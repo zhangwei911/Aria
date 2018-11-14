@@ -76,7 +76,7 @@ abstract class AbsTaskQueue<TASK extends AbsTask, TASK_ENTITY extends AbsTaskEnt
         int state = task.getState();
         if (task.isRunning() || (state != IEntity.STATE_COMPLETE
             && state != IEntity.STATE_CANCEL)) {
-          task.stop();
+          task.stop(TaskSchedulerType.TYPE_STOP_NOT_NEXT);
         }
       }
     }

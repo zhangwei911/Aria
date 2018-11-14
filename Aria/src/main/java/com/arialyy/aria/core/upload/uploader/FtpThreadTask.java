@@ -15,6 +15,9 @@
  */
 package com.arialyy.aria.core.upload.uploader;
 
+import aria.apache.commons.net.ftp.FTPClient;
+import aria.apache.commons.net.ftp.FTPReply;
+import aria.apache.commons.net.ftp.OnFtpInputStreamListener;
 import com.arialyy.aria.core.common.StateConstance;
 import com.arialyy.aria.core.common.SubThreadConfig;
 import com.arialyy.aria.core.common.ftp.AbsFtpThreadTask;
@@ -27,9 +30,6 @@ import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.BufferedRandomAccessFile;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import org.apache.commons.net.ftp.FTPClient;
-import org.apache.commons.net.ftp.FTPReply;
-import org.apache.commons.net.ftp.OnFtpInputStreamListener;
 
 /**
  * Created by Aria.Lao on 2017/7/28.

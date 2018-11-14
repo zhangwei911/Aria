@@ -1,6 +1,6 @@
 package com.arialyy.aria.core.common.ftp;
 
-import com.arialyy.aria.util.ALog;
+import aria.apache.commons.net.ftp.FTPSClient;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -10,7 +10,6 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSessionContext;
 import javax.net.ssl.SSLSocket;
-import org.apache.commons.net.ftp.FTPSClient;
 
 public class SSLSessionReuseFTPSClient extends FTPSClient {
 
@@ -40,7 +39,6 @@ public class SSLSessionReuseFTPSClient extends FTPSClient {
               String.valueOf(socket.getPort())).toLowerCase(Locale.ROOT), session);
           method.invoke(cache, String.format("%s:%s", socket.getInetAddress().getHostAddress(),
               String.valueOf(socket.getPort())).toLowerCase(Locale.ROOT), session);
-          ALog.d("tag", "GGGG");
         } catch (NoSuchFieldException e) {
           throw new IOException(e);
         } catch (Exception e) {

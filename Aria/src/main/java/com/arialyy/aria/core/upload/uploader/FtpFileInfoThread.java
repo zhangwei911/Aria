@@ -15,6 +15,7 @@
  */
 package com.arialyy.aria.core.upload.uploader;
 
+import aria.apache.commons.net.ftp.FTPFile;
 import com.arialyy.aria.core.common.ftp.AbsFtpInfoThread;
 import com.arialyy.aria.core.common.CompleteInfo;
 import com.arialyy.aria.core.common.OnFileInfoCallback;
@@ -25,7 +26,6 @@ import com.arialyy.aria.core.upload.UploadTaskEntity;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.DbHelper;
 import java.util.ArrayList;
-import org.apache.commons.net.ftp.FTPFile;
 
 /**
  * Created by Aria.Lao on 2017/9/26.

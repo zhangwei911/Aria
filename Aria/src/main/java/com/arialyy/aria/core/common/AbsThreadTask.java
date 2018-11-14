@@ -15,6 +15,7 @@
  */
 package com.arialyy.aria.core.common;
 
+import android.os.Process;
 import com.arialyy.aria.core.AriaManager;
 import com.arialyy.aria.core.inf.AbsNormalEntity;
 import com.arialyy.aria.core.inf.AbsTaskEntity;
@@ -74,6 +75,7 @@ public abstract class AbsThreadTask<ENTITY extends AbsNormalEntity, TASK_ENTITY 
 
   private Thread mConfigThread = new Thread(new Runnable() {
     @Override public void run() {
+      Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
       final long currentTemp = mChildCurrentLocation;
       writeConfig(false, currentTemp);
     }
@@ -460,6 +462,7 @@ public abstract class AbsThreadTask<ENTITY extends AbsNormalEntity, TASK_ENTITY 
 
   @Override public AbsThreadTask call() throws Exception {
     isInterrupted = false;
+    Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
     return this;
   }
 }

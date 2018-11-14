@@ -47,7 +47,7 @@ public class ErrorHelp {
    */
   private static String getLogPath() {
     String path = String.format("%slog/AriaCrash_%s.log", CommonUtil.getAppPath(AriaManager.APP),
-        getData("yyyy-MM-dd_HH:mm:ss"));
+        getData("yyyy-MM-dd_HH_mm_ss"));
 
     File log = new File(path);
     if (!log.getParentFile().exists()) {
@@ -76,7 +76,11 @@ public class ErrorHelp {
     stringBuffer.append("\n\n");
     PrintWriter writer = null;
     try {
-      writer = new PrintWriter(new FileWriter(getLogPath(), true));
+      File file = new File(getLogPath());
+      if(!file.exists()){
+        CommonUtil.createFile(file.getPath());
+      }
+      writer = new PrintWriter(new FileWriter(file.getPath(), true));
       writer.append(stringBuffer);
       writer.flush();
     } catch (Exception e) {

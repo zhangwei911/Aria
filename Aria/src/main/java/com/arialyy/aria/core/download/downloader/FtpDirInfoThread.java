@@ -15,6 +15,7 @@
  */
 package com.arialyy.aria.core.download.downloader;
 
+import aria.apache.commons.net.ftp.FTPFile;
 import com.arialyy.aria.core.FtpUrlEntity;
 import com.arialyy.aria.core.common.CompleteInfo;
 import com.arialyy.aria.core.common.OnFileInfoCallback;
@@ -27,7 +28,6 @@ import com.arialyy.aria.core.inf.AbsTaskEntity;
 import com.arialyy.aria.util.CommonUtil;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
-import org.apache.commons.net.ftp.FTPFile;
 
 /**
  * Created by Aria.Lao on 2017/7/25.

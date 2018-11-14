@@ -15,6 +15,7 @@
  */
 package com.arialyy.aria.core.download.downloader;
 
+import android.os.Process;
 import android.text.TextUtils;
 import com.arialyy.aria.core.AriaManager;
 import com.arialyy.aria.core.common.CompleteInfo;
@@ -59,6 +60,7 @@ class HttpFileInfoThread implements Runnable {
   }
 
   @Override public void run() {
+    Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
     HttpURLConnection conn = null;
     try {
       URL url = new URL(CommonUtil.convertUrl(mEntity.getUrl()));
@@ -144,7 +146,7 @@ class HttpFileInfoThread implements Runnable {
           if (info.startsWith("filename") && info.contains("=")) {
             String[] temp = info.split("=");
             if (temp.length > 1) {
-              String newName = URLDecoder.decode(temp[1], "utf-8");
+              String newName = URLDecoder.decode(temp[1], "utf-8").replaceAll("\"", "");
               mEntity.setServerFileName(newName);
               renameFile(newName);
               break;
@@ -191,11 +193,13 @@ class HttpFileInfoThread implements Runnable {
     } else if (code == HttpURLConnection.HTTP_MOVED_TEMP
         || code == HttpURLConnection.HTTP_MOVED_PERM
         || code == HttpURLConnection.HTTP_SEE_OTHER
+        || code == HttpURLConnection.HTTP_CREATED // 201 跳转
         || code == 307) {
       handleUrlReTurn(conn, conn.getHeaderField("Location"));
     } else {
       failDownload(new AriaIOException(TAG,
-          String.format("任务下载失败，errorCode：%s, url: %s", code, mEntity.getUrl())), true);
+          String.format("任务下载失败，errorCode：%s, errorMsg: %s, url: %s", code,
+              conn.getResponseMessage(), mEntity.getUrl())), true);
     }
     if (end) {
       mTaskEntity.setChunked(isChunked);

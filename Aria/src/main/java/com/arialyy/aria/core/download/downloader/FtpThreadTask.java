@@ -15,6 +15,8 @@
  */
 package com.arialyy.aria.core.download.downloader;
 
+import aria.apache.commons.net.ftp.FTPClient;
+import aria.apache.commons.net.ftp.FTPReply;
 import com.arialyy.aria.core.common.StateConstance;
 import com.arialyy.aria.core.common.SubThreadConfig;
 import com.arialyy.aria.core.common.ftp.AbsFtpThreadTask;
@@ -32,8 +34,6 @@ import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
-import org.apache.commons.net.ftp.FTPClient;
-import org.apache.commons.net.ftp.FTPReply;
 
 /**
  * Created by Aria.Lao on 2017/7/24.

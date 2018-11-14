@@ -14,4 +14,4 @@ dependencies {
   compile project(':AriaAnnotations')
 }
 
-//apply from: 'bintray-release.gradle'
+apply from: 'bintray-release.gradle'

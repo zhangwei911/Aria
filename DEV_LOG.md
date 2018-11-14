@@ -9,6 +9,11 @@
       }
       ```
      - fix bug https://github.com/AriaLyy/Aria/issues/322
+     - 新增201 重定向支持 https://github.com/AriaLyy/Aria/issues/318
+     - 修复使用`useServerFileName(true)`中含有`"`导致的文件后缀名错误问题
+     - 优化logcat日志提示
+     - 修改下载线程的优先级为`Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);`
+     - fix bug https://github.com/AriaLyy/Aria/issues/319
   + v_3.5.1
     - 优化`taskExists`方法
     - 添加`post`参数请求支持

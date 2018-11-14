@@ -54,14 +54,17 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.net.URLEncoder;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -352,25 +355,25 @@ public class CommonUtil {
   public static String convertUrl(String url) {
     Uri uri = Uri.parse(url);
     url = uri.toString();
-    //if (hasDoubleCharacter(url)) {
-    //  //预先处理空格，URLEncoder只会把空格转换为+
-    //  url = url.replaceAll(" ", "%20");
-    //  //匹配双字节字符(包括汉字在内)
-    //  String regex = Regular.REG_DOUBLE_CHAR_AND_SPACE;
-    //  Pattern p = Pattern.compile(regex);
-    //  Matcher m = p.matcher(url);
-    //  Set<String> strs = new HashSet<>();
-    //  while (m.find()) {
-    //    strs.add(m.group());
-    //  }
-    //  try {
-    //    for (String str : strs) {
-    //      url = url.replaceAll(str, URLEncoder.encode(str, "UTF-8"));
-    //    }
-    //  } catch (UnsupportedEncodingException e) {
-    //    e.printStackTrace();
-    //  }
-    //}
+    if (hasDoubleCharacter(url)) {
+      //预先处理空格，URLEncoder只会把空格转换为+
+      url = url.replaceAll(" ", "%20");
+      //匹配双字节字符(包括汉字在内)
+      String regex = Regular.REG_DOUBLE_CHAR_AND_SPACE;
+      Pattern p = Pattern.compile(regex);
+      Matcher m = p.matcher(url);
+      Set<String> strs = new HashSet<>();
+      while (m.find()) {
+        strs.add(m.group());
+      }
+      try {
+        for (String str : strs) {
+          url = url.replaceAll(str, URLEncoder.encode(str, "UTF-8"));
+        }
+      } catch (UnsupportedEncodingException e) {
+        e.printStackTrace();
+      }
+    }
     return url;
   }
 

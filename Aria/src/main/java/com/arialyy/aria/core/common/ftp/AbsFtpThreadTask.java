@@ -16,6 +16,10 @@
 package com.arialyy.aria.core.common.ftp;
 
 import android.text.TextUtils;
+import aria.apache.commons.net.ftp.FTP;
+import aria.apache.commons.net.ftp.FTPClient;
+import aria.apache.commons.net.ftp.FTPReply;
+import aria.apache.commons.net.ftp.FTPSClient;
 import com.arialyy.aria.core.FtpUrlEntity;
 import com.arialyy.aria.core.common.AbsThreadTask;
 import com.arialyy.aria.core.common.ProtocolType;
@@ -30,10 +34,6 @@ import com.arialyy.aria.util.SSLContextUtil;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import javax.net.ssl.SSLContext;
-import org.apache.commons.net.ftp.FTP;
-import org.apache.commons.net.ftp.FTPClient;
-import org.apache.commons.net.ftp.FTPReply;
-import org.apache.commons.net.ftp.FTPSClient;
 
 /**
  * Created by lyy on 2017/9/26.

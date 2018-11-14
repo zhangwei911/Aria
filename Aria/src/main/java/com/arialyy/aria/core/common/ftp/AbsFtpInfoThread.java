@@ -15,7 +15,13 @@
  */
 package com.arialyy.aria.core.common.ftp;
 
+import android.os.Process;
 import android.text.TextUtils;
+import aria.apache.commons.net.ftp.FTP;
+import aria.apache.commons.net.ftp.FTPClient;
+import aria.apache.commons.net.ftp.FTPFile;
+import aria.apache.commons.net.ftp.FTPReply;
+import aria.apache.commons.net.ftp.FTPSClient;
 import com.arialyy.aria.core.AriaManager;
 import com.arialyy.aria.core.FtpUrlEntity;
 import com.arialyy.aria.core.common.OnFileInfoCallback;
@@ -37,11 +43,6 @@ import java.net.UnknownHostException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.net.ssl.SSLContext;
-import org.apache.commons.net.ftp.FTP;
-import org.apache.commons.net.ftp.FTPClient;
-import org.apache.commons.net.ftp.FTPFile;
-import org.apache.commons.net.ftp.FTPReply;
-import org.apache.commons.net.ftp.FTPSClient;
 
 /**
  * Created by Aria.Lao on 2017/7/25.
@@ -78,6 +79,7 @@ public abstract class AbsFtpInfoThread<ENTITY extends AbsEntity, TASK_ENTITY ext
   protected abstract String setRemotePath();
 
   @Override public void run() {
+    Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
     FTPClient client = null;
     try {
       client = createFtpClient();

@@ -263,7 +263,6 @@ abstract class AbsSchedulers<TASK_ENTITY extends AbsTaskEntity, TASK extends Abs
     if (!task.needRetry || task.isStop() || task.isCancel()) {
       callback(FAIL, task);
       mQueue.removeTaskFormQueue(task.getKey());
-      ALog.d(TAG, "fail_next");
       startNextTask(task);
       return;
     }
@@ -287,7 +286,6 @@ abstract class AbsSchedulers<TASK_ENTITY extends AbsTaskEntity, TASK extends Abs
       callback(FAIL, task);
       mQueue.removeTaskFormQueue(task.getKey());
       startNextTask(task);
-      ALog.d(TAG, "retry_next");
       TEManager.getInstance().removeTEntity(task.getKey());
       return;
     }
@@ -306,7 +304,6 @@ abstract class AbsSchedulers<TASK_ENTITY extends AbsTaskEntity, TASK extends Abs
         } else {
           mQueue.removeTaskFormQueue(task.getKey());
           startNextTask(task);
-          ALog.d(TAG, "retry_next_1");
           TEManager.getInstance().removeTEntity(task.getKey());
         }
       }
@@ -324,7 +321,7 @@ abstract class AbsSchedulers<TASK_ENTITY extends AbsTaskEntity, TASK extends Abs
     TASK newTask = mQueue.getNextTask();
     if (newTask == null) {
       if (mQueue.getCurrentExePoolNum() == 0) {
-        ALog.i(TAG, "没有下一任务");
+        ALog.i(TAG, "没有等待中的任务");
       }
       return;
     }

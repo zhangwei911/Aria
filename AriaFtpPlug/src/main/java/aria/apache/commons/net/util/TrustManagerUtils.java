@@ -19,9 +19,12 @@ package aria.apache.commons.net.util;
 
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
+import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 
+import javax.net.ssl.KeyManager;
+import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509TrustManager;
 
@@ -92,7 +95,7 @@ public final class TrustManagerUtils {
    * Return the default TrustManager provided by the JVM.
    * <p>
    * This should be the same as the default used by
-   * {@link javax.net.ssl.SSLContext#init(javax.net.ssl.KeyManager[], javax.net.ssl.TrustManager[], * java.security.SecureRandom)
+   * {@link javax.net.ssl.SSLContext#init(KeyManager[], javax.net.ssl.TrustManager[], SecureRandom)}
    * SSLContext#init(KeyManager[], TrustManager[], SecureRandom)}
    * when the TrustManager parameter is set to {@code null}
    *

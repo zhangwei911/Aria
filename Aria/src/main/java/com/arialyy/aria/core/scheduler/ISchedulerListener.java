@@ -61,7 +61,7 @@ public interface ISchedulerListener<TASK extends ITask> {
   /**
    * 任务失败
    *
-   * @deprecated @see{{@link #onTaskFail(ITask, Exception)}}
+   * @deprecated {@link #onTaskFail(ITask, Exception)}
    */
   @Deprecated
   void onTaskFail(TASK task);
