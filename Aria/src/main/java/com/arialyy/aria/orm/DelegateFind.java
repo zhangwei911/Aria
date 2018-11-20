@@ -356,6 +356,26 @@ class DelegateFind extends AbsDelegate {
   }
 
   /**
+   * 模糊查寻数据
+   */
+  <T extends DbEntity> List<T> findDataByFuzzy(SQLiteDatabase db, Class<T> clazz, String conditions) {
+    db = checkDb(db);
+    if(TextUtils.isEmpty(conditions)){
+      throw new IllegalArgumentException("sql语句表达式不能为null或\"\"");
+    }
+    if(!conditions.toUpperCase().contains("LIKE")){
+      throw new IllegalArgumentException("sql语句表达式未包含LIEK");
+    }
+    String sql =
+            "SELECT rowid, * FROM " + CommonUtil.getClassName(clazz) + " WHERE "+conditions;
+    print(FIND_DATA, sql);
+    Cursor cursor = db.rawQuery(sql, null);
+    List<T> data = cursor.getCount() > 0 ? newInstanceEntity(clazz, cursor) : null;
+    closeCursor(cursor);
+    close(db);
+    return data;
+  }
+  /**
    * 查找表的所有数据
    */
   <T extends DbEntity> List<T> findAllData(SQLiteDatabase db, Class<T> clazz) {
