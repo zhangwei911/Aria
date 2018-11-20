@@ -16,10 +16,9 @@
     <!--android:name=".test.TestActivity"-->
     <!--android:name=".test.AnyRunActivity"-->
     <!--android:name=".download.group.DownloadGroupActivity"-->
-    <!--android:name=".test.TestGroupActivity"-->
         <!--android:name=".MainActivity"-->
     <activity
-    android:name="com.arialyy.simple.test.AnyRunActivity"
+    android:name=".test.TestGroupActivity"
         android:label="@string/app_name">
       <intent-filter>
         <action android:name="android.intent.action.MAIN"/>

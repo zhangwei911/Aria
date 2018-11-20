@@ -28,6 +28,7 @@ import com.arialyy.aria.core.queue.UploadTaskQueue;
 import com.arialyy.aria.core.upload.UploadEntity;
 import com.arialyy.aria.core.upload.UploadTaskEntity;
 import com.arialyy.aria.orm.DbEntity;
+import com.arialyy.aria.util.ALog;
 import java.util.List;
 
 /**
@@ -99,6 +100,10 @@ public class CancelAllCmd<T extends AbsTaskEntity> extends AbsNormalCmd<T> {
   }
 
   private void remove(AbsTaskEntity te) {
+    if (te == null){
+      ALog.w(TAG, "取消任务失败，任务为空");
+      return;
+    }
     if (te instanceof DownloadTaskEntity) {
       mQueue = DownloadTaskQueue.getInstance();
     } else if (te instanceof UploadTaskEntity) {
