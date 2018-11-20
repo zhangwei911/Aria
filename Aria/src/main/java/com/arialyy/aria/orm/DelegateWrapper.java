@@ -119,6 +119,13 @@ public class DelegateWrapper {
   }
 
   /**
+   * 模糊查寻数据
+   */
+  <T extends DbEntity> List<T> findDataByFuzzy(Class<T> clazz, String conditions) {
+    return mDManager.getDelegate(DelegateFind.class).findDataByFuzzy(mDb, clazz, conditions);
+  }
+
+  /**
    * 通过rowId判断数据是否存在
    */
   <T extends DbEntity> boolean isExist(Class<T> clazz, long rowId) {

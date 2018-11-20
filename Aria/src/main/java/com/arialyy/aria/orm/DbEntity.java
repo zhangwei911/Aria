@@ -103,6 +103,19 @@ public abstract class DbEntity {
   }
 
   /**
+   * 模糊查询一组数据
+   * <code>
+   * DownloadEntity.findDatas(DownloadEntity.class, "downloadUrl like http://");
+   * </code>
+   *
+   * @return 没有数据返回null
+   */
+  public static <T extends DbEntity> List<T> findDataByFuzzy(Class<T> clazz, String conditions) {
+    DelegateWrapper util = DelegateWrapper.getInstance();
+    return util.findDataByFuzzy(clazz, conditions);
+  }
+
+  /**
    * 查询一行数据
    * <code>
    * DownloadEntity.findFirst(DownloadEntity.class, "downloadUrl=?", downloadUrl);
