@@ -35,7 +35,7 @@ import javax.lang.model.element.Modifier;
  * Created by lyy on 2017/9/6.
  * 各类注解统计技术类
  */
-final class CountFiler {
+@Deprecated final class CountFiler {
   private Filer mFiler;
   private ParamObtainUtil mPbUtil;
 

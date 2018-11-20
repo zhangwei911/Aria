@@ -42,11 +42,8 @@ public class CancelAllCmd<T extends AbsTaskEntity> extends AbsNormalCmd<T> {
    */
   public boolean removeFile = false;
 
-  /**
-   * @param targetName 产生任务的对象名
-   */
-  CancelAllCmd(String targetName, T entity, int taskType) {
-    super(targetName, entity, taskType);
+  CancelAllCmd(T entity, int taskType) {
+    super(entity, taskType);
   }
 
   @Override public void executeCmd() {

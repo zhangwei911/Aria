@@ -17,6 +17,7 @@ package com.arialyy.aria.core.download.downloader;
 
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.inf.IDownloadListener;
+import com.arialyy.aria.exception.BaseException;
 
 /**
  * Created by Aria.Lao on 2017/7/20.
@@ -54,7 +55,7 @@ public interface IDownloadGroupListener extends IDownloadListener {
   /**
    * 子任务下载失败
    */
-  void onSubFail(DownloadEntity subEntity);
+  void onSubFail(DownloadEntity subEntity, BaseException e);
 
   /**
    * 子任务取消下载

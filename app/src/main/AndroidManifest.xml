@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.arialyy.simple">
 
   <uses-permission android:name="android.permission.INTERNET"/>
@@ -12,13 +13,13 @@
       android:icon="@mipmap/ic_launcher"
       android:label="@string/app_name"
       android:supportsRtl="true"
-      android:theme="@style/AppTheme.NoActionBar">
-    <!--android:name=".test.TestActivity"-->
-    <!--android:name=".test.AnyRunActivity"-->
+      android:theme="@style/AppTheme.NoActionBar"
+      tools:ignore="GoogleAppIndexingWarning">
+    <!--android:name=".test.TestFTPDirActivity"-->
+    <!--android:name=".test.TestFTPActivity"-->
     <!--android:name=".download.group.DownloadGroupActivity"-->
-        <!--android:name=".MainActivity"-->
     <activity
-    android:name=".test.TestGroupActivity"
+        android:name=".download.SingleTaskActivity"
         android:label="@string/app_name">
       <intent-filter>
         <action android:name="android.intent.action.MAIN"/>
@@ -28,18 +29,17 @@
     </activity>
 
     <activity android:name=".download.DownloadActivity"/>
-    <activity android:name=".download.SingleTaskActivity"/>
+    <!--<activity android:name=".download.SingleTaskActivity"/>-->
     <activity android:name=".download.multi_download.MultiTaskActivity"/>
     <activity android:name=".download.fragment_download.FragmentActivity"/>
     <activity android:name=".download.multi_download.MultiDownloadActivity"/>
     <activity android:name=".download.HighestPriorityActivity"/>
     <activity android:name=".test.TestMutilTaskSysDownload"/>
-    <!--<activity android:name=".download.group.DownloadGroupActivity"/>-->
+    <activity android:name=".download.group.DownloadGroupActivity"/>
     <activity android:name=".download.FtpDownloadActivity"/>
     <activity android:name=".download.group.FTPDirDownloadActivity"/>
     <activity android:name=".upload.HttpUploadActivity"/>
     <activity android:name=".upload.FtpUploadActivity"/>
-    <activity android:name=".download.KotlinDownloadActivity"/>
 
     <service android:name=".download.service_download.DownloadService"/>
   </application>

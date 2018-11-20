@@ -59,9 +59,17 @@ public interface ISchedulerListener<TASK extends ITask> {
   void onTaskCancel(TASK task);
 
   /**
-   * 任务下载失败
+   * 任务失败
+   *
+   * @deprecated {@link #onTaskFail(ITask, Exception)}
    */
+  @Deprecated
   void onTaskFail(TASK task);
+
+  /**
+   * 任务失败
+   */
+  void onTaskFail(TASK task, Exception e);
 
   /**
    * 任务完成

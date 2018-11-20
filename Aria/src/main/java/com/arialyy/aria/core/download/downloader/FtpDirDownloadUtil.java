@@ -19,6 +19,8 @@ import com.arialyy.aria.core.common.CompleteInfo;
 import com.arialyy.aria.core.common.OnFileInfoCallback;
 import com.arialyy.aria.core.download.DownloadGroupTaskEntity;
 import com.arialyy.aria.core.download.DownloadTaskEntity;
+import com.arialyy.aria.exception.BaseException;
+import com.arialyy.aria.exception.TaskException;
 import com.arialyy.aria.util.ErrorHelp;
 import java.util.Set;
 
@@ -51,14 +53,13 @@ public class FtpDirDownloadUtil extends AbsGroupUtil {
           }
         }
 
-        @Override public void onFail(String url, String errorMsg, boolean needRetry) {
+        @Override public void onFail(String url, BaseException e, boolean needRetry) {
           DownloadTaskEntity te = mExeMap.get(url);
           if (te != null) {
             mFailMap.put(url, te);
             mExeMap.remove(url);
           }
-          mListener.onFail(needRetry);
-          ErrorHelp.saveError(TAG, "", errorMsg);
+          mListener.onFail(needRetry, e);
         }
       }).start();
     }

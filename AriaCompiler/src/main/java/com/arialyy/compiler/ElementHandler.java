@@ -142,7 +142,7 @@ class ElementHandler {
   void createProxyFile() {
     try {
       new EventProxyFiler(mFiler, mPbUtil).createEventProxyFile();
-      new CountFiler(mFiler, mPbUtil).createCountFile();
+      //new CountFiler(mFiler, mPbUtil).createCountFile();
     } catch (IOException e) {
       e.printStackTrace();
     }

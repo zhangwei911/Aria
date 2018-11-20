@@ -18,15 +18,8 @@ package com.arialyy.aria.core.inf;
 /**
  * Created by lyy on 2017/6/3.
  */
-public abstract class AbsNormalTask<TASK_ENTITY extends AbsNormalTaskEntity>
-    extends AbsTask<TASK_ENTITY> {
-
-  /**
-   * 暂停任务，并让任务处于等待状态
-   */
-  public void stopAndWait() {
-
-  }
+public abstract class AbsNormalTask<ENTITY extends AbsEntity, TASK_ENTITY extends AbsNormalTaskEntity>
+    extends AbsTask<ENTITY, TASK_ENTITY> {
 
   /**
    * 最高优先级命令，最高优先级命令有以下属性

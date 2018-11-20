@@ -22,6 +22,8 @@ import com.arialyy.aria.core.common.OnFileInfoCallback;
 import com.arialyy.aria.core.download.DownloadGroupTaskEntity;
 import com.arialyy.aria.core.download.DownloadTaskEntity;
 import com.arialyy.aria.core.inf.IEntity;
+import com.arialyy.aria.exception.BaseException;
+import com.arialyy.aria.exception.TaskException;
 import com.arialyy.aria.util.ALog;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
@@ -85,8 +87,8 @@ public class DownloadGroupUtil extends AbsGroupUtil implements IUtil {
     }
 
     if (mExeMap.size() == 0) {
-      ALog.e(TAG, "任务组无可执行任务");
-      mListener.onFail(false);
+      mListener.onFail(false, new TaskException(TAG,
+          String.format("任务组【%s】无可执行任务", mGTEntity.getEntity().getGroupName())));
       return;
     }
     Set<String> keys = mExeMap.keySet();
@@ -133,7 +135,7 @@ public class DownloadGroupUtil extends AbsGroupUtil implements IUtil {
           checkStartFlow();
         }
 
-        @Override public void onFail(String url, String errorMsg, boolean needRetry) {
+        @Override public void onFail(String url, BaseException e, boolean needRetry) {
           if (isStop) return;
           ALog.e(TAG, String.format("任务【%s】初始化失败", url));
           DownloadTaskEntity te = mExeMap.get(url);
@@ -163,9 +165,14 @@ public class DownloadGroupUtil extends AbsGroupUtil implements IUtil {
    */
   private void checkStartFlow() {
     synchronized (DownloadGroupUtil.class) {
+      if (isStop) {
+        closeTimer();
+        return;
+      }
       if (mInitFailNum == mExeNum) {
         closeTimer();
-        mListener.onFail(true);
+        mListener.onFail(true, new TaskException(TAG,
+            String.format("任务组【%s】初始化失败", mGTEntity.getEntity().getGroupName())));
       }
       if (!isStart && mInitCompleteNum + mInitFailNum == mExeNum || !isNeedLoadFileSize) {
         startRunningFlow();

@@ -21,10 +21,14 @@ import com.arialyy.aria.core.AriaManager;
 import com.arialyy.aria.core.command.ICmd;
 import com.arialyy.aria.core.command.normal.CancelCmd;
 import com.arialyy.aria.core.command.normal.NormalCmdFactory;
+import com.arialyy.aria.core.common.TaskRecord;
+import com.arialyy.aria.core.common.http.PostDelegate;
+import com.arialyy.aria.core.download.DownloadGroupEntity;
 import com.arialyy.aria.core.download.DownloadGroupTaskEntity;
 import com.arialyy.aria.core.download.DownloadTaskEntity;
 import com.arialyy.aria.core.manager.TEManager;
 import com.arialyy.aria.core.upload.UploadTaskEntity;
+import com.arialyy.aria.orm.DbEntity;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
 import java.util.ArrayList;
@@ -34,8 +38,8 @@ import java.util.List;
  * Created by AriaL on 2017/7/3.
  */
 public abstract class AbsTarget<TARGET extends AbsTarget, ENTITY extends AbsEntity, TASK_ENTITY extends AbsTaskEntity>
-    implements ITarget<TARGET> {
-  protected String TAG ;
+    implements ITarget {
+  protected String TAG;
   protected ENTITY mEntity;
   protected TASK_ENTITY mTaskEntity;
   protected String mTargetName;
@@ -64,9 +68,26 @@ public abstract class AbsTarget<TARGET extends AbsTarget, ENTITY extends AbsEnti
       ALog.d("AbsTarget", "任务正在下载，即将删除任务");
       cancel();
     } else {
-      mEntity.deleteData();
+      if (mEntity instanceof AbsNormalEntity) {
+        TaskRecord record =
+            DbEntity.findFirst(TaskRecord.class, "TaskRecord.filePath=?", mTaskEntity.getKey());
+        if (record != null) {
+          CommonUtil.delTaskRecord(record, mTaskEntity.isRemoveFile(), (AbsNormalEntity) mEntity);
+        } else {
+          mEntity.deleteData();
+        }
+      } else if (mEntity instanceof DownloadGroupEntity) {
+        CommonUtil.delGroupTaskRecord(mTaskEntity.isRemoveFile(), ((DownloadGroupEntity) mEntity));
+      }
       TEManager.getInstance().removeTEntity(mEntity.getKey());
     }
+  }
+
+  /**
+   * 获取任务实体
+   */
+  public TASK_ENTITY getTaskEntity() {
+    return mTaskEntity;
   }
 
   /**
@@ -74,7 +95,6 @@ public abstract class AbsTarget<TARGET extends AbsTarget, ENTITY extends AbsEnti
    *
    * @return 该任务进度
    */
-  @Override
   public long getCurrentProgress() {
     return mEntity == null ? -1 : mEntity.getCurrentProgress();
   }
@@ -84,7 +104,7 @@ public abstract class AbsTarget<TARGET extends AbsTarget, ENTITY extends AbsEnti
    *
    * @return 文件大小
    */
-  @Override public long getSize() {
+  public long getSize() {
     return mEntity == null ? 0 : mEntity.getFileSize();
   }
 
@@ -93,7 +113,7 @@ public abstract class AbsTarget<TARGET extends AbsTarget, ENTITY extends AbsEnti
    *
    * @return 文件大小{@code xxx mb}
    */
-  @Override public String getConvertSize() {
+  public String getConvertSize() {
     return mEntity == null ? "0b" : CommonUtil.formatFileSize(mEntity.getFileSize());
   }
 
@@ -129,7 +149,6 @@ public abstract class AbsTarget<TARGET extends AbsTarget, ENTITY extends AbsEnti
    *
    * @return {@link IEntity}
    */
-  @Override
   public int getTaskState() {
     return mEntity.getState();
   }
@@ -139,7 +158,7 @@ public abstract class AbsTarget<TARGET extends AbsTarget, ENTITY extends AbsEnti
    *
    * @return 返回任务进度
    */
-  @Override public int getPercent() {
+  public int getPercent() {
     if (mEntity == null) {
       ALog.e("AbsTarget", "下载管理器中没有该任务");
       return 0;
@@ -179,13 +198,27 @@ public abstract class AbsTarget<TARGET extends AbsTarget, ENTITY extends AbsEnti
   }
 
   /**
+   * 任务是否在执行
+   *
+   * @return {@code true} 任务正在执行
+   */
+  public abstract boolean isRunning();
+
+  /**
+   * 任务是否存在
+   *
+   * @return {@code true} 任务存在
+   */
+  public abstract boolean taskExists();
+
+  /**
    * 开始任务
    */
   @Override public void start() {
     if (checkEntity()) {
       AriaManager.getInstance(AriaManager.APP)
-          .setCmd(CommonUtil.createNormalCmd(mTargetName, mTaskEntity, NormalCmdFactory.TASK_START,
-              checkTaskType()))
+          .setCmd(
+              CommonUtil.createNormalCmd(mTaskEntity, NormalCmdFactory.TASK_START, checkTaskType()))
           .exe();
     }
   }
@@ -204,8 +237,8 @@ public abstract class AbsTarget<TARGET extends AbsTarget, ENTITY extends AbsEnti
   @Override public void stop() {
     if (checkEntity()) {
       AriaManager.getInstance(AriaManager.APP)
-          .setCmd(CommonUtil.createNormalCmd(mTargetName, mTaskEntity, NormalCmdFactory.TASK_STOP,
-              checkTaskType()))
+          .setCmd(
+              CommonUtil.createNormalCmd(mTaskEntity, NormalCmdFactory.TASK_STOP, checkTaskType()))
           .exe();
     }
   }
@@ -216,8 +249,8 @@ public abstract class AbsTarget<TARGET extends AbsTarget, ENTITY extends AbsEnti
   @Override public void resume() {
     if (checkEntity()) {
       AriaManager.getInstance(AriaManager.APP)
-          .setCmd(CommonUtil.createNormalCmd(mTargetName, mTaskEntity, NormalCmdFactory.TASK_START,
-              checkTaskType()))
+          .setCmd(
+              CommonUtil.createNormalCmd(mTaskEntity, NormalCmdFactory.TASK_START, checkTaskType()))
           .exe();
     }
   }
@@ -228,7 +261,7 @@ public abstract class AbsTarget<TARGET extends AbsTarget, ENTITY extends AbsEnti
   @Override public void cancel() {
     if (checkEntity()) {
       AriaManager.getInstance(AriaManager.APP)
-          .setCmd(CommonUtil.createNormalCmd(mTargetName, mTaskEntity, NormalCmdFactory.TASK_CANCEL,
+          .setCmd(CommonUtil.createNormalCmd(mTaskEntity, NormalCmdFactory.TASK_CANCEL,
               checkTaskType()))
           .exe();
     }
@@ -242,10 +275,8 @@ public abstract class AbsTarget<TARGET extends AbsTarget, ENTITY extends AbsEnti
       List<ICmd> cmds = new ArrayList<>();
       int taskType = checkTaskType();
       cmds.add(
-          CommonUtil.createNormalCmd(mTargetName, mTaskEntity, NormalCmdFactory.TASK_STOP,
-              taskType));
-      cmds.add(CommonUtil.createNormalCmd(mTargetName, mTaskEntity, NormalCmdFactory.TASK_START,
-          taskType));
+          CommonUtil.createNormalCmd(mTaskEntity, NormalCmdFactory.TASK_STOP, taskType));
+      cmds.add(CommonUtil.createNormalCmd(mTaskEntity, NormalCmdFactory.TASK_START, taskType));
       AriaManager.getInstance(AriaManager.APP).setCmds(cmds).exe();
     }
   }
@@ -258,8 +289,9 @@ public abstract class AbsTarget<TARGET extends AbsTarget, ENTITY extends AbsEnti
    */
   public void cancel(boolean removeFile) {
     if (checkEntity()) {
-      CancelCmd cancelCmd = (CancelCmd) CommonUtil.createNormalCmd(mTargetName, mTaskEntity,
-          NormalCmdFactory.TASK_CANCEL, checkTaskType());
+      CancelCmd cancelCmd =
+          (CancelCmd) CommonUtil.createNormalCmd(mTaskEntity, NormalCmdFactory.TASK_CANCEL,
+              checkTaskType());
       cancelCmd.removeFile = removeFile;
       AriaManager.getInstance(AriaManager.APP).setCmd(cancelCmd).exe();
     }

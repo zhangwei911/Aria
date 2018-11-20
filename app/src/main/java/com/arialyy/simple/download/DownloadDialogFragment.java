@@ -17,7 +17,7 @@ import com.arialyy.simple.base.BaseDialog;
 import com.arialyy.simple.databinding.DialogFragmentDownloadBinding;
 
 /**
- * Created by Aria.Lao on 2017/8/8.
+ * Created by lyy on 2017/8/8.
  */
 @SuppressLint("ValidFragment") public class DownloadDialogFragment
     extends BaseDialog<DialogFragmentDownloadBinding> {

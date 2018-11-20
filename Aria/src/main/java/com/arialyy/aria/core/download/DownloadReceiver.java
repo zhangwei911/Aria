@@ -47,12 +47,12 @@ public class DownloadReceiver extends AbsReceiver {
 
   /**
    * 设置最大下载速度，单位：kb
-   * 该方法为实验性功能，清不要轻易在生产环境中使用。
    *
    * @param maxSpeed 为0表示不限速
    */
-  @Deprecated public void setMaxSpeed(int maxSpeed) {
+  public DownloadReceiver setMaxSpeed(int maxSpeed) {
     AriaManager.getInstance(AriaManager.APP).getDownloadConfig().setMaxSpeed(maxSpeed);
+    return this;
   }
 
   /**
@@ -160,15 +160,17 @@ public class DownloadReceiver extends AbsReceiver {
       ALog.e(TAG, String.format("【%s】观察者为空", targetName));
       return;
     }
-    Set<String> dCounter = ProxyHelper.getInstance().downloadCounter;
-    Set<String> dgCounter = ProxyHelper.getInstance().downloadGroupCounter;
-    Set<String> dgsCounter = ProxyHelper.getInstance().downloadGroupSubCounter;
-    if (dCounter != null && dCounter.contains(targetName)) {
-      DownloadSchedulers.getInstance().register(obj);
-    }
-    if ((dgCounter != null && dgCounter.contains(targetName)) || (dgsCounter != null
-        && dgsCounter.contains(targetName))) {
-      DownloadGroupSchedulers.getInstance().register(obj);
+    Set<Integer> set = ProxyHelper.getInstance().checkProxyType(obj.getClass());
+    if (set != null && !set.isEmpty()) {
+      for (Integer type : set) {
+        if (type == ProxyHelper.PROXY_TYPE_DOWNLOAD) {
+          DownloadSchedulers.getInstance().register(obj);
+        } else if (type == ProxyHelper.PROXY_TYPE_DOWNLOAD_GROUP) {
+          DownloadGroupSchedulers.getInstance().register(obj);
+        }
+      }
+    } else {
+      ALog.w(TAG, "没有Aria的注解方法");
     }
   }
 
@@ -204,15 +206,15 @@ public class DownloadReceiver extends AbsReceiver {
       ALog.e(TAG, String.format("【%s】观察者为空", targetName));
       return;
     }
-    Set<String> dCounter = ProxyHelper.getInstance().downloadCounter;
-    Set<String> dgCounter = ProxyHelper.getInstance().downloadGroupCounter;
-    Set<String> dgsCounter = ProxyHelper.getInstance().downloadGroupSubCounter;
-    if (dCounter != null && dCounter.contains(targetName)) {
-      DownloadSchedulers.getInstance().unRegister(obj);
-    }
-    if (dgCounter != null && dgCounter.contains(targetName) || (dgsCounter != null
-        && dgsCounter.contains(targetName))) {
-      DownloadGroupSchedulers.getInstance().unRegister(obj);
+    Set<Integer> set = ProxyHelper.getInstance().mProxyCache.get(obj.getClass().getName());
+    if (set != null) {
+      for (Integer integer : set) {
+        if (integer == ProxyHelper.PROXY_TYPE_DOWNLOAD) {
+          DownloadSchedulers.getInstance().unRegister(obj);
+        } else if (integer == ProxyHelper.PROXY_TYPE_DOWNLOAD_GROUP) {
+          DownloadGroupSchedulers.getInstance().unRegister(obj);
+        }
+      }
     }
   }
 
@@ -286,7 +288,7 @@ public class DownloadReceiver extends AbsReceiver {
    * @return {@code true}存在，{@code false} 不存在
    */
   public boolean taskExists(String downloadUrl) {
-    return DownloadEntity.findFirst(DownloadEntity.class, "url=?", downloadUrl) != null;
+    return DbEntity.checkDataExist(DownloadTaskEntity.class, "url=?", downloadUrl);
   }
 
   /**
@@ -299,8 +301,7 @@ public class DownloadReceiver extends AbsReceiver {
       return false;
     }
     String groupName = CommonUtil.getMd5Code(urls);
-    return DownloadGroupEntity.findFirst(DownloadGroupEntity.class, "groupName=?", groupName)
-        != null;
+    return DbEntity.checkDataExist(DownloadGroupEntity.class, "groupName=?", groupName);
   }
 
   /**
@@ -368,7 +369,7 @@ public class DownloadReceiver extends AbsReceiver {
   public void stopAllTask() {
     AriaManager.getInstance(AriaManager.APP)
         .setCmd(NormalCmdFactory.getInstance()
-            .createCmd(targetName, new DownloadTaskEntity(), NormalCmdFactory.TASK_STOP_ALL,
+            .createCmd(new DownloadTaskEntity(), NormalCmdFactory.TASK_STOP_ALL,
                 ICmd.TASK_TYPE_DOWNLOAD))
         .exe();
   }
@@ -381,7 +382,7 @@ public class DownloadReceiver extends AbsReceiver {
   public void resumeAllTask() {
     AriaManager.getInstance(AriaManager.APP)
         .setCmd(NormalCmdFactory.getInstance()
-            .createCmd(targetName, new DownloadTaskEntity(), NormalCmdFactory.TASK_RESUME_ALL,
+            .createCmd(new DownloadTaskEntity(), NormalCmdFactory.TASK_RESUME_ALL,
                 ICmd.TASK_TYPE_DOWNLOAD))
         .exe();
   }
@@ -395,7 +396,7 @@ public class DownloadReceiver extends AbsReceiver {
   public void removeAllTask(boolean removeFile) {
     final AriaManager ariaManager = AriaManager.getInstance(AriaManager.APP);
     CancelAllCmd cancelCmd =
-        (CancelAllCmd) CommonUtil.createNormalCmd(targetName, new DownloadTaskEntity(),
+        (CancelAllCmd) CommonUtil.createNormalCmd(new DownloadTaskEntity(),
             NormalCmdFactory.TASK_CANCEL_ALL, ICmd.TASK_TYPE_DOWNLOAD);
     cancelCmd.removeFile = removeFile;
     ariaManager.setCmd(cancelCmd).exe();

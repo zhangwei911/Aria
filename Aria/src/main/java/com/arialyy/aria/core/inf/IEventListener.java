@@ -15,6 +15,8 @@
  */
 package com.arialyy.aria.core.inf;
 
+import com.arialyy.aria.exception.BaseException;
+
 /**
  * Created by Aria.Lao on 2017/7/18.
  * 基础事件
@@ -58,8 +60,9 @@ public interface IEventListener {
 
   /**
    * 下载失败
+   *
    * @param needRetry 是否需要重试{@code true} 需要
+   * @param e 失败信息
    */
-  void onFail(boolean needRetry);
-
+  void onFail(boolean needRetry, BaseException e);
 }

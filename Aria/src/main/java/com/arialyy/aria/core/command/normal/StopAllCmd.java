@@ -7,11 +7,8 @@ import com.arialyy.aria.core.inf.AbsTaskEntity;
  * 停止所有任务的命令，并清空所有等待队列
  */
 final class StopAllCmd<T extends AbsTaskEntity> extends AbsNormalCmd<T> {
-  /**
-   * @param targetName 产生任务的对象名
-   */
-  StopAllCmd(String targetName, T entity, int taskType) {
-    super(targetName, entity, taskType);
+  StopAllCmd(T entity, int taskType) {
+    super(entity, taskType);
   }
 
   @Override public void executeCmd() {

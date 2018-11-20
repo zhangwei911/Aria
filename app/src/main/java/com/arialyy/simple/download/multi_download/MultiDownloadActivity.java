@@ -117,7 +117,7 @@ public class MultiDownloadActivity extends BaseActivity<ActivityMultiDownloadBin
   }
 
   @DownloadGroup.onWait void groupTaskWait(DownloadGroupTask task) {
-    ALog.d(TAG, String.format("group【%s】wait", task.getTaskName()));
+    ALog.d(TAG, String.format("group【%s】wait---", task.getTaskName()));
     mAdapter.updateState(task.getEntity());
   }
 

@@ -18,8 +18,9 @@ package com.arialyy.aria.core.download;
 import android.support.annotation.CheckResult;
 import android.support.annotation.NonNull;
 import com.arialyy.aria.core.common.RequestEnum;
-import com.arialyy.aria.core.delegate.HttpHeaderDelegate;
-import com.arialyy.aria.core.inf.IHttpHeaderTarget;
+import com.arialyy.aria.core.common.http.HttpHeaderDelegate;
+import com.arialyy.aria.core.common.http.PostDelegate;
+import com.arialyy.aria.core.inf.IHttpHeaderDelegate;
 import java.net.Proxy;
 import java.util.Map;
 
@@ -28,9 +29,8 @@ import java.util.Map;
  * https://github.com/AriaLyy/Aria
  */
 public class DownloadTarget extends BaseNormalTarget<DownloadTarget>
-    implements IHttpHeaderTarget<DownloadTarget> {
-  private HttpHeaderDelegate<DownloadTarget, DownloadEntity, DownloadTaskEntity> mDelegate;
-
+    implements IHttpHeaderDelegate<DownloadTarget> {
+  private HttpHeaderDelegate<DownloadTarget> mHeaderDelegate;
 
   DownloadTarget(DownloadEntity entity, String targetName) {
     this(entity.getUrl(), targetName);
@@ -38,7 +38,14 @@ public class DownloadTarget extends BaseNormalTarget<DownloadTarget>
 
   DownloadTarget(String url, String targetName) {
     initTarget(url, targetName);
-    mDelegate = new HttpHeaderDelegate<>(this, mTaskEntity);
+    mHeaderDelegate = new HttpHeaderDelegate<>(this);
+  }
+
+  /**
+   * Post处理
+   */
+  public PostDelegate asPost() {
+    return new PostDelegate<>(this);
   }
 
   /**
@@ -50,17 +57,6 @@ public class DownloadTarget extends BaseNormalTarget<DownloadTarget>
   @CheckResult
   public DownloadTarget useServerFileName(boolean use) {
     mTaskEntity.setUseServerFileName(use);
-    return this;
-  }
-
-  /**
-   * 设置URL的代理
-   *
-   * @param proxy {@link Proxy}
-   */
-  @CheckResult
-  public DownloadTarget setUrlProxy(Proxy proxy) {
-    mTaskEntity.setProxy(proxy);
     return this;
   }
 
@@ -90,6 +86,21 @@ public class DownloadTarget extends BaseNormalTarget<DownloadTarget>
   }
 
   /**
+   * 设置文件存储路径，如果需要修改新的文件名，修改路径便可。
+   * 如：原文件路径 /mnt/sdcard/test.zip
+   * 如果需要将test.zip改为game.zip，只需要重新设置文件路径为：/mnt/sdcard/game.zip
+   *
+   * @param filePath 路径必须为文件路径，不能为文件夹路径
+   * @param forceDownload {@code true}强制下载，不考虑未见路径是否被占用
+   */
+  @CheckResult
+  public DownloadTarget setFilePath(@NonNull String filePath, boolean forceDownload) {
+    mTempFilePath = filePath;
+    this.forceDownload = forceDownload;
+    return this;
+  }
+
+  /**
    * 从header中获取文件描述信息
    */
   public String getContentDisposition() {
@@ -100,18 +111,24 @@ public class DownloadTarget extends BaseNormalTarget<DownloadTarget>
     return HTTP;
   }
 
+  /**
+   * 设置URL的代理
+   *
+   * @param proxy {@link Proxy}
+   */
+  @CheckResult
+  @Override public DownloadTarget setUrlProxy(Proxy proxy) {
+    return mHeaderDelegate.setUrlProxy(proxy);
+  }
+
   @CheckResult
   @Override public DownloadTarget addHeader(@NonNull String key, @NonNull String value) {
-    return mDelegate.addHeader(key, value);
+    return mHeaderDelegate.addHeader(key, value);
   }
 
   @CheckResult
   @Override public DownloadTarget addHeaders(Map<String, String> headers) {
-    return mDelegate.addHeaders(headers);
+    return mHeaderDelegate.addHeaders(headers);
   }
 
-  @CheckResult
-  @Override public DownloadTarget setRequestMode(RequestEnum requestEnum) {
-    return mDelegate.setRequestMode(requestEnum);
-  }
 }

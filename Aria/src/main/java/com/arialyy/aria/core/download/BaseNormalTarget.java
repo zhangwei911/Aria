@@ -86,7 +86,7 @@ abstract class BaseNormalTarget<TARGET extends BaseNormalTarget>
    * @return {@code true}任务存在
    */
   @Override public boolean taskExists() {
-    return DownloadTaskQueue.getInstance().getTask(mEntity.getUrl()) != null;
+    return DownloadTaskQueue.getInstance().getTask(mEntity.getKey()) != null;
   }
 
   /**
@@ -162,11 +162,17 @@ abstract class BaseNormalTarget<TARGET extends BaseNormalTarget>
       }
     }
 
-    //设置文件保存路径，如果新文件路径和就文件路径不同，则修改路径
+    //设置文件保存路径，如果新文件路径和旧文件路径不同，则修改路径
     if (!filePath.equals(mEntity.getDownloadPath())) {
       if (DbEntity.checkDataExist(DownloadEntity.class, "downloadPath=?", filePath)) {
-        ALog.e(TAG, "下载失败，保存路径【" + filePath + "】已经被其它任务占用，请设置其它保存路径");
-        return false;
+        if (!forceDownload) {
+          ALog.e(TAG, "下载失败，保存路径【" + filePath + "】已经被其它任务占用，请设置其它保存路径");
+          return false;
+        }else {
+          ALog.d(TAG, "保存路径【" + filePath + "】已经被其它任务占用，当前任务将覆盖该路径的文件");
+          DbEntity.deleteData(DownloadEntity.class, "downloadPath=?", filePath);
+          mTaskEntity = TEManager.getInstance().getTEntity(DownloadTaskEntity.class, url);
+        }
       }
       File oldFile = new File(mEntity.getDownloadPath());
       File newFile = new File(filePath);
@@ -200,7 +206,7 @@ abstract class BaseNormalTarget<TARGET extends BaseNormalTarget>
       ALog.e(TAG, "下载失败，url【" + url + "】不合法");
       return false;
     }
-    if (!TextUtils.isEmpty(newUrl)){
+    if (!TextUtils.isEmpty(newUrl)) {
       mEntity.setUrl(newUrl);
       mTaskEntity.setUrl(newUrl);
     }

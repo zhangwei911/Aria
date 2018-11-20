@@ -46,13 +46,11 @@ public abstract class AbsNormalCmd<T extends AbsTaskEntity> extends AbsCmd<T> {
   int taskType;
 
   /**
-   * @param targetName 产生任务的对象名
    * @param taskType 下载任务类型{@link ICmd#TASK_TYPE_DOWNLOAD}、{@link ICmd#TASK_TYPE_DOWNLOAD_GROUP}、{@link
    * ICmd#TASK_TYPE_UPLOAD}
    */
-  AbsNormalCmd(String targetName, T entity, int taskType) {
+  AbsNormalCmd(T entity, int taskType) {
     this.taskType = taskType;
-    mTargetName = targetName;
     mTaskEntity = entity;
     TAG = CommonUtil.getClassName(this);
     if (taskType == ICmd.TASK_TYPE_DOWNLOAD) {
@@ -126,7 +124,7 @@ public abstract class AbsNormalCmd<T extends AbsTaskEntity> extends AbsCmd<T> {
    */
   void removeTask(AbsTaskEntity taskEntity) {
     AbsTask tempTask = getTask(taskEntity.getEntity());
-    if (tempTask == null){
+    if (tempTask == null) {
       tempTask = createTask(taskEntity);
     }
     mQueue.cancelTask(tempTask);
@@ -181,7 +179,7 @@ public abstract class AbsNormalCmd<T extends AbsTaskEntity> extends AbsCmd<T> {
    * @return 创建的任务
    */
   AbsTask createTask() {
-    tempTask = mQueue.createTask(mTargetName, mTaskEntity);
+    tempTask = mQueue.createTask(mTaskEntity);
     return tempTask;
   }
 
@@ -193,6 +191,6 @@ public abstract class AbsNormalCmd<T extends AbsTaskEntity> extends AbsCmd<T> {
    */
   AbsTask createTask(AbsTaskEntity taskEntity) {
     TEManager.getInstance().addTEntity(taskEntity);
-    return mQueue.createTask(mTargetName, taskEntity);
+    return mQueue.createTask(taskEntity);
   }
 }

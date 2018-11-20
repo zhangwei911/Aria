@@ -82,7 +82,7 @@ class DelegateUpdate extends AbsDelegate {
   /**
    * 删除某条数据
    */
-  <T extends DbEntity> void delData(SQLiteDatabase db, Class<T> clazz, String... expression) {
+  synchronized <T extends DbEntity> void delData(SQLiteDatabase db, Class<T> clazz, String... expression) {
     db = checkDb(db);
     CheckUtil.checkSqlExpression(expression);
 
@@ -101,7 +101,7 @@ class DelegateUpdate extends AbsDelegate {
   /**
    * 修改某行数据
    */
-  void modifyData(SQLiteDatabase db, DbEntity dbEntity) {
+  synchronized void modifyData(SQLiteDatabase db, DbEntity dbEntity) {
     db = checkDb(db);
     Class<?> clazz = dbEntity.getClass();
     List<Field> fields = CommonUtil.getAllFields(clazz);
@@ -141,7 +141,7 @@ class DelegateUpdate extends AbsDelegate {
   /**
    * 插入数据
    */
-  void insertData(SQLiteDatabase db, DbEntity dbEntity) {
+  synchronized void insertData(SQLiteDatabase db, DbEntity dbEntity) {
     db = checkDb(db);
     Class<?> clazz = dbEntity.getClass();
     List<Field> fields = CommonUtil.getAllFields(clazz);

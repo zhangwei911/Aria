@@ -56,6 +56,10 @@ public class AbsSchedulerListener<TASK extends ITask, SUB_ENTITY extends AbsNorm
 
   }
 
+  @Override public void onTaskFail(TASK task, Exception e) {
+
+  }
+
   @Override public void onTaskComplete(TASK task) {
 
   }
@@ -92,7 +96,12 @@ public class AbsSchedulerListener<TASK extends ITask, SUB_ENTITY extends AbsNorm
 
   }
 
+  @Deprecated
   public void onSubTaskFail(TASK task, SUB_ENTITY subTask) {
+
+  }
+
+  public void onSubTaskFail(TASK task, SUB_ENTITY subTask, Exception e) {
 
   }
 

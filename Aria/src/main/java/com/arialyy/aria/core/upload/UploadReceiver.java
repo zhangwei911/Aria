@@ -20,6 +20,7 @@ import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import com.arialyy.aria.core.AriaManager;
 import com.arialyy.aria.core.command.ICmd;
+import com.arialyy.aria.core.command.normal.CancelAllCmd;
 import com.arialyy.aria.core.command.normal.NormalCmdFactory;
 import com.arialyy.aria.core.common.ProxyHelper;
 import com.arialyy.aria.core.inf.AbsReceiver;
@@ -38,6 +39,16 @@ import java.util.Set;
  */
 public class UploadReceiver extends AbsReceiver {
   private static final String TAG = "UploadReceiver";
+
+  /**
+   * 设置最大上传速度，单位：kb
+   *
+   * @param maxSpeed 为0表示不限速
+   */
+  public UploadReceiver setMaxSpeed(int maxSpeed) {
+    AriaManager.getInstance(AriaManager.APP).getUploadConfig().setMaxSpeed(maxSpeed);
+    return this;
+  }
 
   /**
    * 加载HTTP单文件上传任务
@@ -78,7 +89,7 @@ public class UploadReceiver extends AbsReceiver {
    * @return {@code true}存在，{@code false} 不存在
    */
   public boolean taskExists(String filePath) {
-    return DbEntity.findFirst(UploadEntity.class, "filePath=?", filePath) != null;
+    return DbEntity.checkDataExist(UploadTaskEntity.class, "key=?", filePath);
   }
 
   /**
@@ -112,7 +123,7 @@ public class UploadReceiver extends AbsReceiver {
   public void stopAllTask() {
     AriaManager.getInstance(AriaManager.APP)
         .setCmd(NormalCmdFactory.getInstance()
-            .createCmd(targetName, new UploadTaskEntity(), NormalCmdFactory.TASK_STOP_ALL,
+            .createCmd(new UploadTaskEntity(), NormalCmdFactory.TASK_STOP_ALL,
                 ICmd.TASK_TYPE_UPLOAD))
         .exe();
   }
@@ -125,10 +136,11 @@ public class UploadReceiver extends AbsReceiver {
    */
   public void removeAllTask(boolean removeFile) {
     final AriaManager am = AriaManager.getInstance(AriaManager.APP);
-
-    am.setCmd(CommonUtil.createNormalCmd(targetName, new UploadTaskEntity(),
-        NormalCmdFactory.TASK_CANCEL_ALL, ICmd.TASK_TYPE_UPLOAD)).exe();
-
+    CancelAllCmd cancelCmd =
+        (CancelAllCmd) CommonUtil.createNormalCmd(new UploadTaskEntity(),
+            NormalCmdFactory.TASK_CANCEL_ALL, ICmd.TASK_TYPE_UPLOAD);
+    cancelCmd.removeFile = removeFile;
+    am.setCmd(cancelCmd).exe();
     Set<String> keys = am.getReceiver().keySet();
     for (String key : keys) {
       am.getReceiver().remove(key);
@@ -148,9 +160,15 @@ public class UploadReceiver extends AbsReceiver {
       ALog.e(TAG, String.format("【%s】观察者为空", targetName));
       return;
     }
-    Set<String> cCounter = ProxyHelper.getInstance().uploadCounter;
-    if (cCounter != null && cCounter.contains(targetName)) {
-      UploadSchedulers.getInstance().register(obj);
+    Set<Integer> set = ProxyHelper.getInstance().checkProxyType(obj.getClass());
+    if (set != null && !set.isEmpty()) {
+      for (Integer type : set) {
+        if (type == ProxyHelper.PROXY_TYPE_UPLOAD) {
+          UploadSchedulers.getInstance().register(obj);
+        }
+      }
+    } else {
+      ALog.i(TAG, "没有Aria的注解方法");
     }
   }
 
@@ -179,9 +197,14 @@ public class UploadReceiver extends AbsReceiver {
       ALog.e(TAG, String.format("【%s】观察者为空", targetName));
       return;
     }
-    Set<String> dCounter = ProxyHelper.getInstance().uploadCounter;
-    if (dCounter != null && dCounter.contains(targetName)) {
-      UploadSchedulers.getInstance().unRegister(obj);
+
+    Set<Integer> set = ProxyHelper.getInstance().mProxyCache.get(obj.getClass().getName());
+    if (set != null) {
+      for (Integer integer : set) {
+        if (integer == ProxyHelper.PROXY_TYPE_UPLOAD) {
+          UploadSchedulers.getInstance().unRegister(obj);
+        }
+      }
     }
   }
 }

@@ -26,7 +26,6 @@ public abstract class AbsCmd<T extends AbsTaskEntity> implements ICmd {
   protected ITaskQueue mQueue;
   protected T mTaskEntity;
   protected String TAG;
-  protected String mTargetName;
 
   /**
    * 是否是下载任务的命令

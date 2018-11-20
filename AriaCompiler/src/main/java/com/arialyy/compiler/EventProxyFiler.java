@@ -16,6 +16,7 @@
 package com.arialyy.compiler;
 
 import com.arialyy.annotations.Download;
+import com.arialyy.annotations.DownloadGroup;
 import com.arialyy.annotations.Upload;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.CodeBlock;
@@ -91,33 +92,54 @@ final class EventProxyFiler {
    *
    * @param taskEnum 任务类型枚举{@link TaskEnum}
    * @param annotation {@link Download}、{@link Upload}
-   * @param methodName 被代理类注解的方法名
+   * @param methodInfo 被代理类注解的方法信息
    */
   private MethodSpec createProxyMethod(TaskEnum taskEnum, Class<? extends Annotation> annotation,
-      String methodName) {
+      MethodInfo methodInfo) {
     ClassName task = ClassName.get(taskEnum.getPkg(), taskEnum.getClassName());
 
     ParameterSpec taskParam =
         ParameterSpec.builder(task, "task").addModifiers(Modifier.FINAL).build();
 
     String callCode;
+
     if (taskEnum == TaskEnum.DOWNLOAD_GROUP_SUB) {
-      callCode = "task, subEntity";
+      if (methodInfo.params.get(methodInfo.params.size() - 1)
+          .asType()
+          .toString()
+          .equals(Exception.class.getName())
+          && annotation == DownloadGroup.onSubTaskFail.class) {
+        callCode = "task, subEntity, e";
+      } else {
+        callCode = "task, subEntity";
+      }
     } else {
-      callCode = "task";
+      if (methodInfo.params.get(methodInfo.params.size() - 1)
+          .asType()
+          .toString()
+          .equals(Exception.class.getName())
+          && (annotation == Download.onTaskFail.class
+          || annotation == Upload.onTaskFail.class
+          || annotation == DownloadGroup.onTaskFail.class)) {
+        callCode = "task, e";
+      } else {
+        callCode = "task";
+      }
     }
     StringBuilder sb = new StringBuilder();
-    sb.append("Set<String> keys = keyMapping.get(\"").append(methodName).append("\");\n");
+    sb.append("Set<String> keys = keyMapping.get(\"")
+        .append(methodInfo.methodName)
+        .append("\");\n");
     sb.append("if (keys != null) {\n\tif (keys.contains(task.getKey())) {\n")
         .append("\t\tobj.")
-        .append(methodName)
+        .append(methodInfo.methodName)
         .append("((")
         .append(taskEnum.getClassName())
         .append(")")
         .append(callCode)
         .append(");\n\t}\n} else {\n")
         .append("\tobj.")
-        .append(methodName)
+        .append(methodInfo.methodName)
         .append("((")
         .append(taskEnum.getClassName())
         .append(")")
@@ -133,12 +155,22 @@ final class EventProxyFiler {
 
     //任务组接口
     if (taskEnum == TaskEnum.DOWNLOAD_GROUP_SUB) {
-      ClassName subTask = ClassName.get(TaskEnum.DOWNLOAD_ENTITY.pkg, TaskEnum.DOWNLOAD_ENTITY.className);
+      ClassName subTask =
+          ClassName.get(TaskEnum.DOWNLOAD_ENTITY.pkg, TaskEnum.DOWNLOAD_ENTITY.className);
       ParameterSpec subTaskParam =
           ParameterSpec.builder(subTask, "subEntity").addModifiers(Modifier.FINAL).build();
 
       builder.addParameter(subTaskParam);
     }
+
+    if (annotation == Download.onTaskFail.class
+        || annotation == Upload.onTaskFail.class
+        || annotation == DownloadGroup.onTaskFail.class
+        || annotation == DownloadGroup.onSubTaskFail.class) {
+      ParameterSpec exception = ParameterSpec.builder(Exception.class, "e").build();
+      builder.addParameter(exception);
+    }
+
     return builder.build();
   }
 
@@ -161,12 +193,22 @@ final class EventProxyFiler {
         "keyMapping").addModifiers(Modifier.PRIVATE).initializer("new $T()", HashMap.class).build();
     builder.addField(mappingField);
 
+    //Set<Integer> type = new HashSet<>();
     //添加注解方法
     for (TaskEnum te : entity.methods.keySet()) {
-      Map<Class<? extends Annotation>, String> temp = entity.methods.get(te);
-      if (temp != null) {
-        for (Class<? extends Annotation> annotation : temp.keySet()) {
-          MethodSpec method = createProxyMethod(te, annotation, temp.get(annotation));
+      Map<Class<? extends Annotation>, MethodInfo> methodInfoMap = entity.methods.get(te);
+      //if (entity.proxyClassName.contains(TaskEnum.DOWNLOAD.proxySuffix)) {
+      //  type.add(1);
+      //} else if (entity.proxyClassName.contains(TaskEnum.DOWNLOAD_GROUP.proxySuffix)) {
+      //  type.add(2);
+      //} else if (entity.proxyClassName.contains(TaskEnum.UPLOAD.proxySuffix)) {
+      //  type.add(3);
+      //} else if (entity.proxyClassName.contains(TaskEnum.UPLOAD_GROUP.proxySuffix)) {
+      //  type.add(4);
+      //}
+      if (methodInfoMap != null) {
+        for (Class<? extends Annotation> annotation : methodInfoMap.keySet()) {
+          MethodSpec method = createProxyMethod(te, annotation, methodInfoMap.get(annotation));
           builder.addMethod(method);
         }
       }
@@ -189,6 +231,24 @@ final class EventProxyFiler {
       sb.append("keyMapping.put(\"").append(methodName).append("\", ").append("set);\n");
       cb.add(sb.toString(), ClassName.get(HashSet.class));
     }
+    //注册当前类
+    //for (Integer i : type) {
+    //  String str = null;
+    //  switch (i) {
+    //    case 1:
+    //    case 2:
+    //      str = "$T.download(obj).register();\n";
+    //      break;
+    //    case 3:
+    //    case 4:
+    //      str = "$T.upload(obj).register();\n";
+    //      break;
+    //  }
+    //  if (str != null) {
+    //    cb.add(str, ClassName.get("com.arialyy.aria.core", "Aria"));
+    //  }
+    //}
+
     MethodSpec structure =
         MethodSpec.constructorBuilder().addModifiers(Modifier.PUBLIC).addCode(cb.build()).build();
     builder.addMethod(structure);

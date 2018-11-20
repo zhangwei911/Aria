@@ -19,7 +19,7 @@ import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.download.DownloadGroupEntity;
 
 /**
- * Created by Aria.Lao on 2017/7/14.
+ * Created by lyy on 2017/7/14.
  */
 public class MultiEntity {
   public static final int SIMPLE_DOWNLOAD = 0xa1;

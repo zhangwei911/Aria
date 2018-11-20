@@ -29,6 +29,7 @@ import com.arialyy.annotations.DownloadGroup;
 import com.arialyy.aria.core.Aria;
 import com.arialyy.aria.core.download.DownloadGroupTask;
 import com.arialyy.aria.core.download.DownloadTask;
+import com.arialyy.aria.util.ALog;
 import com.arialyy.frame.util.FileUtil;
 import com.arialyy.simple.R;
 import com.arialyy.simple.base.BaseActivity;
@@ -117,6 +118,11 @@ public class MultiTaskActivity extends BaseActivity<ActivityMultiBinding> {
 
   @DownloadGroup.onTaskResume void groupTaskResume(DownloadGroupTask task) {
     mAdapter.updateBtState(task.getKey(), false);
+  }
+
+  @DownloadGroup.onWait void groupTaskWait(DownloadGroupTask task) {
+    ALog.d(TAG, String.format("group【%s】wait---", task.getTaskName()));
+    mAdapter.updateBtState(task.getKey(), true);
   }
 
   @DownloadGroup.onTaskStop void groupTaskStop(DownloadGroupTask task) {

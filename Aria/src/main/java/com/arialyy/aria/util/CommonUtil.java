@@ -21,6 +21,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Environment;
+import android.os.StatFs;
 import android.text.TextUtils;
 import android.util.Base64;
 import com.arialyy.aria.core.AriaManager;
@@ -53,14 +54,17 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.net.URLEncoder;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -72,12 +76,60 @@ public class CommonUtil {
   private static final String TAG = "CommonUtil";
 
   /**
+   * 检查SD内存空间是否充足
+   *
+   * @param filePath 文件保存路径
+   * @param fileSize 文件大小
+   * @return {@code false} 内存空间不足，{@code true}内存空间足够
+   */
+  public static boolean checkSDMemorySpace(String filePath, long fileSize) {
+    List<String> dirs = FileUtil.getSDPathList(AriaManager.APP);
+    if (dirs == null || dirs.isEmpty()) {
+      return true;
+    }
+    for (String path : dirs) {
+      if (filePath.contains(path)) {
+        if (fileSize > 0 && fileSize > getAvailableExternalMemorySize(path)) {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+
+  /**
+   * sdcard 可用大小
+   *
+   * @param sdcardPath sdcard 根路径
+   * @return 单位为：byte
+   */
+  public static long getAvailableExternalMemorySize(String sdcardPath) {
+    StatFs stat = new StatFs(sdcardPath);
+    long blockSize = stat.getBlockSize();
+    long availableBlocks = stat.getAvailableBlocks();
+    return availableBlocks * blockSize;
+  }
+
+  /**
+   * sdcard 总大小
+   *
+   * @param sdcardPath sdcard 根路径
+   * @return 单位为：byte
+   */
+  public static long getTotalExternalMemorySize(String sdcardPath) {
+    StatFs stat = new StatFs(sdcardPath);
+    long blockSize = stat.getBlockSize();
+    long totalBlocks = stat.getBlockCount();
+    return totalBlocks * blockSize;
+  }
+
+  /**
    * 获取某包下所有类
    *
    * @param className 过滤的类名
    * @return 类的完整名称
    */
-  public static List<String> getClassName(Context context, String className) {
+  public static List<String> getPkgClassNames(Context context, String className) {
     List<String> classNameList = new ArrayList<>();
     String pPath = context.getPackageCodePath();
     File dir = new File(pPath).getParentFile();
@@ -289,6 +341,7 @@ public class CommonUtil {
         entity.user = userInfo;
       }
     }
+    entity.scheme = uri.getScheme();
     entity.remotePath = TextUtils.isEmpty(remotePath) ? "/" : remotePath;
     return entity;
   }
@@ -302,25 +355,25 @@ public class CommonUtil {
   public static String convertUrl(String url) {
     Uri uri = Uri.parse(url);
     url = uri.toString();
-    //if (hasDoubleCharacter(url)) {
-    //  //预先处理空格，URLEncoder只会把空格转换为+
-    //  url = url.replaceAll(" ", "%20");
-    //  //匹配双字节字符(包括汉字在内)
-    //  String regex = Regular.REG_DOUBLE_CHAR_AND_SPACE;
-    //  Pattern p = Pattern.compile(regex);
-    //  Matcher m = p.matcher(url);
-    //  Set<String> strs = new HashSet<>();
-    //  while (m.find()) {
-    //    strs.add(m.group());
-    //  }
-    //  try {
-    //    for (String str : strs) {
-    //      url = url.replaceAll(str, URLEncoder.encode(str, "UTF-8"));
-    //    }
-    //  } catch (UnsupportedEncodingException e) {
-    //    e.printStackTrace();
-    //  }
-    //}
+    if (hasDoubleCharacter(url)) {
+      //预先处理空格，URLEncoder只会把空格转换为+
+      url = url.replaceAll(" ", "%20");
+      //匹配双字节字符(包括汉字在内)
+      String regex = Regular.REG_DOUBLE_CHAR_AND_SPACE;
+      Pattern p = Pattern.compile(regex);
+      Matcher m = p.matcher(url);
+      Set<String> strs = new HashSet<>();
+      while (m.find()) {
+        strs.add(m.group());
+      }
+      try {
+        for (String str : strs) {
+          url = url.replaceAll(str, URLEncoder.encode(str, "UTF-8"));
+        }
+      } catch (UnsupportedEncodingException e) {
+        e.printStackTrace();
+      }
+    }
     return url;
   }
 
@@ -396,6 +449,23 @@ public class CommonUtil {
   }
 
   /**
+   * 获取字符串的md5
+   *
+   * @return 字符串为空或获取md5失败，则返回""
+   */
+  public static String getStrMd5(String str) {
+    if (TextUtils.isEmpty(str)) return "";
+    try {
+      MessageDigest md = MessageDigest.getInstance("MD5");
+      md.update(str.getBytes());
+      return new BigInteger(1, md.digest()).toString(16);
+    } catch (NoSuchAlgorithmException e) {
+      ALog.e(TAG, e.getMessage());
+    }
+    return "";
+  }
+
+  /**
    * 删除任务组记录
    *
    * @param removeFile {@code true} 不仅删除任务数据库记录，还会删除已经删除完成的文件
@@ -435,11 +505,14 @@ public class CommonUtil {
         }
       }
     }
-    File dir = new File(groupEntity.getDirPath());
-    if (dir.exists() && (removeFile || !groupEntity.isComplete())) {
-      dir.delete();
+
+    if (!TextUtils.isEmpty(groupEntity.getDirPath())) {
+      File dir = new File(groupEntity.getDirPath());
+      if (dir.exists() && (removeFile || !groupEntity.isComplete())) {
+        dir.delete();
+      }
+      groupEntity.deleteData();
     }
-    groupEntity.deleteData();
   }
 
   /**
@@ -619,9 +692,9 @@ public class CommonUtil {
    * @param taskType {@link ICmd#TASK_TYPE_DOWNLOAD}、{@link ICmd#TASK_TYPE_DOWNLOAD_GROUP}、{@link
    * ICmd#TASK_TYPE_UPLOAD}
    */
-  public static <T extends AbsTaskEntity> AbsNormalCmd createNormalCmd(String target, T entity,
+  public static <T extends AbsTaskEntity> AbsNormalCmd createNormalCmd(T entity,
       int cmd, int taskType) {
-    return NormalCmdFactory.getInstance().createCmd(target, entity, cmd, taskType);
+    return NormalCmdFactory.getInstance().createCmd(entity, cmd, taskType);
   }
 
   /**
@@ -870,8 +943,11 @@ public class CommonUtil {
     // 创建目标文件
     if (file.exists()) {
       final File to = new File(file.getAbsolutePath() + System.currentTimeMillis());
-      file.renameTo(to);
-      to.delete();
+      if (file.renameTo(to)) {
+        to.delete();
+      }else {
+        file.delete();
+      }
     }
     try {
       if (file.createNewFile()) {

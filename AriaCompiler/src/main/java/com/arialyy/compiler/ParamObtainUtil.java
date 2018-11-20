@@ -15,6 +15,9 @@
  */
 package com.arialyy.compiler;
 
+import com.arialyy.annotations.Download;
+import com.arialyy.annotations.DownloadGroup;
+import com.arialyy.annotations.Upload;
 import java.lang.annotation.Annotation;
 import java.util.Collections;
 import java.util.HashMap;
@@ -33,7 +36,7 @@ import javax.lang.model.element.VariableElement;
 import javax.lang.model.util.Elements;
 
 /**
- * Created by Aria.Lao on 2017/9/6.
+ * Created by lyy on 2017/9/6.
  * 构建代理文件的参数获取工具
  */
 class ParamObtainUtil {
@@ -70,11 +73,15 @@ class ParamObtainUtil {
         ExecutableElement method = (ExecutableElement) element;
         TypeElement classElement = (TypeElement) method.getEnclosingElement();
         PackageElement packageElement = mElementUtil.getPackageOf(classElement);
-        checkDownloadMethod(taskEnum, method);
+
         String methodName = method.getSimpleName().toString();
         String className = method.getEnclosingElement().toString(); //全类名\
         String key = className + taskEnum.proxySuffix;
         ProxyClassParam proxyEntity = mMethodParams.get(key);
+        MethodInfo methodInfo = new MethodInfo();
+        methodInfo.methodName = methodName;
+        methodInfo.params = (List<VariableElement>) method.getParameters();
+        checkMethod(taskEnum, method, annotationClazz, methodInfo.params);
 
         if (proxyEntity == null) {
           proxyEntity = new ProxyClassParam();
@@ -90,9 +97,10 @@ class ParamObtainUtil {
         }
         proxyEntity.taskEnums.add(taskEnum);
         if (proxyEntity.methods.get(taskEnum) == null) {
-          proxyEntity.methods.put(taskEnum, new HashMap<Class<? extends Annotation>, String>());
+          proxyEntity.methods.put(taskEnum, new HashMap<Class<? extends Annotation>, MethodInfo>());
         }
-        proxyEntity.methods.get(taskEnum).put(annotationClazz, methodName);
+
+        proxyEntity.methods.get(taskEnum).put(annotationClazz, methodInfo);
         proxyEntity.keyMappings.put(methodName, getValues(taskEnum, method, annotationType));
       }
     }
@@ -144,50 +152,69 @@ class ParamObtainUtil {
   /**
    * 检查和下载相关的方法，如果被注解的方法为private或参数不合法，则抛异常
    */
-  private void checkDownloadMethod(TaskEnum taskEnum, ExecutableElement method) {
+  private void checkMethod(TaskEnum taskEnum, ExecutableElement method,
+      Class<? extends Annotation> annotationClazz, List<VariableElement> params) {
     String methodName = method.getSimpleName().toString();
     String className = method.getEnclosingElement().toString();
     Set<Modifier> modifiers = method.getModifiers();
     if (modifiers.contains(Modifier.PRIVATE)) {
-      throw new IllegalAccessError(className + "." + methodName + "不能为private方法");
+      throw new IllegalAccessError(String.format("%s.%s, 不能为private方法", className, methodName));
     }
-    List<VariableElement> params = (List<VariableElement>) method.getParameters();
     if (taskEnum == TaskEnum.DOWNLOAD_GROUP_SUB) {
-      if (params.size() != 2) {
-        throw new IllegalArgumentException(className
-            + "."
-            + methodName
-            + "参数错误, 参数只有两个，且第一个参数必须是"
-            + getCheckParams(taskEnum)
-            + "，第二个参数必须是"
-            + getCheckSubParams(taskEnum));
+      if (isFailAnnotation(annotationClazz)) {
+        if (params.size() != 3 && params.size() != 2) {
+          throw new IllegalArgumentException(
+              String.format("%s.%s参数错误, 参数只能是两个或三个，第一个参数是：%s，第二个参数是：%s，第三个参数（可选）是：%s", className,
+                  methodName,
+                  getCheckParams(taskEnum), getCheckSubParams(taskEnum),
+                  Exception.class.getSimpleName()));
+        }
+      } else {
+        if (params.size() != 2) {
+          throw new IllegalArgumentException(
+              String.format("%s.%s参数错误, 参数只能是两个，第一个参数是：%s，第二个参数是：%s", className, methodName,
+                  getCheckParams(taskEnum), getCheckSubParams(taskEnum)));
+        }
       }
     } else {
-      if (params.size() != 1) {
-        throw new IllegalArgumentException(
-            className + "." + methodName + "参数错误, 参数只能有一个，且参数必须是" + getCheckParams(taskEnum));
+      if (isFailAnnotation(annotationClazz)) {
+        if (params.size() != 1 && params.size() != 2) {
+          throw new IllegalArgumentException(
+              String.format("%s.%s参数错误, 参数只能有一个或两个，第一个参数是：%s，第二个参（可选）数是：%s", className, methodName,
+                  getCheckParams(taskEnum), Exception.class.getSimpleName()));
+        }
+      } else {
+        if (params.size() != 1) {
+          throw new IllegalArgumentException(
+              String.format("%s.%s参数错误, 参数只能有一个，且参数必须是：%s", className, methodName,
+                  getCheckParams(taskEnum)));
+        }
       }
     }
     if (!params.get(0).asType().toString().equals(getCheckParams(taskEnum))) {
-      throw new IllegalArgumentException(className
-          + "."
-          + methodName
-          + "参数【"
-          + params.get(0).getSimpleName()
-          + "】类型错误，参数必须是"
-          + getCheckParams(taskEnum));
+      throw new IllegalArgumentException(
+          String.format("%s.%s参数【%s】类型错误，参数必须是：%s", className, methodName,
+              params.get(0).getSimpleName(), getCheckParams(taskEnum)));
     }
     if (taskEnum == TaskEnum.DOWNLOAD_GROUP_SUB) {
       if (!params.get(1).asType().toString().equals(getCheckSubParams(taskEnum))) {
-        throw new IllegalArgumentException(className
-            + "."
-            + methodName
-            + "参数【"
-            + params.get(0).getSimpleName()
-            + "】类型错误，参数必须是"
-            + getCheckSubParams(taskEnum));
+        throw new IllegalArgumentException(
+            String.format("%s.%s参数【%s】类型错误，参数必须是：%s", className, methodName,
+                params.get(0).getSimpleName(), getCheckSubParams(taskEnum)));
       }
     }
+  }
+
+  /**
+   * 判断是否是任务失败的回调注解
+   *
+   * @return ｛@code true｝是任务失败的回调注解
+   */
+  private boolean isFailAnnotation(Class<? extends Annotation> annotationClazz) {
+    return annotationClazz == Download.onTaskFail.class
+        || annotationClazz == DownloadGroup.onTaskFail.class
+        || annotationClazz == DownloadGroup.onSubTaskFail.class
+        || annotationClazz == Upload.onTaskFail.class;
   }
 
   /**

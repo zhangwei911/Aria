@@ -18,7 +18,6 @@ package com.arialyy.aria.orm;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.v4.util.LruCache;
-import android.text.TextUtils;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
 import java.lang.reflect.Field;
@@ -134,11 +133,13 @@ abstract class AbsDelegate {
   }
 
   void closeCursor(Cursor cursor) {
-    if (cursor != null && !cursor.isClosed()) {
-      try {
-        cursor.close();
-      } catch (android.database.SQLException e) {
-        e.printStackTrace();
+    synchronized (AbsDelegate.class) {
+      if (cursor != null && !cursor.isClosed()) {
+        try {
+          cursor.close();
+        } catch (android.database.SQLException e) {
+          e.printStackTrace();
+        }
       }
     }
   }

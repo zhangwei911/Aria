@@ -35,7 +35,7 @@ class DBConfig {
   /*adb pull /mnt/sdcard/Android/data/com.arialyy.simple/files/DB/AriaLyyDb d:/db*/
   static Map<String, Class> mapping = new HashMap<>();
   static String DB_NAME;
-  static int VERSION = 39;
+  static int VERSION = 41;
 
   /**
    * 是否将数据库保存在Sd卡，{@code true} 是

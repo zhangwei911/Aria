@@ -184,6 +184,9 @@ class ConfigHelper extends DefaultHandler {
     if (mType == ConfigType.DOWNLOAD) {
       mDownloadConfig.maxSpeed = maxSpeed;
     }
+    if (mType == ConfigType.UPLOAD) {
+      mUploadConfig.maxSpeed = maxSpeed;
+    }
   }
 
   private void loadConvertSpeed(String value) {

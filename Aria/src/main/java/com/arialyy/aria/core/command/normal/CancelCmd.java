@@ -16,7 +16,6 @@
 
 package com.arialyy.aria.core.command.normal;
 
-import android.text.TextUtils;
 import com.arialyy.aria.core.inf.AbsTask;
 import com.arialyy.aria.core.inf.AbsTaskEntity;
 
@@ -31,8 +30,8 @@ public class CancelCmd<T extends AbsTaskEntity> extends AbsNormalCmd<T> {
    */
   public boolean removeFile = false;
 
-  CancelCmd(String targetName, T entity, int taskType) {
-    super(targetName, entity, taskType);
+  CancelCmd(T entity, int taskType) {
+    super(entity, taskType);
   }
 
   @Override public void executeCmd() {
@@ -43,9 +42,6 @@ public class CancelCmd<T extends AbsTaskEntity> extends AbsNormalCmd<T> {
     }
     if (task != null) {
       mTaskEntity.setRemoveFile(removeFile);
-      if (!TextUtils.isEmpty(mTargetName)) {
-        task.setTargetName(mTargetName);
-      }
       removeTask();
     }
   }

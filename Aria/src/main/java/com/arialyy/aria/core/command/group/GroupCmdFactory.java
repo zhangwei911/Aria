@@ -62,13 +62,13 @@ public class GroupCmdFactory {
     AbsGroupCmd cmd = null;
     switch (type) {
       case SUB_TASK_START:
-        cmd = new GroupStartCmd<>(target, entity);
+        cmd = new GroupStartCmd<>(entity);
         break;
       case SUB_TASK_STOP:
-        cmd = new GroupStopCmd<>(target, entity);
+        cmd = new GroupStopCmd<>(entity);
         break;
       case SUB_TASK_CANCEL:
-        cmd = new GroupCancelCmd<>(target, entity);
+        cmd = new GroupCancelCmd<>(entity);
     }
     if (cmd != null) {
       cmd.childUrl = childUrl;

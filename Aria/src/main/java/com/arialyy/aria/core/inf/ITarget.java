@@ -18,48 +18,7 @@ package com.arialyy.aria.core.inf;
 /**
  * Created by AriaL on 2017/6/29.
  */
-public interface ITarget<TARGET extends ITarget> {
-  /**
-   * 获取任务状态
-   *
-   * @return {@link IEntity}
-   */
-  int getTaskState();
-
-  /**
-   * 任务是否在执行
-   *
-   * @return {@code true} 任务正在执行
-   */
-  boolean isRunning();
-
-  /**
-   * 任务是否存在
-   *
-   * @return {@code true} 任务存在
-   */
-  boolean taskExists();
-
-  /**
-   * 任务文件大小
-   */
-  long getSize();
-
-  /**
-   * 转换后的大小
-   */
-  String getConvertSize();
-
-  /**
-   * 获取任务进度百分比
-   */
-  int getPercent();
-
-  /**
-   * 获取任务进度，如果任务存在，则返回当前进度
-   */
-  long getCurrentProgress();
-
+public interface ITarget {
   /**
    * 开始下载
    */

@@ -15,26 +15,47 @@
  */
 package com.arialyy.aria.core.common;
 
+import android.os.Build;
 import com.arialyy.aria.core.AriaManager;
 import com.arialyy.aria.util.CommonUtil;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created by Aria.Lao on 2017/7/10.
  * 代理参数获取
  */
 public class ProxyHelper {
+  /**
+   * 普通下载任务类型
+   */
+  public static int PROXY_TYPE_DOWNLOAD = 0x01;
+  /**
+   * 组合下载任务类型
+   */
+  public static int PROXY_TYPE_DOWNLOAD_GROUP = 0x02;
+  ///**
+  // * 组合任务子任务类型
+  // */
+  //public static int PROXY_TYPE_DOWNLOAD_GROUP_SUB = 0x03;
+  /**
+   * 普通上传任务类型
+   */
+  public static int PROXY_TYPE_UPLOAD = 0x04;
   public Set<String> downloadCounter = new HashSet<>(), uploadCounter = new HashSet<>(),
       downloadGroupCounter = new HashSet<>(), downloadGroupSubCounter = new HashSet<>();
+  public Map<String, Set<Integer>> mProxyCache = new ConcurrentHashMap<>();
 
   public static volatile ProxyHelper INSTANCE = null;
+  private boolean canLoadClass = false;
 
   private ProxyHelper() {
-    init();
+    //init();
   }
 
   public static ProxyHelper getInstance() {
@@ -46,14 +67,75 @@ public class ProxyHelper {
     return INSTANCE;
   }
 
+  /**
+   * @since 3.4.6 版本开始，已经在ElementHandler中关闭了ProxyClassCounter对象的生成
+   */
+  @Deprecated
   private void init() {
-    List<String> classes = CommonUtil.getClassName(AriaManager.APP,
+    List<String> classes = CommonUtil.getPkgClassNames(AriaManager.APP,
         "com.arialyy.aria.ProxyClassCounter");
-    for (String className : classes) {
-      count(className);
+    canLoadClass = classes != null
+        && !classes.isEmpty()
+        && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP;
+    if (canLoadClass) {
+      for (String className : classes) {
+        count(className);
+      }
     }
   }
 
+  /**
+   * 是否能读取到代理计数文件
+   *
+   * @return {@code true} 可以读取，{@code false} 不能读取
+   */
+  public boolean isCanLoadCountClass() {
+    return canLoadClass;
+  }
+
+  /**
+   * 检查观察者对象的代理文件类型
+   *
+   * @param clazz 观察者对象
+   * @return {@link #PROXY_TYPE_DOWNLOAD}，如果没有实体对象则返回空的list
+   */
+  public Set<Integer> checkProxyType(Class clazz) {
+    final String className = clazz.getName();
+    Set<Integer> result = mProxyCache.get(clazz.getName());
+    if (result != null) {
+      return result;
+    }
+    result = new HashSet<>();
+    try {
+      if (Class.forName(className.concat("$$DownloadGroupListenerProxy")) != null) {
+        result.add(PROXY_TYPE_DOWNLOAD_GROUP);
+      }
+    } catch (ClassNotFoundException e) {
+      //e.printStackTrace();
+    }
+    try {
+      if (Class.forName(className.concat("$$DownloadListenerProxy")) != null) {
+        result.add(PROXY_TYPE_DOWNLOAD);
+      }
+    } catch (ClassNotFoundException e) {
+      //e.printStackTrace();
+    }
+
+    try {
+      if (Class.forName(className.concat("$$UploadListenerProxy")) != null) {
+        result.add(PROXY_TYPE_UPLOAD);
+      }
+    } catch (ClassNotFoundException e) {
+      //e.printStackTrace();
+    }
+
+    if (!result.isEmpty()) {
+      mProxyCache.put(clazz.getName(), result);
+    }
+    return result;
+  }
+
+  @Deprecated
   private void count(String className) {
     try {
       Class clazz = Class.forName(className);

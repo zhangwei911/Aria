@@ -18,6 +18,7 @@ package com.arialyy.simple.widget;
 import android.content.Context;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,10 +32,10 @@ import java.util.Map;
 import java.util.WeakHashMap;
 
 /**
- * Created by Aria.Lao on 2017/7/17.
+ * Created by lyy on 2017/7/17.
  */
 public class SubStateLinearLayout extends LinearLayout implements View.OnClickListener {
-
+  private final String TAG = "SubStateLinearLayout";
   interface OnShowCallback {
     void onShow(boolean visibility);
   }

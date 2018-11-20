@@ -16,6 +16,7 @@
 package com.arialyy.aria.core.inf;
 
 import android.support.annotation.CheckResult;
+import java.net.Proxy;
 
 /**
  * Created by laoyuyu on 2018/3/9.
@@ -45,4 +46,12 @@ public interface IFtpTarget<TARGET extends ITarget> {
    */
   @CheckResult
   TARGET login(String userName, String password, String account);
+
+  /**
+   * 设置代理
+   *
+   * @param proxy {@link Proxy}
+   */
+  @CheckResult
+  TARGET setProxy(Proxy proxy);
 }

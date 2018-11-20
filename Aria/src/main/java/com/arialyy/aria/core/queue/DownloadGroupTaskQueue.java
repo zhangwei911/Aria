@@ -16,7 +16,6 @@
 
 package com.arialyy.aria.core.queue;
 
-import android.text.TextUtils;
 import com.arialyy.aria.core.AriaManager;
 import com.arialyy.aria.core.download.DownloadGroupTask;
 import com.arialyy.aria.core.download.DownloadGroupTaskEntity;
@@ -60,19 +59,15 @@ public class DownloadGroupTaskQueue
     return AriaManager.getInstance(AriaManager.APP).getDownloadConfig().getMaxTaskNum();
   }
 
-  @Override public DownloadGroupTask createTask(String targetName, DownloadGroupTaskEntity entity) {
+  @Override public DownloadGroupTask createTask(DownloadGroupTaskEntity entity) {
     DownloadGroupTask task = null;
-    if (!TextUtils.isEmpty(targetName)) {
-      if (mCachePool.getTask(entity.getEntity().getKey()) == null
-          && mExecutePool.getTask(entity.getEntity().getKey()) == null) {
-        task = (DownloadGroupTask) TaskFactory.getInstance()
-            .createTask(targetName, entity, DownloadGroupSchedulers.getInstance());
-        mCachePool.putTask(task);
-      } else {
-        ALog.w(TAG, "任务已存在");
-      }
+    if (mCachePool.getTask(entity.getEntity().getKey()) == null
+        && mExecutePool.getTask(entity.getEntity().getKey()) == null) {
+      task = (DownloadGroupTask) TaskFactory.getInstance()
+          .createTask(entity, DownloadGroupSchedulers.getInstance());
+      mCachePool.putTask(task);
     } else {
-      ALog.e(TAG, "target name 为 null！！");
+      ALog.w(TAG, "任务已存在");
     }
     return task;
   }

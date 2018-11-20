@@ -16,10 +16,11 @@
 
 package com.arialyy.aria.core.queue;
 
-import android.text.TextUtils;
 import com.arialyy.aria.core.AriaManager;
 import com.arialyy.aria.core.download.DownloadTask;
 import com.arialyy.aria.core.download.DownloadTaskEntity;
+import com.arialyy.aria.core.inf.AbsTask;
+import com.arialyy.aria.core.inf.TaskSchedulerType;
 import com.arialyy.aria.core.queue.pool.BaseCachePool;
 import com.arialyy.aria.core.queue.pool.BaseExecutePool;
 import com.arialyy.aria.core.queue.pool.DownloadSharePool;
@@ -89,7 +90,7 @@ public class DownloadTaskQueue extends AbsTaskQueue<DownloadTask, DownloadTaskEn
         DownloadTask oldTsk = mExecutePool.pollTask();
         if (oldTsk != null && oldTsk.isRunning()) {
           if (i == maxSize - 1) {
-            oldTsk.stopAndWait();
+            oldTsk.stop(TaskSchedulerType.TYPE_STOP_AND_WAIT);
             mCachePool.putTaskToFirst(oldTsk);
             break;
           }
@@ -104,31 +105,15 @@ public class DownloadTaskQueue extends AbsTaskQueue<DownloadTask, DownloadTaskEn
     }
   }
 
-  /**
-   * 最大下载速度
-   */
-  public void setMaxSpeed(double maxSpeed) {
-    Map<String, DownloadTask> tasks = mExecutePool.getAllTask();
-    Set<String> keys = tasks.keySet();
-    for (String key : keys) {
-      DownloadTask task = tasks.get(key);
-      task.setMaxSpeed(maxSpeed);
-    }
-  }
-
-  @Override public DownloadTask createTask(String target, DownloadTaskEntity entity) {
+  @Override public DownloadTask createTask(DownloadTaskEntity entity) {
     DownloadTask task = null;
-    if (!TextUtils.isEmpty(target)) {
-      if (mCachePool.getTask(entity.getEntity().getKey()) == null
-          && mExecutePool.getTask(entity.getEntity().getKey()) == null) {
-        task = (DownloadTask) TaskFactory.getInstance()
-            .createTask(target, entity, DownloadSchedulers.getInstance());
-        mCachePool.putTask(task);
-      } else {
-        ALog.w(TAG, "任务已存在");
-      }
+    if (mCachePool.getTask(entity.getEntity().getKey()) == null
+        && mExecutePool.getTask(entity.getEntity().getKey()) == null) {
+      task = (DownloadTask) TaskFactory.getInstance()
+          .createTask(entity, DownloadSchedulers.getInstance());
+      mCachePool.putTask(task);
     } else {
-      ALog.e(TAG, "target name 为 null！！");
+      ALog.w(TAG, "任务已存在");
     }
 
     return task;

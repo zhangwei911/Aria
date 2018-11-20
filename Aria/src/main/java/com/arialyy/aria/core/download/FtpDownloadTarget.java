@@ -17,10 +17,14 @@ package com.arialyy.aria.core.download;
 
 import android.support.annotation.CheckResult;
 import android.support.annotation.NonNull;
-import com.arialyy.aria.core.delegate.FtpDelegate;
+import android.text.TextUtils;
+import com.arialyy.aria.core.common.ftp.FTPSConfig;
+import com.arialyy.aria.core.common.ftp.FtpDelegate;
 import com.arialyy.aria.core.inf.AbsTaskEntity;
 import com.arialyy.aria.core.inf.IFtpTarget;
+import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
+import java.net.Proxy;
 
 /**
  * Created by lyy on 2016/12/5.
@@ -28,7 +32,7 @@ import com.arialyy.aria.util.CommonUtil;
  */
 public class FtpDownloadTarget extends BaseNormalTarget<FtpDownloadTarget>
     implements IFtpTarget<FtpDownloadTarget> {
-  private FtpDelegate<FtpDownloadTarget, DownloadEntity, DownloadTaskEntity> mDelegate;
+  private FtpDelegate<FtpDownloadTarget> mDelegate;
 
   public FtpDownloadTarget(DownloadEntity entity, String targetName) {
     this(entity.getUrl(), targetName);
@@ -45,7 +49,32 @@ public class FtpDownloadTarget extends BaseNormalTarget<FtpDownloadTarget>
     mTaskEntity.setUrlEntity(CommonUtil.getFtpUrlInfo(url));
     mTaskEntity.setRequestType(AbsTaskEntity.D_FTP);
 
-    mDelegate = new FtpDelegate<>(this, mTaskEntity);
+    mDelegate = new FtpDelegate<>(this);
+  }
+
+  /**
+   * 是否是FTPS协议
+   * 如果是FTPS协议，需要使用{@link FTPSConfig#setStorePath(String)} 、{@link FTPSConfig#setAlias(String)}
+   * 设置证书信息
+   */
+  @CheckResult
+  public FTPSConfig<FtpDownloadTarget> asFtps() {
+    mTaskEntity.getUrlEntity().isFtps = true;
+    return new FTPSConfig<>(this);
+  }
+
+  @Override protected boolean checkEntity() {
+    if (mTaskEntity.getUrlEntity().isFtps){
+      if (TextUtils.isEmpty(mTaskEntity.getUrlEntity().storePath)){
+        ALog.e(TAG, "证书路径为空");
+        return false;
+      }
+      if (TextUtils.isEmpty(mTaskEntity.getUrlEntity().keyAlias)){
+        ALog.e(TAG, "证书别名为空");
+        return false;
+      }
+    }
+    return super.checkEntity();
   }
 
   /**
@@ -89,5 +118,10 @@ public class FtpDownloadTarget extends BaseNormalTarget<FtpDownloadTarget>
   @CheckResult
   @Override public FtpDownloadTarget login(String userName, String password, String account) {
     return mDelegate.login(userName, password, account);
+  }
+
+  @CheckResult
+  @Override public FtpDownloadTarget setProxy(Proxy proxy) {
+    return mDelegate.setProxy(proxy);
   }
 }

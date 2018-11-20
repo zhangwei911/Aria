@@ -59,15 +59,11 @@ class DGTEFactory implements IGTEFactory<DownloadGroupEntity, DownloadGroupTaskE
       if (gte == null) {
         // 创建新的任务组任务实体
         gte = new DownloadGroupTaskEntity();
-        //创建子任务的任务实体
-        gte.setSubTaskEntities(createDGSubTaskEntity(entity));
-      } else if (gte.getSubTaskEntities() == null || gte.getSubTaskEntities().isEmpty()) {
-        gte.setSubTaskEntities(createDGSubTaskEntity(entity));
       }
     } else {
       gte = new DownloadGroupTaskEntity();
-      gte.setSubTaskEntities(createDGSubTaskEntity(entity));
     }
+    gte.setSubTaskEntities(createDGSubTaskEntity(entity));
     gte.setKey(entity.getGroupName());
     gte.setEntity(entity);
 

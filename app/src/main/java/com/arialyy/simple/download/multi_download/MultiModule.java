@@ -19,7 +19,7 @@ import android.content.Context;
 import com.arialyy.simple.base.BaseModule;
 
 /**
- * Created by Aria.Lao on 2017/7/14.
+ * Created by lyy on 2017/7/14.
  */
 public class MultiModule extends BaseModule{
   public MultiModule(Context context) {

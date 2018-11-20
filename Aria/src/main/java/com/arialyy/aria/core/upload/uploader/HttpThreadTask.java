@@ -15,13 +15,14 @@
  */
 package com.arialyy.aria.core.upload.uploader;
 
-import com.arialyy.aria.core.AriaManager;
 import com.arialyy.aria.core.common.AbsThreadTask;
 import com.arialyy.aria.core.common.StateConstance;
 import com.arialyy.aria.core.common.SubThreadConfig;
 import com.arialyy.aria.core.inf.IUploadListener;
 import com.arialyy.aria.core.upload.UploadEntity;
 import com.arialyy.aria.core.upload.UploadTaskEntity;
+import com.arialyy.aria.exception.BaseException;
+import com.arialyy.aria.exception.TaskException;
 import com.arialyy.aria.util.ALog;
 import java.io.BufferedReader;
 import java.io.File;
@@ -52,19 +53,20 @@ class HttpThreadTask extends AbsThreadTask<UploadEntity, UploadTaskEntity> {
   HttpThreadTask(StateConstance constance, IUploadListener listener,
       SubThreadConfig<UploadTaskEntity> uploadInfo) {
     super(constance, listener, uploadInfo);
-    AriaManager manager = AriaManager.getInstance(AriaManager.APP);
-    mConnectTimeOut = manager.getUploadConfig().getConnectTimeOut();
-    mReadTimeOut = manager.getUploadConfig().getIOTimeOut();
-    mBufSize = manager.getUploadConfig().getBuffSize();
-    isNotNetRetry = manager.getUploadConfig().isNotNetRetry();
+    mConnectTimeOut = mAridManager.getUploadConfig().getConnectTimeOut();
+    mReadTimeOut = mAridManager.getUploadConfig().getIOTimeOut();
+    mBufSize = mAridManager.getUploadConfig().getBuffSize();
+    isNotNetRetry = mAridManager.getUploadConfig().isNotNetRetry();
   }
 
-  @Override public void run() {
+  @Override public HttpThreadTask call() throws Exception {
+    super.call();
     File uploadFile = new File(mEntity.getFilePath());
     if (!uploadFile.exists()) {
-      ALog.e(TAG, String.format("【%s】，文件不存在。", mEntity.getFilePath()));
-      fail();
-      return;
+      fail(new TaskException(TAG,
+          String.format("上传失败，文件不存在；filePath: %s, url: %s", mEntity.getFilePath(),
+              mEntity.getUrl())));
+      return this;
     }
     mListener.onPre();
     URL url;
@@ -103,13 +105,15 @@ class HttpThreadTask extends AbsThreadTask<UploadEntity, UploadTaskEntity> {
       mListener.onComplete();
     } catch (Exception e) {
       e.printStackTrace();
-      fail();
+      fail(new TaskException(TAG,
+          String.format("上传失败，filePath: %s, url: %s", mEntity.getFilePath(), mEntity.getUrl()), e));
     }
+    return this;
   }
 
-  private void fail() {
+  private void fail(BaseException e1) {
     try {
-      mListener.onFail(true);
+      mListener.onFail(true, e1);
       STATE.isRunning = false;
       if (mOutputStream != null) {
         mOutputStream.close();
@@ -167,6 +171,9 @@ class HttpThreadTask extends AbsThreadTask<UploadEntity, UploadTaskEntity> {
       if (STATE.isCancel) {
         break;
       }
+      if (mSpeedBandUtil != null) {
+        mSpeedBandUtil.limitNextBytes(bytesRead);
+      }
     }
 
     mOutputStream.flush();
@@ -198,7 +205,7 @@ class HttpThreadTask extends AbsThreadTask<UploadEntity, UploadTaskEntity> {
     if (status == HttpURLConnection.HTTP_OK) {
       BufferedReader reader = new BufferedReader(new InputStreamReader(mHttpConn.getInputStream()));
       String line;
-      while ((line = reader.readLine()) != null) {
+      while (isLive() && (line = reader.readLine()) != null) {
         response.append(line);
       }
       reader.close();
@@ -211,5 +218,9 @@ class HttpThreadTask extends AbsThreadTask<UploadEntity, UploadTaskEntity> {
     writer.close();
     mOutputStream.close();
     return response.toString();
+  }
+
+  @Override public int getMaxSpeed() {
+    return mAridManager.getUploadConfig().getMaxSpeed();
   }
 }

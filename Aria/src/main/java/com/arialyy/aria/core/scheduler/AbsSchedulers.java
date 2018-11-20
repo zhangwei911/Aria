@@ -26,6 +26,7 @@ import com.arialyy.aria.core.inf.AbsTask;
 import com.arialyy.aria.core.inf.AbsTaskEntity;
 import com.arialyy.aria.core.inf.GroupSendParams;
 import com.arialyy.aria.core.inf.IEntity;
+import com.arialyy.aria.core.inf.TaskSchedulerType;
 import com.arialyy.aria.core.manager.TEManager;
 import com.arialyy.aria.core.queue.ITaskQueue;
 import com.arialyy.aria.core.upload.UploadTask;
@@ -40,7 +41,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * Created by lyy on 2017/6/4.
  * 事件调度器，用于处理任务状态的调度
  */
-abstract class AbsSchedulers<TASK_ENTITY extends AbsTaskEntity, TASK extends AbsTask<TASK_ENTITY>,
+abstract class AbsSchedulers<TASK_ENTITY extends AbsTaskEntity, TASK extends AbsTask,
     QUEUE extends ITaskQueue<TASK, TASK_ENTITY>> implements ISchedulers<TASK> {
   private final String TAG = "AbsSchedulers";
 
@@ -139,7 +140,8 @@ abstract class AbsSchedulers<TASK_ENTITY extends AbsTaskEntity, TASK extends Abs
             listener.onSubTaskStop((TASK) params.groupTask, params.entity);
             break;
           case SUB_FAIL:
-            listener.onSubTaskFail((TASK) params.groupTask, params.entity);
+            listener.onSubTaskFail((TASK) params.groupTask, params.entity,
+                (Exception) (params.groupTask).getExpand(AbsTask.ERROR_INFO_KEY));
             break;
           case SUB_RUNNING:
             listener.onSubTaskRunning((TASK) params.groupTask, params.entity);
@@ -169,13 +171,13 @@ abstract class AbsSchedulers<TASK_ENTITY extends AbsTaskEntity, TASK extends Abs
         mQueue.removeTaskFormQueue(task.getKey());
         if (mQueue.getCurrentExePoolNum() < mQueue.getMaxTaskNum()) {
           ALog.d(TAG, "stop_next");
-          startNextTask();
+          startNextTask(task);
         }
         break;
       case COMPLETE:
         mQueue.removeTaskFormQueue(task.getKey());
         ALog.d(TAG, "complete_next");
-        startNextTask();
+        startNextTask(task);
         break;
       case FAIL:
         handleFailTask(task);
@@ -243,7 +245,7 @@ abstract class AbsSchedulers<TASK_ENTITY extends AbsTaskEntity, TASK extends Abs
           listener.onTaskComplete(task);
           break;
         case FAIL:
-          listener.onTaskFail(task);
+          listener.onTaskFail(task, (Exception) task.getExpand(AbsTask.ERROR_INFO_KEY));
           break;
         case SUPPORT_BREAK_POINT:
           listener.onNoSupportBreakPoint(task);
@@ -259,9 +261,9 @@ abstract class AbsSchedulers<TASK_ENTITY extends AbsTaskEntity, TASK extends Abs
    */
   private void handleFailTask(final TASK task) {
     if (!task.needRetry || task.isStop() || task.isCancel()) {
+      callback(FAIL, task);
       mQueue.removeTaskFormQueue(task.getKey());
-      ALog.d(TAG, "fail_next");
-      startNextTask();
+      startNextTask(task);
       return;
     }
     long interval = 2000;
@@ -283,8 +285,7 @@ abstract class AbsSchedulers<TASK_ENTITY extends AbsTaskEntity, TASK extends Abs
         || task.getTaskEntity().getEntity().getFailNum() > reTryNum) {
       callback(FAIL, task);
       mQueue.removeTaskFormQueue(task.getKey());
-      startNextTask();
-      ALog.d(TAG, "retry_next");
+      startNextTask(task);
       TEManager.getInstance().removeTEntity(task.getKey());
       return;
     }
@@ -302,8 +303,7 @@ abstract class AbsSchedulers<TASK_ENTITY extends AbsTaskEntity, TASK extends Abs
           mQueue.reTryStart(task);
         } else {
           mQueue.removeTaskFormQueue(task.getKey());
-          startNextTask();
-          ALog.d(TAG, "retry_next_1");
+          startNextTask(task);
           TEManager.getInstance().removeTEntity(task.getKey());
         }
       }
@@ -314,11 +314,14 @@ abstract class AbsSchedulers<TASK_ENTITY extends AbsTaskEntity, TASK extends Abs
   /**
    * 启动下一个任务，条件：任务停止，取消下载，任务完成
    */
-  private void startNextTask() {
+  private void startNextTask(TASK oldTask) {
+    if (oldTask.getSchedulerType() == TaskSchedulerType.TYPE_STOP_NOT_NEXT) {
+      return;
+    }
     TASK newTask = mQueue.getNextTask();
     if (newTask == null) {
       if (mQueue.getCurrentExePoolNum() == 0) {
-        ALog.i(TAG, "没有下一任务");
+        ALog.i(TAG, "没有等待中的任务");
       }
       return;
     }

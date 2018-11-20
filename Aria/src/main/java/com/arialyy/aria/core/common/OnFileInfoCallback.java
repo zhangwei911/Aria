@@ -15,6 +15,8 @@
  */
 package com.arialyy.aria.core.common;
 
+import com.arialyy.aria.exception.BaseException;
+
 public interface OnFileInfoCallback {
   /**
    * 处理完成
@@ -26,7 +28,7 @@ public interface OnFileInfoCallback {
   /**
    * 请求失败
    *
-   * @param errorMsg 错误信息
+   * @param e 错误信息
    */
-  void onFail(String url, String errorMsg, boolean needRetry);
+  void onFail(String url, BaseException e, boolean needRetry);
 }

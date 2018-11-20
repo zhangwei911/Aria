@@ -26,7 +26,6 @@ import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.widget.PopupWindow;
-import android.widget.Toast;
 import com.arialyy.aria.core.command.ICmd;
 import com.arialyy.aria.core.common.QueueMod;
 import com.arialyy.aria.core.download.DownloadEntity;
@@ -71,7 +70,6 @@ import org.xml.sax.SAXException;
    * activity 和其Dialog、Fragment的映射表
    */
   private Map<String, List<String>> mSubClass = new ConcurrentHashMap<>();
-  private List<String> mActivityCount = new ArrayList<>();
   public static Context APP;
   private List<ICmd> mCommands = new ArrayList<>();
   private Configuration.DownloadConfig mDConfig;
@@ -470,9 +468,6 @@ import org.xml.sax.SAXException;
   private class LifeCallback implements Application.ActivityLifecycleCallbacks {
 
     @Override public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
-      mActivityCount.add(
-          String.format("%s_%s", activity.getClass().getName(), activity.hashCode()));
-      ALog.w(TAG, "size  = " + mActivityCount.size());
     }
 
     @Override public void onActivityStarted(Activity activity) {
@@ -497,13 +492,6 @@ import org.xml.sax.SAXException;
 
     @Override public void onActivityDestroyed(Activity activity) {
       removeReceiver(activity);
-      mActivityCount.remove(
-          String.format("%s_%s", activity.getClass().getName(), activity.hashCode()));
-      ALog.w(TAG, "size  = " + mActivityCount.size());
-      if (mActivityCount.size() == 0) {
-        ALog.e(TAG, "gggg");
-        //Toast.makeText(activity, "destroy", Toast.LENGTH_SHORT).show();
-      }
     }
   }
 }

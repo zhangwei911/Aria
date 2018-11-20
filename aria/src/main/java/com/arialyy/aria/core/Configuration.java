@@ -17,6 +17,7 @@ package com.arialyy.aria.core;
 
 import android.text.TextUtils;
 import com.arialyy.aria.core.common.QueueMod;
+import com.arialyy.aria.core.queue.DownloadGroupTaskQueue;
 import com.arialyy.aria.core.queue.DownloadTaskQueue;
 import com.arialyy.aria.core.queue.UploadTaskQueue;
 import com.arialyy.aria.util.ALog;
@@ -33,7 +34,7 @@ import java.util.Properties;
  * Created by lyy on 2016/12/8.
  * 信息配置
  */
-class Configuration {
+public class Configuration {
   static final String TAG = "Configuration";
   static final String DOWNLOAD_CONFIG_FILE = "/Aria/DownloadConfig.properties";
   static final String UPLOAD_CONFIG_FILE = "/Aria/UploadConfig.properties";
@@ -247,6 +248,21 @@ class Configuration {
      */
     int iOTimeOut = 20 * 1000;
 
+    /**
+     * 设置最大下载/上传速度，单位：kb, 为0表示不限速
+     */
+    int maxSpeed = 0;
+
+    public int getMaxSpeed() {
+      return maxSpeed;
+    }
+
+    public BaseTaskConfig setMaxSpeed(int maxSpeed) {
+      this.maxSpeed = maxSpeed;
+      saveKey("maxSpeed", String.valueOf(maxSpeed));
+      return this;
+    }
+
     public long getUpdateInterval() {
       return updateInterval;
     }
@@ -375,11 +391,6 @@ class Configuration {
     int threadNum = 3;
 
     /**
-     * 设置最大下载速度，单位：kb, 为0表示不限速
-     */
-    int maxSpeed = 0;
-
-    /**
      * 多线程下载是否使用块下载模式，{@code true}使用，{@code false}不使用
      * 注意：
      * 1、使用分块模式，在读写性能底下的手机上，合并文件需要的时间会更加长；
@@ -393,6 +404,13 @@ class Configuration {
       return useBlock;
     }
 
+    @Override public DownloadConfig setMaxSpeed(int maxSpeed) {
+      super.setMaxSpeed(maxSpeed);
+      DownloadTaskQueue.getInstance().setMaxSpeed(maxSpeed);
+      DownloadGroupTaskQueue.getInstance().setMaxSpeed(maxSpeed);
+      return this;
+    }
+
     public DownloadConfig setUseBlock(boolean useBlock) {
       this.useBlock = useBlock;
       saveKey("useBlock", String.valueOf(useBlock));
@@ -404,17 +422,6 @@ class Configuration {
       this.maxTaskNum = maxTaskNum;
       saveKey("maxTaskNum", String.valueOf(maxTaskNum));
       DownloadTaskQueue.getInstance().setMaxTaskNum(maxTaskNum);
-      return this;
-    }
-
-    public int getMaxSpeed() {
-      return maxSpeed;
-    }
-
-    public DownloadConfig setMaxSpeed(int maxSpeed) {
-      this.maxSpeed = maxSpeed;
-      saveKey("maxSpeed", String.valueOf(maxSpeed));
-      DownloadTaskQueue.getInstance().setMaxSpeed(maxSpeed);
       return this;
     }
 
@@ -476,6 +483,12 @@ class Configuration {
 
     private UploadConfig() {
       loadConfig();
+    }
+
+    @Override public UploadConfig setMaxSpeed(int maxSpeed) {
+      super.setMaxSpeed(maxSpeed);
+      UploadTaskQueue.getInstance().setMaxSpeed(maxSpeed);
+      return this;
     }
 
     public UploadConfig setMaxTaskNum(int maxTaskNum) {

@@ -60,7 +60,9 @@ public interface IUtil {
   void resume();
 
   /**
-   * 设置最大速度
+   * 设置最大下载/上传速度
+   *
+   * @param speed 单位：kb
    */
-  void setMaxSpeed(double maxSpeed);
+  void setMaxSpeed(int speed);
 }

@@ -16,10 +16,9 @@
 
 package com.arialyy.aria.core.command.normal;
 
-import android.text.TextUtils;
 import com.arialyy.aria.core.inf.AbsTask;
-import com.arialyy.aria.core.inf.IEntity;
 import com.arialyy.aria.core.inf.AbsTaskEntity;
+import com.arialyy.aria.core.inf.IEntity;
 import com.arialyy.aria.util.ALog;
 
 /**
@@ -28,8 +27,8 @@ import com.arialyy.aria.util.ALog;
  */
 class StopCmd<T extends AbsTaskEntity> extends AbsNormalCmd<T> {
 
-  StopCmd(String targetName, T entity, int taskType) {
-    super(targetName, entity, taskType);
+  StopCmd(T entity, int taskType) {
+    super(entity, taskType);
   }
 
   @Override public void executeCmd() {
@@ -42,9 +41,6 @@ class StopCmd<T extends AbsTaskEntity> extends AbsNormalCmd<T> {
         ALog.w(TAG, "停止命令执行失败，【调度器中没有该任务】");
       }
     } else {
-      if (!TextUtils.isEmpty(mTargetName)) {
-        task.setTargetName(mTargetName);
-      }
       stopTask();
     }
   }

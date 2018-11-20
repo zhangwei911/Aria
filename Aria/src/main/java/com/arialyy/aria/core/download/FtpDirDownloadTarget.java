@@ -17,11 +17,14 @@ package com.arialyy.aria.core.download;
 
 import android.support.annotation.CheckResult;
 import android.text.TextUtils;
-import com.arialyy.aria.core.delegate.FtpDelegate;
+import com.arialyy.aria.core.FtpUrlEntity;
+import com.arialyy.aria.core.common.ftp.FTPSConfig;
+import com.arialyy.aria.core.common.ftp.FtpDelegate;
 import com.arialyy.aria.core.inf.AbsTaskEntity;
 import com.arialyy.aria.core.inf.IFtpTarget;
 import com.arialyy.aria.core.manager.TEManager;
 import com.arialyy.aria.util.ALog;
+import java.net.Proxy;
 
 /**
  * Created by Aria.Lao on 2017/7/26.
@@ -29,7 +32,7 @@ import com.arialyy.aria.util.ALog;
  */
 public class FtpDirDownloadTarget extends BaseGroupTarget<FtpDirDownloadTarget>
     implements IFtpTarget<FtpDirDownloadTarget> {
-  private FtpDelegate<FtpDirDownloadTarget, DownloadGroupEntity, DownloadGroupTaskEntity> mDelegate;
+  private FtpDelegate<FtpDirDownloadTarget> mDelegate;
 
   FtpDirDownloadTarget(String url, String targetName) {
     mTargetName = targetName;
@@ -44,7 +47,7 @@ public class FtpDirDownloadTarget extends BaseGroupTarget<FtpDirDownloadTarget>
     if (mEntity != null) {
       mDirPathTemp = mEntity.getDirPath();
     }
-    mDelegate = new FtpDelegate<>(this, mTaskEntity);
+    mDelegate = new FtpDelegate<>(this);
   }
 
   @Override protected int getTargetType() {
@@ -58,12 +61,32 @@ public class FtpDirDownloadTarget extends BaseGroupTarget<FtpDirDownloadTarget>
       mTaskEntity.save();
       if (mTaskEntity.getSubTaskEntities() != null) {
         //初始化子项的登录信息
+        FtpUrlEntity tUrlEntity = mTaskEntity.getUrlEntity();
         for (DownloadTaskEntity entity : mTaskEntity.getSubTaskEntities()) {
-          entity.getUrlEntity().needLogin = mTaskEntity.getUrlEntity().needLogin;
-          entity.getUrlEntity().account = mTaskEntity.getUrlEntity().account;
-          entity.getUrlEntity().user = mTaskEntity.getUrlEntity().user;
-          entity.getUrlEntity().password = mTaskEntity.getUrlEntity().password;
+          FtpUrlEntity urlEntity = entity.getUrlEntity();
+          urlEntity.needLogin = tUrlEntity.needLogin;
+          urlEntity.account = tUrlEntity.account;
+          urlEntity.user = tUrlEntity.user;
+          urlEntity.password = tUrlEntity.password;
+          // 处理ftps详细
+          if (tUrlEntity.isFtps) {
+            urlEntity.isFtps = true;
+            urlEntity.protocol = tUrlEntity.protocol;
+            urlEntity.storePath = tUrlEntity.storePath;
+            urlEntity.storePass = tUrlEntity.storePass;
+            urlEntity.keyAlias = tUrlEntity.keyAlias;
+          }
         }
+      }
+    }
+    if (mTaskEntity.getUrlEntity().isFtps) {
+      if (TextUtils.isEmpty(mTaskEntity.getUrlEntity().storePath)) {
+        ALog.e(TAG, "证书路径为空");
+        return false;
+      }
+      if (TextUtils.isEmpty(mTaskEntity.getUrlEntity().keyAlias)) {
+        ALog.e(TAG, "证书别名为空");
+        return false;
       }
     }
     return b;
@@ -90,16 +113,34 @@ public class FtpDirDownloadTarget extends BaseGroupTarget<FtpDirDownloadTarget>
     }
     return true;
   }
+
+  /**
+   * 是否是FTPS协议
+   * 如果是FTPS协议，需要使用{@link FTPSConfig#setStorePath(String)} 、{@link FTPSConfig#setAlias(String)}
+   * 设置证书信息
+   */
+  @CheckResult
+  public FTPSConfig<FtpDirDownloadTarget> asFtps() {
+    mTaskEntity.getUrlEntity().isFtps = true;
+    return new FTPSConfig<>(this);
+  }
+
   @CheckResult
   @Override public FtpDirDownloadTarget charSet(String charSet) {
     return mDelegate.charSet(charSet);
   }
+
   @CheckResult
   @Override public FtpDirDownloadTarget login(String userName, String password) {
     return mDelegate.login(userName, password);
   }
+
   @CheckResult
   @Override public FtpDirDownloadTarget login(String userName, String password, String account) {
     return mDelegate.login(userName, password, account);
+  }
+
+  @Override public FtpDirDownloadTarget setProxy(Proxy proxy) {
+    return mDelegate.setProxy(proxy);
   }
 }

@@ -1,4 +1,73 @@
 ## 开发日志
+  + v_3.5.2
+    - 添加Serializable接口支持 https://github.com/AriaLyy/Aria/issues/320
+    - 失败回调增加错误原因 https://github.com/AriaLyy/Aria/issues/310
+      ```
+      @Download.onTaskFail void taskFail(DownloadTask task, Exception e) {
+         e.getMessage();
+        ...
+      }
+      ```
+     - fix bug https://github.com/AriaLyy/Aria/issues/322
+     - 新增201 重定向支持 https://github.com/AriaLyy/Aria/issues/318
+     - 修复使用`useServerFileName(true)`中含有`"`导致的文件后缀名错误问题
+     - 优化logcat日志提示
+     - 修改下载线程的优先级为`Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);`
+     - fix bug https://github.com/AriaLyy/Aria/issues/319
+  + v_3.5.1
+    - 优化`taskExists`方法
+    - 添加`post`参数请求支持
+      ```java
+      Aria.download(SingleTaskActivity.this)
+              .load(DOWNLOAD_URL)
+              .setFilePath(path)
+              .asPost() // post请求
+              .setParam("key", "value") //传递参数
+              //.setParams(Map<String, String>) // 传递多参数
+              .start();
+      ```
+     - 增加强制设置文件路径的api, https://github.com/AriaLyy/Aria/issues/311
+       ```
+       Aria.download(SingleTaskActivity.this)
+                     .load(DOWNLOAD_URL)
+                     .setFilePath(path, true) // true表示忽略路径是否被占用
+                     .start();
+       ```
+  + v_3.5
+    - fix bug https://github.com/AriaLyy/Aria/issues/302
+    - fix bug https://github.com/AriaLyy/Aria/issues/283
+    - fix bug https://github.com/AriaLyy/Aria/issues/305
+    - fix bug https://github.com/AriaLyy/Aria/issues/306
+    - fix bug https://github.com/AriaLyy/Aria/issues/272  (现在，停止所有任务，未开始的任务状态将变为停止)
+    - fix bug https://github.com/AriaLyy/Aria/issues/277
+    - fix bug https://github.com/AriaLyy/Aria/issues/303
+    - 优化停止任务的速度
+    - 修复组合任务修改子任务文件名失败的问题
+  + v_3.4.12
+    - fix bug https://github.com/AriaLyy/Aria/issues/286
+    - 优化线程池任务
+  + v_3.4.11
+    - fix bug https://github.com/AriaLyy/Aria/issues/288
+    - fix bug https://github.com/AriaLyy/Aria/issues/282
+  + v_3.4.10
+    - fix bug https://github.com/AriaLyy/Aria/issues/280
+  + v_3.4.9
+    - fix bug https://github.com/AriaLyy/Aria/issues/276
+  + v_3.4.8
+    - 组合任务新增`updateUrls(List<String>)`用于修改组合子任务的url，[see](https://aria.laoyuyu.me/aria_doc/api/update_url.html)
+    - 出于安全考虑，FTP数据库去掉密码的保存
+    - 增加FTPS支持 [see](https://aria.laoyuyu.me/aria_doc/download/ftps.html)
+    - 增加速度限制支持[see](https://aria.laoyuyu.me/aria_doc/api/speed_handle.html)
+    - 增加内存空间不足验证
+  + v_3.4.7
+    - 修复分块任务异常操作导致的问题
+  + v_3.4.6
+    - 修复android 4.4.4 版本多dex下无法进行回调的问题
+    - 新增`updateUrl(newUrl)`用于修改任务的url，[see](https://aria.laoyuyu.me/aria_doc/api/task_handle.html#%E6%9B%B4%E6%96%B0%E4%BB%BB%E5%8A%A1url)
+    - 优化分块下载
+    - 修复了字符串中有特殊字符导致的路径冲突问题；修复ftp分块下载失败问题
+    - 修复连接中有`+`导致的地址呗使用问题。
+    - 修复表重复创建导致的崩溃问题 https://github.com/AriaLyy/Aria/issues/264
   + v_3.4.4
     - 实现[多线程分块下载](https://aria.laoyuyu.me/aria_doc/start/config.html)
     - 修复`stopAll()`和`resumeAll()`导致的进度为0问题

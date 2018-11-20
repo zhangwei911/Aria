@@ -222,9 +222,9 @@ public class CheckUtil {
     } else if (TextUtils.isEmpty(entity.getUrl())) {
       throw new IllegalArgumentException("下载链接不能为空");
     } else if (TextUtils.isEmpty(entity.getFileName())) {
-      throw new FileException("文件名不能为null");
+      throw new NullPointerException("文件名不能为null");
     } else if (TextUtils.isEmpty(entity.getDownloadPath())) {
-      throw new FileException("文件保存路径不能为null");
+      throw new NullPointerException("文件保存路径不能为null");
     }
   }
 }

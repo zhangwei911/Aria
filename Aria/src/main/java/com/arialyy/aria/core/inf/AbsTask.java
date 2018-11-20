@@ -17,12 +17,19 @@ package com.arialyy.aria.core.inf;
 
 import android.content.Context;
 import android.os.Handler;
+import android.text.TextUtils;
+import com.arialyy.aria.core.common.IUtil;
+import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by AriaL on 2017/6/29.
  */
-public abstract class AbsTask<TASK_ENTITY extends AbsTaskEntity> implements ITask<TASK_ENTITY> {
+public abstract class AbsTask<ENTITY extends AbsEntity, TASK_ENTITY extends AbsTaskEntity>
+    implements ITask<TASK_ENTITY> {
+  public static final String ERROR_INFO_KEY = "ERROR_INFO_KEY";
 
   /**
    * 是否需要重试，默认为true
@@ -30,17 +37,62 @@ public abstract class AbsTask<TASK_ENTITY extends AbsTaskEntity> implements ITas
   public boolean needRetry = true;
   protected TASK_ENTITY mTaskEntity;
   protected Handler mOutHandler;
-
-  /**
-   * 用于生成该任务对象的hash码
-   */
-  private String mTargetName;
   protected Context mContext;
-  protected boolean isHeighestTask = false;
+  boolean isHeighestTask = false;
   private boolean isCancel = false, isStop = false;
+  protected IUtil mUtil;
+  /**
+   * 扩展信息
+   */
+  private Map<String, Object> mExpand = new HashMap<>();
+  /**
+   * 该任务的调度类型
+   */
+  @TaskSchedulerType
+  private int mSchedulerType = TaskSchedulerType.TYPE_DEFAULT;
+  protected IEventListener mListener;
+  protected ENTITY mEntity;
+  protected String TAG;
+
+  protected AbsTask() {
+    TAG = CommonUtil.getClassName(this);
+  }
 
   public Handler getOutHandler() {
     return mOutHandler;
+  }
+
+  /**
+   * 添加扩展数据
+   * 读取扩展数据{@link #getExpand(String)}
+   */
+  public void putExpand(String key, Object obj) {
+    if (TextUtils.isEmpty(key)) {
+      ALog.e(TAG, "key 为空");
+      return;
+    } else if (obj == null) {
+      ALog.e(TAG, "扩展数据为空");
+      return;
+    }
+    mExpand.put(key, obj);
+  }
+
+  /**
+   * 读取扩展数据
+   */
+  public Object getExpand(String key) {
+    return mExpand.get(key);
+  }
+
+  /**
+   * 设置最大下载/上传速度
+   *
+   * @param speed 单位为：kb
+   */
+  public void setMaxSpeed(int speed) {
+    if (mUtil != null) {
+      mUtil.setMaxSpeed(speed);
+    }
   }
 
   /**
@@ -118,16 +170,55 @@ public abstract class AbsTask<TASK_ENTITY extends AbsTaskEntity> implements ITas
    *
    * @return 如果实体不存在，则返回null，否则返回扩展字段
    */
-  @Override public String getExtendField() {
+  public String getExtendField() {
     return mTaskEntity.getEntity() == null ? null : mTaskEntity.getEntity().getStr();
   }
 
+  @Override public void start() {
+    if (mUtil.isRunning()) {
+      ALog.d(TAG, "任务正在下载");
+    } else {
+      mUtil.start();
+    }
+  }
+
   @Override public void stop() {
+    stop(TaskSchedulerType.TYPE_DEFAULT);
+  }
+
+  @Override public void stop(@TaskSchedulerType int type) {
     isStop = true;
+    mSchedulerType = type;
+    if (mUtil.isRunning()) {
+      mUtil.stop();
+    } else {
+      mListener.onStop(mEntity.getCurrentProgress());
+    }
   }
 
   @Override public void cancel() {
     isCancel = true;
+    if (!mUtil.isRunning()) {
+      mListener.onCancel();
+    } else {
+      mUtil.cancel();
+    }
+  }
+
+  /**
+   * 是否真正下载
+   *
+   * @return {@code true} 真正下载
+   */
+  @Override public boolean isRunning() {
+    return mUtil.isRunning();
+  }
+
+  /**
+   * 任务的调度类型
+   */
+  public int getSchedulerType() {
+    return mSchedulerType;
   }
 
   /**
@@ -198,14 +289,6 @@ public abstract class AbsTask<TASK_ENTITY extends AbsTaskEntity> implements ITas
    * 获取任务名，也就是文件名
    */
   public abstract String getTaskName();
-
-  public String getTargetName() {
-    return mTargetName;
-  }
-
-  @Override public void setTargetName(String targetName) {
-    this.mTargetName = targetName;
-  }
 
   public boolean isHighestPriorityTask() {
     return isHeighestTask;

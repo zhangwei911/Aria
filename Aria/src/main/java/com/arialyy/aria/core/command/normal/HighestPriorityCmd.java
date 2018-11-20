@@ -36,11 +36,8 @@ import com.arialyy.aria.util.NetUtils;
  * 目前只只支持单下载任务的最高优先级任务
  */
 final class HighestPriorityCmd<T extends AbsTaskEntity> extends AbsNormalCmd<T> {
-  /**
-   * @param targetName 产生任务的对象名
-   */
-  HighestPriorityCmd(String targetName, T entity, int taskType) {
-    super(targetName, entity, taskType);
+  HighestPriorityCmd(T entity, int taskType) {
+    super(entity, taskType);
   }
 
   @Override public void executeCmd() {
@@ -54,9 +51,6 @@ final class HighestPriorityCmd<T extends AbsTaskEntity> extends AbsNormalCmd<T> 
       task = (DownloadTask) createTask();
     }
     if (task != null) {
-      if (!TextUtils.isEmpty(mTargetName)) {
-        task.setTargetName(mTargetName);
-      }
       ((DownloadTaskQueue) mQueue).setTaskHighestPriority(task);
     }
   }

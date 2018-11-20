@@ -19,8 +19,12 @@ import com.arialyy.aria.core.FtpUrlEntity;
 import com.arialyy.aria.core.common.RequestEnum;
 import com.arialyy.aria.orm.DbEntity;
 import com.arialyy.aria.orm.annotation.Ignore;
+import java.net.CookieManager;
+import java.net.HttpCookie;
 import java.net.Proxy;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -55,6 +59,8 @@ public abstract class AbsTaskEntity<ENTITY extends AbsEntity> extends DbEntity {
    */
   public static final int U_FTP = 0xA2;
 
+  @Ignore private CookieManager cookieManager;
+
   /**
    * 账号和密码
    */
@@ -69,6 +75,11 @@ public abstract class AbsTaskEntity<ENTITY extends AbsEntity> extends DbEntity {
    * 是否是新任务，{@code true} 新任务
    */
   @Ignore private boolean isNewTask = false;
+
+  /**
+   * 请求参数
+   */
+  @Ignore private Map<String, String> params;
 
   /**
    * 任务状态，和Entity的state同步
@@ -128,6 +139,14 @@ public abstract class AbsTaskEntity<ENTITY extends AbsEntity> extends DbEntity {
   @Ignore private Proxy proxy;
 
   public abstract ENTITY getEntity();
+
+  public CookieManager getCookieManager() {
+    return cookieManager;
+  }
+
+  public void setCookieManager(CookieManager cookieManager) {
+    this.cookieManager = cookieManager;
+  }
 
   /**
    * 获取任务下载状态
@@ -255,5 +274,13 @@ public abstract class AbsTaskEntity<ENTITY extends AbsEntity> extends DbEntity {
 
   public void setCode(int code) {
     this.code = code;
+  }
+
+  public Map<String, String> getParams() {
+    return params;
+  }
+
+  public void setParams(Map<String, String> params) {
+    this.params = params;
   }
 }

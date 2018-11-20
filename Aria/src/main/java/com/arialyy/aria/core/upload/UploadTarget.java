@@ -17,10 +17,11 @@ package com.arialyy.aria.core.upload;
 
 import android.support.annotation.CheckResult;
 import android.support.annotation.NonNull;
-import com.arialyy.aria.core.common.RequestEnum;
-import com.arialyy.aria.core.delegate.HttpHeaderDelegate;
+import com.arialyy.aria.core.common.http.HttpHeaderDelegate;
+import com.arialyy.aria.core.common.http.PostDelegate;
 import com.arialyy.aria.core.inf.AbsTaskEntity;
-import com.arialyy.aria.core.inf.IHttpHeaderTarget;
+import com.arialyy.aria.core.inf.IHttpHeaderDelegate;
+import java.net.Proxy;
 import java.util.Map;
 
 /**
@@ -28,8 +29,8 @@ import java.util.Map;
  * http 单文件上传
  */
 public class UploadTarget extends BaseNormalTarget<UploadTarget>
-    implements IHttpHeaderTarget<UploadTarget> {
-  private HttpHeaderDelegate<UploadTarget, UploadEntity, UploadTaskEntity> mDelegate;
+    implements IHttpHeaderDelegate<UploadTarget> {
+  private HttpHeaderDelegate<UploadTarget> mDelegate;
 
   UploadTarget(String filePath, String targetName) {
     this.mTargetName = targetName;
@@ -42,7 +43,14 @@ public class UploadTarget extends BaseNormalTarget<UploadTarget>
     //http暂时不支持断点上传
     mTaskEntity.setSupportBP(false);
     mTaskEntity.setRequestType(AbsTaskEntity.U_HTTP);
-    mDelegate = new HttpHeaderDelegate<>(this, mTaskEntity);
+    mDelegate = new HttpHeaderDelegate<>(this);
+  }
+
+  /**
+   * Post处理
+   */
+  public PostDelegate asPost() {
+    return new PostDelegate<>(this);
   }
 
   /**
@@ -86,8 +94,7 @@ public class UploadTarget extends BaseNormalTarget<UploadTarget>
     return mDelegate.addHeaders(headers);
   }
 
-  @CheckResult
-  @Override public UploadTarget setRequestMode(RequestEnum requestEnum) {
-    return mDelegate.setRequestMode(requestEnum);
+  @Override public UploadTarget setUrlProxy(Proxy proxy) {
+    return mDelegate.setUrlProxy(proxy);
   }
 }

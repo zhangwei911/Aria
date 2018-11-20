@@ -35,7 +35,7 @@ import com.arialyy.simple.databinding.FragmentDownloadBinding;
 import com.arialyy.simple.widget.HorizontalProgressBarWithNumber;
 
 /**
- * Created by Aria.Lao on 2017/1/4.
+ * Created by lyy on 2017/1/4.
  */
 public class DownloadFragment extends AbsFragment<FragmentDownloadBinding> {
   @Bind(R.id.start) Button mStart;

@@ -22,6 +22,8 @@ import com.arialyy.aria.core.inf.AbsTaskEntity;
 import com.arialyy.aria.core.inf.IUploadListener;
 import com.arialyy.aria.core.upload.UploadEntity;
 import com.arialyy.aria.core.upload.UploadTaskEntity;
+import com.arialyy.aria.exception.BaseException;
+import com.arialyy.aria.exception.TaskException;
 import com.arialyy.aria.util.CheckUtil;
 
 /**
@@ -60,8 +62,8 @@ public class SimpleUploadUtil implements IUtil, Runnable {
             }
           }
 
-          @Override public void onFail(String url, String errorMsg, boolean needRetry) {
-            mListener.onFail(needRetry);
+          @Override public void onFail(String url, BaseException e, boolean needRetry) {
+            mListener.onFail(needRetry, e);
           }
         }).start();
         break;
@@ -99,7 +101,7 @@ public class SimpleUploadUtil implements IUtil, Runnable {
     mUploader.cancel();
   }
 
-  @Override public void setMaxSpeed(double maxSpeed) {
-    mUploader.setMaxSpeed(maxSpeed);
+  @Override public void setMaxSpeed(int speed) {
+    mUploader.setMaxSpeed(speed);
   }
 }

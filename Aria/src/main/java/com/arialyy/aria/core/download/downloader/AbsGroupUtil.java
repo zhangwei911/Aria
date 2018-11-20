@@ -22,23 +22,23 @@ import com.arialyy.aria.core.download.DownloadGroupTaskEntity;
 import com.arialyy.aria.core.download.DownloadTaskEntity;
 import com.arialyy.aria.core.inf.IDownloadListener;
 import com.arialyy.aria.core.inf.IEntity;
+import com.arialyy.aria.exception.BaseException;
+import com.arialyy.aria.exception.TaskException;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
 import com.arialyy.aria.util.NetUtils;
 import java.io.File;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by AriaL on 2017/6/30.
  * 任务组核心逻辑
  */
-public abstract class AbsGroupUtil implements IUtil {
+public abstract class AbsGroupUtil implements IUtil, Runnable {
   private static final Object LOCK = new Object();
   private final String TAG = "AbsGroupUtil";
   /**
@@ -55,30 +55,29 @@ public abstract class AbsGroupUtil implements IUtil {
    */
   long mTotalLen = 0;
   long mCurrentLocation = 0;
-  private ExecutorService mExePool;
   protected IDownloadGroupListener mListener;
   DownloadGroupTaskEntity mGTEntity;
   private boolean isRunning = false;
-  private Timer mTimer;
+  private ScheduledThreadPoolExecutor mTimer;
   /**
    * 保存所有没有下载完成的任务，key为下载地址
    */
-  Map<String, DownloadTaskEntity> mExeMap = new HashMap<>();
+  Map<String, DownloadTaskEntity> mExeMap = new ConcurrentHashMap<>();
 
   /**
    * 下载失败的映射表，key为下载地址
    */
-  Map<String, DownloadTaskEntity> mFailMap = new HashMap<>();
+  Map<String, DownloadTaskEntity> mFailMap = new ConcurrentHashMap<>();
 
   /**
    * 该任务组对应的所有任务
    */
-  private Map<String, DownloadTaskEntity> mTasksMap = new HashMap<>();
+  private Map<String, DownloadTaskEntity> mTasksMap = new ConcurrentHashMap<>();
 
   /**
    * 下载器映射表，key为下载地址
    */
-  private Map<String, Downloader> mDownloaderMap = new HashMap<>();
+  private Map<String, Downloader> mDownloaderMap = new ConcurrentHashMap<>();
 
   /**
    * 是否需要读取文件长度，{@code true}需要
@@ -96,7 +95,6 @@ public abstract class AbsGroupUtil implements IUtil {
   AbsGroupUtil(IDownloadGroupListener listener, DownloadGroupTaskEntity groupEntity) {
     mListener = listener;
     mGTEntity = groupEntity;
-    mExePool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
     mUpdateInterval =
         AriaManager.getInstance(AriaManager.APP).getDownloadConfig().getUpdateInterval();
   }
@@ -227,10 +225,6 @@ public abstract class AbsGroupUtil implements IUtil {
     isCancel = true;
     closeTimer();
     onCancel();
-    if (!mExePool.isShutdown()) {
-      mExePool.shutdown();
-    }
-
     Set<String> keys = mDownloaderMap.keySet();
     for (String key : keys) {
       Downloader dt = mDownloaderMap.get(key);
@@ -250,9 +244,6 @@ public abstract class AbsGroupUtil implements IUtil {
     isStop = true;
     closeTimer();
     onStop();
-    if (!mExePool.isShutdown()) {
-      mExePool.shutdown();
-    }
 
     Set<String> keys = mDownloaderMap.keySet();
     for (String key : keys) {
@@ -275,6 +266,7 @@ public abstract class AbsGroupUtil implements IUtil {
    */
   protected void onPre() {
     mListener.onPre();
+    isRunning = true;
     mGroupSize = mGTEntity.getSubTaskEntities().size();
     mTotalLen = mGTEntity.getEntity().getFileSize();
     isNeedLoadFileSize = mTotalLen <= 10;
@@ -295,6 +287,10 @@ public abstract class AbsGroupUtil implements IUtil {
   }
 
   @Override public void start() {
+    new Thread(this).start();
+  }
+
+  @Override public void run() {
     if (isStop || isCancel) {
       closeTimer();
       return;
@@ -311,8 +307,14 @@ public abstract class AbsGroupUtil implements IUtil {
     start();
   }
 
-  @Override public void setMaxSpeed(double maxSpeed) {
-
+  @Override public void setMaxSpeed(int speed) {
+    Set<String> keys = mDownloaderMap.keySet();
+    for (String key : keys) {
+      Downloader dt = mDownloaderMap.get(key);
+      if (dt != null) {
+        dt.setMaxSpeed(speed);
+      }
+    }
   }
 
   private void clearState() {
@@ -320,12 +322,9 @@ public abstract class AbsGroupUtil implements IUtil {
     mFailMap.clear();
   }
 
-  void closeTimer() {
-    isRunning = false;
-    if (mTimer != null) {
-      mTimer.purge();
-      mTimer.cancel();
-      mTimer = null;
+  synchronized void closeTimer() {
+    if (mTimer != null && !mTimer.isShutdown()) {
+      mTimer.shutdown();
     }
   }
 
@@ -343,10 +342,10 @@ public abstract class AbsGroupUtil implements IUtil {
     startTimer();
   }
 
-  private void startTimer() {
+  private synchronized void startTimer() {
     isRunning = true;
-    mTimer = new Timer(true);
-    mTimer.schedule(new TimerTask() {
+    mTimer = new ScheduledThreadPoolExecutor(1);
+    mTimer.scheduleWithFixedDelay(new Runnable() {
       @Override public void run() {
         if (!isRunning) {
           closeTimer();
@@ -363,7 +362,7 @@ public abstract class AbsGroupUtil implements IUtil {
           mListener.onProgress(t);
         }
       }
-    }, 0, mUpdateInterval);
+    }, 0, mUpdateInterval, TimeUnit.MILLISECONDS);
   }
 
   /**
@@ -382,9 +381,8 @@ public abstract class AbsGroupUtil implements IUtil {
     ChildDownloadListener listener = new ChildDownloadListener(taskEntity);
     Downloader dt = new Downloader(listener, taskEntity);
     mDownloaderMap.put(taskEntity.getEntity().getUrl(), dt);
-    if (mExePool.isShutdown()) return dt;
     if (start) {
-      mExePool.execute(dt);
+      dt.start();
     }
     return dt;
   }
@@ -397,9 +395,9 @@ public abstract class AbsGroupUtil implements IUtil {
     private DownloadEntity subEntity;
     private int RUN_SAVE_INTERVAL = 5 * 1000;  //5s保存一次下载中的进度
     private long lastSaveTime;
-    private long lastLen = 0;
-    private Timer timer;
-    private boolean isNotNetRetry = false;
+    private long lastLen;
+    private ScheduledThreadPoolExecutor timer;
+    private boolean isNotNetRetry;
 
     ChildDownloadListener(DownloadTaskEntity entity) {
       subTaskEntity = entity;
@@ -486,7 +484,7 @@ public abstract class AbsGroupUtil implements IUtil {
       }
     }
 
-    @Override public void onFail(boolean needRetry) {
+    @Override public void onFail(boolean needRetry, BaseException e) {
       subEntity.setFailNum(subEntity.getFailNum() + 1);
       saveData(IEntity.STATE_FAIL, lastLen);
       handleSpeed(0);
@@ -497,22 +495,26 @@ public abstract class AbsGroupUtil implements IUtil {
      * 重试下载，只有全部都下载失败才会执行任务组的整体重试，否则只会执行单个子任务的重试
      */
     private void reTry(boolean needRetry) {
-      Downloader dt = mDownloaderMap.get(subEntity.getUrl());
       synchronized (AbsGroupUtil.LOCK) {
+        Downloader dt = mDownloaderMap.get(subEntity.getUrl());
         if (!isCancel && !isStop && dt != null
             && !dt.isBreak()
             && needRetry
             && subEntity.getFailNum() < 3
             && (NetUtils.isConnected(AriaManager.APP) || isNotNetRetry)) {
+          ALog.d(TAG, "downloader retry");
           reStartTask(dt);
         } else {
           mFailMap.put(subTaskEntity.getUrl(), subTaskEntity);
-          mListener.onSubFail(subEntity);
+          mListener.onSubFail(subEntity, new TaskException(TAG,
+              String.format("任务组子任务【%s】下载失败，下载地址【%s】", subEntity.getFileName(),
+                  subEntity.getUrl())));
           if (mFailMap.size() == mExeMap.size() || mFailMap.size() + mCompleteNum == mGroupSize) {
             closeTimer();
           }
           if (mFailMap.size() == mGroupSize) {
-            mListener.onFail(true);
+            mListener.onFail(true, new TaskException(TAG,
+                String.format("任务组【%s】下载失败", mGTEntity.getEntity().getGroupName())));
           } else if (mFailMap.size() + mCompleteNum >= mExeMap.size()) {
             mListener.onStop(mCurrentLocation);
           }
@@ -521,18 +523,16 @@ public abstract class AbsGroupUtil implements IUtil {
     }
 
     private void reStartTask(final Downloader dt) {
-      if (timer != null) {
-        timer.purge();
-        timer.cancel();
+      if (timer == null || timer.isShutdown()) {
+        timer = new ScheduledThreadPoolExecutor(1);
       }
-      timer = new Timer();
-      timer.schedule(new TimerTask() {
+      timer.schedule(new Runnable() {
         @Override public void run() {
           if (dt != null) {
-            dt.retryThreadTask();
+            dt.retryTask();
           }
         }
-      }, 5000);
+      }, 5, TimeUnit.SECONDS);
     }
 
     private void handleSpeed(long speed) {

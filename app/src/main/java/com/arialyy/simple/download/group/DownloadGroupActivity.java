@@ -22,6 +22,7 @@ import android.view.View;
 import butterknife.Bind;
 import com.arialyy.annotations.DownloadGroup;
 import com.arialyy.aria.core.Aria;
+import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.download.DownloadGroupEntity;
 import com.arialyy.aria.core.download.DownloadGroupTask;
 import com.arialyy.aria.core.download.DownloadGroupTaskEntity;
@@ -31,10 +32,11 @@ import com.arialyy.simple.R;
 import com.arialyy.simple.base.BaseActivity;
 import com.arialyy.simple.databinding.ActivityDownloadGroupBinding;
 import com.arialyy.simple.widget.SubStateLinearLayout;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by Aria.Lao on 2017/7/6.
+ * Created by lyy on 2017/7/6.
  */
 public class DownloadGroupActivity extends BaseActivity<ActivityDownloadGroupBinding> {
 
@@ -79,21 +81,25 @@ public class DownloadGroupActivity extends BaseActivity<ActivityDownloadGroupBin
   public void onClick(View view) {
     switch (view.getId()) {
       case R.id.start:
+        List<String> temp = new ArrayList<>();
+        temp.add("https://d.pcs.baidu.com/file/130335545f3f4d9cc38afe709c19af5a?fid=1411168371-250528-1010657263806840&dstime=1531134714&rt=sh&sign=FDtAERVY-DCb740ccc5511e5e8fedcff06b081203-h8KgJ6gl4oY9UR6NqvwJsT4nVSM%3D&expires=8h&chkv=1&chkbd=0&chkpc=et&dp-logid=4401996296756616039&dp-callid=0&r=279987343");
         Aria.download(this)
             .loadGroup(mUrls)
             .setDirPath(
-                Environment.getExternalStorageDirectory().getPath() + "/Download/group_test_3")
+                //Environment.getExternalStorageDirectory().getPath() + "/Download/group_test_5")
+                Environment.getExternalStorageDirectory().getPath() + "/Download/group_test_1")
             .setGroupAlias("任务组测试")
-            //.setSubFileName(getModule(GroupModule.class).getSubName())
-            //.setFileSize(32895492)
+            //.setSubFileName(getModule(GroupModule.class).getSubName2())
+            .setSubFileName(getModule(GroupModule.class).getSubName())
+            //.updateUrls(temp)
             .start();
         break;
       case R.id.stop:
         Aria.download(this).loadGroup(mUrls).stop();
         break;
       case R.id.cancel:
-        //Aria.download(this).load(mUrls).cancel(true);
-        Aria.download(this).removeAllTask(true);
+        Aria.download(this).loadGroup(mUrls).cancel(true);
+        //Aria.download(this).removeAllTask(true);
         //mUrls = getModule(GroupModule.class).getUrls1();
         //Aria.download(this)
         //    .load(mUrls)
@@ -141,6 +147,7 @@ public class DownloadGroupActivity extends BaseActivity<ActivityDownloadGroupBin
         + task.getCurrentProgress());
     getBinding().setProgress(task.getPercent());
     getBinding().setSpeed(task.getConvertSpeed());
+    //Log.d(TAG, "sub_len = " + task.getEntity().getSubEntities().size());
     mChildList.updateChildProgress(task.getEntity().getSubEntities());
   }
 
@@ -169,5 +176,54 @@ public class DownloadGroupActivity extends BaseActivity<ActivityDownloadGroupBin
     mChildList.updateChildProgress(task.getEntity().getSubEntities());
     T.showShort(this, "任务组下载完成");
     L.d(TAG, "任务组下载完成");
+  }
+
+  @DownloadGroup.onSubTaskRunning void onSubTaskRunning(DownloadGroupTask groupTask,
+      DownloadEntity subEntity) {
+    //Log.e(TAG, "gHash = "
+    //    + groupTask.getEntity().getSubEntities().get(0).hashCode()
+    //    + "; subHash = "
+    //    + groupTask.getTaskEntity().getSubTaskEntities().get(0).getEntity().hashCode() +
+    //    "; subHash = " + subEntity.hashCode());
+    //int percent = subEntity.getPercent();
+    ////如果你打开了速度单位转换配置，将可以通过以下方法获取带单位的下载速度，如：1 mb/s
+    //String convertSpeed = subEntity.getConvertSpeed();
+    ////当前下载完成的进度，长度bytes
+    //long completedSize = subEntity.getCurrentProgress();
+    //Log.d(TAG, "subTask名字："
+    //    + subEntity.getFileName()
+    //    + ", "
+    //    + " speed:"
+    //    + convertSpeed
+    //    + ",percent: "
+    //    + percent
+    //    + "%,  completedSize:"
+    //    + completedSize);
+  }
+
+  @DownloadGroup.onSubTaskPre void onSubTaskPre(DownloadGroupTask groupTask,
+      DownloadEntity subEntity) {
+  }
+
+  @DownloadGroup.onSubTaskStop void onSubTaskStop(DownloadGroupTask groupTask,
+      DownloadEntity subEntity) {
+  }
+
+  @DownloadGroup.onSubTaskStart void onSubTaskStart(DownloadGroupTask groupTask,
+      DownloadEntity subEntity) {
+  }
+
+  //@DownloadGroup.onSubTaskCancel void onSubTaskCancel(DownloadGroupTask groupTask,
+  //    DownloadEntity subEntity) {
+  //  Log.d(TAG, "new Size: " + groupTask.getConvertFileSize());
+  //  mSub.setText("子任务：" + mChildName + "，状态：取消下载");
+  //}
+
+  @DownloadGroup.onSubTaskComplete void onSubTaskComplete(DownloadGroupTask groupTask,
+      DownloadEntity subEntity) {
+  }
+
+  @DownloadGroup.onSubTaskFail void onSubTaskFail(DownloadGroupTask groupTask,
+      DownloadEntity subEntity) {
   }
 }

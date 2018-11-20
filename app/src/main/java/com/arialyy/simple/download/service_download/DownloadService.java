@@ -26,7 +26,7 @@ import com.arialyy.aria.core.download.DownloadTask;
 import com.arialyy.frame.util.show.T;
 
 /**
- * Created by Aria.Lao on 2017/4/5.
+ * Created by lyy on 2017/4/5.
  * 在服务中使用 Aria进行下载
  */
 public class DownloadService extends Service {

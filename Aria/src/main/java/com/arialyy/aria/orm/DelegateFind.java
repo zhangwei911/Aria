@@ -201,7 +201,7 @@ class DelegateFind extends AbsDelegate {
    * @param pColumnAlias 关联查询父表别名
    * @param cColumnAlias 关联查询子表别名
    */
-  private <T extends AbsWrapper, P extends DbEntity, C extends DbEntity> List<T> newInstanceEntity(
+  private synchronized <T extends AbsWrapper, P extends DbEntity, C extends DbEntity> List<T> newInstanceEntity(
       Class<T> clazz, Class<P> parent,
       Class<C> child,
       Cursor cursor,
@@ -356,6 +356,26 @@ class DelegateFind extends AbsDelegate {
   }
 
   /**
+   * 模糊查寻数据
+   */
+  <T extends DbEntity> List<T> findDataByFuzzy(SQLiteDatabase db, Class<T> clazz, String conditions) {
+    db = checkDb(db);
+    if(TextUtils.isEmpty(conditions)){
+      throw new IllegalArgumentException("sql语句表达式不能为null或\"\"");
+    }
+    if(!conditions.toUpperCase().contains("LIKE")){
+      throw new IllegalArgumentException("sql语句表达式未包含LIEK");
+    }
+    String sql =
+            "SELECT rowid, * FROM " + CommonUtil.getClassName(clazz) + " WHERE "+conditions;
+    print(FIND_DATA, sql);
+    Cursor cursor = db.rawQuery(sql, null);
+    List<T> data = cursor.getCount() > 0 ? newInstanceEntity(clazz, cursor) : null;
+    closeCursor(cursor);
+    close(db);
+    return data;
+  }
+  /**
    * 查找表的所有数据
    */
   <T extends DbEntity> List<T> findAllData(SQLiteDatabase db, Class<T> clazz) {
@@ -373,7 +393,7 @@ class DelegateFind extends AbsDelegate {
   /**
    * 根据数据游标创建一个具体的对象
    */
-  private <T extends DbEntity> List<T> newInstanceEntity(Class<T> clazz, Cursor cursor) {
+  private synchronized <T extends DbEntity> List<T> newInstanceEntity(Class<T> clazz, Cursor cursor) {
     List<Field> fields = CommonUtil.getAllFields(clazz);
     List<T> entitys = new ArrayList<>();
     if (fields != null && fields.size() > 0) {
@@ -419,6 +439,10 @@ class DelegateFind extends AbsDelegate {
    */
   private void setFieldValue(Class type, Field field, int column, Cursor cursor, Object entity)
       throws IllegalAccessException {
+    if (cursor == null || cursor.isClosed()) {
+      ALog.e(TAG, "cursor没有初始化");
+      return;
+    }
     if (type == String.class) {
       String temp = cursor.getString(column);
       if (!TextUtils.isEmpty(temp)) {

@@ -25,7 +25,7 @@ import java.io.File;
 import java.util.List;
 
 /**
- * Created by Aria.Lao on 2017/7/26.
+ * Created by lyy on 2017/7/26.
  */
 abstract class BaseGroupTarget<TARGET extends BaseGroupTarget>
     extends AbsDownloadTarget<TARGET, DownloadGroupEntity, DownloadGroupTaskEntity> {

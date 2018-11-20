@@ -15,12 +15,18 @@
  */
 package com.arialyy.aria.core.download.downloader;
 
+import android.os.Process;
 import android.text.TextUtils;
+import android.util.Log;
 import com.arialyy.aria.core.AriaManager;
 import com.arialyy.aria.core.common.CompleteInfo;
 import com.arialyy.aria.core.common.OnFileInfoCallback;
+import com.arialyy.aria.core.common.RequestEnum;
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.download.DownloadTaskEntity;
+import com.arialyy.aria.exception.AriaIOException;
+import com.arialyy.aria.exception.BaseException;
+import com.arialyy.aria.exception.TaskException;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CheckUtil;
 import com.arialyy.aria.util.CommonUtil;
@@ -28,9 +34,18 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.net.CookieHandler;
+import java.net.CookieManager;
+import java.net.HttpCookie;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * 下载文件信息获取
@@ -51,6 +66,7 @@ class HttpFileInfoThread implements Runnable {
   }
 
   @Override public void run() {
+    Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
     HttpURLConnection conn = null;
     try {
       URL url = new URL(CommonUtil.convertUrl(mEntity.getUrl()));
@@ -62,12 +78,9 @@ class HttpFileInfoThread implements Runnable {
       conn.connect();
       handleConnect(conn);
     } catch (IOException e) {
-      failDownload("下载失败【downloadUrl:"
-          + mEntity.getUrl()
-          + "】\n【filePath:"
-          + mEntity.getDownloadPath()
-          + "】\n"
-          + ALog.getExceptionString(e), true);
+      failDownload(new AriaIOException(TAG,
+              String.format("下载失败，filePath: %s, url: %s", mEntity.getDownloadPath(), mEntity.getUrl())),
+          true);
     } finally {
       if (conn != null) {
         conn.disconnect();
@@ -76,6 +89,23 @@ class HttpFileInfoThread implements Runnable {
   }
 
   private void handleConnect(HttpURLConnection conn) throws IOException {
+    if (mTaskEntity.getRequestEnum() == RequestEnum.POST) {
+      Map<String, String> params = mTaskEntity.getParams();
+      if (params != null) {
+        OutputStreamWriter dos = new OutputStreamWriter(conn.getOutputStream());
+        Set<String> keys = params.keySet();
+        StringBuilder sb = new StringBuilder();
+        for (String key : keys) {
+          sb.append(key).append("=").append(URLEncoder.encode(params.get(key))).append("&");
+        }
+        String url = sb.toString();
+        url = url.substring(0, url.length() - 1);
+        dos.write(url);
+        dos.flush();
+        dos.close();
+      }
+    }
+
     long len = conn.getContentLength();
     if (len < 0) {
       String temp = conn.getHeaderField("Content-Length");
@@ -92,6 +122,14 @@ class HttpFileInfoThread implements Runnable {
         }
       }
     }
+
+    if (!CommonUtil.checkSDMemorySpace(mEntity.getDownloadPath(), len)) {
+      failDownload(new TaskException(TAG,
+          String.format("下载失败，内存空间不足；filePath: %s, url: %s", mEntity.getDownloadPath(),
+              mEntity.getUrl())), false);
+      return;
+    }
+
     int code = conn.getResponseCode();
     boolean end = false;
     if (TextUtils.isEmpty(mEntity.getMd5Code())) {
@@ -104,7 +142,7 @@ class HttpFileInfoThread implements Runnable {
     if (!TextUtils.isEmpty(str) && str.equals("chunked")) {
       isChunked = true;
     }
-    //Map<String, List<String>> headers = conn.getHeaderFields();
+    Map<String, List<String>> headers = conn.getHeaderFields();
     String disposition = conn.getHeaderField("Content-Disposition");
     if (mTaskEntity.isUseServerFileName() && !TextUtils.isEmpty(disposition)) {
       mEntity.setDisposition(CommonUtil.encryptBASE64(disposition));
@@ -114,19 +152,33 @@ class HttpFileInfoThread implements Runnable {
           if (info.startsWith("filename") && info.contains("=")) {
             String[] temp = info.split("=");
             if (temp.length > 1) {
-              String newName = URLDecoder.decode(temp[1], "utf-8");
+              String newName = URLDecoder.decode(temp[1], "utf-8").replaceAll("\"", "");
               mEntity.setServerFileName(newName);
-              fileRename(newName);
+              renameFile(newName);
               break;
             }
           }
         }
       }
     }
+    CookieManager msCookieManager = new CookieManager();
+    List<String> cookiesHeader = headers.get("Set-Cookie");
+
+    if (cookiesHeader != null) {
+      for (String cookie : cookiesHeader) {
+        msCookieManager.getCookieStore().add(null, HttpCookie.parse(cookie).get(0));
+      }
+      mTaskEntity.setCookieManager(msCookieManager);
+    }
 
     mTaskEntity.setCode(code);
     if (code == HttpURLConnection.HTTP_PARTIAL) {
       if (!checkLen(len) && !isChunked) {
+        if (len < 0) {
+          failDownload(
+              new AriaIOException(TAG, String.format("任务下载失败，文件长度小于0， url: %s", mEntity.getUrl())),
+              false);
+        }
         return;
       }
       mEntity.setFileSize(len);
@@ -149,6 +201,12 @@ class HttpFileInfoThread implements Runnable {
         handleUrlReTurn(conn, CommonUtil.getWindowReplaceUrl(sb.toString()));
         return;
       } else if (!checkLen(len) && !isChunked) {
+        if (len < 0) {
+          failDownload(
+              new AriaIOException(TAG, String.format("任务下载失败，文件长度小于0， url: %s", mEntity.getUrl())),
+              false);
+        }
+        ALog.d(TAG, "len < 0");
         return;
       }
       mEntity.setFileSize(len);
@@ -156,14 +214,18 @@ class HttpFileInfoThread implements Runnable {
       mTaskEntity.setSupportBP(false);
       end = true;
     } else if (code == HttpURLConnection.HTTP_NOT_FOUND) {
-      failDownload("任务【" + mEntity.getUrl() + "】下载失败，错误码：404", true);
+      failDownload(new AriaIOException(TAG,
+          String.format("任务下载失败，errorCode：404, url: %s", mEntity.getUrl())), true);
     } else if (code == HttpURLConnection.HTTP_MOVED_TEMP
         || code == HttpURLConnection.HTTP_MOVED_PERM
         || code == HttpURLConnection.HTTP_SEE_OTHER
+        || code == HttpURLConnection.HTTP_CREATED // 201 跳转
         || code == 307) {
       handleUrlReTurn(conn, conn.getHeaderField("Location"));
     } else {
-      failDownload("任务【" + mEntity.getUrl() + "】下载失败，错误码：" + code, true);
+      failDownload(new AriaIOException(TAG,
+          String.format("任务下载失败，errorCode：%s, errorMsg: %s, url: %s", code,
+              conn.getResponseMessage(), mEntity.getUrl())), true);
     }
     if (end) {
       mTaskEntity.setChunked(isChunked);
@@ -178,7 +240,7 @@ class HttpFileInfoThread implements Runnable {
   /**
    * 重命名文件
    */
-  private void fileRename(String newName) {
+  private void renameFile(String newName) {
     if (TextUtils.isEmpty(newName)) {
       ALog.w(TAG, "重命名失败【服务器返回的文件名为空】");
       return;
@@ -201,19 +263,20 @@ class HttpFileInfoThread implements Runnable {
     if (TextUtils.isEmpty(newUrl) || newUrl.equalsIgnoreCase("null") || !newUrl.startsWith(
         "http")) {
       if (onFileInfoCallback != null) {
-        onFileInfoCallback.onFail(mEntity.getUrl(), "获取重定向链接失败", false);
+        onFileInfoCallback.onFail(mEntity.getUrl(), new TaskException(TAG, "获取重定向链接失败"), false);
       }
       return;
     }
     if (!CheckUtil.checkUrl(newUrl)) {
-      failDownload("下载失败，重定向url错误", false);
+      failDownload(new TaskException(TAG, "下载失败，重定向url错误"), false);
       return;
     }
     mTaskEntity.setRedirectUrl(newUrl);
     mEntity.setRedirect(true);
     mEntity.setRedirectUrl(newUrl);
     String cookies = conn.getHeaderField("Set-Cookie");
-    conn = (HttpURLConnection) new URL(newUrl).openConnection();
+    URL url = new URL(CommonUtil.convertUrl(newUrl));
+    conn = ConnectionHelp.handleConnection(url, mTaskEntity);
     conn = ConnectionHelp.setConnectParam(mTaskEntity, conn);
     conn.setRequestProperty("Cookie", cookies);
     conn.setRequestProperty("Range", "bytes=" + 0 + "-");
@@ -233,17 +296,12 @@ class HttpFileInfoThread implements Runnable {
     if (len != mEntity.getFileSize()) {
       mTaskEntity.setNewTask(true);
     }
-    if (len < 0) {
-      failDownload("任务【" + mEntity.getUrl() + "】下载失败，文件长度小于0", true);
-      return false;
-    }
     return true;
   }
 
-  private void failDownload(String errorMsg, boolean needRetry) {
-    ALog.e(TAG, errorMsg);
+  private void failDownload(BaseException e, boolean needRetry) {
     if (onFileInfoCallback != null) {
-      onFileInfoCallback.onFail(mEntity.getUrl(), errorMsg, needRetry);
+      onFileInfoCallback.onFail(mEntity.getUrl(), e, needRetry);
     }
   }
 }

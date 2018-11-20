@@ -1,5 +1,6 @@
 package com.arialyy.aria.core.command.normal;
 
+import android.text.TextUtils;
 import com.arialyy.aria.core.AriaManager;
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.download.DownloadGroupEntity;
@@ -32,11 +33,8 @@ import java.util.List;
 final class ResumeAllCmd<T extends AbsTaskEntity> extends AbsNormalCmd<T> {
   private List<AbsTaskEntity> mWaitList = new ArrayList<>();
 
-  /**
-   * @param targetName 产生任务的对象名
-   */
-  ResumeAllCmd(String targetName, T entity, int taskType) {
-    super(targetName, entity, taskType);
+  ResumeAllCmd(T entity, int taskType) {
+    super(entity, taskType);
   }
 
   @Override public void executeCmd() {
@@ -65,6 +63,9 @@ final class ResumeAllCmd<T extends AbsTaskEntity> extends AbsNormalCmd<T> {
               "isGroupChild=? AND state!=? ORDER BY stopTime DESC", "false", "1");
       if (entities != null && !entities.isEmpty()) {
         for (DownloadEntity entity : entities) {
+          //if (TextUtils.isEmpty(entity.getDownloadPath())){
+          //  continue;
+          //}
           resumeTask(TEManager.getInstance().getTEntity(DownloadTaskEntity.class, entity.getKey()));
         }
       }

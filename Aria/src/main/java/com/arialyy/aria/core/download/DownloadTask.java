@@ -19,9 +19,9 @@ package com.arialyy.aria.core.download;
 import android.os.Handler;
 import android.os.Looper;
 import com.arialyy.aria.core.AriaManager;
-import com.arialyy.aria.core.common.IUtil;
 import com.arialyy.aria.core.download.downloader.SimpleDownloadUtil;
 import com.arialyy.aria.core.inf.AbsNormalTask;
+import com.arialyy.aria.core.inf.IDownloadListener;
 import com.arialyy.aria.core.scheduler.ISchedulers;
 import com.arialyy.aria.util.ALog;
 import java.io.File;
@@ -30,19 +30,15 @@ import java.io.File;
  * Created by lyy on 2016/8/11.
  * 下载任务类
  */
-public class DownloadTask extends AbsNormalTask<DownloadTaskEntity> {
+public class DownloadTask extends AbsNormalTask<DownloadEntity, DownloadTaskEntity> {
   public static final String TAG = "DownloadTask";
-
-  private DownloadListener mListener;
-  private DownloadEntity mEntity;
-  private IUtil mUtil;
 
   private DownloadTask(DownloadTaskEntity taskEntity, Handler outHandler) {
     mTaskEntity = taskEntity;
     mOutHandler = outHandler;
     mContext = AriaManager.APP;
-    mListener = new DownloadListener(this, mOutHandler);
-    mUtil = new SimpleDownloadUtil(taskEntity, mListener);
+    mListener = new BaseDListener(this, mOutHandler);
+    mUtil = new SimpleDownloadUtil(taskEntity, (IDownloadListener) mListener);
     mEntity = taskEntity.getEntity();
   }
 
@@ -76,74 +72,8 @@ public class DownloadTask extends AbsNormalTask<DownloadTaskEntity> {
     return mEntity.getUrl();
   }
 
-  /**
-   * 是否真正下载
-   *
-   * @return {@code true} 真正下载
-   */
-  @Override public boolean isRunning() {
-    return mUtil.isRunning();
-  }
-
   public DownloadEntity getDownloadEntity() {
     return mEntity;
-  }
-
-  /**
-   * 暂停任务，并让任务处于等待状态
-   */
-  @Override public void stopAndWait() {
-    stop(true);
-  }
-
-  /**
-   * 设置最大下载速度，单位：kb
-   *
-   * @param maxSpeed 为0表示不限速
-   */
-  public void setMaxSpeed(double maxSpeed) {
-    mUtil.setMaxSpeed(maxSpeed);
-  }
-
-  /**
-   * 开始下载
-   */
-  @Override public void start() {
-    mListener.isWait = false;
-    if (mUtil.isRunning()) {
-      ALog.d(TAG, "任务正在下载");
-    } else {
-      mUtil.start();
-    }
-  }
-
-  /**
-   * 停止下载
-   */
-  @Override public void stop() {
-    super.stop();
-    stop(false);
-  }
-
-  private void stop(boolean isWait) {
-    mListener.isWait = isWait;
-    if (mUtil.isRunning()) {
-      mUtil.stop();
-    } else {
-      mListener.onStop(mEntity.getCurrentProgress());
-    }
-  }
-
-  /**
-   * 取消下载
-   */
-  @Override public void cancel() {
-    super.cancel();
-    if (mUtil.isRunning()) {
-      mUtil.cancel();
-    } else {
-      mListener.onCancel();
-    }
   }
 
   @Override public String getTaskName() {
@@ -153,10 +83,8 @@ public class DownloadTask extends AbsNormalTask<DownloadTaskEntity> {
   public static class Builder {
     DownloadTaskEntity taskEntity;
     Handler outHandler;
-    String targetName;
 
-    public Builder(String targetName, DownloadTaskEntity taskEntity) {
-      this.targetName = targetName;
+    public Builder(DownloadTaskEntity taskEntity) {
       this.taskEntity = taskEntity;
     }
 
@@ -166,19 +94,12 @@ public class DownloadTask extends AbsNormalTask<DownloadTaskEntity> {
      * @param schedulers {@link ISchedulers}
      */
     public Builder setOutHandler(ISchedulers schedulers) {
-      try {
-        outHandler = new Handler(schedulers);
-      } catch (Exception e) {
-        ALog.w(TAG, ALog.getExceptionString(e));
-        outHandler = new Handler(Looper.getMainLooper(), schedulers);
-      }
+      outHandler = new Handler(Looper.getMainLooper(), schedulers);
       return this;
     }
 
     public DownloadTask build() {
-      DownloadTask task = new DownloadTask(taskEntity, outHandler);
-      task.setTargetName(targetName);
-      return task;
+      return new DownloadTask(taskEntity, outHandler);
     }
   }
 }

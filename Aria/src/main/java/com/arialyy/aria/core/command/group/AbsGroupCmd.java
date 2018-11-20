@@ -36,11 +36,7 @@ public abstract class AbsGroupCmd<T extends AbsGroupTaskEntity> extends AbsCmd<T
 
   AbsGroupTask tempTask;
 
-  /**
-   * @param targetName 创建任务的对象名
-   */
-  AbsGroupCmd(String targetName, T entity) {
-    mTargetName = targetName;
+  AbsGroupCmd(T entity) {
     mTaskEntity = entity;
     TAG = CommonUtil.getClassName(this);
     if (entity instanceof DownloadGroupTaskEntity) {
@@ -55,7 +51,7 @@ public abstract class AbsGroupCmd<T extends AbsGroupTaskEntity> extends AbsCmd<T
    * @return 创建的任务
    */
   AbsTask createTask() {
-    tempTask = (AbsGroupTask) mQueue.createTask(mTargetName, mTaskEntity);
+    tempTask = (AbsGroupTask) mQueue.createTask(mTaskEntity);
     return tempTask;
   }
 

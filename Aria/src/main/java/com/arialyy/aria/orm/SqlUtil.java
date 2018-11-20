@@ -35,7 +35,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Created by Aria.Lao on 2017/7/24.
+ * Created by lyy on 2017/7/24.
  * sql工具
  */
 final class SqlUtil {

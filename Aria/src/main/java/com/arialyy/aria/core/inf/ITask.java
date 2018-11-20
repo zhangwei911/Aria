@@ -26,11 +26,6 @@ public interface ITask<TASK_ENTITY extends AbsTaskEntity> {
   int getState();
 
   /**
-   * 获取扩展字段
-   */
-  String getExtendField();
-
-  /**
    * 唯一标识符，DownloadTask 为下载地址，UploadTask 为文件路径
    */
   String getKey();
@@ -49,7 +44,16 @@ public interface ITask<TASK_ENTITY extends AbsTaskEntity> {
 
   void start();
 
+  /**
+   * 停止任务
+   */
   void stop();
+
+  /**
+   * 停止任务
+   * @param type {@code 0}默认操作，{@code 1}停止任务不自动执行下一任务
+   */
+  void stop(int type);
 
   void cancel();
 
@@ -89,6 +93,4 @@ public interface ITask<TASK_ENTITY extends AbsTaskEntity> {
    * @return 返回 3mb
    */
   String getConvertCurrentProgress();
-
-  void setTargetName(String targetName);
 }

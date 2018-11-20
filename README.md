@@ -11,6 +11,7 @@ Aria有以下特点：
    - 支持HTTP任务组\FTP文件夹，断点续传下载
    - 支持HTTP表单上传
    - 支持文件FTP断点续传上传
+   - 支持FTPS/SFTP断点续传，[see](https://aria.laoyuyu.me/aria_doc/download/ftps.html)
  + 支持https地址下载
    - 在配置文件中很容易就可以设置CA证书的信息
  + 支持[多线程分块下载](https://aria.laoyuyu.me/aria_doc/start/config.html)，能更有效的发挥机器IO性能
@@ -31,8 +32,8 @@ Aria有以下特点：
 [![Download](https://api.bintray.com/packages/arialyy/maven/AriaApi/images/download.svg)](https://bintray.com/arialyy/maven/AriaApi/_latestVersion)
 [![Download](https://api.bintray.com/packages/arialyy/maven/AriaCompiler/images/download.svg)](https://bintray.com/arialyy/maven/AriaCompiler/_latestVersion)
 ```java
-compile 'com.arialyy.aria:aria-core:3.4.4'
-annotationProcessor 'com.arialyy.aria:aria-compiler:3.4.4'
+compile 'com.arialyy.aria:aria-core:3.5.1'
+annotationProcessor 'com.arialyy.aria:aria-compiler:3.5.1'
 ```
 如果出现android support，请将 `compile 'com.arialyy.aria:aria-core:<last-version>'`替换为
 ```
@@ -100,10 +101,25 @@ protected void onCreate(Bundle savedInstanceState) {
 
 
 ### 版本日志
-  + v_3.4.4
-    - 实现[多线程分块下载](https://aria.laoyuyu.me/aria_doc/start/config.html)
-    - 修复`stopAll()`和`resumeAll()`导致的进度为0问题
-    - 修复任务组添加header无效的问题
++ v_3.5.1
+    - 优化`taskExists`方法
+    - 添加`post`参数请求支持
+      ```java
+      Aria.download(SingleTaskActivity.this)
+              .load(DOWNLOAD_URL)
+              .setFilePath(path)
+              .asPost() // post请求
+              .setParam("key", "value") //传递参数
+              //.setParams(Map<String, String>) // 传递多参数
+              .start();
+      ```
+     - 增加强制设置文件路径的api, https://github.com/AriaLyy/Aria/issues/311
+       ```
+       Aria.download(SingleTaskActivity.this)
+                     .load(DOWNLOAD_URL)
+                     .setFilePath(path, true) // true表示忽略路径是否被占用
+                     .start();
+       ```
 
 [更多版本记录](https://github.com/AriaLyy/Aria/blob/master/DEV_LOG.md)
 

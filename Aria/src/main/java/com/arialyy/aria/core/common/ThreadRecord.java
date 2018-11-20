@@ -47,4 +47,9 @@ public class ThreadRecord extends DbEntity {
    * 线程id
    */
   public int threadId = -1;
+
+  /**
+   * 分块长度
+   */
+  public long blockLen = 0;
 }

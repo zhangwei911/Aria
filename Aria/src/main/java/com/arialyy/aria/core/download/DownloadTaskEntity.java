@@ -21,6 +21,7 @@ import com.arialyy.aria.orm.annotation.Foreign;
 import com.arialyy.aria.orm.annotation.Ignore;
 import com.arialyy.aria.orm.annotation.NoNull;
 import com.arialyy.aria.orm.annotation.Primary;
+import java.util.Map;
 
 /**
  * Created by lyy on 2017/1/23.
@@ -59,8 +60,6 @@ public class DownloadTaskEntity extends AbsNormalTaskEntity<DownloadEntity> {
   @Foreign(parent = DownloadEntity.class, column = "downloadPath",
       onUpdate = ActionPolicy.CASCADE, onDelete = ActionPolicy.CASCADE)
   private String key;
-
-
 
   public DownloadTaskEntity() {
   }
@@ -112,6 +111,4 @@ public class DownloadTaskEntity extends AbsNormalTaskEntity<DownloadEntity> {
   public void setGroupTask(boolean groupTask) {
     isGroupTask = groupTask;
   }
-
-
 }

@@ -16,7 +16,6 @@
 package com.arialyy.aria.util;
 
 import android.annotation.SuppressLint;
-import android.util.Log;
 import com.arialyy.aria.core.AriaManager;
 import java.io.File;
 import java.io.FileWriter;
@@ -38,8 +37,7 @@ public class ErrorHelp {
    * @param ex 异常
    */
   public static void saveError(String tag, String msg, String ex) {
-    String message = "\nmsg【" + msg + "】\nException：" + ex;
-    writeLogToFile(tag, message);
+    writeLogToFile(tag, String.format("\nmsg【%s】\nException：%s", msg, ex));
   }
 
   /**
@@ -48,10 +46,8 @@ public class ErrorHelp {
    * @return "/mnt/sdcard/Android/data/{package_name}/files/log/*"
    */
   private static String getLogPath() {
-    String path = CommonUtil.getAppPath(AriaManager.APP)
-        + "log/AriaCrash_"
-        + getData("yyyy-MM-dd_HH:mm:ss")
-        + ".log";
+    String path = String.format("%slog/AriaCrash_%s.log", CommonUtil.getAppPath(AriaManager.APP),
+        getData("yyyy-MM-dd_HH_mm_ss"));
 
     File log = new File(path);
     if (!log.getParentFile().exists()) {
@@ -80,7 +76,11 @@ public class ErrorHelp {
     stringBuffer.append("\n\n");
     PrintWriter writer = null;
     try {
-      writer = new PrintWriter(new FileWriter(getLogPath(), true));
+      File file = new File(getLogPath());
+      if(!file.exists()){
+        CommonUtil.createFile(file.getPath());
+      }
+      writer = new PrintWriter(new FileWriter(file.getPath(), true));
       writer.append(stringBuffer);
       writer.flush();
     } catch (Exception e) {

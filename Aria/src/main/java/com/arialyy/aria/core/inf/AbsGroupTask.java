@@ -21,10 +21,8 @@ import com.arialyy.aria.core.download.downloader.AbsGroupUtil;
  * Created by AriaL on 2017/6/29.
  * 任务组任务抽象类
  */
-public abstract class AbsGroupTask<TASK_ENTITY extends AbsGroupTaskEntity>
-    extends AbsTask<TASK_ENTITY> {
-
-  protected AbsGroupUtil mUtil;
+public abstract class AbsGroupTask<ENTITY extends AbsEntity, TASK_ENTITY extends AbsGroupTaskEntity>
+    extends AbsTask<ENTITY, TASK_ENTITY> {
 
   @Override public String getKey() {
     return mTaskEntity.getEntity().getKey();
@@ -37,7 +35,7 @@ public abstract class AbsGroupTask<TASK_ENTITY extends AbsGroupTaskEntity>
    */
   public void startSubTask(String url) {
     if (mUtil != null) {
-      mUtil.startSubTask(url);
+      ((AbsGroupUtil) mUtil).startSubTask(url);
     }
   }
 
@@ -48,7 +46,7 @@ public abstract class AbsGroupTask<TASK_ENTITY extends AbsGroupTaskEntity>
    */
   public void stopSubTask(String url) {
     if (mUtil != null) {
-      mUtil.stopSubTask(url);
+      ((AbsGroupUtil) mUtil).stopSubTask(url);
     }
   }
 
@@ -59,7 +57,7 @@ public abstract class AbsGroupTask<TASK_ENTITY extends AbsGroupTaskEntity>
    */
   public void cancelSubTask(String url) {
     if (mUtil != null) {
-      mUtil.cancelSubTask(url);
+      ((AbsGroupUtil) mUtil).cancelSubTask(url);
     }
   }
 }

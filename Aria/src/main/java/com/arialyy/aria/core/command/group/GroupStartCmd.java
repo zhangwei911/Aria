@@ -22,11 +22,8 @@ import com.arialyy.aria.core.inf.AbsGroupTaskEntity;
  * 任务组开始命令，该命令负责处理任务组子任务的开始\恢复等工作
  */
 class GroupStartCmd<T extends AbsGroupTaskEntity> extends AbsGroupCmd<T> {
-  /**
-   * @param targetName 创建任务的对象名
-   */
-  GroupStartCmd(String targetName, T entity) {
-    super(targetName, entity);
+  GroupStartCmd( T entity) {
+    super( entity);
   }
 
   @Override public void executeCmd() {

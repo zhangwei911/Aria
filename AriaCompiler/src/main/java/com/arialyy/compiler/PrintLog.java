@@ -20,7 +20,7 @@ import javax.lang.model.element.Element;
 import javax.tools.Diagnostic;
 
 /**
- * Created by Aria.Lao on 2017/6/6.
+ * Created by lyy on 2017/6/6.
  */
 class PrintLog {
 

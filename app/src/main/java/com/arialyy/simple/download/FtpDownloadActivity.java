@@ -31,7 +31,7 @@ import com.arialyy.simple.databinding.ActivityFtpDownloadBinding;
 import java.io.File;
 
 /**
- * Created by Aria.Lao on 2017/7/25.
+ * Created by lyy on 2017/7/25.
  * Ftp下载测试
  */
 public class FtpDownloadActivity extends BaseActivity<ActivityFtpDownloadBinding> {

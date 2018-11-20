@@ -41,6 +41,11 @@ abstract class AbsDownloadTarget<TARGET extends AbsTarget, ENTITY extends AbsEnt
   String mTempFilePath;
 
   /**
+   * {@code true}强制下载，不考虑文件路径是否被占用
+   */
+  boolean forceDownload = false;
+
+  /**
    * 将任务设置为最高优先级任务，最高优先级任务有以下特点：
    * 1、在下载队列中，有且只有一个最高优先级任务
    * 2、最高优先级任务会一直存在，直到用户手动暂停或任务完成
@@ -52,8 +57,8 @@ abstract class AbsDownloadTarget<TARGET extends AbsTarget, ENTITY extends AbsEnt
   protected void setHighestPriority() {
     if (checkEntity()) {
       AriaManager.getInstance(AriaManager.APP)
-          .setCmd(CommonUtil.createNormalCmd(mTargetName, mTaskEntity,
-              NormalCmdFactory.TASK_HIGHEST_PRIORITY, checkTaskType()))
+          .setCmd(CommonUtil.createNormalCmd(mTaskEntity, NormalCmdFactory.TASK_HIGHEST_PRIORITY,
+              checkTaskType()))
           .exe();
     }
   }
@@ -64,7 +69,7 @@ abstract class AbsDownloadTarget<TARGET extends AbsTarget, ENTITY extends AbsEnt
   public void add() {
     if (checkEntity()) {
       AriaManager.getInstance(AriaManager.APP)
-          .setCmd(CommonUtil.createNormalCmd(mTargetName, mTaskEntity, NormalCmdFactory.TASK_CREATE,
+          .setCmd(CommonUtil.createNormalCmd(mTaskEntity, NormalCmdFactory.TASK_CREATE,
               checkTaskType()))
           .exe();
     }

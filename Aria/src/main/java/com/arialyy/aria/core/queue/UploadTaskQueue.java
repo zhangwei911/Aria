@@ -16,7 +16,6 @@
 
 package com.arialyy.aria.core.queue;
 
-import android.text.TextUtils;
 import com.arialyy.aria.core.AriaManager;
 import com.arialyy.aria.core.queue.pool.BaseCachePool;
 import com.arialyy.aria.core.queue.pool.BaseExecutePool;
@@ -62,19 +61,15 @@ public class UploadTaskQueue extends AbsTaskQueue<UploadTask, UploadTaskEntity> 
     return AriaManager.getInstance(AriaManager.APP).getUploadConfig().getMaxTaskNum();
   }
 
-  @Override public UploadTask createTask(String targetName, UploadTaskEntity entity) {
+  @Override public UploadTask createTask(UploadTaskEntity entity) {
     UploadTask task = null;
-    if (!TextUtils.isEmpty(targetName)) {
-      if (mCachePool.getTask(entity.getEntity().getKey()) == null
-          && mExecutePool.getTask(entity.getEntity().getKey()) == null) {
-        task = (UploadTask) TaskFactory.getInstance()
-            .createTask(targetName, entity, UploadSchedulers.getInstance());
-        mCachePool.putTask(task);
-      } else {
-        ALog.w(TAG, "任务已存在");
-      }
+    if (mCachePool.getTask(entity.getEntity().getKey()) == null
+        && mExecutePool.getTask(entity.getEntity().getKey()) == null) {
+      task = (UploadTask) TaskFactory.getInstance()
+          .createTask(entity, UploadSchedulers.getInstance());
+      mCachePool.putTask(task);
     } else {
-      ALog.e(TAG, "target name 为 null是！！");
+      ALog.w(TAG, "任务已存在");
     }
     return task;
   }

@@ -56,13 +56,6 @@ public class DelegateWrapper {
     return INSTANCE;
   }
 
-  ///**
-  // * 保存关联数据
-  // */
-  //void saveRelationData(AbsWrapper wrapper){
-  //
-  //}
-
   /**
    * 查询关联表数据
    *
@@ -123,6 +116,13 @@ public class DelegateWrapper {
    */
   <T extends DbEntity> List<T> findData(Class<T> clazz, String... expression) {
     return mDManager.getDelegate(DelegateFind.class).findData(mDb, clazz, expression);
+  }
+
+  /**
+   * 模糊查寻数据
+   */
+  <T extends DbEntity> List<T> findDataByFuzzy(Class<T> clazz, String conditions) {
+    return mDManager.getDelegate(DelegateFind.class).findDataByFuzzy(mDb, clazz, conditions);
   }
 
   /**

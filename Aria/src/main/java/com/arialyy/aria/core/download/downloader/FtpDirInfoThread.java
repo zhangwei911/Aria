@@ -15,10 +15,11 @@
  */
 package com.arialyy.aria.core.download.downloader;
 
+import aria.apache.commons.net.ftp.FTPFile;
 import com.arialyy.aria.core.FtpUrlEntity;
-import com.arialyy.aria.core.common.AbsFtpInfoThread;
 import com.arialyy.aria.core.common.CompleteInfo;
 import com.arialyy.aria.core.common.OnFileInfoCallback;
+import com.arialyy.aria.core.common.ftp.AbsFtpInfoThread;
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.download.DownloadGroupEntity;
 import com.arialyy.aria.core.download.DownloadGroupTaskEntity;
@@ -27,7 +28,6 @@ import com.arialyy.aria.core.inf.AbsTaskEntity;
 import com.arialyy.aria.util.CommonUtil;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
-import org.apache.commons.net.ftp.FTPFile;
 
 /**
  * Created by Aria.Lao on 2017/7/25.
@@ -61,7 +61,7 @@ class FtpDirInfoThread extends AbsFtpInfoThread<DownloadGroupEntity, DownloadGro
     final FtpUrlEntity urlEntity = mTaskEntity.getUrlEntity().clone();
     DownloadEntity entity = new DownloadEntity();
     entity.setUrl(
-        urlEntity.protocol + "://" + urlEntity.hostName + ":" + urlEntity.port + "/" + remotePath);
+        urlEntity.scheme + "://" + urlEntity.hostName + ":" + urlEntity.port + "/" + remotePath);
     entity.setDownloadPath(mEntity.getDirPath() + "/" + remotePath);
     int lastIndex = remotePath.lastIndexOf("/");
     String fileName = lastIndex < 0 ? CommonUtil.keyToHashKey(remotePath)

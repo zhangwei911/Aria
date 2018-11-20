@@ -19,10 +19,14 @@ package com.arialyy.aria.exception;
  * Created by lyy on 2017/1/18.
  * Aria 文件异常
  */
-public class FileException extends NullPointerException {
-  private static final String ARIA_FILE_EXCEPTION = "Aria Exception:";
+public class FileException extends BaseException {
+  private static final String ARIA_FILE_EXCEPTION = "Aria File Exception:";
 
-  public FileException(String detailMessage) {
-    super(ARIA_FILE_EXCEPTION + detailMessage);
+  public FileException(String tag, String detailMessage) {
+    super(tag, String.format("%s%s", ARIA_FILE_EXCEPTION, detailMessage));
+  }
+
+  public FileException(String tag, String message, Exception e){
+    super(tag, message, e);
   }
 }

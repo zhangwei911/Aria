@@ -19,9 +19,12 @@ package com.arialyy.aria.core.queue;
 import com.arialyy.aria.core.inf.AbsTask;
 import com.arialyy.aria.core.inf.AbsTaskEntity;
 import com.arialyy.aria.core.inf.IEntity;
+import com.arialyy.aria.core.inf.TaskSchedulerType;
 import com.arialyy.aria.core.queue.pool.BaseCachePool;
 import com.arialyy.aria.core.queue.pool.BaseExecutePool;
 import com.arialyy.aria.util.ALog;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by lyy on 2017/2/23.
@@ -67,16 +70,36 @@ abstract class AbsTaskQueue<TASK extends AbsTask, TASK_ENTITY extends AbsTaskEnt
    * 停止所有任务
    */
   @Override public void stopAllTask() {
-    mCachePool.clear();
     for (String key : mExecutePool.getAllTask().keySet()) {
       TASK task = mExecutePool.getAllTask().get(key);
       if (task != null) {
         int state = task.getState();
         if (task.isRunning() || (state != IEntity.STATE_COMPLETE
             && state != IEntity.STATE_CANCEL)) {
-          task.stop();
+          task.stop(TaskSchedulerType.TYPE_STOP_NOT_NEXT);
         }
       }
+    }
+
+    for (String key : mCachePool.getAllTask().keySet()) {
+      TASK task = mCachePool.getAllTask().get(key);
+      if (task != null) {
+        task.stop(TaskSchedulerType.TYPE_STOP_NOT_NEXT);
+      }
+    }
+
+    mCachePool.clear();
+  }
+
+  /**
+   * 最大下载速度
+   */
+  public void setMaxSpeed(int maxSpeed) {
+    Map<String, TASK> tasks = mExecutePool.getAllTask();
+    Set<String> keys = tasks.keySet();
+    for (String key : keys) {
+      TASK task = tasks.get(key);
+      task.setMaxSpeed(maxSpeed);
     }
   }
 
@@ -173,7 +196,6 @@ abstract class AbsTaskQueue<TASK extends AbsTask, TASK_ENTITY extends AbsTaskEnt
   }
 
   @Override public void removeTaskFormQueue(String key) {
-    //TEManager.getInstance().removeTEntity(key);
     TASK task = mExecutePool.getTask(key);
     if (task != null) {
       ALog.d(TAG, String.format("从执行池删除任务【%s】%s", task.getTaskName(),
@@ -191,10 +213,6 @@ abstract class AbsTaskQueue<TASK extends AbsTask, TASK_ENTITY extends AbsTaskEnt
       ALog.e(TAG, "任务重试失败，原因：task 为null");
       return;
     }
-    //if (!NetUtils.isConnected(AriaManager.APP)) {
-    //  ALog.e(TAG, "任务【" + task.getTaskName() + "】重试失败，原因：网络未连接");
-    //  return;
-    //}
     if (!task.isRunning()) {
       task.start();
     } else {

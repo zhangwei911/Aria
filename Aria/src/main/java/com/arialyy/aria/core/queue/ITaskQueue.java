@@ -113,10 +113,9 @@ public interface ITaskQueue<TASK extends AbsTask, TASK_ENTITY extends AbsTaskEnt
    * 创建一个新的任务，创建时只是将新任务存储到缓存池
    *
    * @param entity 任务实体{@link DownloadTaskEntity}、{@link UploadTaskEntity}
-   * @param targetName 生成该任务的对象
    * @return {@link DownloadTask}、{@link UploadTask}
    */
-  TASK createTask(String targetName, TASK_ENTITY entity);
+  TASK createTask(TASK_ENTITY entity);
 
   /**
    * 通过工作实体缓存池或任务池搜索下载任务，如果缓存池或任务池都没有任务，则创建新任务

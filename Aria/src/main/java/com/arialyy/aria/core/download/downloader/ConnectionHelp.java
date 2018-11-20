@@ -16,18 +16,21 @@
 package com.arialyy.aria.core.download.downloader;
 
 import android.text.TextUtils;
+import com.arialyy.aria.core.AriaManager;
+import com.arialyy.aria.core.common.ProtocolType;
 import com.arialyy.aria.core.common.RequestEnum;
 import com.arialyy.aria.core.download.DownloadTaskEntity;
 import com.arialyy.aria.core.inf.AbsTaskEntity;
 import com.arialyy.aria.util.SSLContextUtil;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.CookieManager;
+import java.net.CookieStore;
+import java.net.HttpCookie;
 import java.net.HttpURLConnection;
 import java.net.ProtocolException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.InflaterInputStream;
@@ -75,11 +78,13 @@ class ConnectionHelp {
       urlConn = url.openConnection();
     }
     if (urlConn instanceof HttpsURLConnection) {
+      AriaManager manager = AriaManager.getInstance(AriaManager.APP);
       conn = (HttpsURLConnection) urlConn;
       SSLContext sslContext =
-          SSLContextUtil.getSSLContext(SSLContextUtil.CA_ALIAS, SSLContextUtil.CA_PATH);
+          SSLContextUtil.getSSLContextFromAssets(manager.getDownloadConfig().getCaName(),
+              manager.getDownloadConfig().getCaPath(), ProtocolType.Default);
       if (sslContext == null) {
-        sslContext = SSLContextUtil.getDefaultSLLContext();
+        sslContext = SSLContextUtil.getDefaultSLLContext(ProtocolType.Default);
       }
       SSLSocketFactory ssf = sslContext.getSocketFactory();
       ((HttpsURLConnection) conn).setSSLSocketFactory(ssf);
@@ -98,6 +103,8 @@ class ConnectionHelp {
   static HttpURLConnection setConnectParam(DownloadTaskEntity entity, HttpURLConnection conn) {
     if (entity.getRequestEnum() == RequestEnum.POST) {
       conn.setDoInput(true);
+      conn.setDoOutput(true);
+      conn.setUseCaches(false);
     }
     Set<String> keys = null;
     if (entity.getHeaders() != null && entity.getHeaders().size() > 0) {
@@ -106,7 +113,9 @@ class ConnectionHelp {
         conn.setRequestProperty(key, entity.getHeaders().get(key));
       }
     }
-
+    if (conn.getRequestProperty("Accept-Language") == null) {
+      conn.setRequestProperty("Accept-Language", "zh-CN,zh;q=0.9,en;q=0.8,ja;q=0.7");
+    }
     if (conn.getRequestProperty("Accept-Encoding") == null) {
       conn.setRequestProperty("Accept-Encoding", "identity");
     }
@@ -124,30 +133,40 @@ class ConnectionHelp {
           "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36");
     }
     if (conn.getRequestProperty("Accept") == null) {
-      StringBuilder accept = new StringBuilder();
+      //StringBuilder accept = new StringBuilder();
       //accept
-          //.append("image/gif, ")
-          //.append("image/jpeg, ")
-          //.append("image/pjpeg, ")
-          //.append("image/webp, ")
-          //.append("image/apng, ")
-          //.append("application/xml, ")
-          //.append("application/xaml+xml, ")
-          //.append("application/xhtml+xml, ")
-          //.append("application/x-shockwave-flash, ")
-          //.append("application/x-ms-xbap, ")
-          //.append("application/x-ms-application, ")
-          //.append("application/msword, ")
-          //.append("application/vnd.ms-excel, ")
-          //.append("application/vnd.ms-xpsdocument, ")
-          //.append("application/vnd.ms-powerpoint, ")
-          //.append("text/plain, ")
-          //.append("text/html, ")
-          //.append("*/*");
+      //.append("image/gif, ")
+      //.append("image/jpeg, ")
+      //.append("image/pjpeg, ")
+      //.append("image/webp, ")
+      //.append("image/apng, ")
+      //.append("application/xml, ")
+      //.append("application/xaml+xml, ")
+      //.append("application/xhtml+xml, ")
+      //.append("application/x-shockwave-flash, ")
+      //.append("application/x-ms-xbap, ")
+      //.append("application/x-ms-application, ")
+      //.append("application/msword, ")
+      //.append("application/vnd.ms-excel, ")
+      //.append("application/vnd.ms-xpsdocument, ")
+      //.append("application/vnd.ms-powerpoint, ")
+      //.append("text/plain, ")
+      //.append("text/html, ")
+      //.append("*/*");
       conn.setRequestProperty("Accept", "*/*");
     }
     //302获取重定向地址
     conn.setInstanceFollowRedirects(false);
+
+    CookieManager manager = entity.getCookieManager();
+    if (manager != null) {
+      CookieStore store = manager.getCookieStore();
+      if (store != null && store.getCookies().size() > 0) {
+        conn.setRequestProperty("Cookie",
+            TextUtils.join(";", store.getCookies()));
+      }
+    }
+
     return conn;
   }
 }

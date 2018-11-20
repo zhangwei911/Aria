@@ -39,7 +39,7 @@ import com.arialyy.simple.widget.HorizontalProgressBarWithNumber;
 import java.util.List;
 
 /**
- * Created by Aria.Lao on 2017/9/5.
+ * Created by lyy on 2017/9/5.
  */
 @SuppressLint("ValidFragment") public class ChildHandleDialog
     extends BaseDialog<DialogSubTaskHandlerBinding> {

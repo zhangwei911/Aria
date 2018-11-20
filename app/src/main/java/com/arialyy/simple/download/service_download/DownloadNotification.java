@@ -22,7 +22,7 @@ import android.support.v4.app.NotificationCompat;
 import com.arialyy.simple.R;
 
 /**
- * Created by Aria.Lao on 2017/1/18.
+ * Created by lyy on 2017/1/18.
  */
 public class DownloadNotification {
 

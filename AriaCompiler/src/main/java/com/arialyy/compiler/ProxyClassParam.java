@@ -21,7 +21,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Created by Aria.Lao on 2017/6/7.
+ * Created by lyy on 2017/6/7.
  * 代理类参数
  */
 class ProxyClassParam {
@@ -48,5 +48,5 @@ class ProxyClassParam {
 
   Set<TaskEnum> taskEnums;
   Map<String, Set<String>> keyMappings = new HashMap<>();
-  Map<TaskEnum, Map<Class<? extends Annotation>, String>> methods = new HashMap<>();
+  Map<TaskEnum, Map<Class<? extends Annotation>, MethodInfo>> methods = new HashMap<>();
 }
