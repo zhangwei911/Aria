@@ -24,6 +24,9 @@ import com.arialyy.aria.core.inf.AbsTaskEntity;
 import com.arialyy.aria.util.SSLContextUtil;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.CookieManager;
+import java.net.CookieStore;
+import java.net.HttpCookie;
 import java.net.HttpURLConnection;
 import java.net.ProtocolException;
 import java.net.URL;
@@ -154,6 +157,16 @@ class ConnectionHelp {
     }
     //302获取重定向地址
     conn.setInstanceFollowRedirects(false);
+
+    CookieManager manager = entity.getCookieManager();
+    if (manager != null) {
+      CookieStore store = manager.getCookieStore();
+      if (store != null && store.getCookies().size() > 0) {
+        conn.setRequestProperty("Cookie",
+            TextUtils.join(";", store.getCookies()));
+      }
+    }
+
     return conn;
   }
 }

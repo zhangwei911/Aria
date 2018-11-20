@@ -205,7 +205,7 @@ public abstract class AbsFileer<ENTITY extends AbsNormalEntity, TASK_ENTITY exte
     }, 0, mUpdateInterval, TimeUnit.MILLISECONDS);
   }
 
-  protected synchronized void closeTimer() {
+  public synchronized void closeTimer() {
     if (mTimer != null && !mTimer.isShutdown()) {
       mTimer.shutdown();
     }

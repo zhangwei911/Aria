@@ -127,6 +127,7 @@ public class SimpleDownloadUtil implements IUtil, Runnable {
 
           @Override public void onFail(String url, BaseException e, boolean needRetry) {
             failDownload(e, needRetry);
+            mDownloader.closeTimer();
           }
         });
       case AbsTaskEntity.D_HTTP:
@@ -137,6 +138,7 @@ public class SimpleDownloadUtil implements IUtil, Runnable {
 
           @Override public void onFail(String url, BaseException e, boolean needRetry) {
             failDownload(e, needRetry);
+            mDownloader.closeTimer();
           }
         });
     }

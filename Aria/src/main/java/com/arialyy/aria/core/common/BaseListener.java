@@ -111,6 +111,7 @@ public abstract class BaseListener<ENTITY extends AbsEntity, TASK_ENTITY extends
     saveData(IEntity.STATE_FAIL, mEntity.getCurrentProgress());
     handleSpeed(0);
     mTask.needRetry = needRetry;
+    mTask.putExpand(AbsTask.ERROR_INFO_KEY, e);
     sendInState2Target(ISchedulers.FAIL);
     e.printStackTrace();
     ErrorHelp.saveError(e.getTag(), "", ALog.getExceptionString(e));

@@ -17,6 +17,7 @@ package com.arialyy.aria.core.download.downloader;
 
 import android.os.Process;
 import android.text.TextUtils;
+import android.util.Log;
 import com.arialyy.aria.core.AriaManager;
 import com.arialyy.aria.core.common.CompleteInfo;
 import com.arialyy.aria.core.common.OnFileInfoCallback;
@@ -34,10 +35,15 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.net.CookieHandler;
+import java.net.CookieManager;
+import java.net.HttpCookie;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -136,7 +142,7 @@ class HttpFileInfoThread implements Runnable {
     if (!TextUtils.isEmpty(str) && str.equals("chunked")) {
       isChunked = true;
     }
-    //Map<String, List<String>> headers = conn.getHeaderFields();
+    Map<String, List<String>> headers = conn.getHeaderFields();
     String disposition = conn.getHeaderField("Content-Disposition");
     if (mTaskEntity.isUseServerFileName() && !TextUtils.isEmpty(disposition)) {
       mEntity.setDisposition(CommonUtil.encryptBASE64(disposition));
@@ -155,10 +161,24 @@ class HttpFileInfoThread implements Runnable {
         }
       }
     }
+    CookieManager msCookieManager = new CookieManager();
+    List<String> cookiesHeader = headers.get("Set-Cookie");
+
+    if (cookiesHeader != null) {
+      for (String cookie : cookiesHeader) {
+        msCookieManager.getCookieStore().add(null, HttpCookie.parse(cookie).get(0));
+      }
+      mTaskEntity.setCookieManager(msCookieManager);
+    }
 
     mTaskEntity.setCode(code);
     if (code == HttpURLConnection.HTTP_PARTIAL) {
       if (!checkLen(len) && !isChunked) {
+        if (len < 0) {
+          failDownload(
+              new AriaIOException(TAG, String.format("任务下载失败，文件长度小于0， url: %s", mEntity.getUrl())),
+              false);
+        }
         return;
       }
       mEntity.setFileSize(len);
@@ -181,6 +201,12 @@ class HttpFileInfoThread implements Runnable {
         handleUrlReTurn(conn, CommonUtil.getWindowReplaceUrl(sb.toString()));
         return;
       } else if (!checkLen(len) && !isChunked) {
+        if (len < 0) {
+          failDownload(
+              new AriaIOException(TAG, String.format("任务下载失败，文件长度小于0， url: %s", mEntity.getUrl())),
+              false);
+        }
+        ALog.d(TAG, "len < 0");
         return;
       }
       mEntity.setFileSize(len);
@@ -269,12 +295,6 @@ class HttpFileInfoThread implements Runnable {
   private boolean checkLen(long len) {
     if (len != mEntity.getFileSize()) {
       mTaskEntity.setNewTask(true);
-    }
-    if (len < 0) {
-      failDownload(
-          new AriaIOException(TAG, String.format("任务下载失败，文件长度小于0， url: %s", mEntity.getUrl())),
-          true);
-      return false;
     }
     return true;
   }

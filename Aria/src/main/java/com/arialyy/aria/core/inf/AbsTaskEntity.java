@@ -19,8 +19,12 @@ import com.arialyy.aria.core.FtpUrlEntity;
 import com.arialyy.aria.core.common.RequestEnum;
 import com.arialyy.aria.orm.DbEntity;
 import com.arialyy.aria.orm.annotation.Ignore;
+import java.net.CookieManager;
+import java.net.HttpCookie;
 import java.net.Proxy;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -54,6 +58,8 @@ public abstract class AbsTaskEntity<ENTITY extends AbsEntity> extends DbEntity {
    * FTP单文件上传
    */
   public static final int U_FTP = 0xA2;
+
+  @Ignore private CookieManager cookieManager;
 
   /**
    * 账号和密码
@@ -133,6 +139,14 @@ public abstract class AbsTaskEntity<ENTITY extends AbsEntity> extends DbEntity {
   @Ignore private Proxy proxy;
 
   public abstract ENTITY getEntity();
+
+  public CookieManager getCookieManager() {
+    return cookieManager;
+  }
+
+  public void setCookieManager(CookieManager cookieManager) {
+    this.cookieManager = cookieManager;
+  }
 
   /**
    * 获取任务下载状态
