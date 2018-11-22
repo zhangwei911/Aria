@@ -19,11 +19,7 @@ package com.arialyy.aria.core.queue;
 import com.arialyy.aria.core.AriaManager;
 import com.arialyy.aria.core.download.DownloadTask;
 import com.arialyy.aria.core.download.DownloadTaskEntity;
-import com.arialyy.aria.core.inf.AbsTask;
 import com.arialyy.aria.core.inf.TaskSchedulerType;
-import com.arialyy.aria.core.queue.pool.BaseCachePool;
-import com.arialyy.aria.core.queue.pool.BaseExecutePool;
-import com.arialyy.aria.core.queue.pool.DownloadSharePool;
 import com.arialyy.aria.core.scheduler.DownloadSchedulers;
 import com.arialyy.aria.util.ALog;
 import java.util.LinkedHashSet;
@@ -50,12 +46,8 @@ public class DownloadTaskQueue extends AbsTaskQueue<DownloadTask, DownloadTaskEn
   private DownloadTaskQueue() {
   }
 
-  @Override BaseCachePool<DownloadTask> setCachePool() {
-    return DownloadSharePool.getInstance().cachePool;
-  }
-
-  @Override BaseExecutePool<DownloadTask> setExecutePool() {
-    return DownloadSharePool.getInstance().executePool;
+  @Override int getQueueType() {
+    return TYPE_D_QUEUE;
   }
 
   @Override public int getConfigMaxNum() {

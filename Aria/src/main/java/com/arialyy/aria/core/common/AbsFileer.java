@@ -391,16 +391,20 @@ public abstract class AbsFileer<ENTITY extends AbsNormalEntity, TASK_ENTITY exte
               "startLocation = %s; endLocation = %s; block = %s; tempLen = %s; i = %s",
               tr.startLocation, tr.endLocation, blockLen, temp.length(), i));
           if (tr.endLocation == realLocation) {
-            ALog.d(TAG, String.format("分块【%s】已完成，更新记录", temp.getPath()));
+            ALog.i(TAG, String.format("分块【%s】已完成，更新记录", temp.getPath()));
             tr.startLocation = realLocation;
             tr.isComplete = true;
             mCompleteThreadNum++;
           } else {
             tr.isComplete = false;
-            if (realLocation != tr.startLocation) {
+            if (realLocation == tr.startLocation) {
+              i++;
+              continue;
+            }
+            if (realLocation > tr.startLocation) {
               ALog.i(TAG, String.format("修正分块【%s】的进度记录为：%s", temp.getPath(), realLocation));
               tr.startLocation = realLocation;
-            } else if (realLocation > tr.endLocation) {
+            } else {
               ALog.i(TAG, String.format("分块【%s】错误，将重新开始该分块", temp.getPath()));
               temp.delete();
               tr.startLocation = i * blockLen;
@@ -415,7 +419,7 @@ public abstract class AbsFileer<ENTITY extends AbsNormalEntity, TASK_ENTITY exte
   }
 
   /**
-   * convertDb 为兼容性代码
+   * convertDb 是兼容性代码
    * 从3.4.1开始，线程配置信息将存储在数据库中。
    * 将配置文件的内容复制到数据库中，并将配置文件删除
    */
@@ -548,13 +552,9 @@ public abstract class AbsFileer<ENTITY extends AbsNormalEntity, TASK_ENTITY exte
   private void handleBreakpoint() {
     long fileLength = mEntity.getFileSize();
     long blockSize = fileLength / mTotalThreadNum;
-    int[] threadId = new int[mTotalThreadNum];
-    int rl = 0;
+    Set<Integer> threads = new HashSet<>();
 
     mRecord.fileLength = fileLength;
-    for (int i = 0; i < mTotalThreadNum; i++) {
-      threadId[i] = -1;
-    }
     if (mTaskEntity.isNewTask() && !handleNewTask()) {
       return;
     }
@@ -572,7 +572,7 @@ public abstract class AbsFileer<ENTITY extends AbsNormalEntity, TASK_ENTITY exte
       }
 
       if (tr.blockLen == 0) {
-        tr.blockLen = i == mTotalThreadNum - 1 ? (fileLength - i * blockSize) : blockSize;
+        tr.blockLen = CommonUtil.getBlockLen(fileLength, i, mTotalThreadNum);
       }
 
       if (tr.isComplete) {//该线程已经完成
@@ -605,8 +605,7 @@ public abstract class AbsFileer<ENTITY extends AbsNormalEntity, TASK_ENTITY exte
       AbsThreadTask task = createSingThreadTask(i, startL, endL, fileLength, tr);
       if (task == null) return;
       mTask.put(i, task);
-      threadId[rl] = i;
-      rl++;
+      threads.add(i);
     }
     if (mConstance.CURRENT_LOCATION != 0
         && mConstance.CURRENT_LOCATION != mEntity.getCurrentProgress()) {
@@ -614,13 +613,13 @@ public abstract class AbsFileer<ENTITY extends AbsNormalEntity, TASK_ENTITY exte
       mEntity.setCurrentProgress(mConstance.CURRENT_LOCATION);
     }
     saveRecord();
-    startThreadTask(threadId);
+    startThreadTask(threads);
   }
 
   /**
    * 启动单线程任务
    */
-  private void startThreadTask(int[] recordL) {
+  private void startThreadTask(Set<Integer> recordL) {
     if (isBreak()) {
       return;
     }

@@ -247,6 +247,9 @@ final class HttpThreadTask extends AbsThreadTask<DownloadEntity, DownloadTaskEnt
     if (isBreak()) {
       return;
     }
+    if (!checkBlock()){
+      return;
+    }
 
     if (mChildCurrentLocation == mConfig.END_LOCATION) {
       //支持断点的处理

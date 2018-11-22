@@ -49,7 +49,7 @@ public abstract class AbsThreadTask<ENTITY extends AbsNormalEntity, TASK_ENTITY 
 
   private final String TAG = "AbsThreadTask";
   /**
-   * 当前子线程的下载位置
+   * 当前子线程相对于总长度的位置
    */
   protected long mChildCurrentLocation = 0;
   protected int mBufSize;
@@ -236,10 +236,37 @@ public abstract class AbsThreadTask<ENTITY extends AbsNormalEntity, TASK_ENTITY 
           f.delete();
         }
       }
+      File targetFile = new File(STATE.TASK_RECORD.filePath);
+      if (targetFile.exists() && targetFile.length() > mEntity.getFileSize()) {
+        ALog.e(TAG, String.format("任务【%s】分块文件合并失败，下载长度超出文件真实长度，downloadLen: %s，fileSize: %s",
+            mConfig.TEMP_FILE.getName(), targetFile.length(), mEntity.getFileSize()));
+        return false;
+      }
       return true;
     } else {
       return false;
     }
+  }
+
+  /**
+   * 检查下载完成的分块大小，如果下载完成的分块大小大于或小于分配的大小，则需要重新下载该分块
+   * 如果是非分块任务，直接返回{@code true}
+   *
+   * @return {@code true} 分块分大小正常，{@code false} 分块大小错误
+   */
+  protected boolean checkBlock() {
+    if (!getTaskRecord().isBlock) {
+      return true;
+    }
+    ThreadRecord tr = getThreadRecord();
+    File blockFile = getBockFile();
+    if (!blockFile.exists() || blockFile.length() != tr.blockLen) {
+      ALog.i(TAG, String.format("分块【%s】下载错误，即将重新下载该分块，开始位置：%s，结束位置：%s", blockFile.getName(),
+          tr.startLocation, tr.endLocation));
+      retryThis(isBreak());
+      return false;
+    }
+    return true;
   }
 
   /**
@@ -248,11 +275,20 @@ public abstract class AbsThreadTask<ENTITY extends AbsNormalEntity, TASK_ENTITY 
   public void stop() {
     synchronized (AriaManager.LOCK) {
       if (mConfig.SUPPORT_BP) {
-        final long currentTemp = mChildCurrentLocation;
+        final long stopLocation;
+        if (getTaskRecord().isBlock) {
+          File blockFile = getBockFile();
+          ThreadRecord tr = getThreadRecord();
+          long block = mEntity.getFileSize() / getTaskRecord().threadRecords.size();
+          stopLocation =
+              blockFile.exists() ? (tr.threadId * block + blockFile.length()) : tr.threadId * block;
+        } else {
+          stopLocation = mChildCurrentLocation;
+        }
         STATE.STOP_NUM++;
-        ALog.d(TAG, String.format("任务【%s】thread__%s__停止【停止位置：%s】", mConfig.TEMP_FILE.getName(),
-            mConfig.THREAD_ID, currentTemp));
-        writeConfig(false, currentTemp);
+        ALog.d(TAG, String.format("任务【%s】thread__%s__停止【当前线程停止位置：%s】", mConfig.TEMP_FILE.getName(),
+            mConfig.THREAD_ID, stopLocation));
+        writeConfig(false, stopLocation);
         if (STATE.isStop()) {
           ALog.i(TAG, String.format("任务【%s】已停止", mConfig.TEMP_FILE.getName()));
           STATE.isRunning = false;
@@ -273,7 +309,8 @@ public abstract class AbsThreadTask<ENTITY extends AbsNormalEntity, TASK_ENTITY 
     synchronized (AriaManager.LOCK) {
       if (STATE.CURRENT_LOCATION > mEntity.getFileSize()) {
         String errorMsg =
-            String.format("下载失败，下载长度超出文件大；currentLocation=%s, fileSize=%s", STATE.CURRENT_LOCATION,
+            String.format("下载失败，下载长度超出文件真实长度；currentLocation=%s, fileSize=%s",
+                STATE.CURRENT_LOCATION,
                 mEntity.getFileSize());
         taskBreak = true;
         fail(mChildCurrentLocation, new FileException(TAG, errorMsg), false);
@@ -376,29 +413,40 @@ public abstract class AbsThreadTask<ENTITY extends AbsNormalEntity, TASK_ENTITY 
     if (getTaskRecord().isBlock) {
       ThreadRecord tr = getThreadRecord();
       long block = mEntity.getFileSize() / getTaskRecord().threadRecords.size();
-      File file = mConfig.TEMP_FILE;
-      if (file.length() > tr.endLocation) {
-        ALog.i(TAG, String.format("分块【%s】错误，将重新下载该分块", file.getPath()));
-        boolean b = file.delete();
-        ALog.w(TAG, "删除：" + b);
+
+      File blockFile = getBockFile();
+      if (blockFile.length() > tr.blockLen) {
+        ALog.i(TAG, String.format("分块【%s】错误，将重新下载该分块", blockFile.getPath()));
+        blockFile.delete();
         tr.startLocation = block * tr.threadId;
         tr.isComplete = false;
         mConfig.START_LOCATION = tr.startLocation;
-      } else if (file.length() == tr.endLocation) {
+      } else if (blockFile.length() < tr.blockLen) {
+        tr.startLocation = block * tr.threadId + blockFile.length();
+        tr.isComplete = false;
+        mConfig.START_LOCATION = tr.startLocation;
+        STATE.CURRENT_LOCATION = getBlockRealTotalSize();
+        ALog.i(TAG, String.format("修正分块【%s】，开始位置：%s，当前进度：%s", blockFile.getPath(), tr.startLocation,
+            STATE.CURRENT_LOCATION));
+      } else {
         STATE.COMPLETE_THREAD_NUM++;
         tr.isComplete = true;
-      } else {
-        tr.startLocation = block * tr.threadId + file.length();
-        mConfig.START_LOCATION = tr.startLocation;
-        tr.isComplete = false;
-        STATE.CURRENT_LOCATION = getBlockRealTotalSize();
-        ALog.i(TAG, String.format("修正分块【%s】进度，开始位置：%s，当前进度：%s", file.getPath(), tr.startLocation,
-            STATE.CURRENT_LOCATION));
       }
+      tr.update();
     } else {
       mConfig.START_LOCATION = mChildCurrentLocation == 0 ? mConfig.START_LOCATION
           : mConfig.THREAD_RECORD.startLocation;
     }
+  }
+
+  /**
+   * 获取分块文件
+   *
+   * @return 分块文件
+   */
+  private File getBockFile() {
+    return new File(String.format(AbsFileer.SUB_PATH, STATE.TASK_RECORD.filePath,
+        getThreadRecord().threadId));
   }
 
   /**
@@ -448,7 +496,9 @@ public abstract class AbsThreadTask<ENTITY extends AbsNormalEntity, TASK_ENTITY 
       ThreadRecord tr = getThreadRecord();
       if (tr != null) {
         tr.isComplete = isComplete;
-        if (getTaskRecord().isBlock || getTaskRecord().isOpenDynamicFile) {
+        if (getTaskRecord().isBlock) {
+          tr.startLocation = record;
+        } else if (getTaskRecord().isOpenDynamicFile) {
           tr.startLocation = mConfig.TEMP_FILE.length();
         } else {
           if (0 < record && record < mConfig.END_LOCATION) {

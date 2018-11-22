@@ -17,9 +17,6 @@
 package com.arialyy.aria.core.queue;
 
 import com.arialyy.aria.core.AriaManager;
-import com.arialyy.aria.core.queue.pool.BaseCachePool;
-import com.arialyy.aria.core.queue.pool.BaseExecutePool;
-import com.arialyy.aria.core.queue.pool.UploadSharePool;
 import com.arialyy.aria.core.scheduler.UploadSchedulers;
 import com.arialyy.aria.core.upload.UploadTask;
 import com.arialyy.aria.core.upload.UploadTaskEntity;
@@ -45,12 +42,8 @@ public class UploadTaskQueue extends AbsTaskQueue<UploadTask, UploadTaskEntity> 
   private UploadTaskQueue() {
   }
 
-  @Override BaseCachePool<UploadTask> setCachePool() {
-    return UploadSharePool.getInstance().cachePool;
-  }
-
-  @Override BaseExecutePool<UploadTask> setExecutePool() {
-    return UploadSharePool.getInstance().executePool;
+  @Override int getQueueType() {
+    return TYPE_U_QUEUE;
   }
 
   @Override public int getConfigMaxNum() {

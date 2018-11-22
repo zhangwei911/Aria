@@ -22,6 +22,8 @@ import com.arialyy.aria.core.inf.IEntity;
 import com.arialyy.aria.core.inf.TaskSchedulerType;
 import com.arialyy.aria.core.queue.pool.BaseCachePool;
 import com.arialyy.aria.core.queue.pool.BaseExecutePool;
+import com.arialyy.aria.core.queue.pool.DownloadSharePool;
+import com.arialyy.aria.core.queue.pool.UploadSharePool;
 import com.arialyy.aria.util.ALog;
 import java.util.Map;
 import java.util.Set;
@@ -32,18 +34,29 @@ import java.util.Set;
  */
 abstract class AbsTaskQueue<TASK extends AbsTask, TASK_ENTITY extends AbsTaskEntity>
     implements ITaskQueue<TASK, TASK_ENTITY> {
+  protected final int TYPE_D_QUEUE = 1;
+  protected final int TYPE_DG_QUEUE = 2;
+  protected final int TYPE_U_QUEUE = 3;
+
   private final String TAG = "AbsTaskQueue";
   BaseCachePool<TASK> mCachePool;
   BaseExecutePool<TASK> mExecutePool;
 
   AbsTaskQueue() {
-    mCachePool = setCachePool();
-    mExecutePool = setExecutePool();
+    switch (getQueueType()) {
+      case TYPE_D_QUEUE:
+      case TYPE_DG_QUEUE:
+        mCachePool = DownloadSharePool.getInstance().cachePool;
+        mExecutePool = DownloadSharePool.getInstance().executePool;
+        break;
+      case TYPE_U_QUEUE:
+        mCachePool = UploadSharePool.getInstance().cachePool;
+        mExecutePool = UploadSharePool.getInstance().executePool;
+        break;
+    }
   }
 
-  abstract BaseCachePool<TASK> setCachePool();
-
-  abstract BaseExecutePool<TASK> setExecutePool();
+  abstract int getQueueType();
 
   @Override public boolean taskIsRunning(String key) {
     return mExecutePool.getTask(key) != null;

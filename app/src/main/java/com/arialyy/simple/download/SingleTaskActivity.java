@@ -55,13 +55,12 @@ public class SingleTaskActivity extends BaseActivity<ActivitySingleBinding> {
   //"https://yizi-kejian.oss-cn-beijing.aliyuncs.com/qimeng/package1/qmtable11.zip";
   //"http://rs.0.gaoshouyou.com/d/04/1e/400423a7551e1f3f0eb1812afa1f9b44.apk";
       //"http://58.210.9.131/tpk/sipgt//TDLYZTGH.tpk"; //chunked 下载
-      //"https://static.donguo.me//video/ip/course/pfys_1.mp4";
+      "https://static.donguo.me//video/ip/course/pfys_1.mp4";
       //"https://www.baidu.com/link?url=_LFCuTPtnzFxVJByJ504QymRywIA1Z_T5xUxe9ZLuxcGM0C_RcdpWyB1eGjbJC-e5wv5wAKM4WmLMAS5KeF6EZJHB8Va3YqZUiaErqK_pxm&wd=&eqid=e8583fe70002d126000000065a99f864";
       //"https://d.pcs.baidu.com/file/a02c89a2d479d4fd2756f3313d42491d?fid=4232431903-250528-1114369760340736&dstime=1525491372&rt=sh&sign=FDtAERVY-DCb740ccc5511e5e8fedcff06b081203-3C13vkOkuk4TqXvVYW05zj1K0ao%3D&expires=8h&chkv=1&chkbd=0&chkpc=et&dp-logid=8651730921842106225&dp-callid=0&r=165533013";
       //"http://apk500.bce.baidu-mgame.com/game/67000/67734/20170622040827_oem_5502845.apk?r=1";
       //"https://dl.genymotion.com/releases/genymotion-2.12.1/genymotion-2.12.1-vbox.exe";
       //"http://9.9.9.59:5000/download/CentOS-7-x86_64-Minimal-1804.iso";
-      "https://firmwareapi.azurewebsites.net/firmware-overview?name=A19_Filament_W_IMG0038_00102411-encrypted.ota";
   @Bind(R.id.start) Button mStart;
   @Bind(R.id.stop) Button mStop;
   @Bind(R.id.cancel) Button mCancel;
@@ -197,11 +196,11 @@ public class SingleTaskActivity extends BaseActivity<ActivitySingleBinding> {
       L.d(TAG, "path ==> " + task.getDownloadEntity().getDownloadPath());
       L.d(TAG, "md5Code ==> " + CommonUtil.getFileMD5(new File(task.getDownloadPath())));
       L.d(TAG, "data ==> " + Aria.download(this).getDownloadEntity(DOWNLOAD_URL));
-      Intent install = new Intent(Intent.ACTION_VIEW);
-      install.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-      File apkFile = new File(task.getDownloadPath());
-      install.setDataAndType(Uri.fromFile(apkFile), "application/vnd.android.package-archive");
-      startActivity(install);
+      //Intent install = new Intent(Intent.ACTION_VIEW);
+      //install.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+      //File apkFile = new File(task.getDownloadPath());
+      //install.setDataAndType(Uri.fromFile(apkFile), "application/vnd.android.package-archive");
+      //startActivity(install);
     }
   }
 
@@ -261,7 +260,7 @@ public class SingleTaskActivity extends BaseActivity<ActivitySingleBinding> {
     Aria.download(SingleTaskActivity.this)
         .load(DOWNLOAD_URL)
         //.addHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8")
-        .addHeader("Accept-Encoding", "gzip, deflate")
+        //.addHeader("Accept-Encoding", "gzip, deflate")
         //.addHeader("DNT", "1")
         //.addHeader("Cookie", "BAIDUID=648E5FF020CC69E8DD6F492D1068AAA9:FG=1; BIDUPSID=648E5FF020CC69E8DD6F492D1068AAA9; PSTM=1519099573; BD_UPN=12314753; locale=zh; BDSVRTM=0")
         .useServerFileName(true)

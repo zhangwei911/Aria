@@ -39,7 +39,7 @@ task clean(type: Delete) {
 ext {
   userOrg = 'arialyy'
   groupId = 'com.arialyy.aria'
-  publishVersion = '3.5.2_dev_2'
+  publishVersion = '3.5.2_dev_3'
 //  publishVersion = '1.0.4'  //FTP插件
   repoName='maven'
   desc = 'android 下载框架'

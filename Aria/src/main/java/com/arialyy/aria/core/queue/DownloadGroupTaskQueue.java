@@ -19,9 +19,6 @@ package com.arialyy.aria.core.queue;
 import com.arialyy.aria.core.AriaManager;
 import com.arialyy.aria.core.download.DownloadGroupTask;
 import com.arialyy.aria.core.download.DownloadGroupTaskEntity;
-import com.arialyy.aria.core.queue.pool.BaseCachePool;
-import com.arialyy.aria.core.queue.pool.BaseExecutePool;
-import com.arialyy.aria.core.queue.pool.DownloadSharePool;
 import com.arialyy.aria.core.scheduler.DownloadGroupSchedulers;
 import com.arialyy.aria.util.ALog;
 
@@ -47,12 +44,8 @@ public class DownloadGroupTaskQueue
   private DownloadGroupTaskQueue() {
   }
 
-  @Override BaseCachePool<DownloadGroupTask> setCachePool() {
-    return DownloadSharePool.getInstance().cachePool;
-  }
-
-  @Override BaseExecutePool<DownloadGroupTask> setExecutePool() {
-    return DownloadSharePool.getInstance().executePool;
+  @Override int getQueueType() {
+    return TYPE_DG_QUEUE;
   }
 
   @Override public int getMaxTaskNum() {

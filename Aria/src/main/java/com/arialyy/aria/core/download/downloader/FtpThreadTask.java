@@ -133,6 +133,9 @@ class FtpThreadTask extends AbsFtpThreadTask<DownloadEntity, DownloadTaskEntity>
     if (isBreak()) {
       return;
     }
+    if (!checkBlock()) {
+      return;
+    }
     ALog.i(TAG,
         String.format("任务【%s】线程__%s__下载完毕", mConfig.TEMP_FILE.getName(), mConfig.THREAD_ID));
     writeConfig(true, mConfig.END_LOCATION);

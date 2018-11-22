@@ -76,6 +76,19 @@ public class CommonUtil {
   private static final String TAG = "CommonUtil";
 
   /**
+   * 获取分块文件的快大小
+   *
+   * @param fileLen 文件总长度
+   * @param blockId 分块id
+   * @param blockNum 分块数量
+   * @return 分块长度
+   */
+  public static long getBlockLen(long fileLen, int blockId, int blockNum) {
+    final long averageLen = fileLen / blockNum;
+    return blockId == blockNum - 1 ? (fileLen - blockId * averageLen) : averageLen;
+  }
+
+  /**
    * 检查SD内存空间是否充足
    *
    * @param filePath 文件保存路径
@@ -945,7 +958,7 @@ public class CommonUtil {
       final File to = new File(file.getAbsolutePath() + System.currentTimeMillis());
       if (file.renameTo(to)) {
         to.delete();
-      }else {
+      } else {
         file.delete();
       }
     }
