@@ -18,6 +18,7 @@ package com.arialyy.aria.core.common;
 import android.content.Context;
 import android.util.SparseArray;
 import com.arialyy.aria.core.AriaManager;
+import com.arialyy.aria.core.download.BaseDListener;
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.download.DownloadTaskEntity;
 import com.arialyy.aria.core.inf.AbsNormalEntity;
@@ -196,6 +197,7 @@ public abstract class AbsFileer<ENTITY extends AbsNormalEntity, TASK_ENTITY exte
         if (mConstance.isComplete()
             || mConstance.isStop()
             || mConstance.isCancel()
+            || mConstance.isFail()
             || !mConstance.isRunning) {
           closeTimer();
         } else if (mConstance.CURRENT_LOCATION >= 0) {
@@ -653,6 +655,9 @@ public abstract class AbsFileer<ENTITY extends AbsNormalEntity, TASK_ENTITY exte
    * 处理不支持断点的任务
    */
   private void handleNoSupportBP() {
+    if (mListener instanceof BaseDListener){
+      ((BaseDListener) mListener).supportBreakpoint(false);
+    }
     SubThreadConfig<TASK_ENTITY> config = new SubThreadConfig<>();
     config.TOTAL_FILE_SIZE = mEntity.getFileSize();
     config.URL = mEntity.isRedirect() ? mEntity.getRedirectUrl() : mEntity.getUrl();

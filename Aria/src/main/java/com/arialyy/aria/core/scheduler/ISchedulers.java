@@ -30,9 +30,9 @@ public interface ISchedulers<Task extends AbsTask> extends Handler.Callback {
   int IS_SUB_TASK = 0xd1;
 
   /**
-   * 断点支持
+   * 不支持断点
    */
-  int SUPPORT_BREAK_POINT = 9;
+  int NO_SUPPORT_BREAK_POINT = 9;
   /**
    * 任务预加载
    */

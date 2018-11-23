@@ -247,7 +247,7 @@ abstract class AbsSchedulers<TASK_ENTITY extends AbsTaskEntity, TASK extends Abs
         case FAIL:
           listener.onTaskFail(task, (Exception) task.getExpand(AbsTask.ERROR_INFO_KEY));
           break;
-        case SUPPORT_BREAK_POINT:
+        case NO_SUPPORT_BREAK_POINT:
           listener.onNoSupportBreakPoint(task);
           break;
       }

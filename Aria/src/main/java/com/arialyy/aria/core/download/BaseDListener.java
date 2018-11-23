@@ -27,7 +27,7 @@ import com.arialyy.aria.util.CommonUtil;
 /**
  * 下载监听类
  */
-class BaseDListener extends BaseListener<DownloadEntity, DownloadTaskEntity, DownloadTask>
+public class BaseDListener extends BaseListener<DownloadEntity, DownloadTaskEntity, DownloadTask>
     implements IDownloadListener {
   private static final String TAG = "BaseDListener";
 
@@ -45,7 +45,9 @@ class BaseDListener extends BaseListener<DownloadEntity, DownloadTaskEntity, Dow
   }
 
   @Override public void supportBreakpoint(boolean support) {
-
+    if (!support){
+      sendInState2Target(ISchedulers.NO_SUPPORT_BREAK_POINT);
+    }
   }
 
   @Override

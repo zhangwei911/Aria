@@ -378,8 +378,8 @@ public abstract class AbsThreadTask<ENTITY extends AbsNormalEntity, TASK_ENTITY 
         retryThis(needRetry && STATE.START_THREAD_NUM != 1);
       } else {
         ALog.e(TAG, String.format("任务【%s】执行失败", mConfig.TEMP_FILE.getName()));
-        mListener.onFail(true, ex);
         ErrorHelp.saveError(TAG, "", ALog.getExceptionString(ex));
+        handleFailState(!isBreak());
       }
     }
   }
@@ -478,7 +478,6 @@ public abstract class AbsThreadTask<ENTITY extends AbsNormalEntity, TASK_ENTITY 
         // 手动停止不进行fail回调
         if (!STATE.isStop) {
           String errorMsg = String.format("任务【%s】执行失败", mConfig.TEMP_FILE.getName());
-          //ALog.e(TAG, errorMsg);
           mListener.onFail(taskNeedReTry, new TaskException(TAG, errorMsg));
         }
       }
