@@ -14,6 +14,9 @@
      - 优化logcat日志提示
      - 修改下载线程的优先级为`Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);`
      - fix bug https://github.com/AriaLyy/Aria/issues/319
+     - 修复分卡下载失败的问题 https://github.com/AriaLyy/Aria/issues/326
+     - 初始化Aria时会将所有数据库状态为下载中的任务改为已停止，防止应用被kill后，任务状态错误
+     - 初始化时自动判断文件是否被删除，文件被删除的任务将自动重置默认值
   + v_3.5.1
     - 优化`taskExists`方法
     - 添加`post`参数请求支持

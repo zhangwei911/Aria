@@ -16,6 +16,7 @@
 package com.arialyy.aria.core.download;
 
 import android.text.TextUtils;
+import com.arialyy.aria.core.common.TaskRecord;
 import com.arialyy.aria.core.manager.TEManager;
 import com.arialyy.aria.core.queue.DownloadTaskQueue;
 import com.arialyy.aria.orm.DbEntity;
@@ -168,9 +169,9 @@ abstract class BaseNormalTarget<TARGET extends BaseNormalTarget>
         if (!forceDownload) {
           ALog.e(TAG, "下载失败，保存路径【" + filePath + "】已经被其它任务占用，请设置其它保存路径");
           return false;
-        }else {
-          ALog.d(TAG, "保存路径【" + filePath + "】已经被其它任务占用，当前任务将覆盖该路径的文件");
-          DbEntity.deleteData(DownloadEntity.class, "downloadPath=?", filePath);
+        } else {
+          ALog.w(TAG, "保存路径【" + filePath + "】已经被其它任务占用，当前任务将覆盖该路径的文件");
+          CommonUtil.delTaskRecord(filePath, 1);
           mTaskEntity = TEManager.getInstance().getTEntity(DownloadTaskEntity.class, url);
         }
       }

@@ -177,6 +177,14 @@ public abstract class DbEntity {
   }
 
   /**
+   * 表是否存在
+   * @return  {@code true} 存在
+   */
+  public static boolean tableExists(Class<DbEntity> clazz){
+    return DelegateWrapper.getInstance().tableExists(clazz);
+  }
+
+  /**
    * 插入数据，只有 target中checkEntity成功后才能插入，创建实体部分也不允许操作
    */
   public void insert() {

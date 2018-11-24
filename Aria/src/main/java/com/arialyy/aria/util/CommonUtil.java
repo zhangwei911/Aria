@@ -35,10 +35,12 @@ import com.arialyy.aria.core.common.AbsFileer;
 import com.arialyy.aria.core.common.TaskRecord;
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.download.DownloadGroupEntity;
+import com.arialyy.aria.core.download.DownloadTaskEntity;
 import com.arialyy.aria.core.inf.AbsGroupTaskEntity;
 import com.arialyy.aria.core.inf.AbsNormalEntity;
 import com.arialyy.aria.core.inf.AbsTaskEntity;
 import com.arialyy.aria.core.upload.UploadEntity;
+import com.arialyy.aria.core.upload.UploadTaskEntity;
 import com.arialyy.aria.orm.DbEntity;
 import dalvik.system.DexFile;
 import java.io.File;
@@ -568,6 +570,50 @@ public class CommonUtil {
   }
 
   /**
+   * 删除任务记录，默认删除文件
+   *
+   * @param filePath 文件路径
+   * @param type {@code 1}下载任务的记录，{@code 2} 上传任务的记录
+   * {@code false}如果任务已经完成，只删除任务数据库记录
+   */
+  public static void delTaskRecord(String filePath, int type) {
+    if (TextUtils.isEmpty(filePath)) {
+      throw new NullPointerException("删除记录失败，文件路径为空");
+    }
+    if (type != 1 && type != 2) {
+      throw new IllegalArgumentException("任务记录类型错误");
+    }
+    TaskRecord record = DbEntity.findFirst(TaskRecord.class, "filePath=?", filePath);
+    if (record == null) {
+      ALog.w(TAG, "删除记录失败，记录为空");
+      return;
+    }
+    File file = new File(filePath);
+    // 删除分块文件
+    if (record.isBlock) {
+      for (int i = 0, len = record.threadNum; i < len; i++) {
+        File partFile = new File(String.format(AbsFileer.SUB_PATH, record.filePath, i));
+        if (partFile.exists()) {
+          partFile.delete();
+        }
+      }
+    }
+    if (file.exists()) {
+      file.delete();
+    }
+
+    record.deleteData();
+    //下载任务实体和下载实体为一对一关系，下载实体删除，任务实体自动删除
+    if (type == 1) {
+      DbEntity.deleteData(DownloadTaskEntity.class, "key=?", filePath);
+      DbEntity.deleteData(DownloadEntity.class, "downloadPath=?", filePath);
+    }else {
+      DbEntity.deleteData(UploadTaskEntity.class, "key=?", filePath);
+      DbEntity.deleteData(UploadEntity.class, "filePath=?", filePath);
+    }
+  }
+
+  /**
    * 获取CPU核心数
    */
   public static int getCoresNum() {
@@ -705,8 +751,8 @@ public class CommonUtil {
    * @param taskType {@link ICmd#TASK_TYPE_DOWNLOAD}、{@link ICmd#TASK_TYPE_DOWNLOAD_GROUP}、{@link
    * ICmd#TASK_TYPE_UPLOAD}
    */
-  public static <T extends AbsTaskEntity> AbsNormalCmd createNormalCmd(T entity,
-      int cmd, int taskType) {
+  public static <T extends AbsTaskEntity> AbsNormalCmd createNormalCmd(T entity, int cmd,
+      int taskType) {
     return NormalCmdFactory.getInstance().createCmd(entity, cmd, taskType);
   }
 

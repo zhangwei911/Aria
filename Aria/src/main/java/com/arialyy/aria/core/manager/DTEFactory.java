@@ -16,6 +16,8 @@
 package com.arialyy.aria.core.manager;
 
 import android.text.TextUtils;
+import com.arialyy.aria.core.common.AbsFileer;
+import com.arialyy.aria.core.common.TaskRecord;
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.download.DownloadTaskEntity;
 import com.arialyy.aria.core.download.wrapper.DTEWrapper;
@@ -57,7 +59,8 @@ class DTEFactory implements INormalTEFactory<DownloadEntity, DownloadTaskEntity>
       taskEntity = wrapper.get(0).taskEntity;
       if (taskEntity == null) {
         taskEntity = new DownloadTaskEntity();
-      } else if (taskEntity.getEntity() == null || TextUtils.isEmpty(taskEntity.getEntity().getUrl())) {
+      } else if (taskEntity.getEntity() == null || TextUtils.isEmpty(
+          taskEntity.getEntity().getUrl())) {
         taskEntity.setEntity(entity);
       }
     } else {
@@ -93,9 +96,37 @@ class DTEFactory implements INormalTEFactory<DownloadEntity, DownloadTaskEntity>
       entity.setDownloadPath(UUID.randomUUID().toString().replace("-", ""));  //设置临时路径
     }
     File file = new File(entity.getDownloadPath());
-    if (!file.exists()) {
-      entity.setState(IEntity.STATE_WAIT);
+    TaskRecord record =
+        TaskRecord.findFirst(TaskRecord.class, "filePath=?", entity.getDownloadPath());
+    if (record == null) {
+      resetEntity(entity);
+    } else {
+      if (record.isBlock) {
+        int count = 0;
+        for (int i = 0, len = record.threadNum; i < len; i++) {
+          File temp = new File(String.format(AbsFileer.SUB_PATH, record.filePath, i));
+          if (!temp.exists()) {
+            count++;
+          }
+        }
+        if (count == record.threadNum) {
+          resetEntity(entity);
+        }
+      } else if (!file.exists()) { // 非分块文件需要判断文件是否存在
+        resetEntity(entity);
+      }
     }
     return entity;
+  }
+
+  /**
+   * 初始化下载实体
+   */
+  private void resetEntity(DownloadEntity entity) {
+    entity.setPercent(0);
+    entity.setCompleteTime(0);
+    entity.setComplete(false);
+    entity.setCurrentProgress(0);
+    entity.setState(IEntity.STATE_WAIT);
   }
 }
