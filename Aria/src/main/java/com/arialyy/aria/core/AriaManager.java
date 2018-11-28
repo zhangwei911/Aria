@@ -130,7 +130,7 @@ import org.xml.sax.SAXException;
         DownloadEntity.class, UploadEntity.class, DownloadGroupEntity.class,
         DownloadTaskEntity.class, UploadTaskEntity.class, DownloadGroupTaskEntity.class
     };
-    String sql = "UPDATE %s SET state=2 WHERE state=4";
+    String sql = "UPDATE %s SET state=2 WHERE state in (3,4,5,6)";
     for (Class clazz : clazzs) {
       String temp = String.format(sql, clazz.getSimpleName());
       DbEntity.exeSql(temp);

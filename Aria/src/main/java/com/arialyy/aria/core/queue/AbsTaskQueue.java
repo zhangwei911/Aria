@@ -29,14 +29,13 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Created by lyy on 2017/2/23.
- * 任务队列
+ * Created by lyy on 2017/2/23. 任务队列
  */
 abstract class AbsTaskQueue<TASK extends AbsTask, TASK_ENTITY extends AbsTaskEntity>
     implements ITaskQueue<TASK, TASK_ENTITY> {
-  protected final int TYPE_D_QUEUE = 1;
-  protected final int TYPE_DG_QUEUE = 2;
-  protected final int TYPE_U_QUEUE = 3;
+  final int TYPE_D_QUEUE = 1;
+  final int TYPE_DG_QUEUE = 2;
+  final int TYPE_U_QUEUE = 3;
 
   private final String TAG = "AbsTaskQueue";
   BaseCachePool<TASK> mCachePool;
@@ -63,9 +62,7 @@ abstract class AbsTaskQueue<TASK extends AbsTask, TASK_ENTITY extends AbsTaskEnt
   }
 
   /**
-   * 恢复任务
-   * 如果执行队列任务未满，则直接启动任务。
-   * 如果执行队列已经满了，则暂停执行队列队首任务，并恢复指定任务
+   * 恢复任务 如果执行队列任务未满，则直接启动任务。 如果执行队列已经满了，则暂停执行队列队首任务，并恢复指定任务
    *
    * @param task 需要恢复的任务
    */
@@ -197,14 +194,34 @@ abstract class AbsTaskQueue<TASK extends AbsTask, TASK_ENTITY extends AbsTaskEnt
   }
 
   @Override public void stopTask(TASK task) {
-    if (!task.isRunning()) {
-      ALog.w(TAG, String.format("停止任务【%s】失败，原因：已停止", task.getTaskName()));
+    int state = task.getState();
+    boolean canStop = false;
+    switch (state) {
+      case IEntity.STATE_WAIT:
+        mCachePool.removeTask(task);
+        canStop = true;
+        break;
+      case IEntity.STATE_POST_PRE:
+      case IEntity.STATE_PRE:
+      case IEntity.STATE_RUNNING:
+        mExecutePool.removeTask(task);
+        canStop = true;
+        break;
+      case IEntity.STATE_STOP:
+      case IEntity.STATE_OTHER:
+      case IEntity.STATE_FAIL:
+        ALog.w(TAG, String.format("停止任务【%s】失败，原因：已停止", task.getTaskName()));
+        break;
+      case IEntity.STATE_CANCEL:
+        ALog.w(TAG, String.format("停止任务【%s】失败，原因：任务已删除", task.getTaskName()));
+        break;
+      case IEntity.STATE_COMPLETE:
+        ALog.w(TAG, String.format("停止任务【%s】失败，原因：已完成", task.getTaskName()));
+        break;
     }
-    if (mExecutePool.removeTask(task)) {
+
+    if (canStop) {
       task.stop();
-    } else {
-      task.stop();
-      ALog.w(TAG, String.format("删除任务【%s】失败，原因：执行队列中没有该任务", task.getTaskName()));
     }
   }
 
@@ -226,11 +243,28 @@ abstract class AbsTaskQueue<TASK extends AbsTask, TASK_ENTITY extends AbsTaskEnt
       ALog.e(TAG, "任务重试失败，原因：task 为null");
       return;
     }
-    if (!task.isRunning()) {
-      task.start();
-    } else {
-      task.stop();
-      ALog.e(TAG, String.format("任务【%s】重试失败，原因：任务没有完全停止", task.getTaskName()));
+
+    int state = task.getState();
+    switch (state) {
+      case IEntity.STATE_POST_PRE:
+      case IEntity.STATE_PRE:
+      case IEntity.STATE_RUNNING:
+        ALog.w(TAG, String.format("任务【%s】没有停止，即将重新下载", task.getTaskName()));
+        task.stop(TaskSchedulerType.TYPE_STOP_NOT_NEXT);
+        task.start();
+        break;
+      case IEntity.STATE_WAIT:
+      case IEntity.STATE_STOP:
+      case IEntity.STATE_OTHER:
+      case IEntity.STATE_FAIL:
+        task.start();
+        break;
+      case IEntity.STATE_CANCEL:
+        ALog.e(TAG, String.format("任务【%s】重试失败，原因：任务没已删除", task.getTaskName()));
+        break;
+      case IEntity.STATE_COMPLETE:
+        ALog.e(TAG, String.format("任务【%s】重试失败，原因：已完成", task.getTaskName()));
+        break;
     }
   }
 

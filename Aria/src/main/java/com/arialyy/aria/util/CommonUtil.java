@@ -71,8 +71,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Created by lyy on 2016/1/22.
- * 通用工具
+ * Created by lyy on 2016/1/22. 通用工具
  */
 public class CommonUtil {
   private static final String TAG = "CommonUtil";
@@ -483,8 +482,7 @@ public class CommonUtil {
   /**
    * 删除任务组记录
    *
-   * @param removeFile {@code true} 不仅删除任务数据库记录，还会删除已经删除完成的文件
-   * {@code false}如果任务已经完成，只删除任务数据库记录
+   * @param removeFile {@code true} 不仅删除任务数据库记录，还会删除已经删除完成的文件 {@code false}如果任务已经完成，只删除任务数据库记录
    */
   public static void delGroupTaskRecord(boolean removeFile, DownloadGroupEntity groupEntity) {
     if (groupEntity == null) {
@@ -533,8 +531,7 @@ public class CommonUtil {
   /**
    * 删除任务记录
    *
-   * @param removeFile {@code true} 不仅删除任务数据库记录，还会删除已经完成的文件
-   * {@code false}如果任务已经完成，只删除任务数据库记录
+   * @param removeFile {@code true} 不仅删除任务数据库记录，还会删除已经完成的文件 {@code false}如果任务已经完成，只删除任务数据库记录
    */
   public static void delTaskRecord(TaskRecord record, boolean removeFile, AbsNormalEntity dEntity) {
     if (dEntity == null) return;
@@ -573,10 +570,10 @@ public class CommonUtil {
    * 删除任务记录，默认删除文件
    *
    * @param filePath 文件路径
-   * @param type {@code 1}下载任务的记录，{@code 2} 上传任务的记录
-   * {@code false}如果任务已经完成，只删除任务数据库记录
+   * @param removeFile {@code true} 不仅删除任务数据库记录，还会删除已经删除完成的文件 {@code false}如果任务已经完成，只删除任务数据库记录
+   * @param type {@code 1}下载任务的记录，{@code 2} 上传任务的记录 {@code false}如果任务已经完成，只删除任务数据库记录
    */
-  public static void delTaskRecord(String filePath, int type) {
+  public static void delTaskRecord(String filePath, int type, boolean removeFile) {
     if (TextUtils.isEmpty(filePath)) {
       throw new NullPointerException("删除记录失败，文件路径为空");
     }
@@ -584,33 +581,43 @@ public class CommonUtil {
       throw new IllegalArgumentException("任务记录类型错误");
     }
     TaskRecord record = DbEntity.findFirst(TaskRecord.class, "filePath=?", filePath);
+    File file = new File(filePath);
     if (record == null) {
       ALog.w(TAG, "删除记录失败，记录为空");
-      return;
-    }
-    File file = new File(filePath);
-    // 删除分块文件
-    if (record.isBlock) {
-      for (int i = 0, len = record.threadNum; i < len; i++) {
-        File partFile = new File(String.format(AbsFileer.SUB_PATH, record.filePath, i));
-        if (partFile.exists()) {
-          partFile.delete();
+    } else {
+      // 删除分块文件
+      if (record.isBlock) {
+        for (int i = 0, len = record.threadNum; i < len; i++) {
+          File partFile = new File(String.format(AbsFileer.SUB_PATH, record.filePath, i));
+          if (partFile.exists()) {
+            partFile.delete();
+          }
         }
       }
+
+      record.deleteData();
     }
-    if (file.exists()) {
+    if (file.exists() && removeFile) {
       file.delete();
     }
-
-    record.deleteData();
     //下载任务实体和下载实体为一对一关系，下载实体删除，任务实体自动删除
     if (type == 1) {
       DbEntity.deleteData(DownloadTaskEntity.class, "key=?", filePath);
       DbEntity.deleteData(DownloadEntity.class, "downloadPath=?", filePath);
-    }else {
+    } else {
       DbEntity.deleteData(UploadTaskEntity.class, "key=?", filePath);
       DbEntity.deleteData(UploadEntity.class, "filePath=?", filePath);
     }
+  }
+
+  /**
+   * 删除任务记录，默认删除文件
+   *
+   * @param filePath 文件路径
+   * @param type {@code 1}下载任务的记录，{@code 2} 上传任务的记录 {@code false}如果任务已经完成，只删除任务数据库记录
+   */
+  public static void delTaskRecord(String filePath, int type) {
+    delTaskRecord(filePath, type, false);
   }
 
   /**
@@ -983,9 +990,7 @@ public class CommonUtil {
   }
 
   /**
-   * 创建文件
-   * 当文件不存在的时候就创建一个文件。
-   * 如果文件存在，先删除原文件，然后重新创建一个新文件
+   * 创建文件 当文件不存在的时候就创建一个文件。 如果文件存在，先删除原文件，然后重新创建一个新文件
    */
   public static void createFile(String path) {
     if (TextUtils.isEmpty(path)) {

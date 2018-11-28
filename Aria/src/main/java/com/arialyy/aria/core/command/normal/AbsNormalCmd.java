@@ -23,6 +23,7 @@ import com.arialyy.aria.core.download.DownloadTaskEntity;
 import com.arialyy.aria.core.inf.AbsEntity;
 import com.arialyy.aria.core.inf.AbsTask;
 import com.arialyy.aria.core.inf.AbsTaskEntity;
+import com.arialyy.aria.core.inf.IEntity;
 import com.arialyy.aria.core.manager.TEManager;
 import com.arialyy.aria.core.queue.DownloadGroupTaskQueue;
 import com.arialyy.aria.core.queue.DownloadTaskQueue;
@@ -83,7 +84,7 @@ public abstract class AbsNormalCmd<T extends AbsTaskEntity> extends AbsCmd<T> {
    */
   void sendWaitState() {
     if (tempTask != null) {
-      tempTask.getOutHandler().obtainMessage(ISchedulers.WAIT, tempTask).sendToTarget();
+     sendWaitState(tempTask);
     }
   }
 
@@ -92,6 +93,9 @@ public abstract class AbsNormalCmd<T extends AbsTaskEntity> extends AbsCmd<T> {
    */
   void sendWaitState(AbsTask task) {
     if (task != null) {
+      task.getTaskEntity().getEntity().setState(IEntity.STATE_WAIT);
+      task.getTaskEntity().setState(IEntity.STATE_WAIT);
+      task.getTaskEntity().update();
       task.getOutHandler().obtainMessage(ISchedulers.WAIT, task).sendToTarget();
     }
   }

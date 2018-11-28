@@ -45,7 +45,7 @@ public class BaseDListener extends BaseListener<DownloadEntity, DownloadTaskEnti
   }
 
   @Override public void supportBreakpoint(boolean support) {
-    if (!support){
+    if (!support) {
       sendInState2Target(ISchedulers.NO_SUPPORT_BREAK_POINT);
     }
   }
@@ -62,7 +62,7 @@ public class BaseDListener extends BaseListener<DownloadEntity, DownloadTaskEnti
         if (record != null) {
           CommonUtil.delTaskRecord(record, mTaskEntity.isRemoveFile(), mEntity);
         } else {
-          mEntity.deleteData();
+          CommonUtil.delTaskRecord(mEntity.getDownloadPath(), 1, mTaskEntity.isRemoveFile());
         }
       }
       return;

@@ -205,9 +205,10 @@ public class DownloadAdapter extends AbsRVAdapter<AbsEntity, DownloadAdapter.Sim
     //删除按钮事件
     holder.cancel.setOnClickListener(new View.OnClickListener() {
       @Override public void onClick(View v) {
-        mData.remove(entity);
+//        mData.remove(entity);
         notifyDataSetChanged();
-        cancel(entity);
+//        cancel(entity);
+        stop(entity);
       }
     });
     //if (holder instanceof GroupHolder){

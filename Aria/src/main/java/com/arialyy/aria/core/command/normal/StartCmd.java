@@ -38,9 +38,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by lyy on 2016/8/22.
- * 开始命令
- * 队列模型{@link QueueMod#NOW}、{@link QueueMod#WAIT}
+ * Created by lyy on 2016/8/22. 开始命令 队列模型{@link QueueMod#NOW}、{@link QueueMod#WAIT}
  */
 class StartCmd<T extends AbsTaskEntity> extends AbsNormalCmd<T> {
 
@@ -70,13 +68,18 @@ class StartCmd<T extends AbsTaskEntity> extends AbsNormalCmd<T> {
       if (mod.equals(QueueMod.NOW.getTag())) {
         startTask();
       } else if (mod.equals(QueueMod.WAIT.getTag())) {
-        if (mQueue.getCurrentExePoolNum() < maxTaskNum
-            || task.getState() == IEntity.STATE_STOP
-            || task.getState() == IEntity.STATE_FAIL
-            || task.getState() == IEntity.STATE_OTHER
-            || task.getState() == IEntity.STATE_POST_PRE
-            || task.getState() == IEntity.STATE_COMPLETE) {
-          resumeTask();
+        int state = task.getState();
+        if (mQueue.getCurrentExePoolNum() < maxTaskNum){
+          if (state == IEntity.STATE_STOP
+              || task.getState() == IEntity.STATE_FAIL
+              || task.getState() == IEntity.STATE_OTHER
+              || task.getState() == IEntity.STATE_PRE
+              || task.getState() == IEntity.STATE_POST_PRE
+              || task.getState() == IEntity.STATE_COMPLETE) {
+            resumeTask();
+          }else {
+            startTask();
+          }
         } else {
           sendWaitState(task);
         }

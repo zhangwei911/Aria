@@ -261,9 +261,9 @@ abstract class AbsSchedulers<TASK_ENTITY extends AbsTaskEntity, TASK extends Abs
    */
   private void handleFailTask(final TASK task) {
     if (!task.needRetry || task.isStop() || task.isCancel()) {
-      callback(FAIL, task);
       mQueue.removeTaskFormQueue(task.getKey());
       startNextTask(task);
+      callback(FAIL, task);
       return;
     }
     long interval = 2000;
@@ -283,10 +283,10 @@ abstract class AbsSchedulers<TASK_ENTITY extends AbsTaskEntity, TASK extends Abs
     final int reTryNum = num;
     if ((!NetUtils.isConnected(AriaManager.APP) && !isNotNetRetry)
         || task.getTaskEntity().getEntity().getFailNum() > reTryNum) {
-      callback(FAIL, task);
       mQueue.removeTaskFormQueue(task.getKey());
       startNextTask(task);
       TEManager.getInstance().removeTEntity(task.getKey());
+      callback(FAIL, task);
       return;
     }
 

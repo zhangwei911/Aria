@@ -46,6 +46,8 @@ class BaseUListener extends BaseListener<UploadEntity, UploadTaskEntity, UploadT
             DbEntity.findFirst(TaskRecord.class, "TaskRecord.filePath=?", mTaskEntity.getKey());
         if (record != null) {
           CommonUtil.delTaskRecord(record, mTaskEntity.isRemoveFile(), mEntity);
+        }else {
+          CommonUtil.delTaskRecord(mEntity.getFilePath(), 2, mTaskEntity.isRemoveFile());
         }
       }
       //else if (mEntity instanceof AbsGroupEntity) {

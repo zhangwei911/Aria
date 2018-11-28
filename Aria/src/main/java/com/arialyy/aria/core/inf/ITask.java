@@ -55,6 +55,9 @@ public interface ITask<TASK_ENTITY extends AbsTaskEntity> {
    */
   void stop(int type);
 
+  /**
+   * 删除任务
+   */
   void cancel();
 
   /**
