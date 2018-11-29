@@ -96,7 +96,7 @@ public class HttpUploadActivity extends BaseActivity<ActivityUploadBinding> {
 
   @Upload.onTaskComplete public void taskComplete(UploadTask task) {
     L.d(TAG, "上传完成");
-    L.d(TAG, "上传成功返回数据（如果有的话）：" + task.getEntity().getResponseStr());
+    L.d(TAG, "上传成功服务端返回数据（如果有的话）：" + task.getEntity().getResponseStr());
     getBinding().setSpeed("");
     getBinding().setProgress(100);
   }

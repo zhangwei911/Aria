@@ -22,15 +22,14 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 /**
- * Created by lyy on 2017/5/22.
- * 读取配置文件
+ * Created by lyy on 2017/5/22. 读取配置文件
  */
 class ConfigHelper extends DefaultHandler {
   private final String TAG = "ConfigHelper";
 
-  private Configuration.DownloadConfig mDownloadConfig = Configuration.DownloadConfig.getInstance();
-  private Configuration.UploadConfig mUploadConfig = Configuration.UploadConfig.getInstance();
-  private Configuration.AppConfig mAppConfig = Configuration.AppConfig.getInstance();
+  private Configuration.DownloadConfig mDownloadConfig = Configuration.getInstance().downloadCfg;
+  private Configuration.UploadConfig mUploadConfig = Configuration.getInstance().uploadCfg;
+  private Configuration.AppConfig mAppConfig = Configuration.getInstance().appCfg;
   private @ConfigType int mType;
 
   @Override public void startDocument() throws SAXException {
@@ -357,8 +356,8 @@ class ConfigHelper extends DefaultHandler {
 
   @Override public void endDocument() throws SAXException {
     super.endDocument();
-    mDownloadConfig.saveAll();
-    mUploadConfig.saveAll();
-    mAppConfig.saveAll();
+    mDownloadConfig.save();
+    mUploadConfig.save();
+    mAppConfig.save();
   }
 }

@@ -13,7 +13,7 @@
   <download>
 
     <!--设置任务最大下载速度，0表示不限速，单位为：kb-->
-    <maxSpeed value="0"/>
+    <maxSpeed value="128"/>
 
     <!--
       多线程下载是否使用块下载模式，{@code true}使用，{@code false}不使用

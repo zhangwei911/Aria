@@ -47,11 +47,11 @@ import java.util.Map;
 
 public class SingleTaskActivity extends BaseActivity<ActivitySingleBinding> {
 
-  private static final String DOWNLOAD_URL =
+  private String DOWNLOAD_URL =
       //"http://kotlinlang.org/docs/kotlin-docs.pdf";
       //"https://atom-installer.github.com/v1.13.0/AtomSetup.exe?s=1484074138&ext=.exe";
       //"http://static.gaoshouyou.com/d/22/94/822260b849944492caadd2983f9bb624.apks";
-      "http://120.55.95.61:8811/ghcg/zg/武义总规纲要成果.zip";
+      "http://120.55.95.61:8811/ghcg/zg/武义总规纲要成果.zips";
       //"https://yizi-kejian.oss-cn-beijing.aliyuncs.com/qimeng/package1/qmtable11.zip";
       //"http://rs.0.gaoshouyou.com/d/04/1e/400423a7551e1f3f0eb1812afa1f9b44.apk";
       //"http://58.210.9.131/tpk/sipgt//TDLYZTGH.tpk"; //chunked 下载
@@ -77,8 +77,8 @@ public class SingleTaskActivity extends BaseActivity<ActivitySingleBinding> {
    * 设置start 和 stop 按钮状态
    */
   private void setBtState(boolean state) {
-    mStart.setEnabled(state);
-    mStop.setEnabled(!state);
+    //mStart.setEnabled(state);
+    //mStop.setEnabled(!state);
   }
 
   @Override public boolean onCreateOptionsMenu(Menu menu) {
@@ -141,7 +141,7 @@ public class SingleTaskActivity extends BaseActivity<ActivitySingleBinding> {
 
   @Download.onTaskRunning protected void running(DownloadTask task) {
     ALog.d(TAG, String.format("%s_running_%s", getClass().getName(), hashCode()));
-    if (task.getKey().equals(DOWNLOAD_URL)) {
+    //if (task.getKey().equals(DOWNLOAD_URL)) {
       //Log.d(TAG, task.getKey());
       long len = task.getFileSize();
       if (len == 0) {
@@ -150,7 +150,7 @@ public class SingleTaskActivity extends BaseActivity<ActivitySingleBinding> {
         getBinding().setProgress(task.getPercent());
       }
       getBinding().setSpeed(task.getConvertSpeed());
-    }
+    //}
   }
 
   @Download.onTaskResume void taskResume(DownloadTask task) {
@@ -187,16 +187,17 @@ public class SingleTaskActivity extends BaseActivity<ActivitySingleBinding> {
           .load(DOWNLOAD_URL)
           .updateUrl("http://120.55.95.61:8811/ghcg/zg/武义总规纲要成果.zip")
           .start();
+      //DOWNLOAD_URL = "http://120.55.95.61:8811/ghcg/zg/武义总规纲要成果.zip";
       //ALog.d(TAG, ALog.getExceptionString(e));
     }
   }
 
   @Download.onTaskComplete void taskComplete(DownloadTask task) {
-    if (task.getKey().equals(DOWNLOAD_URL)) {
+    //if (task.getKey().equals(DOWNLOAD_URL)) {
       getBinding().setProgress(100);
       Toast.makeText(SingleTaskActivity.this, "下载完成", Toast.LENGTH_SHORT).show();
       mStart.setText("重新开始？");
-      mCancel.setEnabled(false);
+      //mCancel.setEnabled(false);
       setBtState(true);
       getBinding().setSpeed("");
       L.d(TAG, "path ==> " + task.getDownloadEntity().getDownloadPath());
@@ -207,7 +208,7 @@ public class SingleTaskActivity extends BaseActivity<ActivitySingleBinding> {
       //File apkFile = new File(task.getDownloadPath());
       //install.setDataAndType(Uri.fromFile(apkFile), "application/vnd.android.package-archive");
       //startActivity(install);
-    }
+    //}
   }
 
   @Download.onNoSupportBreakPoint public void onNoSupportBreakPoint(DownloadTask task) {

@@ -57,13 +57,7 @@ public class BaseDListener extends BaseListener<DownloadEntity, DownloadTaskEnti
     mEntity.setComplete(state == IEntity.STATE_COMPLETE);
     if (state == IEntity.STATE_CANCEL) {
       if (mEntity instanceof DownloadEntity) {
-        TaskRecord record =
-            DbEntity.findFirst(TaskRecord.class, "TaskRecord.filePath=?", mTaskEntity.getKey());
-        if (record != null) {
-          CommonUtil.delTaskRecord(record, mTaskEntity.isRemoveFile(), mEntity);
-        } else {
-          CommonUtil.delTaskRecord(mEntity.getDownloadPath(), 1, mTaskEntity.isRemoveFile());
-        }
+        CommonUtil.delTaskRecord(mEntity.getDownloadPath(), 1, mTaskEntity.isRemoveFile());
       }
       return;
     } else if (state == IEntity.STATE_STOP) {

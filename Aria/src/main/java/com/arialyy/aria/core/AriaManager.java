@@ -130,7 +130,7 @@ import org.xml.sax.SAXException;
         DownloadEntity.class, UploadEntity.class, DownloadGroupEntity.class,
         DownloadTaskEntity.class, UploadTaskEntity.class, DownloadGroupTaskEntity.class
     };
-    String sql = "UPDATE %s SET state=2 WHERE state in (3,4,5,6)";
+    String sql = "UPDATE %s SET state=2 WHERE state IN (3,4,5,6)";
     for (Class clazz : clazzs) {
       String temp = String.format(sql, clazz.getSimpleName());
       DbEntity.exeSql(temp);
@@ -376,6 +376,10 @@ import org.xml.sax.SAXException;
    * 初始化配置文件
    */
   private void initConfig() {
+    mDConfig = Configuration.getInstance().downloadCfg;
+    mUConfig = Configuration.getInstance().uploadCfg;
+    mAConfig = Configuration.getInstance().appCfg;
+
     File xmlFile = new File(APP.getFilesDir().getPath() + Configuration.XML_FILE);
     File tempDir = new File(APP.getFilesDir().getPath() + "/temp");
     if (!xmlFile.exists()) {
@@ -389,16 +393,13 @@ import org.xml.sax.SAXException;
         }
         CommonUtil.createFileFormInputStream(APP.getAssets().open("aria_config.xml"),
             file.getPath());
-        if (!CommonUtil.checkMD5(md5Code, file)) {
+        if (!CommonUtil.checkMD5(md5Code, file) || !Configuration.getInstance().configExists()) {
           loadConfig();
         }
       } catch (IOException e) {
         e.printStackTrace();
       }
     }
-    mDConfig = Configuration.DownloadConfig.getInstance();
-    mUConfig = Configuration.UploadConfig.getInstance();
-    mAConfig = Configuration.AppConfig.getInstance();
     if (tempDir.exists()) {
       File newDir = new File(APP.getFilesDir().getPath() + DOWNLOAD_TEMP_DIR);
       newDir.mkdirs();
