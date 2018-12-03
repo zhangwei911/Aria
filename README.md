@@ -32,8 +32,8 @@ Aria有以下特点：
 [![Download](https://api.bintray.com/packages/arialyy/maven/AriaApi/images/download.svg)](https://bintray.com/arialyy/maven/AriaApi/_latestVersion)
 [![Download](https://api.bintray.com/packages/arialyy/maven/AriaCompiler/images/download.svg)](https://bintray.com/arialyy/maven/AriaCompiler/_latestVersion)
 ```java
-compile 'com.arialyy.aria:aria-core:3.5.1'
-annotationProcessor 'com.arialyy.aria:aria-compiler:3.5.1'
+compile 'com.arialyy.aria:aria-core:3.5.2'
+annotationProcessor 'com.arialyy.aria:aria-compiler:3.5.2'
 ```
 如果出现android support，请将 `compile 'com.arialyy.aria:aria-core:<last-version>'`替换为
 ```
@@ -101,25 +101,27 @@ protected void onCreate(Bundle savedInstanceState) {
 
 
 ### 版本日志
-+ v_3.5.1
-    - 优化`taskExists`方法
-    - 添加`post`参数请求支持
-      ```java
-      Aria.download(SingleTaskActivity.this)
-              .load(DOWNLOAD_URL)
-              .setFilePath(path)
-              .asPost() // post请求
-              .setParam("key", "value") //传递参数
-              //.setParams(Map<String, String>) // 传递多参数
-              .start();
+  + v_3.5.2
+    - 添加Serializable接口支持 https://github.com/AriaLyy/Aria/issues/320
+    - 失败回调增加错误原因 https://github.com/AriaLyy/Aria/issues/310
       ```
-     - 增加强制设置文件路径的api, https://github.com/AriaLyy/Aria/issues/311
-       ```
-       Aria.download(SingleTaskActivity.this)
-                     .load(DOWNLOAD_URL)
-                     .setFilePath(path, true) // true表示忽略路径是否被占用
-                     .start();
-       ```
+      @Download.onTaskFail void taskFail(DownloadTask task, Exception e) {
+         e.getMessage();
+        ...
+      }
+      ```
+     - fix bug https://github.com/AriaLyy/Aria/issues/322
+     - 新增201 重定向支持 https://github.com/AriaLyy/Aria/issues/318
+     - 修复使用`useServerFileName(true)`中含有`"`导致的文件后缀名错误问题
+     - 优化logcat日志提示
+     - 修改下载线程的优先级为`Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);`
+     - fix bug https://github.com/AriaLyy/Aria/issues/319
+     - 修复分卡下载失败的问题 https://github.com/AriaLyy/Aria/issues/326
+     - 初始化Aria时会将所有数据库状态为下载中的任务改为已停止，防止应用被kill后，任务状态错误
+     - 初始化时自动判断文件是否被删除，文件被删除的任务将自动重置默认值
+     - 修复刷新url后，文件无法删除的 bug
+     - fix bug https://github.com/AriaLyy/Aria/issues/309
+     - 优化配置文件的读取
 
 [更多版本记录](https://github.com/AriaLyy/Aria/blob/master/DEV_LOG.md)
 

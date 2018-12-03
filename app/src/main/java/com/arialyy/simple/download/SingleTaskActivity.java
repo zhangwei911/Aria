@@ -179,6 +179,11 @@ public class SingleTaskActivity extends BaseActivity<ActivitySingleBinding> {
     }
   }
 
+  /**
+   *
+   * @param task
+   * @param e
+   */
   @Download.onTaskFail void taskFail(DownloadTask task, Exception e) {
     if (task.getKey().equals(DOWNLOAD_URL)) {
       Toast.makeText(SingleTaskActivity.this, "下载失败", Toast.LENGTH_SHORT).show();

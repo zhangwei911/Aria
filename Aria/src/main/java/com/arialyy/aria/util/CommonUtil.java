@@ -82,7 +82,7 @@ public class CommonUtil {
   /**
    * 删除文件
    * @param path  文件路径
-   * @return  {@code true}删除成功、{@co'de false}删除失败
+   * @return  {@code true}删除成功、{@code false}删除失败
    */
   public static boolean deleteFile(String path){
     if (TextUtils.isEmpty(path)){
@@ -155,8 +155,7 @@ public class CommonUtil {
     try {
       fis = new FileInputStream(filePath);
       ObjectInputStream oois = new ObjectInputStream(fis);
-      Object obj = oois.readObject();
-      return obj;
+      return oois.readObject();
     } catch (FileNotFoundException e) {
       e.printStackTrace();
     } catch (IOException e) {
