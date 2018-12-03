@@ -66,6 +66,8 @@
 
     <!--进度更新更新间隔，默认1000毫秒-->
     <updateInterval value="1000"/>
+    <!--除非无法使用注解，否则不建议使用广播来接受任务状态，true：使用广播接收任务状态，false：不适用广播接收状态 -->
+    <useBroadcast value="false"/>
 
   </download>
 
@@ -101,6 +103,9 @@
 
     <!--进度更新更新间隔，默认1000毫秒-->
     <updateInterval value="1000"/>
+
+    <!--除非无法使用注解，否则不建议使用广播来接受任务状态，true：使用广播接收任务状态，false：不适用广播接收状态 -->
+    <useBroadcast value="false"/>
   </upload>
 
 </aria>

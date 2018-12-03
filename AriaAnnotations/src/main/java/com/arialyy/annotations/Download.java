@@ -25,7 +25,7 @@ import java.lang.annotation.Target;
  * Aria下载事件被注解的方法中，参数仅能有一个，参数类型为{@link com.arialyy.aria.core.download.DownloadTask}
  * <pre>
  *   <code>
- *      {@literal @}Download.onPre(DownloadUrl)
+ *      {@literal @}Download.onPre
  *       protected void onPre(DownloadTask task) {
  *          mUpdateHandler.obtainMessage(DOWNLOAD_PRE, task.getDownloadEntity().getFileSize()).sendToTarget();
  *       }

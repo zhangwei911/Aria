@@ -81,10 +81,10 @@ abstract class BaseNormalTarget<TARGET extends AbsUploadTarget>
       mTaskEntity.save();
     }
     if (mTaskEntity.getUrlEntity() != null && mTaskEntity.getUrlEntity().isFtps) {
-      if (TextUtils.isEmpty(mTaskEntity.getUrlEntity().storePath)) {
-        ALog.e(TAG, "证书路径为空");
-        return false;
-      }
+      //if (TextUtils.isEmpty(mTaskEntity.getUrlEntity().storePath)) {
+      //  ALog.e(TAG, "证书路径为空");
+      //  return false;
+      //}
       if (TextUtils.isEmpty(mTaskEntity.getUrlEntity().keyAlias)) {
         ALog.e(TAG, "证书别名为空");
         return false;

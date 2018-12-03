@@ -36,8 +36,7 @@ import javax.annotation.processing.Filer;
 import javax.lang.model.element.Modifier;
 
 /**
- * Created by lyy on 2017/9/6.
- * 任务事件代理文件
+ * Created by lyy on 2017/9/6. 任务事件代理文件
  *
  * <pre>
  *   <code>
@@ -127,24 +126,13 @@ final class EventProxyFiler {
       }
     }
     StringBuilder sb = new StringBuilder();
-    sb.append("Set<String> keys = keyMapping.get(\"")
-        .append(methodInfo.methodName)
-        .append("\");\n");
-    sb.append("if (keys != null) {\n\tif (keys.contains(task.getKey())) {\n")
-        .append("\t\tobj.")
+    sb.append("obj.")
         .append(methodInfo.methodName)
         .append("((")
         .append(taskEnum.getClassName())
         .append(")")
         .append(callCode)
-        .append(");\n\t}\n} else {\n")
-        .append("\tobj.")
-        .append(methodInfo.methodName)
-        .append("((")
-        .append(taskEnum.getClassName())
-        .append(")")
-        .append(callCode)
-        .append(");\n}\n");
+        .append(");\n");
 
     MethodSpec.Builder builder = MethodSpec.methodBuilder(annotation.getSimpleName())
         .addModifiers(Modifier.PUBLIC)
@@ -186,14 +174,6 @@ final class EventProxyFiler {
     FieldSpec observerField = FieldSpec.builder(obj, "obj").addModifiers(Modifier.PRIVATE).build();
     builder.addField(observerField);
 
-    //添加url映射表
-    FieldSpec mappingField = FieldSpec.builder(
-        ParameterizedTypeName.get(ClassName.get(Map.class), ClassName.get(String.class),
-            ParameterizedTypeName.get(ClassName.get(Set.class), ClassName.get(String.class))),
-        "keyMapping").addModifiers(Modifier.PRIVATE).initializer("new $T()", HashMap.class).build();
-    builder.addField(mappingField);
-
-    //Set<Integer> type = new HashSet<>();
     //添加注解方法
     for (TaskEnum te : entity.methods.keySet()) {
       Map<Class<? extends Annotation>, MethodInfo> methodInfoMap = entity.methods.get(te);
@@ -214,23 +194,6 @@ final class EventProxyFiler {
       }
     }
 
-    //增加构造函数
-    CodeBlock.Builder cb = CodeBlock.builder();
-    cb.add("Set<String> set = null;\n");
-    for (String methodName : entity.keyMappings.keySet()) {
-      //PrintLog.getInstance().info("methodName ====> " +  methodName);
-      Set<String> keys = entity.keyMappings.get(methodName);
-      if (keys == null || keys.size() == 0) continue;
-      StringBuilder sb = new StringBuilder();
-      sb.append("set = new $T();\n");
-      for (String key : keys) {
-        if (key.isEmpty()) continue;
-        sb.append("set.add(\"").append(key).append("\");\n");
-      }
-
-      sb.append("keyMapping.put(\"").append(methodName).append("\", ").append("set);\n");
-      cb.add(sb.toString(), ClassName.get(HashSet.class));
-    }
     //注册当前类
     //for (Integer i : type) {
     //  String str = null;
@@ -249,8 +212,7 @@ final class EventProxyFiler {
     //  }
     //}
 
-    MethodSpec structure =
-        MethodSpec.constructorBuilder().addModifiers(Modifier.PUBLIC).addCode(cb.build()).build();
+    MethodSpec structure = MethodSpec.constructorBuilder().addModifiers(Modifier.PUBLIC).build();
     builder.addMethod(structure);
 
     //添加设置代理的类

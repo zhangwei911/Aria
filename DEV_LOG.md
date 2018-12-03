@@ -1,4 +1,7 @@
 ## 开发日志
+  + v_3.5.3
+    - 修复ftps不能加载默认证书的bug https://github.com/AriaLyy/Aria/issues/334
+    - 优化注解性能，移除不必要的判断代码
   + v_3.5.2
     - 添加Serializable接口支持 https://github.com/AriaLyy/Aria/issues/320
     - 失败回调增加错误原因 https://github.com/AriaLyy/Aria/issues/310

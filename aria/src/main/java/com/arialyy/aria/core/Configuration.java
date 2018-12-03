@@ -206,6 +206,23 @@ final class Configuration {
      */
     int maxSpeed = 0;
 
+    /**
+     * 是否使用广播
+     * 除非无法使用注解，否则不建议使用广播来接受任务
+     * {@code true} 使用广播，{@code false} 不适用广播
+     */
+    boolean useBroadcast = false;
+
+    public boolean isUseBroadcast() {
+      return useBroadcast;
+    }
+
+    public BaseTaskConfig setUseBroadcast(boolean useBroadcast) {
+      this.useBroadcast = useBroadcast;
+      save();
+      return this;
+    }
+
     public int getMaxSpeed() {
       return maxSpeed;
     }

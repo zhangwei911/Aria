@@ -45,8 +45,7 @@ import java.util.regex.Pattern;
 import javax.net.ssl.SSLContext;
 
 /**
- * Created by Aria.Lao on 2017/7/25.
- * 获取ftp文件夹信息
+ * Created by Aria.Lao on 2017/7/25. 获取ftp文件夹信息
  */
 public abstract class AbsFtpInfoThread<ENTITY extends AbsEntity, TASK_ENTITY extends AbsTaskEntity<ENTITY>>
     implements Runnable {
@@ -285,13 +284,7 @@ public abstract class AbsFtpInfoThread<ENTITY extends AbsEntity, TASK_ENTITY ext
       if (sslContext == null) {
         sslContext = SSLContextUtil.getDefaultSLLContext(urlEntity.protocol);
       }
-      //System.setProperty("jdk.tls.useExtendedMasterSecret", "false");
-      //FTPSClient client = new SSLSessionReuseFTPSClient(true, sslContext);
-
-      FTPSClient client = new FTPSClient(true, sslContext);
-      //Log.d(TAG, "session = " + client.getEnableSessionCreation());
-
-      temp = client;
+      temp = new FTPSClient(true, sslContext);
     } else {
       temp = new FTPClient();
     }

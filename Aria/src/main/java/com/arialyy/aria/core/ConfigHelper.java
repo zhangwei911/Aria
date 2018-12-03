@@ -77,6 +77,9 @@ class ConfigHelper extends DefaultHandler {
         case "buffSize":
           loadBuffSize(value);
           break;
+        case "useBroadcast":
+          loadUseBroadcast(value);
+          break;
         case "ca":
           String caName = attributes.getValue("name");
           String caPath = attributes.getValue("path");
@@ -111,6 +114,20 @@ class ConfigHelper extends DefaultHandler {
           loadLogLevel(value);
           break;
       }
+    }
+  }
+
+  private void loadUseBroadcast(String value) {
+    boolean b = checkBoolean(value), temp = false;
+
+    if (b) {
+      temp = Boolean.valueOf(value);
+    }
+    if (mType == ConfigType.DOWNLOAD) {
+      mDownloadConfig.useBroadcast = temp;
+    }
+    if (mType == ConfigType.UPLOAD) {
+      mUploadConfig.useBroadcast = temp;
     }
   }
 
