@@ -17,6 +17,7 @@ package com.arialyy.aria.core.inf;
 
 import android.content.Context;
 import android.os.Handler;
+import android.os.Parcelable;
 import android.text.TextUtils;
 import com.arialyy.aria.core.common.IUtil;
 import com.arialyy.aria.util.ALog;
@@ -63,8 +64,7 @@ public abstract class AbsTask<ENTITY extends AbsEntity, TASK_ENTITY extends AbsT
   }
 
   /**
-   * 添加扩展数据
-   * 读取扩展数据{@link #getExpand(String)}
+   * 添加扩展数据 读取扩展数据{@link #getExpand(String)}
    */
   public void putExpand(String key, Object obj) {
     if (TextUtils.isEmpty(key)) {

@@ -18,6 +18,7 @@ package com.arialyy.aria.core.download;
 import android.support.annotation.CheckResult;
 import android.support.annotation.NonNull;
 import com.arialyy.aria.core.common.RequestEnum;
+import com.arialyy.aria.core.common.http.GetDelegate;
 import com.arialyy.aria.core.common.http.HttpHeaderDelegate;
 import com.arialyy.aria.core.common.http.PostDelegate;
 import com.arialyy.aria.core.inf.IHttpHeaderDelegate;
@@ -46,6 +47,13 @@ public class DownloadTarget extends BaseNormalTarget<DownloadTarget>
    */
   public PostDelegate asPost() {
     return new PostDelegate<>(this);
+  }
+
+  /**
+   * get参数传递
+   */
+  public GetDelegate asGet(){
+    return new GetDelegate<>(this);
   }
 
   /**

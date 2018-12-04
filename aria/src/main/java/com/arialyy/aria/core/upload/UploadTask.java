@@ -23,8 +23,7 @@ import com.arialyy.aria.core.scheduler.ISchedulers;
 import com.arialyy.aria.core.upload.uploader.SimpleUploadUtil;
 
 /**
- * Created by lyy on 2017/2/23.
- * 上传任务
+ * Created by lyy on 2017/2/23. 上传任务
  */
 public class UploadTask extends AbsNormalTask<UploadEntity, UploadTaskEntity> {
 
@@ -33,6 +32,10 @@ public class UploadTask extends AbsNormalTask<UploadEntity, UploadTaskEntity> {
     mOutHandler = outHandler;
     mListener = new BaseUListener(this, mOutHandler);
     mUtil = new SimpleUploadUtil(taskEntity, (IUploadListener) mListener);
+  }
+
+  @Override public int getTaskType() {
+    return UPLOAD;
   }
 
   @Override public String getKey() {

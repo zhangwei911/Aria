@@ -31,6 +31,7 @@ public class DownloadGroupSchedulers extends
   private static volatile DownloadGroupSchedulers INSTANCE = null;
 
   private DownloadGroupSchedulers() {
+    super();
     mQueue = DownloadGroupTaskQueue.getInstance();
   }
 

@@ -75,7 +75,7 @@ final class HttpThreadTask extends AbsThreadTask<DownloadEntity, DownloadTaskEnt
     //当前子线程的下载位置
     mChildCurrentLocation = mConfig.START_LOCATION;
     try {
-      URL url = new URL(CommonUtil.convertUrl(mConfig.URL));
+      URL url = ConnectionHelp.handleUrl(mConfig.URL, mTaskEntity);
       conn = ConnectionHelp.handleConnection(url, mTaskEntity);
       if (mConfig.SUPPORT_BP) {
         ALog.d(TAG,

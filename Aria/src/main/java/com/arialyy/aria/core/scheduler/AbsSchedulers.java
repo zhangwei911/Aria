@@ -15,6 +15,8 @@
  */
 package com.arialyy.aria.core.scheduler;
 
+import android.content.Intent;
+import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Message;
 import com.arialyy.aria.core.AriaManager;
@@ -26,6 +28,7 @@ import com.arialyy.aria.core.inf.AbsTask;
 import com.arialyy.aria.core.inf.AbsTaskEntity;
 import com.arialyy.aria.core.inf.GroupSendParams;
 import com.arialyy.aria.core.inf.IEntity;
+import com.arialyy.aria.core.inf.ITask;
 import com.arialyy.aria.core.inf.TaskSchedulerType;
 import com.arialyy.aria.core.manager.TEManager;
 import com.arialyy.aria.core.queue.ITaskQueue;
@@ -38,8 +41,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Created by lyy on 2017/6/4.
- * 事件调度器，用于处理任务状态的调度
+ * Created by lyy on 2017/6/4. 事件调度器，用于处理任务状态的调度
  */
 abstract class AbsSchedulers<TASK_ENTITY extends AbsTaskEntity, TASK extends AbsTask,
     QUEUE extends ITaskQueue<TASK, TASK_ENTITY>> implements ISchedulers<TASK> {
@@ -54,6 +56,12 @@ abstract class AbsSchedulers<TASK_ENTITY extends AbsTaskEntity, TASK extends Abs
    * 设置代理类后缀名
    */
   abstract String getProxySuffix();
+
+  private AriaManager manager;
+
+  AbsSchedulers() {
+    manager = AriaManager.getInstance(AriaManager.APP);
+  }
 
   @Override public void register(Object obj) {
     String targetName = obj.getClass().getName();
@@ -155,6 +163,13 @@ abstract class AbsSchedulers<TASK_ENTITY extends AbsTaskEntity, TASK extends Abs
         }
       }
     }
+
+    boolean canSend = manager.getDownloadConfig().isUseBroadcast();
+    if (canSend) {
+      AriaManager.APP.sendBroadcast(
+          createData(msg.what, ITask.DOWNLOAD_GROUP_SUB, params.entity));
+    }
+
     return true;
   }
 
@@ -201,6 +216,7 @@ abstract class AbsSchedulers<TASK_ENTITY extends AbsTaskEntity, TASK extends Abs
    * @param state 状态
    */
   private void callback(int state, TASK task) {
+    sendNormalBroadcast(state, task);
     if (mObservers.size() > 0) {
       Set<String> keys = mObservers.keySet();
       for (String key : keys) {
@@ -255,6 +271,46 @@ abstract class AbsSchedulers<TASK_ENTITY extends AbsTaskEntity, TASK extends Abs
   }
 
   /**
+   * 发送普通任务的广播
+   */
+  private void sendNormalBroadcast(int state, TASK task) {
+    if (task.getTaskType() == ITask.DOWNLOAD || task.getTaskType() == ITask.DOWNLOAD_GROUP) {
+      boolean canSend = manager.getDownloadConfig().isUseBroadcast();
+      if (canSend) {
+        AriaManager.APP.sendBroadcast(
+            createData(state, task.getTaskType(), task.getTaskEntity().getEntity()));
+      }
+    } else if (task.getTaskType() == ITask.UPLOAD) {
+      boolean canSend = manager.getUploadConfig().isUseBroadcast();
+      if (canSend) {
+        AriaManager.APP.sendBroadcast(
+            createData(state, task.getTaskType(), task.getTaskEntity().getEntity()));
+      }
+    } else {
+      ALog.w(TAG, "发送广播失败，没有对应的任务");
+    }
+  }
+
+  /**
+   * 创建广播发送的数据
+   *
+   * @param taskState 任务状态 {@link ISchedulers}
+   * @param taskType 任务类型 {@link ITask}
+   * @param entity 任务实体
+   */
+  private Intent createData(int taskState, int taskType, AbsEntity entity) {
+    Intent intent = new Intent(ISchedulers.ARIA_TASK_INFO_ACTION);
+    Bundle b = new Bundle();
+    b.putInt(ISchedulers.TASK_TYPE, taskType);
+    b.putInt(ISchedulers.TASK_STATE, taskState);
+    b.putLong(ISchedulers.TASK_SPEED, entity.getSpeed());
+    b.putInt(ISchedulers.TASK_PERCENT, entity.getPercent());
+    b.putParcelable(ISchedulers.TASK_ENTITY, entity);
+    intent.putExtras(b);
+    return intent;
+  }
+
+  /**
    * 处理下载任务下载失败的情形
    *
    * @param task 下载任务
@@ -269,7 +325,6 @@ abstract class AbsSchedulers<TASK_ENTITY extends AbsTaskEntity, TASK extends Abs
     long interval = 2000;
     int num = 10;
     boolean isNotNetRetry = false;
-    AriaManager manager = AriaManager.getInstance(AriaManager.APP);
     if (task instanceof DownloadTask || task instanceof DownloadGroupTask) {
       interval = manager.getDownloadConfig().getReTryInterval();
       num = manager.getDownloadConfig().getReTryNum();

@@ -21,16 +21,22 @@ import com.arialyy.aria.core.common.ProtocolType;
 import com.arialyy.aria.core.common.RequestEnum;
 import com.arialyy.aria.core.download.DownloadTaskEntity;
 import com.arialyy.aria.core.inf.AbsTaskEntity;
+import com.arialyy.aria.util.ALog;
+import com.arialyy.aria.util.CommonUtil;
 import com.arialyy.aria.util.SSLContextUtil;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStreamWriter;
 import java.net.CookieManager;
 import java.net.CookieStore;
 import java.net.HttpCookie;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.net.URLEncoder;
+import java.util.Map;
 import java.util.Set;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.InflaterInputStream;
@@ -39,10 +45,36 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
 
 /**
- * Created by lyy on 2017/1/18.
- * 链接帮助类
+ * Created by lyy on 2017/1/18. 链接帮助类
  */
 class ConnectionHelp {
+  private static final String TAG = "ConnectionHelp";
+
+  /**
+   * 处理url参数
+   *
+   * @throws MalformedURLException
+   */
+  static URL handleUrl(String url, AbsTaskEntity taskEntity) throws MalformedURLException {
+    Map<String, String> params = taskEntity.getParams();
+    if (params != null && taskEntity.getRequestEnum() == RequestEnum.GET) {
+      if (url.contains("?")) {
+        ALog.e(TAG, String.format("设置参数失败，url中已经有?，url: %s", url));
+        return new URL(CommonUtil.convertUrl(url));
+      }
+      StringBuilder sb = new StringBuilder();
+      sb.append(url).append("?");
+      Set<String> keys = params.keySet();
+      for (String key : keys) {
+        sb.append(key).append("=").append(URLEncoder.encode(params.get(key))).append("&");
+      }
+      String temp = sb.toString();
+      temp = temp.substring(0, temp.length() - 1);
+      return new URL(CommonUtil.convertUrl(temp));
+    } else {
+      return new URL(CommonUtil.convertUrl(url));
+    }
+  }
 
   /**
    * 转换HttpUrlConnect的inputStream流

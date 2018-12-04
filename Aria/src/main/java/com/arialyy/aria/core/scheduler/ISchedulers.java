@@ -17,20 +17,59 @@
 package com.arialyy.aria.core.scheduler;
 
 import android.os.Handler;
+import com.arialyy.aria.core.download.DownloadEntity;
+import com.arialyy.aria.core.download.DownloadGroupEntity;
 import com.arialyy.aria.core.inf.AbsTask;
+import com.arialyy.aria.core.inf.ITask;
+import com.arialyy.aria.core.upload.UploadEntity;
 
 /**
- * Created by lyy on 2016/11/2.
- * 调度器功能接口
+ * Created by lyy on 2016/11/2. 调度器功能接口
  */
 public interface ISchedulers<Task extends AbsTask> extends Handler.Callback {
+
+  String ARIA_TASK_INFO_ACTION = "ARIA_TASK_INFO_ACTION";
   /**
-   * 为任务组任务
+   * 广播接收器中通过TASK_TYPE字段获取任务类型 {@link ITask#DOWNLOAD}、{@link ITask#DOWNLOAD_GROUP}、{@link
+   * ITask#UPLOAD}、{@link ITask#DOWNLOAD_GROUP_SUB}
+   */
+  String TASK_TYPE = "ARIA_TASK_TYPE";
+
+  /**
+   * 广播接收器中通过TASK_STATE字段获取任务状态 普通任务的有：
+   * </br>
+   * {@link #NO_SUPPORT_BREAK_POINT}、{@link #PRE}、{@link #POST_PRE}、{@link #START}、{@link
+   * #STOP}、{@link #FAIL}、{@link #CANCEL}、{@link #COMPLETE}、{@link #RUNNING}、{@link #RESUME}、{@link
+   * #WAIT}
+   * </br>
+   * 子任务的有：{@link #SUB_PRE}、{@link #SUB_START}、{@link #SUB_STOP}、{@link #SUB_CANCEL}、{@link
+   * #SUB_FAIL}、{@link #SUB_RUNNING}、{@link #SUB_COMPLETE}
+   */
+  String TASK_STATE = "ARIA_TASK_STATE";
+
+  /**
+   * 广播接收器中通过TASK_ENTITY字段获取任务实体 {@link DownloadEntity}、{@link UploadEntity}、{@link
+   * DownloadGroupEntity}
+   */
+  String TASK_ENTITY = "ARIA_TASK_ENTITY";
+
+  /**
+   * 任务速度，单位：byte/s
+   */
+  String TASK_SPEED = "ARIA_TASK_SPEED";
+
+  /**
+   * 任务进度
+   */
+  String TASK_PERCENT = "ARIA_TASK_PERCENT";
+
+  /**
+   * 为组合任务任务
    */
   int IS_SUB_TASK = 0xd1;
 
   /**
-   * 不支持断点
+   * 任务不支持断点
    */
   int NO_SUPPORT_BREAK_POINT = 9;
   /**
@@ -76,37 +115,37 @@ public interface ISchedulers<Task extends AbsTask> extends Handler.Callback {
   int WAIT = 10;
 
   /**
-   * 任务组子任务预处理
+   * 组合任务子任务预处理
    */
   int SUB_PRE = 0xa1;
 
   /**
-   * 任务组子任务开始
+   * 组合任务子任务开始
    */
   int SUB_START = 0xa2;
 
   /**
-   * 任务组子任务停止
+   * 组合任务子任务停止
    */
   int SUB_STOP = 0xa3;
 
   /**
-   * 任务组子任务取消
+   * 组合任务子任务取消
    */
   int SUB_CANCEL = 0xa4;
 
   /**
-   * 任务组子任务失败
+   * 组合任务子任务失败
    */
   int SUB_FAIL = 0xa5;
 
   /**
-   * 任务组子任务执行执行中
+   * 组合任务子任务执行执行中
    */
   int SUB_RUNNING = 0xa6;
 
   /**
-   * 任务组子任务完成
+   * 组合任务子任务完成
    */
   int SUB_COMPLETE = 0xa7;
 

@@ -69,7 +69,7 @@ class HttpFileInfoThread implements Runnable {
     Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
     HttpURLConnection conn = null;
     try {
-      URL url = new URL(CommonUtil.convertUrl(mEntity.getUrl()));
+      URL url = ConnectionHelp.handleUrl(mEntity.getUrl(), mTaskEntity);
       conn = ConnectionHelp.handleConnection(url, mTaskEntity);
       conn = ConnectionHelp.setConnectParam(mTaskEntity, conn);
       conn.setRequestProperty("Range", "bytes=" + 0 + "-");
@@ -275,7 +275,7 @@ class HttpFileInfoThread implements Runnable {
     mEntity.setRedirect(true);
     mEntity.setRedirectUrl(newUrl);
     String cookies = conn.getHeaderField("Set-Cookie");
-    URL url = new URL(CommonUtil.convertUrl(newUrl));
+    URL url = ConnectionHelp.handleUrl(newUrl, mTaskEntity);
     conn = ConnectionHelp.handleConnection(url, mTaskEntity);
     conn = ConnectionHelp.setConnectParam(mTaskEntity, conn);
     conn.setRequestProperty("Cookie", cookies);

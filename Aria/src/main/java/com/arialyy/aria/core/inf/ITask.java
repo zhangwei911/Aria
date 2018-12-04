@@ -21,6 +21,34 @@ package com.arialyy.aria.core.inf;
 public interface ITask<TASK_ENTITY extends AbsTaskEntity> {
 
   /**
+   * 普通下载任务
+   */
+  int DOWNLOAD = 1;
+  /**
+   * 上传任务
+   */
+  int UPLOAD = 2;
+  /**
+   * 组合任务
+   */
+  int DOWNLOAD_GROUP = 3;
+  /**
+   * 组合任务的子任务
+   */
+  int DOWNLOAD_GROUP_SUB = 4;
+  /**
+   * 未知
+   */
+  int OTHER = -1;
+
+  /**
+   * 获取任务类型
+   *
+   * @return {@link #DOWNLOAD}、{@link #UPLOAD}、{@link #DOWNLOAD_GROUP}
+   */
+  int getTaskType();
+
+  /**
    * 获取下载状态
    */
   int getState();
@@ -51,6 +79,7 @@ public interface ITask<TASK_ENTITY extends AbsTaskEntity> {
 
   /**
    * 停止任务
+   *
    * @param type {@code 0}默认操作，{@code 1}停止任务不自动执行下一任务
    */
   void stop(int type);

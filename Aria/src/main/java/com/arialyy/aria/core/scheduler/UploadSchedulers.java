@@ -29,6 +29,7 @@ public class UploadSchedulers extends AbsSchedulers<UploadTaskEntity, UploadTask
   private static volatile UploadSchedulers INSTANCE = null;
 
   private UploadSchedulers() {
+    super();
     mQueue = UploadTaskQueue.getInstance();
   }
 

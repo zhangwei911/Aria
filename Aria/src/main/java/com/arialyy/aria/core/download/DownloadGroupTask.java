@@ -57,6 +57,10 @@ public class DownloadGroupTask extends AbsGroupTask<DownloadGroupEntity, Downloa
         ? mTaskEntity.getEntity().getGroupName() : mTaskEntity.getEntity().getAlias());
   }
 
+  @Override public int getTaskType() {
+    return DOWNLOAD_GROUP;
+  }
+
   public static class Builder {
     DownloadGroupTaskEntity taskEntity;
     Handler outHandler;

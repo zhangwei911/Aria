@@ -68,6 +68,10 @@ public class DownloadTask extends AbsNormalTask<DownloadEntity, DownloadTaskEnti
     return mEntity.getUrl();
   }
 
+  @Override public int getTaskType() {
+    return DOWNLOAD;
+  }
+
   @Override public String getKey() {
     return mEntity.getUrl();
   }

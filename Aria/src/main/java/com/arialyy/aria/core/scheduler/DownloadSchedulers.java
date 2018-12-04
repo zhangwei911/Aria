@@ -33,6 +33,7 @@ public class DownloadSchedulers
   private static volatile DownloadSchedulers INSTANCE = null;
 
   private DownloadSchedulers() {
+    super();
     mQueue = DownloadTaskQueue.getInstance();
   }
 
