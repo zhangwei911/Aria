@@ -22,6 +22,7 @@ import com.arialyy.annotations.Upload;
 import com.arialyy.aria.core.Aria;
 import com.arialyy.aria.core.upload.UploadEntity;
 import com.arialyy.aria.core.upload.UploadTask;
+import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
 import com.arialyy.frame.util.FileUtil;
 import com.arialyy.frame.util.show.T;
@@ -35,14 +36,15 @@ import java.io.File;
  * Ftp 文件上传demo
  */
 public class FtpUploadActivity extends BaseActivity<ActivityFtpUploadBinding> {
-  private final String FILE_PATH = "/mnt/sdcard/sql.rar";
-  private final String URL = "ftp://192.168.1.7:21/aa//你好";
+  private final String FILE_PATH = "/mnt/sdcard/AriaPrj.rar";
+  private final String URL = "ftp://9.9.9.50:21/aa/你好";
 
   @Override protected void init(Bundle savedInstanceState) {
     setTile("D_FTP 文件上传");
     super.init(savedInstanceState);
     Aria.upload(this).register();
     UploadEntity entity = Aria.upload(this).getUploadEntity(FILE_PATH);
+    ALog.d(TAG, "pare = >" + entity.getPercent());
     if (entity != null) {
       getBinding().setFileSize(CommonUtil.formatFileSize(entity.getFileSize()));
       getBinding().setProgress(entity.isComplete() ? 100
@@ -94,6 +96,10 @@ public class FtpUploadActivity extends BaseActivity<ActivityFtpUploadBinding> {
     getBinding().setFileSize("");
     getBinding().setProgress(0);
     Log.d(TAG, "删除任务");
+  }
+
+  @Upload.onTaskFail public void taskFail(UploadTask task) {
+    Log.d(TAG, "上传失败");
   }
 
   @Upload.onTaskRunning public void taskRunning(UploadTask task) {

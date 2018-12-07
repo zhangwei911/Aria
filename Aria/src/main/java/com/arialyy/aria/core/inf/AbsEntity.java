@@ -67,7 +67,7 @@ public abstract class AbsEntity extends DbEntity implements IEntity, Parcelable,
   /**
    * 进度百分比
    */
-  @Ignore private int percent;
+  private int percent;
 
   private boolean isComplete = false;
 

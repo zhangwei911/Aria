@@ -130,6 +130,14 @@ public abstract class BaseListener<ENTITY extends AbsEntity, TASK_ENTITY extends
         : mEntity.getCurrentProgress() * 100 / mEntity.getFileSize()));
   }
 
+  protected void handleComplete(){
+    mEntity.setComplete(true);
+    mEntity.setCompleteTime(System.currentTimeMillis());
+    mEntity.setCurrentProgress(mEntity.getFileSize());
+    mEntity.setPercent(100);
+    handleSpeed(0);
+  }
+
   /**
    * 将任务状态发送给下载器
    *

@@ -2,6 +2,19 @@
   + v_3.5.3
     - 修复ftps不能加载默认证书的bug https://github.com/AriaLyy/Aria/issues/334
     - 优化注解性能，移除不必要的判断代码
+    - 增加广播支持，详情见:http://aria.laoyuyu.me/aria_doc/api/use_broadcast.html
+    - 增加get参数支持
+      ```java
+      Aria.download(SingleTaskActivity.this)
+              .load(DOWNLOAD_URL) // url 必须是主体url，也就是?前面的内容
+              .setFilePath(path, true)
+              .asGet()
+              .setParams(params) // 设置参数
+              .start();
+      ```
+      - fix bug https://github.com/AriaLyy/Aria/issues/335
+      - 新增进度百分比保存 https://github.com/AriaLyy/Aria/issues/336
+      - fix bug https://github.com/AriaLyy/Aria/issues/335
   + v_3.5.2
     - 添加Serializable接口支持 https://github.com/AriaLyy/Aria/issues/320
     - 失败回调增加错误原因 https://github.com/AriaLyy/Aria/issues/310

@@ -17,6 +17,7 @@ package com.arialyy.aria.core.common.ftp;
 
 import android.os.Process;
 import android.text.TextUtils;
+import android.util.Log;
 import aria.apache.commons.net.ftp.FTP;
 import aria.apache.commons.net.ftp.FTPClient;
 import aria.apache.commons.net.ftp.FTPFile;
@@ -119,6 +120,9 @@ public abstract class AbsFtpInfoThread<ENTITY extends AbsEntity, TASK_ENTITY ext
         client.disconnect();
         return;
       }
+
+      // 检查ftp文件是否被打开
+
       //为了防止编码错乱，需要使用原始字符串
       mSize = getFileSize(files, client, setRemotePath());
       int reply = client.getReplyCode();
@@ -339,6 +343,7 @@ public abstract class AbsFtpInfoThread<ENTITY extends AbsEntity, TASK_ENTITY ext
     for (FTPFile file : files) {
       if (file.isFile()) {
         size += file.getSize();
+        ALog.d(TAG, "isValid = " + file.isValid());
         handleFile(path + file.getName(), file);
       } else {
         String remotePath =

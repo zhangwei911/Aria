@@ -54,7 +54,7 @@ public class BaseDListener extends BaseListener<DownloadEntity, DownloadTaskEnti
   protected void saveData(int state, long location) {
     mTaskEntity.setState(state);
     mEntity.setState(state);
-    mEntity.setComplete(state == IEntity.STATE_COMPLETE);
+
     if (state == IEntity.STATE_CANCEL) {
       if (mEntity instanceof DownloadEntity) {
         CommonUtil.delTaskRecord(mEntity.getDownloadPath(), 1, mTaskEntity.isRemoveFile());
@@ -62,9 +62,8 @@ public class BaseDListener extends BaseListener<DownloadEntity, DownloadTaskEnti
       return;
     } else if (state == IEntity.STATE_STOP) {
       mEntity.setStopTime(System.currentTimeMillis());
-    } else if (mEntity.isComplete()) {
-      mEntity.setCompleteTime(System.currentTimeMillis());
-      mEntity.setCurrentProgress(mEntity.getFileSize());
+    } else if (state == IEntity.STATE_COMPLETE) {
+      handleComplete();
     }
     if (location > 0) {
       mEntity.setCurrentProgress(location);
