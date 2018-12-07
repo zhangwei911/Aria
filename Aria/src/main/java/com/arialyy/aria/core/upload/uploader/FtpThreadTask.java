@@ -32,11 +32,10 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
 /**
- * Created by Aria.Lao on 2017/7/28.
- * FTP 单线程上传任务，需要FTP 服务器给用户打开append和write的权限
+ * Created by Aria.Lao on 2017/7/28. FTP 单线程上传任务，需要FTP 服务器给用户打开append和write的权限
  */
 class FtpThreadTask extends AbsFtpThreadTask<UploadEntity, UploadTaskEntity> {
-  private final String TAG = "FtpUploadThreadTask";
+  private final String TAG = "FtpThreadTask";
   private String dir, remotePath;
 
   FtpThreadTask(StateConstance constance, IEventListener listener,
@@ -85,8 +84,8 @@ class FtpThreadTask extends AbsFtpThreadTask<UploadEntity, UploadTaskEntity> {
         //file.skipBytes((int) mConfig.START_LOCATION);
         file.seek(mConfig.START_LOCATION);
       }
-      upload(client, file);
-      if (isBreak()) {
+      boolean complete = upload(client, file);
+      if (!complete || isBreak()) {
         return this;
       }
       ALog.i(TAG,
@@ -131,7 +130,13 @@ class FtpThreadTask extends AbsFtpThreadTask<UploadEntity, UploadTaskEntity> {
         SERVER_CHARSET);
   }
 
-  private void upload(final FTPClient client, final BufferedRandomAccessFile bis)
+  /**
+   * 上传
+   *
+   * @return {@code true}上传成功、{@code false} 上传失败
+   * @throws IOException
+   */
+  private boolean upload(final FTPClient client, final BufferedRandomAccessFile bis)
       throws IOException {
 
     try {
@@ -156,12 +161,18 @@ class FtpThreadTask extends AbsFtpThreadTask<UploadEntity, UploadTaskEntity> {
         }
       });
     } catch (IOException e) {
+      String msg = String.format("文件上传错误，错误码为：%s, msg：%s, filePath: %s", client.getReplyCode(),
+          client.getReplyString(), mEntity.getFilePath());
+      if (client.isConnected()) {
+        client.disconnect();
+      }
       if (e.getMessage().contains("AriaIOException caught while copying")) {
         e.printStackTrace();
       } else {
         fail(mChildCurrentLocation,
-            new AriaIOException(TAG, String.format("上传失败，filePath: %s", mEntity.getFilePath()), e));
+            new AriaIOException(TAG, msg, e));
       }
+      return false;
     }
 
     int reply = client.getReplyCode();
@@ -175,6 +186,8 @@ class FtpThreadTask extends AbsFtpThreadTask<UploadEntity, UploadTaskEntity> {
       if (client.isConnected()) {
         client.disconnect();
       }
+      return false;
     }
+    return true;
   }
 }

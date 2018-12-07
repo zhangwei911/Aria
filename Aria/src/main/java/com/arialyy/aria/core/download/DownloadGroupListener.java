@@ -27,8 +27,7 @@ import com.arialyy.aria.util.CommonUtil;
 import com.arialyy.aria.util.ErrorHelp;
 
 /**
- * Created by Aria.Lao on 2017/7/20.
- * 任务组下载事件
+ * Created by Aria.Lao on 2017/7/20. 任务组下载事件
  */
 class DownloadGroupListener
     extends BaseListener<DownloadGroupEntity, DownloadGroupTaskEntity, DownloadGroupTask>
@@ -124,7 +123,6 @@ class DownloadGroupListener
   @Override protected void saveData(int state, long location) {
     mTaskEntity.setState(state);
     mEntity.setState(state);
-    mEntity.setComplete(state == IEntity.STATE_COMPLETE);
     if (state == IEntity.STATE_CANCEL) {
       if (mEntity instanceof DownloadGroupEntity) {
         CommonUtil.delGroupTaskRecord(mTaskEntity.isRemoveFile(), mEntity);
@@ -132,9 +130,8 @@ class DownloadGroupListener
       return;
     } else if (state == IEntity.STATE_STOP) {
       mEntity.setStopTime(System.currentTimeMillis());
-    } else if (mEntity.isComplete()) {
-      mEntity.setCompleteTime(System.currentTimeMillis());
-      mEntity.setCurrentProgress(mEntity.getFileSize());
+    } else if (state == IEntity.STATE_COMPLETE) {
+      handleComplete();
     }
     if (location > 0) {
       mEntity.setCurrentProgress(location);

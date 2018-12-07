@@ -39,7 +39,6 @@ class BaseUListener extends BaseListener<UploadEntity, UploadTaskEntity, UploadT
   protected void saveData(int state, long location) {
     mTaskEntity.setState(state);
     mEntity.setState(state);
-    mEntity.setComplete(state == IEntity.STATE_COMPLETE);
     if (state == IEntity.STATE_CANCEL) {
       if (mEntity instanceof UploadEntity) {
         CommonUtil.delTaskRecord(mEntity.getFilePath(), 2, mTaskEntity.isRemoveFile());
@@ -47,9 +46,8 @@ class BaseUListener extends BaseListener<UploadEntity, UploadTaskEntity, UploadT
       return;
     } else if (state == IEntity.STATE_STOP) {
       mEntity.setStopTime(System.currentTimeMillis());
-    } else if (mEntity.isComplete()) {
-      mEntity.setCompleteTime(System.currentTimeMillis());
-      mEntity.setCurrentProgress(mEntity.getFileSize());
+    } else if (state == IEntity.STATE_COMPLETE) {
+      handleComplete();
     } else if (location > 0) {
       mEntity.setCurrentProgress(location);
     }
