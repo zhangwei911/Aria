@@ -36,14 +36,14 @@ public interface ISchedulers<Task extends AbsTask> extends Handler.Callback {
   String TASK_TYPE = "ARIA_TASK_TYPE";
 
   /**
-   * 广播接收器中通过TASK_STATE字段获取任务状态 普通任务的有：
-   * </br>
-   * {@link #NO_SUPPORT_BREAK_POINT}、{@link #PRE}、{@link #POST_PRE}、{@link #START}、{@link
-   * #STOP}、{@link #FAIL}、{@link #CANCEL}、{@link #COMPLETE}、{@link #RUNNING}、{@link #RESUME}、{@link
-   * #WAIT}
-   * </br>
-   * 子任务的有：{@link #SUB_PRE}、{@link #SUB_START}、{@link #SUB_STOP}、{@link #SUB_CANCEL}、{@link
-   * #SUB_FAIL}、{@link #SUB_RUNNING}、{@link #SUB_COMPLETE}
+   * 广播接收器中通过TASK_STATE字段获取任务状态
+   *
+   * 普通任务的有： {@link #NO_SUPPORT_BREAK_POINT}、{@link #PRE}、{@link
+   * #POST_PRE}、{@link #START}、{@link #STOP}、{@link #FAIL}、{@link #CANCEL}、{@link #COMPLETE}、{@link
+   * #RUNNING}、{@link #RESUME}、{@link #WAIT}
+   *
+   * 子任务的有：{@link #SUB_PRE}、{@link #SUB_START}、{@link
+   * #SUB_STOP}、{@link #SUB_CANCEL}、{@link #SUB_FAIL}、{@link #SUB_RUNNING}、{@link #SUB_COMPLETE}
    */
   String TASK_STATE = "ARIA_TASK_STATE";
 

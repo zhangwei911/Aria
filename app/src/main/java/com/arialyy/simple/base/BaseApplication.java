@@ -41,7 +41,14 @@ public class BaseApplication extends Application {
     if (BuildConfig.DEBUG && Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD) {
       StrictMode.setThreadPolicy(
           new StrictMode.ThreadPolicy.Builder().detectAll().penaltyLog().build());
-      StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder().detectAll().penaltyLog().build());
+      StrictMode.VmPolicy policy = new StrictMode.VmPolicy.Builder()
+          //.detectLeakedSqlLiteObjects()
+          //.detectLeakedClosableObjects()
+          .detectAll()
+          .penaltyDeath()
+          .penaltyLog()
+          .build();
+      StrictMode.setVmPolicy(policy);
     }
 
     registerReceiver(new ConnectionChangeReceiver(),

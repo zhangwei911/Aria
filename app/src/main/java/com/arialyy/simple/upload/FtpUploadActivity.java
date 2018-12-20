@@ -32,8 +32,7 @@ import com.arialyy.simple.databinding.ActivityFtpUploadBinding;
 import java.io.File;
 
 /**
- * Created by lyy on 2017/7/28.
- * Ftp 文件上传demo
+ * Created by lyy on 2017/7/28. Ftp 文件上传demo
  */
 public class FtpUploadActivity extends BaseActivity<ActivityFtpUploadBinding> {
   private final String FILE_PATH = "/mnt/sdcard/AriaPrj.rar";

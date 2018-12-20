@@ -27,9 +27,9 @@ import java.io.File;
 import java.io.Serializable;
 
 /**
- * Created by lyy on 2016/12/8. 信息配置
+ * Created by lyy on 2016/12/8. 信息配置 kotlin 方式有bug，不能将public去掉
  */
-final class Configuration {
+public final class Configuration {
   private static final String TAG = "Configuration";
   private static final String DOWNLOAD_CONFIG_FILE = "/Aria/AriaDownload.cfg";
   private static final String UPLOAD_CONFIG_FILE = "/Aria/AriaUpload.cfg";
@@ -207,9 +207,7 @@ final class Configuration {
     int maxSpeed = 0;
 
     /**
-     * 是否使用广播
-     * 除非无法使用注解，否则不建议使用广播来接受任务
-     * {@code true} 使用广播，{@code false} 不适用广播
+     * 是否使用广播 除非无法使用注解，否则不建议使用广播来接受任务 {@code true} 使用广播，{@code false} 不适用广播
      */
     boolean useBroadcast = false;
 
@@ -479,7 +477,19 @@ final class Configuration {
      */
     int logLevel;
 
-    private AppConfig() {
+    /**
+     * 是否检查网络，{@code true}检查网络
+     */
+    boolean netCheck = true;
+
+    public boolean isNetCheck() {
+      return netCheck;
+    }
+
+    public AppConfig setNetCheck(boolean netCheck) {
+      this.netCheck = netCheck;
+      save();
+      return this;
     }
 
     public AppConfig setLogLevel(int level) {

@@ -6,6 +6,8 @@
     <useAriaCrashHandler value="true"/>
     <!--设置Aria的日志级别，{@link ALog#LOG_LEVEL_VERBOSE}-->
     <logLevel value="2"/>
+    <!-- 是否检查网络 -->
+    <netCheck value="false"/>
   </app>
 
 

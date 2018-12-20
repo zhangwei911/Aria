@@ -34,8 +34,7 @@ import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
 
 /**
- * Created by lyy on 2016/8/22.
- * 下载命令
+ * Created by lyy on 2016/8/22. 下载命令
  */
 public abstract class AbsNormalCmd<T extends AbsTaskEntity> extends AbsCmd<T> {
   /**
@@ -84,7 +83,7 @@ public abstract class AbsNormalCmd<T extends AbsTaskEntity> extends AbsCmd<T> {
    */
   void sendWaitState() {
     if (tempTask != null) {
-     sendWaitState(tempTask);
+      sendWaitState(tempTask);
     }
   }
 

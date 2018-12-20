@@ -113,8 +113,19 @@ class ConfigHelper extends DefaultHandler {
         case "logLevel":
           loadLogLevel(value);
           break;
+        case "netCheck":
+          loadNetCheck(value);
+          break;
       }
     }
+  }
+
+  private void loadNetCheck(String value) {
+    boolean b = checkBoolean(value), temp = false;
+    if (b) {
+      temp = Boolean.valueOf(value);
+    }
+    mAppConfig.netCheck = temp;
   }
 
   private void loadUseBroadcast(String value) {

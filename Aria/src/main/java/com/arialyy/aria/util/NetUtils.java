@@ -22,6 +22,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
+import com.arialyy.aria.core.Aria;
 
 /**
  * 跟网络相关的工具类
@@ -54,6 +55,9 @@ public class NetUtils {
    * @return {@code true} 网络已连接、{@code false}网络未连接
    */
   public static boolean isConnected(Context context) {
+    if (!Aria.get(context).getAppConfig().isNetCheck()){
+      return true;
+    }
     ConnectivityManager cm =
         (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
     NetworkInfo ni = cm.getActiveNetworkInfo();
