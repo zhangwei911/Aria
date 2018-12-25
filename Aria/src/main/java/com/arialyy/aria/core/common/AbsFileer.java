@@ -675,6 +675,7 @@ public abstract class AbsFileer<ENTITY extends AbsNormalEntity, TASK_ENTITY exte
     AbsThreadTask task = selectThreadTask(config);
     if (task == null) return;
     mTask.put(0, task);
+    saveRecord();
     ThreadTaskManager.getInstance().startThread(mTaskEntity.getKey(), task);
     mListener.onStart(0);
   }
