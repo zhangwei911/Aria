@@ -1,5 +1,5 @@
 ## 开发日志
-  + v_3.5.3
+  + v_3.5.3 (2018/12/23)
     - 修复ftps不能加载默认证书的bug https://github.com/AriaLyy/Aria/issues/334
     - 优化注解性能，移除不必要的判断代码
     - 增加广播支持，详情见:http://aria.laoyuyu.me/aria_doc/api/use_broadcast.html
