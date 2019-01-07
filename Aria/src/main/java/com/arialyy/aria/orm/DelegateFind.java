@@ -175,6 +175,7 @@ class DelegateFind extends AbsDelegate {
         } else {
           sql = sb.toString();
         }
+        //ALog.d(TAG, sql);
         print(RELATION, sql);
         Cursor cursor = db.rawQuery(sql, null);
         List<T> data =

@@ -39,8 +39,7 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Created by AriaL on 2017/7/1.
- * 任务处理器
+ * Created by AriaL on 2017/7/1. 任务处理器
  */
 public abstract class AbsFileer<ENTITY extends AbsNormalEntity, TASK_ENTITY extends AbsTaskEntity<ENTITY>>
     implements Runnable {
@@ -299,11 +298,7 @@ public abstract class AbsFileer<ENTITY extends AbsNormalEntity, TASK_ENTITY exte
   }
 
   /**
-   * 检查记录
-   * 对于分块任务：
-   * 子分块不存在或被删除，子线程将重新下载
-   * 对于普通任务：
-   * 预下载文件不存在，则任务任务呗删除
+   * 检查记录 对于分块任务： 子分块不存在或被删除，子线程将重新下载 对于普通任务： 预下载文件不存在，则任务任务呗删除
    */
   private void checkRecord() {
     mConfigFile = new File(CommonUtil.getFileConfigPath(false, mEntity.getFileName()));
@@ -421,9 +416,7 @@ public abstract class AbsFileer<ENTITY extends AbsNormalEntity, TASK_ENTITY exte
   }
 
   /**
-   * convertDb 是兼容性代码
-   * 从3.4.1开始，线程配置信息将存储在数据库中。
-   * 将配置文件的内容复制到数据库中，并将配置文件删除
+   * convertDb 是兼容性代码 从3.4.1开始，线程配置信息将存储在数据库中。 将配置文件的内容复制到数据库中，并将配置文件删除
    */
   private void convertDb() {
     List<RecordWrapper> records =
@@ -655,7 +648,7 @@ public abstract class AbsFileer<ENTITY extends AbsNormalEntity, TASK_ENTITY exte
    * 处理不支持断点的任务
    */
   private void handleNoSupportBP() {
-    if (mListener instanceof BaseDListener){
+    if (mListener instanceof BaseDListener) {
       ((BaseDListener) mListener).supportBreakpoint(false);
     }
     SubThreadConfig<TASK_ENTITY> config = new SubThreadConfig<>();
@@ -667,10 +660,15 @@ public abstract class AbsFileer<ENTITY extends AbsNormalEntity, TASK_ENTITY exte
     config.END_LOCATION = config.TOTAL_FILE_SIZE;
     config.SUPPORT_BP = mTaskEntity.isSupportBP();
     config.TASK_ENTITY = mTaskEntity;
-    ThreadRecord record = new ThreadRecord();
+    ThreadRecord record = DbEntity.findFirst(ThreadRecord.class, "key=?", mRecord.filePath);
+    if (record != null) {
+      record.deleteData();
+    }
+    record = new ThreadRecord();
     record.startLocation = 0;
     record.endLocation = config.TOTAL_FILE_SIZE;
     record.key = mTempFile.getPath();
+    mRecord.threadRecords.add(record);
     config.THREAD_RECORD = record;
     AbsThreadTask task = selectThreadTask(config);
     if (task == null) return;

@@ -67,7 +67,7 @@ public class SingleTaskActivity extends BaseActivity<ActivitySingleBinding> {
       //"https://dl.genymotion.com/releases/genymotion-2.12.1/genymotion-2.12.1-vbox.exe";
       //"http://9.9.9.50:5000/download1";
   //"http://9.9.9.50:5000/download/CentOS-7-x86_64-Minimal-1804.iso";
-  "http://cdn-s1.touchfound.com/theme/1543979562763_6907.zip";
+  "http://v2.qingdian1.com/m_20180730_991/2/2B9FB34A4BCD8CE61481D1C8418EFE36_1080P.m3u8";
   //"https://firmwareapi.azurewebsites.net/firmware-overview?name=A19_Filament_W_IMG0038_00102411-encrypted.ota";
   @Bind(R.id.start) Button mStart;
   @Bind(R.id.stop) Button mStop;

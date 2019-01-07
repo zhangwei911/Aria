@@ -69,12 +69,8 @@ abstract class BaseNormalTarget<TARGET extends BaseNormalTarget>
   }
 
   /**
-   * 将任务设置为最高优先级任务，最高优先级任务有以下特点：
-   * 1、在下载队列中，有且只有一个最高优先级任务
-   * 2、最高优先级任务会一直存在，直到用户手动暂停或任务完成
-   * 3、任务调度器不会暂停最高优先级任务
-   * 4、用户手动暂停或任务完成后，第二次重新执行该任务，该命令将失效
-   * 5、如果下载队列中已经满了，则会停止队尾的任务，当高优先级任务完成后，该队尾任务将自动执行
+   * 将任务设置为最高优先级任务，最高优先级任务有以下特点： 1、在下载队列中，有且只有一个最高优先级任务 2、最高优先级任务会一直存在，直到用户手动暂停或任务完成
+   * 3、任务调度器不会暂停最高优先级任务 4、用户手动暂停或任务完成后，第二次重新执行该任务，该命令将失效 5、如果下载队列中已经满了，则会停止队尾的任务，当高优先级任务完成后，该队尾任务将自动执行
    * 6、把任务设置为最高优先级任务后，将自动执行任务，不需要重新调用start()启动任务
    */
   @Override public void setHighestPriority() {
@@ -117,10 +113,7 @@ abstract class BaseNormalTarget<TARGET extends BaseNormalTarget>
   }
 
   /**
-   * 检查下载实体，判断实体是否合法
-   * 合法标准为：
-   * 1、下载路径不为null，并且下载路径是正常的http或ftp路径
-   * 2、保存路径不为null，并且保存路径是android文件系统路径
+   * 检查下载实体，判断实体是否合法 合法标准为： 1、下载路径不为null，并且下载路径是正常的http或ftp路径 2、保存路径不为null，并且保存路径是android文件系统路径
    * 3、保存路径不能重复
    *
    * @return {@code true}合法
@@ -165,6 +158,7 @@ abstract class BaseNormalTarget<TARGET extends BaseNormalTarget>
 
     //设置文件保存路径，如果新文件路径和旧文件路径不同，则修改路径
     if (!filePath.equals(mEntity.getDownloadPath())) {
+      // 检查路径冲突
       if (DbEntity.checkDataExist(DownloadEntity.class, "downloadPath=?", filePath)) {
         if (!forceDownload) {
           ALog.e(TAG, "下载失败，保存路径【" + filePath + "】已经被其它任务占用，请设置其它保存路径");
