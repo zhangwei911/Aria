@@ -33,8 +33,8 @@ Aria有以下特点：
 [![Compiler](https://api.bintray.com/packages/arialyy/maven/AriaCompiler/images/download.svg)](https://bintray.com/arialyy/maven/AriaCompiler/_latestVersion)
 
 ```java
-compile 'com.arialyy.aria:aria-core:3.5.2'
-annotationProcessor 'com.arialyy.aria:aria-compiler:3.5.2'
+compile 'com.arialyy.aria:aria-core:3.5.4'
+annotationProcessor 'com.arialyy.aria:aria-compiler:3.5.4'
 ```
 如果出现android support，请将 `compile 'com.arialyy.aria:aria-core:<last-version>'`替换为
 ```
@@ -102,22 +102,8 @@ protected void onCreate(Bundle savedInstanceState) {
 
 
 ### 版本日志
-  + v_3.5.3(2018/12/23)
-    - 修复ftps不能加载默认证书的bug https://github.com/AriaLyy/Aria/issues/334
-    - 优化注解性能，移除不必要的判断代码
-    - 增加广播支持，详情见:http://aria.laoyuyu.me/aria_doc/api/use_broadcast.html
-    - 增加get参数支持
-      ```java
-      Aria.download(SingleTaskActivity.this)
-              .load(DOWNLOAD_URL) // url 必须是主体url，也就是?前面的内容
-              .setFilePath(path, true)
-              .asGet()
-              .setParams(params) // 设置参数
-              .start();
-      ```
-    - fix bug https://github.com/AriaLyy/Aria/issues/335
-    - 新增进度百分比保存 https://github.com/AriaLyy/Aria/issues/336
-    - fix bug https://github.com/AriaLyy/Aria/issues/335
+  + v_3.5.4 (2019/1/8)
+      - 修复不支持断点的下载地址，重复下载出现的数据库主键冲突问题
 
 [更多版本记录](https://github.com/AriaLyy/Aria/blob/master/DEV_LOG.md)
 

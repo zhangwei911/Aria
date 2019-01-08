@@ -26,8 +26,8 @@ dependencies {
   testCompile 'junit:junit:4.12'
   compile 'com.android.support:appcompat-v7:23.1.1'
   compile project(':AriaAnnotations')
-//  compile 'com.arialyy.aria:aria-ftp-plug:1.0.4'
+  compile 'com.arialyy.aria:aria-ftp-plug:1.0.4'  // 打包时用这个
 
-    compile project(':AriaFtpPlug')
+//    compile project(':AriaFtpPlug')
 }
 apply from: 'bintray-release.gradle'
