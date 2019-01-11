@@ -21,8 +21,7 @@ import android.database.sqlite.SQLiteDatabase;
 import java.util.List;
 
 /**
- * Created by lyy on 2015/2/11.
- * 数据库操作工具
+ * Created by lyy on 2015/2/11. 数据库操作工具
  */
 public class DelegateWrapper {
   private static final String TAG = "DelegateWrapper";
@@ -100,8 +99,15 @@ public class DelegateWrapper {
   /**
    * 修改某行数据
    */
-  void modifyData(DbEntity dbEntity) {
-    mDManager.getDelegate(DelegateUpdate.class).modifyData(mDb, dbEntity);
+  void updateData(DbEntity dbEntity) {
+    mDManager.getDelegate(DelegateUpdate.class).updateData(mDb, dbEntity);
+  }
+
+  /**
+   * 更新多条数据
+   */
+  void updateManyData(List<DbEntity> dbEntitys) {
+    mDManager.getDelegate(DelegateUpdate.class).updateManyData(mDb, dbEntitys);
   }
 
   /**
@@ -144,6 +150,13 @@ public class DelegateWrapper {
    */
   void insertData(DbEntity dbEntity) {
     mDManager.getDelegate(DelegateUpdate.class).insertData(mDb, dbEntity);
+  }
+
+  /**
+   * 插入多条数据
+   */
+  void insertManyData(List<DbEntity> dbEntitys) {
+    mDManager.getDelegate(DelegateUpdate.class).insertManyData(mDb, dbEntitys);
   }
 
   /**

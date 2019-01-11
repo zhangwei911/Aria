@@ -16,11 +16,11 @@
 
 package com.arialyy.aria.orm;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by lyy on 2015/11/2.
- * 所有数据库实体父类
+ * Created by lyy on 2015/11/2. 所有数据库实体父类
  */
 public abstract class DbEntity {
   private static final Object LOCK = new Object();
@@ -130,6 +130,57 @@ public abstract class DbEntity {
   }
 
   /**
+   * 插入多条数据
+   */
+  public static void insertManyData(List<DbEntity> entities) {
+    checkListData(entities);
+    DelegateWrapper.getInstance().insertManyData(entities);
+  }
+
+  /**
+   * 修改多条数据
+   */
+  public static void updateManyData(List<DbEntity> entities) {
+    checkListData(entities);
+    DelegateWrapper.getInstance().updateManyData(entities);
+  }
+
+  /**
+   * 保存多条数据，通过rowID来判断记录存在以否，如果数据库已有记录，则更新该记录；如果数据库中没有记录，则保存该记录
+   */
+  public static void saveAll(List<DbEntity> entities) {
+    checkListData(entities);
+    List<DbEntity> insertD = new ArrayList<>();
+    List<DbEntity> updateD = new ArrayList<>();
+    DelegateWrapper wrapper = DelegateWrapper.getInstance();
+    for (DbEntity entity : entities) {
+      if (entity.rowID == -1) {
+        insertD.add(entity);
+        continue;
+      }
+      if (wrapper.isExist(entity.getClass(), entity.rowID)) {
+        insertD.add(entity);
+      } else {
+        updateD.add(entity);
+      }
+    }
+    if (!insertD.isEmpty()) {
+      wrapper.insertManyData(insertD);
+    } else {
+      wrapper.updateManyData(updateD);
+    }
+  }
+
+  /**
+   * 检查批量操作的列表数据，如果数据为空，抛出{@link NullPointerException}
+   */
+  private static void checkListData(List<DbEntity> entities) {
+    if (entities == null || entities.isEmpty()) {
+      throw new NullPointerException("列表数据为空");
+    }
+  }
+
+  /**
    * 删除当前数据
    */
   public void deleteData() {
@@ -151,12 +202,11 @@ public abstract class DbEntity {
    * 修改数据
    */
   public void update() {
-    DelegateWrapper.getInstance().modifyData(this);
+    DelegateWrapper.getInstance().updateData(this);
   }
 
   /**
-   * 保存自身，如果表中已经有数据，则更新数据，否则插入数据
-   * 只有 target中checkEntity成功后才能保存，创建实体部分也不允许保存
+   * 保存自身，如果表中已经有数据，则更新数据，否则插入数据 只有 target中checkEntity成功后才能保存，创建实体部分也不允许保存
    */
   public void save() {
     synchronized (LOCK) {
@@ -178,9 +228,10 @@ public abstract class DbEntity {
 
   /**
    * 表是否存在
-   * @return  {@code true} 存在
+   *
+   * @return {@code true} 存在
    */
-  public static boolean tableExists(Class<DbEntity> clazz){
+  public static boolean tableExists(Class<DbEntity> clazz) {
     return DelegateWrapper.getInstance().tableExists(clazz);
   }
 

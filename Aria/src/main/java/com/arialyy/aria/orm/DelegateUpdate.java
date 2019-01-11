@@ -28,8 +28,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Created by laoyuyu on 2018/3/22.
- * 增加数据、更新数据
+ * Created by laoyuyu on 2018/3/22. 增加数据、更新数据
  */
 class DelegateUpdate extends AbsDelegate {
   private DelegateUpdate() {
@@ -82,7 +81,8 @@ class DelegateUpdate extends AbsDelegate {
   /**
    * 删除某条数据
    */
-  synchronized <T extends DbEntity> void delData(SQLiteDatabase db, Class<T> clazz, String... expression) {
+  synchronized <T extends DbEntity> void delData(SQLiteDatabase db, Class<T> clazz,
+      String... expression) {
     db = checkDb(db);
     CheckUtil.checkSqlExpression(expression);
 
@@ -101,41 +101,75 @@ class DelegateUpdate extends AbsDelegate {
   /**
    * 修改某行数据
    */
-  synchronized void modifyData(SQLiteDatabase db, DbEntity dbEntity) {
+  synchronized void updateData(SQLiteDatabase db, DbEntity dbEntity) {
     db = checkDb(db);
-    Class<?> clazz = dbEntity.getClass();
-    List<Field> fields = CommonUtil.getAllFields(clazz);
-    if (fields != null && fields.size() > 0) {
-      ContentValues values = new ContentValues();
-      try {
-        for (Field field : fields) {
-          field.setAccessible(true);
-          if (isIgnore(dbEntity, field)) {
-            continue;
-          }
-          String value;
-          Type type = field.getType();
-          if (type == Map.class && checkMap(field)) {
-            value = SqlUtil.map2Str((Map<String, String>) field.get(dbEntity));
-          } else if (type == List.class && checkList(field)) {
-            value = SqlUtil.list2Str(dbEntity, field);
-          } else {
-            Object obj = field.get(dbEntity);
-            value = obj == null ? "" : obj.toString();
-          }
-          values.put(field.getName(), encodeStr(value));
-        }
-      } catch (IllegalAccessException e) {
-        e.printStackTrace();
-      }
-      if (values.size() > 0) {
-        db.update(CommonUtil.getClassName(dbEntity), values, "rowid=?",
-            new String[] { String.valueOf(dbEntity.rowID) });
-      } else {
-        ALog.d(TAG, "没有数据更新");
-      }
+    ContentValues values = createValues(dbEntity);
+    if (values != null) {
+      db.update(CommonUtil.getClassName(dbEntity), values, "rowid=?",
+          new String[] {String.valueOf(dbEntity.rowID)});
+    } else {
+      ALog.e(TAG, "更新记录失败，记录没有属性字段");
     }
     close(db);
+  }
+
+  /**
+   * 更新多条记录
+   */
+  synchronized void updateManyData(SQLiteDatabase db, List<DbEntity> dbEntities) {
+    db = checkDb(db);
+    db.beginTransaction();
+    try {
+      Class oldClazz = null;
+      String table = null;
+      for (DbEntity entity : dbEntities) {
+        if (oldClazz == null || oldClazz != entity.getClass() || table == null) {
+          oldClazz = entity.getClass();
+          table = CommonUtil.getClassName(oldClazz);
+        }
+        ContentValues value = createValues(entity);
+        if (value == null) {
+          ALog.e(TAG, "更新记录失败，记录没有属性字段");
+        } else {
+          db.update(table, value, "rowid=?", new String[] {String.valueOf(entity.rowID)});
+        }
+      }
+      db.setTransactionSuccessful();
+    } catch (Exception e) {
+      e.printStackTrace();
+    } finally {
+      db.endTransaction();
+    }
+  }
+
+  /**
+   * 插入多条记录
+   */
+  synchronized <T extends DbEntity> void insertManyData(SQLiteDatabase db, List<T> dbEntities) {
+    db = checkDb(db);
+    db.beginTransaction();
+    try {
+      Class oldClazz = null;
+      String table = null;
+      for (DbEntity entity : dbEntities) {
+        if (oldClazz == null || oldClazz != entity.getClass() || table == null) {
+          oldClazz = entity.getClass();
+          table = CommonUtil.getClassName(oldClazz);
+        }
+
+        ContentValues value = createValues(entity);
+        if (value == null) {
+          ALog.e(TAG, "保存记录失败，记录没有属性字段");
+        } else {
+          entity.rowID = db.insert(table, null, value);
+        }
+      }
+      db.setTransactionSuccessful();
+    } catch (Exception e) {
+      e.printStackTrace();
+    } finally {
+      db.endTransaction();
+    }
   }
 
   /**
@@ -143,8 +177,22 @@ class DelegateUpdate extends AbsDelegate {
    */
   synchronized void insertData(SQLiteDatabase db, DbEntity dbEntity) {
     db = checkDb(db);
-    Class<?> clazz = dbEntity.getClass();
-    List<Field> fields = CommonUtil.getAllFields(clazz);
+    ContentValues values = createValues(dbEntity);
+    if (values != null) {
+      dbEntity.rowID = db.insert(CommonUtil.getClassName(dbEntity), null, values);
+    } else {
+      ALog.e(TAG, "保存记录失败，记录没有属性字段");
+    }
+    close(db);
+  }
+
+  /**
+   * 创建存储数据\更新数据时使用的ContentValues
+   *
+   * @return 如果没有字段属性，返回null
+   */
+  private ContentValues createValues(DbEntity dbEntity) {
+    List<Field> fields = CommonUtil.getAllFields(dbEntity.getClass());
     if (fields != null && fields.size() > 0) {
       ContentValues values = new ContentValues();
       try {
@@ -167,12 +215,12 @@ class DelegateUpdate extends AbsDelegate {
           }
           values.put(field.getName(), encodeStr(value));
         }
+        return values;
       } catch (IllegalAccessException e) {
         e.printStackTrace();
       }
-      dbEntity.rowID = db.insert(CommonUtil.getClassName(dbEntity), null, values);
     }
-    close(db);
+    return null;
   }
 
   /**

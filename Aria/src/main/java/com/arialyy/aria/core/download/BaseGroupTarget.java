@@ -18,10 +18,13 @@ package com.arialyy.aria.core.download;
 import android.support.annotation.CheckResult;
 import android.text.TextUtils;
 import android.util.Log;
+import com.arialyy.aria.core.inf.AbsEntity;
 import com.arialyy.aria.core.manager.SubTaskManager;
 import com.arialyy.aria.core.queue.DownloadGroupTaskQueue;
+import com.arialyy.aria.orm.DbEntity;
 import com.arialyy.aria.util.ALog;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -122,6 +125,9 @@ abstract class BaseGroupTarget<TARGET extends BaseGroupTarget>
   void reChangeDirPath(String newDirPath) {
     List<DownloadTaskEntity> subTasks = mTaskEntity.getSubTaskEntities();
     if (subTasks != null && !subTasks.isEmpty()) {
+      //List<DownloadEntity> des = new ArrayList<>();
+      //List<DownloadTaskEntity> dtes = new ArrayList<>();
+      List<DbEntity> des = new ArrayList<>();
       for (DownloadTaskEntity dte : subTasks) {
         DownloadEntity de = dte.getEntity();
         String oldPath = de.getDownloadPath();
@@ -132,9 +138,15 @@ abstract class BaseGroupTarget<TARGET extends BaseGroupTarget>
         }
         de.setDownloadPath(newPath);
         dte.setKey(newPath);
-        de.save();
-        dte.save();
+
+        //des.add(de);
+        //dtes.add(dte);
+        //de.save();
+        //dte.save();
+        des.add(de);
+        des.add(dte);
       }
+      AbsEntity.saveAll(des);
     }
   }
 
