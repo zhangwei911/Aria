@@ -15,10 +15,9 @@
  */
 package com.arialyy.aria.core.command.normal;
 
-import android.text.TextUtils;
 import com.arialyy.aria.core.AriaManager;
 import com.arialyy.aria.core.download.DownloadTask;
-import com.arialyy.aria.core.inf.AbsTaskEntity;
+import com.arialyy.aria.core.inf.AbsTaskWrapper;
 import com.arialyy.aria.core.queue.DownloadTaskQueue;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.NetUtils;
@@ -35,7 +34,7 @@ import com.arialyy.aria.util.NetUtils;
  *
  * 目前只只支持单下载任务的最高优先级任务
  */
-final class HighestPriorityCmd<T extends AbsTaskEntity> extends AbsNormalCmd<T> {
+final class HighestPriorityCmd<T extends AbsTaskWrapper> extends AbsNormalCmd<T> {
   HighestPriorityCmd(T entity, int taskType) {
     super(entity, taskType);
   }

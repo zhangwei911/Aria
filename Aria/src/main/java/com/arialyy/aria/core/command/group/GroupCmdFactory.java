@@ -16,11 +16,11 @@
 package com.arialyy.aria.core.command.group;
 
 import com.arialyy.aria.core.AriaManager;
-import com.arialyy.aria.core.inf.AbsGroupTaskEntity;
+import com.arialyy.aria.core.download.DGTaskWrapper;
+import com.arialyy.aria.core.inf.AbsGroupTaskWrapper;
 
 /**
- * Created by AriaL on 2017/6/29.
- * 任务组子任务控制命令
+ * Created by AriaL on 2017/6/29. 任务组子任务控制命令
  */
 public class GroupCmdFactory {
   /**
@@ -53,22 +53,22 @@ public class GroupCmdFactory {
 
   /**
    * @param target 创建任务的对象
-   * @param entity 下载实体
+   * @param wrapper 参数信息
    * @param type 命令类型{@link #SUB_TASK_START}、{@link #SUB_TASK_STOP}、{@link #SUB_TASK_CANCEL}
    * @param childUrl 需要控制的子任务url
    */
-  public AbsGroupCmd createCmd(String target, AbsGroupTaskEntity entity, int type,
+  public AbsGroupCmd createCmd(String target, AbsGroupTaskWrapper wrapper, int type,
       String childUrl) {
     AbsGroupCmd cmd = null;
     switch (type) {
       case SUB_TASK_START:
-        cmd = new GroupStartCmd<>(entity);
+        cmd = new GroupStartCmd<>(wrapper);
         break;
       case SUB_TASK_STOP:
-        cmd = new GroupStopCmd<>(entity);
+        cmd = new GroupStopCmd<>(wrapper);
         break;
       case SUB_TASK_CANCEL:
-        cmd = new GroupCancelCmd<>(entity);
+        cmd = new GroupCancelCmd<>(wrapper);
     }
     if (cmd != null) {
       cmd.childUrl = childUrl;

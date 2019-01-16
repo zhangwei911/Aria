@@ -33,14 +33,14 @@ public class FtpDelegate<TARGET extends AbsTarget> implements IFtpTarget<TARGET>
 
   public FtpDelegate(TARGET target) {
     mTarget = target;
-    mUrlEntity = target.getTaskEntity().getUrlEntity();
+    mUrlEntity = target.getTaskWrapper().asFtp().getUrlEntity();
   }
 
   @Override public TARGET charSet(String charSet) {
     if (TextUtils.isEmpty(charSet)) {
       throw new NullPointerException("字符编码为空");
     }
-    mTarget.getTaskEntity().setCharSet(charSet);
+    mTarget.getTaskWrapper().asFtp().setCharSet(charSet);
     return mTarget;
   }
 
@@ -64,7 +64,7 @@ public class FtpDelegate<TARGET extends AbsTarget> implements IFtpTarget<TARGET>
   }
 
   @Override public TARGET setProxy(Proxy proxy) {
-    mTarget.getTaskEntity().setProxy(proxy);
+    mTarget.getTaskWrapper().asFtp().setProxy(proxy);
     return mTarget;
   }
 }

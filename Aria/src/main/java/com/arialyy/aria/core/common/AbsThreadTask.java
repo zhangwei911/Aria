@@ -18,7 +18,7 @@ package com.arialyy.aria.core.common;
 import android.os.Process;
 import com.arialyy.aria.core.AriaManager;
 import com.arialyy.aria.core.inf.AbsNormalEntity;
-import com.arialyy.aria.core.inf.AbsTaskEntity;
+import com.arialyy.aria.core.inf.AbsTaskWrapper;
 import com.arialyy.aria.core.inf.IEventListener;
 import com.arialyy.aria.core.manager.ThreadTaskManager;
 import com.arialyy.aria.core.upload.UploadEntity;
@@ -40,7 +40,7 @@ import java.util.concurrent.Executors;
  * Created by lyy on 2017/1/18.
  * 任务线程
  */
-public abstract class AbsThreadTask<ENTITY extends AbsNormalEntity, TASK_ENTITY extends AbsTaskEntity<ENTITY>>
+public abstract class AbsThreadTask<ENTITY extends AbsNormalEntity, TASK_WRAPPER extends AbsTaskWrapper<ENTITY>>
     implements Callable<AbsThreadTask> {
   /**
    * 线程重试次数
@@ -55,9 +55,9 @@ public abstract class AbsThreadTask<ENTITY extends AbsNormalEntity, TASK_ENTITY 
   protected int mBufSize;
   protected IEventListener mListener;
   protected StateConstance STATE;
-  protected SubThreadConfig<TASK_ENTITY> mConfig;
+  protected SubThreadConfig<TASK_WRAPPER> mConfig;
   protected ENTITY mEntity;
-  protected TASK_ENTITY mTaskEntity;
+  protected TASK_WRAPPER mTaskWrapper;
   private int mFailTimes = 0;
   private long mLastSaveTime;
   private ExecutorService mConfigThreadPool;
@@ -82,12 +82,12 @@ public abstract class AbsThreadTask<ENTITY extends AbsNormalEntity, TASK_ENTITY 
   });
 
   protected AbsThreadTask(StateConstance constance, IEventListener listener,
-      SubThreadConfig<TASK_ENTITY> config) {
+      SubThreadConfig<TASK_WRAPPER> config) {
     STATE = constance;
     mListener = listener;
     mConfig = config;
-    mTaskEntity = mConfig.TASK_ENTITY;
-    mEntity = mTaskEntity.getEntity();
+    mTaskWrapper = mConfig.TASK_ENTITY;
+    mEntity = mTaskWrapper.getEntity();
     mLastSaveTime = System.currentTimeMillis();
     mConfigThreadPool = Executors.newCachedThreadPool();
     mThreadNum = STATE.TASK_RECORD.threadRecords.size();

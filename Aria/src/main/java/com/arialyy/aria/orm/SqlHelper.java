@@ -21,15 +21,10 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.text.TextUtils;
+import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.download.DownloadEntity;
-import com.arialyy.aria.core.download.DownloadGroupEntity;
-import com.arialyy.aria.core.download.DownloadGroupTaskEntity;
-import com.arialyy.aria.core.download.DownloadTaskEntity;
-import com.arialyy.aria.core.upload.UploadEntity;
-import com.arialyy.aria.core.upload.UploadTaskEntity;
 import com.arialyy.aria.util.ALog;
 import java.lang.reflect.Field;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -191,39 +186,39 @@ final class SqlHelper extends SQLiteOpenHelper {
 
       //创建一个原本的表
       mDelegate.createTable(db, clazz);
-      //插入数据
-      if (list != null && list.size() > 0) {
-        DelegateUpdate update = DelegateManager.getInstance().getDelegate(DelegateUpdate.class);
-        try {
-          for (DbEntity entity : list) {
-            if (entity instanceof DownloadTaskEntity && ((DownloadTaskEntity) entity).isGroupTask()) {
-              if (TextUtils.isEmpty(((DownloadTaskEntity) entity).getKey())) {
-                ALog.w(TAG, "DownloadTaskEntity的key为空，将忽略该条数据");
-                continue;
-              }
-              if (TextUtils.isEmpty(((DownloadTaskEntity) entity).getUrl())) {
-                List<DbEntity> temp = map.get("DownloadEntity");
-                boolean isRefresh = false;
-                for (DbEntity dbEntity : temp) {
-                  if (((DownloadEntity) dbEntity).getDownloadPath()
-                      .equals(((DownloadTaskEntity) entity).getKey())) {
-                    ((DownloadTaskEntity) entity).setUrl(((DownloadEntity) dbEntity).getUrl());
-                    isRefresh = true;
-                    break;
-                  }
-                }
-                if (isRefresh) {
-                  update.insertData(db, entity);
-                }
-              }
-            } else {
-              update.insertData(db, entity);
-            }
-          }
-        } catch (Exception e) {
-          ALog.e(TAG, ALog.getExceptionString(e));
-        }
-      }
+      //插入数据，3.6版本后移除任务实体的保存
+      //if (list != null && list.size() > 0) {
+      //  DelegateUpdate update = DelegateManager.getInstance().getDelegate(DelegateUpdate.class);
+      //  try {
+      //    for (DbEntity entity : list) {
+      //      if (entity instanceof DTaskWrapper && ((DTaskWrapper) entity).isGroupTask()) {
+      //        if (TextUtils.isEmpty(((DTaskWrapper) entity).getKey())) {
+      //          ALog.w(TAG, "DownloadTaskEntity的key为空，将忽略该条数据");
+      //          continue;
+      //        }
+      //        if (TextUtils.isEmpty(((DTaskWrapper) entity).getUrl())) {
+      //          List<DbEntity> temp = map.get("DownloadEntity");
+      //          boolean isRefresh = false;
+      //          for (DbEntity dbEntity : temp) {
+      //            if (((DownloadEntity) dbEntity).getDownloadPath()
+      //                .equals(((DTaskWrapper) entity).getKey())) {
+      //              ((DTaskWrapper) entity).setUrl(((DownloadEntity) dbEntity).getUrl());
+      //              isRefresh = true;
+      //              break;
+      //            }
+      //          }
+      //          if (isRefresh) {
+      //            update.insertData(db, entity);
+      //          }
+      //        }
+      //      } else {
+      //        update.insertData(db, entity);
+      //      }
+      //    }
+      //  } catch (Exception e) {
+      //    ALog.e(TAG, ALog.getExceptionString(e));
+      //  }
+      //}
 
       //删除中介表
       mDelegate.dropTable(db, tableName + "_temp");

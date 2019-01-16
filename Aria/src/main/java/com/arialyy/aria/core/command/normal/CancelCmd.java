@@ -17,13 +17,13 @@
 package com.arialyy.aria.core.command.normal;
 
 import com.arialyy.aria.core.inf.AbsTask;
-import com.arialyy.aria.core.inf.AbsTaskEntity;
+import com.arialyy.aria.core.inf.AbsTaskWrapper;
 
 /**
  * Created by lyy on 2016/9/20.
  * 取消命令
  */
-public class CancelCmd<T extends AbsTaskEntity> extends AbsNormalCmd<T> {
+public class CancelCmd<T extends AbsTaskWrapper> extends AbsNormalCmd<T> {
   /**
    * removeFile {@code true} 删除已经下载完成的任务，不仅删除下载记录，还会删除已经下载完成的文件，{@code false}
    * 如果文件已经下载完成，只删除下载记录
@@ -41,7 +41,7 @@ public class CancelCmd<T extends AbsTaskEntity> extends AbsNormalCmd<T> {
       task = createTask();
     }
     if (task != null) {
-      mTaskEntity.setRemoveFile(removeFile);
+      mTaskWrapper.setRemoveFile(removeFile);
       removeTask();
     }
   }

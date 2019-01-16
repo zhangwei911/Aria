@@ -19,8 +19,8 @@ import android.util.SparseArray;
 import com.arialyy.aria.core.common.CompleteInfo;
 import com.arialyy.aria.core.common.IUtil;
 import com.arialyy.aria.core.common.OnFileInfoCallback;
-import com.arialyy.aria.core.download.DownloadGroupTaskEntity;
-import com.arialyy.aria.core.download.DownloadTaskEntity;
+import com.arialyy.aria.core.download.DGTaskWrapper;
+import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.inf.IEntity;
 import com.arialyy.aria.exception.BaseException;
 import com.arialyy.aria.exception.TaskException;
@@ -53,8 +53,8 @@ public class DownloadGroupUtil extends AbsGroupUtil implements IUtil {
    */
   private SparseArray<OnFileInfoCallback> mFileInfoCallbacks = new SparseArray<>();
 
-  public DownloadGroupUtil(IDownloadGroupListener listener, DownloadGroupTaskEntity taskEntity) {
-    super(listener, taskEntity);
+  public DownloadGroupUtil(IDownloadGroupListener listener, DGTaskWrapper taskWrapper) {
+    super(listener, taskWrapper);
     mInfoPool = Executors.newCachedThreadPool();
   }
 
@@ -88,13 +88,13 @@ public class DownloadGroupUtil extends AbsGroupUtil implements IUtil {
 
     if (mExeMap.size() == 0) {
       mListener.onFail(false, new TaskException(TAG,
-          String.format("任务组【%s】无可执行任务", mGTEntity.getEntity().getGroupName())));
+          String.format("任务组【%s】无可执行任务", mGTWrapper.getEntity().getGroupName())));
       return;
     }
     Set<String> keys = mExeMap.keySet();
     mExeNum = mExeMap.size();
     for (String key : keys) {
-      DownloadTaskEntity taskEntity = mExeMap.get(key);
+      DTaskWrapper taskEntity = mExeMap.get(key);
       if (taskEntity != null) {
         if (taskEntity.getState() != IEntity.STATE_FAIL
             && taskEntity.getState() != IEntity.STATE_WAIT) {
@@ -114,7 +114,7 @@ public class DownloadGroupUtil extends AbsGroupUtil implements IUtil {
   /**
    * 创建文件信息获取线程
    */
-  private HttpFileInfoThread createFileInfoThread(DownloadTaskEntity taskEntity) {
+  private HttpFileInfoThread createFileInfoThread(DTaskWrapper taskEntity) {
     OnFileInfoCallback callback = mFileInfoCallbacks.get(taskEntity.hashCode());
 
     if (callback == null) {
@@ -123,7 +123,7 @@ public class DownloadGroupUtil extends AbsGroupUtil implements IUtil {
 
         @Override public void onComplete(String url, CompleteInfo info) {
           if (isStop) return;
-          DownloadTaskEntity te = mExeMap.get(url);
+          DTaskWrapper te = mExeMap.get(url);
           if (te != null) {
             if (isNeedLoadFileSize) {
               mTotalLen += te.getEntity().getFileSize();
@@ -138,7 +138,7 @@ public class DownloadGroupUtil extends AbsGroupUtil implements IUtil {
         @Override public void onFail(String url, BaseException e, boolean needRetry) {
           if (isStop) return;
           ALog.e(TAG, String.format("任务【%s】初始化失败", url));
-          DownloadTaskEntity te = mExeMap.get(url);
+          DTaskWrapper te = mExeMap.get(url);
           if (te != null) {
             mFailMap.put(url, te);
             mFileInfoCallbacks.put(te.hashCode(), this);
@@ -172,7 +172,7 @@ public class DownloadGroupUtil extends AbsGroupUtil implements IUtil {
       if (mInitFailNum == mExeNum) {
         closeTimer();
         mListener.onFail(true, new TaskException(TAG,
-            String.format("任务组【%s】初始化失败", mGTEntity.getEntity().getGroupName())));
+            String.format("任务组【%s】初始化失败", mGTWrapper.getEntity().getGroupName())));
       }
       if (!isStart && mInitCompleteNum + mInitFailNum == mExeNum || !isNeedLoadFileSize) {
         startRunningFlow();

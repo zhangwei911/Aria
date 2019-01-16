@@ -19,12 +19,11 @@ package com.arialyy.aria.core.download.downloader;
 import com.arialyy.aria.core.common.CompleteInfo;
 import com.arialyy.aria.core.common.IUtil;
 import com.arialyy.aria.core.common.OnFileInfoCallback;
-import com.arialyy.aria.core.download.DownloadTaskEntity;
-import com.arialyy.aria.core.inf.AbsTaskEntity;
+import com.arialyy.aria.core.download.DTaskWrapper;
+import com.arialyy.aria.core.inf.AbsTaskWrapper;
 import com.arialyy.aria.core.inf.IDownloadListener;
 import com.arialyy.aria.core.inf.IEntity;
 import com.arialyy.aria.exception.BaseException;
-import com.arialyy.aria.exception.TaskException;
 
 /**
  * Created by lyy on 2015/8/25.
@@ -34,10 +33,10 @@ public class SimpleDownloadUtil implements IUtil, Runnable {
   private String TAG = "SimpleDownloadUtil";
   private IDownloadListener mListener;
   private Downloader mDownloader;
-  private DownloadTaskEntity mTaskEntity;
+  private DTaskWrapper mTaskEntity;
   private boolean isStop = false, isCancel = false;
 
-  public SimpleDownloadUtil(DownloadTaskEntity entity, IDownloadListener downloadListener) {
+  public SimpleDownloadUtil(DTaskWrapper entity, IDownloadListener downloadListener) {
     mTaskEntity = entity;
     mListener = downloadListener;
     mDownloader = new Downloader(downloadListener, entity);
@@ -106,7 +105,7 @@ public class SimpleDownloadUtil implements IUtil, Runnable {
     }
     if (mTaskEntity.getEntity().getFileSize() <= 1
         || mTaskEntity.isRefreshInfo()
-        || mTaskEntity.getRequestType() == AbsTaskEntity.D_FTP
+        || mTaskEntity.getRequestType() == AbsTaskWrapper.D_FTP
         || mTaskEntity.getState() == IEntity.STATE_FAIL) {
       new Thread(createInfoThread()).start();
     } else {
@@ -119,7 +118,7 @@ public class SimpleDownloadUtil implements IUtil, Runnable {
    */
   private Runnable createInfoThread() {
     switch (mTaskEntity.getRequestType()) {
-      case AbsTaskEntity.D_FTP:
+      case AbsTaskWrapper.D_FTP:
         return new FtpFileInfoThread(mTaskEntity, new OnFileInfoCallback() {
           @Override public void onComplete(String url, CompleteInfo info) {
             mDownloader.start();
@@ -130,7 +129,7 @@ public class SimpleDownloadUtil implements IUtil, Runnable {
             mDownloader.closeTimer();
           }
         });
-      case AbsTaskEntity.D_HTTP:
+      case AbsTaskWrapper.D_HTTP:
         return new HttpFileInfoThread(mTaskEntity, new OnFileInfoCallback() {
           @Override public void onComplete(String url, CompleteInfo info) {
             mDownloader.start();

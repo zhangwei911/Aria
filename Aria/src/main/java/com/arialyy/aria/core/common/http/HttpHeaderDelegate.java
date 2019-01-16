@@ -18,7 +18,7 @@ package com.arialyy.aria.core.common.http;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import com.arialyy.aria.core.inf.AbsTarget;
-import com.arialyy.aria.core.inf.AbsTaskEntity;
+import com.arialyy.aria.core.inf.AbsTaskWrapper;
 import com.arialyy.aria.core.inf.IHttpHeaderDelegate;
 import com.arialyy.aria.util.ALog;
 import java.net.Proxy;
@@ -55,7 +55,7 @@ public class HttpHeaderDelegate<TARGET extends AbsTarget>
       ALog.w(TAG, "设置header失败，header对应的value不能为null");
       return mTarget;
     }
-    addHeader(mTarget.getTaskEntity(), key, value);
+    addHeader(mTarget.getTaskWrapper(), key, value);
     return mTarget;
   }
 
@@ -71,24 +71,26 @@ public class HttpHeaderDelegate<TARGET extends AbsTarget>
       ALog.w(TAG, "设置header失败，map没有header数据");
       return mTarget;
     }
-    addHeaders(mTarget.getTaskEntity(), headers);
+    addHeaders(mTarget.getTaskWrapper(), headers);
     return mTarget;
   }
 
   @Override public TARGET setUrlProxy(Proxy proxy) {
-    mTarget.getTaskEntity().setProxy(proxy);
+    mTarget.getTaskWrapper().asHttp().setProxy(proxy);
     return mTarget;
   }
 
-  public void addHeader(AbsTaskEntity taskEntity, String key, String value) {
-    if (taskEntity.getHeaders().get(key) == null) {
-      taskEntity.getHeaders().put(key, value);
-    } else if (!taskEntity.getHeaders().get(key).equals(value)) {
-      taskEntity.getHeaders().put(key, value);
+  public void addHeader(AbsTaskWrapper taskWrapper, String key, String value) {
+    HttpTaskDelegate taskDelegate = taskWrapper.asHttp();
+    if (taskDelegate.getHeaders().get(key) == null) {
+      taskDelegate.getHeaders().put(key, value);
+    } else if (!taskDelegate.getHeaders().get(key).equals(value)) {
+      taskDelegate.getHeaders().put(key, value);
     }
   }
 
-  public void addHeaders(AbsTaskEntity taskEntity, Map<String, String> headers) {
+  public void addHeaders(AbsTaskWrapper taskWrapper, Map<String, String> headers) {
+    HttpTaskDelegate taskDelegate = taskWrapper.asHttp();
      /*
       两个map比较逻辑
       1、比对key是否相同
@@ -96,9 +98,9 @@ public class HttpHeaderDelegate<TARGET extends AbsTarget>
       3、只有当上面两个步骤中key 和 value都相同时才能任务两个map数据一致
      */
     boolean mapEquals = false;
-    if (taskEntity.getHeaders().size() == headers.size()) {
+    if (taskDelegate.getHeaders().size() == headers.size()) {
       int i = 0;
-      Set<String> keys = taskEntity.getHeaders().keySet();
+      Set<String> keys = taskDelegate.getHeaders().keySet();
       for (String key : keys) {
         if (headers.containsKey(key)) {
           i++;
@@ -106,9 +108,9 @@ public class HttpHeaderDelegate<TARGET extends AbsTarget>
           break;
         }
       }
-      if (i == taskEntity.getHeaders().size()) {
+      if (i == taskDelegate.getHeaders().size()) {
         int j = 0;
-        Collection<String> values = taskEntity.getHeaders().values();
+        Collection<String> values = taskDelegate.getHeaders().values();
         for (String value : values) {
           if (headers.containsValue(value)) {
             j++;
@@ -116,17 +118,17 @@ public class HttpHeaderDelegate<TARGET extends AbsTarget>
             break;
           }
         }
-        if (j == taskEntity.getHeaders().size()) {
+        if (j == taskDelegate.getHeaders().size()) {
           mapEquals = true;
         }
       }
     }
 
     if (!mapEquals) {
-      taskEntity.getHeaders().clear();
+      taskDelegate.getHeaders().clear();
       Set<String> keys = headers.keySet();
       for (String key : keys) {
-        taskEntity.getHeaders().put(key, headers.get(key));
+        taskDelegate.getHeaders().put(key, headers.get(key));
       }
     }
   }

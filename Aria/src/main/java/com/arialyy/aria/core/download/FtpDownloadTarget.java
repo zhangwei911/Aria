@@ -20,7 +20,8 @@ import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import com.arialyy.aria.core.common.ftp.FTPSConfig;
 import com.arialyy.aria.core.common.ftp.FtpDelegate;
-import com.arialyy.aria.core.inf.AbsTaskEntity;
+import com.arialyy.aria.core.common.ftp.FtpTaskDelegate;
+import com.arialyy.aria.core.inf.AbsTaskWrapper;
 import com.arialyy.aria.core.inf.IFtpTarget;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
@@ -45,9 +46,9 @@ public class FtpDownloadTarget extends BaseNormalTarget<FtpDownloadTarget>
 
   private void init() {
     int lastIndex = url.lastIndexOf("/");
-    mEntity.setFileName(url.substring(lastIndex + 1, url.length()));
-    mTaskEntity.setUrlEntity(CommonUtil.getFtpUrlInfo(url));
-    mTaskEntity.setRequestType(AbsTaskEntity.D_FTP);
+    mEntity.setFileName(url.substring(lastIndex + 1));
+    mTaskWrapper.asFtp().setUrlEntity(CommonUtil.getFtpUrlInfo(url));
+    mTaskWrapper.setRequestType(AbsTaskWrapper.D_FTP);
 
     mDelegate = new FtpDelegate<>(this);
   }
@@ -59,17 +60,17 @@ public class FtpDownloadTarget extends BaseNormalTarget<FtpDownloadTarget>
    */
   @CheckResult
   public FTPSConfig<FtpDownloadTarget> asFtps() {
-    mTaskEntity.getUrlEntity().isFtps = true;
+    mTaskWrapper.asFtp().getUrlEntity().isFtps = true;
     return new FTPSConfig<>(this);
   }
 
   @Override protected boolean checkEntity() {
-    if (mTaskEntity.getUrlEntity().isFtps){
-      if (TextUtils.isEmpty(mTaskEntity.getUrlEntity().storePath)){
+    if (mTaskWrapper.asFtp().getUrlEntity().isFtps){
+      if (TextUtils.isEmpty(mTaskWrapper.asFtp().getUrlEntity().storePath)){
         ALog.e(TAG, "证书路径为空");
         return false;
       }
-      if (TextUtils.isEmpty(mTaskEntity.getUrlEntity().keyAlias)){
+      if (TextUtils.isEmpty(mTaskWrapper.asFtp().getUrlEntity().keyAlias)){
         ALog.e(TAG, "证书别名为空");
         return false;
       }

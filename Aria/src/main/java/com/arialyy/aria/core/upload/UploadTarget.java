@@ -19,7 +19,7 @@ import android.support.annotation.CheckResult;
 import android.support.annotation.NonNull;
 import com.arialyy.aria.core.common.http.HttpHeaderDelegate;
 import com.arialyy.aria.core.common.http.PostDelegate;
-import com.arialyy.aria.core.inf.AbsTaskEntity;
+import com.arialyy.aria.core.inf.AbsTaskWrapper;
 import com.arialyy.aria.core.inf.IHttpHeaderDelegate;
 import java.net.Proxy;
 import java.util.Map;
@@ -41,8 +41,8 @@ public class UploadTarget extends BaseNormalTarget<UploadTarget>
     initTarget(filePath);
 
     //http暂时不支持断点上传
-    mTaskEntity.setSupportBP(false);
-    mTaskEntity.setRequestType(AbsTaskEntity.U_HTTP);
+    mTaskWrapper.setSupportBP(false);
+    mTaskWrapper.setRequestType(AbsTaskWrapper.U_HTTP);
     mDelegate = new HttpHeaderDelegate<>(this);
   }
 
@@ -58,7 +58,7 @@ public class UploadTarget extends BaseNormalTarget<UploadTarget>
    */
   @CheckResult
   public UploadTarget setUserAngent(@NonNull String userAgent) {
-    mTaskEntity.setUserAgent(userAgent);
+    mTaskWrapper.asHttp().setUserAgent(userAgent);
     return this;
   }
 
@@ -69,7 +69,7 @@ public class UploadTarget extends BaseNormalTarget<UploadTarget>
    */
   @CheckResult
   public UploadTarget setAttachment(@NonNull String attachment) {
-    mTaskEntity.setAttachment(attachment);
+    mTaskWrapper.asHttp().setAttachment(attachment);
     return this;
   }
 
@@ -80,7 +80,7 @@ public class UploadTarget extends BaseNormalTarget<UploadTarget>
    */
   @CheckResult
   public UploadTarget setContentType(String contentType) {
-    mTaskEntity.setContentType(contentType);
+    mTaskWrapper.asHttp().setContentType(contentType);
     return this;
   }
 

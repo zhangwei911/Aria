@@ -17,12 +17,11 @@
 package com.arialyy.aria.util;
 
 import android.text.TextUtils;
+import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.download.DownloadEntity;
-import com.arialyy.aria.core.download.DownloadTaskEntity;
-import com.arialyy.aria.core.inf.AbsTaskEntity;
+import com.arialyy.aria.core.inf.AbsTaskWrapper;
+import com.arialyy.aria.core.upload.UTaskWrapper;
 import com.arialyy.aria.core.upload.UploadEntity;
-import com.arialyy.aria.core.upload.UploadTaskEntity;
-import com.arialyy.aria.exception.FileException;
 import java.io.File;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -157,11 +156,11 @@ public class CheckUtil {
   /**
    * 检查任务实体
    */
-  public static void checkTaskEntity(AbsTaskEntity entity) {
-    if (entity instanceof DownloadTaskEntity) {
-      checkDownloadTaskEntity(((DownloadTaskEntity) entity).getEntity());
-    } else if (entity instanceof UploadTaskEntity) {
-      checkUploadTaskEntity(((UploadTaskEntity) entity).getEntity());
+  public static void checkTaskEntity(AbsTaskWrapper entity) {
+    if (entity instanceof DTaskWrapper) {
+      checkDownloadTaskEntity(((DTaskWrapper) entity).getEntity());
+    } else if (entity instanceof UTaskWrapper) {
+      checkUploadTaskEntity(((UTaskWrapper) entity).getEntity());
     }
   }
 
@@ -171,10 +170,10 @@ public class CheckUtil {
    * @param checkType 删除命令和停止命令不需要检查下载链接和保存路径
    * @return {@code false}实体无效
    */
-  public static boolean checkCmdEntity(AbsTaskEntity entity, boolean checkType) {
+  public static boolean checkCmdEntity(AbsTaskWrapper entity, boolean checkType) {
     boolean b = false;
-    if (entity instanceof DownloadTaskEntity) {
-      DownloadEntity entity1 = ((DownloadTaskEntity) entity).getEntity();
+    if (entity instanceof DTaskWrapper) {
+      DownloadEntity entity1 = ((DTaskWrapper) entity).getEntity();
       if (entity1 == null) {
         ALog.e(TAG, "下载实体不能为空");
       } else if (checkType && TextUtils.isEmpty(entity1.getUrl())) {
@@ -184,8 +183,8 @@ public class CheckUtil {
       } else {
         b = true;
       }
-    } else if (entity instanceof UploadTaskEntity) {
-      UploadEntity entity1 = ((UploadTaskEntity) entity).getEntity();
+    } else if (entity instanceof UTaskWrapper) {
+      UploadEntity entity1 = ((UTaskWrapper) entity).getEntity();
       if (entity1 == null) {
         ALog.e(TAG, "上传实体不能为空");
       } else if (TextUtils.isEmpty(entity1.getFilePath())) {

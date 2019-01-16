@@ -18,7 +18,6 @@
 package com.arialyy.aria.core;
 
 import com.arialyy.aria.core.common.ProtocolType;
-import com.arialyy.aria.orm.annotation.Ignore;
 import java.net.InetAddress;
 
 /**
@@ -58,7 +57,6 @@ public class FtpUrlEntity implements Cloneable {
   /**
    * 密码
    */
-  @Ignore
   public String password;
 
   /**

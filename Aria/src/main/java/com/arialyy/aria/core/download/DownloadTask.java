@@ -23,18 +23,17 @@ import com.arialyy.aria.core.download.downloader.SimpleDownloadUtil;
 import com.arialyy.aria.core.inf.AbsNormalTask;
 import com.arialyy.aria.core.inf.IDownloadListener;
 import com.arialyy.aria.core.scheduler.ISchedulers;
-import com.arialyy.aria.util.ALog;
 import java.io.File;
 
 /**
  * Created by lyy on 2016/8/11.
  * 下载任务类
  */
-public class DownloadTask extends AbsNormalTask<DownloadEntity, DownloadTaskEntity> {
+public class DownloadTask extends AbsNormalTask<DownloadEntity, DTaskWrapper> {
   public static final String TAG = "DownloadTask";
 
-  private DownloadTask(DownloadTaskEntity taskEntity, Handler outHandler) {
-    mTaskEntity = taskEntity;
+  private DownloadTask(DTaskWrapper taskEntity, Handler outHandler) {
+    mTaskWrapper = taskEntity;
     mOutHandler = outHandler;
     mContext = AriaManager.APP;
     mListener = new BaseDListener(this, mOutHandler);
@@ -56,7 +55,7 @@ public class DownloadTask extends AbsNormalTask<DownloadEntity, DownloadTaskEnti
   }
 
   public DownloadEntity getEntity() {
-    return mTaskEntity.getEntity();
+    return mTaskWrapper.getEntity();
   }
 
   /**
@@ -85,10 +84,10 @@ public class DownloadTask extends AbsNormalTask<DownloadEntity, DownloadTaskEnti
   }
 
   public static class Builder {
-    DownloadTaskEntity taskEntity;
+    DTaskWrapper taskEntity;
     Handler outHandler;
 
-    public Builder(DownloadTaskEntity taskEntity) {
+    public Builder(DTaskWrapper taskEntity) {
       this.taskEntity = taskEntity;
     }
 

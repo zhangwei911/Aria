@@ -16,10 +16,10 @@
 package com.arialyy.aria.core.manager;
 
 import android.support.v4.util.LruCache;
-import com.arialyy.aria.core.download.DownloadGroupTaskEntity;
-import com.arialyy.aria.core.download.DownloadTaskEntity;
-import com.arialyy.aria.core.inf.AbsTaskEntity;
-import com.arialyy.aria.core.upload.UploadTaskEntity;
+import com.arialyy.aria.core.download.DGTaskWrapper;
+import com.arialyy.aria.core.download.DTaskWrapper;
+import com.arialyy.aria.core.inf.AbsTaskWrapper;
+import com.arialyy.aria.core.upload.UTaskWrapper;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
 import java.util.List;
@@ -33,7 +33,7 @@ import java.util.concurrent.locks.ReentrantLock;
 public class TEManager {
   private static final String TAG = "TaskManager";
   private static volatile TEManager INSTANCE = null;
-  private LruCache<String, AbsTaskEntity> cache = new LruCache<>(1024);
+  private LruCache<String, AbsTaskWrapper> cache = new LruCache<>(1024);
   private Lock lock;
 
   public static TEManager getInstance() {
@@ -54,11 +54,11 @@ public class TEManager {
    *
    * @return 如果任务实体创建失败，返回null
    */
-  private <TE extends AbsTaskEntity> TE createNormalTE(Class<TE> clazz, String key) {
+  private <TE extends AbsTaskWrapper> TE createNormalTE(Class<TE> clazz, String key) {
     final Lock lock = this.lock;
     lock.lock();
     try {
-      AbsTaskEntity tEntity = cache.get(convertKey(key));
+      AbsTaskWrapper tEntity = cache.get(convertKey(key));
       if (tEntity == null || tEntity.getClass() != clazz) {
         INormalTEFactory factory = chooseNormalFactory(clazz);
         if (factory == null) {
@@ -79,7 +79,7 @@ public class TEManager {
    *
    * @return 如果任务实体创建失败，返回null
    */
-  public <TE extends AbsTaskEntity> TE createNormalNoCacheTE(Class<TE> clazz, String key) {
+  public <TE extends AbsTaskWrapper> TE createNormalNoCacheTE(Class<TE> clazz, String key) {
     final Lock lock = this.lock;
     lock.lock();
     try {
@@ -88,7 +88,7 @@ public class TEManager {
         ALog.e(TAG, "任务实体创建失败");
         return null;
       }
-      AbsTaskEntity tEntity = factory.create(key);
+      AbsTaskWrapper tEntity = factory.create(key);
       return (TE) tEntity;
     } finally {
       lock.unlock();
@@ -100,12 +100,12 @@ public class TEManager {
    *
    * @return 如果任务实体创建失败，返回null
    */
-  private <TE extends AbsTaskEntity> TE createGTEntity(Class<TE> clazz, List<String> urls) {
+  private <TE extends AbsTaskWrapper> TE createGTEntity(Class<TE> clazz, List<String> urls) {
     final Lock lock = this.lock;
     lock.lock();
     try {
       String groupName = CommonUtil.getMd5Code(urls);
-      AbsTaskEntity tEntity = cache.get(convertKey(groupName));
+      AbsTaskWrapper tEntity = cache.get(convertKey(groupName));
       if (tEntity == null || tEntity.getClass() != clazz) {
         IGTEFactory factory = chooseGroupFactory(clazz);
         if (factory == null) {
@@ -126,11 +126,11 @@ public class TEManager {
    *
    * @return 如果任务实体创建失败，返回null
    */
-  private <TE extends AbsTaskEntity> TE createFDTE(Class<TE> clazz, String key) {
+  private <TE extends AbsTaskWrapper> TE createFDTE(Class<TE> clazz, String key) {
     final Lock lock = this.lock;
     lock.lock();
     try {
-      AbsTaskEntity tEntity = cache.get(convertKey(key));
+      AbsTaskWrapper tEntity = cache.get(convertKey(key));
       if (tEntity == null || tEntity.getClass() != clazz) {
         IGTEFactory factory = chooseGroupFactory(clazz);
         if (factory == null) {
@@ -147,16 +147,16 @@ public class TEManager {
   }
 
   private IGTEFactory chooseGroupFactory(Class clazz) {
-    if (clazz == DownloadGroupTaskEntity.class) {
+    if (clazz == DGTaskWrapper.class) {
       return DGTEFactory.getInstance();
     }
     return null;
   }
 
   private INormalTEFactory chooseNormalFactory(Class clazz) {
-    if (clazz == DownloadTaskEntity.class) {
+    if (clazz == DTaskWrapper.class) {
       return DTEFactory.getInstance();
-    } else if (clazz == UploadTaskEntity.class) {
+    } else if (clazz == UTaskWrapper.class) {
       return UTEFactory.getInstance();
     }
     return null;
@@ -165,13 +165,13 @@ public class TEManager {
   /**
    * 从缓存中获取单任务实体，如果任务实体不存在，则创建任务实体
    *
-   * @return 创建失败，返回null；成功返回{@link DownloadTaskEntity}或者{@link UploadTaskEntity}
+   * @return 创建失败，返回null；成功返回{@link DTaskWrapper}或者{@link UTaskWrapper}
    */
-  public <TE extends AbsTaskEntity> TE getTEntity(Class<TE> clazz, String key) {
+  public <TE extends AbsTaskWrapper> TE getTEntity(Class<TE> clazz, String key) {
     final Lock lock = this.lock;
     lock.lock();
     try {
-      AbsTaskEntity tEntity = cache.get(convertKey(key));
+      AbsTaskWrapper tEntity = cache.get(convertKey(key));
       if (tEntity == null) {
         return createNormalTE(clazz, key);
       } else {
@@ -185,13 +185,13 @@ public class TEManager {
   /**
    * 从缓存中获取FTP文件夹任务实体，如果任务实体不存在，则创建任务实体
    *
-   * @return 创建失败，返回null；成功返回{@link DownloadTaskEntity}，
+   * @return 创建失败，返回null；成功返回{@link DTaskWrapper}，
    */
-  public <TE extends AbsTaskEntity> TE getFDTEntity(Class<TE> clazz, String key) {
+  public <TE extends AbsTaskWrapper> TE getFDTEntity(Class<TE> clazz, String key) {
     final Lock lock = this.lock;
     lock.lock();
     try {
-      AbsTaskEntity tEntity = cache.get(convertKey(key));
+      AbsTaskWrapper tEntity = cache.get(convertKey(key));
       if (tEntity == null) {
         return createFDTE(clazz, key);
       } else {
@@ -207,9 +207,9 @@ public class TEManager {
    * 获取{}
    *
    * @param urls HTTP任务组的子任务下载地址列表
-   * @return 地址列表为null或创建实体失败，返回null；成功返回{@link DownloadGroupTaskEntity}
+   * @return 地址列表为null或创建实体失败，返回null；成功返回{@link DGTaskWrapper}
    */
-  public <TE extends AbsTaskEntity> TE getGTEntity(Class<TE> clazz, List<String> urls) {
+  public <TE extends AbsTaskWrapper> TE getGTEntity(Class<TE> clazz, List<String> urls) {
     if (urls == null || urls.isEmpty()) {
       ALog.e(TAG, "获取HTTP任务组实体失败：任务组的子任务下载地址列表为null");
       return null;
@@ -218,7 +218,7 @@ public class TEManager {
     lock.lock();
     try {
       String groupName = CommonUtil.getMd5Code(urls);
-      AbsTaskEntity tEntity = cache.get(convertKey(groupName));
+      AbsTaskWrapper tEntity = cache.get(convertKey(groupName));
       if (tEntity == null) {
         return createGTEntity(clazz, urls);
       } else {
@@ -232,7 +232,7 @@ public class TEManager {
   /**
    * 更新任务实体
    */
-  public void putTEntity(String key, AbsTaskEntity tEntity) {
+  public void putTEntity(String key, AbsTaskWrapper tEntity) {
     final Lock lock = this.lock;
     lock.lock();
     try {
@@ -247,7 +247,7 @@ public class TEManager {
    *
    * @return {@code false} 实体为null，添加失败
    */
-  public boolean addTEntity(AbsTaskEntity te) {
+  public boolean addTEntity(AbsTaskWrapper te) {
     if (te == null) {
       ALog.e(TAG, "任务实体添加失败");
       return false;
@@ -265,7 +265,7 @@ public class TEManager {
    * 通过key删除任务实体
    * 当任务complete或删除记录时将删除缓存
    */
-  public AbsTaskEntity removeTEntity(String key) {
+  public AbsTaskWrapper removeTEntity(String key) {
     final Lock lock = this.lock;
     lock.lock();
     try {

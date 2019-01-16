@@ -4,8 +4,8 @@ import android.os.Bundle;
 
 import android.util.Log;
 import android.view.View;
+import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.download.DownloadEntity;
-import com.arialyy.aria.core.download.DownloadTaskEntity;
 import com.arialyy.aria.core.inf.AbsEntity;
 import com.arialyy.aria.orm.DbEntity;
 import com.arialyy.simple.base.BaseActivity;
@@ -40,7 +40,7 @@ public class DbTestActivity extends BaseActivity<ActivityDbTestBinding> {
 
   private void searchAll(){
     long startT = System.currentTimeMillis();
-    //List<DownloadTaskEntity> data = DownloadEntity.findRelationData(DownloadEntity.class);
+    //List<DTaskWrapper> data = DownloadEntity.findRelationData(DownloadEntity.class);
 
     long endT = System.currentTimeMillis();
     Log.d(TAG, "search_time=" + (endT - startT));
@@ -58,7 +58,7 @@ public class DbTestActivity extends BaseActivity<ActivityDbTestBinding> {
       entity.setFileName("ssssssssssssssssss");
       entity.setDownloadPath(key);
 
-      DownloadTaskEntity dte = new DownloadTaskEntity();
+      DTaskWrapper dte = new DTaskWrapper();
       dte.setUrl(url);
       dte.setKey(key);
       dte.setEntity(entity);

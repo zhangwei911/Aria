@@ -1,17 +1,13 @@
 package com.arialyy.simple.test;
 
 import android.os.Bundle;
-import android.os.Environment;
 import android.util.Log;
 import android.view.View;
 import com.arialyy.aria.core.Aria;
-import com.arialyy.aria.core.download.DownloadEntity;
-import com.arialyy.aria.core.download.DownloadTaskEntity;
-import com.arialyy.aria.util.ALog;
+import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.simple.R;
 import com.arialyy.simple.base.BaseActivity;
 import com.arialyy.simple.databinding.ActivityTestBinding;
-import java.util.List;
 
 /**
  * Created by laoyuyu on 2018/4/13.
@@ -46,7 +42,7 @@ public class AnyRunActivity extends BaseActivity<ActivityTestBinding> {
     mBar.setVisibility(View.GONE);
     module = new AnyRunnModule(this);
     urls = getResources().getStringArray(R.array.group_urls);
-    DownloadTaskEntity entity = Aria.download(this).getDownloadTask(URL);
+    DTaskWrapper entity = Aria.download(this).getDownloadTask(URL);
     Log.d(TAG, entity + "");
   }
 

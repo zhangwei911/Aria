@@ -17,17 +17,15 @@ package com.arialyy.aria.core.download;
 
 import android.os.Handler;
 import com.arialyy.aria.core.common.BaseListener;
-import com.arialyy.aria.core.common.TaskRecord;
 import com.arialyy.aria.core.inf.IDownloadListener;
 import com.arialyy.aria.core.inf.IEntity;
 import com.arialyy.aria.core.scheduler.ISchedulers;
-import com.arialyy.aria.orm.DbEntity;
 import com.arialyy.aria.util.CommonUtil;
 
 /**
  * 下载监听类
  */
-public class BaseDListener extends BaseListener<DownloadEntity, DownloadTaskEntity, DownloadTask>
+public class BaseDListener extends BaseListener<DownloadEntity, DTaskWrapper, DownloadTask>
     implements IDownloadListener {
   private static final String TAG = "BaseDListener";
 
@@ -68,6 +66,5 @@ public class BaseDListener extends BaseListener<DownloadEntity, DownloadTaskEnti
     if (location > 0) {
       mEntity.setCurrentProgress(location);
     }
-    mTaskEntity.update();
   }
 }

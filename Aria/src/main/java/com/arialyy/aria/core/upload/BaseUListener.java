@@ -17,16 +17,14 @@ package com.arialyy.aria.core.upload;
 
 import android.os.Handler;
 import com.arialyy.aria.core.common.BaseListener;
-import com.arialyy.aria.core.common.TaskRecord;
 import com.arialyy.aria.core.inf.IEntity;
 import com.arialyy.aria.core.inf.IUploadListener;
-import com.arialyy.aria.orm.DbEntity;
 import com.arialyy.aria.util.CommonUtil;
 
 /**
  * 下载监听类
  */
-class BaseUListener extends BaseListener<UploadEntity, UploadTaskEntity, UploadTask>
+class BaseUListener extends BaseListener<UploadEntity, UTaskWrapper, UploadTask>
     implements IUploadListener {
 
   BaseUListener(UploadTask task, Handler outHandler) {
@@ -51,6 +49,5 @@ class BaseUListener extends BaseListener<UploadEntity, UploadTaskEntity, UploadT
     } else if (location > 0) {
       mEntity.setCurrentProgress(location);
     }
-    mTaskEntity.update();
   }
 }

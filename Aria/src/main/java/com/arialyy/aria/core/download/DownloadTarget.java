@@ -17,7 +17,6 @@ package com.arialyy.aria.core.download;
 
 import android.support.annotation.CheckResult;
 import android.support.annotation.NonNull;
-import com.arialyy.aria.core.common.RequestEnum;
 import com.arialyy.aria.core.common.http.GetDelegate;
 import com.arialyy.aria.core.common.http.HttpHeaderDelegate;
 import com.arialyy.aria.core.common.http.PostDelegate;
@@ -64,7 +63,7 @@ public class DownloadTarget extends BaseNormalTarget<DownloadTarget>
    */
   @CheckResult
   public DownloadTarget useServerFileName(boolean use) {
-    mTaskEntity.setUseServerFileName(use);
+    mTaskWrapper.asHttp().setUseServerFileName(use);
     return this;
   }
 

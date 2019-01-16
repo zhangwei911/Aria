@@ -35,12 +35,11 @@ import com.arialyy.aria.core.common.AbsFileer;
 import com.arialyy.aria.core.common.TaskRecord;
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.download.DownloadGroupEntity;
-import com.arialyy.aria.core.download.DownloadTaskEntity;
-import com.arialyy.aria.core.inf.AbsGroupTaskEntity;
+import com.arialyy.aria.core.download.DownloadGroupTask;
+import com.arialyy.aria.core.inf.AbsGroupTaskWrapper;
 import com.arialyy.aria.core.inf.AbsNormalEntity;
-import com.arialyy.aria.core.inf.AbsTaskEntity;
+import com.arialyy.aria.core.inf.AbsTaskWrapper;
 import com.arialyy.aria.core.upload.UploadEntity;
-import com.arialyy.aria.core.upload.UploadTaskEntity;
 import com.arialyy.aria.orm.DbEntity;
 import dalvik.system.DexFile;
 import java.io.File;
@@ -700,10 +699,8 @@ public class CommonUtil {
     }
     //下载任务实体和下载实体为一对一关系，下载实体删除，任务实体自动删除
     if (type == 1) {
-      DbEntity.deleteData(DownloadTaskEntity.class, "key=?", filePath);
       DbEntity.deleteData(DownloadEntity.class, "downloadPath=?", filePath);
     } else {
-      DbEntity.deleteData(UploadTaskEntity.class, "key=?", filePath);
       DbEntity.deleteData(UploadEntity.class, "filePath=?", filePath);
     }
   }
@@ -856,7 +853,7 @@ public class CommonUtil {
    * @param taskType {@link ICmd#TASK_TYPE_DOWNLOAD}、{@link ICmd#TASK_TYPE_DOWNLOAD_GROUP}、{@link
    * ICmd#TASK_TYPE_UPLOAD}
    */
-  public static <T extends AbsTaskEntity> AbsNormalCmd createNormalCmd(T entity, int cmd,
+  public static <T extends AbsTaskWrapper> AbsNormalCmd createNormalCmd(T entity, int cmd,
       int taskType) {
     return NormalCmdFactory.getInstance().createCmd(entity, cmd, taskType);
   }
@@ -866,7 +863,7 @@ public class CommonUtil {
    *
    * @param childUrl 子任务url
    */
-  public static <T extends AbsGroupTaskEntity> AbsGroupCmd createGroupCmd(String target, T entity,
+  public static <T extends AbsGroupTaskWrapper> AbsGroupCmd createGroupCmd(String target, T entity,
       int cmd, String childUrl) {
     return GroupCmdFactory.getInstance().createCmd(target, entity, cmd, childUrl);
   }

@@ -17,11 +17,9 @@ package com.arialyy.aria.core.download.downloader;
 
 import com.arialyy.aria.core.common.CompleteInfo;
 import com.arialyy.aria.core.common.OnFileInfoCallback;
-import com.arialyy.aria.core.download.DownloadGroupTaskEntity;
-import com.arialyy.aria.core.download.DownloadTaskEntity;
+import com.arialyy.aria.core.download.DGTaskWrapper;
+import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.exception.BaseException;
-import com.arialyy.aria.exception.TaskException;
-import com.arialyy.aria.util.ErrorHelp;
 import java.util.Set;
 
 /**
@@ -31,7 +29,7 @@ import java.util.Set;
 public class FtpDirDownloadUtil extends AbsGroupUtil {
   private String TAG = "FtpDirDownloadUtil";
 
-  public FtpDirDownloadUtil(IDownloadGroupListener listener, DownloadGroupTaskEntity taskEntity) {
+  public FtpDirDownloadUtil(IDownloadGroupListener listener, DGTaskWrapper taskEntity) {
     super(listener, taskEntity);
   }
 
@@ -41,11 +39,11 @@ public class FtpDirDownloadUtil extends AbsGroupUtil {
 
   @Override protected void onStart() {
     super.onStart();
-    if (mGTEntity.getEntity().getFileSize() > 1) {
+    if (mGTWrapper.getEntity().getFileSize() > 1) {
       onPre();
       startDownload();
     } else {
-      new FtpDirInfoThread(mGTEntity, new OnFileInfoCallback() {
+      new FtpDirInfoThread(mGTWrapper, new OnFileInfoCallback() {
         @Override public void onComplete(String url, CompleteInfo info) {
           if (info.code >= 200 && info.code < 300) {
             onPre();
@@ -54,7 +52,7 @@ public class FtpDirDownloadUtil extends AbsGroupUtil {
         }
 
         @Override public void onFail(String url, BaseException e, boolean needRetry) {
-          DownloadTaskEntity te = mExeMap.get(url);
+          DTaskWrapper te = mExeMap.get(url);
           if (te != null) {
             mFailMap.put(url, te);
             mExeMap.remove(url);
@@ -73,7 +71,7 @@ public class FtpDirDownloadUtil extends AbsGroupUtil {
     int i = 0;
     Set<String> keys = mExeMap.keySet();
     for (String key : keys) {
-      DownloadTaskEntity taskEntity = mExeMap.get(key);
+      DTaskWrapper taskEntity = mExeMap.get(key);
       if (taskEntity != null) {
         createChildDownload(taskEntity);
         i++;

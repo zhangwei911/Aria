@@ -27,13 +27,13 @@ import java.io.File;
  * Created by AriaL on 2018/3/9.
  */
 abstract class BaseNormalTarget<TARGET extends AbsUploadTarget>
-    extends AbsUploadTarget<TARGET, UploadEntity, UploadTaskEntity> {
+    extends AbsUploadTarget<TARGET, UploadEntity, UTaskWrapper> {
 
   protected String mTempUrl;
 
   void initTarget(String filePath) {
-    mTaskEntity = TEManager.getInstance().getTEntity(UploadTaskEntity.class, filePath);
-    mEntity = mTaskEntity.getEntity();
+    mTaskWrapper = TEManager.getInstance().getTEntity(UTaskWrapper.class, filePath);
+    mEntity = mTaskWrapper.getEntity();
     File file = new File(filePath);
     mEntity.setFileName(file.getName());
     mEntity.setFileSize(file.length());
@@ -78,14 +78,13 @@ abstract class BaseNormalTarget<TARGET extends AbsUploadTarget>
     boolean b = checkUrl() && checkFilePath();
     if (b) {
       mEntity.save();
-      mTaskEntity.save();
     }
-    if (mTaskEntity.getUrlEntity() != null && mTaskEntity.getUrlEntity().isFtps) {
-      //if (TextUtils.isEmpty(mTaskEntity.getUrlEntity().storePath)) {
+    if (mTaskWrapper.asFtp().getUrlEntity() != null && mTaskWrapper.asFtp().getUrlEntity().isFtps) {
+      //if (TextUtils.isEmpty(mTaskWrapper.getUrlEntity().storePath)) {
       //  ALog.e(TAG, "证书路径为空");
       //  return false;
       //}
-      if (TextUtils.isEmpty(mTaskEntity.getUrlEntity().keyAlias)) {
+      if (TextUtils.isEmpty(mTaskWrapper.asFtp().getUrlEntity().keyAlias)) {
         ALog.e(TAG, "证书别名为空");
         return false;
       }
@@ -117,7 +116,7 @@ abstract class BaseNormalTarget<TARGET extends AbsUploadTarget>
       ALog.e(TAG, "上传失败，文件【" + filePath + "】不能是文件夹");
       return false;
     }
-    mTaskEntity.setKey(mEntity.getFilePath());
+    mTaskWrapper.setKey(mEntity.getFilePath());
     return true;
   }
 

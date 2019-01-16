@@ -17,8 +17,8 @@
 package com.arialyy.aria.core.queue;
 
 import com.arialyy.aria.core.AriaManager;
+import com.arialyy.aria.core.download.DGTaskWrapper;
 import com.arialyy.aria.core.download.DownloadGroupTask;
-import com.arialyy.aria.core.download.DownloadGroupTaskEntity;
 import com.arialyy.aria.core.scheduler.DownloadGroupSchedulers;
 import com.arialyy.aria.util.ALog;
 
@@ -27,7 +27,7 @@ import com.arialyy.aria.util.ALog;
  * 任务组下载队列
  */
 public class DownloadGroupTaskQueue
-    extends AbsTaskQueue<DownloadGroupTask, DownloadGroupTaskEntity> {
+    extends AbsTaskQueue<DownloadGroupTask, DGTaskWrapper> {
   private static volatile DownloadGroupTaskQueue INSTANCE = null;
 
   private final String TAG = "DownloadGroupTaskQueue";
@@ -52,12 +52,12 @@ public class DownloadGroupTaskQueue
     return AriaManager.getInstance(AriaManager.APP).getDownloadConfig().getMaxTaskNum();
   }
 
-  @Override public DownloadGroupTask createTask(DownloadGroupTaskEntity entity) {
+  @Override public DownloadGroupTask createTask(DGTaskWrapper wrapper) {
     DownloadGroupTask task = null;
-    if (mCachePool.getTask(entity.getEntity().getKey()) == null
-        && mExecutePool.getTask(entity.getEntity().getKey()) == null) {
+    if (mCachePool.getTask(wrapper.getEntity().getKey()) == null
+        && mExecutePool.getTask(wrapper.getEntity().getKey()) == null) {
       task = (DownloadGroupTask) TaskFactory.getInstance()
-          .createTask(entity, DownloadGroupSchedulers.getInstance());
+          .createTask(wrapper, DownloadGroupSchedulers.getInstance());
       mCachePool.putTask(task);
     } else {
       ALog.w(TAG, "任务已存在");

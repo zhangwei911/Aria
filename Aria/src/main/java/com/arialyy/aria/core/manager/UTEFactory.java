@@ -16,8 +16,8 @@
 package com.arialyy.aria.core.manager;
 
 import android.text.TextUtils;
+import com.arialyy.aria.core.upload.UTaskWrapper;
 import com.arialyy.aria.core.upload.UploadEntity;
-import com.arialyy.aria.core.upload.UploadTaskEntity;
 import com.arialyy.aria.core.upload.wrapper.UTEWrapper;
 import com.arialyy.aria.orm.DbEntity;
 import com.arialyy.aria.util.Regular;
@@ -28,7 +28,7 @@ import java.util.regex.Pattern;
  * Created by Aria.Lao on 2017/11/1.
  * 任务实体工厂
  */
-class UTEFactory implements INormalTEFactory<UploadEntity, UploadTaskEntity> {
+class UTEFactory implements INormalTEFactory<UploadEntity, UTaskWrapper> {
   private static final String TAG = "DTEFactory";
   private static volatile UTEFactory INSTANCE = null;
 
@@ -44,29 +44,29 @@ class UTEFactory implements INormalTEFactory<UploadEntity, UploadTaskEntity> {
     return INSTANCE;
   }
 
-  private UploadTaskEntity create(UploadEntity entity) {
+  private UTaskWrapper create(UploadEntity entity) {
     List<UTEWrapper> wrapper =
-        DbEntity.findRelationData(UTEWrapper.class, "UploadTaskEntity.key=?",
+        DbEntity.findRelationData(UTEWrapper.class, "UTaskWrapper.key=?",
             entity.getFilePath());
-    UploadTaskEntity uTaskEntity = null;
+    UTaskWrapper uTaskEntity = null;
     if (wrapper != null && !wrapper.isEmpty()) {
       uTaskEntity = wrapper.get(0).taskEntity;
       if (uTaskEntity == null) {
-        uTaskEntity = new UploadTaskEntity();
+        uTaskEntity = new UTaskWrapper();
         uTaskEntity.setEntity(entity);
       } else if (uTaskEntity.getEntity() == null || TextUtils.isEmpty(
           uTaskEntity.getEntity().getFilePath())) {
         uTaskEntity.setEntity(entity);
       }
     } else {
-      uTaskEntity = new UploadTaskEntity();
+      uTaskEntity = new UTaskWrapper();
       uTaskEntity.setEntity(entity);
     }
     uTaskEntity.setKey(entity.getFilePath());
     return uTaskEntity;
   }
 
-  @Override public UploadTaskEntity create(String key) {
+  @Override public UTaskWrapper create(String key) {
     return create(getUploadEntity(key));
   }
 

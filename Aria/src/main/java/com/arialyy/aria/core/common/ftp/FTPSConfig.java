@@ -31,7 +31,7 @@ public class FTPSConfig<TARGET extends AbsTarget> implements ITarget {
 
   public FTPSConfig(TARGET target) {
     mTarget = target;
-    mUrlEntity = mTarget.getTaskEntity().getUrlEntity();
+    mUrlEntity = mTarget.getTaskWrapper().asFtp().getUrlEntity();
   }
 
   /**

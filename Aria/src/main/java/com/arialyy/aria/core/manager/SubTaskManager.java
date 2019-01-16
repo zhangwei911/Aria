@@ -18,7 +18,7 @@ package com.arialyy.aria.core.manager;
 import android.text.TextUtils;
 import com.arialyy.aria.core.AriaManager;
 import com.arialyy.aria.core.command.group.GroupCmdFactory;
-import com.arialyy.aria.core.inf.AbsGroupTaskEntity;
+import com.arialyy.aria.core.download.DGTaskWrapper;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
 import java.util.List;
@@ -29,10 +29,10 @@ import java.util.List;
  */
 public class SubTaskManager {
   private String TAG = "SubTaskManager";
-  private AbsGroupTaskEntity mEntity;
+  private DGTaskWrapper mEntity;
   private String mTargetName;
 
-  public SubTaskManager(String targetName, AbsGroupTaskEntity entity) {
+  public SubTaskManager(String targetName, DGTaskWrapper entity) {
     mTargetName = targetName;
     mEntity = entity;
   }

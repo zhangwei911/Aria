@@ -20,7 +20,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.text.TextUtils;
 import com.arialyy.aria.core.inf.AbsNormalEntity;
-import com.arialyy.aria.core.inf.AbsTaskEntity;
+import com.arialyy.aria.core.inf.AbsTaskWrapper;
 import com.arialyy.aria.orm.ActionPolicy;
 import com.arialyy.aria.orm.annotation.Foreign;
 import com.arialyy.aria.orm.annotation.Primary;
@@ -61,7 +61,7 @@ public class DownloadEntity extends AbsNormalEntity implements Parcelable {
   }
 
   @Override public int getTaskType() {
-    return getUrl().startsWith("ftp") ? AbsTaskEntity.D_FTP : AbsTaskEntity.D_HTTP;
+    return getUrl().startsWith("ftp") ? AbsTaskWrapper.D_FTP : AbsTaskWrapper.D_HTTP;
   }
 
   public DownloadEntity() {

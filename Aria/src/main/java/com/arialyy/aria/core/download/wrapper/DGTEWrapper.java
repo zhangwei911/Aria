@@ -15,10 +15,10 @@
  */
 package com.arialyy.aria.core.download.wrapper;
 
+import com.arialyy.aria.core.download.DGTaskWrapper;
 import com.arialyy.aria.core.download.DownloadGroupEntity;
-import com.arialyy.aria.core.download.DownloadGroupTaskEntity;
-import com.arialyy.aria.core.download.DownloadTaskEntity;
-import com.arialyy.aria.core.inf.AbsTaskEntity;
+import com.arialyy.aria.core.download.DTaskWrapper;
+import com.arialyy.aria.core.inf.AbsTaskWrapper;
 import com.arialyy.aria.orm.AbsWrapper;
 import com.arialyy.aria.orm.DbEntity;
 import com.arialyy.aria.orm.annotation.Many;
@@ -39,26 +39,26 @@ public class DGTEWrapper extends AbsWrapper {
   public DownloadGroupEntity entity;
 
   @Many(parentColumn = "groupName", entityColumn = "key")
-  private List<DownloadGroupTaskEntity> taskEntitys;
+  private List<DGTaskWrapper> taskEntitys;
 
-  public DownloadGroupTaskEntity taskEntity;
+  public DGTaskWrapper taskEntity;
 
   @Override protected void handleConvert() {
     taskEntity = (taskEntitys == null || taskEntitys.isEmpty()) ? null : taskEntitys.get(0);
     if (taskEntity != null) {
       taskEntity.setEntity(entity);
       List<DTEWrapper> subWrappers =
-          DbEntity.findRelationData(DTEWrapper.class, "DownloadTaskEntity.groupName=?",
+          DbEntity.findRelationData(DTEWrapper.class, "DTaskWrapper.groupName=?",
               taskEntity.getKey());
       if (subWrappers != null && !subWrappers.isEmpty()) {
-        List<DownloadTaskEntity> temp = new ArrayList<>();
+        List<DTaskWrapper> temp = new ArrayList<>();
         for (DTEWrapper dw : subWrappers) {
-          if (dw.taskEntity.getRequestType() == AbsTaskEntity.D_FTP) {
-            dw.taskEntity.setUrlEntity(CommonUtil.getFtpUrlInfo(dw.taskEntity.getUrl()));
+          if (dw.taskEntity.getRequestType() == AbsTaskWrapper.D_FTP) {
+            dw.taskEntity.asFtp().setUrlEntity(CommonUtil.getFtpUrlInfo(dw.taskEntity.getUrl()));
           }
           temp.add(dw.taskEntity);
         }
-        taskEntity.setSubTaskEntities(temp);
+        taskEntity.setSubTaskWrapper(temp);
       }
     }
   }

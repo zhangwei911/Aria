@@ -19,7 +19,7 @@ import android.os.Handler;
 import com.arialyy.aria.core.AriaManager;
 import com.arialyy.aria.core.inf.AbsEntity;
 import com.arialyy.aria.core.inf.AbsTask;
-import com.arialyy.aria.core.inf.AbsTaskEntity;
+import com.arialyy.aria.core.inf.AbsTaskWrapper;
 import com.arialyy.aria.core.inf.IEntity;
 import com.arialyy.aria.core.inf.IEventListener;
 import com.arialyy.aria.core.inf.TaskSchedulerType;
@@ -30,7 +30,7 @@ import com.arialyy.aria.util.CommonUtil;
 import com.arialyy.aria.util.ErrorHelp;
 import java.lang.ref.WeakReference;
 
-public abstract class BaseListener<ENTITY extends AbsEntity, TASK_ENTITY extends AbsTaskEntity<ENTITY>, TASK extends AbsTask<ENTITY, TASK_ENTITY>>
+public abstract class BaseListener<ENTITY extends AbsEntity, TASK_ENTITY extends AbsTaskWrapper<ENTITY>, TASK extends AbsTask<ENTITY, TASK_ENTITY>>
     implements IEventListener {
   private static final String TAG = "BaseListener";
   protected WeakReference<Handler> outHandler;
@@ -48,8 +48,8 @@ public abstract class BaseListener<ENTITY extends AbsEntity, TASK_ENTITY extends
   protected BaseListener(TASK task, Handler outHandler) {
     this.outHandler = new WeakReference<>(outHandler);
     this.mTask = new WeakReference<>(task).get();
-    this.mEntity = mTask.getTaskEntity().getEntity();
-    this.mTaskEntity = mTask.getTaskEntity();
+    this.mEntity = mTask.getTaskWrapper().getEntity();
+    this.mTaskEntity = mTask.getTaskWrapper();
     manager = AriaManager.getInstance(AriaManager.APP);
     mLastLen = mEntity.getCurrentProgress();
     mLastSaveTime = System.currentTimeMillis();

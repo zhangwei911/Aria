@@ -15,13 +15,13 @@
  */
 package com.arialyy.aria.core.command.group;
 
-import com.arialyy.aria.core.inf.AbsGroupTaskEntity;
+import com.arialyy.aria.core.inf.AbsGroupTaskWrapper;
 
 /**
  * Created by AriaL on 2017/6/29.
  * 停止任务组的命令
  */
-class GroupStopCmd<T extends AbsGroupTaskEntity> extends AbsGroupCmd<T> {
+class GroupStopCmd<T extends AbsGroupTaskWrapper> extends AbsGroupCmd<T> {
   GroupStopCmd(T entity) {
     super(entity);
   }

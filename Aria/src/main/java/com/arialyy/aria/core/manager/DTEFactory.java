@@ -18,8 +18,8 @@ package com.arialyy.aria.core.manager;
 import android.text.TextUtils;
 import com.arialyy.aria.core.common.AbsFileer;
 import com.arialyy.aria.core.common.TaskRecord;
+import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.download.DownloadEntity;
-import com.arialyy.aria.core.download.DownloadTaskEntity;
 import com.arialyy.aria.core.download.wrapper.DTEWrapper;
 import com.arialyy.aria.core.inf.IEntity;
 import com.arialyy.aria.orm.DbEntity;
@@ -31,7 +31,7 @@ import java.util.UUID;
  * Created by Aria.Lao on 2017/11/1.
  * 任务实体工厂
  */
-class DTEFactory implements INormalTEFactory<DownloadEntity, DownloadTaskEntity> {
+class DTEFactory implements INormalTEFactory<DownloadEntity, DTaskWrapper> {
   private static final String TAG = "DTEFactory";
   private static volatile DTEFactory INSTANCE = null;
 
@@ -50,21 +50,21 @@ class DTEFactory implements INormalTEFactory<DownloadEntity, DownloadTaskEntity>
   /**
    * 通过下载实体创建任务实体
    */
-  private DownloadTaskEntity create(DownloadEntity entity) {
+  private DTaskWrapper create(DownloadEntity entity) {
     List<DTEWrapper> wrapper = DbEntity.findRelationData(DTEWrapper.class,
-        "DownloadTaskEntity.key=? and DownloadTaskEntity.isGroupTask='false' and DownloadTaskEntity.url=?",
+        "DTaskWrapper.key=? and DTaskWrapper.isGroupTask='false' and DTaskWrapper.url=?",
         entity.getDownloadPath(), entity.getUrl());
-    DownloadTaskEntity taskEntity;
+    DTaskWrapper taskEntity;
     if (wrapper != null && !wrapper.isEmpty()) {
       taskEntity = wrapper.get(0).taskEntity;
       if (taskEntity == null) {
-        taskEntity = new DownloadTaskEntity();
+        taskEntity = new DTaskWrapper();
       } else if (taskEntity.getEntity() == null || TextUtils.isEmpty(
           taskEntity.getEntity().getUrl())) {
         taskEntity.setEntity(entity);
       }
     } else {
-      taskEntity = new DownloadTaskEntity();
+      taskEntity = new DTaskWrapper();
     }
     taskEntity.setKey(entity.getDownloadPath());
     taskEntity.setUrl(entity.getUrl());
@@ -75,7 +75,7 @@ class DTEFactory implements INormalTEFactory<DownloadEntity, DownloadTaskEntity>
   /**
    * 通过下载地址创建任务实体
    */
-  @Override public DownloadTaskEntity create(String downloadUrl) {
+  @Override public DTaskWrapper create(String downloadUrl) {
     return create(getEntity(downloadUrl));
   }
 

@@ -18,17 +18,17 @@ package com.arialyy.aria.core.queue;
 
 import com.arialyy.aria.core.download.DownloadGroupTask;
 import com.arialyy.aria.core.download.DownloadTask;
-import com.arialyy.aria.core.download.DownloadTaskEntity;
+import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.inf.AbsTask;
-import com.arialyy.aria.core.inf.AbsTaskEntity;
+import com.arialyy.aria.core.inf.AbsTaskWrapper;
 import com.arialyy.aria.core.upload.UploadTask;
-import com.arialyy.aria.core.upload.UploadTaskEntity;
+import com.arialyy.aria.core.upload.UTaskWrapper;
 
 /**
  * Created by lyy on 2016/8/16.
  * 任务功能接口
  */
-public interface ITaskQueue<TASK extends AbsTask, TASK_ENTITY extends AbsTaskEntity> {
+public interface ITaskQueue<TASK extends AbsTask, TASK_WRAPPER extends AbsTaskWrapper> {
 
   /**
    * 通过key判断任务是否正在执行
@@ -112,10 +112,10 @@ public interface ITaskQueue<TASK extends AbsTask, TASK_ENTITY extends AbsTaskEnt
   /**
    * 创建一个新的任务，创建时只是将新任务存储到缓存池
    *
-   * @param entity 任务实体{@link DownloadTaskEntity}、{@link UploadTaskEntity}
+   * @param wrapper 任务实体{@link DTaskWrapper}、{@link UTaskWrapper}
    * @return {@link DownloadTask}、{@link UploadTask}
    */
-  TASK createTask(TASK_ENTITY entity);
+  TASK createTask(TASK_WRAPPER wrapper);
 
   /**
    * 通过工作实体缓存池或任务池搜索下载任务，如果缓存池或任务池都没有任务，则创建新任务

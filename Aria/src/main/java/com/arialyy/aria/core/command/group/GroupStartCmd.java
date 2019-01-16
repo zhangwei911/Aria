@@ -15,15 +15,14 @@
  */
 package com.arialyy.aria.core.command.group;
 
-import com.arialyy.aria.core.inf.AbsGroupTaskEntity;
+import com.arialyy.aria.core.inf.AbsGroupTaskWrapper;
 
 /**
- * Created by AriaL on 2017/6/29.
- * 任务组开始命令，该命令负责处理任务组子任务的开始\恢复等工作
+ * Created by AriaL on 2017/6/29. 任务组开始命令，该命令负责处理任务组子任务的开始\恢复等工作
  */
-class GroupStartCmd<T extends AbsGroupTaskEntity> extends AbsGroupCmd<T> {
-  GroupStartCmd( T entity) {
-    super( entity);
+class GroupStartCmd<T extends AbsGroupTaskWrapper> extends AbsGroupCmd<T> {
+  GroupStartCmd(T wrapper) {
+    super(wrapper);
   }
 
   @Override public void executeCmd() {

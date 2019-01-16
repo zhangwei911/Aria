@@ -17,7 +17,6 @@ package com.arialyy.aria.core.download;
 
 import android.support.annotation.CheckResult;
 import android.text.TextUtils;
-import android.util.Log;
 import com.arialyy.aria.core.inf.AbsEntity;
 import com.arialyy.aria.core.manager.SubTaskManager;
 import com.arialyy.aria.core.queue.DownloadGroupTaskQueue;
@@ -31,7 +30,7 @@ import java.util.List;
  * Created by lyy on 2017/7/26.
  */
 abstract class BaseGroupTarget<TARGET extends BaseGroupTarget>
-    extends AbsDownloadTarget<TARGET, DownloadGroupEntity, DownloadGroupTaskEntity> {
+    extends AbsDownloadTarget<TARGET, DownloadGroupEntity, DGTaskWrapper> {
 
   /**
    * 组任务名
@@ -56,7 +55,7 @@ abstract class BaseGroupTarget<TARGET extends BaseGroupTarget>
   @CheckResult
   public SubTaskManager getSubTaskManager() {
     if (mSubTaskManager == null) {
-      mSubTaskManager = new SubTaskManager(mTargetName, mTaskEntity);
+      mSubTaskManager = new SubTaskManager(mTargetName, mTaskWrapper);
     }
     return mSubTaskManager;
   }
@@ -123,12 +122,10 @@ abstract class BaseGroupTarget<TARGET extends BaseGroupTarget>
    * @param newDirPath 新的文件夹路径
    */
   void reChangeDirPath(String newDirPath) {
-    List<DownloadTaskEntity> subTasks = mTaskEntity.getSubTaskEntities();
+    List<DTaskWrapper> subTasks = mTaskWrapper.getSubTaskWrapper();
     if (subTasks != null && !subTasks.isEmpty()) {
-      //List<DownloadEntity> des = new ArrayList<>();
-      //List<DownloadTaskEntity> dtes = new ArrayList<>();
       List<DbEntity> des = new ArrayList<>();
-      for (DownloadTaskEntity dte : subTasks) {
+      for (DTaskWrapper dte : subTasks) {
         DownloadEntity de = dte.getEntity();
         String oldPath = de.getDownloadPath();
         String newPath = newDirPath + "/" + de.getFileName();
@@ -138,13 +135,7 @@ abstract class BaseGroupTarget<TARGET extends BaseGroupTarget>
         }
         de.setDownloadPath(newPath);
         dte.setKey(newPath);
-
-        //des.add(de);
-        //dtes.add(dte);
-        //de.save();
-        //dte.save();
         des.add(de);
-        des.add(dte);
       }
       AbsEntity.saveAll(des);
     }

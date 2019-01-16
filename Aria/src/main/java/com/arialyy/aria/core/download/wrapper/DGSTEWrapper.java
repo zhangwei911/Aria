@@ -15,8 +15,8 @@
  */
 package com.arialyy.aria.core.download.wrapper;
 
-import com.arialyy.aria.core.download.DownloadGroupTaskEntity;
-import com.arialyy.aria.core.download.DownloadTaskEntity;
+import com.arialyy.aria.core.download.DGTaskWrapper;
+import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.orm.AbsWrapper;
 import com.arialyy.aria.orm.annotation.Many;
 import com.arialyy.aria.orm.annotation.One;
@@ -31,14 +31,14 @@ import java.util.List;
 public class DGSTEWrapper extends AbsWrapper {
 
   @One
-  public DownloadGroupTaskEntity dgTaskEntity;
+  public DGTaskWrapper dgTaskEntity;
 
   @Many(parentColumn = "key", entityColumn = "groupName")
-  public List<DownloadTaskEntity> subTaskEntity;
+  public List<DTaskWrapper> subTaskEntity;
 
   @Override protected void handleConvert() {
     if (subTaskEntity != null && !subTaskEntity.isEmpty()) {
-      dgTaskEntity.setSubTaskEntities(subTaskEntity);
+      dgTaskEntity.setSubTaskWrapper(subTaskEntity);
     }
   }
 }

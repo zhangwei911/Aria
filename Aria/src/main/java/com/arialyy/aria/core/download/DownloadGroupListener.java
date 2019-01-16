@@ -30,7 +30,7 @@ import com.arialyy.aria.util.ErrorHelp;
  * Created by Aria.Lao on 2017/7/20. 任务组下载事件
  */
 class DownloadGroupListener
-    extends BaseListener<DownloadGroupEntity, DownloadGroupTaskEntity, DownloadGroupTask>
+    extends BaseListener<DownloadGroupEntity, DGTaskWrapper, DownloadGroupTask>
     implements IDownloadGroupListener {
   private final String TAG = "DownloadGroupListener";
   private GroupSendParams<DownloadGroupTask, DownloadEntity> mSeedEntity;
@@ -136,6 +136,5 @@ class DownloadGroupListener
     if (location > 0) {
       mEntity.setCurrentProgress(location);
     }
-    mTaskEntity.update();
   }
 }

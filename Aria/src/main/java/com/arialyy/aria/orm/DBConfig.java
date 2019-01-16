@@ -20,10 +20,10 @@ import com.arialyy.aria.core.common.TaskRecord;
 import com.arialyy.aria.core.common.ThreadRecord;
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.download.DownloadGroupEntity;
-import com.arialyy.aria.core.download.DownloadGroupTaskEntity;
-import com.arialyy.aria.core.download.DownloadTaskEntity;
+import com.arialyy.aria.core.download.DGTaskWrapper;
+import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.upload.UploadEntity;
-import com.arialyy.aria.core.upload.UploadTaskEntity;
+import com.arialyy.aria.core.upload.UTaskWrapper;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -52,10 +52,10 @@ class DBConfig {
   }
 
   static {
-    mapping.put("DownloadGroupTaskEntity", DownloadGroupTaskEntity.class);
+    mapping.put("DGTaskWrapper", DGTaskWrapper.class);
     mapping.put("DownloadGroupEntity", DownloadGroupEntity.class);
-    mapping.put("DownloadTaskEntity", DownloadTaskEntity.class);
-    mapping.put("UploadTaskEntity", UploadTaskEntity.class);
+    mapping.put("DTaskWrapper", DTaskWrapper.class);
+    mapping.put("UTaskWrapper", UTaskWrapper.class);
     mapping.put("DownloadEntity", DownloadEntity.class);
     mapping.put("UploadEntity", UploadEntity.class);
     mapping.put("TaskRecord", TaskRecord.class);

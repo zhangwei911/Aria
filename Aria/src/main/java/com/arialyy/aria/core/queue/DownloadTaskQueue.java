@@ -17,8 +17,8 @@
 package com.arialyy.aria.core.queue;
 
 import com.arialyy.aria.core.AriaManager;
+import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.download.DownloadTask;
-import com.arialyy.aria.core.download.DownloadTaskEntity;
 import com.arialyy.aria.core.inf.TaskSchedulerType;
 import com.arialyy.aria.core.scheduler.DownloadSchedulers;
 import com.arialyy.aria.util.ALog;
@@ -30,7 +30,7 @@ import java.util.Set;
  * Created by lyy on 2016/8/17.
  * 下载任务队列
  */
-public class DownloadTaskQueue extends AbsTaskQueue<DownloadTask, DownloadTaskEntity> {
+public class DownloadTaskQueue extends AbsTaskQueue<DownloadTask, DTaskWrapper> {
   private static final String TAG = "DownloadTaskQueue";
   private static volatile DownloadTaskQueue INSTANCE = null;
 
@@ -97,12 +97,12 @@ public class DownloadTaskQueue extends AbsTaskQueue<DownloadTask, DownloadTaskEn
     }
   }
 
-  @Override public DownloadTask createTask(DownloadTaskEntity entity) {
+  @Override public DownloadTask createTask(DTaskWrapper wrapper) {
     DownloadTask task = null;
-    if (mCachePool.getTask(entity.getEntity().getKey()) == null
-        && mExecutePool.getTask(entity.getEntity().getKey()) == null) {
+    if (mCachePool.getTask(wrapper.getEntity().getKey()) == null
+        && mExecutePool.getTask(wrapper.getEntity().getKey()) == null) {
       task = (DownloadTask) TaskFactory.getInstance()
-          .createTask(entity, DownloadSchedulers.getInstance());
+          .createTask(wrapper, DownloadSchedulers.getInstance());
       mCachePool.putTask(task);
     } else {
       ALog.w(TAG, "任务已存在");

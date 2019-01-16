@@ -18,17 +18,17 @@ package com.arialyy.aria.core.command.normal;
 
 import com.arialyy.aria.core.AriaManager;
 import com.arialyy.aria.core.common.QueueMod;
-import com.arialyy.aria.core.download.DownloadGroupTaskEntity;
-import com.arialyy.aria.core.download.DownloadTaskEntity;
+import com.arialyy.aria.core.download.DGTaskWrapper;
+import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.download.wrapper.DGTEWrapper;
 import com.arialyy.aria.core.download.wrapper.DTEWrapper;
 import com.arialyy.aria.core.inf.AbsTask;
-import com.arialyy.aria.core.inf.AbsTaskEntity;
+import com.arialyy.aria.core.inf.AbsTaskWrapper;
 import com.arialyy.aria.core.inf.IEntity;
 import com.arialyy.aria.core.queue.DownloadGroupTaskQueue;
 import com.arialyy.aria.core.queue.DownloadTaskQueue;
 import com.arialyy.aria.core.queue.UploadTaskQueue;
-import com.arialyy.aria.core.upload.UploadTaskEntity;
+import com.arialyy.aria.core.upload.UTaskWrapper;
 import com.arialyy.aria.core.upload.wrapper.UTEWrapper;
 import com.arialyy.aria.orm.DbEntity;
 import com.arialyy.aria.util.ALog;
@@ -40,7 +40,7 @@ import java.util.List;
 /**
  * Created by lyy on 2016/8/22. 开始命令 队列模型{@link QueueMod#NOW}、{@link QueueMod#WAIT}
  */
-class StartCmd<T extends AbsTaskEntity> extends AbsNormalCmd<T> {
+class StartCmd<T extends AbsTaskWrapper> extends AbsNormalCmd<T> {
 
   StartCmd(T entity, int taskType) {
     super(entity, taskType);
@@ -115,11 +115,11 @@ class StartCmd<T extends AbsTaskEntity> extends AbsNormalCmd<T> {
       }
     }
 
-    private List<AbsTaskEntity> findWaitData(int type) {
-      List<AbsTaskEntity> waitList = new ArrayList<>();
+    private List<AbsTaskWrapper> findWaitData(int type) {
+      List<AbsTaskWrapper> waitList = new ArrayList<>();
       if (type == 1) {
         List<DTEWrapper> wrappers = DbEntity.findRelationData(DTEWrapper.class,
-            "DownloadTaskEntity.isGroupTask=? and DownloadTaskEntity.state=?", "false", "3");
+            "DTaskWrapper.isGroupTask=? and DTaskWrapper.state=?", "false", "3");
         if (wrappers != null && !wrappers.isEmpty()) {
           for (DTEWrapper w : wrappers) {
             waitList.add(w.taskEntity);
@@ -127,7 +127,7 @@ class StartCmd<T extends AbsTaskEntity> extends AbsNormalCmd<T> {
         }
       } else if (type == 2) {
         List<DGTEWrapper> wrappers =
-            DbEntity.findRelationData(DGTEWrapper.class, "DownloadGroupTaskEntity.state=?", "3");
+            DbEntity.findRelationData(DGTEWrapper.class, "DGTaskWrapper.state=?", "3");
         if (wrappers != null && !wrappers.isEmpty()) {
           for (DGTEWrapper w : wrappers) {
             waitList.add(w.taskEntity);
@@ -135,7 +135,7 @@ class StartCmd<T extends AbsTaskEntity> extends AbsNormalCmd<T> {
         }
       } else if (type == 3) {
         List<UTEWrapper> wrappers = DbEntity.findRelationData(UTEWrapper.class,
-            "UploadTaskEntity.state=?", "3");
+            "UTaskWrapper.state=?", "3");
         if (wrappers != null && !wrappers.isEmpty()) {
           for (UTEWrapper w : wrappers) {
             waitList.add(w.taskEntity);
@@ -145,20 +145,20 @@ class StartCmd<T extends AbsTaskEntity> extends AbsNormalCmd<T> {
       return waitList;
     }
 
-    private void handleTask(List<AbsTaskEntity> waitList) {
-      for (AbsTaskEntity te : waitList) {
+    private void handleTask(List<AbsTaskWrapper> waitList) {
+      for (AbsTaskWrapper te : waitList) {
         if (te.getEntity() == null) continue;
         AbsTask task = getTask(te.getEntity());
         if (task != null) continue;
-        if (te instanceof DownloadTaskEntity) {
-          if (te.getRequestType() == AbsTaskEntity.D_FTP
-              || te.getRequestType() == AbsTaskEntity.U_FTP) {
-            te.setUrlEntity(CommonUtil.getFtpUrlInfo(te.getEntity().getKey()));
+        if (te instanceof DTaskWrapper) {
+          if (te.getRequestType() == AbsTaskWrapper.D_FTP
+              || te.getRequestType() == AbsTaskWrapper.U_FTP) {
+            te.asFtp().setUrlEntity(CommonUtil.getFtpUrlInfo(te.getEntity().getKey()));
           }
           mQueue = DownloadTaskQueue.getInstance();
-        } else if (te instanceof UploadTaskEntity) {
+        } else if (te instanceof UTaskWrapper) {
           mQueue = UploadTaskQueue.getInstance();
-        } else if (te instanceof DownloadGroupTaskEntity) {
+        } else if (te instanceof DGTaskWrapper) {
           mQueue = DownloadGroupTaskQueue.getInstance();
         }
         createTask(te);

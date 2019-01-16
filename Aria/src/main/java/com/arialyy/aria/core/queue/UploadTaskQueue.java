@@ -18,15 +18,15 @@ package com.arialyy.aria.core.queue;
 
 import com.arialyy.aria.core.AriaManager;
 import com.arialyy.aria.core.scheduler.UploadSchedulers;
+import com.arialyy.aria.core.upload.UTaskWrapper;
 import com.arialyy.aria.core.upload.UploadTask;
-import com.arialyy.aria.core.upload.UploadTaskEntity;
 import com.arialyy.aria.util.ALog;
 
 /**
  * Created by lyy on 2017/2/27.
  * 上传任务队列
  */
-public class UploadTaskQueue extends AbsTaskQueue<UploadTask, UploadTaskEntity> {
+public class UploadTaskQueue extends AbsTaskQueue<UploadTask, UTaskWrapper> {
   private static final String TAG = "UploadTaskQueue";
   private static volatile UploadTaskQueue INSTANCE = null;
 
@@ -54,12 +54,12 @@ public class UploadTaskQueue extends AbsTaskQueue<UploadTask, UploadTaskEntity> 
     return AriaManager.getInstance(AriaManager.APP).getUploadConfig().getMaxTaskNum();
   }
 
-  @Override public UploadTask createTask(UploadTaskEntity entity) {
+  @Override public UploadTask createTask(UTaskWrapper wrapper) {
     UploadTask task = null;
-    if (mCachePool.getTask(entity.getEntity().getKey()) == null
-        && mExecutePool.getTask(entity.getEntity().getKey()) == null) {
+    if (mCachePool.getTask(wrapper.getEntity().getKey()) == null
+        && mExecutePool.getTask(wrapper.getEntity().getKey()) == null) {
       task = (UploadTask) TaskFactory.getInstance()
-          .createTask(entity, UploadSchedulers.getInstance());
+          .createTask(wrapper, UploadSchedulers.getInstance());
       mCachePool.putTask(task);
     } else {
       ALog.w(TAG, "任务已存在");

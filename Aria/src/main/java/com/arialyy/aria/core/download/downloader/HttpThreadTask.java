@@ -19,14 +19,14 @@ import com.arialyy.aria.core.common.AbsThreadTask;
 import com.arialyy.aria.core.common.RequestEnum;
 import com.arialyy.aria.core.common.StateConstance;
 import com.arialyy.aria.core.common.SubThreadConfig;
+import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.download.DownloadEntity;
-import com.arialyy.aria.core.download.DownloadTaskEntity;
+import com.arialyy.aria.core.common.http.HttpTaskDelegate;
 import com.arialyy.aria.core.inf.IDownloadListener;
 import com.arialyy.aria.exception.AriaIOException;
 import com.arialyy.aria.exception.TaskException;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.BufferedRandomAccessFile;
-import com.arialyy.aria.util.CommonUtil;
 import java.io.BufferedInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -47,13 +47,13 @@ import java.util.Set;
  * Created by lyy on 2017/1/18.
  * 下载线程
  */
-final class HttpThreadTask extends AbsThreadTask<DownloadEntity, DownloadTaskEntity> {
+final class HttpThreadTask extends AbsThreadTask<DownloadEntity, DTaskWrapper> {
   private final String TAG = "HttpThreadTask";
   private boolean isOpenDynamicFile;
   private boolean isBlock;
 
   HttpThreadTask(StateConstance constance, IDownloadListener listener,
-      SubThreadConfig<DownloadTaskEntity> downloadInfo) {
+      SubThreadConfig<DTaskWrapper> downloadInfo) {
     super(constance, listener, downloadInfo);
     mConnectTimeOut = mAridManager.getDownloadConfig().getConnectTimeOut();
     mReadTimeOut = mAridManager.getDownloadConfig().getIOTimeOut();
@@ -75,8 +75,9 @@ final class HttpThreadTask extends AbsThreadTask<DownloadEntity, DownloadTaskEnt
     //当前子线程的下载位置
     mChildCurrentLocation = mConfig.START_LOCATION;
     try {
-      URL url = ConnectionHelp.handleUrl(mConfig.URL, mTaskEntity);
-      conn = ConnectionHelp.handleConnection(url, mTaskEntity);
+      HttpTaskDelegate taskDelegate = mTaskWrapper.asHttp();
+      URL url = ConnectionHelp.handleUrl(mConfig.URL, taskDelegate);
+      conn = ConnectionHelp.handleConnection(url, taskDelegate);
       if (mConfig.SUPPORT_BP) {
         ALog.d(TAG,
             String.format("任务【%s】线程__%s__开始下载【开始位置 : %s，结束位置：%s】", mConfig.TEMP_FILE.getName(),
@@ -86,12 +87,12 @@ final class HttpThreadTask extends AbsThreadTask<DownloadEntity, DownloadTaskEnt
       } else {
         ALog.w(TAG, "该下载不支持断点");
       }
-      conn = ConnectionHelp.setConnectParam(mConfig.TASK_ENTITY, conn);
+      ConnectionHelp.setConnectParam(taskDelegate, conn);
       conn.setConnectTimeout(mConnectTimeOut);
       conn.setReadTimeout(mReadTimeOut);  //设置读取流的等待时间,必须设置该参数
       conn.connect();
-      if (mTaskEntity.getRequestEnum() == RequestEnum.POST) {
-        Map<String, String> params = mTaskEntity.getParams();
+      if (taskDelegate.getRequestEnum() == RequestEnum.POST) {
+        Map<String, String> params = taskDelegate.getParams();
         if (params != null) {
           OutputStreamWriter dos = new OutputStreamWriter(conn.getOutputStream());
           Set<String> keys = params.keySet();
@@ -115,7 +116,7 @@ final class HttpThreadTask extends AbsThreadTask<DownloadEntity, DownloadTaskEnt
         file = new BufferedRandomAccessFile(mConfig.TEMP_FILE, "rwd", mBufSize);
         //设置每条线程写入文件的位置
         file.seek(mConfig.START_LOCATION);
-        if (mTaskEntity.isChunked()) {
+        if (taskDelegate.isChunked()) {
           readChunk(is, file);
         } else {
           readNormal(is, file);

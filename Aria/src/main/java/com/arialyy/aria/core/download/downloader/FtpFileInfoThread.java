@@ -19,8 +19,8 @@ import aria.apache.commons.net.ftp.FTPFile;
 import com.arialyy.aria.core.common.CompleteInfo;
 import com.arialyy.aria.core.common.OnFileInfoCallback;
 import com.arialyy.aria.core.common.ftp.AbsFtpInfoThread;
+import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.download.DownloadEntity;
-import com.arialyy.aria.core.download.DownloadTaskEntity;
 import com.arialyy.aria.exception.AriaIOException;
 import com.arialyy.aria.util.CommonUtil;
 
@@ -28,10 +28,10 @@ import com.arialyy.aria.util.CommonUtil;
  * Created by Aria.Lao on 2017/7/25.
  * 获取ftp文件信息
  */
-class FtpFileInfoThread extends AbsFtpInfoThread<DownloadEntity, DownloadTaskEntity> {
+class FtpFileInfoThread extends AbsFtpInfoThread<DownloadEntity, DTaskWrapper> {
   private final String TAG = "FtpFileInfoThread";
 
-  FtpFileInfoThread(DownloadTaskEntity taskEntity, OnFileInfoCallback callback) {
+  FtpFileInfoThread(DTaskWrapper taskEntity, OnFileInfoCallback callback) {
     super(taskEntity, callback);
   }
 
@@ -46,13 +46,13 @@ class FtpFileInfoThread extends AbsFtpInfoThread<DownloadEntity, DownloadTaskEnt
   }
 
   @Override protected String setRemotePath() {
-    return mTaskEntity.getUrlEntity().remotePath;
+    return mTaskWrapper.asFtp().getUrlEntity().remotePath;
   }
 
   @Override protected void onPreComplete(int code) {
     super.onPreComplete(code);
-    if (mSize != mTaskEntity.getEntity().getFileSize()) {
-      mTaskEntity.setNewTask(true);
+    if (mSize != mTaskWrapper.getEntity().getFileSize()) {
+      mTaskWrapper.setNewTask(true);
     }
     mEntity.setFileSize(mSize);
     mCallback.onComplete(mEntity.getUrl(), new CompleteInfo(code));

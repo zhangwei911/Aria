@@ -30,15 +30,15 @@ import com.arialyy.aria.core.command.ICmd;
 import com.arialyy.aria.core.common.QueueMod;
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.download.DownloadGroupEntity;
-import com.arialyy.aria.core.download.DownloadGroupTaskEntity;
+import com.arialyy.aria.core.download.DGTaskWrapper;
 import com.arialyy.aria.core.download.DownloadReceiver;
-import com.arialyy.aria.core.download.DownloadTaskEntity;
+import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.inf.AbsReceiver;
 import com.arialyy.aria.core.inf.IReceiver;
 import com.arialyy.aria.core.inf.ReceiverType;
 import com.arialyy.aria.core.upload.UploadEntity;
 import com.arialyy.aria.core.upload.UploadReceiver;
-import com.arialyy.aria.core.upload.UploadTaskEntity;
+import com.arialyy.aria.core.upload.UTaskWrapper;
 import com.arialyy.aria.orm.DbEntity;
 import com.arialyy.aria.orm.DelegateWrapper;
 import com.arialyy.aria.util.ALog;
@@ -128,7 +128,7 @@ import org.xml.sax.SAXException;
   private void amendTaskState() {
     Class[] clazzs = new Class[] {
         DownloadEntity.class, UploadEntity.class, DownloadGroupEntity.class,
-        DownloadTaskEntity.class, UploadTaskEntity.class, DownloadGroupTaskEntity.class
+        DTaskWrapper.class, UTaskWrapper.class, DGTaskWrapper.class
     };
     String sql = "UPDATE %s SET state=2 WHERE state IN (3,4,5,6)";
     for (Class clazz : clazzs) {

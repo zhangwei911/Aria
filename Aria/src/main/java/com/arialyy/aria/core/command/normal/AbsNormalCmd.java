@@ -18,25 +18,25 @@ package com.arialyy.aria.core.command.normal;
 
 import com.arialyy.aria.core.command.AbsCmd;
 import com.arialyy.aria.core.command.ICmd;
-import com.arialyy.aria.core.download.DownloadGroupTaskEntity;
-import com.arialyy.aria.core.download.DownloadTaskEntity;
+import com.arialyy.aria.core.download.DGTaskWrapper;
+import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.inf.AbsEntity;
 import com.arialyy.aria.core.inf.AbsTask;
-import com.arialyy.aria.core.inf.AbsTaskEntity;
+import com.arialyy.aria.core.inf.AbsTaskWrapper;
 import com.arialyy.aria.core.inf.IEntity;
 import com.arialyy.aria.core.manager.TEManager;
 import com.arialyy.aria.core.queue.DownloadGroupTaskQueue;
 import com.arialyy.aria.core.queue.DownloadTaskQueue;
 import com.arialyy.aria.core.queue.UploadTaskQueue;
 import com.arialyy.aria.core.scheduler.ISchedulers;
-import com.arialyy.aria.core.upload.UploadTaskEntity;
+import com.arialyy.aria.core.upload.UTaskWrapper;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
 
 /**
  * Created by lyy on 2016/8/22. 下载命令
  */
-public abstract class AbsNormalCmd<T extends AbsTaskEntity> extends AbsCmd<T> {
+public abstract class AbsNormalCmd<T extends AbsTaskWrapper> extends AbsCmd<T> {
   /**
    * 能否执行命令
    */
@@ -51,22 +51,22 @@ public abstract class AbsNormalCmd<T extends AbsTaskEntity> extends AbsCmd<T> {
    */
   AbsNormalCmd(T entity, int taskType) {
     this.taskType = taskType;
-    mTaskEntity = entity;
+    mTaskWrapper = entity;
     TAG = CommonUtil.getClassName(this);
     if (taskType == ICmd.TASK_TYPE_DOWNLOAD) {
-      if (!(entity instanceof DownloadTaskEntity)) {
+      if (!(entity instanceof DTaskWrapper)) {
         ALog.e(TAG, "任务类型错误，任务类型应该为ICM.TASK_TYPE_DOWNLOAD");
         return;
       }
       mQueue = DownloadTaskQueue.getInstance();
     } else if (taskType == ICmd.TASK_TYPE_DOWNLOAD_GROUP) {
-      if (!(entity instanceof DownloadGroupTaskEntity)) {
+      if (!(entity instanceof DGTaskWrapper)) {
         ALog.e(TAG, "任务类型错误，任务类型应该为ICM.TASK_TYPE_DOWNLOAD_GROUP");
         return;
       }
       mQueue = DownloadGroupTaskQueue.getInstance();
     } else if (taskType == ICmd.TASK_TYPE_UPLOAD) {
-      if (!(entity instanceof UploadTaskEntity)) {
+      if (!(entity instanceof UTaskWrapper)) {
         ALog.e(TAG, "任务类型错误，任务类型应该为ICM.TASK_TYPE_UPLOAD");
         return;
       }
@@ -92,9 +92,8 @@ public abstract class AbsNormalCmd<T extends AbsTaskEntity> extends AbsCmd<T> {
    */
   void sendWaitState(AbsTask task) {
     if (task != null) {
-      task.getTaskEntity().getEntity().setState(IEntity.STATE_WAIT);
-      task.getTaskEntity().setState(IEntity.STATE_WAIT);
-      task.getTaskEntity().update();
+      task.getTaskWrapper().getEntity().setState(IEntity.STATE_WAIT);
+      task.getTaskWrapper().setState(IEntity.STATE_WAIT);
       task.getOutHandler().obtainMessage(ISchedulers.WAIT, task).sendToTarget();
     }
   }
@@ -125,7 +124,7 @@ public abstract class AbsNormalCmd<T extends AbsTaskEntity> extends AbsCmd<T> {
   /**
    * 删除任务
    */
-  void removeTask(AbsTaskEntity taskEntity) {
+  void removeTask(AbsTaskWrapper taskEntity) {
     AbsTask tempTask = getTask(taskEntity.getEntity());
     if (tempTask == null) {
       tempTask = createTask(taskEntity);
@@ -162,7 +161,7 @@ public abstract class AbsNormalCmd<T extends AbsTaskEntity> extends AbsCmd<T> {
    * @return 执行任务
    */
   AbsTask getTask() {
-    tempTask = mQueue.getTask(mTaskEntity.getEntity().getKey());
+    tempTask = mQueue.getTask(mTaskWrapper.getEntity().getKey());
     return tempTask;
   }
 
@@ -182,7 +181,7 @@ public abstract class AbsNormalCmd<T extends AbsTaskEntity> extends AbsCmd<T> {
    * @return 创建的任务
    */
   AbsTask createTask() {
-    tempTask = mQueue.createTask(mTaskEntity);
+    tempTask = mQueue.createTask(mTaskWrapper);
     return tempTask;
   }
 
@@ -192,7 +191,7 @@ public abstract class AbsNormalCmd<T extends AbsTaskEntity> extends AbsCmd<T> {
    * @param taskEntity 特定的任务实体
    * @return 创建的任务
    */
-  AbsTask createTask(AbsTaskEntity taskEntity) {
+  AbsTask createTask(AbsTaskWrapper taskEntity) {
     TEManager.getInstance().addTEntity(taskEntity);
     return mQueue.createTask(taskEntity);
   }

@@ -16,8 +16,8 @@
 package com.arialyy.aria.core.inf;
 
 /**
- * Created by Aria.Lao on 2017/10/12.
- * 当任务实体
+ * 任务信息
  */
-public abstract class AbsNormalTaskEntity<ENTITY extends AbsEntity> extends AbsTaskEntity<ENTITY> {
+public interface ITaskDelegate {
+
 }

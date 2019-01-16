@@ -19,17 +19,14 @@ import android.text.TextUtils;
 import com.arialyy.aria.core.AriaManager;
 import com.arialyy.aria.core.common.ProtocolType;
 import com.arialyy.aria.core.common.RequestEnum;
-import com.arialyy.aria.core.download.DownloadTaskEntity;
-import com.arialyy.aria.core.inf.AbsTaskEntity;
+import com.arialyy.aria.core.common.http.HttpTaskDelegate;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
 import com.arialyy.aria.util.SSLContextUtil;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStreamWriter;
 import java.net.CookieManager;
 import java.net.CookieStore;
-import java.net.HttpCookie;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
@@ -55,9 +52,9 @@ class ConnectionHelp {
    *
    * @throws MalformedURLException
    */
-  static URL handleUrl(String url, AbsTaskEntity taskEntity) throws MalformedURLException {
-    Map<String, String> params = taskEntity.getParams();
-    if (params != null && taskEntity.getRequestEnum() == RequestEnum.GET) {
+  static URL handleUrl(String url, HttpTaskDelegate taskDelegate) throws MalformedURLException {
+    Map<String, String> params = taskDelegate.getParams();
+    if (params != null && taskDelegate.getRequestEnum() == RequestEnum.GET) {
       if (url.contains("?")) {
         ALog.e(TAG, String.format("设置参数失败，url中已经有?，url: %s", url));
         return new URL(CommonUtil.convertUrl(url));
@@ -101,11 +98,12 @@ class ConnectionHelp {
    *
    * @throws IOException
    */
-  static HttpURLConnection handleConnection(URL url, AbsTaskEntity taskEntity) throws IOException {
+  static HttpURLConnection handleConnection(URL url, HttpTaskDelegate taskDelegate)
+      throws IOException {
     HttpURLConnection conn;
     URLConnection urlConn;
-    if (taskEntity.getProxy() != null) {
-      urlConn = url.openConnection(taskEntity.getProxy());
+    if (taskDelegate.getProxy() != null) {
+      urlConn = url.openConnection(taskDelegate.getProxy());
     } else {
       urlConn = url.openConnection();
     }
@@ -132,17 +130,17 @@ class ConnectionHelp {
    *
    * @throws ProtocolException
    */
-  static HttpURLConnection setConnectParam(DownloadTaskEntity entity, HttpURLConnection conn) {
-    if (entity.getRequestEnum() == RequestEnum.POST) {
+  static HttpURLConnection setConnectParam(HttpTaskDelegate delegate, HttpURLConnection conn) {
+    if (delegate.getRequestEnum() == RequestEnum.POST) {
       conn.setDoInput(true);
       conn.setDoOutput(true);
       conn.setUseCaches(false);
     }
     Set<String> keys = null;
-    if (entity.getHeaders() != null && entity.getHeaders().size() > 0) {
-      keys = entity.getHeaders().keySet();
+    if (delegate.getHeaders() != null && delegate.getHeaders().size() > 0) {
+      keys = delegate.getHeaders().keySet();
       for (String key : keys) {
-        conn.setRequestProperty(key, entity.getHeaders().get(key));
+        conn.setRequestProperty(key, delegate.getHeaders().get(key));
       }
     }
     if (conn.getRequestProperty("Accept-Language") == null) {
@@ -190,7 +188,7 @@ class ConnectionHelp {
     //302获取重定向地址
     conn.setInstanceFollowRedirects(false);
 
-    CookieManager manager = entity.getCookieManager();
+    CookieManager manager = delegate.getCookieManager();
     if (manager != null) {
       CookieStore store = manager.getCookieStore();
       if (store != null && store.getCookies().size() > 0) {

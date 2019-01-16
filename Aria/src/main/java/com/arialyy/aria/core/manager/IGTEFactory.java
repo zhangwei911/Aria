@@ -16,14 +16,14 @@
 package com.arialyy.aria.core.manager;
 
 import com.arialyy.aria.core.inf.AbsEntity;
-import com.arialyy.aria.core.inf.AbsTaskEntity;
+import com.arialyy.aria.core.inf.AbsTaskWrapper;
 import java.util.List;
 
 /**
  * 任务组通过组创建任务
  * Created by Aria.Lao on 2017/11/1.
  */
-interface IGTEFactory<ENTITY extends AbsEntity, TASK_ENTITY extends AbsTaskEntity<ENTITY>> {
+interface IGTEFactory<ENTITY extends AbsEntity, TASK_ENTITY extends AbsTaskWrapper<ENTITY>> {
 
   /**
    * 获取任务组的任务实体，

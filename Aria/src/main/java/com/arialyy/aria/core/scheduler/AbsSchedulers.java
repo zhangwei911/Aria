@@ -25,7 +25,7 @@ import com.arialyy.aria.core.download.DownloadTask;
 import com.arialyy.aria.core.inf.AbsEntity;
 import com.arialyy.aria.core.inf.AbsNormalEntity;
 import com.arialyy.aria.core.inf.AbsTask;
-import com.arialyy.aria.core.inf.AbsTaskEntity;
+import com.arialyy.aria.core.inf.AbsTaskWrapper;
 import com.arialyy.aria.core.inf.GroupSendParams;
 import com.arialyy.aria.core.inf.IEntity;
 import com.arialyy.aria.core.inf.ITask;
@@ -43,7 +43,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * Created by lyy on 2017/6/4. 事件调度器，用于处理任务状态的调度
  */
-abstract class AbsSchedulers<TASK_ENTITY extends AbsTaskEntity, TASK extends AbsTask,
+abstract class AbsSchedulers<TASK_ENTITY extends AbsTaskWrapper, TASK extends AbsTask,
     QUEUE extends ITaskQueue<TASK, TASK_ENTITY>> implements ISchedulers<TASK> {
   private final String TAG = "AbsSchedulers";
 
@@ -202,7 +202,7 @@ abstract class AbsSchedulers<TASK_ENTITY extends AbsTaskEntity, TASK extends Abs
       TEManager.getInstance().removeTEntity(task.getKey());
     } else {
       if (what != RUNNING) {
-        TEManager.getInstance().putTEntity(task.getKey(), task.getTaskEntity());
+        TEManager.getInstance().putTEntity(task.getKey(), task.getTaskWrapper());
       }
     }
     if (what != FAIL) {
@@ -278,13 +278,13 @@ abstract class AbsSchedulers<TASK_ENTITY extends AbsTaskEntity, TASK extends Abs
       boolean canSend = manager.getDownloadConfig().isUseBroadcast();
       if (canSend) {
         AriaManager.APP.sendBroadcast(
-            createData(state, task.getTaskType(), task.getTaskEntity().getEntity()));
+            createData(state, task.getTaskType(), task.getTaskWrapper().getEntity()));
       }
     } else if (task.getTaskType() == ITask.UPLOAD) {
       boolean canSend = manager.getUploadConfig().isUseBroadcast();
       if (canSend) {
         AriaManager.APP.sendBroadcast(
-            createData(state, task.getTaskType(), task.getTaskEntity().getEntity()));
+            createData(state, task.getTaskType(), task.getTaskWrapper().getEntity()));
       }
     } else {
       ALog.w(TAG, "发送广播失败，没有对应的任务");
@@ -337,7 +337,7 @@ abstract class AbsSchedulers<TASK_ENTITY extends AbsTaskEntity, TASK extends Abs
 
     final int reTryNum = num;
     if ((!NetUtils.isConnected(AriaManager.APP) && !isNotNetRetry)
-        || task.getTaskEntity().getEntity().getFailNum() > reTryNum) {
+        || task.getTaskWrapper().getEntity().getFailNum() > reTryNum) {
       mQueue.removeTaskFormQueue(task.getKey());
       startNextTask(task);
       TEManager.getInstance().removeTEntity(task.getKey());
@@ -351,7 +351,7 @@ abstract class AbsSchedulers<TASK_ENTITY extends AbsTaskEntity, TASK extends Abs
       }
 
       @Override public void onFinish() {
-        AbsEntity entity = task.getTaskEntity().getEntity();
+        AbsEntity entity = task.getTaskWrapper().getEntity();
         if (entity.getFailNum() <= reTryNum) {
           ALog.d(TAG, String.format("任务【%s】开始重试", task.getTaskName()));
           TASK task = mQueue.getTask(entity.getKey());

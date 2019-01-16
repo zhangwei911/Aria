@@ -15,8 +15,8 @@
  */
 package com.arialyy.aria.core.upload.wrapper;
 
+import com.arialyy.aria.core.upload.UTaskWrapper;
 import com.arialyy.aria.core.upload.UploadEntity;
-import com.arialyy.aria.core.upload.UploadTaskEntity;
 import com.arialyy.aria.orm.AbsWrapper;
 import com.arialyy.aria.orm.annotation.Many;
 import com.arialyy.aria.orm.annotation.One;
@@ -33,9 +33,9 @@ public class UTEWrapper extends AbsWrapper {
   public UploadEntity entity;
 
   @Many(parentColumn = "filePath", entityColumn = "key")
-  private List<UploadTaskEntity> taskEntitys = null;
+  private List<UTaskWrapper> taskEntitys = null;
 
-  public UploadTaskEntity taskEntity;
+  public UTaskWrapper taskEntity;
 
   @Override public void handleConvert() {
     //taskEntity.entity = (tEntity == null || tEntity.isEmpty()) ? null : tEntity.get(0);

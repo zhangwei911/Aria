@@ -18,7 +18,7 @@ package com.arialyy.aria.core.inf;
 /**
  * Created by lyy on 2017/2/13.
  */
-public interface ITask<TASK_ENTITY extends AbsTaskEntity> {
+public interface ITask<TASK_WRAPPER extends AbsTaskWrapper> {
 
   /**
    * 普通下载任务
@@ -68,7 +68,7 @@ public interface ITask<TASK_ENTITY extends AbsTaskEntity> {
   /**
    * 获取信息实体
    */
-  TASK_ENTITY getTaskEntity();
+  TASK_WRAPPER getTaskWrapper();
 
   void start();
 

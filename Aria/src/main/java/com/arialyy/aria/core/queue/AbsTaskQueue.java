@@ -17,7 +17,7 @@
 package com.arialyy.aria.core.queue;
 
 import com.arialyy.aria.core.inf.AbsTask;
-import com.arialyy.aria.core.inf.AbsTaskEntity;
+import com.arialyy.aria.core.inf.AbsTaskWrapper;
 import com.arialyy.aria.core.inf.IEntity;
 import com.arialyy.aria.core.inf.TaskSchedulerType;
 import com.arialyy.aria.core.queue.pool.BaseCachePool;
@@ -31,7 +31,7 @@ import java.util.Set;
 /**
  * Created by lyy on 2017/2/23. 任务队列
  */
-abstract class AbsTaskQueue<TASK extends AbsTask, TASK_ENTITY extends AbsTaskEntity>
+abstract class AbsTaskQueue<TASK extends AbsTask, TASK_ENTITY extends AbsTaskWrapper>
     implements ITaskQueue<TASK, TASK_ENTITY> {
   final int TYPE_D_QUEUE = 1;
   final int TYPE_DG_QUEUE = 2;
@@ -68,7 +68,7 @@ abstract class AbsTaskQueue<TASK extends AbsTask, TASK_ENTITY extends AbsTaskEnt
    */
   @Override public void resumeTask(TASK task) {
     if (mExecutePool.size() >= getMaxTaskNum()) {
-      task.getTaskEntity().getEntity().setState(IEntity.STATE_WAIT);
+      task.getTaskWrapper().getEntity().setState(IEntity.STATE_WAIT);
       mCachePool.putTaskToFirst(task);
       stopTask(mExecutePool.pollTask());
     } else {
@@ -188,7 +188,7 @@ abstract class AbsTaskQueue<TASK extends AbsTask, TASK_ENTITY extends AbsTaskEnt
   @Override public void startTask(TASK task) {
     if (mExecutePool.putTask(task)) {
       mCachePool.removeTask(task);
-      task.getTaskEntity().getEntity().setFailNum(0);
+      task.getTaskWrapper().getEntity().setFailNum(0);
       task.start();
     }
   }

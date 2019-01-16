@@ -20,9 +20,9 @@ import android.util.SparseArray;
 import com.arialyy.aria.core.AriaManager;
 import com.arialyy.aria.core.download.BaseDListener;
 import com.arialyy.aria.core.download.DownloadEntity;
-import com.arialyy.aria.core.download.DownloadTaskEntity;
+import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.inf.AbsNormalEntity;
-import com.arialyy.aria.core.inf.AbsTaskEntity;
+import com.arialyy.aria.core.inf.AbsTaskWrapper;
 import com.arialyy.aria.core.inf.IEventListener;
 import com.arialyy.aria.core.manager.ThreadTaskManager;
 import com.arialyy.aria.orm.DbEntity;
@@ -41,7 +41,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Created by AriaL on 2017/7/1. 任务处理器
  */
-public abstract class AbsFileer<ENTITY extends AbsNormalEntity, TASK_ENTITY extends AbsTaskEntity<ENTITY>>
+public abstract class AbsFileer<ENTITY extends AbsNormalEntity, TASK_ENTITY extends AbsTaskWrapper<ENTITY>>
     implements Runnable {
   private static final String STATE = "_state_";
   private static final String RECORD = "_record_";
@@ -140,7 +140,7 @@ public abstract class AbsFileer<ENTITY extends AbsNormalEntity, TASK_ENTITY exte
     mConstance.START_THREAD_NUM = mTotalThreadNum;
 
     // 处理分块和动态文件参数
-    if (mTaskEntity.isNewTask() && mTaskEntity instanceof DownloadTaskEntity) {
+    if (mTaskEntity.isNewTask() && mTaskEntity instanceof DTaskWrapper) {
       AriaManager manager = AriaManager.getInstance(AriaManager.APP);
       mRecord.isBlock = mTotalThreadNum > 1 && manager.getDownloadConfig().isUseBlock();
       // 线程数不等1并且没有使用块下载，则认为没有使用动态文件
@@ -148,7 +148,7 @@ public abstract class AbsFileer<ENTITY extends AbsNormalEntity, TASK_ENTITY exte
     }
 
     /*
-     * mTaskEntity.getEntity().getFileSize() != mTempFile.length()为兼容以前老版本代码
+     * mTaskWrapper.getEntity().getFileSize() != mTempFile.length()为兼容以前老版本代码
      * 动态长度条件：
      * 1、总线程数为1，并且是新任务
      * 2、总线程数为1，不是新任务，但是长度不是文件全长度

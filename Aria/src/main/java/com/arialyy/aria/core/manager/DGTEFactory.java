@@ -15,10 +15,10 @@
  */
 package com.arialyy.aria.core.manager;
 
+import com.arialyy.aria.core.download.DGTaskWrapper;
+import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.download.DownloadGroupEntity;
-import com.arialyy.aria.core.download.DownloadGroupTaskEntity;
-import com.arialyy.aria.core.download.DownloadTaskEntity;
 import com.arialyy.aria.core.download.wrapper.DGEWrapper;
 import com.arialyy.aria.core.download.wrapper.DGTEWrapper;
 import com.arialyy.aria.orm.DbEntity;
@@ -31,7 +31,7 @@ import java.util.List;
  * Created by Aria.Lao on 2017/11/1.
  * 任务实体工厂
  */
-class DGTEFactory implements IGTEFactory<DownloadGroupEntity, DownloadGroupTaskEntity> {
+class DGTEFactory implements IGTEFactory<DownloadGroupEntity, DGTaskWrapper> {
   private static final String TAG = "DTEFactory";
   private static volatile DGTEFactory INSTANCE = null;
 
@@ -47,39 +47,39 @@ class DGTEFactory implements IGTEFactory<DownloadGroupEntity, DownloadGroupTaskE
     return INSTANCE;
   }
 
-  @Override public DownloadGroupTaskEntity getGTE(String groupName, List<String> urls) {
+  @Override public DGTaskWrapper getGTE(String groupName, List<String> urls) {
     DownloadGroupEntity entity = createDGroupEntity(groupName, urls);
     List<DGTEWrapper> wrapper =
-        DbEntity.findRelationData(DGTEWrapper.class, "DownloadGroupTaskEntity.key=?",
+        DbEntity.findRelationData(DGTEWrapper.class, "DGTaskWrapper.key=?",
             entity.getGroupName());
-    DownloadGroupTaskEntity gte;
+    DGTaskWrapper gte;
 
     if (wrapper != null && !wrapper.isEmpty()) {
       gte = wrapper.get(0).taskEntity;
       if (gte == null) {
         // 创建新的任务组任务实体
-        gte = new DownloadGroupTaskEntity();
+        gte = new DGTaskWrapper();
       }
     } else {
-      gte = new DownloadGroupTaskEntity();
+      gte = new DGTaskWrapper();
     }
-    gte.setSubTaskEntities(createDGSubTaskEntity(entity));
+    gte.setSubTaskWrapper(createDGSubTaskEntity(entity));
     gte.setKey(entity.getGroupName());
     gte.setEntity(entity);
 
     return gte;
   }
 
-  @Override public DownloadGroupTaskEntity getFTE(String ftpUrl) {
+  @Override public DGTaskWrapper getFTE(String ftpUrl) {
     List<DGTEWrapper> wrapper =
-        DbEntity.findRelationData(DGTEWrapper.class, "DownloadGroupTaskEntity.key=?",
+        DbEntity.findRelationData(DGTEWrapper.class, "DGTaskWrapper.key=?",
             ftpUrl);
-    DownloadGroupTaskEntity fte;
+    DGTaskWrapper fte;
 
     if (wrapper != null && !wrapper.isEmpty()) {
       fte = wrapper.get(0).taskEntity;
       if (fte == null) {
-        fte = new DownloadGroupTaskEntity();
+        fte = new DGTaskWrapper();
         DownloadGroupEntity dge = new DownloadGroupEntity();
         dge.setGroupName(ftpUrl);
         fte.setEntity(dge);
@@ -89,19 +89,19 @@ class DGTEFactory implements IGTEFactory<DownloadGroupEntity, DownloadGroupTaskE
         fte.setEntity(dge);
       }
     } else {
-      fte = new DownloadGroupTaskEntity();
+      fte = new DGTaskWrapper();
       DownloadGroupEntity dge = new DownloadGroupEntity();
       dge.setGroupName(ftpUrl);
       fte.setEntity(dge);
     }
     fte.setKey(ftpUrl);
-    fte.setUrlEntity(CommonUtil.getFtpUrlInfo(ftpUrl));
+    fte.asFtp().setUrlEntity(CommonUtil.getFtpUrlInfo(ftpUrl));
 
     if (fte.getEntity().getSubEntities() == null) {
       fte.getEntity().setSubEntities(new ArrayList<DownloadEntity>());
     }
-    if (fte.getSubTaskEntities() == null) {
-      fte.setSubTaskEntities(new ArrayList<DownloadTaskEntity>());
+    if (fte.getSubTaskWrapper() == null) {
+      fte.setSubTaskWrapper(new ArrayList<DTaskWrapper>());
     }
     return fte;
   }
@@ -109,10 +109,10 @@ class DGTEFactory implements IGTEFactory<DownloadGroupEntity, DownloadGroupTaskE
   /**
    * 创建任务组子任务的任务实体
    */
-  private List<DownloadTaskEntity> createDGSubTaskEntity(DownloadGroupEntity dge) {
-    List<DownloadTaskEntity> list = new ArrayList<>();
+  private List<DTaskWrapper> createDGSubTaskEntity(DownloadGroupEntity dge) {
+    List<DTaskWrapper> list = new ArrayList<>();
     for (DownloadEntity entity : dge.getSubEntities()) {
-      DownloadTaskEntity taskEntity = new DownloadTaskEntity();
+      DTaskWrapper taskEntity = new DTaskWrapper();
       taskEntity.setEntity(entity);
       taskEntity.setKey(entity.getDownloadPath());
       taskEntity.setGroupName(dge.getKey());

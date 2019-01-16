@@ -20,8 +20,8 @@ import com.arialyy.aria.core.common.AbsFileer;
 import com.arialyy.aria.core.common.AbsThreadTask;
 import com.arialyy.aria.core.common.SubThreadConfig;
 import com.arialyy.aria.core.download.DownloadEntity;
-import com.arialyy.aria.core.download.DownloadTaskEntity;
-import com.arialyy.aria.core.inf.AbsTaskEntity;
+import com.arialyy.aria.core.download.DTaskWrapper;
+import com.arialyy.aria.core.inf.AbsTaskWrapper;
 import com.arialyy.aria.core.inf.IDownloadListener;
 import com.arialyy.aria.exception.BaseException;
 import com.arialyy.aria.exception.TaskException;
@@ -33,10 +33,10 @@ import java.io.IOException;
  * Created by AriaL on 2017/7/1.
  * 文件下载器
  */
-class Downloader extends AbsFileer<DownloadEntity, DownloadTaskEntity> {
+class Downloader extends AbsFileer<DownloadEntity, DTaskWrapper> {
   private String TAG = "Downloader";
 
-  Downloader(IDownloadListener listener, DownloadTaskEntity taskEntity) {
+  Downloader(IDownloadListener listener, DTaskWrapper taskEntity) {
     super(listener, taskEntity);
     mTempFile = new File(mEntity.getDownloadPath());
     AriaManager manager = AriaManager.getInstance(AriaManager.APP);
@@ -48,8 +48,8 @@ class Downloader extends AbsFileer<DownloadEntity, DownloadTaskEntity> {
     return
         // 小于1m的文件或是任务组的子任务、使用虚拟文件，线程数都是1
         mEntity.getFileSize() <= SUB_LEN
-            || mTaskEntity.getRequestType() == AbsTaskEntity.D_FTP_DIR
-            || mTaskEntity.getRequestType() == AbsTaskEntity.DG_HTTP
+            || mTaskEntity.getRequestType() == AbsTaskWrapper.D_FTP_DIR
+            || mTaskEntity.getRequestType() == AbsTaskWrapper.DG_HTTP
             || threadNum == 1
             ? 1
             : threadNum;
@@ -95,12 +95,12 @@ class Downloader extends AbsFileer<DownloadEntity, DownloadTaskEntity> {
     }
   }
 
-  @Override protected AbsThreadTask selectThreadTask(SubThreadConfig<DownloadTaskEntity> config) {
+  @Override protected AbsThreadTask selectThreadTask(SubThreadConfig<DTaskWrapper> config) {
     switch (mTaskEntity.getRequestType()) {
-      case AbsTaskEntity.D_FTP:
-      case AbsTaskEntity.D_FTP_DIR:
+      case AbsTaskWrapper.D_FTP:
+      case AbsTaskWrapper.D_FTP_DIR:
         return new FtpThreadTask(mConstance, (IDownloadListener) mListener, config);
-      case AbsTaskEntity.D_HTTP:
+      case AbsTaskWrapper.D_HTTP:
         return new HttpThreadTask(mConstance, (IDownloadListener) mListener, config);
     }
     return null;

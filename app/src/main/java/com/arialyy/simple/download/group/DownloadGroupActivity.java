@@ -25,7 +25,7 @@ import com.arialyy.aria.core.Aria;
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.download.DownloadGroupEntity;
 import com.arialyy.aria.core.download.DownloadGroupTask;
-import com.arialyy.aria.core.download.DownloadGroupTaskEntity;
+import com.arialyy.aria.core.download.DGTaskWrapper;
 import com.arialyy.frame.util.show.L;
 import com.arialyy.frame.util.show.T;
 import com.arialyy.simple.R;
@@ -48,7 +48,7 @@ public class DownloadGroupActivity extends BaseActivity<ActivityDownloadGroupBin
     Aria.download(this).register();
     setTitle("任务组");
     mUrls = getModule(GroupModule.class).getUrls();
-    DownloadGroupTaskEntity entity = Aria.download(this).getGroupTask(mUrls);
+    DGTaskWrapper entity = Aria.download(this).getGroupTask(mUrls);
     if (entity != null && entity.getEntity() != null) {
       DownloadGroupEntity groupEntity = entity.getEntity();
       mChildList.addData(groupEntity.getSubEntities());
@@ -183,7 +183,7 @@ public class DownloadGroupActivity extends BaseActivity<ActivityDownloadGroupBin
     //Log.e(TAG, "gHash = "
     //    + groupTask.getEntity().getSubEntities().get(0).hashCode()
     //    + "; subHash = "
-    //    + groupTask.getTaskEntity().getSubTaskEntities().get(0).getEntity().hashCode() +
+    //    + groupTask.getTaskWrapper().getSubTaskEntities().get(0).getEntity().hashCode() +
     //    "; subHash = " + subEntity.hashCode());
     //int percent = subEntity.getPercent();
     ////如果你打开了速度单位转换配置，将可以通过以下方法获取带单位的下载速度，如：1 mb/s

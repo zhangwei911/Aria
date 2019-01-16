@@ -15,38 +15,24 @@
  */
 package com.arialyy.aria.core.download;
 
-import com.arialyy.aria.core.inf.AbsNormalTaskEntity;
-import com.arialyy.aria.orm.ActionPolicy;
-import com.arialyy.aria.orm.annotation.Foreign;
-import com.arialyy.aria.orm.annotation.Ignore;
-import com.arialyy.aria.orm.annotation.NoNull;
-import com.arialyy.aria.orm.annotation.Primary;
-import java.util.Map;
+import com.arialyy.aria.core.inf.AbsTaskWrapper;
 
 /**
- * Created by lyy on 2017/1/23.
- * 下载任务实体和下载实体为一对一关系，下载实体删除，任务实体自动删除
+ * Created by lyy on 2017/1/23. 下载任务实体和下载实体为一对一关系，下载实体删除，任务实体自动删除
  */
-public class DownloadTaskEntity extends AbsNormalTaskEntity<DownloadEntity> {
+public class DTaskWrapper extends AbsTaskWrapper<DownloadEntity> {
 
-  @Ignore private DownloadEntity entity;
+  private DownloadEntity entity;
 
   /**
    * 任务的url
    */
-  @NoNull private String url;
+  private String url;
 
   /**
    * 所属的任务组组名，如果不属于任务组，则为null
    */
-  @Foreign(parent = DownloadGroupTaskEntity.class, column = "key",
-      onUpdate = ActionPolicy.CASCADE, onDelete = ActionPolicy.CASCADE)
   private String groupName;
-
-  /**
-   * 是否是chunk模式
-   */
-  private boolean isChunked = false;
 
   /**
    * 该任务是否属于任务组
@@ -56,12 +42,9 @@ public class DownloadTaskEntity extends AbsNormalTaskEntity<DownloadEntity> {
   /**
    * Task实体对应的key
    */
-  @Primary
-  @Foreign(parent = DownloadEntity.class, column = "downloadPath",
-      onUpdate = ActionPolicy.CASCADE, onDelete = ActionPolicy.CASCADE)
   private String key;
 
-  public DownloadTaskEntity() {
+  public DTaskWrapper() {
   }
 
   @Override public DownloadEntity getEntity() {
@@ -84,10 +67,6 @@ public class DownloadTaskEntity extends AbsNormalTaskEntity<DownloadEntity> {
     return groupName;
   }
 
-  public boolean isChunked() {
-    return isChunked;
-  }
-
   public boolean isGroupTask() {
     return isGroupTask;
   }
@@ -102,10 +81,6 @@ public class DownloadTaskEntity extends AbsNormalTaskEntity<DownloadEntity> {
 
   public void setGroupName(String groupName) {
     this.groupName = groupName;
-  }
-
-  public void setChunked(boolean chunked) {
-    isChunked = chunked;
   }
 
   public void setGroupTask(boolean groupTask) {

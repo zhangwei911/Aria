@@ -17,7 +17,7 @@
 package com.arialyy.aria.core.command.normal;
 
 import com.arialyy.aria.core.inf.AbsTask;
-import com.arialyy.aria.core.inf.AbsTaskEntity;
+import com.arialyy.aria.core.inf.AbsTaskWrapper;
 import com.arialyy.aria.core.inf.IEntity;
 import com.arialyy.aria.util.ALog;
 
@@ -25,7 +25,7 @@ import com.arialyy.aria.util.ALog;
  * Created by lyy on 2016/9/20.
  * 停止命令
  */
-class StopCmd<T extends AbsTaskEntity> extends AbsNormalCmd<T> {
+class StopCmd<T extends AbsTaskWrapper> extends AbsNormalCmd<T> {
 
   StopCmd(T entity, int taskType) {
     super(entity, taskType);
@@ -35,7 +35,7 @@ class StopCmd<T extends AbsTaskEntity> extends AbsNormalCmd<T> {
     if (!canExeCmd) return;
     AbsTask task = getTask();
     if (task == null) {
-      if (mTaskEntity.getEntity().getState() == IEntity.STATE_RUNNING) {
+      if (mTaskWrapper.getEntity().getState() == IEntity.STATE_RUNNING) {
         stopTask();
       } else {
         ALog.w(TAG, "停止命令执行失败，【调度器中没有该任务】");

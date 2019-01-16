@@ -67,8 +67,8 @@ public class DownloadGroupTarget extends BaseGroupTarget<DownloadGroupTarget> im
 
   private void init() {
     mGroupName = CommonUtil.getMd5Code(mUrls);
-    mTaskEntity = TEManager.getInstance().getGTEntity(DownloadGroupTaskEntity.class, mUrls);
-    mEntity = mTaskEntity.getEntity();
+    mTaskWrapper = TEManager.getInstance().getGTEntity(DGTaskWrapper.class, mUrls);
+    mEntity = mTaskWrapper.getEntity();
     if (mEntity != null) {
       mDirPathTemp = mEntity.getDirPath();
     }
@@ -99,7 +99,7 @@ public class DownloadGroupTarget extends BaseGroupTarget<DownloadGroupTarget> im
     mUrls.addAll(urls);
     mGroupName = CommonUtil.getMd5Code(urls);
     mEntity.setGroupName(mGroupName);
-    mTaskEntity.setKey(mGroupName);
+    mTaskWrapper.setKey(mGroupName);
     mEntity.update();
     if (mEntity.getSubEntities() != null && !mEntity.getSubEntities().isEmpty()) {
       for (DownloadEntity de : mEntity.getSubEntities()) {
@@ -159,7 +159,7 @@ public class DownloadGroupTarget extends BaseGroupTarget<DownloadGroupTarget> im
       ALog.e(TAG, "修改子任务的文件名失败：列表为null");
       return this;
     }
-    if (subTaskFileName.size() != mTaskEntity.getSubTaskEntities().size()) {
+    if (subTaskFileName.size() != mTaskWrapper.getSubTaskWrapper().size()) {
       ALog.e(TAG, "修改子任务的文件名失败：子任务文件名列表数量和子任务的数量不匹配");
       return this;
     }
@@ -186,14 +186,13 @@ public class DownloadGroupTarget extends BaseGroupTarget<DownloadGroupTarget> im
         return false;
       }
 
-      if (mTaskEntity.getRequestEnum() == RequestEnum.POST) {
-        for (DownloadTaskEntity subTask : mTaskEntity.getSubTaskEntities()) {
-          subTask.setRequestEnum(RequestEnum.POST);
+      if (mTaskWrapper.asHttp().getRequestEnum() == RequestEnum.POST) {
+        for (DTaskWrapper subTask : mTaskWrapper.getSubTaskWrapper()) {
+          subTask.asHttp().setRequestEnum(RequestEnum.POST);
         }
       }
 
       mEntity.save();
-      mTaskEntity.save();
 
       if (needModifyPath) {
         reChangeDirPath(mDirPathTemp);
@@ -211,9 +210,9 @@ public class DownloadGroupTarget extends BaseGroupTarget<DownloadGroupTarget> im
    * 更新所有改动的子任务文件名
    */
   private void updateSingleSubFileName() {
-    List<DownloadTaskEntity> entities = mTaskEntity.getSubTaskEntities();
+    List<DTaskWrapper> entities = mTaskWrapper.getSubTaskWrapper();
     int i = 0;
-    for (DownloadTaskEntity entity : entities) {
+    for (DTaskWrapper entity : entities) {
       if (i < mSubNameTemp.size()) {
         String newName = mSubNameTemp.get(i);
         updateSingleSubFileName(entity, newName);
@@ -271,7 +270,7 @@ public class DownloadGroupTarget extends BaseGroupTarget<DownloadGroupTarget> im
   /**
    * 更新单个子任务文件名
    */
-  private void updateSingleSubFileName(DownloadTaskEntity taskEntity, String newName) {
+  private void updateSingleSubFileName(DTaskWrapper taskEntity, String newName) {
     DownloadEntity entity = taskEntity.getEntity();
     if (!newName.equals(entity.getFileName())) {
       String oldPath = mEntity.getDirPath() + "/" + entity.getFileName();
@@ -314,7 +313,7 @@ public class DownloadGroupTarget extends BaseGroupTarget<DownloadGroupTarget> im
 
   @CheckResult
   @Override public DownloadGroupTarget addHeader(@NonNull String key, @NonNull String value) {
-    for (DownloadTaskEntity subTask : mTaskEntity.getSubTaskEntities()) {
+    for (DTaskWrapper subTask : mTaskWrapper.getSubTaskWrapper()) {
       mDelegate.addHeader(subTask, key, value);
     }
     return mDelegate.addHeader(key, value);
@@ -322,7 +321,7 @@ public class DownloadGroupTarget extends BaseGroupTarget<DownloadGroupTarget> im
 
   @CheckResult
   @Override public DownloadGroupTarget addHeaders(Map<String, String> headers) {
-    for (DownloadTaskEntity subTask : mTaskEntity.getSubTaskEntities()) {
+    for (DTaskWrapper subTask : mTaskWrapper.getSubTaskWrapper()) {
       mDelegate.addHeaders(subTask, headers);
     }
     return mDelegate.addHeaders(headers);

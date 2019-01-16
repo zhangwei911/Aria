@@ -19,13 +19,13 @@ import com.arialyy.aria.core.AriaManager;
 import com.arialyy.aria.core.command.normal.NormalCmdFactory;
 import com.arialyy.aria.core.inf.AbsEntity;
 import com.arialyy.aria.core.inf.AbsTarget;
-import com.arialyy.aria.core.inf.AbsTaskEntity;
+import com.arialyy.aria.core.inf.AbsTaskWrapper;
 import com.arialyy.aria.util.CommonUtil;
 
 /**
  * Created by lyy on 2017/2/28.
  */
-abstract class AbsDownloadTarget<TARGET extends AbsTarget, ENTITY extends AbsEntity, TASK_ENTITY extends AbsTaskEntity>
+abstract class AbsDownloadTarget<TARGET extends AbsTarget, ENTITY extends AbsEntity, TASK_ENTITY extends AbsTaskWrapper>
     extends AbsTarget<TARGET, ENTITY, TASK_ENTITY> {
 
   static final int HTTP = 1;
@@ -57,7 +57,7 @@ abstract class AbsDownloadTarget<TARGET extends AbsTarget, ENTITY extends AbsEnt
   protected void setHighestPriority() {
     if (checkEntity()) {
       AriaManager.getInstance(AriaManager.APP)
-          .setCmd(CommonUtil.createNormalCmd(mTaskEntity, NormalCmdFactory.TASK_HIGHEST_PRIORITY,
+          .setCmd(CommonUtil.createNormalCmd(mTaskWrapper, NormalCmdFactory.TASK_HIGHEST_PRIORITY,
               checkTaskType()))
           .exe();
     }
@@ -69,7 +69,7 @@ abstract class AbsDownloadTarget<TARGET extends AbsTarget, ENTITY extends AbsEnt
   public void add() {
     if (checkEntity()) {
       AriaManager.getInstance(AriaManager.APP)
-          .setCmd(CommonUtil.createNormalCmd(mTaskEntity, NormalCmdFactory.TASK_CREATE,
+          .setCmd(CommonUtil.createNormalCmd(mTaskWrapper, NormalCmdFactory.TASK_CREATE,
               checkTaskType()))
           .exe();
     }

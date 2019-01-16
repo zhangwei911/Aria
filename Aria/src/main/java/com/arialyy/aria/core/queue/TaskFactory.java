@@ -17,17 +17,17 @@
 package com.arialyy.aria.core.queue;
 
 import com.arialyy.aria.core.AriaManager;
+import com.arialyy.aria.core.download.DGTaskWrapper;
+import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.download.DownloadGroupTask;
-import com.arialyy.aria.core.download.DownloadGroupTaskEntity;
 import com.arialyy.aria.core.download.DownloadTask;
-import com.arialyy.aria.core.download.DownloadTaskEntity;
-import com.arialyy.aria.core.inf.AbsTaskEntity;
+import com.arialyy.aria.core.inf.AbsTaskWrapper;
 import com.arialyy.aria.core.inf.ITask;
 import com.arialyy.aria.core.scheduler.DownloadSchedulers;
 import com.arialyy.aria.core.scheduler.ISchedulers;
 import com.arialyy.aria.core.scheduler.UploadSchedulers;
+import com.arialyy.aria.core.upload.UTaskWrapper;
 import com.arialyy.aria.core.upload.UploadTask;
-import com.arialyy.aria.core.upload.UploadTaskEntity;
 
 /**
  * Created by lyy on 2016/8/18.
@@ -55,19 +55,19 @@ class TaskFactory {
    *
    * @param entity 下载实体
    * @param schedulers 对应的任务调度器
-   * @param <TASK_ENTITY> {@link DownloadTaskEntity}、{@link UploadTaskEntity}、{@link
-   * DownloadGroupTaskEntity}
+   * @param <TASK_ENTITY> {@link DTaskWrapper}、{@link UTaskWrapper}、{@link
+   * DGTaskWrapper}
    * @param <SCHEDULER> {@link DownloadSchedulers}、{@link UploadSchedulers}
    * @return {@link DownloadTask}、{@link UploadTask}、{@link DownloadGroupTask}
    */
-  <TASK_ENTITY extends AbsTaskEntity, SCHEDULER extends ISchedulers> ITask createTask(
+  <TASK_ENTITY extends AbsTaskWrapper, SCHEDULER extends ISchedulers> ITask createTask(
       TASK_ENTITY entity, SCHEDULER schedulers) {
-    if (entity instanceof DownloadTaskEntity) {
-      return createDownloadTask((DownloadTaskEntity) entity, schedulers);
-    } else if (entity instanceof UploadTaskEntity) {
-      return createUploadTask((UploadTaskEntity) entity, schedulers);
-    } else if (entity instanceof DownloadGroupTaskEntity) {
-      return createDownloadGroupTask((DownloadGroupTaskEntity) entity, schedulers);
+    if (entity instanceof DTaskWrapper) {
+      return createDownloadTask((DTaskWrapper) entity, schedulers);
+    } else if (entity instanceof UTaskWrapper) {
+      return createUploadTask((UTaskWrapper) entity, schedulers);
+    } else if (entity instanceof DGTaskWrapper) {
+      return createDownloadGroupTask((DGTaskWrapper) entity, schedulers);
     }
     return null;
   }
@@ -78,7 +78,7 @@ class TaskFactory {
    * @param entity 下载任务实体{@link DownloadGroupTask}
    * @param schedulers {@link ISchedulers}
    */
-  private DownloadGroupTask createDownloadGroupTask(DownloadGroupTaskEntity entity,
+  private DownloadGroupTask createDownloadGroupTask(DGTaskWrapper entity,
       ISchedulers schedulers) {
     DownloadGroupTask.Builder builder = new DownloadGroupTask.Builder(entity);
     builder.setOutHandler(schedulers);
@@ -86,10 +86,10 @@ class TaskFactory {
   }
 
   /**
-   * @param entity 上传任务实体{@link UploadTaskEntity}
+   * @param entity 上传任务实体{@link UTaskWrapper}
    * @param schedulers {@link ISchedulers}
    */
-  private UploadTask createUploadTask(UploadTaskEntity entity, ISchedulers schedulers) {
+  private UploadTask createUploadTask(UTaskWrapper entity, ISchedulers schedulers) {
     UploadTask.Builder builder = new UploadTask.Builder();
     builder.setUploadTaskEntity(entity);
     builder.setOutHandler(schedulers);
@@ -97,10 +97,10 @@ class TaskFactory {
   }
 
   /**
-   * @param entity 下载任务实体{@link DownloadTaskEntity}
+   * @param entity 下载任务实体{@link DTaskWrapper}
    * @param schedulers {@link ISchedulers}
    */
-  private DownloadTask createDownloadTask(DownloadTaskEntity entity, ISchedulers schedulers) {
+  private DownloadTask createDownloadTask(DTaskWrapper entity, ISchedulers schedulers) {
     DownloadTask.Builder builder = new DownloadTask.Builder(entity);
     builder.setOutHandler(schedulers);
     return builder.build();

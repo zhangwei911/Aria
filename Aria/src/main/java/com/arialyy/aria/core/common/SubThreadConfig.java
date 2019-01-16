@@ -1,12 +1,12 @@
 package com.arialyy.aria.core.common;
 
-import com.arialyy.aria.core.inf.AbsTaskEntity;
+import com.arialyy.aria.core.inf.AbsTaskWrapper;
 import java.io.File;
 
 /**
  * 子线程下载信息类
  */
-public class SubThreadConfig<TASK_ENTITY extends AbsTaskEntity> {
+public class SubThreadConfig<TASK_ENTITY extends AbsTaskWrapper> {
   //线程Id
   public int THREAD_ID;
   //文件总长度

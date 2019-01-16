@@ -18,7 +18,7 @@ package com.arialyy.aria.core.upload;
 import android.os.Parcel;
 import android.os.Parcelable;
 import com.arialyy.aria.core.inf.AbsNormalEntity;
-import com.arialyy.aria.core.inf.AbsTaskEntity;
+import com.arialyy.aria.core.inf.AbsTaskWrapper;
 import com.arialyy.aria.orm.annotation.Primary;
 
 /**
@@ -57,7 +57,7 @@ public class UploadEntity extends AbsNormalEntity implements Parcelable {
   }
 
   @Override public int getTaskType() {
-    return getUrl().startsWith("ftp") ? AbsTaskEntity.D_FTP : AbsTaskEntity.D_HTTP;
+    return getUrl().startsWith("ftp") ? AbsTaskWrapper.D_FTP : AbsTaskWrapper.D_HTTP;
   }
 
   public UploadEntity() {

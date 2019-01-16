@@ -236,14 +236,14 @@ public class DownloadReceiver extends AbsReceiver {
    * @param downloadUrl 下载地址
    * @return 如果url错误或查找不到数据，则返回null
    */
-  public DownloadTaskEntity getDownloadTask(String downloadUrl) {
+  public DTaskWrapper getDownloadTask(String downloadUrl) {
     if (!CheckUtil.checkUrl(downloadUrl)) {
       return null;
     }
     if (!taskExists(downloadUrl)) {
       return null;
     }
-    return TEManager.getInstance().getTEntity(DownloadTaskEntity.class, downloadUrl);
+    return TEManager.getInstance().getTEntity(DTaskWrapper.class, downloadUrl);
   }
 
   /**
@@ -252,7 +252,7 @@ public class DownloadReceiver extends AbsReceiver {
    * @param urls 任务组子任务下载地址列表
    * @return 返回对应的任务组实体；如果查找不到对应的数据或子任务列表为null，返回null
    */
-  public DownloadGroupTaskEntity getGroupTask(List<String> urls) {
+  public DGTaskWrapper getGroupTask(List<String> urls) {
     if (urls == null || urls.isEmpty()) {
       ALog.e(TAG, "获取任务组实体失败：任务组子任务下载地址列表为null");
       return null;
@@ -260,7 +260,7 @@ public class DownloadReceiver extends AbsReceiver {
     if (!taskExists(urls)) {
       return null;
     }
-    return TEManager.getInstance().getGTEntity(DownloadGroupTaskEntity.class, urls);
+    return TEManager.getInstance().getGTEntity(DGTaskWrapper.class, urls);
   }
 
   /**
@@ -269,7 +269,7 @@ public class DownloadReceiver extends AbsReceiver {
    * @param dirUrl FTP文件夹本地下载路径
    * @return 返回对应的任务组实体；如果查找不到对应的数据或路径为null，返回null
    */
-  public DownloadGroupTaskEntity getFtpDirTask(String dirUrl) {
+  public DGTaskWrapper getFtpDirTask(String dirUrl) {
     if (TextUtils.isEmpty(dirUrl)) {
       ALog.e(TAG, "获取FTP文件夹实体失败：下载路径为null");
       return null;
@@ -279,7 +279,7 @@ public class DownloadReceiver extends AbsReceiver {
     if (!b) {
       return null;
     }
-    return TEManager.getInstance().getFDTEntity(DownloadGroupTaskEntity.class, dirUrl);
+    return TEManager.getInstance().getFDTEntity(DGTaskWrapper.class, dirUrl);
   }
 
   /**
@@ -288,7 +288,7 @@ public class DownloadReceiver extends AbsReceiver {
    * @return {@code true}存在，{@code false} 不存在
    */
   public boolean taskExists(String downloadUrl) {
-    return DbEntity.checkDataExist(DownloadTaskEntity.class, "url=?", downloadUrl);
+    return DbEntity.checkDataExist(DTaskWrapper.class, "url=?", downloadUrl);
   }
 
   /**
@@ -369,7 +369,7 @@ public class DownloadReceiver extends AbsReceiver {
   public void stopAllTask() {
     AriaManager.getInstance(AriaManager.APP)
         .setCmd(NormalCmdFactory.getInstance()
-            .createCmd(new DownloadTaskEntity(), NormalCmdFactory.TASK_STOP_ALL,
+            .createCmd(new DTaskWrapper(), NormalCmdFactory.TASK_STOP_ALL,
                 ICmd.TASK_TYPE_DOWNLOAD))
         .exe();
   }
@@ -382,7 +382,7 @@ public class DownloadReceiver extends AbsReceiver {
   public void resumeAllTask() {
     AriaManager.getInstance(AriaManager.APP)
         .setCmd(NormalCmdFactory.getInstance()
-            .createCmd(new DownloadTaskEntity(), NormalCmdFactory.TASK_RESUME_ALL,
+            .createCmd(new DTaskWrapper(), NormalCmdFactory.TASK_RESUME_ALL,
                 ICmd.TASK_TYPE_DOWNLOAD))
         .exe();
   }
@@ -396,7 +396,7 @@ public class DownloadReceiver extends AbsReceiver {
   public void removeAllTask(boolean removeFile) {
     final AriaManager ariaManager = AriaManager.getInstance(AriaManager.APP);
     CancelAllCmd cancelCmd =
-        (CancelAllCmd) CommonUtil.createNormalCmd(new DownloadTaskEntity(),
+        (CancelAllCmd) CommonUtil.createNormalCmd(new DTaskWrapper(),
             NormalCmdFactory.TASK_CANCEL_ALL, ICmd.TASK_TYPE_DOWNLOAD);
     cancelCmd.removeFile = removeFile;
     ariaManager.setCmd(cancelCmd).exe();

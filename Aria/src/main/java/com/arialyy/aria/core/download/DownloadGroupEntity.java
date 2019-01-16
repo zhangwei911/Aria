@@ -17,7 +17,7 @@ package com.arialyy.aria.core.download;
 
 import android.os.Parcel;
 import com.arialyy.aria.core.inf.AbsGroupEntity;
-import com.arialyy.aria.core.inf.AbsTaskEntity;
+import com.arialyy.aria.core.inf.AbsTaskWrapper;
 import com.arialyy.aria.orm.annotation.Ignore;
 import java.util.List;
 
@@ -47,7 +47,7 @@ public class DownloadGroupEntity extends AbsGroupEntity {
   }
 
   @Override public int getTaskType() {
-    return getKey().startsWith("ftp") ? AbsTaskEntity.D_FTP_DIR : AbsTaskEntity.DG_HTTP;
+    return getKey().startsWith("ftp") ? AbsTaskWrapper.D_FTP_DIR : AbsTaskWrapper.DG_HTTP;
   }
 
   public DownloadGroupEntity() {

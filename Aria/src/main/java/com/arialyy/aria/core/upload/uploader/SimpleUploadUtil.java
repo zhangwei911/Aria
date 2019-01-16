@@ -18,12 +18,11 @@ package com.arialyy.aria.core.upload.uploader;
 import com.arialyy.aria.core.common.CompleteInfo;
 import com.arialyy.aria.core.common.IUtil;
 import com.arialyy.aria.core.common.OnFileInfoCallback;
-import com.arialyy.aria.core.inf.AbsTaskEntity;
+import com.arialyy.aria.core.inf.AbsTaskWrapper;
 import com.arialyy.aria.core.inf.IUploadListener;
+import com.arialyy.aria.core.upload.UTaskWrapper;
 import com.arialyy.aria.core.upload.UploadEntity;
-import com.arialyy.aria.core.upload.UploadTaskEntity;
 import com.arialyy.aria.exception.BaseException;
-import com.arialyy.aria.exception.TaskException;
 import com.arialyy.aria.util.CheckUtil;
 
 /**
@@ -34,11 +33,11 @@ public class SimpleUploadUtil implements IUtil, Runnable {
   private static final String TAG = "SimpleUploadUtil";
 
   private UploadEntity mUploadEntity;
-  private UploadTaskEntity mTaskEntity;
+  private UTaskWrapper mTaskEntity;
   private IUploadListener mListener;
   private Uploader mUploader;
 
-  public SimpleUploadUtil(UploadTaskEntity taskEntity, IUploadListener listener) {
+  public SimpleUploadUtil(UTaskWrapper taskEntity, IUploadListener listener) {
     mTaskEntity = taskEntity;
     CheckUtil.checkTaskEntity(taskEntity);
     mUploadEntity = taskEntity.getEntity();
@@ -52,7 +51,7 @@ public class SimpleUploadUtil implements IUtil, Runnable {
   @Override public void run() {
     mListener.onPre();
     switch (mTaskEntity.getRequestType()) {
-      case AbsTaskEntity.U_FTP:
+      case AbsTaskWrapper.U_FTP:
         new FtpFileInfoThread(mTaskEntity, new OnFileInfoCallback() {
           @Override public void onComplete(String url, CompleteInfo info) {
             if (info.code == FtpFileInfoThread.CODE_COMPLETE) {
@@ -67,7 +66,7 @@ public class SimpleUploadUtil implements IUtil, Runnable {
           }
         }).start();
         break;
-      case AbsTaskEntity.U_HTTP:
+      case AbsTaskWrapper.U_HTTP:
         mUploader.start();
         break;
     }

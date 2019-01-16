@@ -15,26 +15,18 @@
  */
 package com.arialyy.aria.core.download;
 
-import com.arialyy.aria.core.inf.AbsGroupTaskEntity;
-import com.arialyy.aria.orm.ActionPolicy;
-import com.arialyy.aria.orm.annotation.Foreign;
-import com.arialyy.aria.orm.annotation.Ignore;
-import com.arialyy.aria.orm.annotation.Primary;
+import com.arialyy.aria.core.inf.AbsGroupTaskWrapper;
 import java.util.List;
 
 /**
- * Created by AriaL on 2017/7/1.
- * 任务组的任务实体
+ * Created by AriaL on 2017/7/1. 任务组的任务实体
  */
-public class DownloadGroupTaskEntity extends AbsGroupTaskEntity<DownloadGroupEntity> {
+public class DGTaskWrapper extends AbsGroupTaskWrapper<DownloadGroupEntity, DTaskWrapper> {
 
-  @Ignore private DownloadGroupEntity entity;
+  private DownloadGroupEntity entity;
 
-  @Ignore private List<DownloadTaskEntity> subTaskEntities;
+  private List<DTaskWrapper> subTaskEntities;
 
-  @Primary
-  @Foreign(parent = DownloadGroupEntity.class, column = "groupName",
-      onUpdate = ActionPolicy.CASCADE, onDelete = ActionPolicy.CASCADE)
   private String key;
 
   @Override public DownloadGroupEntity getEntity() {
@@ -45,11 +37,8 @@ public class DownloadGroupTaskEntity extends AbsGroupTaskEntity<DownloadGroupEnt
     this.entity = entity;
   }
 
-  public List<DownloadTaskEntity> getSubTaskEntities() {
-    return subTaskEntities;
-  }
-
-  public void setSubTaskEntities(List<DownloadTaskEntity> subTaskEntities) {
+  @Override
+  public void setSubTaskWrapper(List<DTaskWrapper> subTaskEntities) {
     this.subTaskEntities = subTaskEntities;
   }
 
@@ -59,5 +48,9 @@ public class DownloadGroupTaskEntity extends AbsGroupTaskEntity<DownloadGroupEnt
 
   public void setKey(String key) {
     this.key = key;
+  }
+
+  @Override public List<DTaskWrapper> getSubTaskWrapper() {
+    return subTaskEntities;
   }
 }

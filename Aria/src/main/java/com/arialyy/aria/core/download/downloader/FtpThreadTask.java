@@ -20,8 +20,8 @@ import aria.apache.commons.net.ftp.FTPReply;
 import com.arialyy.aria.core.common.StateConstance;
 import com.arialyy.aria.core.common.SubThreadConfig;
 import com.arialyy.aria.core.common.ftp.AbsFtpThreadTask;
+import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.download.DownloadEntity;
-import com.arialyy.aria.core.download.DownloadTaskEntity;
 import com.arialyy.aria.core.inf.IDownloadListener;
 import com.arialyy.aria.exception.AriaIOException;
 import com.arialyy.aria.exception.TaskException;
@@ -39,13 +39,13 @@ import java.nio.channels.ReadableByteChannel;
  * Created by Aria.Lao on 2017/7/24.
  * Ftp下载任务
  */
-class FtpThreadTask extends AbsFtpThreadTask<DownloadEntity, DownloadTaskEntity> {
+class FtpThreadTask extends AbsFtpThreadTask<DownloadEntity, DTaskWrapper> {
   private final String TAG = "FtpThreadTask";
   private boolean isOpenDynamicFile;
   private boolean isBlock;
 
   FtpThreadTask(StateConstance constance, IDownloadListener listener,
-      SubThreadConfig<DownloadTaskEntity> downloadInfo) {
+      SubThreadConfig<DTaskWrapper> downloadInfo) {
     super(constance, listener, downloadInfo);
     mConnectTimeOut = mAridManager.getDownloadConfig().getConnectTimeOut();
     mReadTimeOut = mAridManager.getDownloadConfig().getIOTimeOut();
@@ -87,7 +87,7 @@ class FtpThreadTask extends AbsFtpThreadTask<DownloadEntity, DownloadTaskEntity>
         return this;
       }
       String remotePath =
-          new String(mTaskEntity.getUrlEntity().remotePath.getBytes(charSet), SERVER_CHARSET);
+          new String(mTaskWrapper.asFtp().getUrlEntity().remotePath.getBytes(charSet), SERVER_CHARSET);
       ALog.i(TAG, String.format("remotePath【%s】", remotePath));
       is = client.retrieveFileStream(remotePath);
       reply = client.getReplyCode();

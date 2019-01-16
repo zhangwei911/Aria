@@ -13,20 +13,45 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.arialyy.aria.core.command;
+package com.arialyy.aria.core.upload;
 
 import com.arialyy.aria.core.inf.AbsTaskWrapper;
 
 /**
- * Created by AriaL on 2017/6/29.
- * 抽象命令工厂
+ * Created by lyy on 2017/2/9. 上传任务实体
  */
-public abstract class AbsCmdFactory<TASK_ENTITY extends AbsTaskWrapper, CMD extends AbsCmd> {
+public class UTaskWrapper extends AbsTaskWrapper<UploadEntity> {
 
-  /**
-   * @param entity 下载实体
-   * @param taskType {@link ICmd#TASK_TYPE_DOWNLOAD}、{@link ICmd#TASK_TYPE_DOWNLOAD_GROUP}、{@link
-   * ICmd#TASK_TYPE_UPLOAD}
-   */
-  public abstract CMD createCmd(TASK_ENTITY entity, int type, int taskType);
+  private UploadEntity entity;
+
+  private String filePath;
+
+  private String key;
+
+  public UTaskWrapper() {
+  }
+
+  @Override public UploadEntity getEntity() {
+    return entity;
+  }
+
+  @Override public String getKey() {
+    return key;
+  }
+
+  public void setEntity(UploadEntity entity) {
+    this.entity = entity;
+  }
+
+  public String getFilePath() {
+    return filePath;
+  }
+
+  public void setFilePath(String filePath) {
+    this.filePath = filePath;
+  }
+
+  public void setKey(String key) {
+    this.key = key;
+  }
 }

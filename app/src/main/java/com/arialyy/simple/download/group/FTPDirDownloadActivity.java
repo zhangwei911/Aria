@@ -23,7 +23,7 @@ import com.arialyy.annotations.DownloadGroup;
 import com.arialyy.aria.core.Aria;
 import com.arialyy.aria.core.download.DownloadGroupEntity;
 import com.arialyy.aria.core.download.DownloadGroupTask;
-import com.arialyy.aria.core.download.DownloadGroupTaskEntity;
+import com.arialyy.aria.core.download.DGTaskWrapper;
 import com.arialyy.frame.util.show.L;
 import com.arialyy.frame.util.show.T;
 import com.arialyy.simple.R;
@@ -43,7 +43,7 @@ public class FTPDirDownloadActivity extends BaseActivity<ActivityDownloadGroupBi
     super.init(savedInstanceState);
     Aria.download(this).register();
     setTitle("FTP文件夹下载");
-    DownloadGroupTaskEntity entity = Aria.download(this).getFtpDirTask(dir);
+    DGTaskWrapper entity = Aria.download(this).getFtpDirTask(dir);
     if (entity != null && entity.getEntity() != null) {
       DownloadGroupEntity groupEntity = entity.getEntity();
       mChildList.addData(groupEntity.getSubEntities());

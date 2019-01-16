@@ -21,8 +21,8 @@ import com.arialyy.aria.core.common.CompleteInfo;
 import com.arialyy.aria.core.common.OnFileInfoCallback;
 import com.arialyy.aria.core.common.TaskRecord;
 import com.arialyy.aria.core.common.ThreadRecord;
+import com.arialyy.aria.core.upload.UTaskWrapper;
 import com.arialyy.aria.core.upload.UploadEntity;
-import com.arialyy.aria.core.upload.UploadTaskEntity;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.DbHelper;
 import java.util.ArrayList;
@@ -31,17 +31,17 @@ import java.util.ArrayList;
  * Created by Aria.Lao on 2017/9/26.
  * 单任务上传远程服务器文件信息
  */
-class FtpFileInfoThread extends AbsFtpInfoThread<UploadEntity, UploadTaskEntity> {
+class FtpFileInfoThread extends AbsFtpInfoThread<UploadEntity, UTaskWrapper> {
   private static final String TAG = "FtpUploadFileInfoThread";
   static final int CODE_COMPLETE = 0xab1;
   private boolean isComplete = false;
 
-  FtpFileInfoThread(UploadTaskEntity taskEntity, OnFileInfoCallback callback) {
+  FtpFileInfoThread(UTaskWrapper taskEntity, OnFileInfoCallback callback) {
     super(taskEntity, callback);
   }
 
   @Override protected String setRemotePath() {
-    return mTaskEntity.getUrlEntity().remotePath + "/" + mEntity.getFileName();
+    return mTaskWrapper.asFtp().getUrlEntity().remotePath + "/" + mEntity.getFileName();
   }
 
   /**
@@ -68,14 +68,14 @@ class FtpFileInfoThread extends AbsFtpInfoThread<UploadEntity, UploadTaskEntity>
             + "尝试从位置："
             + (ftpFile.getSize() - 1)
             + "开始上传");
-        mTaskEntity.setNewTask(false);
+        mTaskWrapper.setNewTask(false);
 
         // 修改记录
-        TaskRecord record = DbHelper.getTaskRecord(mTaskEntity.getKey());
+        TaskRecord record = DbHelper.getTaskRecord(mTaskWrapper.getKey());
         if (record == null) {
           record = new TaskRecord();
           record.fileName = mEntity.getFileName();
-          record.filePath = mTaskEntity.getKey();
+          record.filePath = mTaskWrapper.getKey();
           record.threadRecords = new ArrayList<>();
         }
         ThreadRecord threadRecord;

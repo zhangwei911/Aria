@@ -16,7 +16,7 @@
 package com.arialyy.aria.core.download.wrapper;
 
 import com.arialyy.aria.core.download.DownloadEntity;
-import com.arialyy.aria.core.download.DownloadTaskEntity;
+import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.orm.AbsWrapper;
 import com.arialyy.aria.orm.annotation.Many;
 import com.arialyy.aria.orm.annotation.One;
@@ -33,9 +33,9 @@ public class DTEWrapper extends AbsWrapper {
   public DownloadEntity entity;
 
   @Many(parentColumn = "downloadPath", entityColumn = "key")
-  private List<DownloadTaskEntity> taskEntitys = null;
+  private List<DTaskWrapper> taskEntitys = null;
 
-  public DownloadTaskEntity taskEntity;
+  public DTaskWrapper taskEntity;
 
   @Override public void handleConvert() {
     taskEntity = (taskEntitys == null || taskEntitys.isEmpty()) ? null : taskEntitys.get(0);

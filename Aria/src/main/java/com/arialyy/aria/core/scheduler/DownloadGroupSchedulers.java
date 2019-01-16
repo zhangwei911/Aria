@@ -16,9 +16,8 @@
 package com.arialyy.aria.core.scheduler;
 
 import com.arialyy.aria.core.AriaManager;
-import com.arialyy.aria.core.download.DownloadGroupEntity;
+import com.arialyy.aria.core.download.DGTaskWrapper;
 import com.arialyy.aria.core.download.DownloadGroupTask;
-import com.arialyy.aria.core.download.DownloadGroupTaskEntity;
 import com.arialyy.aria.core.queue.DownloadGroupTaskQueue;
 
 /**
@@ -26,7 +25,7 @@ import com.arialyy.aria.core.queue.DownloadGroupTaskQueue;
  * 任务组调度器
  */
 public class DownloadGroupSchedulers extends
-    AbsSchedulers<DownloadGroupTaskEntity, DownloadGroupTask, DownloadGroupTaskQueue> {
+    AbsSchedulers<DGTaskWrapper, DownloadGroupTask, DownloadGroupTaskQueue> {
   private final String TAG = "DownloadGroupSchedulers";
   private static volatile DownloadGroupSchedulers INSTANCE = null;
 

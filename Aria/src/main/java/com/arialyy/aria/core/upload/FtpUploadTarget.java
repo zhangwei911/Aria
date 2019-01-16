@@ -21,7 +21,8 @@ import com.arialyy.aria.core.FtpUrlEntity;
 import com.arialyy.aria.core.command.normal.NormalCmdFactory;
 import com.arialyy.aria.core.common.ftp.FTPSConfig;
 import com.arialyy.aria.core.common.ftp.FtpDelegate;
-import com.arialyy.aria.core.inf.AbsTaskEntity;
+import com.arialyy.aria.core.common.ftp.FtpTaskDelegate;
+import com.arialyy.aria.core.inf.AbsTaskWrapper;
 import com.arialyy.aria.core.inf.IFtpTarget;
 import com.arialyy.aria.util.CommonUtil;
 import java.net.Proxy;
@@ -44,7 +45,7 @@ public class FtpUploadTarget extends BaseNormalTarget<FtpUploadTarget>
 
   private void initTask(String filePath) {
     initTarget(filePath);
-    mTaskEntity.setRequestType(AbsTaskEntity.U_FTP);
+    mTaskWrapper.setRequestType(AbsTaskWrapper.U_FTP);
     mDelegate = new FtpDelegate<>(this);
   }
 
@@ -54,7 +55,7 @@ public class FtpUploadTarget extends BaseNormalTarget<FtpUploadTarget>
   public void add() {
     if (checkEntity()) {
       AriaManager.getInstance(AriaManager.APP)
-          .setCmd(CommonUtil.createNormalCmd(mTaskEntity, NormalCmdFactory.TASK_CREATE,
+          .setCmd(CommonUtil.createNormalCmd(mTaskWrapper, NormalCmdFactory.TASK_CREATE,
               checkTaskType()))
           .exe();
     }
@@ -65,7 +66,8 @@ public class FtpUploadTarget extends BaseNormalTarget<FtpUploadTarget>
     if (!b) {
       return false;
     }
-    FtpUrlEntity temp = mTaskEntity.getUrlEntity();
+    FtpTaskDelegate taskDelegate = mTaskWrapper.asFtp();
+    FtpUrlEntity temp = taskDelegate.getUrlEntity();
     FtpUrlEntity newEntity = CommonUtil.getFtpUrlInfo(mTempUrl);
     if (temp != null) { //处理FTPS的信息
       newEntity.isFtps = temp.isFtps;
@@ -74,11 +76,11 @@ public class FtpUploadTarget extends BaseNormalTarget<FtpUploadTarget>
       newEntity.protocol = temp.protocol;
       newEntity.storePath = temp.storePath;
     }
-    mTaskEntity.setUrlEntity(newEntity);
-    mTaskEntity.getUrlEntity().account = mAccount;
-    mTaskEntity.getUrlEntity().user = mUser;
-    mTaskEntity.getUrlEntity().password = mPw;
-    mTaskEntity.getUrlEntity().needLogin = needLogin;
+    taskDelegate.setUrlEntity(newEntity);
+    taskDelegate.getUrlEntity().account = mAccount;
+    taskDelegate.getUrlEntity().user = mUser;
+    taskDelegate.getUrlEntity().password = mPw;
+    taskDelegate.getUrlEntity().needLogin = needLogin;
     return true;
   }
 
@@ -89,10 +91,10 @@ public class FtpUploadTarget extends BaseNormalTarget<FtpUploadTarget>
    */
   @CheckResult
   public FTPSConfig<FtpUploadTarget> asFtps() {
-    if (mTaskEntity.getUrlEntity() == null) {
+    if (mTaskWrapper.asFtp().getUrlEntity() == null) {
       FtpUrlEntity urlEntity = new FtpUrlEntity();
       urlEntity.isFtps = true;
-      mTaskEntity.setUrlEntity(urlEntity);
+      mTaskWrapper.asFtp().setUrlEntity(urlEntity);
     }
     return new FTPSConfig<>(this);
   }

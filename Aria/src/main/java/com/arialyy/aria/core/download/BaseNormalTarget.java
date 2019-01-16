@@ -16,7 +16,6 @@
 package com.arialyy.aria.core.download;
 
 import android.text.TextUtils;
-import com.arialyy.aria.core.common.TaskRecord;
 import com.arialyy.aria.core.manager.TEManager;
 import com.arialyy.aria.core.queue.DownloadTaskQueue;
 import com.arialyy.aria.orm.DbEntity;
@@ -28,7 +27,7 @@ import java.io.File;
  * Created by Aria.Lao on 2017/7/26.
  */
 abstract class BaseNormalTarget<TARGET extends BaseNormalTarget>
-    extends AbsDownloadTarget<TARGET, DownloadEntity, DownloadTaskEntity> {
+    extends AbsDownloadTarget<TARGET, DownloadEntity, DTaskWrapper> {
 
   /**
    * 资源地址
@@ -41,8 +40,8 @@ abstract class BaseNormalTarget<TARGET extends BaseNormalTarget>
   void initTarget(String url, String targetName) {
     this.url = url;
     mTargetName = targetName;
-    mTaskEntity = TEManager.getInstance().getTEntity(DownloadTaskEntity.class, url);
-    mEntity = mTaskEntity.getEntity();
+    mTaskWrapper = TEManager.getInstance().getTEntity(DTaskWrapper.class, url);
+    mEntity = mTaskWrapper.getEntity();
 
     if (mEntity != null) {
       mTempFilePath = mEntity.getDownloadPath();
@@ -64,7 +63,7 @@ abstract class BaseNormalTarget<TARGET extends BaseNormalTarget>
       return (TARGET) this;
     }
     this.newUrl = newUrl;
-    mTaskEntity.setRefreshInfo(true);
+    mTaskWrapper.setRefreshInfo(true);
     return (TARGET) this;
   }
 
@@ -122,7 +121,6 @@ abstract class BaseNormalTarget<TARGET extends BaseNormalTarget>
     boolean b = getTargetType() < GROUP_HTTP && checkUrl() && checkFilePath();
     if (b) {
       mEntity.save();
-      mTaskEntity.save();
     }
     return b;
   }
@@ -166,14 +164,14 @@ abstract class BaseNormalTarget<TARGET extends BaseNormalTarget>
         } else {
           ALog.w(TAG, "保存路径【" + filePath + "】已经被其它任务占用，当前任务将覆盖该路径的文件");
           CommonUtil.delTaskRecord(filePath, 1);
-          mTaskEntity = TEManager.getInstance().getTEntity(DownloadTaskEntity.class, url);
+          mTaskWrapper = TEManager.getInstance().getTEntity(DTaskWrapper.class, url);
         }
       }
       File oldFile = new File(mEntity.getDownloadPath());
       File newFile = new File(filePath);
       mEntity.setDownloadPath(filePath);
       mEntity.setFileName(newFile.getName());
-      mTaskEntity.setKey(filePath);
+      mTaskWrapper.setKey(filePath);
       if (oldFile.exists()) {
         oldFile.renameTo(newFile);
         CommonUtil.modifyTaskRecord(oldFile.getPath(), newFile.getPath());
@@ -203,7 +201,7 @@ abstract class BaseNormalTarget<TARGET extends BaseNormalTarget>
     }
     if (!TextUtils.isEmpty(newUrl)) {
       mEntity.setUrl(newUrl);
-      mTaskEntity.setUrl(newUrl);
+      mTaskWrapper.setUrl(newUrl);
     }
     return true;
   }

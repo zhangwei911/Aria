@@ -17,7 +17,7 @@
 package com.arialyy.aria.core.command.normal;
 
 import com.arialyy.aria.core.inf.AbsTask;
-import com.arialyy.aria.core.inf.AbsTaskEntity;
+import com.arialyy.aria.core.inf.AbsTaskWrapper;
 import com.arialyy.aria.core.inf.IEntity;
 import com.arialyy.aria.util.ALog;
 
@@ -25,7 +25,7 @@ import com.arialyy.aria.util.ALog;
  * Created by lyy on 2016/8/22.
  * 添加任务的命令
  */
-class AddCmd<T extends AbsTaskEntity> extends AbsNormalCmd<T> {
+class AddCmd<T extends AbsTaskWrapper> extends AbsNormalCmd<T> {
 
   AddCmd(T entity, int taskType) {
     super(entity, taskType);
@@ -35,7 +35,7 @@ class AddCmd<T extends AbsTaskEntity> extends AbsNormalCmd<T> {
     if (!canExeCmd) return;
     AbsTask task = getTask();
     if (task == null) {
-      mTaskEntity.getEntity().setState(IEntity.STATE_WAIT);
+      mTaskWrapper.getEntity().setState(IEntity.STATE_WAIT);
       createTask();
       sendWaitState();
     } else {

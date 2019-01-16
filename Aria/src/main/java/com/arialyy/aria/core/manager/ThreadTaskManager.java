@@ -17,7 +17,7 @@
 package com.arialyy.aria.core.manager;
 
 import com.arialyy.aria.core.common.AbsThreadTask;
-import com.arialyy.aria.core.inf.AbsTaskEntity;
+import com.arialyy.aria.core.inf.AbsTaskWrapper;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
 import java.util.HashMap;
@@ -54,7 +54,7 @@ public class ThreadTaskManager {
   /**
    * 启动线程任务
    *
-   * @param key 任务对应的key{@link AbsTaskEntity#getKey()}
+   * @param key 任务对应的key{@link AbsTaskWrapper#getKey()}
    * @param threadTask 线程任务{@link AbsThreadTask}
    */
   public synchronized void startThread(String key, AbsThreadTask threadTask) {
@@ -74,7 +74,7 @@ public class ThreadTaskManager {
   /**
    * 停止任务的所有线程
    *
-   * @param key 任务对应的key{@link AbsTaskEntity#getKey()}
+   * @param key 任务对应的key{@link AbsTaskWrapper#getKey()}
    */
   public synchronized void stopTaskThread(String key) {
     if (mExePool.isShutdown()) {
@@ -126,7 +126,7 @@ public class ThreadTaskManager {
   /**
    * map中的key
    *
-   * @param key 任务的key{@link AbsTaskEntity#getKey()}
+   * @param key 任务的key{@link AbsTaskWrapper#getKey()}
    * @return 转换后的map中的key
    */
   private String getKey(String key) {

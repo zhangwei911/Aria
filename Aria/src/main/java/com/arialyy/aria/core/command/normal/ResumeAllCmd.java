@@ -1,20 +1,19 @@
 package com.arialyy.aria.core.command.normal;
 
-import android.text.TextUtils;
 import com.arialyy.aria.core.AriaManager;
+import com.arialyy.aria.core.download.DGTaskWrapper;
+import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.download.DownloadGroupEntity;
-import com.arialyy.aria.core.download.DownloadGroupTaskEntity;
-import com.arialyy.aria.core.download.DownloadTaskEntity;
 import com.arialyy.aria.core.inf.AbsTask;
-import com.arialyy.aria.core.inf.AbsTaskEntity;
+import com.arialyy.aria.core.inf.AbsTaskWrapper;
 import com.arialyy.aria.core.inf.IEntity;
 import com.arialyy.aria.core.manager.TEManager;
 import com.arialyy.aria.core.queue.DownloadGroupTaskQueue;
 import com.arialyy.aria.core.queue.DownloadTaskQueue;
 import com.arialyy.aria.core.queue.UploadTaskQueue;
+import com.arialyy.aria.core.upload.UTaskWrapper;
 import com.arialyy.aria.core.upload.UploadEntity;
-import com.arialyy.aria.core.upload.UploadTaskEntity;
 import com.arialyy.aria.orm.DbEntity;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
@@ -30,8 +29,8 @@ import java.util.List;
  * 3.如果队列中只有等待状态的任务，如果执行队列没有满，则会启动等待状态的任务，如果执行队列已经满了，则会将所有等待状态的任务加载到缓存队列中
  * 4.恢复下载的任务规则是，停止时间越晚的任务启动越早，按照DESC来进行排序
  */
-final class ResumeAllCmd<T extends AbsTaskEntity> extends AbsNormalCmd<T> {
-  private List<AbsTaskEntity> mWaitList = new ArrayList<>();
+final class ResumeAllCmd<T extends AbsTaskWrapper> extends AbsNormalCmd<T> {
+  private List<AbsTaskWrapper> mWaitList = new ArrayList<>();
 
   ResumeAllCmd(T entity, int taskType) {
     super(entity, taskType);
@@ -66,7 +65,7 @@ final class ResumeAllCmd<T extends AbsTaskEntity> extends AbsNormalCmd<T> {
           //if (TextUtils.isEmpty(entity.getDownloadPath())){
           //  continue;
           //}
-          resumeTask(TEManager.getInstance().getTEntity(DownloadTaskEntity.class, entity.getKey()));
+          resumeTask(TEManager.getInstance().getTEntity(DTaskWrapper.class, entity.getKey()));
         }
       }
     } else if (type == 2) {
@@ -75,7 +74,7 @@ final class ResumeAllCmd<T extends AbsTaskEntity> extends AbsNormalCmd<T> {
       if (entities != null && !entities.isEmpty()) {
         for (DownloadGroupEntity entity : entities) {
           resumeTask(
-              TEManager.getInstance().getGTEntity(DownloadGroupTaskEntity.class, entity.getUrls()));
+              TEManager.getInstance().getGTEntity(DGTaskWrapper.class, entity.getUrls()));
         }
       }
     } else if (type == 3) {
@@ -83,7 +82,7 @@ final class ResumeAllCmd<T extends AbsTaskEntity> extends AbsNormalCmd<T> {
           DbEntity.findDatas(UploadEntity.class, "state!=? ORDER BY stopTime DESC", "1");
       if (entities != null && !entities.isEmpty()) {
         for (UploadEntity entity : entities) {
-          resumeTask(TEManager.getInstance().getTEntity(UploadTaskEntity.class, entity.getKey()));
+          resumeTask(TEManager.getInstance().getTEntity(UTaskWrapper.class, entity.getKey()));
         }
       }
     }
@@ -92,7 +91,7 @@ final class ResumeAllCmd<T extends AbsTaskEntity> extends AbsNormalCmd<T> {
   /**
    * 恢复任务
    */
-  private void resumeTask(AbsTaskEntity te) {
+  private void resumeTask(AbsTaskWrapper te) {
     if (te == null || te.getEntity() == null) return;
     int state = te.getState();
     if (state == IEntity.STATE_STOP || state == IEntity.STATE_OTHER) {
@@ -112,12 +111,12 @@ final class ResumeAllCmd<T extends AbsTaskEntity> extends AbsNormalCmd<T> {
   private void resumeWaitTask() {
     int maxTaskNum = mQueue.getMaxTaskNum();
     if (mWaitList == null || mWaitList.isEmpty()) return;
-    for (AbsTaskEntity te : mWaitList) {
-      if (te instanceof DownloadTaskEntity) {
+    for (AbsTaskWrapper te : mWaitList) {
+      if (te instanceof DTaskWrapper) {
         mQueue = DownloadTaskQueue.getInstance();
-      } else if (te instanceof UploadTaskEntity) {
+      } else if (te instanceof UTaskWrapper) {
         mQueue = UploadTaskQueue.getInstance();
-      } else if (te instanceof DownloadGroupTaskEntity) {
+      } else if (te instanceof DGTaskWrapper) {
         mQueue = DownloadGroupTaskQueue.getInstance();
       }
       if (mQueue.getCurrentExePoolNum() < maxTaskNum) {
@@ -135,16 +134,16 @@ final class ResumeAllCmd<T extends AbsTaskEntity> extends AbsNormalCmd<T> {
    *
    * @param te 任务实体
    */
-  private void resumeEntity(AbsTaskEntity te) {
-    if (te instanceof DownloadTaskEntity) {
-      if (te.getRequestType() == AbsTaskEntity.D_FTP
-          || te.getRequestType() == AbsTaskEntity.U_FTP) {
-        te.setUrlEntity(CommonUtil.getFtpUrlInfo(te.getEntity().getKey()));
+  private void resumeEntity(AbsTaskWrapper te) {
+    if (te instanceof DTaskWrapper) {
+      if (te.getRequestType() == AbsTaskWrapper.D_FTP
+          || te.getRequestType() == AbsTaskWrapper.U_FTP) {
+        te.asFtp().setUrlEntity(CommonUtil.getFtpUrlInfo(te.getEntity().getKey()));
       }
       mQueue = DownloadTaskQueue.getInstance();
-    } else if (te instanceof UploadTaskEntity) {
+    } else if (te instanceof UTaskWrapper) {
       mQueue = UploadTaskQueue.getInstance();
-    } else if (te instanceof DownloadGroupTaskEntity) {
+    } else if (te instanceof DGTaskWrapper) {
       mQueue = DownloadGroupTaskQueue.getInstance();
     }
     int exeNum = mQueue.getCurrentExePoolNum();

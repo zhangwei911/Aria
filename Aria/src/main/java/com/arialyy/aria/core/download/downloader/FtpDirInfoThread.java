@@ -20,27 +20,26 @@ import com.arialyy.aria.core.FtpUrlEntity;
 import com.arialyy.aria.core.common.CompleteInfo;
 import com.arialyy.aria.core.common.OnFileInfoCallback;
 import com.arialyy.aria.core.common.ftp.AbsFtpInfoThread;
+import com.arialyy.aria.core.download.DGTaskWrapper;
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.download.DownloadGroupEntity;
-import com.arialyy.aria.core.download.DownloadGroupTaskEntity;
-import com.arialyy.aria.core.download.DownloadTaskEntity;
-import com.arialyy.aria.core.inf.AbsTaskEntity;
+import com.arialyy.aria.core.download.DTaskWrapper;
+import com.arialyy.aria.core.inf.AbsTaskWrapper;
 import com.arialyy.aria.util.CommonUtil;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 
 /**
- * Created by Aria.Lao on 2017/7/25.
- * 获取ftp文件夹信息
+ * Created by Aria.Lao on 2017/7/25. 获取ftp文件夹信息
  */
-class FtpDirInfoThread extends AbsFtpInfoThread<DownloadGroupEntity, DownloadGroupTaskEntity> {
+class FtpDirInfoThread extends AbsFtpInfoThread<DownloadGroupEntity, DGTaskWrapper> {
 
-  FtpDirInfoThread(DownloadGroupTaskEntity taskEntity, OnFileInfoCallback callback) {
+  FtpDirInfoThread(DGTaskWrapper taskEntity, OnFileInfoCallback callback) {
     super(taskEntity, callback);
   }
 
   @Override protected String setRemotePath() {
-    return mTaskEntity.getUrlEntity().remotePath;
+    return mTaskWrapper.asFtp().getUrlEntity().remotePath;
   }
 
   @Override protected void handleFile(String remotePath, FTPFile ftpFile) {
@@ -58,36 +57,36 @@ class FtpDirInfoThread extends AbsFtpInfoThread<DownloadGroupEntity, DownloadGro
    * FTP文件夹的子任务实体 在这生成
    */
   private void addEntity(String remotePath, FTPFile ftpFile) {
-    final FtpUrlEntity urlEntity = mTaskEntity.getUrlEntity().clone();
+    final FtpUrlEntity urlEntity = mTaskWrapper.asFtp().getUrlEntity().clone();
     DownloadEntity entity = new DownloadEntity();
     entity.setUrl(
         urlEntity.scheme + "://" + urlEntity.hostName + ":" + urlEntity.port + "/" + remotePath);
     entity.setDownloadPath(mEntity.getDirPath() + "/" + remotePath);
     int lastIndex = remotePath.lastIndexOf("/");
     String fileName = lastIndex < 0 ? CommonUtil.keyToHashKey(remotePath)
-        : remotePath.substring(lastIndex + 1, remotePath.length());
-    entity.setFileName(new String(fileName.getBytes(), Charset.forName(mTaskEntity.getCharSet())));
+        : remotePath.substring(lastIndex + 1);
+    entity.setFileName(
+        new String(fileName.getBytes(), Charset.forName(mTaskWrapper.asHttp().getCharSet())));
     entity.setGroupName(mEntity.getGroupName());
     entity.setGroupChild(true);
     entity.setFileSize(ftpFile.getSize());
     entity.insert();
 
-    DownloadTaskEntity taskEntity = new DownloadTaskEntity();
+    DTaskWrapper taskEntity = new DTaskWrapper();
     taskEntity.setKey(entity.getDownloadPath());
     taskEntity.setUrl(entity.getUrl());
     taskEntity.setEntity(entity);
     taskEntity.setGroupTask(true);
     taskEntity.setGroupName(mEntity.getGroupName());
-    taskEntity.setRequestType(AbsTaskEntity.D_FTP);
+    taskEntity.setRequestType(AbsTaskWrapper.D_FTP);
     urlEntity.url = entity.getUrl();
     urlEntity.remotePath = remotePath;
-    taskEntity.setUrlEntity(urlEntity);
-    taskEntity.insert();
+    taskEntity.asFtp().setUrlEntity(urlEntity);
 
     if (mEntity.getUrls() == null) {
       mEntity.setUrls(new ArrayList<String>());
     }
     mEntity.getSubEntities().add(entity);
-    mTaskEntity.getSubTaskEntities().add(taskEntity);
+    mTaskWrapper.getSubTaskWrapper().add(taskEntity);
   }
 }

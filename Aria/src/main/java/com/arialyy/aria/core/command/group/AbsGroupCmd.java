@@ -16,10 +16,10 @@
 package com.arialyy.aria.core.command.group;
 
 import com.arialyy.aria.core.command.AbsCmd;
-import com.arialyy.aria.core.download.DownloadGroupTaskEntity;
+import com.arialyy.aria.core.download.DGTaskWrapper;
 import com.arialyy.aria.core.inf.AbsGroupTask;
-import com.arialyy.aria.core.inf.AbsGroupTaskEntity;
 import com.arialyy.aria.core.inf.AbsTask;
+import com.arialyy.aria.core.inf.AbsGroupTaskWrapper;
 import com.arialyy.aria.core.queue.DownloadGroupTaskQueue;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
@@ -28,7 +28,7 @@ import com.arialyy.aria.util.CommonUtil;
  * Created by AriaL on 2017/6/29.
  * 任务组命令
  */
-public abstract class AbsGroupCmd<T extends AbsGroupTaskEntity> extends AbsCmd<T> {
+public abstract class AbsGroupCmd<T extends AbsGroupTaskWrapper> extends AbsCmd<T> {
   /**
    * 需要控制的子任务url
    */
@@ -37,9 +37,9 @@ public abstract class AbsGroupCmd<T extends AbsGroupTaskEntity> extends AbsCmd<T
   AbsGroupTask tempTask;
 
   AbsGroupCmd(T entity) {
-    mTaskEntity = entity;
+    mTaskWrapper = entity;
     TAG = CommonUtil.getClassName(this);
-    if (entity instanceof DownloadGroupTaskEntity) {
+    if (entity instanceof DGTaskWrapper) {
       mQueue = DownloadGroupTaskQueue.getInstance();
       isDownloadCmd = true;
     }
@@ -51,12 +51,12 @@ public abstract class AbsGroupCmd<T extends AbsGroupTaskEntity> extends AbsCmd<T
    * @return 创建的任务
    */
   AbsTask createTask() {
-    tempTask = (AbsGroupTask) mQueue.createTask(mTaskEntity);
+    tempTask = (AbsGroupTask) mQueue.createTask(mTaskWrapper);
     return tempTask;
   }
 
   boolean checkTask() {
-    tempTask = (AbsGroupTask) mQueue.getTask(mTaskEntity.getEntity().getKey());
+    tempTask = (AbsGroupTask) mQueue.getTask(mTaskWrapper.getEntity().getKey());
     if (tempTask == null) {
       createTask();
       if (tempTask.isComplete()) {

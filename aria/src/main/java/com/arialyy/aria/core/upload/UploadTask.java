@@ -25,10 +25,10 @@ import com.arialyy.aria.core.upload.uploader.SimpleUploadUtil;
 /**
  * Created by lyy on 2017/2/23. 上传任务
  */
-public class UploadTask extends AbsNormalTask<UploadEntity, UploadTaskEntity> {
+public class UploadTask extends AbsNormalTask<UploadEntity, UTaskWrapper> {
 
-  private UploadTask(UploadTaskEntity taskEntity, Handler outHandler) {
-    mTaskEntity = taskEntity;
+  private UploadTask(UTaskWrapper taskEntity, Handler outHandler) {
+    mTaskWrapper = taskEntity;
     mOutHandler = outHandler;
     mListener = new BaseUListener(this, mOutHandler);
     mUtil = new SimpleUploadUtil(taskEntity, (IUploadListener) mListener);
@@ -39,26 +39,26 @@ public class UploadTask extends AbsNormalTask<UploadEntity, UploadTaskEntity> {
   }
 
   @Override public String getKey() {
-    return mTaskEntity.getEntity().getFilePath();
+    return mTaskWrapper.getEntity().getFilePath();
   }
 
   public UploadEntity getEntity() {
-    return mTaskEntity.getEntity();
+    return mTaskWrapper.getEntity();
   }
 
   @Override public String getTaskName() {
-    return mTaskEntity.getEntity().getFileName();
+    return mTaskWrapper.getEntity().getFileName();
   }
 
   public static class Builder {
     private Handler mOutHandler;
-    private UploadTaskEntity mTaskEntity;
+    private UTaskWrapper mTaskEntity;
 
     public void setOutHandler(ISchedulers outHandler) {
       mOutHandler = new Handler(Looper.getMainLooper(), outHandler);
     }
 
-    public void setUploadTaskEntity(UploadTaskEntity taskEntity) {
+    public void setUploadTaskEntity(UTaskWrapper taskEntity) {
       mTaskEntity = taskEntity;
     }
 

@@ -15,17 +15,39 @@
  */
 package com.arialyy.aria.core.inf;
 
-import java.util.Map;
+import com.arialyy.aria.core.download.DownloadGroupEntity;
 
 /**
- * post 通用处理接口
+ * 组合任务实体包裹器，用于加载和任务相关的参数，如：组合任务实体{@link DownloadGroupEntity}、header头部
  */
-public interface IPostDelegate<TARGET extends ITarget> {
+public interface ITaskWrapper<ENTITY extends AbsEntity> {
 
   /**
-   * 设置Post请求参数
+   * HTTP单任务载
    */
-  TARGET setParams(Map<String, String> params);
+  int D_HTTP = 0x11;
+  /**
+   * HTTP任务组下载
+   */
+  int DG_HTTP = 0x12;
 
-  TARGET setParam(String key, String value);
+  /**
+   * FTP单文件下载
+   */
+  int D_FTP = 0x13;
+  /**
+   * FTP文件夹下载，为避免登录过多，子任务由单线程进行处理
+   */
+  int D_FTP_DIR = 0x14;
+
+  /**
+   * HTTP单文件上传
+   */
+  int U_HTTP = 0xA1;
+  /**
+   * FTP单文件上传
+   */
+  int U_FTP = 0xA2;
+
+  ENTITY getEntity();
 }

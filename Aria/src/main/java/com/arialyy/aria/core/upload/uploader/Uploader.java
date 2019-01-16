@@ -19,20 +19,19 @@ import com.arialyy.aria.core.AriaManager;
 import com.arialyy.aria.core.common.AbsFileer;
 import com.arialyy.aria.core.common.AbsThreadTask;
 import com.arialyy.aria.core.common.SubThreadConfig;
-import com.arialyy.aria.core.inf.AbsTaskEntity;
+import com.arialyy.aria.core.inf.AbsTaskWrapper;
 import com.arialyy.aria.core.inf.IUploadListener;
+import com.arialyy.aria.core.upload.UTaskWrapper;
 import com.arialyy.aria.core.upload.UploadEntity;
-import com.arialyy.aria.core.upload.UploadTaskEntity;
-import com.arialyy.aria.orm.DbEntity;
 import java.io.File;
 
 /**
  * Created by Aria.Lao on 2017/7/27.
  * 文件上传器
  */
-class Uploader extends AbsFileer<UploadEntity, UploadTaskEntity> {
+class Uploader extends AbsFileer<UploadEntity, UTaskWrapper> {
 
-  Uploader(IUploadListener listener, UploadTaskEntity taskEntity) {
+  Uploader(IUploadListener listener, UTaskWrapper taskEntity) {
     super(listener, taskEntity);
     mTempFile = new File(mEntity.getFilePath());
     setUpdateInterval(
@@ -47,11 +46,11 @@ class Uploader extends AbsFileer<UploadEntity, UploadTaskEntity> {
     return 1;
   }
 
-  @Override protected AbsThreadTask selectThreadTask(SubThreadConfig<UploadTaskEntity> config) {
+  @Override protected AbsThreadTask selectThreadTask(SubThreadConfig<UTaskWrapper> config) {
     switch (mTaskEntity.getRequestType()) {
-      case AbsTaskEntity.U_FTP:
+      case AbsTaskWrapper.U_FTP:
         return new FtpThreadTask(mConstance, mListener, config);
-      case AbsTaskEntity.U_HTTP:
+      case AbsTaskWrapper.U_HTTP:
         return new HttpThreadTask(mConstance, (IUploadListener) mListener, config);
     }
     return null;

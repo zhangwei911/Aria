@@ -17,13 +17,13 @@ package com.arialyy.aria.core.download.downloader;
 
 import android.os.Process;
 import android.text.TextUtils;
-import android.util.Log;
 import com.arialyy.aria.core.AriaManager;
 import com.arialyy.aria.core.common.CompleteInfo;
 import com.arialyy.aria.core.common.OnFileInfoCallback;
 import com.arialyy.aria.core.common.RequestEnum;
+import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.download.DownloadEntity;
-import com.arialyy.aria.core.download.DownloadTaskEntity;
+import com.arialyy.aria.core.common.http.HttpTaskDelegate;
 import com.arialyy.aria.exception.AriaIOException;
 import com.arialyy.aria.exception.BaseException;
 import com.arialyy.aria.exception.TaskException;
@@ -35,14 +35,12 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.net.CookieHandler;
 import java.net.CookieManager;
 import java.net.HttpCookie;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -53,25 +51,27 @@ import java.util.Set;
 class HttpFileInfoThread implements Runnable {
   private final String TAG = "HttpFileInfoThread";
   private DownloadEntity mEntity;
-  private DownloadTaskEntity mTaskEntity;
+  private DTaskWrapper mTaskWrapper;
   private int mConnectTimeOut;
   private OnFileInfoCallback onFileInfoCallback;
+  private HttpTaskDelegate mTaskDelegate;
 
-  HttpFileInfoThread(DownloadTaskEntity taskEntity, OnFileInfoCallback callback) {
-    this.mTaskEntity = taskEntity;
-    mEntity = taskEntity.getEntity();
+  HttpFileInfoThread(DTaskWrapper taskWrapper, OnFileInfoCallback callback) {
+    this.mTaskWrapper = taskWrapper;
+    mEntity = taskWrapper.getEntity();
     mConnectTimeOut =
         AriaManager.getInstance(AriaManager.APP).getDownloadConfig().getConnectTimeOut();
     onFileInfoCallback = callback;
+    mTaskDelegate = taskWrapper.asHttp();
   }
 
   @Override public void run() {
     Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
     HttpURLConnection conn = null;
     try {
-      URL url = ConnectionHelp.handleUrl(mEntity.getUrl(), mTaskEntity);
-      conn = ConnectionHelp.handleConnection(url, mTaskEntity);
-      conn = ConnectionHelp.setConnectParam(mTaskEntity, conn);
+      URL url = ConnectionHelp.handleUrl(mEntity.getUrl(), mTaskDelegate);
+      conn = ConnectionHelp.handleConnection(url, mTaskDelegate);
+      ConnectionHelp.setConnectParam(mTaskDelegate, conn);
       conn.setRequestProperty("Range", "bytes=" + 0 + "-");
       conn.setConnectTimeout(mConnectTimeOut);
       //conn.setChunkedStreamingMode(0);
@@ -89,8 +89,8 @@ class HttpFileInfoThread implements Runnable {
   }
 
   private void handleConnect(HttpURLConnection conn) throws IOException {
-    if (mTaskEntity.getRequestEnum() == RequestEnum.POST) {
-      Map<String, String> params = mTaskEntity.getParams();
+    if (mTaskDelegate.getRequestEnum() == RequestEnum.POST) {
+      Map<String, String> params = mTaskDelegate.getParams();
       if (params != null) {
         OutputStreamWriter dos = new OutputStreamWriter(conn.getOutputStream());
         Set<String> keys = params.keySet();
@@ -144,7 +144,7 @@ class HttpFileInfoThread implements Runnable {
     }
     Map<String, List<String>> headers = conn.getHeaderFields();
     String disposition = conn.getHeaderField("Content-Disposition");
-    if (mTaskEntity.isUseServerFileName() && !TextUtils.isEmpty(disposition)) {
+    if (mTaskDelegate.isUseServerFileName() && !TextUtils.isEmpty(disposition)) {
       mEntity.setDisposition(CommonUtil.encryptBASE64(disposition));
       if (disposition.contains(";")) {
         String[] infos = disposition.split(";");
@@ -168,10 +168,10 @@ class HttpFileInfoThread implements Runnable {
       for (String cookie : cookiesHeader) {
         msCookieManager.getCookieStore().add(null, HttpCookie.parse(cookie).get(0));
       }
-      mTaskEntity.setCookieManager(msCookieManager);
+      mTaskDelegate.setCookieManager(msCookieManager);
     }
 
-    mTaskEntity.setCode(code);
+    mTaskWrapper.setCode(code);
     if (code == HttpURLConnection.HTTP_PARTIAL) {
       if (!checkLen(len) && !isChunked) {
         if (len < 0) {
@@ -182,7 +182,7 @@ class HttpFileInfoThread implements Runnable {
         return;
       }
       mEntity.setFileSize(len);
-      mTaskEntity.setSupportBP(true);
+      mTaskWrapper.setSupportBP(true);
       end = true;
     } else if (code == HttpURLConnection.HTTP_OK) {
       String contentType = conn.getHeaderField("Content-Type");
@@ -210,8 +210,8 @@ class HttpFileInfoThread implements Runnable {
         return;
       }
       mEntity.setFileSize(len);
-      mTaskEntity.setNewTask(true);
-      mTaskEntity.setSupportBP(false);
+      mTaskWrapper.setNewTask(true);
+      mTaskWrapper.setSupportBP(false);
       end = true;
     } else if (code == HttpURLConnection.HTTP_NOT_FOUND) {
       failDownload(new AriaIOException(TAG,
@@ -228,8 +228,7 @@ class HttpFileInfoThread implements Runnable {
               conn.getResponseMessage(), mEntity.getUrl())), true);
     }
     if (end) {
-      mTaskEntity.setChunked(isChunked);
-      mTaskEntity.update();
+      mTaskDelegate.setChunked(isChunked);
       if (onFileInfoCallback != null) {
         CompleteInfo info = new CompleteInfo(code);
         onFileInfoCallback.onComplete(mEntity.getUrl(), info);
@@ -252,7 +251,7 @@ class HttpFileInfoThread implements Runnable {
     }
     mEntity.setFileName(newName);
     mEntity.setDownloadPath(newPath);
-    mTaskEntity.setKey(newPath);
+    mTaskWrapper.setKey(newPath);
   }
 
   /**
@@ -271,13 +270,13 @@ class HttpFileInfoThread implements Runnable {
       failDownload(new TaskException(TAG, "下载失败，重定向url错误"), false);
       return;
     }
-    mTaskEntity.setRedirectUrl(newUrl);
+    mTaskDelegate.setRedirectUrl(newUrl);
     mEntity.setRedirect(true);
     mEntity.setRedirectUrl(newUrl);
     String cookies = conn.getHeaderField("Set-Cookie");
-    URL url = ConnectionHelp.handleUrl(newUrl, mTaskEntity);
-    conn = ConnectionHelp.handleConnection(url, mTaskEntity);
-    conn = ConnectionHelp.setConnectParam(mTaskEntity, conn);
+    URL url = ConnectionHelp.handleUrl(newUrl, mTaskDelegate);
+    conn = ConnectionHelp.handleConnection(url, mTaskDelegate);
+    ConnectionHelp.setConnectParam(mTaskDelegate, conn);
     conn.setRequestProperty("Cookie", cookies);
     conn.setRequestProperty("Range", "bytes=" + 0 + "-");
     conn.setConnectTimeout(mConnectTimeOut);
@@ -294,7 +293,7 @@ class HttpFileInfoThread implements Runnable {
    */
   private boolean checkLen(long len) {
     if (len != mEntity.getFileSize()) {
-      mTaskEntity.setNewTask(true);
+      mTaskWrapper.setNewTask(true);
     }
     return true;
   }

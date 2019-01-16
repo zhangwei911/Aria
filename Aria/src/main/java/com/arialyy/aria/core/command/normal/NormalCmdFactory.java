@@ -19,13 +19,13 @@ package com.arialyy.aria.core.command.normal;
 import com.arialyy.aria.core.AriaManager;
 import com.arialyy.aria.core.command.AbsCmdFactory;
 import com.arialyy.aria.core.command.ICmd;
-import com.arialyy.aria.core.inf.AbsTaskEntity;
+import com.arialyy.aria.core.inf.AbsTaskWrapper;
 
 /**
  * Created by Lyy on 2016/9/23.
  * 命令工厂
  */
-public class NormalCmdFactory extends AbsCmdFactory<AbsTaskEntity, AbsNormalCmd> {
+public class NormalCmdFactory extends AbsCmdFactory<AbsTaskWrapper, AbsNormalCmd> {
   /**
    * 创建任务
    */
@@ -84,7 +84,7 @@ public class NormalCmdFactory extends AbsCmdFactory<AbsTaskEntity, AbsNormalCmd>
    * @param taskType {@link ICmd#TASK_TYPE_DOWNLOAD}、{@link ICmd#TASK_TYPE_DOWNLOAD_GROUP}、{@link
    * ICmd#TASK_TYPE_UPLOAD}
    */
-  public AbsNormalCmd createCmd(AbsTaskEntity entity, int type, int taskType) {
+  public AbsNormalCmd createCmd(AbsTaskWrapper entity, int type, int taskType) {
     switch (type) {
       case TASK_CREATE:
         return new AddCmd<>(entity, taskType);

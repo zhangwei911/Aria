@@ -16,17 +16,17 @@
 
 package com.arialyy.aria.core.command.normal;
 
+import com.arialyy.aria.core.download.DGTaskWrapper;
+import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.download.DownloadGroupEntity;
-import com.arialyy.aria.core.download.DownloadGroupTaskEntity;
-import com.arialyy.aria.core.download.DownloadTaskEntity;
-import com.arialyy.aria.core.inf.AbsTaskEntity;
+import com.arialyy.aria.core.inf.AbsTaskWrapper;
 import com.arialyy.aria.core.manager.TEManager;
 import com.arialyy.aria.core.queue.DownloadGroupTaskQueue;
 import com.arialyy.aria.core.queue.DownloadTaskQueue;
 import com.arialyy.aria.core.queue.UploadTaskQueue;
+import com.arialyy.aria.core.upload.UTaskWrapper;
 import com.arialyy.aria.core.upload.UploadEntity;
-import com.arialyy.aria.core.upload.UploadTaskEntity;
 import com.arialyy.aria.orm.DbEntity;
 import com.arialyy.aria.util.ALog;
 import java.util.List;
@@ -35,7 +35,7 @@ import java.util.List;
  * Created by AriaL on 2017/6/27.
  * 删除所有任务，并且删除所有回掉
  */
-public class CancelAllCmd<T extends AbsTaskEntity> extends AbsNormalCmd<T> {
+public class CancelAllCmd<T extends AbsTaskWrapper> extends AbsNormalCmd<T> {
   /**
    * removeFile {@code true} 删除已经下载完成的任务，不仅删除下载记录，还会删除已经下载完成的文件，{@code false}
    * 如果文件已经下载完成，只删除下载记录
@@ -64,7 +64,7 @@ public class CancelAllCmd<T extends AbsTaskEntity> extends AbsNormalCmd<T> {
         DbEntity.findDatas(DownloadEntity.class, "isGroupChild=?", "false");
     if (entities != null && !entities.isEmpty()) {
       for (DownloadEntity entity : entities) {
-        remove(TEManager.getInstance().getTEntity(DownloadTaskEntity.class, entity.getKey()));
+        remove(TEManager.getInstance().getTEntity(DTaskWrapper.class, entity.getKey()));
       }
     }
   }
@@ -78,7 +78,7 @@ public class CancelAllCmd<T extends AbsTaskEntity> extends AbsNormalCmd<T> {
     if (entities != null && !entities.isEmpty()) {
       for (DownloadGroupEntity entity : entities) {
         remove(
-            TEManager.getInstance().getGTEntity(DownloadGroupTaskEntity.class, entity.getUrls()));
+            TEManager.getInstance().getGTEntity(DGTaskWrapper.class, entity.getUrls()));
       }
     }
   }
@@ -91,21 +91,21 @@ public class CancelAllCmd<T extends AbsTaskEntity> extends AbsNormalCmd<T> {
         DbEntity.findDatas(UploadEntity.class, "isGroupChild=?", "false");
     if (entities != null && !entities.isEmpty()) {
       for (UploadEntity entity : entities) {
-        remove(TEManager.getInstance().getTEntity(UploadTaskEntity.class, entity.getKey()));
+        remove(TEManager.getInstance().getTEntity(UTaskWrapper.class, entity.getKey()));
       }
     }
   }
 
-  private void remove(AbsTaskEntity te) {
+  private void remove(AbsTaskWrapper te) {
     if (te == null){
       ALog.w(TAG, "取消任务失败，任务为空");
       return;
     }
-    if (te instanceof DownloadTaskEntity) {
+    if (te instanceof DTaskWrapper) {
       mQueue = DownloadTaskQueue.getInstance();
-    } else if (te instanceof UploadTaskEntity) {
+    } else if (te instanceof UTaskWrapper) {
       mQueue = UploadTaskQueue.getInstance();
-    } else if (te instanceof DownloadGroupTaskEntity) {
+    } else if (te instanceof DGTaskWrapper) {
       mQueue = DownloadGroupTaskQueue.getInstance();
     }
     te.setRemoveFile(removeFile);

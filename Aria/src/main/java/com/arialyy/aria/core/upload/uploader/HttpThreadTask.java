@@ -18,9 +18,10 @@ package com.arialyy.aria.core.upload.uploader;
 import com.arialyy.aria.core.common.AbsThreadTask;
 import com.arialyy.aria.core.common.StateConstance;
 import com.arialyy.aria.core.common.SubThreadConfig;
+import com.arialyy.aria.core.common.http.HttpTaskDelegate;
 import com.arialyy.aria.core.inf.IUploadListener;
+import com.arialyy.aria.core.upload.UTaskWrapper;
 import com.arialyy.aria.core.upload.UploadEntity;
-import com.arialyy.aria.core.upload.UploadTaskEntity;
 import com.arialyy.aria.exception.BaseException;
 import com.arialyy.aria.exception.TaskException;
 import com.arialyy.aria.util.ALog;
@@ -42,7 +43,7 @@ import java.util.UUID;
  * Created by Aria.Lao on 2017/7/28.
  * 不支持断点的HTTP上传任务
  */
-class HttpThreadTask extends AbsThreadTask<UploadEntity, UploadTaskEntity> {
+class HttpThreadTask extends AbsThreadTask<UploadEntity, UTaskWrapper> {
   private final String TAG = "HttpThreadTask";
 
   private final String BOUNDARY = UUID.randomUUID().toString(); // 边界标识 随机生成
@@ -51,7 +52,7 @@ class HttpThreadTask extends AbsThreadTask<UploadEntity, UploadTaskEntity> {
   private OutputStream mOutputStream;
 
   HttpThreadTask(StateConstance constance, IUploadListener listener,
-      SubThreadConfig<UploadTaskEntity> uploadInfo) {
+      SubThreadConfig<UTaskWrapper> uploadInfo) {
     super(constance, listener, uploadInfo);
     mConnectTimeOut = mAridManager.getUploadConfig().getConnectTimeOut();
     mReadTimeOut = mAridManager.getUploadConfig().getIOTimeOut();
@@ -72,15 +73,16 @@ class HttpThreadTask extends AbsThreadTask<UploadEntity, UploadTaskEntity> {
     URL url;
     try {
       url = new URL(mEntity.getUrl());
+      HttpTaskDelegate taskDelegate = mTaskWrapper.asHttp();
       mHttpConn = (HttpURLConnection) url.openConnection();
-      mHttpConn.setRequestMethod(mTaskEntity.getRequestEnum().name);
+      mHttpConn.setRequestMethod(taskDelegate.getRequestEnum().name);
       mHttpConn.setUseCaches(false);
       mHttpConn.setDoOutput(true);
       mHttpConn.setDoInput(true);
       mHttpConn.setRequestProperty("Connection", "Keep-Alive");
       mHttpConn.setRequestProperty("Content-Type",
-          mTaskEntity.getContentType() + "; boundary=" + BOUNDARY);
-      mHttpConn.setRequestProperty("User-Agent", mTaskEntity.getUserAgent());
+          taskDelegate.getContentType() + "; boundary=" + BOUNDARY);
+      mHttpConn.setRequestProperty("User-Agent", taskDelegate.getUserAgent());
       mHttpConn.setConnectTimeout(mConnectTimeOut);
       mHttpConn.setReadTimeout(mReadTimeOut);
       //mHttpConn.setRequestProperty("Range", "bytes=" + 0 + "-" + "100");
@@ -88,20 +90,20 @@ class HttpThreadTask extends AbsThreadTask<UploadEntity, UploadTaskEntity> {
       mHttpConn.setChunkedStreamingMode(mBufSize);
 
       //添加Http请求头部
-      Set<String> keys = mTaskEntity.getHeaders().keySet();
+      Set<String> keys = taskDelegate.getHeaders().keySet();
       for (String key : keys) {
-        mHttpConn.setRequestProperty(key, mTaskEntity.getHeaders().get(key));
+        mHttpConn.setRequestProperty(key, taskDelegate.getHeaders().get(key));
       }
       mOutputStream = mHttpConn.getOutputStream();
       PrintWriter writer =
-          new PrintWriter(new OutputStreamWriter(mOutputStream, mTaskEntity.getCharSet()), true);
+          new PrintWriter(new OutputStreamWriter(mOutputStream, taskDelegate.getCharSet()), true);
       //添加文件上传表单字段
-      keys = mTaskEntity.getFormFields().keySet();
+      keys = taskDelegate.getFormFields().keySet();
       for (String key : keys) {
-        addFormField(writer, key, mTaskEntity.getFormFields().get(key));
+        addFormField(writer, key, taskDelegate.getFormFields().get(key));
       }
-      uploadFile(writer, mTaskEntity.getAttachment(), uploadFile);
-      mTaskEntity.getEntity().setResponseStr(finish(writer));
+      uploadFile(writer, taskDelegate.getAttachment(), uploadFile);
+      mTaskWrapper.getEntity().setResponseStr(finish(writer));
       mListener.onComplete();
     } catch (Exception e) {
       e.printStackTrace();
@@ -133,7 +135,7 @@ class HttpThreadTask extends AbsThreadTask<UploadEntity, UploadTaskEntity> {
         .append("\"")
         .append(LINE_END);
     writer.append("Content-Type: text/plain; charset=")
-        .append(mTaskEntity.getCharSet())
+        .append(mTaskWrapper.asHttp().getCharSet())
         .append(LINE_END);
     writer.append(LINE_END);
     writer.append(value).append(LINE_END);
@@ -152,11 +154,11 @@ class HttpThreadTask extends AbsThreadTask<UploadEntity, UploadTaskEntity> {
     writer.append("Content-Disposition: form-data; name=\"")
         .append(attachment)
         .append("\"; filename=\"")
-        .append(mTaskEntity.getEntity().getFileName())
+        .append(mTaskWrapper.getEntity().getFileName())
         .append("\"")
         .append(LINE_END);
     writer.append("Content-Type: ")
-        .append(URLConnection.guessContentTypeFromName(mTaskEntity.getEntity().getFileName()))
+        .append(URLConnection.guessContentTypeFromName(mTaskWrapper.getEntity().getFileName()))
         .append(LINE_END);
     writer.append("Content-Transfer-Encoding: binary").append(LINE_END);
     writer.append(LINE_END);

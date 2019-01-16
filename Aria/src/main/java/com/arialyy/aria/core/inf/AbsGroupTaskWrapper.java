@@ -13,14 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.arialyy.aria.core.inf;
 
+import com.arialyy.aria.core.download.DownloadGroupEntity;
+import java.util.List;
+
 /**
- * Created by lyy on 2017/9/5.
+ * 组合任务实体包裹器，用于加载和任务相关的参数，如：组合任务实体{@link DownloadGroupEntity}
  */
-public abstract class AbsGroupTaskEntity<ENTITY extends AbsGroupEntity> extends AbsTaskEntity<ENTITY>{
-  @Override public ENTITY getEntity() {
-    return null;
-  }
+public abstract class AbsGroupTaskWrapper<ENTITY extends AbsEntity, SUB extends AbsTaskWrapper>
+    extends AbsTaskWrapper<ENTITY> {
+
+  public abstract List<SUB> getSubTaskWrapper();
+
+  public abstract void setSubTaskWrapper(List<SUB> subTaskWrapper);
 }

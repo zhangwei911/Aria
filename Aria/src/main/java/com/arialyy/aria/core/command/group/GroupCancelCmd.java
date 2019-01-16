@@ -15,13 +15,13 @@
  */
 package com.arialyy.aria.core.command.group;
 
-import com.arialyy.aria.core.inf.AbsGroupTaskEntity;
+import com.arialyy.aria.core.inf.AbsGroupTaskWrapper;
 
 /**
  * Created by AriaL on 2017/6/29.
  * 删除任务组子任务
  */
-class GroupCancelCmd<T extends AbsGroupTaskEntity> extends AbsGroupCmd<T> {
+class GroupCancelCmd<T extends AbsGroupTaskWrapper> extends AbsGroupCmd<T> {
   GroupCancelCmd(T entity) {
     super(entity);
   }
