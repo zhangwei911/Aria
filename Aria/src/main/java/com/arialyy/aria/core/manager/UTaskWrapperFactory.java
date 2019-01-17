@@ -15,55 +15,34 @@
  */
 package com.arialyy.aria.core.manager;
 
-import android.text.TextUtils;
 import com.arialyy.aria.core.upload.UTaskWrapper;
 import com.arialyy.aria.core.upload.UploadEntity;
-import com.arialyy.aria.core.upload.wrapper.UTEWrapper;
-import com.arialyy.aria.orm.DbEntity;
 import com.arialyy.aria.util.Regular;
-import java.util.List;
 import java.util.regex.Pattern;
 
 /**
- * Created by Aria.Lao on 2017/11/1.
- * 任务实体工厂
+ * Created by Aria.Lao on 2017/11/1. 任务实体工厂
  */
-class UTEFactory implements INormalTEFactory<UploadEntity, UTaskWrapper> {
-  private static final String TAG = "DTEFactory";
-  private static volatile UTEFactory INSTANCE = null;
+class UTaskWrapperFactory implements INormalTEFactory<UploadEntity, UTaskWrapper> {
+  private static final String TAG = "UTaskWrapperFactory";
+  private static volatile UTaskWrapperFactory INSTANCE = null;
 
-  private UTEFactory() {
+  private UTaskWrapperFactory() {
   }
 
-  public static UTEFactory getInstance() {
+  public static UTaskWrapperFactory getInstance() {
     if (INSTANCE == null) {
-      synchronized (UTEFactory.class) {
-        INSTANCE = new UTEFactory();
+      synchronized (UTaskWrapperFactory.class) {
+        INSTANCE = new UTaskWrapperFactory();
       }
     }
     return INSTANCE;
   }
 
   private UTaskWrapper create(UploadEntity entity) {
-    List<UTEWrapper> wrapper =
-        DbEntity.findRelationData(UTEWrapper.class, "UTaskWrapper.key=?",
-            entity.getFilePath());
-    UTaskWrapper uTaskEntity = null;
-    if (wrapper != null && !wrapper.isEmpty()) {
-      uTaskEntity = wrapper.get(0).taskEntity;
-      if (uTaskEntity == null) {
-        uTaskEntity = new UTaskWrapper();
-        uTaskEntity.setEntity(entity);
-      } else if (uTaskEntity.getEntity() == null || TextUtils.isEmpty(
-          uTaskEntity.getEntity().getFilePath())) {
-        uTaskEntity.setEntity(entity);
-      }
-    } else {
-      uTaskEntity = new UTaskWrapper();
-      uTaskEntity.setEntity(entity);
-    }
-    uTaskEntity.setKey(entity.getFilePath());
-    return uTaskEntity;
+    UTaskWrapper wrapper = new UTaskWrapper(entity);
+    wrapper.setKey(entity.getFilePath());
+    return wrapper;
   }
 
   @Override public UTaskWrapper create(String key) {

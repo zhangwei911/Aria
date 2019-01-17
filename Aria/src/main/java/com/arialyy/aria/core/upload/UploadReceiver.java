@@ -123,7 +123,7 @@ public class UploadReceiver extends AbsReceiver {
   public void stopAllTask() {
     AriaManager.getInstance(AriaManager.APP)
         .setCmd(NormalCmdFactory.getInstance()
-            .createCmd(new UTaskWrapper(), NormalCmdFactory.TASK_STOP_ALL,
+            .createCmd(new UTaskWrapper(null), NormalCmdFactory.TASK_STOP_ALL,
                 ICmd.TASK_TYPE_UPLOAD))
         .exe();
   }
@@ -137,7 +137,7 @@ public class UploadReceiver extends AbsReceiver {
   public void removeAllTask(boolean removeFile) {
     final AriaManager am = AriaManager.getInstance(AriaManager.APP);
     CancelAllCmd cancelCmd =
-        (CancelAllCmd) CommonUtil.createNormalCmd(new UTaskWrapper(),
+        (CancelAllCmd) CommonUtil.createNormalCmd(new UTaskWrapper(null),
             NormalCmdFactory.TASK_CANCEL_ALL, ICmd.TASK_TYPE_UPLOAD);
     cancelCmd.removeFile = removeFile;
     am.setCmd(cancelCmd).exe();

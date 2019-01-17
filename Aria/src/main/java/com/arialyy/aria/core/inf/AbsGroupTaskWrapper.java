@@ -24,6 +24,10 @@ import java.util.List;
 public abstract class AbsGroupTaskWrapper<ENTITY extends AbsEntity, SUB extends AbsTaskWrapper>
     extends AbsTaskWrapper<ENTITY> {
 
+  public AbsGroupTaskWrapper(ENTITY entity) {
+    super(entity);
+  }
+
   public abstract List<SUB> getSubTaskWrapper();
 
   public abstract void setSubTaskWrapper(List<SUB> subTaskWrapper);

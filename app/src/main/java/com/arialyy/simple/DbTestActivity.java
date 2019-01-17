@@ -58,13 +58,11 @@ public class DbTestActivity extends BaseActivity<ActivityDbTestBinding> {
       entity.setFileName("ssssssssssssssssss");
       entity.setDownloadPath(key);
 
-      DTaskWrapper dte = new DTaskWrapper();
+      DTaskWrapper dte = new DTaskWrapper(entity);
       dte.setUrl(url);
       dte.setKey(key);
-      dte.setEntity(entity);
 
       datas.add(entity);
-      datas.add(dte);
     }
 
     //AbsEntity.insertManyData(DownloadEntity.class, datas);

@@ -30,7 +30,7 @@ import com.arialyy.aria.core.inf.GroupSendParams;
 import com.arialyy.aria.core.inf.IEntity;
 import com.arialyy.aria.core.inf.ITask;
 import com.arialyy.aria.core.inf.TaskSchedulerType;
-import com.arialyy.aria.core.manager.TEManager;
+import com.arialyy.aria.core.manager.TaskWrapperManager;
 import com.arialyy.aria.core.queue.ITaskQueue;
 import com.arialyy.aria.core.upload.UploadTask;
 import com.arialyy.aria.util.ALog;
@@ -199,10 +199,10 @@ abstract class AbsSchedulers<TASK_ENTITY extends AbsTaskWrapper, TASK extends Ab
         break;
     }
     if (what == CANCEL || what == COMPLETE) {
-      TEManager.getInstance().removeTEntity(task.getKey());
+      TaskWrapperManager.getInstance().removeTaskWrapper(task.getKey());
     } else {
       if (what != RUNNING) {
-        TEManager.getInstance().putTEntity(task.getKey(), task.getTaskWrapper());
+        TaskWrapperManager.getInstance().putTaskWrapper(task.getKey(), task.getTaskWrapper());
       }
     }
     if (what != FAIL) {
@@ -340,7 +340,7 @@ abstract class AbsSchedulers<TASK_ENTITY extends AbsTaskWrapper, TASK extends Ab
         || task.getTaskWrapper().getEntity().getFailNum() > reTryNum) {
       mQueue.removeTaskFormQueue(task.getKey());
       startNextTask(task);
-      TEManager.getInstance().removeTEntity(task.getKey());
+      TaskWrapperManager.getInstance().removeTaskWrapper(task.getKey());
       callback(FAIL, task);
       return;
     }
@@ -359,7 +359,7 @@ abstract class AbsSchedulers<TASK_ENTITY extends AbsTaskWrapper, TASK extends Ab
         } else {
           mQueue.removeTaskFormQueue(task.getKey());
           startNextTask(task);
-          TEManager.getInstance().removeTEntity(task.getKey());
+          TaskWrapperManager.getInstance().removeTaskWrapper(task.getKey());
         }
       }
     };

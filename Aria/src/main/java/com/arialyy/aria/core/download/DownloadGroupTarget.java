@@ -22,7 +22,7 @@ import com.arialyy.aria.core.common.RequestEnum;
 import com.arialyy.aria.core.common.http.HttpHeaderDelegate;
 import com.arialyy.aria.core.common.http.PostDelegate;
 import com.arialyy.aria.core.inf.IHttpHeaderDelegate;
-import com.arialyy.aria.core.manager.TEManager;
+import com.arialyy.aria.core.manager.TaskWrapperManager;
 import com.arialyy.aria.orm.DbEntity;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
@@ -67,7 +67,7 @@ public class DownloadGroupTarget extends BaseGroupTarget<DownloadGroupTarget> im
 
   private void init() {
     mGroupName = CommonUtil.getMd5Code(mUrls);
-    mTaskWrapper = TEManager.getInstance().getGTEntity(DGTaskWrapper.class, mUrls);
+    mTaskWrapper = TaskWrapperManager.getInstance().getDGTaskWrapper(DGTaskWrapper.class, mUrls);
     mEntity = mTaskWrapper.getEntity();
     if (mEntity != null) {
       mDirPathTemp = mEntity.getDirPath();

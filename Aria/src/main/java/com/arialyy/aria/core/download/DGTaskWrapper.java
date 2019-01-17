@@ -23,18 +23,12 @@ import java.util.List;
  */
 public class DGTaskWrapper extends AbsGroupTaskWrapper<DownloadGroupEntity, DTaskWrapper> {
 
-  private DownloadGroupEntity entity;
-
   private List<DTaskWrapper> subTaskEntities;
 
   private String key;
 
-  @Override public DownloadGroupEntity getEntity() {
-    return entity;
-  }
-
-  public void setEntity(DownloadGroupEntity entity) {
-    this.entity = entity;
+  public DGTaskWrapper(DownloadGroupEntity entity) {
+    super(entity);
   }
 
   @Override

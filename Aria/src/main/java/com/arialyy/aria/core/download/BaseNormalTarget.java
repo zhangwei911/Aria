@@ -16,7 +16,7 @@
 package com.arialyy.aria.core.download;
 
 import android.text.TextUtils;
-import com.arialyy.aria.core.manager.TEManager;
+import com.arialyy.aria.core.manager.TaskWrapperManager;
 import com.arialyy.aria.core.queue.DownloadTaskQueue;
 import com.arialyy.aria.orm.DbEntity;
 import com.arialyy.aria.util.ALog;
@@ -40,7 +40,7 @@ abstract class BaseNormalTarget<TARGET extends BaseNormalTarget>
   void initTarget(String url, String targetName) {
     this.url = url;
     mTargetName = targetName;
-    mTaskWrapper = TEManager.getInstance().getTEntity(DTaskWrapper.class, url);
+    mTaskWrapper = TaskWrapperManager.getInstance().getHttpTaskWrapper(DTaskWrapper.class, url);
     mEntity = mTaskWrapper.getEntity();
 
     if (mEntity != null) {
@@ -164,7 +164,7 @@ abstract class BaseNormalTarget<TARGET extends BaseNormalTarget>
         } else {
           ALog.w(TAG, "保存路径【" + filePath + "】已经被其它任务占用，当前任务将覆盖该路径的文件");
           CommonUtil.delTaskRecord(filePath, 1);
-          mTaskWrapper = TEManager.getInstance().getTEntity(DTaskWrapper.class, url);
+          mTaskWrapper = TaskWrapperManager.getInstance().getHttpTaskWrapper(DTaskWrapper.class, url);
         }
       }
       File oldFile = new File(mEntity.getDownloadPath());

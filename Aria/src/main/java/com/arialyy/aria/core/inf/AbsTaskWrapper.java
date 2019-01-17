@@ -17,6 +17,9 @@ package com.arialyy.aria.core.inf;
 
 import com.arialyy.aria.core.common.ftp.FtpTaskDelegate;
 import com.arialyy.aria.core.common.http.HttpTaskDelegate;
+import com.arialyy.aria.core.download.DownloadEntity;
+import com.arialyy.aria.core.download.DownloadGroupEntity;
+import com.arialyy.aria.core.upload.UploadEntity;
 
 /**
  * Created by lyy on 2017/2/23. 所有任务实体的父类
@@ -64,9 +67,22 @@ public abstract class AbsTaskWrapper<ENTITY extends AbsEntity>
    */
   private int code;
 
+  /**
+   * {@link DownloadEntity} or {@link UploadEntity} or {@link DownloadGroupEntity}
+   */
+  private ENTITY entity;
+
+  public AbsTaskWrapper(ENTITY entity) {
+    this.entity = entity;
+  }
+
   public abstract String getKey();
 
   public abstract void setKey(String key);
+
+  @Override public ENTITY getEntity() {
+    return entity;
+  }
 
   /**
    * 设置或获取HTTP任务相关参数

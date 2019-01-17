@@ -22,7 +22,7 @@ import com.arialyy.aria.core.common.ftp.FTPSConfig;
 import com.arialyy.aria.core.common.ftp.FtpDelegate;
 import com.arialyy.aria.core.inf.AbsTaskWrapper;
 import com.arialyy.aria.core.inf.IFtpTarget;
-import com.arialyy.aria.core.manager.TEManager;
+import com.arialyy.aria.core.manager.TaskWrapperManager;
 import com.arialyy.aria.util.ALog;
 import java.net.Proxy;
 
@@ -41,7 +41,7 @@ public class FtpDirDownloadTarget extends BaseGroupTarget<FtpDirDownloadTarget>
 
   private void init(String key) {
     mGroupName = key;
-    mTaskWrapper = TEManager.getInstance().getFDTEntity(DGTaskWrapper.class, key);
+    mTaskWrapper = TaskWrapperManager.getInstance().getFtpTaskWrapper(DGTaskWrapper.class, key);
     mTaskWrapper.setRequestType(AbsTaskWrapper.D_FTP_DIR);
     mEntity = mTaskWrapper.getEntity();
     if (mEntity != null) {

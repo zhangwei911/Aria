@@ -13,10 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.arialyy.aria.core.download.wrapper;
+package com.arialyy.aria.core.download;
 
-import com.arialyy.aria.core.download.DownloadEntity;
-import com.arialyy.aria.core.download.DownloadGroupEntity;
 import com.arialyy.aria.orm.AbsWrapper;
 import com.arialyy.aria.orm.annotation.Many;
 import com.arialyy.aria.orm.annotation.One;
@@ -28,7 +26,7 @@ import java.util.List;
  * 任务组实体和子任务实体的关系
  */
 @Wrapper
-public class DGEWrapper extends AbsWrapper {
+public class DGEntityWrapper extends AbsWrapper {
 
   @One
   public DownloadGroupEntity groupEntity;

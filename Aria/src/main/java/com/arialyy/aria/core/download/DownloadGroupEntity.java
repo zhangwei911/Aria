@@ -22,14 +22,11 @@ import com.arialyy.aria.orm.annotation.Ignore;
 import java.util.List;
 
 /**
- * Created by AriaL on 2017/6/29.
- * 下载任务组实体
+ * Created by AriaL on 2017/6/29. 下载任务组实体
  */
 public class DownloadGroupEntity extends AbsGroupEntity {
 
   @Ignore private List<DownloadEntity> subEntities;
-
-
 
   /**
    * 子任务实体列表

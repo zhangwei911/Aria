@@ -183,7 +183,7 @@ public class DownloadGroupActivity extends BaseActivity<ActivityDownloadGroupBin
     //Log.e(TAG, "gHash = "
     //    + groupTask.getEntity().getSubEntities().get(0).hashCode()
     //    + "; subHash = "
-    //    + groupTask.getTaskWrapper().getSubTaskEntities().get(0).getEntity().hashCode() +
+    //    + groupTask.getHttpTaskWrapper().getSubTaskEntities().get(0).getEntity().hashCode() +
     //    "; subHash = " + subEntity.hashCode());
     //int percent = subEntity.getPercent();
     ////如果你打开了速度单位转换配置，将可以通过以下方法获取带单位的下载速度，如：1 mb/s

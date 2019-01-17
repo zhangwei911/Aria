@@ -23,11 +23,10 @@ import com.arialyy.aria.core.command.ICmd;
 import com.arialyy.aria.core.command.normal.CancelAllCmd;
 import com.arialyy.aria.core.command.normal.NormalCmdFactory;
 import com.arialyy.aria.core.common.ProxyHelper;
-import com.arialyy.aria.core.download.wrapper.DGEWrapper;
 import com.arialyy.aria.core.inf.AbsEntity;
 import com.arialyy.aria.core.inf.AbsReceiver;
 import com.arialyy.aria.core.inf.ReceiverType;
-import com.arialyy.aria.core.manager.TEManager;
+import com.arialyy.aria.core.manager.TaskWrapperManager;
 import com.arialyy.aria.core.scheduler.DownloadGroupSchedulers;
 import com.arialyy.aria.core.scheduler.DownloadSchedulers;
 import com.arialyy.aria.orm.DbEntity;
@@ -243,7 +242,7 @@ public class DownloadReceiver extends AbsReceiver {
     if (!taskExists(downloadUrl)) {
       return null;
     }
-    return TEManager.getInstance().getTEntity(DTaskWrapper.class, downloadUrl);
+    return TaskWrapperManager.getInstance().getHttpTaskWrapper(DTaskWrapper.class, downloadUrl);
   }
 
   /**
@@ -260,7 +259,7 @@ public class DownloadReceiver extends AbsReceiver {
     if (!taskExists(urls)) {
       return null;
     }
-    return TEManager.getInstance().getGTEntity(DGTaskWrapper.class, urls);
+    return TaskWrapperManager.getInstance().getDGTaskWrapper(DGTaskWrapper.class, urls);
   }
 
   /**
@@ -279,7 +278,7 @@ public class DownloadReceiver extends AbsReceiver {
     if (!b) {
       return null;
     }
-    return TEManager.getInstance().getFDTEntity(DGTaskWrapper.class, dirUrl);
+    return TaskWrapperManager.getInstance().getFtpTaskWrapper(DGTaskWrapper.class, dirUrl);
   }
 
   /**
@@ -336,12 +335,12 @@ public class DownloadReceiver extends AbsReceiver {
    * @return 如果没有任务组列表，则返回null
    */
   public List<DownloadGroupEntity> getGroupTaskList() {
-    List<DGEWrapper> wrappers = DbEntity.findRelationData(DGEWrapper.class);
+    List<DGEntityWrapper> wrappers = DbEntity.findRelationData(DGEntityWrapper.class);
     if (wrappers == null || wrappers.isEmpty()) {
       return null;
     }
     List<DownloadGroupEntity> entities = new ArrayList<>();
-    for (DGEWrapper wrapper : wrappers) {
+    for (DGEntityWrapper wrapper : wrappers) {
       entities.add(wrapper.groupEntity);
     }
     return entities;
@@ -369,7 +368,7 @@ public class DownloadReceiver extends AbsReceiver {
   public void stopAllTask() {
     AriaManager.getInstance(AriaManager.APP)
         .setCmd(NormalCmdFactory.getInstance()
-            .createCmd(new DTaskWrapper(), NormalCmdFactory.TASK_STOP_ALL,
+            .createCmd(new DTaskWrapper(null), NormalCmdFactory.TASK_STOP_ALL,
                 ICmd.TASK_TYPE_DOWNLOAD))
         .exe();
   }
@@ -382,7 +381,7 @@ public class DownloadReceiver extends AbsReceiver {
   public void resumeAllTask() {
     AriaManager.getInstance(AriaManager.APP)
         .setCmd(NormalCmdFactory.getInstance()
-            .createCmd(new DTaskWrapper(), NormalCmdFactory.TASK_RESUME_ALL,
+            .createCmd(new DTaskWrapper(null), NormalCmdFactory.TASK_RESUME_ALL,
                 ICmd.TASK_TYPE_DOWNLOAD))
         .exe();
   }
@@ -396,7 +395,7 @@ public class DownloadReceiver extends AbsReceiver {
   public void removeAllTask(boolean removeFile) {
     final AriaManager ariaManager = AriaManager.getInstance(AriaManager.APP);
     CancelAllCmd cancelCmd =
-        (CancelAllCmd) CommonUtil.createNormalCmd(new DTaskWrapper(),
+        (CancelAllCmd) CommonUtil.createNormalCmd(new DTaskWrapper(null),
             NormalCmdFactory.TASK_CANCEL_ALL, ICmd.TASK_TYPE_DOWNLOAD);
     cancelCmd.removeFile = removeFile;
     ariaManager.setCmd(cancelCmd).exe();

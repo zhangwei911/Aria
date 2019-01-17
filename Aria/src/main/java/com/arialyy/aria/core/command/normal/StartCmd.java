@@ -20,19 +20,22 @@ import com.arialyy.aria.core.AriaManager;
 import com.arialyy.aria.core.common.QueueMod;
 import com.arialyy.aria.core.download.DGTaskWrapper;
 import com.arialyy.aria.core.download.DTaskWrapper;
-import com.arialyy.aria.core.download.wrapper.DGTEWrapper;
-import com.arialyy.aria.core.download.wrapper.DTEWrapper;
+import com.arialyy.aria.core.download.DownloadEntity;
+import com.arialyy.aria.core.download.DownloadGroupEntity;
 import com.arialyy.aria.core.inf.AbsTask;
 import com.arialyy.aria.core.inf.AbsTaskWrapper;
 import com.arialyy.aria.core.inf.IEntity;
+import com.arialyy.aria.core.manager.TaskWrapperManager;
 import com.arialyy.aria.core.queue.DownloadGroupTaskQueue;
 import com.arialyy.aria.core.queue.DownloadTaskQueue;
 import com.arialyy.aria.core.queue.UploadTaskQueue;
 import com.arialyy.aria.core.upload.UTaskWrapper;
-import com.arialyy.aria.core.upload.wrapper.UTEWrapper;
+import com.arialyy.aria.core.upload.UploadEntity;
+import com.arialyy.aria.orm.AbsWrapper;
 import com.arialyy.aria.orm.DbEntity;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
+import com.arialyy.aria.util.DbDataHelper;
 import com.arialyy.aria.util.NetUtils;
 import java.util.ArrayList;
 import java.util.List;
@@ -69,7 +72,7 @@ class StartCmd<T extends AbsTaskWrapper> extends AbsNormalCmd<T> {
         startTask();
       } else if (mod.equals(QueueMod.WAIT.getTag())) {
         int state = task.getState();
-        if (mQueue.getCurrentExePoolNum() < maxTaskNum){
+        if (mQueue.getCurrentExePoolNum() < maxTaskNum) {
           if (state == IEntity.STATE_STOP
               || task.getState() == IEntity.STATE_FAIL
               || task.getState() == IEntity.STATE_OTHER
@@ -77,7 +80,7 @@ class StartCmd<T extends AbsTaskWrapper> extends AbsNormalCmd<T> {
               || task.getState() == IEntity.STATE_POST_PRE
               || task.getState() == IEntity.STATE_COMPLETE) {
             resumeTask();
-          }else {
+          } else {
             startTask();
           }
         } else {
@@ -117,28 +120,41 @@ class StartCmd<T extends AbsTaskWrapper> extends AbsNormalCmd<T> {
 
     private List<AbsTaskWrapper> findWaitData(int type) {
       List<AbsTaskWrapper> waitList = new ArrayList<>();
-      if (type == 1) {
-        List<DTEWrapper> wrappers = DbEntity.findRelationData(DTEWrapper.class,
-            "DTaskWrapper.isGroupTask=? and DTaskWrapper.state=?", "false", "3");
-        if (wrappers != null && !wrappers.isEmpty()) {
-          for (DTEWrapper w : wrappers) {
-            waitList.add(w.taskEntity);
+      TaskWrapperManager tManager = TaskWrapperManager.getInstance();
+      if (type == 1) { // 普通下载任务
+        List<DownloadEntity> dEntities = DbEntity.findDatas(DownloadEntity.class,
+            "isGroupChild=? and state=?", "false", "3");
+        if (dEntities != null && !dEntities.isEmpty()) {
+          for (DownloadEntity e : dEntities) {
+            if (e.getTaskType() == AbsTaskWrapper.D_FTP) {
+              waitList.add(tManager.getFtpTaskWrapper(DTaskWrapper.class, e.getKey()));
+            } else if (e.getTaskType() == AbsTaskWrapper.D_HTTP) {
+              waitList.add(tManager.getHttpTaskWrapper(DTaskWrapper.class, e.getKey()));
+            }
           }
         }
-      } else if (type == 2) {
-        List<DGTEWrapper> wrappers =
-            DbEntity.findRelationData(DGTEWrapper.class, "DGTaskWrapper.state=?", "3");
-        if (wrappers != null && !wrappers.isEmpty()) {
-          for (DGTEWrapper w : wrappers) {
-            waitList.add(w.taskEntity);
+      } else if (type == 2) { // 组合任务
+        List<DownloadGroupEntity> dEntities =
+            DbEntity.findDatas(DownloadGroupEntity.class, "state=?", "3");
+        if (dEntities != null && !dEntities.isEmpty()) {
+          for (DownloadGroupEntity e : dEntities) {
+            if (e.getTaskType() == AbsTaskWrapper.DG_HTTP) {
+              waitList.add(tManager.getDGTaskWrapper(DGTaskWrapper.class, e.getUrls()));
+            } else if (e.getTaskType() == AbsTaskWrapper.D_FTP_DIR) {
+              waitList.add(tManager.getFtpTaskWrapper(DGTaskWrapper.class, e.getKey()));
+            }
           }
         }
-      } else if (type == 3) {
-        List<UTEWrapper> wrappers = DbEntity.findRelationData(UTEWrapper.class,
-            "UTaskWrapper.state=?", "3");
-        if (wrappers != null && !wrappers.isEmpty()) {
-          for (UTEWrapper w : wrappers) {
-            waitList.add(w.taskEntity);
+      } else if (type == 3) { //普通上传任务
+        List<UploadEntity> dEntities = DbEntity.findDatas(UploadEntity.class, "state=?", "3");
+
+        if (dEntities != null && !dEntities.isEmpty()) {
+          for (UploadEntity e : dEntities) {
+            if (e.getTaskType() == AbsTaskWrapper.D_FTP) {
+              waitList.add(tManager.getFtpTaskWrapper(UTaskWrapper.class, e.getKey()));
+            } else if (e.getTaskType() == AbsTaskWrapper.D_HTTP) {
+              waitList.add(tManager.getHttpTaskWrapper(UTaskWrapper.class, e.getKey()));
+            }
           }
         }
       }

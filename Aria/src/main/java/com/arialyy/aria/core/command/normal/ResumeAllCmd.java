@@ -8,7 +8,7 @@ import com.arialyy.aria.core.download.DownloadGroupEntity;
 import com.arialyy.aria.core.inf.AbsTask;
 import com.arialyy.aria.core.inf.AbsTaskWrapper;
 import com.arialyy.aria.core.inf.IEntity;
-import com.arialyy.aria.core.manager.TEManager;
+import com.arialyy.aria.core.manager.TaskWrapperManager;
 import com.arialyy.aria.core.queue.DownloadGroupTaskQueue;
 import com.arialyy.aria.core.queue.DownloadTaskQueue;
 import com.arialyy.aria.core.queue.UploadTaskQueue;
@@ -65,7 +65,7 @@ final class ResumeAllCmd<T extends AbsTaskWrapper> extends AbsNormalCmd<T> {
           //if (TextUtils.isEmpty(entity.getDownloadPath())){
           //  continue;
           //}
-          resumeTask(TEManager.getInstance().getTEntity(DTaskWrapper.class, entity.getKey()));
+          resumeTask(TaskWrapperManager.getInstance().getHttpTaskWrapper(DTaskWrapper.class, entity.getKey()));
         }
       }
     } else if (type == 2) {
@@ -74,7 +74,7 @@ final class ResumeAllCmd<T extends AbsTaskWrapper> extends AbsNormalCmd<T> {
       if (entities != null && !entities.isEmpty()) {
         for (DownloadGroupEntity entity : entities) {
           resumeTask(
-              TEManager.getInstance().getGTEntity(DGTaskWrapper.class, entity.getUrls()));
+              TaskWrapperManager.getInstance().getDGTaskWrapper(DGTaskWrapper.class, entity.getUrls()));
         }
       }
     } else if (type == 3) {
@@ -82,7 +82,7 @@ final class ResumeAllCmd<T extends AbsTaskWrapper> extends AbsNormalCmd<T> {
           DbEntity.findDatas(UploadEntity.class, "state!=? ORDER BY stopTime DESC", "1");
       if (entities != null && !entities.isEmpty()) {
         for (UploadEntity entity : entities) {
-          resumeTask(TEManager.getInstance().getTEntity(UTaskWrapper.class, entity.getKey()));
+          resumeTask(TaskWrapperManager.getInstance().getHttpTaskWrapper(UTaskWrapper.class, entity.getKey()));
         }
       }
     }

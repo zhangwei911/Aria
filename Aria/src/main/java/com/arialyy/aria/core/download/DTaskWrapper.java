@@ -22,8 +22,6 @@ import com.arialyy.aria.core.inf.AbsTaskWrapper;
  */
 public class DTaskWrapper extends AbsTaskWrapper<DownloadEntity> {
 
-  private DownloadEntity entity;
-
   /**
    * 任务的url
    */
@@ -44,11 +42,8 @@ public class DTaskWrapper extends AbsTaskWrapper<DownloadEntity> {
    */
   private String key;
 
-  public DTaskWrapper() {
-  }
-
-  @Override public DownloadEntity getEntity() {
-    return entity;
+  public DTaskWrapper(DownloadEntity entity) {
+    super(entity);
   }
 
   @Override public String getKey() {
@@ -69,10 +64,6 @@ public class DTaskWrapper extends AbsTaskWrapper<DownloadEntity> {
 
   public boolean isGroupTask() {
     return isGroupTask;
-  }
-
-  public void setEntity(DownloadEntity entity) {
-    this.entity = entity;
   }
 
   public void setUrl(String url) {

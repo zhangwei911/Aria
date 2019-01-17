@@ -25,7 +25,7 @@ import com.arialyy.aria.core.common.TaskRecord;
 import com.arialyy.aria.core.download.DGTaskWrapper;
 import com.arialyy.aria.core.download.DownloadGroupEntity;
 import com.arialyy.aria.core.download.DTaskWrapper;
-import com.arialyy.aria.core.manager.TEManager;
+import com.arialyy.aria.core.manager.TaskWrapperManager;
 import com.arialyy.aria.core.upload.UTaskWrapper;
 import com.arialyy.aria.orm.DbEntity;
 import com.arialyy.aria.util.ALog;
@@ -78,7 +78,7 @@ public abstract class AbsTarget<TARGET extends AbsTarget, ENTITY extends AbsEnti
       } else if (mEntity instanceof DownloadGroupEntity) {
         CommonUtil.delGroupTaskRecord(mTaskWrapper.isRemoveFile(), ((DownloadGroupEntity) mEntity));
       }
-      TEManager.getInstance().removeTEntity(mEntity.getKey());
+      TaskWrapperManager.getInstance().removeTaskWrapper(mEntity.getKey());
     }
   }
 

@@ -24,7 +24,7 @@ import com.arialyy.aria.core.common.ThreadRecord;
 import com.arialyy.aria.core.upload.UTaskWrapper;
 import com.arialyy.aria.core.upload.UploadEntity;
 import com.arialyy.aria.util.ALog;
-import com.arialyy.aria.util.DbHelper;
+import com.arialyy.aria.util.DbDataHelper;
 import java.util.ArrayList;
 
 /**
@@ -71,7 +71,7 @@ class FtpFileInfoThread extends AbsFtpInfoThread<UploadEntity, UTaskWrapper> {
         mTaskWrapper.setNewTask(false);
 
         // 修改记录
-        TaskRecord record = DbHelper.getTaskRecord(mTaskWrapper.getKey());
+        TaskRecord record = DbDataHelper.getTaskRecord(mTaskWrapper.getKey());
         if (record == null) {
           record = new TaskRecord();
           record.fileName = mEntity.getFileName();

@@ -35,7 +35,6 @@ import com.arialyy.aria.core.common.AbsFileer;
 import com.arialyy.aria.core.common.TaskRecord;
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.download.DownloadGroupEntity;
-import com.arialyy.aria.core.download.DownloadGroupTask;
 import com.arialyy.aria.core.inf.AbsGroupTaskWrapper;
 import com.arialyy.aria.core.inf.AbsNormalEntity;
 import com.arialyy.aria.core.inf.AbsTaskWrapper;
@@ -1143,7 +1142,7 @@ public class CommonUtil {
       ALog.w(TAG, "修改任务记录失败，新文件路径和旧文件路径一致");
       return;
     }
-    TaskRecord record = DbHelper.getTaskRecord(oldPath);
+    TaskRecord record = DbDataHelper.getTaskRecord(oldPath);
     if (record == null) {
       if (new File(oldPath).exists()) {
         ALog.w(TAG, "修改任务记录失败，文件【" + oldPath + "】对应的任务记录不存在");

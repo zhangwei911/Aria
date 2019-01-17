@@ -58,7 +58,7 @@ public class SingleTaskActivity extends BaseActivity<ActivitySingleBinding> {
       //"http://static.gaoshouyou.com/d/22/94/822260b849944492caadd2983f9bb624.apks";
       //"http://120.55.95.61:8811/ghcg/zg/武义总规纲要成果.zip";
       //"https://yizi-kejian.oss-cn-beijing.aliyuncs.com/qimeng/package1/qmtable11.zip";
-      //"http://rs.0.gaoshouyou.com/d/04/1e/400423a7551e1f3f0eb1812afa1f9b44.apk";
+      "http://rs.0.gaoshouyou.com/d/04/1e/400423a7551e1f3f0eb1812afa1f9b44.apk";
       //"http://58.210.9.131/tpk/sipgt//TDLYZTGH.tpk"; //chunked 下载
       //"https://static.donguo.me/video/ip/course/pfys_1.mp4";
       //"https://www.baidu.com/link?url=_LFCuTPtnzFxVJByJ504QymRywIA1Z_T5xUxe9ZLuxcGM0C_RcdpWyB1eGjbJC-e5wv5wAKM4WmLMAS5KeF6EZJHB8Va3YqZUiaErqK_pxm&wd=&eqid=e8583fe70002d126000000065a99f864";
@@ -67,7 +67,7 @@ public class SingleTaskActivity extends BaseActivity<ActivitySingleBinding> {
       //"https://dl.genymotion.com/releases/genymotion-2.12.1/genymotion-2.12.1-vbox.exe";
       //"http://9.9.9.50:5000/download1";
   //"http://9.9.9.50:5000/download/CentOS-7-x86_64-Minimal-1804.iso";
-  "http://v2.qingdian1.com/m_20180730_991/2/2B9FB34A4BCD8CE61481D1C8418EFE36_1080P.m3u8";
+  //"http://v2.qingdian1.com/m_20180730_991/2/2B9FB34A4BCD8CE61481D1C8418EFE36_1080P.m3u8";
   //"https://firmwareapi.azurewebsites.net/firmware-overview?name=A19_Filament_W_IMG0038_00102411-encrypted.ota";
   @Bind(R.id.start) Button mStart;
   @Bind(R.id.stop) Button mStop;
@@ -93,7 +93,7 @@ public class SingleTaskActivity extends BaseActivity<ActivitySingleBinding> {
 
   @Override protected void onDestroy() {
     super.onDestroy();
-    unregisterReceiver(receiver);
+    //unregisterReceiver(receiver);
     Aria.download(this).unRegister();
   }
 

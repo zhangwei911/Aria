@@ -18,7 +18,7 @@ package com.arialyy.aria.core.upload;
 import android.support.annotation.CheckResult;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
-import com.arialyy.aria.core.manager.TEManager;
+import com.arialyy.aria.core.manager.TaskWrapperManager;
 import com.arialyy.aria.core.queue.UploadTaskQueue;
 import com.arialyy.aria.util.ALog;
 import java.io.File;
@@ -32,7 +32,7 @@ abstract class BaseNormalTarget<TARGET extends AbsUploadTarget>
   protected String mTempUrl;
 
   void initTarget(String filePath) {
-    mTaskWrapper = TEManager.getInstance().getTEntity(UTaskWrapper.class, filePath);
+    mTaskWrapper = TaskWrapperManager.getInstance().getHttpTaskWrapper(UTaskWrapper.class, filePath);
     mEntity = mTaskWrapper.getEntity();
     File file = new File(filePath);
     mEntity.setFileName(file.getName());

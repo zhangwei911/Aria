@@ -15,33 +15,28 @@
  */
 package com.arialyy.aria.core.manager;
 
-import android.text.TextUtils;
 import com.arialyy.aria.core.common.AbsFileer;
 import com.arialyy.aria.core.common.TaskRecord;
 import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.download.DownloadEntity;
-import com.arialyy.aria.core.download.wrapper.DTEWrapper;
 import com.arialyy.aria.core.inf.IEntity;
-import com.arialyy.aria.orm.DbEntity;
 import java.io.File;
-import java.util.List;
 import java.util.UUID;
 
 /**
- * Created by Aria.Lao on 2017/11/1.
- * 任务实体工厂
+ * 创建下载任务wrapper Created by Aria.Lao on 2017/11/1.
  */
-class DTEFactory implements INormalTEFactory<DownloadEntity, DTaskWrapper> {
-  private static final String TAG = "DTEFactory";
-  private static volatile DTEFactory INSTANCE = null;
+class DTaskWrapperFactory implements INormalTEFactory<DownloadEntity, DTaskWrapper> {
+  private static final String TAG = "DTaskWrapperFactory";
+  private static volatile DTaskWrapperFactory INSTANCE = null;
 
-  private DTEFactory() {
+  private DTaskWrapperFactory() {
   }
 
-  public static DTEFactory getInstance() {
+  public static DTaskWrapperFactory getInstance() {
     if (INSTANCE == null) {
-      synchronized (DTEFactory.class) {
-        INSTANCE = new DTEFactory();
+      synchronized (DTaskWrapperFactory.class) {
+        INSTANCE = new DTaskWrapperFactory();
       }
     }
     return INSTANCE;
@@ -51,25 +46,10 @@ class DTEFactory implements INormalTEFactory<DownloadEntity, DTaskWrapper> {
    * 通过下载实体创建任务实体
    */
   private DTaskWrapper create(DownloadEntity entity) {
-    List<DTEWrapper> wrapper = DbEntity.findRelationData(DTEWrapper.class,
-        "DTaskWrapper.key=? and DTaskWrapper.isGroupTask='false' and DTaskWrapper.url=?",
-        entity.getDownloadPath(), entity.getUrl());
-    DTaskWrapper taskEntity;
-    if (wrapper != null && !wrapper.isEmpty()) {
-      taskEntity = wrapper.get(0).taskEntity;
-      if (taskEntity == null) {
-        taskEntity = new DTaskWrapper();
-      } else if (taskEntity.getEntity() == null || TextUtils.isEmpty(
-          taskEntity.getEntity().getUrl())) {
-        taskEntity.setEntity(entity);
-      }
-    } else {
-      taskEntity = new DTaskWrapper();
-    }
-    taskEntity.setKey(entity.getDownloadPath());
-    taskEntity.setUrl(entity.getUrl());
-    taskEntity.setEntity(entity);
-    return taskEntity;
+    DTaskWrapper wrapper = new DTaskWrapper(entity);
+    wrapper.setKey(entity.getDownloadPath());
+    wrapper.setUrl(entity.getUrl());
+    return wrapper;
   }
 
   /**

@@ -28,7 +28,7 @@ import com.arialyy.aria.core.manager.ThreadTaskManager;
 import com.arialyy.aria.orm.DbEntity;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
-import com.arialyy.aria.util.DbHelper;
+import com.arialyy.aria.util.DbDataHelper;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -305,7 +305,7 @@ public abstract class AbsFileer<ENTITY extends AbsNormalEntity, TASK_ENTITY exte
     if (mConfigFile.exists()) {
       convertDb();
     } else {
-      mRecord = DbHelper.getTaskRecord(mTaskEntity.getKey());
+      mRecord = DbDataHelper.getTaskRecord(mTaskEntity.getKey());
       if (mRecord == null) {
         initRecord(true);
       } else {
