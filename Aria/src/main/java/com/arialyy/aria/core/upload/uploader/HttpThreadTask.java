@@ -57,7 +57,7 @@ class HttpThreadTask extends AbsThreadTask<UploadEntity, UTaskWrapper> {
     mConnectTimeOut = mAridManager.getUploadConfig().getConnectTimeOut();
     mReadTimeOut = mAridManager.getUploadConfig().getIOTimeOut();
     mBufSize = mAridManager.getUploadConfig().getBuffSize();
-    isNotNetRetry = mAridManager.getUploadConfig().isNotNetRetry();
+    isNotNetRetry = mAridManager.getAppConfig().isNotNetRetry();
   }
 
   @Override public HttpThreadTask call() throws Exception {

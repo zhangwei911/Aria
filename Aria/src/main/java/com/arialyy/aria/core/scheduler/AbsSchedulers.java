@@ -164,7 +164,7 @@ abstract class AbsSchedulers<TASK_ENTITY extends AbsTaskWrapper, TASK extends Ab
       }
     }
 
-    boolean canSend = manager.getDownloadConfig().isUseBroadcast();
+    boolean canSend = manager.getAppConfig().isUseBroadcast();
     if (canSend) {
       AriaManager.APP.sendBroadcast(
           createData(msg.what, ITask.DOWNLOAD_GROUP_SUB, params.entity));
@@ -274,18 +274,16 @@ abstract class AbsSchedulers<TASK_ENTITY extends AbsTaskWrapper, TASK extends Ab
    * 发送普通任务的广播
    */
   private void sendNormalBroadcast(int state, TASK task) {
+    boolean canSend = manager.getAppConfig().isUseBroadcast();
+    if (!canSend) {
+      return;
+    }
     if (task.getTaskType() == ITask.DOWNLOAD || task.getTaskType() == ITask.DOWNLOAD_GROUP) {
-      boolean canSend = manager.getDownloadConfig().isUseBroadcast();
-      if (canSend) {
-        AriaManager.APP.sendBroadcast(
-            createData(state, task.getTaskType(), task.getTaskWrapper().getEntity()));
-      }
+      AriaManager.APP.sendBroadcast(
+          createData(state, task.getTaskType(), task.getTaskWrapper().getEntity()));
     } else if (task.getTaskType() == ITask.UPLOAD) {
-      boolean canSend = manager.getUploadConfig().isUseBroadcast();
-      if (canSend) {
-        AriaManager.APP.sendBroadcast(
-            createData(state, task.getTaskType(), task.getTaskWrapper().getEntity()));
-      }
+      AriaManager.APP.sendBroadcast(
+          createData(state, task.getTaskType(), task.getTaskWrapper().getEntity()));
     } else {
       ALog.w(TAG, "发送广播失败，没有对应的任务");
     }
@@ -324,15 +322,13 @@ abstract class AbsSchedulers<TASK_ENTITY extends AbsTaskWrapper, TASK extends Ab
     }
     long interval = 2000;
     int num = 10;
-    boolean isNotNetRetry = false;
+    boolean isNotNetRetry = manager.getAppConfig().isNotNetRetry();;
     if (task instanceof DownloadTask || task instanceof DownloadGroupTask) {
       interval = manager.getDownloadConfig().getReTryInterval();
       num = manager.getDownloadConfig().getReTryNum();
-      isNotNetRetry = manager.getDownloadConfig().isNotNetRetry();
     } else if (task instanceof UploadTask) {
       interval = manager.getUploadConfig().getReTryInterval();
       num = manager.getUploadConfig().getReTryNum();
-      isNotNetRetry = manager.getUploadConfig().isNotNetRetry();
     }
 
     final int reTryNum = num;

@@ -34,14 +34,17 @@ public final class Configuration {
   private static final String DOWNLOAD_CONFIG_FILE = "/Aria/AriaDownload.cfg";
   private static final String UPLOAD_CONFIG_FILE = "/Aria/AriaUpload.cfg";
   private static final String APP_CONFIG_FILE = "/Aria/AriaApp.cfg";
+  private static final String DGROUP_CONFIG_FILE = "/Aria/AriaDGroup.cfg";
   private static final int TYPE_DOWNLOAD = 1;
   private static final int TYPE_UPLOAD = 2;
   private static final int TYPE_APP = 3;
+  private static final int TYPE_DGROUP = 4;
   private static volatile Configuration INSTANCE = null;
   static final String XML_FILE = "/Aria/aria_config.xml";
   DownloadConfig downloadCfg;
   UploadConfig uploadCfg;
   AppConfig appCfg;
+  DGroupConfig dGroupCfg;
 
   private Configuration() {
     //删除老版本的配置文件
@@ -62,6 +65,7 @@ public final class Configuration {
     File newDCfg = new File(String.format("%s%s", basePath, DOWNLOAD_CONFIG_FILE));
     File newUCfg = new File(String.format("%s%s", basePath, UPLOAD_CONFIG_FILE));
     File newACfg = new File(String.format("%s%s", basePath, APP_CONFIG_FILE));
+    File dgCfg = new File(String.format("%s%s", basePath, DGROUP_CONFIG_FILE));
     // 加载下载配置
     if (newDCfg.exists()) {
       downloadCfg = (DownloadConfig) CommonUtil.readObjFromFile(newDCfg.getPath());
@@ -83,6 +87,13 @@ public final class Configuration {
     if (appCfg == null) {
       appCfg = new AppConfig();
     }
+    // 加载下载类型组合任务的配置
+    if (dgCfg.exists()) {
+      dGroupCfg = (DGroupConfig) CommonUtil.readObjFromFile(dgCfg.getPath());
+    }
+    if (dGroupCfg == null) {
+      dGroupCfg = new DGroupConfig();
+    }
   }
 
   static Configuration getInstance() {
@@ -95,7 +106,8 @@ public final class Configuration {
   }
 
   /**
-   * 检查配置文件是否存在，只要{@link DownloadConfig}、{@link UploadConfig}、{@link AppConfig}其中一个不存在 则任务配置文件不存在
+   * 检查配置文件是否存在，只要{@link DownloadConfig}、{@link UploadConfig}、{@link AppConfig}、{@link
+   * DGroupConfig}其中一个不存在 则任务配置文件不存在
    *
    * @return {@code true}配置存在，{@code false}配置不存在
    */
@@ -103,7 +115,8 @@ public final class Configuration {
     String basePath = AriaManager.APP.getFilesDir().getPath();
     return (new File(String.format("%s%s", basePath, DOWNLOAD_CONFIG_FILE))).exists()
         && (new File(String.format("%s%s", basePath, UPLOAD_CONFIG_FILE))).exists()
-        && (new File(String.format("%s%s", basePath, APP_CONFIG_FILE))).exists();
+        && (new File(String.format("%s%s", basePath, APP_CONFIG_FILE))).exists()
+        && (new File(String.format("%s%s", basePath, DGROUP_CONFIG_FILE))).exists();
   }
 
   abstract static class BaseConfig implements Serializable {
@@ -111,7 +124,7 @@ public final class Configuration {
     /**
      * 类型
      *
-     * @return {@link #TYPE_DOWNLOAD}、{@link #TYPE_UPLOAD}、{@link #TYPE_APP}
+     * @return {@link #TYPE_DOWNLOAD}、{@link #TYPE_UPLOAD}、{@link #TYPE_APP}、{@link #TYPE_DGROUP}
      */
     abstract int getType();
 
@@ -192,11 +205,6 @@ public final class Configuration {
     String queueMod = "wait";
 
     /**
-     * 断网的时候是否重试，{@code true}断网也重试；{@code false}断网不重试，直接走失败的回调
-     */
-    boolean notNetRetry = false;
-
-    /**
      * 设置IO流读取时间，单位为毫秒，默认20000毫秒，该时间不能少于10000毫秒
      */
     int iOTimeOut = 20 * 1000;
@@ -207,16 +215,37 @@ public final class Configuration {
     int maxSpeed = 0;
 
     /**
-     * 是否使用广播 除非无法使用注解，否则不建议使用广播来接受任务 {@code true} 使用广播，{@code false} 不适用广播
+     * 设置https ca 证书信息；path 为assets目录下的CA证书完整路径
      */
-    boolean useBroadcast = false;
+    String caPath;
+    /**
+     * name 为CA证书名
+     */
+    String caName;
 
-    public boolean isUseBroadcast() {
-      return useBroadcast;
+    public String getCaPath() {
+      return caPath;
     }
 
-    public BaseTaskConfig setUseBroadcast(boolean useBroadcast) {
-      this.useBroadcast = useBroadcast;
+    public BaseConfig setCaPath(String caPath) {
+      this.caPath = caPath;
+      save();
+      return this;
+    }
+
+    public String getCaName() {
+      return caName;
+    }
+
+    public BaseConfig setCaName(String caName) {
+      this.caName = caName;
+      save();
+      return this;
+    }
+
+    public BaseTaskConfig setMaxTaskNum(int maxTaskNum) {
+      oldMaxTaskNum = this.maxTaskNum;
+      this.maxTaskNum = maxTaskNum;
       save();
       return this;
     }
@@ -304,16 +333,6 @@ public final class Configuration {
       return this;
     }
 
-    public boolean isNotNetRetry() {
-      return notNetRetry;
-    }
-
-    public BaseTaskConfig setNotNetRetry(boolean notNetRetry) {
-      this.notNetRetry = notNetRetry;
-      save();
-      return this;
-    }
-
     public int getIOTimeOut() {
       return iOTimeOut;
     }
@@ -339,15 +358,6 @@ public final class Configuration {
    * 下载配置
    */
   public static class DownloadConfig extends BaseTaskConfig implements Serializable {
-
-    /**
-     * 设置https ca 证书信息；path 为assets目录下的CA证书完整路径
-     */
-    String caPath;
-    /**
-     * name 为CA证书名
-     */
-    String caName;
     /**
      * 下载线程数，下载线程数不能小于1 注意： 1、线程下载数改变后，新的下载任务才会生效； 2、如果任务大小小于1m，该设置不会生效；
      * 3、从3.4.1开始，如果线程数为1，文件初始化时将不再预占用对应长度的空间，下载多少byte，则占多大的空间； 对于采用多线程的任务或旧任务，依然采用原来的文件空间占用方式；
@@ -367,7 +377,6 @@ public final class Configuration {
     @Override public DownloadConfig setMaxSpeed(int maxSpeed) {
       super.setMaxSpeed(maxSpeed);
       DownloadTaskQueue.getInstance().setMaxSpeed(maxSpeed);
-      DownloadGroupTaskQueue.getInstance().setMaxSpeed(maxSpeed);
       return this;
     }
 
@@ -378,35 +387,13 @@ public final class Configuration {
     }
 
     public DownloadConfig setMaxTaskNum(int maxTaskNum) {
-      oldMaxTaskNum = this.maxTaskNum;
-      this.maxTaskNum = maxTaskNum;
+      super.setMaxTaskNum(maxTaskNum);
       DownloadTaskQueue.getInstance().setMaxTaskNum(maxTaskNum);
-      save();
       return this;
     }
 
     public DownloadConfig setThreadNum(int threadNum) {
       this.threadNum = threadNum;
-      save();
-      return this;
-    }
-
-    public String getCaPath() {
-      return caPath;
-    }
-
-    public DownloadConfig setCaPath(String caPath) {
-      this.caPath = caPath;
-      save();
-      return this;
-    }
-
-    public String getCaName() {
-      return caName;
-    }
-
-    public DownloadConfig setCaName(String caName) {
-      this.caName = caName;
       save();
       return this;
     }
@@ -440,16 +427,14 @@ public final class Configuration {
     }
 
     public UploadConfig setMaxTaskNum(int maxTaskNum) {
-      oldMaxTaskNum = this.maxTaskNum;
-      this.maxTaskNum = maxTaskNum;
+      super.setMaxTaskNum(maxTaskNum);
       UploadTaskQueue.getInstance().setMaxTaskNum(maxTaskNum);
-      save();
       return this;
     }
 
     static UploadConfig getInstance() {
       if (INSTANCE == null) {
-        synchronized (DownloadConfig.class) {
+        synchronized (UploadConfig.class) {
           INSTANCE = new UploadConfig();
         }
       }
@@ -462,9 +447,90 @@ public final class Configuration {
   }
 
   /**
+   * 下载类型的组合任务
+   */
+  public static class DGroupConfig extends BaseTaskConfig implements Serializable {
+
+    private static DGroupConfig INSTANCE = null;
+
+    /**
+     * 能同时下载的子任务最大任务数，默认3
+     */
+    int subMaxTaskNum = 3;
+
+    /**
+     * 子任务重试次数，默认为5
+     */
+    int subReTryNum = 5;
+
+    /**
+     * 子任务下载失败时的重试间隔，单位为毫秒，默认2000毫秒-
+     */
+    int subReTryInterval = 2000;
+
+    private DGroupConfig() {
+    }
+
+    static DGroupConfig getInstance() {
+      if (INSTANCE == null) {
+        synchronized (DGroupConfig.class) {
+          INSTANCE = new DGroupConfig();
+        }
+      }
+      return INSTANCE;
+    }
+
+    @Override int getType() {
+      return TYPE_DGROUP;
+    }
+
+    @Override public DGroupConfig setMaxSpeed(int maxSpeed) {
+      super.setMaxSpeed(maxSpeed);
+      DownloadGroupTaskQueue.getInstance().setMaxSpeed(maxSpeed);
+      return this;
+    }
+
+    public DGroupConfig setMaxTaskNum(int maxTaskNum) {
+      super.setMaxTaskNum(maxTaskNum);
+      DownloadGroupTaskQueue.getInstance().setMaxTaskNum(maxSpeed);
+      return this;
+    }
+
+    public int getSubMaxTaskNum() {
+      return subMaxTaskNum;
+    }
+
+    public DGroupConfig setSubMaxTaskNum(int subMaxTaskNum) {
+      this.subMaxTaskNum = subMaxTaskNum;
+      save();
+      return this;
+    }
+
+    public int getSubReTryNum() {
+      return subReTryNum;
+    }
+
+    public DGroupConfig setSubReTryNum(int subReTryNum) {
+      this.subReTryNum = subReTryNum;
+      save();
+      return this;
+    }
+
+    public int getSubReTryInterval() {
+      return subReTryInterval;
+    }
+
+    public DGroupConfig setSubReTryInterval(int subReTryInterval) {
+      this.subReTryInterval = subReTryInterval;
+      save();
+      return this;
+    }
+  }
+
+  /**
    * 应用配置
    */
-  public static class AppConfig extends BaseConfig {
+  public static class AppConfig extends BaseConfig implements Serializable {
     /**
      * 是否使用{@link AriaCrashHandler}来捕获异常 {@code true} 使用；{@code false} 不使用
      */
@@ -481,6 +547,36 @@ public final class Configuration {
      * 是否检查网络，{@code true}检查网络
      */
     boolean netCheck = true;
+
+    /**
+     * 是否使用广播 除非无法使用注解，否则不建议使用广播来接受任务 {@code true} 使用广播，{@code false} 不适用广播
+     */
+    boolean useBroadcast = false;
+
+    /**
+     * 断网的时候是否重试，{@code true}断网也重试；{@code false}断网不重试，直接走失败的回调
+     */
+    boolean notNetRetry = false;
+
+    public boolean isNotNetRetry() {
+      return notNetRetry;
+    }
+
+    public AppConfig setNotNetRetry(boolean notNetRetry) {
+      this.notNetRetry = notNetRetry;
+      save();
+      return this;
+    }
+
+    public boolean isUseBroadcast() {
+      return useBroadcast;
+    }
+
+    public AppConfig setUseBroadcast(boolean useBroadcast) {
+      this.useBroadcast = useBroadcast;
+      save();
+      return this;
+    }
 
     public boolean isNetCheck() {
       return netCheck;

@@ -22,27 +22,14 @@ import com.arialyy.aria.core.inf.AbsTaskWrapper;
  */
 public class UTaskWrapper extends AbsTaskWrapper<UploadEntity> {
 
-  private String filePath;
-
-  private String key;
-
   public UTaskWrapper(UploadEntity entity) {
     super(entity);
   }
 
+  /**
+   * 文件保存路径
+   */
   @Override public String getKey() {
-    return key;
-  }
-
-  public String getFilePath() {
-    return filePath;
-  }
-
-  public void setFilePath(String filePath) {
-    this.filePath = filePath;
-  }
-
-  public void setKey(String key) {
-    this.key = key;
+    return getEntity().getKey();
   }
 }

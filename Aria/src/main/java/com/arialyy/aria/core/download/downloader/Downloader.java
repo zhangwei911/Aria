@@ -48,8 +48,8 @@ class Downloader extends AbsFileer<DownloadEntity, DTaskWrapper> {
     return
         // 小于1m的文件或是任务组的子任务、使用虚拟文件，线程数都是1
         mEntity.getFileSize() <= SUB_LEN
-            || mTaskEntity.getRequestType() == AbsTaskWrapper.D_FTP_DIR
-            || mTaskEntity.getRequestType() == AbsTaskWrapper.DG_HTTP
+            || mTaskWrapper.getRequestType() == AbsTaskWrapper.D_FTP_DIR
+            || mTaskWrapper.getRequestType() == AbsTaskWrapper.DG_HTTP
             || threadNum == 1
             ? 1
             : threadNum;
@@ -86,6 +86,10 @@ class Downloader extends AbsFileer<DownloadEntity, DTaskWrapper> {
     return false;
   }
 
+  @Override protected int getType() {
+    return DOWNLOAD;
+  }
+
   @Override protected void onPostPre() {
     super.onPostPre();
     ((IDownloadListener) mListener).onPostPre(mEntity.getFileSize());
@@ -96,7 +100,7 @@ class Downloader extends AbsFileer<DownloadEntity, DTaskWrapper> {
   }
 
   @Override protected AbsThreadTask selectThreadTask(SubThreadConfig<DTaskWrapper> config) {
-    switch (mTaskEntity.getRequestType()) {
+    switch (mTaskWrapper.getRequestType()) {
       case AbsTaskWrapper.D_FTP:
       case AbsTaskWrapper.D_FTP_DIR:
         return new FtpThreadTask(mConstance, (IDownloadListener) mListener, config);

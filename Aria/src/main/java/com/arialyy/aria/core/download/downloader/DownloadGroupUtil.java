@@ -88,7 +88,7 @@ public class DownloadGroupUtil extends AbsGroupUtil implements IUtil {
 
     if (mExeMap.size() == 0) {
       mListener.onFail(false, new TaskException(TAG,
-          String.format("任务组【%s】无可执行任务", mGTWrapper.getEntity().getGroupName())));
+          String.format("任务组【%s】无可执行任务", mGTWrapper.getEntity().getGroupHash())));
       return;
     }
     Set<String> keys = mExeMap.keySet();
@@ -172,7 +172,7 @@ public class DownloadGroupUtil extends AbsGroupUtil implements IUtil {
       if (mInitFailNum == mExeNum) {
         closeTimer();
         mListener.onFail(true, new TaskException(TAG,
-            String.format("任务组【%s】初始化失败", mGTWrapper.getEntity().getGroupName())));
+            String.format("任务组【%s】初始化失败", mGTWrapper.getEntity().getGroupHash())));
       }
       if (!isStart && mInitCompleteNum + mInitFailNum == mExeNum || !isNeedLoadFileSize) {
         startRunningFlow();

@@ -17,6 +17,9 @@ package com.arialyy.aria.core;
 
 import android.text.TextUtils;
 import com.arialyy.aria.util.ALog;
+import com.arialyy.aria.util.CommonUtil;
+import java.lang.reflect.Field;
+import javax.xml.validation.Validator;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -30,6 +33,7 @@ class ConfigHelper extends DefaultHandler {
   private Configuration.DownloadConfig mDownloadConfig = Configuration.getInstance().downloadCfg;
   private Configuration.UploadConfig mUploadConfig = Configuration.getInstance().uploadCfg;
   private Configuration.AppConfig mAppConfig = Configuration.getInstance().appCfg;
+  private Configuration.DGroupConfig mDGroupConfig = Configuration.getInstance().dGroupCfg;
   private @ConfigType int mType;
 
   @Override public void startDocument() throws SAXException {
@@ -50,281 +54,165 @@ class ConfigHelper extends DefaultHandler {
       case "app":
         mType = ConfigType.APP;
         break;
+      case "dGroup":
+        mType = ConfigType.D_GROUP;
+        break;
     }
 
-    if (mType == ConfigType.DOWNLOAD || mType == ConfigType.UPLOAD) {
+    if (mType == ConfigType.DOWNLOAD || mType == ConfigType.UPLOAD || mType == ConfigType.D_GROUP) {
 
       String value = attributes.getValue("value");
       switch (qName) {
-        case "threadNum":
-          loadThreadNum(value);
+        case "threadNum": // 线程数
+          int threadNum = checkInt(value) ? Integer.parseInt(value) : 3;
+          if (threadNum < 1) {
+            ALog.w(TAG, "下载线程数不能小于 1");
+            threadNum = 1;
+          }
+          setField("threadNum", threadNum, ConfigType.DOWNLOAD);
           break;
-        case "maxTaskNum":
-          loadMaxQueue(value);
+        case "maxTaskNum":  //最大任务书
+          int maxTaskNum = checkInt(value) ? Integer.parseInt(value) : 2;
+          if (maxTaskNum < 1) {
+            ALog.w(TAG, "任务队列数不能小于 1");
+            maxTaskNum = 2;
+          }
+          setField("maxTaskNum", maxTaskNum, getAllTaskType());
           break;
-        case "reTryNum":
-          loadReTry(value);
+        case "reTryNum":  //任务重试次数
+          setField("reTryNum", checkInt(value) ? Integer.parseInt(value) : 0, getAllTaskType());
           break;
-        case "connectTimeOut":
-          loadConnectTime(value);
+        case "connectTimeOut": // 连接超时时间
+          setField("connectTimeOut", checkInt(value) ? Integer.parseInt(value) : 5 * 1000,
+              getAllTaskType());
           break;
-        case "iOTimeOut":
-          loadIOTimeout(value);
+        case "iOTimeOut":   //io流超时时间
+          int iOTimeOut = checkInt(value) ? Integer.parseInt(value) : 10 * 1000;
+          if (iOTimeOut < 10 * 1000) {
+            iOTimeOut = 10 * 1000;
+          }
+          setField("iOTimeOut", iOTimeOut, getAllTaskType());
           break;
-        case "reTryInterval":
-          loadReTryInterval(value);
+        case "reTryInterval":   //失败重试间隔
+          int reTryInterval = checkInt(value) ? Integer.parseInt(value) : 2 * 1000;
+
+          if (reTryInterval < 2 * 1000) {
+            reTryInterval = 2 * 1000;
+          }
+          setField("reTryInterval", reTryInterval, getAllTaskType());
           break;
-        case "buffSize":
-          loadBuffSize(value);
+        case "buffSize":    //缓冲大小
+          int buffSize = checkInt(value) ? Integer.parseInt(value) : 8192;
+
+          if (buffSize < 2048) {
+            buffSize = 2048;
+          }
+
+          setField("buffSize", buffSize, getAllTaskType());
           break;
-        case "useBroadcast":
-          loadUseBroadcast(value);
-          break;
-        case "ca":
+        case "ca":    // ca证书
           String caName = attributes.getValue("name");
           String caPath = attributes.getValue("path");
-          loadCA(caName, caPath);
+          setField("caName", caName, getAllTaskType());
+          setField("caPath", caPath, getAllTaskType());
           break;
-        case "convertSpeed":
-          loadConvertSpeed(value);
+        case "convertSpeed": // 是否转换速度
+          setField("isConvertSpeed", !checkBoolean(value) || Boolean.parseBoolean(value),
+              getAllTaskType());
           break;
-        case "maxSpeed":
-          loadMaxSpeed(value);
+        case "maxSpeed":  // 最大速度
+          int maxSpeed = checkInt(value) ? Integer.parseInt(value) : 0;
+          setField("maxSpeed", maxSpeed, getAllTaskType());
           break;
-        case "queueMod":
-          loadQueueMod(value);
+        case "queueMod":  // 队列类型
+          String mod = "now";
+          if (!TextUtils.isEmpty(value) && (value.equalsIgnoreCase("now") || value.equalsIgnoreCase(
+              "wait"))) {
+            mod = value;
+          }
+          setField("queueMod", mod, getAllTaskType());
           break;
-        case "updateInterval":
-          loadUpdateInterval(value);
+        case "updateInterval":  // 进度更新时间
+          setField("updateInterval", checkLong(value) ? Long.parseLong(value) : 1000,
+              getAllTaskType());
           break;
-        case "notNetRetry":
-          loadNotNetRetry(value);
+
+        case "useBlock":    // 是否使用分块任务
+          setField("useBlock", checkBoolean(value) ? Boolean.valueOf(value) : false,
+              ConfigType.DOWNLOAD);
           break;
-        case "useBlock":
-          loadUseBlock(value);
+        case "subMaxTaskNum": // 子任务最大任务数
+          int subMaxTaskNum = checkInt(value) ? Integer.parseInt(value) : 3;
+          setField("subMaxTaskNum", subMaxTaskNum, ConfigType.D_GROUP);
+          break;
+        case "subReTryNum": // 子任务重试次数
+          int subReTryNum = checkInt(value) ? Integer.parseInt(value) : 5;
+          setField("subReTryNum", subReTryNum, ConfigType.D_GROUP);
+          break;
+        case "subReTryInterval":  // 子任务重试间隔
+          int subReTryInterval = checkInt(value) ? Integer.parseInt(value) : 2000;
+          setField("subReTryInterval", subReTryInterval, ConfigType.D_GROUP);
           break;
       }
     } else if (mType == ConfigType.APP) {
       String value = attributes.getValue("value");
       switch (qName) {
-        case "useAriaCrashHandler":
-          loadUseAriaCrashHandler(value);
+        case "useAriaCrashHandler": // 是否捕捉崩溃日志
+          setField("useAriaCrashHandler", checkBoolean(value) ? Boolean.valueOf(value) : true,
+              ConfigType.APP);
           break;
-        case "logLevel":
-          loadLogLevel(value);
+        case "logLevel":    // 日记等级
+          int level = checkInt(value) ? Integer.parseInt(value) : ALog.LOG_LEVEL_VERBOSE;
+          if (level < ALog.LOG_LEVEL_VERBOSE || level > ALog.LOG_CLOSE) {
+            ALog.w(TAG, "level【" + level + "】错误");
+            level = ALog.LOG_LEVEL_VERBOSE;
+          }
+          setField("level", level, ConfigType.APP);
           break;
-        case "netCheck":
-          loadNetCheck(value);
+        case "netCheck":    // 是否检查网络
+          setField("netCheck", checkBoolean(value) ? Boolean.valueOf(value) : false,
+              ConfigType.APP);
+          break;
+        case "useBroadcast":  // 是否使用广播
+          setField("useBroadcast", checkBoolean(value) ? Boolean.valueOf(value) : false,
+              ConfigType.APP);
+          break;
+        case "notNetRetry":   // 没有网络也重试
+          setField("notNetRetry", checkBoolean(value) ? Boolean.valueOf(value) : false,
+              ConfigType.APP);
           break;
       }
     }
   }
 
-  private void loadNetCheck(String value) {
-    boolean b = checkBoolean(value), temp = false;
-    if (b) {
-      temp = Boolean.valueOf(value);
-    }
-    mAppConfig.netCheck = temp;
+  /**
+   * 获取任务类型集合，类型有 {@link ConfigType#DOWNLOAD}、{@link ConfigType#UPLOAD}、{@link ConfigType#D_GROUP}
+   */
+  private int[] getAllTaskType() {
+    return new int[] {ConfigType.DOWNLOAD, ConfigType.UPLOAD,
+        ConfigType.D_GROUP};
   }
 
-  private void loadUseBroadcast(String value) {
-    boolean b = checkBoolean(value), temp = false;
-
-    if (b) {
-      temp = Boolean.valueOf(value);
-    }
-    if (mType == ConfigType.DOWNLOAD) {
-      mDownloadConfig.useBroadcast = temp;
-    }
-    if (mType == ConfigType.UPLOAD) {
-      mUploadConfig.useBroadcast = temp;
-    }
-  }
-
-  private void loadUseBlock(String value) {
-    if (mType == ConfigType.DOWNLOAD) {
-      mDownloadConfig.useBlock = checkBoolean(value) ? Boolean.valueOf(value) : false;
+  private void setField(String key, Object value, int... types) {
+    for (int type : types) {
+      if (type == ConfigType.DOWNLOAD) {
+        setField(Configuration.DownloadConfig.class, mDownloadConfig, key, value);
+      } else if (type == ConfigType.UPLOAD) {
+        setField(Configuration.UploadConfig.class, mUploadConfig, key, value);
+      } else if (type == ConfigType.APP) {
+        setField(Configuration.AppConfig.class, mAppConfig, key, value);
+      } else if (type == ConfigType.D_GROUP) {
+        setField(Configuration.DGroupConfig.class, mDGroupConfig, key, value);
+      }
     }
   }
 
-  private void loadNotNetRetry(String value) {
-    if (mType == ConfigType.DOWNLOAD) {
-      mDownloadConfig.notNetRetry = checkBoolean(value) ? Boolean.valueOf(value) : false;
-    }
-    if (mType == ConfigType.UPLOAD) {
-      mUploadConfig.notNetRetry = checkBoolean(value) ? Boolean.valueOf(value) : false;
-    }
-  }
-
-  private void loadLogLevel(String value) {
-    int level;
+  private void setField(Class clazz, Object target, String key, Object value) {
+    Field field = CommonUtil.getField(clazz, key);
     try {
-      level = Integer.parseInt(value);
-    } catch (NumberFormatException e) {
+      field.set(target, value);
+    } catch (IllegalAccessException e) {
       e.printStackTrace();
-      level = ALog.LOG_LEVEL_VERBOSE;
-    }
-    if (level < ALog.LOG_LEVEL_VERBOSE || level > ALog.LOG_CLOSE) {
-      ALog.w(TAG, "level【" + level + "】错误");
-      mAppConfig.logLevel = ALog.LOG_LEVEL_VERBOSE;
-    } else {
-      mAppConfig.logLevel = level;
-    }
-  }
-
-  private void loadUseAriaCrashHandler(String value) {
-    if (checkBoolean(value)) {
-      mAppConfig.useAriaCrashHandler = Boolean.parseBoolean(value);
-    } else {
-      ALog.w(TAG, "useAriaCrashHandler【" + value + "】错误");
-      mAppConfig.useAriaCrashHandler = true;
-    }
-  }
-
-  private void loadUpdateInterval(String value) {
-    long temp = checkLong(value) ? Long.parseLong(value) : 1000;
-    if (mType == ConfigType.DOWNLOAD) {
-      mDownloadConfig.updateInterval = temp;
-    }
-    if (mType == ConfigType.UPLOAD) {
-      mUploadConfig.updateInterval = temp;
-    }
-  }
-
-  private void loadQueueMod(String value) {
-    String mod = "now";
-    if (!TextUtils.isEmpty(value) && (value.equalsIgnoreCase("now") || value.equalsIgnoreCase(
-        "wait"))) {
-      mod = value;
-    }
-    if (mType == ConfigType.DOWNLOAD) {
-      mDownloadConfig.queueMod = mod;
-    }
-    if (mType == ConfigType.UPLOAD) {
-      mUploadConfig.queueMod = mod;
-    }
-  }
-
-  private void loadMaxSpeed(String value) {
-    int maxSpeed = checkInt(value) ? Integer.parseInt(value) : 0;
-    if (mType == ConfigType.DOWNLOAD) {
-      mDownloadConfig.maxSpeed = maxSpeed;
-    }
-    if (mType == ConfigType.UPLOAD) {
-      mUploadConfig.maxSpeed = maxSpeed;
-    }
-  }
-
-  private void loadConvertSpeed(String value) {
-    boolean open = true;
-    if (checkBoolean(value)) {
-      open = Boolean.parseBoolean(value);
-    }
-
-    if (mType == ConfigType.DOWNLOAD) {
-      mDownloadConfig.isConvertSpeed = open;
-    }
-    if (mType == ConfigType.UPLOAD) {
-      mUploadConfig.isConvertSpeed = open;
-    }
-  }
-
-  private void loadReTryInterval(String value) {
-    int time = checkInt(value) ? Integer.parseInt(value) : 2 * 1000;
-
-    if (time < 2 * 1000) {
-      time = 2 * 1000;
-    }
-
-    if (mType == ConfigType.DOWNLOAD) {
-      mDownloadConfig.reTryInterval = time;
-    }
-  }
-
-  private void loadCA(String name, String path) {
-    if (mType == ConfigType.DOWNLOAD) {
-      mDownloadConfig.caName = name;
-      mDownloadConfig.caPath = path;
-    }
-  }
-
-  private void loadBuffSize(String value) {
-    int buffSize = checkInt(value) ? Integer.parseInt(value) : 8192;
-
-    if (buffSize < 2048) {
-      buffSize = 2048;
-    }
-
-    if (mType == ConfigType.DOWNLOAD) {
-      mDownloadConfig.buffSize = buffSize;
-    }
-
-    if (mType == ConfigType.UPLOAD) {
-      mUploadConfig.buffSize = buffSize;
-    }
-  }
-
-  private void loadIOTimeout(String value) {
-    int time = checkInt(value) ? Integer.parseInt(value) : 10 * 1000;
-
-    if (time < 10 * 1000) {
-      time = 10 * 1000;
-    }
-
-    if (mType == ConfigType.DOWNLOAD) {
-      mDownloadConfig.iOTimeOut = time;
-    }
-
-    if (mType == ConfigType.UPLOAD) {
-      mUploadConfig.iOTimeOut = time;
-    }
-  }
-
-  private void loadConnectTime(String value) {
-    int time = checkInt(value) ? Integer.parseInt(value) : 5 * 1000;
-
-    if (mType == ConfigType.DOWNLOAD) {
-      mDownloadConfig.connectTimeOut = time;
-    }
-    if (mType == ConfigType.UPLOAD) {
-      mUploadConfig.connectTimeOut = time;
-    }
-  }
-
-  private void loadReTry(String value) {
-    int num = checkInt(value) ? Integer.parseInt(value) : 0;
-
-    if (mType == ConfigType.DOWNLOAD) {
-      mDownloadConfig.reTryNum = num;
-    }
-    if (mType == ConfigType.UPLOAD) {
-      mUploadConfig.reTryNum = num;
-    }
-  }
-
-  private void loadMaxQueue(String value) {
-    int num = checkInt(value) ? Integer.parseInt(value) : 2;
-    if (num < 1) {
-      ALog.w(TAG, "任务队列数不能小于 1");
-      num = 2;
-    }
-    if (mType == ConfigType.DOWNLOAD) {
-      mDownloadConfig.maxTaskNum = num;
-    }
-    if (mType == ConfigType.UPLOAD) {
-      mUploadConfig.maxTaskNum = num;
-    }
-  }
-
-  private void loadThreadNum(String value) {
-    int num = checkInt(value) ? Integer.parseInt(value) : 3;
-    if (num < 1) {
-      ALog.e(TAG, "下载线程数不能小于 1");
-      num = 1;
-    }
-    if (mType == ConfigType.DOWNLOAD) {
-      mDownloadConfig.threadNum = num;
     }
   }
 
@@ -338,8 +226,8 @@ class ConfigHelper extends DefaultHandler {
       return false;
     }
     try {
-      Integer l = Integer.parseInt(value);
-      return true;
+      int l = Integer.parseInt(value);
+      return l >= 0;
     } catch (NumberFormatException e) {
       e.printStackTrace();
       return false;
@@ -387,5 +275,6 @@ class ConfigHelper extends DefaultHandler {
     mDownloadConfig.save();
     mUploadConfig.save();
     mAppConfig.save();
+    mDGroupConfig.save();
   }
 }

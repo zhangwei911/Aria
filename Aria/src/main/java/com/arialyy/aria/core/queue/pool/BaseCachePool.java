@@ -29,8 +29,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Created by lyy on 2016/8/14.
- * 任务缓存池，所有下载任务最先缓存在这个池中
+ * Created by lyy on 2016/8/14. 任务缓存池，所有下载任务最先缓存在这个池中
  */
 public class BaseCachePool<TASK extends AbsTask> implements IPool<TASK> {
   private static final String TAG = "BaseCachePool";
@@ -88,7 +87,7 @@ public class BaseCachePool<TASK extends AbsTask> implements IPool<TASK> {
         ALog.e(TAG, "任务不能为空！！");
         return false;
       }
-      String url = task.getKey();
+      String key = task.getKey();
       if (mCacheQueue.contains(task)) {
         ALog.w(TAG, "任务【" + task.getTaskName() + "】进入缓存队列失败，原因：已经在缓存队列中");
         return false;
@@ -96,7 +95,7 @@ public class BaseCachePool<TASK extends AbsTask> implements IPool<TASK> {
         boolean s = mCacheQueue.offer(task);
         ALog.d(TAG, "任务【" + task.getTaskName() + "】进入缓存队列" + (s ? "成功" : "失败"));
         if (s) {
-          mCacheMap.put(CommonUtil.keyToHashKey(url), task);
+          mCacheMap.put(CommonUtil.keyToHashKey(key), task);
         }
         return s;
       }
@@ -128,6 +127,10 @@ public class BaseCachePool<TASK extends AbsTask> implements IPool<TASK> {
       }
       return mCacheMap.get(CommonUtil.keyToHashKey(key));
     }
+  }
+
+  @Override public boolean taskExits(String key) {
+    return mCacheMap.containsKey(CommonUtil.keyToHashKey(key));
   }
 
   @Override public boolean removeTask(TASK task) {

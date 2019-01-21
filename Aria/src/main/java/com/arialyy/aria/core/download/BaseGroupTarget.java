@@ -35,7 +35,7 @@ abstract class BaseGroupTarget<TARGET extends BaseGroupTarget>
   /**
    * 组任务名
    */
-  String mGroupName;
+  String mGroupHash;
   /**
    * 文件夹临时路径
    */
@@ -71,7 +71,7 @@ abstract class BaseGroupTarget<TARGET extends BaseGroupTarget>
   }
 
   @Override public boolean taskExists() {
-    return DownloadGroupTaskQueue.getInstance().getTask(mEntity.getGroupName()) != null;
+    return DownloadGroupTaskQueue.getInstance().getTask(mEntity.getGroupHash()) != null;
   }
 
   /**
@@ -134,7 +134,6 @@ abstract class BaseGroupTarget<TARGET extends BaseGroupTarget>
           file.renameTo(new File(newPath));
         }
         de.setDownloadPath(newPath);
-        dte.setKey(newPath);
         des.add(de);
       }
       AbsEntity.saveAll(des);

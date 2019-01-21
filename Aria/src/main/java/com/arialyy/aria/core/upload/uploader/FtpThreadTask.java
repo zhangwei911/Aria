@@ -44,7 +44,7 @@ class FtpThreadTask extends AbsFtpThreadTask<UploadEntity, UTaskWrapper> {
     mConnectTimeOut = mAridManager.getUploadConfig().getConnectTimeOut();
     mReadTimeOut = mAridManager.getUploadConfig().getIOTimeOut();
     mBufSize = mAridManager.getUploadConfig().getBuffSize();
-    isNotNetRetry = mAridManager.getUploadConfig().isNotNetRetry();
+    isNotNetRetry = mAridManager.getAppConfig().isNotNetRetry();
   }
 
   @Override public int getMaxSpeed() {

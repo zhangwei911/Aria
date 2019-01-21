@@ -66,7 +66,7 @@ public class DownloadGroupTarget extends BaseGroupTarget<DownloadGroupTarget> im
   }
 
   private void init() {
-    mGroupName = CommonUtil.getMd5Code(mUrls);
+    mGroupHash = CommonUtil.getMd5Code(mUrls);
     mTaskWrapper = TaskWrapperManager.getInstance().getDGTaskWrapper(DGTaskWrapper.class, mUrls);
     mEntity = mTaskWrapper.getEntity();
     if (mEntity != null) {
@@ -97,13 +97,12 @@ public class DownloadGroupTarget extends BaseGroupTarget<DownloadGroupTarget> im
     }
     mUrls.clear();
     mUrls.addAll(urls);
-    mGroupName = CommonUtil.getMd5Code(urls);
-    mEntity.setGroupName(mGroupName);
-    mTaskWrapper.setKey(mGroupName);
+    mGroupHash = CommonUtil.getMd5Code(urls);
+    mEntity.setGroupHash(mGroupHash);
     mEntity.update();
     if (mEntity.getSubEntities() != null && !mEntity.getSubEntities().isEmpty()) {
       for (DownloadEntity de : mEntity.getSubEntities()) {
-        de.setGroupName(mGroupName);
+        de.setGroupHash(mGroupHash);
         de.update();
       }
     }
@@ -262,7 +261,7 @@ public class DownloadGroupTarget extends BaseGroupTarget<DownloadGroupTarget> im
       }
     }
 
-    mEntity.setGroupName(CommonUtil.getMd5Code(mUrls));
+    mEntity.setGroupHash(CommonUtil.getMd5Code(mUrls));
 
     return true;
   }
@@ -288,7 +287,6 @@ public class DownloadGroupTarget extends BaseGroupTarget<DownloadGroupTarget> im
 
       CommonUtil.modifyTaskRecord(oldFile.getPath(), newPath);
       entity.setDownloadPath(newPath);
-      taskEntity.setKey(newPath);
       entity.setFileName(newName);
       entity.update();
     }

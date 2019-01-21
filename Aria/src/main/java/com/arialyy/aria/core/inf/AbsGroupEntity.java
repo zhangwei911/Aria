@@ -28,7 +28,7 @@ public abstract class AbsGroupEntity extends AbsEntity implements Parcelable {
   /**
    * 组名，组名为任务地址相加的url的Md5
    */
-  @Primary protected String groupName;
+  @Primary protected String groupHash;
 
   /**
    * 任务组别名
@@ -61,8 +61,8 @@ public abstract class AbsGroupEntity extends AbsEntity implements Parcelable {
     this.urls = urls;
   }
 
-  public String getGroupName() {
-    return groupName;
+  public String getGroupHash() {
+    return groupHash;
   }
 
   public String getAlias() {
@@ -70,7 +70,7 @@ public abstract class AbsGroupEntity extends AbsEntity implements Parcelable {
   }
 
   @Override public String getKey() {
-    return groupName;
+    return groupHash;
   }
 
   public void setAlias(String alias) {
@@ -86,13 +86,13 @@ public abstract class AbsGroupEntity extends AbsEntity implements Parcelable {
 
   @Override public void writeToParcel(Parcel dest, int flags) {
     super.writeToParcel(dest, flags);
-    dest.writeString(this.groupName);
+    dest.writeString(this.groupHash);
     dest.writeString(this.alias);
   }
 
   protected AbsGroupEntity(Parcel in) {
     super(in);
-    this.groupName = in.readString();
+    this.groupHash = in.readString();
     this.alias = in.readString();
   }
 }

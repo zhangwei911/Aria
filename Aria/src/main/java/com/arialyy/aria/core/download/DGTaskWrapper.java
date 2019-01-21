@@ -25,8 +25,6 @@ public class DGTaskWrapper extends AbsGroupTaskWrapper<DownloadGroupEntity, DTas
 
   private List<DTaskWrapper> subTaskEntities;
 
-  private String key;
-
   public DGTaskWrapper(DownloadGroupEntity entity) {
     super(entity);
   }
@@ -36,12 +34,11 @@ public class DGTaskWrapper extends AbsGroupTaskWrapper<DownloadGroupEntity, DTas
     this.subTaskEntities = subTaskEntities;
   }
 
+  /**
+   * 组名
+   */
   @Override public String getKey() {
-    return key;
-  }
-
-  public void setKey(String key) {
-    this.key = key;
+    return getEntity().getKey();
   }
 
   @Override public List<DTaskWrapper> getSubTaskWrapper() {

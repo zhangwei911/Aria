@@ -171,7 +171,6 @@ abstract class BaseNormalTarget<TARGET extends BaseNormalTarget>
       File newFile = new File(filePath);
       mEntity.setDownloadPath(filePath);
       mEntity.setFileName(newFile.getName());
-      mTaskWrapper.setKey(filePath);
       if (oldFile.exists()) {
         oldFile.renameTo(newFile);
         CommonUtil.modifyTaskRecord(oldFile.getPath(), newFile.getPath());
@@ -201,7 +200,6 @@ abstract class BaseNormalTarget<TARGET extends BaseNormalTarget>
     }
     if (!TextUtils.isEmpty(newUrl)) {
       mEntity.setUrl(newUrl);
-      mTaskWrapper.setUrl(newUrl);
     }
     return true;
   }

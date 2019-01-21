@@ -78,8 +78,6 @@ public abstract class AbsTaskWrapper<ENTITY extends AbsEntity>
 
   public abstract String getKey();
 
-  public abstract void setKey(String key);
-
   @Override public ENTITY getEntity() {
     return entity;
   }
@@ -131,6 +129,7 @@ public abstract class AbsTaskWrapper<ENTITY extends AbsEntity>
 
   public void setState(int state) {
     this.state = state;
+    entity.setState(state);
   }
 
   public int getRequestType() {

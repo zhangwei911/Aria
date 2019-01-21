@@ -31,7 +31,7 @@ public class DGEntityWrapper extends AbsWrapper {
   @One
   public DownloadGroupEntity groupEntity;
 
-  @Many(parentColumn = "groupName", entityColumn = "groupName")
+  @Many(parentColumn = "groupHash", entityColumn = "groupHash")
   public List<DownloadEntity> subEntity;
 
   @Override protected void handleConvert() {

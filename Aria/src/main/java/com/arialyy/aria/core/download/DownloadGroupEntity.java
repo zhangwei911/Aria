@@ -39,8 +39,8 @@ public class DownloadGroupEntity extends AbsGroupEntity {
     this.subEntities = subTasks;
   }
 
-  public void setGroupName(String key) {
-    this.groupName = key;
+  public void setGroupHash(String key) {
+    this.groupHash = key;
   }
 
   @Override public int getTaskType() {

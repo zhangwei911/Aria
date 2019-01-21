@@ -173,6 +173,10 @@ public abstract class AbsEntity extends DbEntity implements IEntity, Parcelable,
 
   /**
    * 实体唯一标识符
+   * 下载实体：下载url
+   * 上传实体：文件路径
+   * 下载任务组：组名
+   * ftp文件夹下载：下载url
    */
   public abstract String getKey();
 

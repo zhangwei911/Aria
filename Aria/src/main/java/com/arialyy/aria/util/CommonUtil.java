@@ -586,7 +586,7 @@ public class CommonUtil {
       return;
     }
     List<TaskRecord> records =
-        DbEntity.findDatas(TaskRecord.class, "dGroupName=?", groupEntity.getGroupName());
+        DbEntity.findDatas(TaskRecord.class, "dGroupHash=?", groupEntity.getGroupHash());
 
     if (records == null || records.isEmpty()) {
       ALog.w(TAG, "组任务记录删除失败，记录为null");

@@ -23,8 +23,7 @@ import com.arialyy.aria.core.upload.UploadTask;
 import com.arialyy.aria.util.ALog;
 
 /**
- * Created by lyy on 2017/2/27.
- * 上传任务队列
+ * Created by lyy on 2017/2/27. 上传任务队列
  */
 public class UploadTaskQueue extends AbsTaskQueue<UploadTask, UTaskWrapper> {
   private static final String TAG = "UploadTaskQueue";
@@ -46,7 +45,7 @@ public class UploadTaskQueue extends AbsTaskQueue<UploadTask, UTaskWrapper> {
     return TYPE_U_QUEUE;
   }
 
-  @Override public int getConfigMaxNum() {
+  @Override public int getOldMaxNum() {
     return AriaManager.getInstance(AriaManager.APP).getUploadConfig().oldMaxTaskNum;
   }
 
@@ -55,12 +54,12 @@ public class UploadTaskQueue extends AbsTaskQueue<UploadTask, UTaskWrapper> {
   }
 
   @Override public UploadTask createTask(UTaskWrapper wrapper) {
+    super.createTask(wrapper);
     UploadTask task = null;
-    if (mCachePool.getTask(wrapper.getEntity().getKey()) == null
-        && mExecutePool.getTask(wrapper.getEntity().getKey()) == null) {
+    if (!mCachePool.taskExits(wrapper.getKey()) && !mExecutePool.taskExits(wrapper.getKey())) {
       task = (UploadTask) TaskFactory.getInstance()
           .createTask(wrapper, UploadSchedulers.getInstance());
-      mCachePool.putTask(task);
+      addTask(task);
     } else {
       ALog.w(TAG, "任务已存在");
     }

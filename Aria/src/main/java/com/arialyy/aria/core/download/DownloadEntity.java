@@ -36,9 +36,9 @@ public class DownloadEntity extends AbsNormalEntity implements Parcelable {
   /**
    * 所属任务组
    */
-  @Foreign(parent = DownloadGroupEntity.class, column = "groupName",
+  @Foreign(parent = DownloadGroupEntity.class, column = "groupHash",
       onUpdate = ActionPolicy.CASCADE, onDelete = ActionPolicy.CASCADE)
-  private String groupName;
+  private String groupHash;
 
   /**
    * 从服务器的返回信息中获取的文件md5信息，如果服务器没有返回，则不会设置该信息
@@ -91,12 +91,12 @@ public class DownloadEntity extends AbsNormalEntity implements Parcelable {
     this.serverFileName = serverFileName;
   }
 
-  public String getGroupName() {
-    return groupName;
+  public String getGroupHash() {
+    return groupHash;
   }
 
-  public void setGroupName(String groupName) {
-    this.groupName = groupName;
+  public void setGroupHash(String groupHash) {
+    this.groupHash = groupHash;
   }
 
   public String getDownloadPath() {
@@ -119,7 +119,7 @@ public class DownloadEntity extends AbsNormalEntity implements Parcelable {
   @Override public void writeToParcel(Parcel dest, int flags) {
     super.writeToParcel(dest, flags);
     dest.writeString(this.downloadPath);
-    dest.writeString(this.groupName);
+    dest.writeString(this.groupHash);
     dest.writeString(this.md5Code);
     dest.writeString(this.disposition);
     dest.writeString(this.serverFileName);
@@ -130,8 +130,8 @@ public class DownloadEntity extends AbsNormalEntity implements Parcelable {
         + "downloadPath='"
         + downloadPath
         + '\''
-        + ", groupName='"
-        + groupName
+        + ", groupHash='"
+        + groupHash
         + '\''
         + ", md5Code='"
         + md5Code
@@ -148,7 +148,7 @@ public class DownloadEntity extends AbsNormalEntity implements Parcelable {
   protected DownloadEntity(Parcel in) {
     super(in);
     this.downloadPath = in.readString();
-    this.groupName = in.readString();
+    this.groupHash = in.readString();
     this.md5Code = in.readString();
     this.disposition = in.readString();
     this.serverFileName = in.readString();

@@ -16,6 +16,7 @@
 
 package com.arialyy.aria.core.queue;
 
+import com.arialyy.aria.core.download.DGTaskWrapper;
 import com.arialyy.aria.core.download.DownloadGroupTask;
 import com.arialyy.aria.core.download.DownloadTask;
 import com.arialyy.aria.core.download.DTaskWrapper;
@@ -25,10 +26,17 @@ import com.arialyy.aria.core.upload.UploadTask;
 import com.arialyy.aria.core.upload.UTaskWrapper;
 
 /**
- * Created by lyy on 2016/8/16.
- * 任务功能接口
+ * Created by lyy on 2016/8/16. 任务功能接口
  */
 public interface ITaskQueue<TASK extends AbsTask, TASK_WRAPPER extends AbsTaskWrapper> {
+
+  /**
+   * 通过key跑断任务是在存在
+   *
+   * @param key 下载链接，或上传文件的路径
+   * @return {@code true} 任务存在
+   */
+  boolean taskExists(String key);
 
   /**
    * 通过key判断任务是否正在执行
@@ -39,9 +47,7 @@ public interface ITaskQueue<TASK extends AbsTask, TASK_WRAPPER extends AbsTaskWr
   boolean taskIsRunning(String key);
 
   /**
-   * 恢复任务
-   * 如果执行队列任务未满，则直接启动任务。
-   * 如果执行队列已经满了，则暂停执行队列队首任务，并恢复指定任务
+   * 恢复任务 如果执行队列任务未满，则直接启动任务。 如果执行队列已经满了，则暂停执行队列队首任务，并恢复指定任务
    *
    * @param task 需要恢复飞任务
    */
@@ -55,21 +61,21 @@ public interface ITaskQueue<TASK extends AbsTask, TASK_WRAPPER extends AbsTaskWr
   /**
    * 开始任务
    *
-   * @param task {@link DownloadTask}、{@link UploadTask}
+   * @param task {@link DownloadTask}、{@link UploadTask}、{@link DownloadGroupTask}
    */
   void startTask(TASK task);
 
   /**
    * 停止任务
    *
-   * @param task {@link DownloadTask}、{@link UploadTask}
+   * @param task {@link DownloadTask}、{@link UploadTask}、{@link DownloadGroupTask}
    */
   void stopTask(TASK task);
 
   /**
    * 取消下载任务
    *
-   * @param task {@link DownloadTask}、{@link UploadTask}
+   * @param task {@link DownloadTask}、{@link UploadTask}、{@link DownloadGroupTask}
    */
   void cancelTask(TASK task);
 
@@ -83,7 +89,7 @@ public interface ITaskQueue<TASK extends AbsTask, TASK_WRAPPER extends AbsTaskWr
   /**
    * 重试下载
    *
-   * @param task {@link DownloadTask}、{@link UploadTask}
+   * @param task {@link DownloadTask}、{@link UploadTask}、{@link DownloadGroupTask}
    */
   void reTryStart(TASK task);
 
@@ -110,10 +116,10 @@ public interface ITaskQueue<TASK extends AbsTask, TASK_WRAPPER extends AbsTaskWr
   int getMaxTaskNum();
 
   /**
-   * 创建一个新的任务，创建时只是将新任务存储到缓存池
+   * 创建一个缓存任务，创建时只是将新任务存储到缓存池
    *
-   * @param wrapper 任务实体{@link DTaskWrapper}、{@link UTaskWrapper}
-   * @return {@link DownloadTask}、{@link UploadTask}
+   * @param wrapper 任务实体{@link DTaskWrapper}、{@link UTaskWrapper}、{@link DGTaskWrapper}
+   * @return {@link DownloadTask}、{@link UploadTask}、{@link DGTaskWrapper}
    */
   TASK createTask(TASK_WRAPPER wrapper);
 

@@ -16,11 +16,11 @@
 
 package com.arialyy.aria.core.queue.pool;
 
+import com.arialyy.aria.core.inf.AbsEntity;
 import com.arialyy.aria.core.inf.AbsTask;
 
 /**
- * Created by lyy on 2016/8/14.
- * 任务池
+ * Created by lyy on 2016/8/14. 任务池
  */
 interface IPool<T extends AbsTask> {
   /**
@@ -36,17 +36,25 @@ interface IPool<T extends AbsTask> {
   T pollTask();
 
   /**
-   * 通过下载链接获取下载任务，当任务不为空时，队列将删除该下载任务
+   * 通过key获取任务，当任务不为空时，队列将删除该下载任务
    *
-   * @param downloadUrl 下载链接
+   * @param key {@link AbsEntity#getKey()}
    * @return 返回null或者下载任务
    */
-  T getTask(String downloadUrl);
+  T getTask(String key);
+
+  /**
+   * 任务是在存在
+   *
+   * @param key {@link AbsEntity#getKey()}
+   * @return {@code true} 任务存在
+   */
+  boolean taskExits(String key);
 
   /**
    * 删除任务池中的下载任务
    *
-   * @param task 下载任务
+   * @param task {@link AbsTask}
    * @return true:移除成功
    */
   boolean removeTask(T task);

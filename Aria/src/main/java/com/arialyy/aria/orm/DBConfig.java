@@ -35,7 +35,7 @@ class DBConfig {
   /*adb pull /mnt/sdcard/Android/data/com.arialyy.simple/files/DB/AriaLyyDb d:/db*/
   static Map<String, Class> mapping = new HashMap<>();
   static String DB_NAME;
-  static int VERSION = 43;
+  static int VERSION = 44;
 
   /**
    * 是否将数据库保存在Sd卡，{@code true} 是
@@ -52,10 +52,7 @@ class DBConfig {
   }
 
   static {
-    mapping.put("DGTaskWrapper", DGTaskWrapper.class);
     mapping.put("DownloadGroupEntity", DownloadGroupEntity.class);
-    mapping.put("DTaskWrapper", DTaskWrapper.class);
-    mapping.put("UTaskWrapper", UTaskWrapper.class);
     mapping.put("DownloadEntity", DownloadEntity.class);
     mapping.put("UploadEntity", UploadEntity.class);
     mapping.put("TaskRecord", TaskRecord.class);

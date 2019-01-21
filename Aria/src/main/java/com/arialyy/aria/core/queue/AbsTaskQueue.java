@@ -16,14 +16,18 @@
 
 package com.arialyy.aria.core.queue;
 
+import com.arialyy.aria.core.download.DownloadGroupTask;
+import com.arialyy.aria.core.download.DownloadTask;
 import com.arialyy.aria.core.inf.AbsTask;
 import com.arialyy.aria.core.inf.AbsTaskWrapper;
 import com.arialyy.aria.core.inf.IEntity;
 import com.arialyy.aria.core.inf.TaskSchedulerType;
+import com.arialyy.aria.core.manager.TaskWrapperManager;
 import com.arialyy.aria.core.queue.pool.BaseCachePool;
 import com.arialyy.aria.core.queue.pool.BaseExecutePool;
 import com.arialyy.aria.core.queue.pool.DownloadSharePool;
 import com.arialyy.aria.core.queue.pool.UploadSharePool;
+import com.arialyy.aria.core.upload.UploadTask;
 import com.arialyy.aria.util.ALog;
 import java.util.Map;
 import java.util.Set;
@@ -31,8 +35,8 @@ import java.util.Set;
 /**
  * Created by lyy on 2017/2/23. 任务队列
  */
-abstract class AbsTaskQueue<TASK extends AbsTask, TASK_ENTITY extends AbsTaskWrapper>
-    implements ITaskQueue<TASK, TASK_ENTITY> {
+public abstract class AbsTaskQueue<TASK extends AbsTask, TASK_WRAPPER extends AbsTaskWrapper>
+    implements ITaskQueue<TASK, TASK_WRAPPER> {
   final int TYPE_D_QUEUE = 1;
   final int TYPE_DG_QUEUE = 2;
   final int TYPE_U_QUEUE = 3;
@@ -114,9 +118,9 @@ abstract class AbsTaskQueue<TASK extends AbsTask, TASK_ENTITY extends AbsTaskWra
   }
 
   /**
-   * 获取配置文件配置的最大可执行任务数
+   * 获取配置文件旧的最大任务数
    */
-  public abstract int getConfigMaxNum();
+  public abstract int getOldMaxNum();
 
   /**
    * 获取任务执行池
@@ -151,7 +155,7 @@ abstract class AbsTaskQueue<TASK extends AbsTask, TASK_ENTITY extends AbsTaskWra
   }
 
   @Override public void setMaxTaskNum(int downloadNum) {
-    int oldMaxSize = getConfigMaxNum();
+    int oldMaxSize = getOldMaxNum();
     int diff = downloadNum - oldMaxSize;
     if (oldMaxSize == downloadNum) {
       ALog.w(TAG, "设置的下载任务数和配置文件的下载任务数一直，跳过");
@@ -177,6 +181,15 @@ abstract class AbsTaskQueue<TASK extends AbsTask, TASK_ENTITY extends AbsTaskWra
     }
   }
 
+  @Override public TASK createTask(TASK_WRAPPER wrapper) {
+    TaskWrapperManager.getInstance().addTaskWrapper(wrapper);
+    return null;
+  }
+
+  @Override public boolean taskExists(String key) {
+    return getTask(key) != null;
+  }
+
   @Override public TASK getTask(String key) {
     TASK task = mExecutePool.getTask(key);
     if (task == null) {
@@ -185,12 +198,26 @@ abstract class AbsTaskQueue<TASK extends AbsTask, TASK_ENTITY extends AbsTaskWra
     return task;
   }
 
-  @Override public void startTask(TASK task) {
-    if (mExecutePool.putTask(task)) {
-      mCachePool.removeTask(task);
-      task.getTaskWrapper().getEntity().setFailNum(0);
-      task.start();
+  /**
+   * 添加等待中的任务
+   *
+   * @param task {@link DownloadTask}、{@link UploadTask}、{@link DownloadGroupTask}
+   */
+  void addTask(TASK task) {
+    if (!mCachePool.taskExits(task.getKey())) {
+      mCachePool.putTask(task);
     }
+  }
+
+  @Override public void startTask(TASK task) {
+    if (mExecutePool.taskExits(task.getKey())) {
+      ALog.w(TAG, String.format("任务【%s】执行中", task.getKey()));
+      return;
+    }
+    mCachePool.removeTask(task);
+    mExecutePool.putTask(task);
+    task.getTaskWrapper().getEntity().setFailNum(0);
+    task.start();
   }
 
   @Override public void stopTask(TASK task) {

@@ -19,11 +19,8 @@ import com.arialyy.aria.core.download.DGTaskWrapper;
 import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.download.DownloadGroupEntity;
-import com.arialyy.aria.core.download.DGEntityWrapper;
-import com.arialyy.aria.orm.DbEntity;
 import com.arialyy.aria.util.CommonUtil;
 import com.arialyy.aria.util.DbDataHelper;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,19 +43,16 @@ class DGTaskWrapperFactory implements IGTEFactory<DownloadGroupEntity, DGTaskWra
     return INSTANCE;
   }
 
-  @Override public DGTaskWrapper getGTE(String groupName, List<String> urls) {
-    DownloadGroupEntity entity = DbDataHelper.getHttpDGEntity(groupName, urls);
+  @Override public DGTaskWrapper getGTE(String groupHash, List<String> urls) {
+    DownloadGroupEntity entity = DbDataHelper.getHttpDGEntity(groupHash, urls);
     DGTaskWrapper wrapper = new DGTaskWrapper(entity);
     wrapper.setSubTaskWrapper(createDGSubTaskWrapper(entity));
-    wrapper.setKey(entity.getGroupName());
     return wrapper;
   }
 
   @Override public DGTaskWrapper getFTE(String ftpUrl) {
     DownloadGroupEntity entity = DbDataHelper.getFtpDGEntity(ftpUrl);
     DGTaskWrapper fte = new DGTaskWrapper(entity);
-
-    fte.setKey(ftpUrl);
     fte.asFtp().setUrlEntity(CommonUtil.getFtpUrlInfo(ftpUrl));
 
     if (fte.getEntity().getSubEntities() == null) {
@@ -77,10 +71,8 @@ class DGTaskWrapperFactory implements IGTEFactory<DownloadGroupEntity, DGTaskWra
     List<DTaskWrapper> list = new ArrayList<>();
     for (DownloadEntity entity : dge.getSubEntities()) {
       DTaskWrapper taskEntity = new DTaskWrapper(entity);
-      taskEntity.setKey(entity.getDownloadPath());
-      taskEntity.setGroupName(dge.getKey());
+      taskEntity.setGroupHash(dge.getKey());
       taskEntity.setGroupTask(true);
-      taskEntity.setUrl(entity.getUrl());
       list.add(taskEntity);
     }
     return list;

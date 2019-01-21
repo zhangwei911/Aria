@@ -67,25 +67,23 @@ class FtpDirInfoThread extends AbsFtpInfoThread<DownloadGroupEntity, DGTaskWrapp
         : remotePath.substring(lastIndex + 1);
     entity.setFileName(
         new String(fileName.getBytes(), Charset.forName(mTaskWrapper.asHttp().getCharSet())));
-    entity.setGroupName(mEntity.getGroupName());
+    entity.setGroupHash(mEntity.getGroupHash());
     entity.setGroupChild(true);
     entity.setFileSize(ftpFile.getSize());
     entity.insert();
 
-    DTaskWrapper taskEntity = new DTaskWrapper(entity);
-    taskEntity.setKey(entity.getDownloadPath());
-    taskEntity.setUrl(entity.getUrl());
-    taskEntity.setGroupTask(true);
-    taskEntity.setGroupName(mEntity.getGroupName());
-    taskEntity.setRequestType(AbsTaskWrapper.D_FTP);
+    DTaskWrapper taskWrapper = new DTaskWrapper(entity);
+    taskWrapper.setGroupTask(true);
+    taskWrapper.setGroupHash(mEntity.getGroupHash());
+    taskWrapper.setRequestType(AbsTaskWrapper.D_FTP);
     urlEntity.url = entity.getUrl();
     urlEntity.remotePath = remotePath;
-    taskEntity.asFtp().setUrlEntity(urlEntity);
+    taskWrapper.asFtp().setUrlEntity(urlEntity);
 
     if (mEntity.getUrls() == null) {
       mEntity.setUrls(new ArrayList<String>());
     }
     mEntity.getSubEntities().add(entity);
-    mTaskWrapper.getSubTaskWrapper().add(taskEntity);
+    mTaskWrapper.getSubTaskWrapper().add(taskWrapper);
   }
 }

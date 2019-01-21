@@ -58,7 +58,7 @@ final class HttpThreadTask extends AbsThreadTask<DownloadEntity, DTaskWrapper> {
     mConnectTimeOut = mAridManager.getDownloadConfig().getConnectTimeOut();
     mReadTimeOut = mAridManager.getDownloadConfig().getIOTimeOut();
     mBufSize = mAridManager.getDownloadConfig().getBuffSize();
-    isNotNetRetry = mAridManager.getDownloadConfig().isNotNetRetry();
+    isNotNetRetry = mAridManager.getAppConfig().isNotNetRetry();
     isOpenDynamicFile = STATE.TASK_RECORD.isOpenDynamicFile;
     isBlock = STATE.TASK_RECORD.isBlock;
   }

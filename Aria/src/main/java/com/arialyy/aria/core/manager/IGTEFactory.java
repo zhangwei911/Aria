@@ -30,10 +30,10 @@ interface IGTEFactory<ENTITY extends AbsEntity, TASK_ENTITY extends AbsTaskWrapp
    * 1、创建实体和任务实体之间的关联
    * 2、如果在数据库中查找不到对应的数据，则新创建任务实体
    *
-   * @param groupName 任务组名
+   * @param groupHash 任务组名
    * @param urls 子任务的下载地址
    */
-  TASK_ENTITY getGTE(String groupName, List<String> urls);
+  TASK_ENTITY getGTE(String groupHash, List<String> urls);
 
   /**
    * 获取FTP文件夹的任务实体，该方法需要以下操作：

@@ -54,7 +54,7 @@ public class DownloadGroupTask extends AbsGroupTask<DownloadGroupEntity, DGTaskW
 
   @Override public String getTaskName() {
     return "任务组->" + (TextUtils.isEmpty(mTaskWrapper.getEntity().getAlias())
-        ? mTaskWrapper.getEntity().getGroupName() : mTaskWrapper.getEntity().getAlias());
+        ? mTaskWrapper.getEntity().getGroupHash() : mTaskWrapper.getEntity().getAlias());
   }
 
   @Override public int getTaskType() {

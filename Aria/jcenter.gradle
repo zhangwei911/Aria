@@ -76,7 +76,7 @@ artifacts {
 //################################# jcenter 上传配置 start #########################################
 bintray {
 //  user = hasProperty("bintrayUser") ? getProperty("bintrayUser") : getProperty("BINTRAY_USER")
-//  groupName = hasProperty("bintrayKey") ? getProperty("bintrayKey") : getProperty("BINTRAY_KEY")
+//  groupHash = hasProperty("bintrayKey") ? getProperty("bintrayKey") : getProperty("BINTRAY_KEY")
   user = BINTRAY_USER
   key = BINTRAY_KEY
   configurations = ['archives']

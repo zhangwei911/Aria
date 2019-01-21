@@ -64,15 +64,15 @@ public class TaskRecord extends DbEntity {
   /**
    * 下载任务组名
    */
-  @Foreign(parent = DownloadGroupEntity.class, column = "groupName", onUpdate = ActionPolicy.CASCADE, onDelete = ActionPolicy.CASCADE)
-  public String dGroupName;
+  @Foreign(parent = DownloadGroupEntity.class, column = "groupHash", onUpdate = ActionPolicy.CASCADE, onDelete = ActionPolicy.CASCADE)
+  public String dGroupHash;
 
   /**
    * 上传组任务名，暂时没有用
    */
   @Ignore
   @Deprecated
-  public String uGroupName;
+  public String uGroupHash;
 
   /**
    * 是否是分块{@code true}是，{@code false} 不是

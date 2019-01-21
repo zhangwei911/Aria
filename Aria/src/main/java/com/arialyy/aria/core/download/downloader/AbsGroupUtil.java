@@ -89,7 +89,7 @@ public abstract class AbsGroupUtil implements IUtil, Runnable {
   private int mStopNum = 0;
   //任务组大小
   int mGroupSize = 0;
-  private long mUpdateInterval = 1000;
+  private long mUpdateInterval;
   private boolean isStop = false, isCancel = false;
 
   AbsGroupUtil(IDownloadGroupListener listener, DGTaskWrapper groupEntity) {
@@ -275,13 +275,13 @@ public abstract class AbsGroupUtil implements IUtil, Runnable {
         mCompleteNum++;
         mCurrentLocation += te.getEntity().getFileSize();
       } else {
-        mExeMap.put(te.getUrl(), te);
+        mExeMap.put(te.getKey(), te);
         mCurrentLocation += file.exists() ? te.getEntity().getCurrentProgress() : 0;
       }
       if (isNeedLoadFileSize) {
         mTotalLen += te.getEntity().getFileSize();
       }
-      mTasksMap.put(te.getUrl(), te);
+      mTasksMap.put(te.getGroupHash(), te);
     }
   }
 
@@ -390,7 +390,7 @@ public abstract class AbsGroupUtil implements IUtil, Runnable {
    * 子任务事件监听
    */
   private class ChildDownloadListener implements IDownloadListener {
-    private DTaskWrapper subTaskEntity;
+    private DTaskWrapper subTaskWrapper;
     private DownloadEntity subEntity;
     private int RUN_SAVE_INTERVAL = 5 * 1000;  //5s保存一次下载中的进度
     private long lastSaveTime;
@@ -399,12 +399,12 @@ public abstract class AbsGroupUtil implements IUtil, Runnable {
     private boolean isNotNetRetry;
 
     ChildDownloadListener(DTaskWrapper entity) {
-      subTaskEntity = entity;
-      subEntity = subTaskEntity.getEntity();
+      subTaskWrapper = entity;
+      subEntity = subTaskWrapper.getEntity();
       subEntity.setFailNum(0);
       lastLen = subEntity.getCurrentProgress();
       lastSaveTime = System.currentTimeMillis();
-      isNotNetRetry = AriaManager.getInstance(AriaManager.APP).getDownloadConfig().isNotNetRetry();
+      isNotNetRetry = AriaManager.getInstance(AriaManager.APP).getAppConfig().isNotNetRetry();
     }
 
     @Override public void onPre() {
@@ -504,7 +504,7 @@ public abstract class AbsGroupUtil implements IUtil, Runnable {
           ALog.d(TAG, "downloader retry");
           reStartTask(dt);
         } else {
-          mFailMap.put(subTaskEntity.getUrl(), subTaskEntity);
+          mFailMap.put(subTaskWrapper.getKey(), subTaskWrapper);
           mListener.onSubFail(subEntity, new TaskException(TAG,
               String.format("任务组子任务【%s】下载失败，下载地址【%s】", subEntity.getFileName(),
                   subEntity.getUrl())));
@@ -513,7 +513,7 @@ public abstract class AbsGroupUtil implements IUtil, Runnable {
           }
           if (mFailMap.size() == mGroupSize) {
             mListener.onFail(true, new TaskException(TAG,
-                String.format("任务组【%s】下载失败", mGTWrapper.getEntity().getGroupName())));
+                String.format("任务组【%s】下载失败", mGTWrapper.getEntity().getGroupHash())));
           } else if (mFailMap.size() + mCompleteNum >= mExeMap.size()) {
             mListener.onStop(mCurrentLocation);
           }
@@ -543,7 +543,7 @@ public abstract class AbsGroupUtil implements IUtil, Runnable {
     }
 
     private void saveData(int state, long location) {
-      subTaskEntity.setState(state);
+      subTaskWrapper.setState(state);
       subEntity.setState(state);
       subEntity.setComplete(state == IEntity.STATE_COMPLETE);
       if (state == IEntity.STATE_CANCEL) {

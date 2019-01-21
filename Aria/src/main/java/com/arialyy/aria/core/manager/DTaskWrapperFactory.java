@@ -46,10 +46,7 @@ class DTaskWrapperFactory implements INormalTEFactory<DownloadEntity, DTaskWrapp
    * 通过下载实体创建任务实体
    */
   private DTaskWrapper create(DownloadEntity entity) {
-    DTaskWrapper wrapper = new DTaskWrapper(entity);
-    wrapper.setKey(entity.getDownloadPath());
-    wrapper.setUrl(entity.getUrl());
-    return wrapper;
+    return new DTaskWrapper(entity);
   }
 
   /**
@@ -72,7 +69,7 @@ class DTaskWrapperFactory implements INormalTEFactory<DownloadEntity, DTaskWrapp
       entity = new DownloadEntity();
       entity.setUrl(downloadUrl);
       entity.setGroupChild(false);
-      entity.setGroupName(null);
+      entity.setGroupHash(null);
       entity.setDownloadPath(UUID.randomUUID().toString().replace("-", ""));  //设置临时路径
     }
     File file = new File(entity.getDownloadPath());

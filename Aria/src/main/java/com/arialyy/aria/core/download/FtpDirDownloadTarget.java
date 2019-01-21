@@ -40,7 +40,7 @@ public class FtpDirDownloadTarget extends BaseGroupTarget<FtpDirDownloadTarget>
   }
 
   private void init(String key) {
-    mGroupName = key;
+    mGroupHash = key;
     mTaskWrapper = TaskWrapperManager.getInstance().getFtpTaskWrapper(DGTaskWrapper.class, key);
     mTaskWrapper.setRequestType(AbsTaskWrapper.D_FTP_DIR);
     mEntity = mTaskWrapper.getEntity();
@@ -97,7 +97,7 @@ public class FtpDirDownloadTarget extends BaseGroupTarget<FtpDirDownloadTarget>
    * @return {@code true}地址合法
    */
   private boolean checkUrl() {
-    final String url = mGroupName;
+    final String url = mGroupHash;
     if (TextUtils.isEmpty(url)) {
       ALog.e(TAG, "下载失败，url为null");
       return false;

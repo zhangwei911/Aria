@@ -40,9 +40,7 @@ class UTaskWrapperFactory implements INormalTEFactory<UploadEntity, UTaskWrapper
   }
 
   private UTaskWrapper create(UploadEntity entity) {
-    UTaskWrapper wrapper = new UTaskWrapper(entity);
-    wrapper.setKey(entity.getFilePath());
-    return wrapper;
+    return new UTaskWrapper(entity);
   }
 
   @Override public UTaskWrapper create(String key) {

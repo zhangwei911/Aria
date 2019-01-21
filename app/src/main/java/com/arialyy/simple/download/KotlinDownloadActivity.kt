@@ -68,7 +68,7 @@
 //  private fun startD() {
 //    Aria.download(this)
 //        .load(DOWNLOAD_URL)
-//        .addHeader("groupName", "value")
+//        .addHeader("groupHash", "value")
 //        .setDownloadPath(Environment.getExternalStorageDirectory().path + "/hhhhhhhh.apk")
 //        .start()
 //  }

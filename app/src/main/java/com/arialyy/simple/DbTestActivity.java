@@ -59,8 +59,6 @@ public class DbTestActivity extends BaseActivity<ActivityDbTestBinding> {
       entity.setDownloadPath(key);
 
       DTaskWrapper dte = new DTaskWrapper(entity);
-      dte.setUrl(url);
-      dte.setKey(key);
 
       datas.add(entity);
     }

@@ -130,16 +130,16 @@ public class TaskWrapperManager {
     final Lock lock = this.lock;
     lock.lock();
     try {
-      String groupName = CommonUtil.getMd5Code(urls);
-      AbsTaskWrapper tWrapper = cache.get(convertKey(groupName));
+      String groupHash = CommonUtil.getMd5Code(urls);
+      AbsTaskWrapper tWrapper = cache.get(convertKey(groupHash));
       if (tWrapper == null || tWrapper.getClass() != clazz) {
         IGTEFactory factory = chooseGroupFactory(clazz);
         if (factory == null) {
           ALog.e(TAG, "任务实体创建失败");
           return null;
         }
-        tWrapper = factory.getGTE(groupName, urls);
-        cache.put(convertKey(groupName), tWrapper);
+        tWrapper = factory.getGTE(groupHash, urls);
+        cache.put(convertKey(groupHash), tWrapper);
       }
       return (TE) tWrapper;
     } finally {

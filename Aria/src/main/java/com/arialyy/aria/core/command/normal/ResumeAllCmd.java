@@ -16,7 +16,6 @@ import com.arialyy.aria.core.upload.UTaskWrapper;
 import com.arialyy.aria.core.upload.UploadEntity;
 import com.arialyy.aria.orm.DbEntity;
 import com.arialyy.aria.util.ALog;
-import com.arialyy.aria.util.CommonUtil;
 import com.arialyy.aria.util.NetUtils;
 import java.util.ArrayList;
 import java.util.List;
@@ -62,10 +61,8 @@ final class ResumeAllCmd<T extends AbsTaskWrapper> extends AbsNormalCmd<T> {
               "isGroupChild=? AND state!=? ORDER BY stopTime DESC", "false", "1");
       if (entities != null && !entities.isEmpty()) {
         for (DownloadEntity entity : entities) {
-          //if (TextUtils.isEmpty(entity.getDownloadPath())){
-          //  continue;
-          //}
-          resumeTask(TaskWrapperManager.getInstance().getHttpTaskWrapper(DTaskWrapper.class, entity.getKey()));
+          addResumeEntity(TaskWrapperManager.getInstance()
+              .getHttpTaskWrapper(DTaskWrapper.class, entity.getKey()));
         }
       }
     } else if (type == 2) {
@@ -73,8 +70,9 @@ final class ResumeAllCmd<T extends AbsTaskWrapper> extends AbsNormalCmd<T> {
           DbEntity.findDatas(DownloadGroupEntity.class, "state!=? ORDER BY stopTime DESC", "1");
       if (entities != null && !entities.isEmpty()) {
         for (DownloadGroupEntity entity : entities) {
-          resumeTask(
-              TaskWrapperManager.getInstance().getDGTaskWrapper(DGTaskWrapper.class, entity.getUrls()));
+          addResumeEntity(
+              TaskWrapperManager.getInstance()
+                  .getDGTaskWrapper(DGTaskWrapper.class, entity.getUrls()));
         }
       }
     } else if (type == 3) {
@@ -82,26 +80,20 @@ final class ResumeAllCmd<T extends AbsTaskWrapper> extends AbsNormalCmd<T> {
           DbEntity.findDatas(UploadEntity.class, "state!=? ORDER BY stopTime DESC", "1");
       if (entities != null && !entities.isEmpty()) {
         for (UploadEntity entity : entities) {
-          resumeTask(TaskWrapperManager.getInstance().getHttpTaskWrapper(UTaskWrapper.class, entity.getKey()));
+          addResumeEntity(TaskWrapperManager.getInstance()
+              .getHttpTaskWrapper(UTaskWrapper.class, entity.getKey()));
         }
       }
     }
   }
 
   /**
-   * 恢复任务
+   * 添加恢复实体
    */
-  private void resumeTask(AbsTaskWrapper te) {
+  private void addResumeEntity(AbsTaskWrapper te) {
     if (te == null || te.getEntity() == null) return;
-    int state = te.getState();
-    if (state == IEntity.STATE_STOP || state == IEntity.STATE_OTHER) {
-      resumeEntity(te);
-    } else if (state == IEntity.STATE_WAIT || state == IEntity.STATE_FAIL) {
+    if (!mQueue.taskExists(te.getKey())) {
       mWaitList.add(te);
-    } else {
-      if (!mQueue.taskIsRunning(te.getEntity().getKey())) {
-        mWaitList.add(te);
-      }
     }
   }
 
@@ -126,33 +118,6 @@ final class ResumeAllCmd<T extends AbsTaskWrapper> extends AbsNormalCmd<T> {
         AbsTask task = createTask(te);
         sendWaitState(task);
       }
-    }
-  }
-
-  /**
-   * 恢复实体任务
-   *
-   * @param te 任务实体
-   */
-  private void resumeEntity(AbsTaskWrapper te) {
-    if (te instanceof DTaskWrapper) {
-      if (te.getRequestType() == AbsTaskWrapper.D_FTP
-          || te.getRequestType() == AbsTaskWrapper.U_FTP) {
-        te.asFtp().setUrlEntity(CommonUtil.getFtpUrlInfo(te.getEntity().getKey()));
-      }
-      mQueue = DownloadTaskQueue.getInstance();
-    } else if (te instanceof UTaskWrapper) {
-      mQueue = UploadTaskQueue.getInstance();
-    } else if (te instanceof DGTaskWrapper) {
-      mQueue = DownloadGroupTaskQueue.getInstance();
-    }
-    int exeNum = mQueue.getCurrentExePoolNum();
-    if (exeNum == 0 || exeNum < mQueue.getMaxTaskNum()) {
-      startTask(createTask(te));
-    } else {
-      te.getEntity().setState(IEntity.STATE_WAIT);
-      AbsTask task = createTask(te);
-      sendWaitState(task);
     }
   }
 }

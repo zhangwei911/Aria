@@ -25,19 +25,19 @@ import java.lang.annotation.Target;
  * Aria下载事件被注解的方法中，参数仅能有一个，参数类型为{@link com.arialyy.aria.core.download.DownloadGroupTask}
  * <pre>
  *   <code>
- *      {@literal @}DownloadGroup.onPre(groupName)
+ *      {@literal @}DownloadGroup.onPre(groupHash)
  *       protected void onPre(DownloadGroupTask task) {
  *       }
  *   </code>
  * </pre>
- * {@literal @}Download.onPre("myGroupName")，如果你的注解中增加了url描述，
- * 则表示，所有下载任务中，只有下载地址为"myGroupName"的任务才能回调该注解的方法。
+ * {@literal @}Download.onPre("mGroupHash")，如果你的注解中增加了url描述，
+ * 则表示，所有下载任务中，只有下载地址为"myGroupHash"的任务才能回调该注解的方法。
  *
  *
  * 如果希望获取子任务的状态，可以使用onSub..类的注解
  * <pre>
  *   <code>
- *      {@literal @}DownloadGroup.onSubPre(groupName)
+ *      {@literal @}DownloadGroup.onSubPre(groupHash)
  *        protected void onPre(DownloadGroupTask task, String url) {
  *      }
  *   </code>

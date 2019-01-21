@@ -48,26 +48,26 @@ public class DbDataHelper {
   /**
    * 获取组合任务实体 如果数据库不存在该实体，则新创建一个新的任务组实体
    *
-   * @param groupName 组合任务名称
+   * @param groupHash 组合任务名称
    * @param urls 子任务url列表
    */
-  public static DownloadGroupEntity getHttpDGEntity(String groupName, List<String> urls) {
+  public static DownloadGroupEntity getHttpDGEntity(String groupHash, List<String> urls) {
     List<DGEntityWrapper> wrapper =
-        DbEntity.findRelationData(DGEntityWrapper.class, "DownloadGroupEntity.groupName=?",
-            groupName);
+        DbEntity.findRelationData(DGEntityWrapper.class, "DownloadGroupEntity.groupHash=?",
+            groupHash);
 
     DownloadGroupEntity groupEntity;
     if (wrapper != null && !wrapper.isEmpty()) {
       groupEntity = wrapper.get(0).groupEntity;
       if (groupEntity == null) {
         groupEntity = new DownloadGroupEntity();
-        groupEntity.setSubEntities(createHttpSubTask(groupName, urls));
+        groupEntity.setSubEntities(createHttpSubTask(groupHash, urls));
       }
     } else {
       groupEntity = new DownloadGroupEntity();
-      groupEntity.setSubEntities(createHttpSubTask(groupName, urls));
+      groupEntity.setSubEntities(createHttpSubTask(groupHash, urls));
     }
-    groupEntity.setGroupName(groupName);
+    groupEntity.setGroupHash(groupHash);
     groupEntity.setUrls(urls);
     return groupEntity;
   }
@@ -75,16 +75,16 @@ public class DbDataHelper {
   /**
    * 创建HTTP子任务实体
    */
-  private static List<DownloadEntity> createHttpSubTask(String groupName, List<String> urls) {
+  private static List<DownloadEntity> createHttpSubTask(String groupHash, List<String> urls) {
     List<DownloadEntity> list = new ArrayList<>();
     for (int i = 0, len = urls.size(); i < len; i++) {
       String url = urls.get(i);
       DownloadEntity entity = new DownloadEntity();
       entity.setUrl(url);
-      entity.setDownloadPath(groupName + "_" + i);
+      entity.setDownloadPath(groupHash + "_" + i);
       int lastIndex = url.lastIndexOf(File.separator);
       entity.setFileName(url.substring(lastIndex + 1));
-      entity.setGroupName(groupName);
+      entity.setGroupHash(groupHash);
       entity.setGroupChild(true);
       list.add(entity);
     }
@@ -98,7 +98,7 @@ public class DbDataHelper {
    */
   public static DownloadGroupEntity getFtpDGEntity(String ftpUrl) {
     List<DGEntityWrapper> wrapper =
-        DbEntity.findRelationData(DGEntityWrapper.class, "DownloadGroupEntity.groupName=?",
+        DbEntity.findRelationData(DGEntityWrapper.class, "DownloadGroupEntity.groupHash=?",
             ftpUrl);
     DownloadGroupEntity groupEntity;
     if (wrapper != null && !wrapper.isEmpty()) {
@@ -109,7 +109,7 @@ public class DbDataHelper {
     } else {
       groupEntity = new DownloadGroupEntity();
     }
-    groupEntity.setGroupName(ftpUrl);
+    groupEntity.setGroupHash(ftpUrl);
     return groupEntity;
   }
 }

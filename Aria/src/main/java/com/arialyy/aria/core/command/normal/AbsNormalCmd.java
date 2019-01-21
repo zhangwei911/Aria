@@ -92,7 +92,6 @@ public abstract class AbsNormalCmd<T extends AbsTaskWrapper> extends AbsCmd<T> {
    */
   void sendWaitState(AbsTask task) {
     if (task != null) {
-      task.getTaskWrapper().getEntity().setState(IEntity.STATE_WAIT);
       task.getTaskWrapper().setState(IEntity.STATE_WAIT);
       task.getOutHandler().obtainMessage(ISchedulers.WAIT, task).sendToTarget();
     }
@@ -192,7 +191,7 @@ public abstract class AbsNormalCmd<T extends AbsTaskWrapper> extends AbsCmd<T> {
    * @return 创建的任务
    */
   AbsTask createTask(AbsTaskWrapper taskEntity) {
-    TaskWrapperManager.getInstance().addTaskWrapper(taskEntity);
+
     return mQueue.createTask(taskEntity);
   }
 }

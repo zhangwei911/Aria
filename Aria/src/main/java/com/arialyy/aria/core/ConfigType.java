@@ -22,10 +22,12 @@ import java.lang.annotation.RetentionPolicy;
 @IntDef({
     ConfigType.DOWNLOAD,
     ConfigType.UPLOAD,
-    ConfigType.APP
+    ConfigType.APP,
+    ConfigType.D_GROUP
 })
 @Retention(RetentionPolicy.SOURCE) @interface ConfigType {
   int DOWNLOAD = 1;
   int UPLOAD = 2;
   int APP = 3;
+  int D_GROUP = 4;
 }

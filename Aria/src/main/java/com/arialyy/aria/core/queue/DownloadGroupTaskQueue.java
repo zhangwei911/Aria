@@ -23,8 +23,7 @@ import com.arialyy.aria.core.scheduler.DownloadGroupSchedulers;
 import com.arialyy.aria.util.ALog;
 
 /**
- * Created by AriaL on 2017/6/29.
- * 任务组下载队列
+ * Created by AriaL on 2017/6/29. 任务组下载队列
  */
 public class DownloadGroupTaskQueue
     extends AbsTaskQueue<DownloadGroupTask, DGTaskWrapper> {
@@ -53,19 +52,19 @@ public class DownloadGroupTaskQueue
   }
 
   @Override public DownloadGroupTask createTask(DGTaskWrapper wrapper) {
+    super.createTask(wrapper);
     DownloadGroupTask task = null;
-    if (mCachePool.getTask(wrapper.getEntity().getKey()) == null
-        && mExecutePool.getTask(wrapper.getEntity().getKey()) == null) {
+    if (!mCachePool.taskExits(wrapper.getKey()) && !mExecutePool.taskExits(wrapper.getKey())) {
       task = (DownloadGroupTask) TaskFactory.getInstance()
           .createTask(wrapper, DownloadGroupSchedulers.getInstance());
-      mCachePool.putTask(task);
+      addTask(task);
     } else {
       ALog.w(TAG, "任务已存在");
     }
     return task;
   }
 
-  @Override public int getConfigMaxNum() {
+  @Override public int getOldMaxNum() {
     return AriaManager.getInstance(AriaManager.APP).getDownloadConfig().oldMaxTaskNum;
   }
 }

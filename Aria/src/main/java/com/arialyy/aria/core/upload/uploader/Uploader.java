@@ -42,12 +42,16 @@ class Uploader extends AbsFileer<UploadEntity, UTaskWrapper> {
     return true;
   }
 
+  @Override protected int getType() {
+    return UPLOAD;
+  }
+
   @Override protected int setNewTaskThreadNum() {
     return 1;
   }
 
   @Override protected AbsThreadTask selectThreadTask(SubThreadConfig<UTaskWrapper> config) {
-    switch (mTaskEntity.getRequestType()) {
+    switch (mTaskWrapper.getRequestType()) {
       case AbsTaskWrapper.U_FTP:
         return new FtpThreadTask(mConstance, mListener, config);
       case AbsTaskWrapper.U_HTTP:

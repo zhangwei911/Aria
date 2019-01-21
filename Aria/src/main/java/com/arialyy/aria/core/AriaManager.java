@@ -30,15 +30,12 @@ import com.arialyy.aria.core.command.ICmd;
 import com.arialyy.aria.core.common.QueueMod;
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.download.DownloadGroupEntity;
-import com.arialyy.aria.core.download.DGTaskWrapper;
 import com.arialyy.aria.core.download.DownloadReceiver;
-import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.inf.AbsReceiver;
 import com.arialyy.aria.core.inf.IReceiver;
 import com.arialyy.aria.core.inf.ReceiverType;
 import com.arialyy.aria.core.upload.UploadEntity;
 import com.arialyy.aria.core.upload.UploadReceiver;
-import com.arialyy.aria.core.upload.UTaskWrapper;
 import com.arialyy.aria.orm.DbEntity;
 import com.arialyy.aria.orm.DelegateWrapper;
 import com.arialyy.aria.util.ALog;
@@ -78,6 +75,7 @@ import org.xml.sax.SAXException;
   private Configuration.DownloadConfig mDConfig;
   private Configuration.UploadConfig mUConfig;
   private Configuration.AppConfig mAConfig;
+  private Configuration.DGroupConfig mDGConfig;
 
   private AriaManager(Context context) {
     APP = context.getApplicationContext();
@@ -127,8 +125,7 @@ import org.xml.sax.SAXException;
    */
   private void amendTaskState() {
     Class[] clazzs = new Class[] {
-        DownloadEntity.class, UploadEntity.class, DownloadGroupEntity.class,
-        DTaskWrapper.class, UTaskWrapper.class, DGTaskWrapper.class
+        DownloadEntity.class, UploadEntity.class, DownloadGroupEntity.class
     };
     String sql = "UPDATE %s SET state=2 WHERE state IN (3,4,5,6)";
     for (Class clazz : clazzs) {
@@ -207,6 +204,19 @@ import org.xml.sax.SAXException;
   }
 
   /**
+   * 如果需要在代码中修改下载类型的组合任务的配置，请使用以下方法
+   * <pre>
+   *   <code>
+   *     //修改最大任务队列数
+   *     Aria.get(this).getDownloadConfig().setMaxTaskNum(3);
+   *   </code>
+   * </pre>
+   */
+  public Configuration.DGroupConfig getDGroupConfig(){
+    return mDGConfig;
+  }
+
+  /**
    * 设置命令
    */
   public AriaManager setCmd(ICmd command) {
@@ -268,7 +278,7 @@ import org.xml.sax.SAXException;
         DbEntity.deleteData(DownloadEntity.class, "url=? and isGroupChild='false'", key);
         break;
       case 2:
-        DbEntity.deleteData(DownloadGroupEntity.class, "groupName=?", key);
+        DbEntity.deleteData(DownloadGroupEntity.class, "groupHash=?", key);
         break;
       case 3:
         DbEntity.deleteData(UploadEntity.class, "filePath=?", key);
@@ -379,6 +389,7 @@ import org.xml.sax.SAXException;
     mDConfig = Configuration.getInstance().downloadCfg;
     mUConfig = Configuration.getInstance().uploadCfg;
     mAConfig = Configuration.getInstance().appCfg;
+    mDGConfig = Configuration.getInstance().dGroupCfg;
 
     File xmlFile = new File(APP.getFilesDir().getPath() + Configuration.XML_FILE);
     File tempDir = new File(APP.getFilesDir().getPath() + "/temp");

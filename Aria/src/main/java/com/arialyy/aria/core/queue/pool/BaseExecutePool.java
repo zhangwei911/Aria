@@ -27,8 +27,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Created by lyy on 2016/8/15.
- * 任务执行池，所有当前下载任务都该任务池中，默认下载大小为2
+ * Created by lyy on 2016/8/15. 任务执行池，所有当前下载任务都该任务池中，默认下载大小为2
  */
 public class BaseExecutePool<TASK extends AbsTask> implements IPool<TASK> {
   private final String TAG = "BaseExecutePool";
@@ -166,6 +165,10 @@ public class BaseExecutePool<TASK extends AbsTask> implements IPool<TASK> {
       }
       return mExecuteMap.get(CommonUtil.keyToHashKey(key));
     }
+  }
+
+  @Override public boolean taskExits(String key) {
+    return mExecuteMap.containsKey(CommonUtil.keyToHashKey(key));
   }
 
   @Override public boolean removeTask(TASK task) {

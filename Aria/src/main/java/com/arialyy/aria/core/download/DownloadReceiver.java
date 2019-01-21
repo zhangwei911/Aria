@@ -274,7 +274,7 @@ public class DownloadReceiver extends AbsReceiver {
       return null;
     }
     boolean b =
-        DownloadGroupEntity.findFirst(DownloadGroupEntity.class, "groupName=?", dirUrl) != null;
+        DownloadGroupEntity.findFirst(DownloadGroupEntity.class, "groupHash=?", dirUrl) != null;
     if (!b) {
       return null;
     }
@@ -299,8 +299,8 @@ public class DownloadReceiver extends AbsReceiver {
     if (urls == null || urls.isEmpty()) {
       return false;
     }
-    String groupName = CommonUtil.getMd5Code(urls);
-    return DbEntity.checkDataExist(DownloadGroupEntity.class, "groupName=?", groupName);
+    String groupHash = CommonUtil.getMd5Code(urls);
+    return DbEntity.checkDataExist(DownloadGroupEntity.class, "groupHash=?", groupHash);
   }
 
   /**

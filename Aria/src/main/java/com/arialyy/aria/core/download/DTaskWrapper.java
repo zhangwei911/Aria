@@ -23,55 +23,36 @@ import com.arialyy.aria.core.inf.AbsTaskWrapper;
 public class DTaskWrapper extends AbsTaskWrapper<DownloadEntity> {
 
   /**
-   * 任务的url
-   */
-  private String url;
-
-  /**
    * 所属的任务组组名，如果不属于任务组，则为null
    */
-  private String groupName;
+  private String groupHash;
 
   /**
    * 该任务是否属于任务组
    */
   private boolean isGroupTask = false;
 
-  /**
-   * Task实体对应的key
-   */
-  private String key;
-
   public DTaskWrapper(DownloadEntity entity) {
     super(entity);
   }
 
+  /**
+   * Task实体对应的key，下载url
+   */
   @Override public String getKey() {
-    return key;
+    return getEntity().getKey();
   }
 
-  @Override public void setKey(String key) {
-    this.key = key;
-  }
-
-  public String getUrl() {
-    return url;
-  }
-
-  public String getGroupName() {
-    return groupName;
+  public String getGroupHash() {
+    return groupHash;
   }
 
   public boolean isGroupTask() {
     return isGroupTask;
   }
 
-  public void setUrl(String url) {
-    this.url = url;
-  }
-
-  public void setGroupName(String groupName) {
-    this.groupName = groupName;
+  public void setGroupHash(String groupHash) {
+    this.groupHash = groupHash;
   }
 
   public void setGroupTask(boolean groupTask) {

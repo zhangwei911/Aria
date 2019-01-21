@@ -251,7 +251,6 @@ class HttpFileInfoThread implements Runnable {
     }
     mEntity.setFileName(newName);
     mEntity.setDownloadPath(newPath);
-    mTaskWrapper.setKey(newPath);
   }
 
   /**

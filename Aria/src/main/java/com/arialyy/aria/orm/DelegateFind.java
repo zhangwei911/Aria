@@ -507,7 +507,7 @@ class DelegateFind extends AbsDelegate {
       ALog.e(TAG, "请输入删除条件");
       return -1;
     } else if (wheres.length != values.length) {
-      ALog.e(TAG, "groupName 和 vaule 长度不相等");
+      ALog.e(TAG, "groupHash 和 vaule 长度不相等");
       return -1;
     }
     StringBuilder sb = new StringBuilder();

@@ -50,7 +50,7 @@ public class DownloadTaskQueue extends AbsTaskQueue<DownloadTask, DTaskWrapper> 
     return TYPE_D_QUEUE;
   }
 
-  @Override public int getConfigMaxNum() {
+  @Override public int getOldMaxNum() {
     return AriaManager.getInstance(AriaManager.APP).getDownloadConfig().oldMaxTaskNum;
   }
 
@@ -98,12 +98,12 @@ public class DownloadTaskQueue extends AbsTaskQueue<DownloadTask, DTaskWrapper> 
   }
 
   @Override public DownloadTask createTask(DTaskWrapper wrapper) {
+    super.createTask(wrapper);
     DownloadTask task = null;
-    if (mCachePool.getTask(wrapper.getEntity().getKey()) == null
-        && mExecutePool.getTask(wrapper.getEntity().getKey()) == null) {
+    if (!mCachePool.taskExits(wrapper.getKey()) && !mExecutePool.taskExits(wrapper.getKey())) {
       task = (DownloadTask) TaskFactory.getInstance()
           .createTask(wrapper, DownloadSchedulers.getInstance());
-      mCachePool.putTask(task);
+      addTask(task);
     } else {
       ALog.w(TAG, "任务已存在");
     }

@@ -31,11 +31,9 @@ import com.arialyy.aria.core.queue.DownloadTaskQueue;
 import com.arialyy.aria.core.queue.UploadTaskQueue;
 import com.arialyy.aria.core.upload.UTaskWrapper;
 import com.arialyy.aria.core.upload.UploadEntity;
-import com.arialyy.aria.orm.AbsWrapper;
 import com.arialyy.aria.orm.DbEntity;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
-import com.arialyy.aria.util.DbDataHelper;
 import com.arialyy.aria.util.NetUtils;
 import java.util.ArrayList;
 import java.util.List;
@@ -178,7 +176,6 @@ class StartCmd<T extends AbsTaskWrapper> extends AbsNormalCmd<T> {
           mQueue = DownloadGroupTaskQueue.getInstance();
         }
         createTask(te);
-        sendWaitState();
       }
     }
   }

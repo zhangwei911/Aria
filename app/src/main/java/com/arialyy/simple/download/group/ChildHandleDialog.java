@@ -18,7 +18,6 @@ package com.arialyy.simple.download.group;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -46,7 +45,7 @@ import java.util.List;
   @Bind(R.id.sub_task) TextView mSub;
   @Bind(R.id.task_group) TextView mGroup;
   @Bind(R.id.pb) HorizontalProgressBarWithNumber mPb;
-  private String mGroupName;
+  private String mGroupHash;
   private String mChildName;
   private List<String> mUrls;
   private DownloadEntity mChildEntity;
@@ -55,7 +54,7 @@ import java.util.List;
     super(context);
     setStyle(STYLE_NO_TITLE, R.style.Theme_Light_Dialog);
     mChildEntity = childEntity;
-    mGroupName = "任务组测试";
+    mGroupHash = "任务组测试";
     mUrls = urls;
     mChildName = childEntity.getFileName();
   }
@@ -72,7 +71,7 @@ import java.util.List;
   }
 
   private void initWidget() {
-    mGroup.setText("任务组：" + mGroupName);
+    mGroup.setText("任务组：" + mGroupHash);
     mSub.setText("子任务：" + mChildName);
     mPb.setProgress((int) (mChildEntity.getCurrentProgress() * 100 / mChildEntity.getFileSize()));
 

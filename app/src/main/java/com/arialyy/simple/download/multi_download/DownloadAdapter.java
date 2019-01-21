@@ -62,7 +62,7 @@ public class DownloadAdapter extends AbsRVAdapter<AbsEntity, DownloadAdapter.Sim
     if (entity instanceof DownloadEntity) {
       return ((DownloadEntity) entity).getUrl();
     } else if (entity instanceof DownloadGroupEntity) {
-      return ((DownloadGroupEntity) entity).getGroupName();
+      return ((DownloadGroupEntity) entity).getGroupHash();
     }
     return "";
   }
