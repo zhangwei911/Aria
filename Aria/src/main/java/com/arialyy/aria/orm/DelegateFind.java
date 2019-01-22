@@ -53,7 +53,7 @@ class DelegateFind extends AbsDelegate {
    * 如果实体中有多个{@link One}或{@link Many}注解，将返回nul
    * {@link One} 的注解对象必须是{@link DbEntity}，{@link Many}的注解对象必须是List，并且List中的类型必须是{@link DbEntity}
    */
-  <T extends AbsWrapper> List<T> findRelationData(SQLiteDatabase db, Class<T> clazz,
+  <T extends AbsDbWrapper> List<T> findRelationData(SQLiteDatabase db, Class<T> clazz,
       String... expression) {
     db = checkDb(db);
 
@@ -202,7 +202,7 @@ class DelegateFind extends AbsDelegate {
    * @param pColumnAlias 关联查询父表别名
    * @param cColumnAlias 关联查询子表别名
    */
-  private synchronized <T extends AbsWrapper, P extends DbEntity, C extends DbEntity> List<T> newInstanceEntity(
+  private synchronized <T extends AbsDbWrapper, P extends DbEntity, C extends DbEntity> List<T> newInstanceEntity(
       Class<T> clazz, Class<P> parent,
       Class<C> child,
       Cursor cursor,

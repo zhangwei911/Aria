@@ -552,7 +552,7 @@ public abstract class AbsFileer<ENTITY extends AbsNormalEntity, TASK_WRAPPER ext
     config.START_LOCATION = startL;
     config.END_LOCATION = endL;
     config.SUPPORT_BP = mTaskWrapper.isSupportBP();
-    config.TASK_ENTITY = mTaskWrapper;
+    config.TASK_WRAPPER = mTaskWrapper;
     config.THREAD_RECORD = record;
     return selectThreadTask(config);
   }
@@ -672,7 +672,7 @@ public abstract class AbsFileer<ENTITY extends AbsNormalEntity, TASK_WRAPPER ext
     config.START_LOCATION = 0;
     config.END_LOCATION = config.TOTAL_FILE_SIZE;
     config.SUPPORT_BP = mTaskWrapper.isSupportBP();
-    config.TASK_ENTITY = mTaskWrapper;
+    config.TASK_WRAPPER = mTaskWrapper;
     ThreadRecord record = DbEntity.findFirst(ThreadRecord.class, "key=?", mRecord.filePath);
     if (record != null) {
       record.deleteData();

@@ -36,8 +36,7 @@ import java.net.UnknownHostException;
 import javax.net.ssl.SSLContext;
 
 /**
- * Created by lyy on 2017/9/26.
- * FTP单任务父类
+ * Created by lyy on 2017/9/26. FTP单任务父类
  */
 public abstract class AbsFtpThreadTask<ENTITY extends AbsNormalEntity, TASK_ENTITY extends AbsTaskWrapper<ENTITY>>
     extends AbsThreadTask<ENTITY, TASK_ENTITY> {
@@ -112,8 +111,8 @@ public abstract class AbsFtpThreadTask<ENTITY extends AbsNormalEntity, TASK_ENTI
         }
       }
       client.setControlEncoding(charSet);
-      client.setDataTimeout(mReadTimeOut);
-      client.setConnectTimeout(mConnectTimeOut);
+      client.setDataTimeout(getTaskConfig().getIOTimeOut());
+      client.setConnectTimeout(getTaskConfig().getConnectTimeOut());
       client.enterLocalPassiveMode();
       client.setFileType(FTP.BINARY_FILE_TYPE);
       client.setControlKeepAliveTimeout(5000);

@@ -13,29 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.arialyy.aria.core.upload;
+package com.arialyy.aria.core.config;
 
-import com.arialyy.aria.core.config.Configuration;
-import com.arialyy.aria.core.config.UploadConfig;
-import com.arialyy.aria.core.inf.AbsTaskWrapper;
+import com.arialyy.aria.core.queue.UploadTaskQueue;
+import java.io.Serializable;
 
 /**
- * Created by lyy on 2017/2/9. 上传任务实体
+ * 上传配置
  */
-public class UTaskWrapper extends AbsTaskWrapper<UploadEntity> {
+public class UploadConfig extends BaseTaskConfig implements Serializable {
 
-  public UTaskWrapper(UploadEntity entity) {
-    super(entity);
+  UploadConfig() {
   }
 
-  /**
-   * 文件保存路径
-   */
-  @Override public String getKey() {
-    return getEntity().getKey();
+  @Override public UploadConfig setMaxSpeed(int maxSpeed) {
+    super.setMaxSpeed(maxSpeed);
+    UploadTaskQueue.getInstance().setMaxSpeed(maxSpeed);
+    return this;
   }
 
-  @Override public UploadConfig getConfig() {
-    return Configuration.getInstance().uploadCfg;
+  public UploadConfig setMaxTaskNum(int maxTaskNum) {
+    super.setMaxTaskNum(maxTaskNum);
+    UploadTaskQueue.getInstance().setMaxTaskNum(maxTaskNum);
+    return this;
+  }
+
+  @Override int getType() {
+    return TYPE_UPLOAD;
   }
 }

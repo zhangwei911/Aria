@@ -29,19 +29,14 @@ class BaseUListener extends BaseListener<UploadEntity, UTaskWrapper, UploadTask>
 
   BaseUListener(UploadTask task, Handler outHandler) {
     super(task, outHandler);
-    isConvertSpeed = manager.getUploadConfig().isConvertSpeed();
-    mUpdateInterval = manager.getUploadConfig().getUpdateInterval();
   }
 
   @Override
   protected void saveData(int state, long location) {
-    mTaskEntity.setState(state);
+    mTaskWrapper.setState(state);
     mEntity.setState(state);
     if (state == IEntity.STATE_CANCEL) {
-      if (mEntity instanceof UploadEntity) {
-        CommonUtil.delTaskRecord(mEntity.getFilePath(), 2, mTaskEntity.isRemoveFile());
-      }
-      return;
+      CommonUtil.delTaskRecord(mEntity.getFilePath(), 2, mTaskWrapper.isRemoveFile());
     } else if (state == IEntity.STATE_STOP) {
       mEntity.setStopTime(System.currentTimeMillis());
     } else if (state == IEntity.STATE_COMPLETE) {

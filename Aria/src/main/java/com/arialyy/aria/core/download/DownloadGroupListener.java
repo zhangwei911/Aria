@@ -39,8 +39,6 @@ class DownloadGroupListener
     super(task, outHandler);
     mSeedEntity = new GroupSendParams<>();
     mSeedEntity.groupTask = task;
-    isConvertSpeed = manager.getDownloadConfig().isConvertSpeed();
-    mUpdateInterval = manager.getDownloadConfig().getUpdateInterval();
   }
 
   @Override public void onSubPre(DownloadEntity subEntity) {
@@ -121,11 +119,11 @@ class DownloadGroupListener
   }
 
   @Override protected void saveData(int state, long location) {
-    mTaskEntity.setState(state);
+    mTaskWrapper.setState(state);
     mEntity.setState(state);
     if (state == IEntity.STATE_CANCEL) {
       if (mEntity instanceof DownloadGroupEntity) {
-        CommonUtil.delGroupTaskRecord(mTaskEntity.isRemoveFile(), mEntity);
+        CommonUtil.delGroupTaskRecord(mTaskWrapper.isRemoveFile(), mEntity);
       }
       return;
     } else if (state == IEntity.STATE_STOP) {

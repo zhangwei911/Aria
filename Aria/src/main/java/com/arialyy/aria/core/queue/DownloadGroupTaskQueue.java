@@ -48,7 +48,7 @@ public class DownloadGroupTaskQueue
   }
 
   @Override public int getMaxTaskNum() {
-    return AriaManager.getInstance(AriaManager.APP).getDownloadConfig().getMaxTaskNum();
+    return AriaManager.getInstance(AriaManager.APP).getDGroupConfig().getMaxTaskNum();
   }
 
   @Override public DownloadGroupTask createTask(DGTaskWrapper wrapper) {
@@ -65,6 +65,6 @@ public class DownloadGroupTaskQueue
   }
 
   @Override public int getOldMaxNum() {
-    return AriaManager.getInstance(AriaManager.APP).getDownloadConfig().oldMaxTaskNum;
+    return AriaManager.getInstance(AriaManager.APP).getDGroupConfig().oldMaxTaskNum;
   }
 }

@@ -31,8 +31,6 @@ public class BaseDListener extends BaseListener<DownloadEntity, DTaskWrapper, Do
 
   BaseDListener(DownloadTask task, Handler outHandler) {
     super(task, outHandler);
-    isConvertSpeed = manager.getDownloadConfig().isConvertSpeed();
-    mUpdateInterval = manager.getDownloadConfig().getUpdateInterval();
   }
 
   @Override public void onPostPre(long fileSize) {
@@ -50,12 +48,12 @@ public class BaseDListener extends BaseListener<DownloadEntity, DTaskWrapper, Do
 
   @Override
   protected void saveData(int state, long location) {
-    mTaskEntity.setState(state);
+    mTaskWrapper.setState(state);
     mEntity.setState(state);
 
     if (state == IEntity.STATE_CANCEL) {
       if (mEntity instanceof DownloadEntity) {
-        CommonUtil.delTaskRecord(mEntity.getDownloadPath(), 1, mTaskEntity.isRemoveFile());
+        CommonUtil.delTaskRecord(mEntity.getDownloadPath(), 1, mTaskWrapper.isRemoveFile());
       }
       return;
     } else if (state == IEntity.STATE_STOP) {

@@ -15,6 +15,8 @@
  */
 package com.arialyy.aria.core.download;
 
+import com.arialyy.aria.core.config.Configuration;
+import com.arialyy.aria.core.config.DownloadConfig;
 import com.arialyy.aria.core.inf.AbsTaskWrapper;
 
 /**
@@ -41,6 +43,14 @@ public class DTaskWrapper extends AbsTaskWrapper<DownloadEntity> {
    */
   @Override public String getKey() {
     return getEntity().getKey();
+  }
+
+  @Override public DownloadConfig getConfig() {
+    if (isGroupTask) {
+      return Configuration.getInstance().dGroupCfg.getSubConfig();
+    } else {
+      return Configuration.getInstance().downloadCfg;
+    }
   }
 
   public String getGroupHash() {

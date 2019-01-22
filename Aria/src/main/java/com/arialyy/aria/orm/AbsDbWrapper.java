@@ -13,21 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.arialyy.aria.core;
+package com.arialyy.aria.orm;
 
-import android.support.annotation.IntDef;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
+/**
+ * Created by laoyuyu on 2018/3/30.
+ */
+public abstract class AbsDbWrapper {
 
-@IntDef({
-    ConfigType.DOWNLOAD,
-    ConfigType.UPLOAD,
-    ConfigType.APP,
-    ConfigType.D_GROUP
-})
-@Retention(RetentionPolicy.SOURCE) @interface ConfigType {
-  int DOWNLOAD = 1;
-  int UPLOAD = 2;
-  int APP = 3;
-  int D_GROUP = 4;
+  /**
+   * 处理转换
+   */
+  protected abstract void handleConvert();
 }

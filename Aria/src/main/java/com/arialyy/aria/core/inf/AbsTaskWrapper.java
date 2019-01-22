@@ -17,6 +17,10 @@ package com.arialyy.aria.core.inf;
 
 import com.arialyy.aria.core.common.ftp.FtpTaskDelegate;
 import com.arialyy.aria.core.common.http.HttpTaskDelegate;
+import com.arialyy.aria.core.config.BaseTaskConfig;
+import com.arialyy.aria.core.config.DGroupConfig;
+import com.arialyy.aria.core.config.DownloadConfig;
+import com.arialyy.aria.core.config.UploadConfig;
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.download.DownloadGroupEntity;
 import com.arialyy.aria.core.upload.UploadEntity;
@@ -76,7 +80,17 @@ public abstract class AbsTaskWrapper<ENTITY extends AbsEntity>
     this.entity = entity;
   }
 
+  /**
+   * 任务识别标志 {@link AbsEntity#getKey()}
+   */
   public abstract String getKey();
+
+  /**
+   * 任务配置
+   *
+   * @return {@link DownloadConfig}、{@link UploadConfig}、{@link DGroupConfig}
+   */
+  public abstract BaseTaskConfig getConfig();
 
   @Override public ENTITY getEntity() {
     return entity;

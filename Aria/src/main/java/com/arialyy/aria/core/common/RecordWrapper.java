@@ -15,7 +15,7 @@
  */
 package com.arialyy.aria.core.common;
 
-import com.arialyy.aria.orm.AbsWrapper;
+import com.arialyy.aria.orm.AbsDbWrapper;
 import com.arialyy.aria.orm.annotation.Many;
 import com.arialyy.aria.orm.annotation.One;
 import com.arialyy.aria.orm.annotation.Wrapper;
@@ -27,7 +27,7 @@ import java.util.List;
  * 任务记录和线程记录的关系
  */
 @Wrapper
-public class RecordWrapper extends AbsWrapper {
+public class RecordWrapper extends AbsDbWrapper {
 
   @One
   public TaskRecord taskRecord;

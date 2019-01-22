@@ -33,12 +33,12 @@ import com.arialyy.aria.util.CheckUtil;
  */
 public class DownloadGroupTask extends AbsGroupTask<DownloadGroupEntity, DGTaskWrapper> {
 
-  private DownloadGroupTask(DGTaskWrapper taskEntity, Handler outHandler) {
-    mTaskWrapper = taskEntity;
+  private DownloadGroupTask(DGTaskWrapper taskWrapper, Handler outHandler) {
+    mTaskWrapper = taskWrapper;
     mOutHandler = outHandler;
     mContext = AriaManager.APP;
     mListener = new DownloadGroupListener(this, mOutHandler);
-    switch (taskEntity.getRequestType()) {
+    switch (taskWrapper.getRequestType()) {
       case AbsTaskWrapper.D_HTTP:
         mUtil = new DownloadGroupUtil((IDownloadGroupListener) mListener, mTaskWrapper);
         break;

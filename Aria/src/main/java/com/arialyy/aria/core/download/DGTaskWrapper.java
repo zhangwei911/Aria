@@ -15,11 +15,13 @@
  */
 package com.arialyy.aria.core.download;
 
+import com.arialyy.aria.core.config.Configuration;
+import com.arialyy.aria.core.config.DGroupConfig;
 import com.arialyy.aria.core.inf.AbsGroupTaskWrapper;
 import java.util.List;
 
 /**
- * Created by AriaL on 2017/7/1. 任务组的任务实体
+ * Created by AriaL on 2017/7/1. 任务组的任务实体修饰器
  */
 public class DGTaskWrapper extends AbsGroupTaskWrapper<DownloadGroupEntity, DTaskWrapper> {
 
@@ -39,6 +41,10 @@ public class DGTaskWrapper extends AbsGroupTaskWrapper<DownloadGroupEntity, DTas
    */
   @Override public String getKey() {
     return getEntity().getKey();
+  }
+
+  @Override public DGroupConfig getConfig() {
+    return Configuration.getInstance().dGroupCfg;
   }
 
   @Override public List<DTaskWrapper> getSubTaskWrapper() {

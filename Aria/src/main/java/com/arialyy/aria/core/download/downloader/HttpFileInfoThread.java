@@ -118,7 +118,7 @@ class HttpFileInfoThread implements Runnable {
           len = -1;
         } else {
           int start = temp.indexOf("/");
-          len = Long.parseLong(temp.substring(start + 1, temp.length()));
+          len = Long.parseLong(temp.substring(start + 1));
         }
       }
     }

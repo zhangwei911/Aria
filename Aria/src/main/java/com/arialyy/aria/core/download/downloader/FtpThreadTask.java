@@ -20,6 +20,8 @@ import aria.apache.commons.net.ftp.FTPReply;
 import com.arialyy.aria.core.common.StateConstance;
 import com.arialyy.aria.core.common.SubThreadConfig;
 import com.arialyy.aria.core.common.ftp.AbsFtpThreadTask;
+import com.arialyy.aria.core.config.BaseTaskConfig;
+import com.arialyy.aria.core.config.DownloadConfig;
 import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.inf.IDownloadListener;
@@ -36,8 +38,7 @@ import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
 
 /**
- * Created by Aria.Lao on 2017/7/24.
- * Ftp下载任务
+ * Created by Aria.Lao on 2017/7/24. Ftp下载任务
  */
 class FtpThreadTask extends AbsFtpThreadTask<DownloadEntity, DTaskWrapper> {
   private final String TAG = "FtpThreadTask";
@@ -47,10 +48,6 @@ class FtpThreadTask extends AbsFtpThreadTask<DownloadEntity, DTaskWrapper> {
   FtpThreadTask(StateConstance constance, IDownloadListener listener,
       SubThreadConfig<DTaskWrapper> downloadInfo) {
     super(constance, listener, downloadInfo);
-    mConnectTimeOut = mAridManager.getDownloadConfig().getConnectTimeOut();
-    mReadTimeOut = mAridManager.getDownloadConfig().getIOTimeOut();
-    mBufSize = mAridManager.getDownloadConfig().getBuffSize();
-    isNotNetRetry = mAridManager.getAppConfig().isNotNetRetry();
     isOpenDynamicFile = STATE.TASK_RECORD.isOpenDynamicFile;
     isBlock = STATE.TASK_RECORD.isBlock;
   }
@@ -87,7 +84,8 @@ class FtpThreadTask extends AbsFtpThreadTask<DownloadEntity, DTaskWrapper> {
         return this;
       }
       String remotePath =
-          new String(mTaskWrapper.asFtp().getUrlEntity().remotePath.getBytes(charSet), SERVER_CHARSET);
+          new String(mTaskWrapper.asFtp().getUrlEntity().remotePath.getBytes(charSet),
+              SERVER_CHARSET);
       ALog.i(TAG, String.format("remotePath【%s】", remotePath));
       is = client.retrieveFileStream(remotePath);
       reply = client.getReplyCode();
@@ -174,7 +172,7 @@ class FtpThreadTask extends AbsFtpThreadTask<DownloadEntity, DTaskWrapper> {
       fos = new FileOutputStream(mConfig.TEMP_FILE, true);
       foc = fos.getChannel();
       fic = Channels.newChannel(is);
-      ByteBuffer bf = ByteBuffer.allocate(mBufSize);
+      ByteBuffer bf = ByteBuffer.allocate(getTaskConfig().getBuffSize());
       while (isLive() && (len = fic.read(bf)) != -1) {
         if (isBreak()) {
           break;
@@ -223,9 +221,9 @@ class FtpThreadTask extends AbsFtpThreadTask<DownloadEntity, DTaskWrapper> {
   private void readNormal(InputStream is) {
     BufferedRandomAccessFile file = null;
     try {
-      file = new BufferedRandomAccessFile(mConfig.TEMP_FILE, "rwd", mBufSize);
+      file = new BufferedRandomAccessFile(mConfig.TEMP_FILE, "rwd", getTaskConfig().getBuffSize());
       file.seek(mConfig.START_LOCATION);
-      byte[] buffer = new byte[mBufSize];
+      byte[] buffer = new byte[getTaskConfig().getBuffSize()];
       int len;
       while (isLive() && (len = is.read(buffer)) != -1) {
         if (isBreak()) {
@@ -259,6 +257,10 @@ class FtpThreadTask extends AbsFtpThreadTask<DownloadEntity, DTaskWrapper> {
   }
 
   @Override public int getMaxSpeed() {
-    return mAridManager.getDownloadConfig().getMaxSpeed();
+    return getTaskConfig().getMaxSpeed();
+  }
+
+  @Override protected DownloadConfig getTaskConfig() {
+    return mTaskWrapper.getConfig();
   }
 }

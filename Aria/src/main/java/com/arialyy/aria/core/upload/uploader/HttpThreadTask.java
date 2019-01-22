@@ -19,6 +19,8 @@ import com.arialyy.aria.core.common.AbsThreadTask;
 import com.arialyy.aria.core.common.StateConstance;
 import com.arialyy.aria.core.common.SubThreadConfig;
 import com.arialyy.aria.core.common.http.HttpTaskDelegate;
+import com.arialyy.aria.core.config.BaseTaskConfig;
+import com.arialyy.aria.core.config.UploadConfig;
 import com.arialyy.aria.core.inf.IUploadListener;
 import com.arialyy.aria.core.upload.UTaskWrapper;
 import com.arialyy.aria.core.upload.UploadEntity;
@@ -40,8 +42,7 @@ import java.util.Set;
 import java.util.UUID;
 
 /**
- * Created by Aria.Lao on 2017/7/28.
- * 不支持断点的HTTP上传任务
+ * Created by Aria.Lao on 2017/7/28. 不支持断点的HTTP上传任务
  */
 class HttpThreadTask extends AbsThreadTask<UploadEntity, UTaskWrapper> {
   private final String TAG = "HttpThreadTask";
@@ -54,10 +55,6 @@ class HttpThreadTask extends AbsThreadTask<UploadEntity, UTaskWrapper> {
   HttpThreadTask(StateConstance constance, IUploadListener listener,
       SubThreadConfig<UTaskWrapper> uploadInfo) {
     super(constance, listener, uploadInfo);
-    mConnectTimeOut = mAridManager.getUploadConfig().getConnectTimeOut();
-    mReadTimeOut = mAridManager.getUploadConfig().getIOTimeOut();
-    mBufSize = mAridManager.getUploadConfig().getBuffSize();
-    isNotNetRetry = mAridManager.getAppConfig().isNotNetRetry();
   }
 
   @Override public HttpThreadTask call() throws Exception {
@@ -83,11 +80,11 @@ class HttpThreadTask extends AbsThreadTask<UploadEntity, UTaskWrapper> {
       mHttpConn.setRequestProperty("Content-Type",
           taskDelegate.getContentType() + "; boundary=" + BOUNDARY);
       mHttpConn.setRequestProperty("User-Agent", taskDelegate.getUserAgent());
-      mHttpConn.setConnectTimeout(mConnectTimeOut);
-      mHttpConn.setReadTimeout(mReadTimeOut);
+      mHttpConn.setConnectTimeout(getTaskConfig().getConnectTimeOut());
+      mHttpConn.setReadTimeout(getTaskConfig().getIOTimeOut());
       //mHttpConn.setRequestProperty("Range", "bytes=" + 0 + "-" + "100");
       //内部缓冲区---分段上传防止oom
-      mHttpConn.setChunkedStreamingMode(mBufSize);
+      mHttpConn.setChunkedStreamingMode(getTaskConfig().getBuffSize());
 
       //添加Http请求头部
       Set<String> keys = taskDelegate.getHeaders().keySet();
@@ -223,6 +220,10 @@ class HttpThreadTask extends AbsThreadTask<UploadEntity, UTaskWrapper> {
   }
 
   @Override public int getMaxSpeed() {
-    return mAridManager.getUploadConfig().getMaxSpeed();
+    return getTaskConfig().getMaxSpeed();
+  }
+
+  @Override protected UploadConfig getTaskConfig() {
+    return mTaskWrapper.getConfig();
   }
 }

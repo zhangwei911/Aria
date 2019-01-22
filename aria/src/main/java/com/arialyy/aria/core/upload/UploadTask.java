@@ -27,11 +27,11 @@ import com.arialyy.aria.core.upload.uploader.SimpleUploadUtil;
  */
 public class UploadTask extends AbsNormalTask<UploadEntity, UTaskWrapper> {
 
-  private UploadTask(UTaskWrapper taskEntity, Handler outHandler) {
-    mTaskWrapper = taskEntity;
+  private UploadTask(UTaskWrapper taskWrapper, Handler outHandler) {
+    mTaskWrapper = taskWrapper;
     mOutHandler = outHandler;
     mListener = new BaseUListener(this, mOutHandler);
-    mUtil = new SimpleUploadUtil(taskEntity, (IUploadListener) mListener);
+    mUtil = new SimpleUploadUtil(taskWrapper, (IUploadListener) mListener);
   }
 
   @Override public int getTaskType() {

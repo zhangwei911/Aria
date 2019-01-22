@@ -19,6 +19,8 @@ import com.arialyy.aria.core.common.AbsThreadTask;
 import com.arialyy.aria.core.common.RequestEnum;
 import com.arialyy.aria.core.common.StateConstance;
 import com.arialyy.aria.core.common.SubThreadConfig;
+import com.arialyy.aria.core.config.BaseTaskConfig;
+import com.arialyy.aria.core.config.DownloadConfig;
 import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.common.http.HttpTaskDelegate;
@@ -44,8 +46,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Created by lyy on 2017/1/18.
- * 下载线程
+ * Created by lyy on 2017/1/18. 下载线程
  */
 final class HttpThreadTask extends AbsThreadTask<DownloadEntity, DTaskWrapper> {
   private final String TAG = "HttpThreadTask";
@@ -55,10 +56,6 @@ final class HttpThreadTask extends AbsThreadTask<DownloadEntity, DTaskWrapper> {
   HttpThreadTask(StateConstance constance, IDownloadListener listener,
       SubThreadConfig<DTaskWrapper> downloadInfo) {
     super(constance, listener, downloadInfo);
-    mConnectTimeOut = mAridManager.getDownloadConfig().getConnectTimeOut();
-    mReadTimeOut = mAridManager.getDownloadConfig().getIOTimeOut();
-    mBufSize = mAridManager.getDownloadConfig().getBuffSize();
-    isNotNetRetry = mAridManager.getAppConfig().isNotNetRetry();
     isOpenDynamicFile = STATE.TASK_RECORD.isOpenDynamicFile;
     isBlock = STATE.TASK_RECORD.isBlock;
   }
@@ -88,8 +85,8 @@ final class HttpThreadTask extends AbsThreadTask<DownloadEntity, DTaskWrapper> {
         ALog.w(TAG, "该下载不支持断点");
       }
       ConnectionHelp.setConnectParam(taskDelegate, conn);
-      conn.setConnectTimeout(mConnectTimeOut);
-      conn.setReadTimeout(mReadTimeOut);  //设置读取流的等待时间,必须设置该参数
+      conn.setConnectTimeout(getTaskConfig().getConnectTimeOut());
+      conn.setReadTimeout(getTaskConfig().getIOTimeOut());  //设置读取流的等待时间,必须设置该参数
       conn.connect();
       if (taskDelegate.getRequestEnum() == RequestEnum.POST) {
         Map<String, String> params = taskDelegate.getParams();
@@ -113,7 +110,8 @@ final class HttpThreadTask extends AbsThreadTask<DownloadEntity, DTaskWrapper> {
         readDynamicFile(is);
       } else {
         //创建可设置位置的文件
-        file = new BufferedRandomAccessFile(mConfig.TEMP_FILE, "rwd", mBufSize);
+        file =
+            new BufferedRandomAccessFile(mConfig.TEMP_FILE, "rwd", getTaskConfig().getBuffSize());
         //设置每条线程写入文件的位置
         file.seek(mConfig.START_LOCATION);
         if (taskDelegate.isChunked()) {
@@ -165,7 +163,7 @@ final class HttpThreadTask extends AbsThreadTask<DownloadEntity, DTaskWrapper> {
       fos = new FileOutputStream(mConfig.TEMP_FILE, true);
       foc = fos.getChannel();
       fic = Channels.newChannel(is);
-      ByteBuffer bf = ByteBuffer.allocate(mBufSize);
+      ByteBuffer bf = ByteBuffer.allocate(getTaskConfig().getBuffSize());
       //如果要通过 Future 的 cancel 方法取消正在运行的任务，那么该任务必定是可以 对线程中断做出响应 的任务。
 
       while (isLive() && (len = fic.read(bf)) != -1) {
@@ -227,7 +225,7 @@ final class HttpThreadTask extends AbsThreadTask<DownloadEntity, DTaskWrapper> {
    */
   private void readNormal(InputStream is, BufferedRandomAccessFile file)
       throws IOException {
-    byte[] buffer = new byte[mBufSize];
+    byte[] buffer = new byte[getTaskConfig().getBuffSize()];
     int len;
     while (isLive() && (len = is.read(buffer)) != -1) {
       if (isBreak()) {
@@ -248,7 +246,7 @@ final class HttpThreadTask extends AbsThreadTask<DownloadEntity, DTaskWrapper> {
     if (isBreak()) {
       return;
     }
-    if (!checkBlock()){
+    if (!checkBlock()) {
       return;
     }
 
@@ -292,5 +290,9 @@ final class HttpThreadTask extends AbsThreadTask<DownloadEntity, DTaskWrapper> {
 
   @Override public int getMaxSpeed() {
     return mAridManager.getDownloadConfig().getMaxSpeed();
+  }
+
+  @Override protected DownloadConfig getTaskConfig() {
+    return mTaskWrapper.getConfig();
   }
 }

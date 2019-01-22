@@ -21,6 +21,9 @@ import aria.apache.commons.net.ftp.OnFtpInputStreamListener;
 import com.arialyy.aria.core.common.StateConstance;
 import com.arialyy.aria.core.common.SubThreadConfig;
 import com.arialyy.aria.core.common.ftp.AbsFtpThreadTask;
+import com.arialyy.aria.core.config.BaseTaskConfig;
+import com.arialyy.aria.core.config.DownloadConfig;
+import com.arialyy.aria.core.config.UploadConfig;
 import com.arialyy.aria.core.inf.IEventListener;
 import com.arialyy.aria.core.upload.UploadEntity;
 import com.arialyy.aria.core.upload.UTaskWrapper;
@@ -41,14 +44,14 @@ class FtpThreadTask extends AbsFtpThreadTask<UploadEntity, UTaskWrapper> {
   FtpThreadTask(StateConstance constance, IEventListener listener,
       SubThreadConfig<UTaskWrapper> info) {
     super(constance, listener, info);
-    mConnectTimeOut = mAridManager.getUploadConfig().getConnectTimeOut();
-    mReadTimeOut = mAridManager.getUploadConfig().getIOTimeOut();
-    mBufSize = mAridManager.getUploadConfig().getBuffSize();
-    isNotNetRetry = mAridManager.getAppConfig().isNotNetRetry();
   }
 
   @Override public int getMaxSpeed() {
-    return mAridManager.getUploadConfig().getMaxSpeed();
+    return getTaskConfig().getMaxSpeed();
+  }
+
+  @Override protected UploadConfig getTaskConfig() {
+    return mTaskWrapper.getConfig();
   }
 
   @Override public FtpThreadTask call() throws Exception {
@@ -79,7 +82,7 @@ class FtpThreadTask extends AbsFtpThreadTask<UploadEntity, UTaskWrapper> {
         return this;
       }
 
-      file = new BufferedRandomAccessFile(mConfig.TEMP_FILE, "rwd", mBufSize);
+      file = new BufferedRandomAccessFile(mConfig.TEMP_FILE, "rwd", getTaskConfig().getBuffSize());
       if (mConfig.START_LOCATION != 0) {
         //file.skipBytes((int) mConfig.START_LOCATION);
         file.seek(mConfig.START_LOCATION);

@@ -6,7 +6,7 @@ import java.io.File;
 /**
  * 子线程下载信息类
  */
-public class SubThreadConfig<TASK_ENTITY extends AbsTaskWrapper> {
+public class SubThreadConfig<TASK_WRAPPER extends AbsTaskWrapper> {
   //线程Id
   public int THREAD_ID;
   //文件总长度
@@ -19,7 +19,7 @@ public class SubThreadConfig<TASK_ENTITY extends AbsTaskWrapper> {
   public File TEMP_FILE;
   //服务器地址
   public String URL;
-  public TASK_ENTITY TASK_ENTITY;
+  public TASK_WRAPPER TASK_WRAPPER;
   public boolean SUPPORT_BP = true;
   public ThreadRecord THREAD_RECORD;
 }

@@ -13,13 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.arialyy.aria.core;
+package com.arialyy.aria.core.config;
 
 import android.text.TextUtils;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
 import java.lang.reflect.Field;
-import javax.xml.validation.Validator;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -27,13 +26,13 @@ import org.xml.sax.helpers.DefaultHandler;
 /**
  * Created by lyy on 2017/5/22. 读取配置文件
  */
-class ConfigHelper extends DefaultHandler {
-  private final String TAG = "ConfigHelper";
+public class XMLReader extends DefaultHandler {
+  private final String TAG = "XMLReader";
 
-  private Configuration.DownloadConfig mDownloadConfig = Configuration.getInstance().downloadCfg;
-  private Configuration.UploadConfig mUploadConfig = Configuration.getInstance().uploadCfg;
-  private Configuration.AppConfig mAppConfig = Configuration.getInstance().appCfg;
-  private Configuration.DGroupConfig mDGroupConfig = Configuration.getInstance().dGroupCfg;
+  private DownloadConfig mDownloadConfig = Configuration.getInstance().downloadCfg;
+  private UploadConfig mUploadConfig = Configuration.getInstance().uploadCfg;
+  private AppConfig mAppConfig = Configuration.getInstance().appCfg;
+  private DGroupConfig mDGroupConfig = Configuration.getInstance().dGroupCfg;
   private @ConfigType int mType;
 
   @Override public void startDocument() throws SAXException {
@@ -167,7 +166,7 @@ class ConfigHelper extends DefaultHandler {
             ALog.w(TAG, "level【" + level + "】错误");
             level = ALog.LOG_LEVEL_VERBOSE;
           }
-          setField("level", level, ConfigType.APP);
+          setField("logLevel", level, ConfigType.APP);
           break;
         case "netCheck":    // 是否检查网络
           setField("netCheck", checkBoolean(value) ? Boolean.valueOf(value) : false,
@@ -196,13 +195,13 @@ class ConfigHelper extends DefaultHandler {
   private void setField(String key, Object value, int... types) {
     for (int type : types) {
       if (type == ConfigType.DOWNLOAD) {
-        setField(Configuration.DownloadConfig.class, mDownloadConfig, key, value);
+        setField(DownloadConfig.class, mDownloadConfig, key, value);
       } else if (type == ConfigType.UPLOAD) {
-        setField(Configuration.UploadConfig.class, mUploadConfig, key, value);
+        setField(UploadConfig.class, mUploadConfig, key, value);
       } else if (type == ConfigType.APP) {
-        setField(Configuration.AppConfig.class, mAppConfig, key, value);
+        setField(AppConfig.class, mAppConfig, key, value);
       } else if (type == ConfigType.D_GROUP) {
-        setField(Configuration.DGroupConfig.class, mDGroupConfig, key, value);
+        setField(DGroupConfig.class, mDGroupConfig, key, value);
       }
     }
   }

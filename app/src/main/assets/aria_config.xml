@@ -112,9 +112,6 @@
   <!-- 下载类组合任务 -->
   <dGroup>
 
-    <!--设置任务最大下载速度，0表示不限速，单位为：kb-->
-    <maxSpeed value="128"/>
-
     <!--组合任务下载队列最大任务数， 默认为2-->
     <maxTaskNum value="1"/>
 
@@ -156,6 +153,9 @@
 
     <!--子任务是否需要转换速度单位，转换完成后为：1b/s、1kb/s、1mb/s、1gb/s、1tb/s，如果不需要将返回byte长度-->
     <convertSpeed value="true"/>
+
+    <!--子任务的最大下载速度，0表示不限速，单位为：kb; -->
+    <maxSpeed value="128"/>
 
   </dGroup>
 </aria>

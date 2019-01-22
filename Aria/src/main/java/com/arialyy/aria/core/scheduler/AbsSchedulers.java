@@ -320,16 +320,9 @@ abstract class AbsSchedulers<TASK_ENTITY extends AbsTaskWrapper, TASK extends Ab
       callback(FAIL, task);
       return;
     }
-    long interval = 2000;
-    int num = 10;
-    boolean isNotNetRetry = manager.getAppConfig().isNotNetRetry();;
-    if (task instanceof DownloadTask || task instanceof DownloadGroupTask) {
-      interval = manager.getDownloadConfig().getReTryInterval();
-      num = manager.getDownloadConfig().getReTryNum();
-    } else if (task instanceof UploadTask) {
-      interval = manager.getUploadConfig().getReTryInterval();
-      num = manager.getUploadConfig().getReTryNum();
-    }
+    long interval = task.getTaskWrapper().getConfig().getReTryInterval();
+    int num = task.getTaskWrapper().getConfig().getReTryNum();
+    boolean isNotNetRetry = manager.getAppConfig().isNotNetRetry();
 
     final int reTryNum = num;
     if ((!NetUtils.isConnected(AriaManager.APP) && !isNotNetRetry)

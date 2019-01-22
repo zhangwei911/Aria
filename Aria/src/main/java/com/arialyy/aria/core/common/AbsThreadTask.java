@@ -17,6 +17,10 @@ package com.arialyy.aria.core.common;
 
 import android.os.Process;
 import com.arialyy.aria.core.AriaManager;
+import com.arialyy.aria.core.config.BaseTaskConfig;
+import com.arialyy.aria.core.config.DGroupConfig;
+import com.arialyy.aria.core.config.DownloadConfig;
+import com.arialyy.aria.core.config.UploadConfig;
 import com.arialyy.aria.core.inf.AbsNormalEntity;
 import com.arialyy.aria.core.inf.AbsTaskWrapper;
 import com.arialyy.aria.core.inf.IEventListener;
@@ -37,8 +41,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /**
- * Created by lyy on 2017/1/18.
- * 任务线程
+ * Created by lyy on 2017/1/18. 任务线程
  */
 public abstract class AbsThreadTask<ENTITY extends AbsNormalEntity, TASK_WRAPPER extends AbsTaskWrapper<ENTITY>>
     implements Callable<AbsThreadTask> {
@@ -52,7 +55,6 @@ public abstract class AbsThreadTask<ENTITY extends AbsNormalEntity, TASK_WRAPPER
    * 当前子线程相对于总长度的位置
    */
   protected long mChildCurrentLocation = 0;
-  protected int mBufSize;
   protected IEventListener mListener;
   protected StateConstance STATE;
   protected SubThreadConfig<TASK_WRAPPER> mConfig;
@@ -61,9 +63,7 @@ public abstract class AbsThreadTask<ENTITY extends AbsNormalEntity, TASK_WRAPPER
   private int mFailTimes = 0;
   private long mLastSaveTime;
   private ExecutorService mConfigThreadPool;
-  protected int mConnectTimeOut; //连接超时时间
-  protected int mReadTimeOut; //流读取的超时时间
-  protected boolean isNotNetRetry = false;  //断网情况是否重试
+  protected boolean isNotNetRetry;  //断网情况是否重试
   private boolean taskBreak = false;  //任务跳出
   protected int mThreadNum;
   /**
@@ -86,7 +86,7 @@ public abstract class AbsThreadTask<ENTITY extends AbsNormalEntity, TASK_WRAPPER
     STATE = constance;
     mListener = listener;
     mConfig = config;
-    mTaskWrapper = mConfig.TASK_ENTITY;
+    mTaskWrapper = mConfig.TASK_WRAPPER;
     mEntity = mTaskWrapper.getEntity();
     mLastSaveTime = System.currentTimeMillis();
     mConfigThreadPool = Executors.newCachedThreadPool();
@@ -95,6 +95,7 @@ public abstract class AbsThreadTask<ENTITY extends AbsNormalEntity, TASK_WRAPPER
     if (getMaxSpeed() > 0) {
       mSpeedBandUtil = new BandwidthLimiter(getMaxSpeed(), mThreadNum);
     }
+    isNotNetRetry = mAridManager.getAppConfig().isNotNetRetry();
   }
 
   /**
@@ -117,24 +118,23 @@ public abstract class AbsThreadTask<ENTITY extends AbsNormalEntity, TASK_WRAPPER
   }
 
   /**
-   * 当前线程是否完成，对于不支持断点的任务，一律未完成
-   * {@code true} 完成；{@code false} 未完成
+   * 当前线程是否完成，对于不支持断点的任务，一律未完成 {@code true} 完成；{@code false} 未完成
    */
-  public boolean isThreadComplete() {
+  boolean isThreadComplete() {
     return mConfig.THREAD_RECORD.isComplete;
   }
 
   /**
    * 获取任务记录
    */
-  public TaskRecord getTaskRecord() {
+  private TaskRecord getTaskRecord() {
     return STATE.TASK_RECORD;
   }
 
   /**
    * 获取线程记录
    */
-  public ThreadRecord getThreadRecord() {
+  protected ThreadRecord getThreadRecord() {
     return mConfig.THREAD_RECORD;
   }
 
@@ -144,6 +144,13 @@ public abstract class AbsThreadTask<ENTITY extends AbsNormalEntity, TASK_WRAPPER
    * @return 单位为：kb
    */
   public abstract int getMaxSpeed();
+
+  /**
+   * 读取任务配置
+   *
+   * @return {@link DownloadConfig}、{@link UploadConfig}、{@link DGroupConfig}
+   */
+  protected abstract BaseTaskConfig getTaskConfig();
 
   /**
    * 设置最大下载速度
@@ -159,7 +166,7 @@ public abstract class AbsThreadTask<ENTITY extends AbsNormalEntity, TASK_WRAPPER
   /**
    * 中断任务
    */
-  public void breakTask() {
+  void breakTask() {
     synchronized (AriaManager.LOCK) {
       taskBreak = true;
       if (mConfig.SUPPORT_BP) {
@@ -207,10 +214,7 @@ public abstract class AbsThreadTask<ENTITY extends AbsNormalEntity, TASK_WRAPPER
   }
 
   /**
-   * 任务是否中断，中断条件：
-   * 1、任务取消
-   * 2、任务停止
-   * 3、手动中断 {@link #taskBreak}
+   * 任务是否中断，中断条件： 1、任务取消 2、任务停止 3、手动中断 {@link #taskBreak}
    *
    * @return {@code true} 中断，{@code false} 不是中断
    */
@@ -249,8 +253,7 @@ public abstract class AbsThreadTask<ENTITY extends AbsNormalEntity, TASK_WRAPPER
   }
 
   /**
-   * 检查下载完成的分块大小，如果下载完成的分块大小大于或小于分配的大小，则需要重新下载该分块
-   * 如果是非分块任务，直接返回{@code true}
+   * 检查下载完成的分块大小，如果下载完成的分块大小大于或小于分配的大小，则需要重新下载该分块 如果是非分块任务，直接返回{@code true}
    *
    * @return {@code true} 分块分大小正常，{@code false} 分块大小错误
    */

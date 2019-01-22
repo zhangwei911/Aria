@@ -37,7 +37,7 @@ class DelegateUpdate extends AbsDelegate {
   ///**
   // * 添加或更新关联数据
   // */
-  //void saveRelationData(SQLiteDatabase db, AbsWrapper wrapper) {
+  //void saveRelationData(SQLiteDatabase db, AbsDbWrapper wrapper) {
   //  Class clazz = wrapper.getClass();
   //  List<Field> fields = CommonUtil.getAllFields(clazz);
   //  DbEntity one = null;

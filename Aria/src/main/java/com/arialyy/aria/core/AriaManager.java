@@ -28,6 +28,12 @@ import android.support.v4.app.Fragment;
 import android.widget.PopupWindow;
 import com.arialyy.aria.core.command.ICmd;
 import com.arialyy.aria.core.common.QueueMod;
+import com.arialyy.aria.core.config.AppConfig;
+import com.arialyy.aria.core.config.DGroupConfig;
+import com.arialyy.aria.core.config.DownloadConfig;
+import com.arialyy.aria.core.config.UploadConfig;
+import com.arialyy.aria.core.config.XMLReader;
+import com.arialyy.aria.core.config.Configuration;
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.download.DownloadGroupEntity;
 import com.arialyy.aria.core.download.DownloadReceiver;
@@ -54,9 +60,7 @@ import javax.xml.parsers.SAXParserFactory;
 import org.xml.sax.SAXException;
 
 /**
- * Created by lyy on 2016/12/1.
- * https://github.com/AriaLyy/Aria
- * Aria管理器，任务操作在这里执行
+ * Created by lyy on 2016/12/1. https://github.com/AriaLyy/Aria Aria管理器，任务操作在这里执行
  */
 @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH) public class AriaManager {
   private static final String TAG = "AriaManager";
@@ -72,10 +76,10 @@ import org.xml.sax.SAXException;
   private Map<String, List<String>> mSubClass = new ConcurrentHashMap<>();
   public static Context APP;
   private List<ICmd> mCommands = new ArrayList<>();
-  private Configuration.DownloadConfig mDConfig;
-  private Configuration.UploadConfig mUConfig;
-  private Configuration.AppConfig mAConfig;
-  private Configuration.DGroupConfig mDGConfig;
+  private DownloadConfig mDConfig;
+  private UploadConfig mUConfig;
+  private AppConfig mAConfig;
+  private DGroupConfig mDGConfig;
 
   private AriaManager(Context context) {
     APP = context.getApplicationContext();
@@ -179,7 +183,7 @@ import org.xml.sax.SAXException;
    *   </code>
    * </pre>
    */
-  public Configuration.DownloadConfig getDownloadConfig() {
+  public DownloadConfig getDownloadConfig() {
     return mDConfig;
   }
 
@@ -192,14 +196,14 @@ import org.xml.sax.SAXException;
    *   </code>
    * </pre>
    */
-  public Configuration.UploadConfig getUploadConfig() {
+  public UploadConfig getUploadConfig() {
     return mUConfig;
   }
 
   /**
    * 获取APP配置
    */
-  public Configuration.AppConfig getAppConfig() {
+  public AppConfig getAppConfig() {
     return mAConfig;
   }
 
@@ -212,7 +216,7 @@ import org.xml.sax.SAXException;
    *   </code>
    * </pre>
    */
-  public Configuration.DGroupConfig getDGroupConfig(){
+  public DGroupConfig getDGroupConfig() {
     return mDGConfig;
   }
 
@@ -423,7 +427,7 @@ import org.xml.sax.SAXException;
    */
   private void loadConfig() {
     try {
-      ConfigHelper helper = new ConfigHelper();
+      XMLReader helper = new XMLReader();
       SAXParserFactory factory = SAXParserFactory.newInstance();
       SAXParser parser = factory.newSAXParser();
       parser.parse(APP.getAssets().open("aria_config.xml"), helper);

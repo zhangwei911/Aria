@@ -33,7 +33,7 @@ public abstract class DbEntity {
   ///**
   // * 保存关联数据
   // */
-  //public static void saveRelationData(AbsWrapper wrapper) {
+  //public static void saveRelationData(AbsDbWrapper wrapper) {
   //  DelegateWrapper.getInstance().saveRelationData(wrapper);
   //}
 
@@ -42,7 +42,7 @@ public abstract class DbEntity {
    *
    * @param expression 查询条件
    */
-  public static <T extends AbsWrapper> List<T> findRelationData(Class<T> clazz,
+  public static <T extends AbsDbWrapper> List<T> findRelationData(Class<T> clazz,
       String... expression) {
     return DelegateWrapper.getInstance().findRelationData(clazz, expression);
   }

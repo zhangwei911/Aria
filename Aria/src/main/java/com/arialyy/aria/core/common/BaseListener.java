@@ -16,7 +16,6 @@
 package com.arialyy.aria.core.common;
 
 import android.os.Handler;
-import com.arialyy.aria.core.AriaManager;
 import com.arialyy.aria.core.inf.AbsEntity;
 import com.arialyy.aria.core.inf.AbsTask;
 import com.arialyy.aria.core.inf.AbsTaskWrapper;
@@ -30,27 +29,28 @@ import com.arialyy.aria.util.CommonUtil;
 import com.arialyy.aria.util.ErrorHelp;
 import java.lang.ref.WeakReference;
 
-public abstract class BaseListener<ENTITY extends AbsEntity, TASK_ENTITY extends AbsTaskWrapper<ENTITY>, TASK extends AbsTask<ENTITY, TASK_ENTITY>>
+public abstract class BaseListener<ENTITY extends AbsEntity, TASK_WRAPPER extends AbsTaskWrapper<ENTITY>,
+    TASK extends AbsTask<ENTITY, TASK_WRAPPER>>
     implements IEventListener {
   private static final String TAG = "BaseListener";
+  private static final int RUN_SAVE_INTERVAL = 5 * 1000;  //5s保存一次下载中的进度
   protected WeakReference<Handler> outHandler;
-  private int RUN_SAVE_INTERVAL = 5 * 1000;  //5s保存一次下载中的进度
   private long mLastLen;   //上一次发送长度
   private boolean isFirst = true;
   private TASK mTask;
   private long mLastSaveTime;
   protected ENTITY mEntity;
-  protected TASK_ENTITY mTaskEntity;
-  protected boolean isConvertSpeed;
-  protected long mUpdateInterval;
-  protected AriaManager manager;
+  protected TASK_WRAPPER mTaskWrapper;
+  private boolean isConvertSpeed;
+  private long mUpdateInterval;
 
   protected BaseListener(TASK task, Handler outHandler) {
     this.outHandler = new WeakReference<>(outHandler);
-    this.mTask = new WeakReference<>(task).get();
-    this.mEntity = mTask.getTaskWrapper().getEntity();
-    this.mTaskEntity = mTask.getTaskWrapper();
-    manager = AriaManager.getInstance(AriaManager.APP);
+    mTask = new WeakReference<>(task).get();
+    mEntity = mTask.getTaskWrapper().getEntity();
+    mTaskWrapper = mTask.getTaskWrapper();
+    isConvertSpeed = mTaskWrapper.getConfig().isConvertSpeed();
+    mUpdateInterval = mTaskWrapper.getConfig().getUpdateInterval();
     mLastLen = mEntity.getCurrentProgress();
     mLastSaveTime = System.currentTimeMillis();
   }
@@ -130,7 +130,7 @@ public abstract class BaseListener<ENTITY extends AbsEntity, TASK_ENTITY extends
         : mEntity.getCurrentProgress() * 100 / mEntity.getFileSize()));
   }
 
-  protected void handleComplete(){
+  protected void handleComplete() {
     mEntity.setComplete(true);
     mEntity.setCompleteTime(System.currentTimeMillis());
     mEntity.setCurrentProgress(mEntity.getFileSize());

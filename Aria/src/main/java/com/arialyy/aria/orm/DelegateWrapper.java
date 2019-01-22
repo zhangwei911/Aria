@@ -60,7 +60,7 @@ public class DelegateWrapper {
    *
    * @param expression 查询条件
    */
-  <T extends AbsWrapper> List<T> findRelationData(Class<T> clazz, String... expression) {
+  <T extends AbsDbWrapper> List<T> findRelationData(Class<T> clazz, String... expression) {
     return mDManager.getDelegate(DelegateFind.class).findRelationData(mDb, clazz, expression);
   }
 

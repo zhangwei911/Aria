@@ -15,7 +15,7 @@
  */
 package com.arialyy.aria.core.download;
 
-import com.arialyy.aria.orm.AbsWrapper;
+import com.arialyy.aria.orm.AbsDbWrapper;
 import com.arialyy.aria.orm.annotation.Many;
 import com.arialyy.aria.orm.annotation.One;
 import com.arialyy.aria.orm.annotation.Wrapper;
@@ -26,7 +26,7 @@ import java.util.List;
  * 任务组实体和子任务实体的关系
  */
 @Wrapper
-public class DGEntityWrapper extends AbsWrapper {
+public class DGEntityWrapper extends AbsDbWrapper {
 
   @One
   public DownloadGroupEntity groupEntity;
