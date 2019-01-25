@@ -48,7 +48,7 @@ import java.util.Set;
 /**
  * 下载文件信息获取
  */
-class HttpFileInfoThread implements Runnable {
+public class HttpFileInfoThread implements Runnable {
   private final String TAG = "HttpFileInfoThread";
   private DownloadEntity mEntity;
   private DTaskWrapper mTaskWrapper;
@@ -56,7 +56,7 @@ class HttpFileInfoThread implements Runnable {
   private OnFileInfoCallback onFileInfoCallback;
   private HttpTaskDelegate mTaskDelegate;
 
-  HttpFileInfoThread(DTaskWrapper taskWrapper, OnFileInfoCallback callback) {
+  public HttpFileInfoThread(DTaskWrapper taskWrapper, OnFileInfoCallback callback) {
     this.mTaskWrapper = taskWrapper;
     mEntity = taskWrapper.getEntity();
     mConnectTimeOut =

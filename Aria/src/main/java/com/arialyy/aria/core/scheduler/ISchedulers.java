@@ -113,6 +113,10 @@ public interface ISchedulers<Task extends AbsTask> extends Handler.Callback {
    * 等待
    */
   int WAIT = 10;
+  /**
+   * 添加任务
+   */
+  int ADD = 11;
 
   /**
    * 组合任务子任务预处理
@@ -148,18 +152,4 @@ public interface ISchedulers<Task extends AbsTask> extends Handler.Callback {
    * 组合任务子任务完成
    */
   int SUB_COMPLETE = 0xa7;
-
-  /**
-   * 将当前类注册到Aria
-   *
-   * @param obj 观察者类
-   */
-  void register(Object obj);
-
-  /**
-   * 移除注册
-   *
-   * @param obj 观察者类
-   */
-  void unRegister(Object obj);
 }

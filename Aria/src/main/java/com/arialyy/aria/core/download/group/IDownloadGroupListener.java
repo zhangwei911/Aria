@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.arialyy.aria.core.download.downloader;
+package com.arialyy.aria.core.download.group;
 
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.inf.IDownloadListener;

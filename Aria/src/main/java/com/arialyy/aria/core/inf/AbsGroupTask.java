@@ -15,7 +15,7 @@
  */
 package com.arialyy.aria.core.inf;
 
-import com.arialyy.aria.core.download.downloader.AbsGroupUtil;
+import com.arialyy.aria.core.download.group.AbsGroupUtil;
 
 /**
  * Created by AriaL on 2017/6/29.

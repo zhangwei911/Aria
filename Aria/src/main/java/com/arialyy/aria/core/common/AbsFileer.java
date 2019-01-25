@@ -92,6 +92,14 @@ public abstract class AbsFileer<ENTITY extends AbsNormalEntity, TASK_WRAPPER ext
     mTaskWrapper.setNewTask(newTask);
   }
 
+  public String getKey() {
+    return mTaskWrapper.getKey();
+  }
+
+  public ENTITY getEntity() {
+    return mEntity;
+  }
+
   /**
    * 设置最大下载/上传速度
    *

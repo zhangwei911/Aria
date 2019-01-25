@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.arialyy.aria.core.download.downloader;
+package com.arialyy.aria.core.download.group;
 
 import com.arialyy.aria.core.common.CompleteInfo;
 import com.arialyy.aria.core.common.OnFileInfoCallback;
@@ -23,8 +23,7 @@ import com.arialyy.aria.exception.BaseException;
 import java.util.Set;
 
 /**
- * Created by Aria.Lao on 2017/7/27.
- * ftp文件夹下载工具
+ * Created by Aria.Lao on 2017/7/27. ftp文件夹下载工具
  */
 public class FtpDirDownloadUtil extends AbsGroupUtil {
   private String TAG = "FtpDirDownloadUtil";

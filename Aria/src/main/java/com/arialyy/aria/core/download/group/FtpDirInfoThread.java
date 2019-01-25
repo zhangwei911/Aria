@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.arialyy.aria.core.download.downloader;
+package com.arialyy.aria.core.download.group;
 
 import aria.apache.commons.net.ftp.FTPFile;
 import com.arialyy.aria.core.FtpUrlEntity;

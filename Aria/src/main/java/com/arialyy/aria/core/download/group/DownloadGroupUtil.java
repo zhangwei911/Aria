@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.arialyy.aria.core.download.downloader;
+package com.arialyy.aria.core.download.group;
 
 import android.util.SparseArray;
 import com.arialyy.aria.core.common.CompleteInfo;
@@ -21,6 +21,7 @@ import com.arialyy.aria.core.common.IUtil;
 import com.arialyy.aria.core.common.OnFileInfoCallback;
 import com.arialyy.aria.core.download.DGTaskWrapper;
 import com.arialyy.aria.core.download.DTaskWrapper;
+import com.arialyy.aria.core.download.downloader.HttpFileInfoThread;
 import com.arialyy.aria.core.inf.IEntity;
 import com.arialyy.aria.exception.BaseException;
 import com.arialyy.aria.exception.TaskException;

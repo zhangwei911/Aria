@@ -30,13 +30,12 @@ import java.io.File;
 import java.io.IOException;
 
 /**
- * Created by AriaL on 2017/7/1.
- * 文件下载器
+ * Created by AriaL on 2017/7/1. 文件下载器
  */
-class Downloader extends AbsFileer<DownloadEntity, DTaskWrapper> {
+public class Downloader extends AbsFileer<DownloadEntity, DTaskWrapper> {
   private String TAG = "Downloader";
 
-  Downloader(IDownloadListener listener, DTaskWrapper taskEntity) {
+  public Downloader(IDownloadListener listener, DTaskWrapper taskEntity) {
     super(listener, taskEntity);
     mTempFile = new File(mEntity.getDownloadPath());
     AriaManager manager = AriaManager.getInstance(AriaManager.APP);

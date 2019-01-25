@@ -63,7 +63,12 @@ abstract class AbsSchedulers<TASK_ENTITY extends AbsTaskWrapper, TASK extends Ab
     manager = AriaManager.getInstance(AriaManager.APP);
   }
 
-  @Override public void register(Object obj) {
+  /**
+   * 将当前类注册到Aria
+   *
+   * @param obj 观察者类
+   */
+  public void register(Object obj) {
     String targetName = obj.getClass().getName();
     AbsSchedulerListener<TASK, AbsNormalEntity> listener = mObservers.get(getKey(obj));
     if (listener == null) {
@@ -77,7 +82,12 @@ abstract class AbsSchedulers<TASK_ENTITY extends AbsTaskWrapper, TASK extends Ab
     }
   }
 
-  @Override public void unRegister(Object obj) {
+  /**
+   * 移除注册
+   *
+   * @param obj 观察者类
+   */
+  public void unRegister(Object obj) {
     if (!mObservers.containsKey(getKey(obj))) {
       return;
     }
