@@ -16,7 +16,6 @@
 package com.arialyy.aria.core.download.group;
 
 import com.arialyy.aria.core.config.Configuration;
-import com.arialyy.aria.core.download.downloader.Downloader;
 import com.arialyy.aria.util.ALog;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -29,16 +28,16 @@ import java.util.Set;
 /**
  * 组合任务队列，该队列生命周期和{@link AbsGroupUtil}生命周期一致
  */
-class SimpleSubQueue implements ISubQueue<Downloader> {
+class SimpleSubQueue implements ISubQueue<SubDownloadLoader> {
   private static final String TAG = "SimpleSubQueue";
   /**
    * 缓存下载器
    */
-  private Map<String, Downloader> mCache = new LinkedHashMap<>();
+  private Map<String, SubDownloadLoader> mCache = new LinkedHashMap<>();
   /**
    * 执行中的下载器
    */
-  private Map<String, Downloader> mExec = new LinkedHashMap<>();
+  private Map<String, SubDownloadLoader> mExec = new LinkedHashMap<>();
 
   /**
    * 最大执行任务数
@@ -53,22 +52,26 @@ class SimpleSubQueue implements ISubQueue<Downloader> {
     return new SimpleSubQueue();
   }
 
-  @Override public void addTask(Downloader fileer) {
+  public Map<String, SubDownloadLoader> getExec() {
+    return mExec;
+  }
+
+  @Override public void addTask(SubDownloadLoader fileer) {
     mCache.put(fileer.getKey(), fileer);
   }
 
-  @Override public void startTask(Downloader fileer) {
+  @Override public void startTask(SubDownloadLoader fileer) {
     if (mExec.size() < mExecSize) {
       mCache.remove(fileer.getKey());
       mExec.put(fileer.getKey(), fileer);
       fileer.start();
     } else {
-      ALog.d(TAG, String.format("执行队列已满，任务见缓冲到缓存器中，key: %s", fileer.getKey()));
+      ALog.d(TAG, String.format("执行队列已满，任务进入缓存器中，key: %s", fileer.getKey()));
       addTask(fileer);
     }
   }
 
-  @Override public void stopTask(Downloader fileer) {
+  @Override public void stopTask(SubDownloadLoader fileer) {
     fileer.stop();
     mExec.remove(fileer.getKey());
   }
@@ -89,7 +92,7 @@ class SimpleSubQueue implements ISubQueue<Downloader> {
     if (oldSize < num) { // 处理队列变小的情况，该情况下将停止队尾任务，并将这些任务添加到缓存队列中
       if (mExec.size() > num) {
         Set<String> keys = mExec.keySet();
-        List<Downloader> caches = new ArrayList<>();
+        List<SubDownloadLoader> caches = new ArrayList<>();
         int i = 0;
         for (String key : keys) {
           if (i > num) {
@@ -97,20 +100,20 @@ class SimpleSubQueue implements ISubQueue<Downloader> {
           }
           i++;
         }
-        Collection<Downloader> temp = mCache.values();
+        Collection<SubDownloadLoader> temp = mCache.values();
         mCache.clear();
         ALog.d(TAG, String.format("测试, map size: %s", mCache.size()));
-        for (Downloader cache : caches) {
+        for (SubDownloadLoader cache : caches) {
           addTask(cache);
         }
-        for (Downloader t : temp) {
+        for (SubDownloadLoader t : temp) {
           addTask(t);
         }
       }
     } else { // 处理队列变大的情况，该情况下将增加任务
       if (mExec.size() < num) {
         for (int i = 0; i < diff; i++) {
-          Downloader next = getNextTask();
+          SubDownloadLoader next = getNextTask();
           if (next != null) {
             startTask(next);
           } else {
@@ -121,7 +124,7 @@ class SimpleSubQueue implements ISubQueue<Downloader> {
     }
   }
 
-  @Override public void removeTaskFromExecQ(Downloader fileer) {
+  @Override public void removeTaskFromExecQ(SubDownloadLoader fileer) {
     if (mExec.containsKey(fileer.getKey())) {
       if (fileer.isRunning()) {
         fileer.stop();
@@ -130,16 +133,21 @@ class SimpleSubQueue implements ISubQueue<Downloader> {
     }
   }
 
-  @Override public void removeTask(Downloader fileer) {
+  @Override public void removeTask(SubDownloadLoader fileer) {
     removeTaskFromExecQ(fileer);
     mCache.remove(fileer.getKey());
   }
 
-  @Override public Downloader getNextTask() {
+  @Override public SubDownloadLoader getNextTask() {
     Iterator<String> keys = mCache.keySet().iterator();
     if (keys.hasNext()) {
       return mCache.get(keys.next());
     }
     return null;
+  }
+
+  @Override public void clear() {
+    mCache.clear();
+    mExec.clear();
   }
 }

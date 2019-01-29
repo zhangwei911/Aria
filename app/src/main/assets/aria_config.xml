@@ -131,7 +131,7 @@
     <!-- =============================以下为子任务的配置====================================-->
 
     <!--能同时下载的子任务最大任务数，默认3-->
-    <subMaxTaskNum value="3"/>
+    <subMaxTaskNum value="1"/>
 
     <!--子任务下载失败时的重试次数，默认为5-->
     <subReTryNum value="5"/>
@@ -155,7 +155,7 @@
     <convertSpeed value="true"/>
 
     <!--子任务的最大下载速度，0表示不限速，单位为：kb; -->
-    <maxSpeed value="128"/>
+    <maxSpeed value="0"/>
 
   </dGroup>
 </aria>

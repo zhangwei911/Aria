@@ -44,7 +44,7 @@ public abstract class AbsEntity extends DbEntity implements IEntity, Parcelable,
   /**
    * 文件大小
    */
-  private long fileSize = 1;
+  private long fileSize = 0;
   /**
    * 转换后的文件大小
    */

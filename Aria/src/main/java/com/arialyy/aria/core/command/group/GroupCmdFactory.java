@@ -31,10 +31,6 @@ public class GroupCmdFactory {
    * 停止子任务
    */
   public static final int SUB_TASK_STOP = 0xa2;
-  /**
-   * 取消子任务
-   */
-  public static final int SUB_TASK_CANCEL = 0xa3;
 
   private static volatile GroupCmdFactory INSTANCE = null;
 
@@ -54,7 +50,7 @@ public class GroupCmdFactory {
   /**
    * @param target 创建任务的对象
    * @param wrapper 参数信息
-   * @param type 命令类型{@link #SUB_TASK_START}、{@link #SUB_TASK_STOP}、{@link #SUB_TASK_CANCEL}
+   * @param type 命令类型{@link #SUB_TASK_START}、{@link #SUB_TASK_STOP}
    * @param childUrl 需要控制的子任务url
    */
   public AbsGroupCmd createCmd(String target, AbsGroupTaskWrapper wrapper, int type,
@@ -67,8 +63,6 @@ public class GroupCmdFactory {
       case SUB_TASK_STOP:
         cmd = new GroupStopCmd<>(wrapper);
         break;
-      case SUB_TASK_CANCEL:
-        cmd = new GroupCancelCmd<>(wrapper);
     }
     if (cmd != null) {
       cmd.childUrl = childUrl;

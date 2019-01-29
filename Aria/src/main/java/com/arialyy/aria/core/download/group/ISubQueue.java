@@ -16,13 +16,15 @@
 package com.arialyy.aria.core.download.group;
 
 import com.arialyy.aria.core.common.AbsFileer;
+import com.arialyy.aria.core.common.IUtil;
+import com.arialyy.aria.core.config.DGroupConfig;
 
 /**
  * 组合任务子任务队列
  *
  * @param <Fileer> {@link AbsFileer}下载器
  */
-interface ISubQueue<Fileer extends AbsFileer> {
+interface ISubQueue<Fileer extends IUtil> {
 
   /**
    * 添加任务
@@ -32,6 +34,9 @@ interface ISubQueue<Fileer extends AbsFileer> {
 
   /**
    * 开始任务
+   * 如果执行队列没有达到上限，则启动任务。
+   * 如果执行队列已经到达上限，则将任务添加到等待队列总。
+   * 队列上限配置{@link DGroupConfig#setSubMaxTaskNum(int)}
    */
   void startTask(Fileer fileer);
 
@@ -61,4 +66,9 @@ interface ISubQueue<Fileer extends AbsFileer> {
    * 获取下一个任务
    */
   Fileer getNextTask();
+
+  /**
+   * 清空缓存队列和执行队列
+   */
+  void clear();
 }

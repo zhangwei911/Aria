@@ -91,6 +91,7 @@ public class DownloadGroupActivity extends BaseActivity<ActivityDownloadGroupBin
             .setGroupAlias("任务组测试")
             //.setSubFileName(getModule(GroupModule.class).getSubName2())
             .setSubFileName(getModule(GroupModule.class).getSubName())
+            .setFileSize(114981416)
             //.updateUrls(temp)
             .start();
         break;

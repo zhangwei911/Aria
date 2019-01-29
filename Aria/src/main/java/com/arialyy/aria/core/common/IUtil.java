@@ -16,11 +16,23 @@
 
 package com.arialyy.aria.core.common;
 
+import com.arialyy.aria.core.download.DownloadEntity;
+import com.arialyy.aria.core.download.DownloadGroupEntity;
+import com.arialyy.aria.core.upload.UploadEntity;
+
 /**
  * Created by lyy on 2016/10/31.
  * 任务功能接口
  */
 public interface IUtil {
+
+  /**
+   * 获取任务标志
+   *
+   * @return {@link DownloadEntity#getKey()}、{@link DownloadGroupEntity#getKey()}、{@link
+   * UploadEntity#getKey()}
+   */
+  String getKey();
 
   /**
    * 获取文件大小

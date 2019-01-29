@@ -26,7 +26,7 @@ import com.arialyy.aria.core.upload.UploadEntity;
 /**
  * Created by lyy on 2016/11/2. 调度器功能接口
  */
-public interface ISchedulers<Task extends AbsTask> extends Handler.Callback {
+public interface ISchedulers extends Handler.Callback {
 
   String ARIA_TASK_INFO_ACTION = "ARIA_TASK_INFO_ACTION";
   /**
@@ -113,10 +113,6 @@ public interface ISchedulers<Task extends AbsTask> extends Handler.Callback {
    * 等待
    */
   int WAIT = 10;
-  /**
-   * 添加任务
-   */
-  int ADD = 11;
 
   /**
    * 组合任务子任务预处理

@@ -33,26 +33,26 @@ public class SimpleUploadUtil implements IUtil, Runnable {
   private static final String TAG = "SimpleUploadUtil";
 
   private UploadEntity mUploadEntity;
-  private UTaskWrapper mTaskEntity;
+  private UTaskWrapper mTaskWrapper;
   private IUploadListener mListener;
   private Uploader mUploader;
 
-  public SimpleUploadUtil(UTaskWrapper taskEntity, IUploadListener listener) {
-    mTaskEntity = taskEntity;
-    CheckUtil.checkTaskEntity(taskEntity);
-    mUploadEntity = taskEntity.getEntity();
+  public SimpleUploadUtil(UTaskWrapper taskWrapper, IUploadListener listener) {
+    mTaskWrapper = taskWrapper;
+    CheckUtil.checkTaskEntity(taskWrapper);
+    mUploadEntity = taskWrapper.getEntity();
     if (listener == null) {
       throw new IllegalArgumentException("上传监听不能为空");
     }
     mListener = listener;
-    mUploader = new Uploader(mListener, taskEntity);
+    mUploader = new Uploader(mListener, taskWrapper);
   }
 
   @Override public void run() {
     mListener.onPre();
-    switch (mTaskEntity.getRequestType()) {
+    switch (mTaskWrapper.getRequestType()) {
       case AbsTaskWrapper.U_FTP:
-        new FtpFileInfoThread(mTaskEntity, new OnFileInfoCallback() {
+        new FtpFileInfoThread(mTaskWrapper, new OnFileInfoCallback() {
           @Override public void onComplete(String url, CompleteInfo info) {
             if (info.code == FtpFileInfoThread.CODE_COMPLETE) {
               mListener.onComplete();
@@ -70,6 +70,10 @@ public class SimpleUploadUtil implements IUtil, Runnable {
         mUploader.start();
         break;
     }
+  }
+
+  @Override public String getKey() {
+    return mTaskWrapper.getKey();
   }
 
   @Override public long getFileSize() {

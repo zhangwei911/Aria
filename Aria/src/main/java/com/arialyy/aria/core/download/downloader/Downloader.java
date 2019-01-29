@@ -15,7 +15,6 @@
  */
 package com.arialyy.aria.core.download.downloader;
 
-import com.arialyy.aria.core.AriaManager;
 import com.arialyy.aria.core.common.AbsFileer;
 import com.arialyy.aria.core.common.AbsThreadTask;
 import com.arialyy.aria.core.common.SubThreadConfig;
@@ -35,23 +34,22 @@ import java.io.IOException;
 public class Downloader extends AbsFileer<DownloadEntity, DTaskWrapper> {
   private String TAG = "Downloader";
 
-  public Downloader(IDownloadListener listener, DTaskWrapper taskEntity) {
-    super(listener, taskEntity);
+  public Downloader(IDownloadListener listener, DTaskWrapper taskWrapper) {
+    super(listener, taskWrapper);
     mTempFile = new File(mEntity.getDownloadPath());
-    AriaManager manager = AriaManager.getInstance(AriaManager.APP);
-    setUpdateInterval(manager.getDownloadConfig().getUpdateInterval());
+    setUpdateInterval(taskWrapper.getConfig().getUpdateInterval());
   }
 
+  /**
+   * 小于1m的文件或是任务组的子任务、线程数都是1
+   */
   @Override protected int setNewTaskThreadNum() {
-    int threadNum = AriaManager.getInstance(mContext).getDownloadConfig().getThreadNum();
-    return
-        // 小于1m的文件或是任务组的子任务、使用虚拟文件，线程数都是1
-        mEntity.getFileSize() <= SUB_LEN
-            || mTaskWrapper.getRequestType() == AbsTaskWrapper.D_FTP_DIR
-            || mTaskWrapper.getRequestType() == AbsTaskWrapper.DG_HTTP
-            || threadNum == 1
-            ? 1
-            : threadNum;
+    int threadNum = mTaskWrapper.getConfig().getThreadNum();
+    return mEntity.getFileSize() <= SUB_LEN
+        || mTaskWrapper.isGroupTask()
+        || threadNum == 1
+        ? 1
+        : threadNum;
   }
 
   @Override protected boolean handleNewTask() {

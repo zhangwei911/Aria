@@ -49,15 +49,4 @@ public abstract class AbsGroupTask<ENTITY extends AbsEntity, TASK_ENTITY extends
       ((AbsGroupUtil) mUtil).stopSubTask(url);
     }
   }
-
-  /**
-   * 删除子任务组中的子任务
-   *
-   * @param url 子任务下载地址
-   */
-  public void cancelSubTask(String url) {
-    if (mUtil != null) {
-      ((AbsGroupUtil) mUtil).cancelSubTask(url);
-    }
-  }
 }

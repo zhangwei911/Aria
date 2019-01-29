@@ -66,20 +66,6 @@ public class SubTaskManager {
   }
 
   /**
-   * 删除子任务组中的子任务
-   *
-   * @param url 子任务下载地址
-   */
-  public void cancelSubTask(String url) {
-    if (checkUrl(url)) {
-      AriaManager.getInstance(AriaManager.APP)
-          .setCmd(
-              CommonUtil.createGroupCmd(mTargetName, mEntity, GroupCmdFactory.SUB_TASK_CANCEL, url))
-          .exe();
-    }
-  }
-
-  /**
    * 检查任务地址
    *
    * @param url 子任务地址

@@ -19,8 +19,8 @@ import com.arialyy.aria.core.common.CompleteInfo;
 import com.arialyy.aria.core.common.OnFileInfoCallback;
 import com.arialyy.aria.core.download.DGTaskWrapper;
 import com.arialyy.aria.core.download.DTaskWrapper;
+import com.arialyy.aria.core.inf.IEntity;
 import com.arialyy.aria.exception.BaseException;
-import java.util.Set;
 
 /**
  * Created by Aria.Lao on 2017/7/27. ftp文件夹下载工具
@@ -39,23 +39,16 @@ public class FtpDirDownloadUtil extends AbsGroupUtil {
   @Override protected void onStart() {
     super.onStart();
     if (mGTWrapper.getEntity().getFileSize() > 1) {
-      onPre();
       startDownload();
     } else {
       new FtpDirInfoThread(mGTWrapper, new OnFileInfoCallback() {
         @Override public void onComplete(String url, CompleteInfo info) {
           if (info.code >= 200 && info.code < 300) {
-            onPre();
             startDownload();
           }
         }
 
         @Override public void onFail(String url, BaseException e, boolean needRetry) {
-          DTaskWrapper te = mExeMap.get(url);
-          if (te != null) {
-            mFailMap.put(url, te);
-            mExeMap.remove(url);
-          }
           mListener.onFail(needRetry, e);
         }
       }).start();
@@ -63,23 +56,10 @@ public class FtpDirDownloadUtil extends AbsGroupUtil {
   }
 
   private void startDownload() {
-    if (mCompleteNum == mGroupSize) {
-      mListener.onComplete();
-      return;
-    }
-    int i = 0;
-    Set<String> keys = mExeMap.keySet();
-    for (String key : keys) {
-      DTaskWrapper taskEntity = mExeMap.get(key);
-      if (taskEntity != null) {
-        createChildDownload(taskEntity);
-        i++;
+    for (DTaskWrapper wrapper : mGTWrapper.getSubTaskWrapper()) {
+      if (wrapper.getState() != IEntity.STATE_COMPLETE) {
+        createSubLoader(wrapper);
       }
-    }
-    if (mExeMap.size() == 0) {
-      mListener.onComplete();
-    } else if (i == mExeMap.size()) {
-      startRunningFlow();
     }
   }
 }

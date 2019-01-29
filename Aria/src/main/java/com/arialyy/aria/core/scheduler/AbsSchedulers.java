@@ -39,12 +39,14 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by lyy on 2017/6/4. 事件调度器，用于处理任务状态的调度
  */
 abstract class AbsSchedulers<TASK_ENTITY extends AbsTaskWrapper, TASK extends AbsTask,
-    QUEUE extends ITaskQueue<TASK, TASK_ENTITY>> implements ISchedulers<TASK> {
+    QUEUE extends ITaskQueue<TASK, TASK_ENTITY>> implements ISchedulers {
   private final String TAG = "AbsSchedulers";
 
   protected QUEUE mQueue;
@@ -344,12 +346,10 @@ abstract class AbsSchedulers<TASK_ENTITY extends AbsTaskWrapper, TASK extends Ab
       return;
     }
 
-    CountDownTimer timer = new CountDownTimer(interval, 1000) {
-      @Override public void onTick(long millisUntilFinished) {
+    final ScheduledThreadPoolExecutor timer = new ScheduledThreadPoolExecutor(1);
 
-      }
-
-      @Override public void onFinish() {
+    timer.schedule(new Runnable() {
+      @Override public void run() {
         AbsEntity entity = task.getTaskWrapper().getEntity();
         if (entity.getFailNum() <= reTryNum) {
           ALog.d(TAG, String.format("任务【%s】开始重试", task.getTaskName()));
@@ -361,8 +361,7 @@ abstract class AbsSchedulers<TASK_ENTITY extends AbsTaskWrapper, TASK extends Ab
           TaskWrapperManager.getInstance().removeTaskWrapper(task.getKey());
         }
       }
-    };
-    timer.start();
+    }, interval, TimeUnit.MILLISECONDS);
   }
 
   /**

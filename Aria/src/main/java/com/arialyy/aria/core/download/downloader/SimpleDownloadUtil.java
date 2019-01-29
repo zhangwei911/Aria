@@ -33,13 +33,17 @@ public class SimpleDownloadUtil implements IUtil, Runnable {
   private String TAG = "SimpleDownloadUtil";
   private IDownloadListener mListener;
   private Downloader mDownloader;
-  private DTaskWrapper mTaskEntity;
+  private DTaskWrapper mTaskWrapper;
   private boolean isStop = false, isCancel = false;
 
-  public SimpleDownloadUtil(DTaskWrapper entity, IDownloadListener downloadListener) {
-    mTaskEntity = entity;
+  public SimpleDownloadUtil(DTaskWrapper wrapper, IDownloadListener downloadListener) {
+    mTaskWrapper = wrapper;
     mListener = downloadListener;
-    mDownloader = new Downloader(downloadListener, entity);
+    mDownloader = new Downloader(downloadListener, wrapper);
+  }
+
+  @Override public String getKey() {
+    return mTaskWrapper.getKey();
   }
 
   @Override public long getFileSize() {
@@ -103,10 +107,10 @@ public class SimpleDownloadUtil implements IUtil, Runnable {
     if (isStop || isCancel) {
       return;
     }
-    if (mTaskEntity.getEntity().getFileSize() <= 1
-        || mTaskEntity.isRefreshInfo()
-        || mTaskEntity.getRequestType() == AbsTaskWrapper.D_FTP
-        || mTaskEntity.getState() == IEntity.STATE_FAIL) {
+    if (mTaskWrapper.getEntity().getFileSize() <= 1
+        || mTaskWrapper.isRefreshInfo()
+        || mTaskWrapper.getRequestType() == AbsTaskWrapper.D_FTP
+        || mTaskWrapper.getState() == IEntity.STATE_FAIL) {
       new Thread(createInfoThread()).start();
     } else {
       mDownloader.start();
@@ -117,9 +121,9 @@ public class SimpleDownloadUtil implements IUtil, Runnable {
    * 通过链接类型创建不同的获取文件信息的线程
    */
   private Runnable createInfoThread() {
-    switch (mTaskEntity.getRequestType()) {
+    switch (mTaskWrapper.getRequestType()) {
       case AbsTaskWrapper.D_FTP:
-        return new FtpFileInfoThread(mTaskEntity, new OnFileInfoCallback() {
+        return new FtpFileInfoThread(mTaskWrapper, new OnFileInfoCallback() {
           @Override public void onComplete(String url, CompleteInfo info) {
             mDownloader.start();
           }
@@ -130,7 +134,7 @@ public class SimpleDownloadUtil implements IUtil, Runnable {
           }
         });
       case AbsTaskWrapper.D_HTTP:
-        return new HttpFileInfoThread(mTaskEntity, new OnFileInfoCallback() {
+        return new HttpFileInfoThread(mTaskWrapper, new OnFileInfoCallback() {
           @Override public void onComplete(String url, CompleteInfo info) {
             mDownloader.start();
           }
