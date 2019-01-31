@@ -69,6 +69,7 @@ class FtpDirInfoThread extends AbsFtpInfoThread<DownloadGroupEntity, DGTaskWrapp
         new String(fileName.getBytes(), Charset.forName(mTaskWrapper.asHttp().getCharSet())));
     entity.setGroupHash(mEntity.getGroupHash());
     entity.setGroupChild(true);
+    entity.setConvertFileSize(CommonUtil.formatFileSize(ftpFile.getSize()));
     entity.setFileSize(ftpFile.getSize());
     entity.insert();
 

@@ -43,7 +43,6 @@ public class FtpUploadActivity extends BaseActivity<ActivityFtpUploadBinding> {
     super.init(savedInstanceState);
     Aria.upload(this).register();
     UploadEntity entity = Aria.upload(this).getUploadEntity(FILE_PATH);
-    ALog.d(TAG, "pare = >" + entity.getPercent());
     if (entity != null) {
       getBinding().setFileSize(CommonUtil.formatFileSize(entity.getFileSize()));
       getBinding().setProgress(entity.isComplete() ? 100

@@ -23,7 +23,8 @@ import com.arialyy.aria.core.inf.IEntity;
 import com.arialyy.aria.exception.BaseException;
 
 /**
- * Created by Aria.Lao on 2017/7/27. ftp文件夹下载工具
+ * Created by Aria.Lao on 2017/7/27.
+ * ftp文件夹下载工具
  */
 public class FtpDirDownloadUtil extends AbsGroupUtil {
   private String TAG = "FtpDirDownloadUtil";

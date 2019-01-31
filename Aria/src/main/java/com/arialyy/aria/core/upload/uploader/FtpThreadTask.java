@@ -141,7 +141,6 @@ class FtpThreadTask extends AbsFtpThreadTask<UploadEntity, UTaskWrapper> {
    * 上传
    *
    * @return {@code true}上传成功、{@code false} 上传失败
-   * @throws IOException
    */
   private boolean upload(final FTPClient client, final BufferedRandomAccessFile bis)
       throws IOException {

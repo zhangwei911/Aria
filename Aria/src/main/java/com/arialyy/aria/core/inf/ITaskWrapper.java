@@ -25,29 +25,29 @@ public interface ITaskWrapper<ENTITY extends AbsEntity> {
   /**
    * HTTP单任务载
    */
-  int D_HTTP = 0x11;
+  int D_HTTP = 1;
   /**
    * HTTP任务组下载
    */
-  int DG_HTTP = 0x12;
+  int DG_HTTP = 2;
 
   /**
    * FTP单文件下载
    */
-  int D_FTP = 0x13;
+  int D_FTP = 3;
   /**
    * FTP文件夹下载，为避免登录过多，子任务由单线程进行处理
    */
-  int D_FTP_DIR = 0x14;
+  int D_FTP_DIR = 4;
 
   /**
    * HTTP单文件上传
    */
-  int U_HTTP = 0xA1;
+  int U_HTTP = 5;
   /**
    * FTP单文件上传
    */
-  int U_FTP = 0xA2;
+  int U_FTP = 6;
 
   ENTITY getEntity();
 }

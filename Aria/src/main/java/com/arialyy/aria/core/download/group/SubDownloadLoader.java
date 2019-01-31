@@ -23,13 +23,16 @@ import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.download.downloader.Downloader;
 import com.arialyy.aria.core.download.downloader.HttpFileInfoThread;
+import com.arialyy.aria.core.inf.AbsTaskWrapper;
 import com.arialyy.aria.core.scheduler.ISchedulers;
 import com.arialyy.aria.exception.BaseException;
+import com.arialyy.aria.util.ALog;
 
 /**
- * 子任务下载工具，负责创建{@link Downloader}
+ * 子任务下载器，负责创建{@link Downloader}
  */
-class  SubDownloadLoader implements IUtil {
+class SubDownloadLoader implements IUtil {
+  private final String TAG = "SubDownloadLoader";
 
   private Downloader mDownloader;
   private DTaskWrapper mWrapper;
@@ -88,17 +91,24 @@ class  SubDownloadLoader implements IUtil {
   }
 
   @Override public void start() {
-    new Thread(new HttpFileInfoThread(mWrapper, new OnFileInfoCallback() {
+    if (mWrapper.getRequestType() == AbsTaskWrapper.D_HTTP) {
+      new Thread(new HttpFileInfoThread(mWrapper, new OnFileInfoCallback() {
 
-      @Override public void onComplete(String url, CompleteInfo info) {
-        mDownloader = new Downloader(mListener, mWrapper);
-        mDownloader.start();
-      }
+        @Override public void onComplete(String url, CompleteInfo info) {
+          mDownloader = new Downloader(mListener, mWrapper);
+          mDownloader.start();
+        }
 
-      @Override public void onFail(String url, BaseException e, boolean needRetry) {
-        mSchedulers.obtainMessage(ISchedulers.FAIL, SubDownloadLoader.this);
-      }
-    })).start();
+        @Override public void onFail(String url, BaseException e, boolean needRetry) {
+          mSchedulers.obtainMessage(ISchedulers.FAIL, SubDownloadLoader.this);
+        }
+      })).start();
+    } else if (mWrapper.getRequestType() == AbsTaskWrapper.D_FTP) {
+      mDownloader = new Downloader(mListener, mWrapper);
+      mDownloader.start();
+    } else {
+      ALog.w(TAG, String.format("不识别的类型，requestType：%s", mWrapper.getRequestType()));
+    }
   }
 
   @Override public void resume() {
