@@ -207,7 +207,7 @@ public abstract class AbsTask<ENTITY extends AbsEntity, TASK_WRAPPER extends Abs
   /**
    * 是否真正下载
    *
-   * @return {@code true} 真正下载
+   * @return {@code true} 正在下载
    */
   @Override public boolean isRunning() {
     return mUtil.isRunning();

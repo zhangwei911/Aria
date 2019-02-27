@@ -33,8 +33,8 @@ Aria有以下特点：
 [![Compiler](https://api.bintray.com/packages/arialyy/maven/AriaCompiler/images/download.svg)](https://bintray.com/arialyy/maven/AriaCompiler/_latestVersion)
 
 ```java
-compile 'com.arialyy.aria:aria-core:3.5.4'
-annotationProcessor 'com.arialyy.aria:aria-compiler:3.5.4'
+compile 'com.arialyy.aria:aria-core:3.6'
+annotationProcessor 'com.arialyy.aria:aria-compiler:3.6'
 ```
 如果出现android support，请将 `compile 'com.arialyy.aria:aria-core:<last-version>'`替换为
 ```
@@ -102,8 +102,13 @@ protected void onCreate(Bundle savedInstanceState) {
 
 
 ### 版本日志
-  + v_3.5.4 (2019/1/8)
-      - 修复不支持断点的下载地址，重复下载出现的数据库主键冲突问题
+  + v_3.6(2019/2/27)
+    - 优化数据库写入\修改的速度
+    - 精减任务实体的存储
+    - 增加下载组合任务的配置
+    - useBroadcast\notNetRetry这两个配置，统一在AppConfig中配置
+    - fix bug https://github.com/AriaLyy/Aria/issues/361
+    - fix bug https://github.com/AriaLyy/Aria/issues/365
 
 [更多版本记录](https://github.com/AriaLyy/Aria/blob/master/DEV_LOG.md)
 

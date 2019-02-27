@@ -3,7 +3,9 @@
     - 优化数据库写入\修改的速度
     - 精减任务实体的存储
     - 增加下载组合任务的配置
-    - useBroadcast\notNetRetry这两个配置，统一在AppConfig中
+    - useBroadcast\notNetRetry这两个配置，统一在AppConfig中配置
+    - fix bug https://github.com/AriaLyy/Aria/issues/361
+    - fix bug https://github.com/AriaLyy/Aria/issues/365
   + v_3.5.4 (2019/1/8)
     - 修复不支持断点的下载地址，重复下载出现的数据库主键冲突问题
   + v_3.5.3 (2018/12/23)

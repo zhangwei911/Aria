@@ -24,6 +24,7 @@ import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import butterknife.Bind;
+import com.arialyy.aria.core.Aria;
 import com.arialyy.frame.permission.OnPermissionCallback;
 import com.arialyy.frame.permission.PermissionManager;
 import com.arialyy.frame.util.show.T;

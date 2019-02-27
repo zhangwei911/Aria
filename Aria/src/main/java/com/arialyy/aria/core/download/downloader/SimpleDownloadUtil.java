@@ -107,14 +107,15 @@ public class SimpleDownloadUtil implements IUtil, Runnable {
     if (isStop || isCancel) {
       return;
     }
-    if (mTaskWrapper.getEntity().getFileSize() <= 1
-        || mTaskWrapper.isRefreshInfo()
-        || mTaskWrapper.getRequestType() == AbsTaskWrapper.D_FTP
-        || mTaskWrapper.getState() == IEntity.STATE_FAIL) {
-      new Thread(createInfoThread()).start();
-    } else {
-      mDownloader.start();
-    }
+    //if (mTaskWrapper.getEntity().getFileSize() <= 1
+    //    || mTaskWrapper.isRefreshInfo()
+    //    || mTaskWrapper.getRequestType() == AbsTaskWrapper.D_FTP
+    //    || mTaskWrapper.getState() == IEntity.STATE_FAIL) {
+    //  new Thread(createInfoThread()).start();
+    //} else {
+    //  mDownloader.start();
+    //}
+    new Thread(createInfoThread()).start();
   }
 
   /**

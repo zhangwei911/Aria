@@ -107,14 +107,16 @@ public class ProxyHelper {
     }
     result = new HashSet<>();
     try {
-      if (Class.forName(className.concat("$$DownloadGroupListenerProxy")) != null) {
+      if (getClass().getClassLoader().loadClass(className.concat("$$DownloadGroupListenerProxy"))
+          != null) {
         result.add(PROXY_TYPE_DOWNLOAD_GROUP);
       }
     } catch (ClassNotFoundException e) {
       //e.printStackTrace();
     }
     try {
-      if (Class.forName(className.concat("$$DownloadListenerProxy")) != null) {
+      if (getClass().getClassLoader().loadClass(className.concat("$$DownloadListenerProxy"))
+          != null) {
         result.add(PROXY_TYPE_DOWNLOAD);
       }
     } catch (ClassNotFoundException e) {
@@ -122,7 +124,8 @@ public class ProxyHelper {
     }
 
     try {
-      if (Class.forName(className.concat("$$UploadListenerProxy")) != null) {
+      if (getClass().getClassLoader().loadClass(className.concat("$$UploadListenerProxy"))
+          != null) {
         result.add(PROXY_TYPE_UPLOAD);
       }
     } catch (ClassNotFoundException e) {
