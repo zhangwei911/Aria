@@ -26,7 +26,7 @@ import android.view.View;
  * 通用Holder
  */
 public class AbsHolder extends RecyclerView.ViewHolder {
-    View mView;
+    private View mView;
     private SparseArray<View> mViews = new SparseArray<>();
 
     public AbsHolder(View itemView) {
@@ -35,7 +35,7 @@ public class AbsHolder extends RecyclerView.ViewHolder {
     }
 
     @SuppressWarnings("unchecked")
-    public <T extends View> T getView(@IdRes int id) {
+    public <T extends View> T findViewById(@IdRes int id) {
         View view = mViews.get(id);
         if (view == null) {
             view = mView.findViewById(id);

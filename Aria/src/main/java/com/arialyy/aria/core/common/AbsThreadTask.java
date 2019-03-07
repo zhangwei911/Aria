@@ -100,7 +100,6 @@ public abstract class AbsThreadTask<ENTITY extends AbsNormalEntity, TASK_WRAPPER
     isNotNetRetry = mAridManager.getAppConfig().isNotNetRetry();
   }
 
-
   /**
    * 设置线程是否中断
    *
@@ -269,6 +268,10 @@ public abstract class AbsThreadTask<ENTITY extends AbsNormalEntity, TASK_WRAPPER
     if (!blockFile.exists() || blockFile.length() != tr.blockLen) {
       ALog.i(TAG, String.format("分块【%s】下载错误，即将重新下载该分块，开始位置：%s，结束位置：%s", blockFile.getName(),
           tr.startLocation, tr.endLocation));
+      if (blockFile.exists()) {
+        blockFile.delete();
+        ALog.i(TAG, String.format("删除分块【%s】成功", blockFile.getName()));
+      }
       retryThis(isBreak());
       return false;
     }
