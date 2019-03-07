@@ -17,11 +17,9 @@
 package com.arialyy.simple.upload;
 
 import android.os.Bundle;
-import butterknife.Bind;
-import butterknife.OnClick;
+import android.view.View;
 import com.arialyy.annotations.Upload;
 import com.arialyy.aria.core.Aria;
-import com.arialyy.aria.core.common.RequestEnum;
 import com.arialyy.aria.core.upload.UploadTask;
 import com.arialyy.frame.util.FileUtil;
 import com.arialyy.frame.util.show.L;
@@ -36,7 +34,7 @@ import java.io.File;
  */
 public class HttpUploadActivity extends BaseActivity<ActivityUploadBinding> {
   private static final String TAG = "HttpUploadActivity";
-  @Bind(R.id.pb) HorizontalProgressBarWithNumber mPb;
+  HorizontalProgressBarWithNumber mPb;
 
   private static final String FILE_PATH = "/mnt/sdcard/test.apk";
 
@@ -48,9 +46,25 @@ public class HttpUploadActivity extends BaseActivity<ActivityUploadBinding> {
     setTile("D_HTTP 上传");
     super.init(savedInstanceState);
     Aria.upload(this).register();
+    getBinding().upload.setOnClickListener(new View.OnClickListener() {
+      @Override public void onClick(View v) {
+        upload();
+      }
+    });
+    getBinding().stop.setOnClickListener(new View.OnClickListener() {
+      @Override public void onClick(View v) {
+        stop();
+      }
+    });
+    getBinding().remove.setOnClickListener(new View.OnClickListener() {
+      @Override public void onClick(View v) {
+        remove();
+      }
+    });
+    mPb = getBinding().pb;
   }
 
-  @OnClick(R.id.upload) void upload() {
+  void upload() {
     Aria.upload(HttpUploadActivity.this).load(FILE_PATH)
         .setUploadUrl(
             "http://lib-test.xzxyun.com:8042/Api/upload?data={\"type\":\"1\",\"fileType\":\".apk\"}")
@@ -60,11 +74,11 @@ public class HttpUploadActivity extends BaseActivity<ActivityUploadBinding> {
         .start();
   }
 
-  @OnClick(R.id.stop) void stop() {
+  void stop() {
     Aria.upload(this).load(FILE_PATH).cancel();
   }
 
-  @OnClick(R.id.remove) void remove() {
+  void remove() {
     Aria.upload(this).load(FILE_PATH).cancel();
   }
 

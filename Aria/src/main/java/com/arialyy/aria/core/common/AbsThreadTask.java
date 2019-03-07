@@ -15,6 +15,7 @@
  */
 package com.arialyy.aria.core.common;
 
+import android.net.TrafficStats;
 import android.os.Process;
 import com.arialyy.aria.core.AriaManager;
 import com.arialyy.aria.core.config.BaseTaskConfig;
@@ -36,6 +37,7 @@ import com.arialyy.aria.util.NetUtils;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -97,6 +99,7 @@ public abstract class AbsThreadTask<ENTITY extends AbsNormalEntity, TASK_WRAPPER
     }
     isNotNetRetry = mAridManager.getAppConfig().isNotNetRetry();
   }
+
 
   /**
    * 设置线程是否中断
@@ -515,6 +518,7 @@ public abstract class AbsThreadTask<ENTITY extends AbsNormalEntity, TASK_WRAPPER
   @Override public AbsThreadTask call() throws Exception {
     isInterrupted = false;
     Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
+    TrafficStats.setThreadStatsTag(UUID.randomUUID().toString().hashCode());
     return this;
   }
 }

@@ -24,7 +24,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-import butterknife.Bind;
 import com.arialyy.annotations.Download;
 import com.arialyy.aria.core.Aria;
 import com.arialyy.aria.core.download.DownloadEntity;
@@ -48,13 +47,13 @@ import java.util.Set;
  * 最高优先级任务Demo
  */
 public class HighestPriorityActivity extends BaseActivity<ActivityHighestPriorityBinding> {
-  @Bind(R.id.progressBar) HorizontalProgressBarWithNumber mPb;
-  @Bind(R.id.start) Button mStart;
-  @Bind(R.id.stop) Button mStop;
-  @Bind(R.id.cancel) Button mCancel;
-  @Bind(R.id.size) TextView mSize;
-  @Bind(R.id.speed) TextView mSpeed;
-  @Bind(R.id.list) RecyclerView mList;
+  private HorizontalProgressBarWithNumber mPb;
+  private Button mStart;
+  private Button mStop;
+  private Button mCancel;
+  private TextView mSize;
+  private TextView mSpeed;
+  private RecyclerView mList;
 
   private String mTaskName = "光明大陆";
   private static final String DOWNLOAD_URL =
@@ -69,6 +68,14 @@ public class HighestPriorityActivity extends BaseActivity<ActivityHighestPriorit
 
   @Override protected void init(Bundle savedInstanceState) {
     super.init(savedInstanceState);
+    mPb = findViewById(R.id.progressBar);
+    mStart = findViewById(R.id.start);
+    mStop = findViewById(R.id.stop);
+    mCancel = findViewById(R.id.cancel);
+    mSize = findViewById(R.id.size);
+    mSpeed = findViewById(R.id.speed);
+    mList = findViewById(R.id.list);
+
     setTitle("最高优先级任务");
     getBinding().setTaskName("任务名：" + mTaskName + " （最高优先级任务）");
     initWidget();

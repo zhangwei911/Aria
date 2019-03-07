@@ -31,7 +31,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.RadioGroup;
 import android.widget.Toast;
-import butterknife.Bind;
+
 import com.arialyy.annotations.Download;
 import com.arialyy.aria.core.Aria;
 import com.arialyy.aria.core.common.RequestEnum;
@@ -46,6 +46,7 @@ import com.arialyy.frame.util.show.T;
 import com.arialyy.simple.R;
 import com.arialyy.simple.base.BaseActivity;
 import com.arialyy.simple.databinding.ActivitySingleBinding;
+
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
@@ -59,23 +60,24 @@ public class SingleTaskActivity extends BaseActivity<ActivitySingleBinding> {
       //"http://120.55.95.61:8811/ghcg/zg/武义总规纲要成果.zip";
       //"https://yizi-kejian.oss-cn-beijing.aliyuncs.com/qimeng/package1/qmtable11.zip";
       "http://rs.0.gaoshouyou.com/d/04/1e/400423a7551e1f3f0eb1812afa1f9b44.apk";
-      //"http://58.210.9.131/tpk/sipgt//TDLYZTGH.tpk"; //chunked 下载
-      //"https://static.donguo.me/video/ip/course/pfys_1.mp4";
-      //"https://www.baidu.com/link?url=_LFCuTPtnzFxVJByJ504QymRywIA1Z_T5xUxe9ZLuxcGM0C_RcdpWyB1eGjbJC-e5wv5wAKM4WmLMAS5KeF6EZJHB8Va3YqZUiaErqK_pxm&wd=&eqid=e8583fe70002d126000000065a99f864";
-      //"https://d.pcs.baidu.com/file/a02c89a2d479d4fd2756f3313d42491d?fid=4232431903-250528-1114369760340736&dstime=1525491372&rt=sh&sign=FDtAERVY-DCb740ccc5511e5e8fedcff06b081203-3C13vkOkuk4TqXvVYW05zj1K0ao%3D&expires=8h&chkv=1&chkbd=0&chkpc=et&dp-logid=8651730921842106225&dp-callid=0&r=165533013";
-      //"http://apk500.bce.baidu-mgame.com/game/67000/67734/20170622040827_oem_5502845.apk?r=1";
-      //"https://dl.genymotion.com/releases/genymotion-2.12.1/genymotion-2.12.1-vbox.exe";
-      //"http://9.9.9.50:5000/download1";
+  //"http://58.210.9.131/tpk/sipgt//TDLYZTGH.tpk"; //chunked 下载
+  //"https://static.donguo.me/video/ip/course/pfys_1.mp4";
+  //"https://www.baidu.com/link?url=_LFCuTPtnzFxVJByJ504QymRywIA1Z_T5xUxe9ZLuxcGM0C_RcdpWyB1eGjbJC-e5wv5wAKM4WmLMAS5KeF6EZJHB8Va3YqZUiaErqK_pxm&wd=&eqid=e8583fe70002d126000000065a99f864";
+  //"https://d.pcs.baidu.com/file/a02c89a2d479d4fd2756f3313d42491d?fid=4232431903-250528-1114369760340736&dstime=1525491372&rt=sh&sign=FDtAERVY-DCb740ccc5511e5e8fedcff06b081203-3C13vkOkuk4TqXvVYW05zj1K0ao%3D&expires=8h&chkv=1&chkbd=0&chkpc=et&dp-logid=8651730921842106225&dp-callid=0&r=165533013";
+  //"http://apk500.bce.baidu-mgame.com/game/67000/67734/20170622040827_oem_5502845.apk?r=1";
+  //"https://dl.genymotion.com/releases/genymotion-2.12.1/genymotion-2.12.1-vbox.exe";
+  //"http://9.9.9.50:5000/download1";
   //"http://9.9.9.50:5000/download/CentOS-7-x86_64-Minimal-1804.iso";
   //"http://v2.qingdian1.com/m_20180730_991/2/2B9FB34A4BCD8CE61481D1C8418EFE36_1080P.m3u8";
   //"https://firmwareapi.azurewebsites.net/firmware-overview?name=A19_Filament_W_IMG0038_00102411-encrypted.ota";
-  @Bind(R.id.start) Button mStart;
-  @Bind(R.id.stop) Button mStop;
-  @Bind(R.id.cancel) Button mCancel;
-  @Bind(R.id.speeds) RadioGroup mRg;
+  Button mStart;
+  Button mStop;
+  Button mCancel;
+  RadioGroup mRg;
 
   BroadcastReceiver receiver = new BroadcastReceiver() {
-    @Override public void onReceive(Context context, Intent intent) {
+    @Override
+    public void onReceive(Context context, Intent intent) {
       if (intent.getAction().equals(ISchedulers.ARIA_TASK_INFO_ACTION)) {
         ALog.d(TAG, "state = " + intent.getIntExtra(ISchedulers.TASK_STATE, -1));
         ALog.d(TAG, "type = " + intent.getIntExtra(ISchedulers.TASK_TYPE, -1));
@@ -86,21 +88,38 @@ public class SingleTaskActivity extends BaseActivity<ActivitySingleBinding> {
     }
   };
 
-  @Override protected void onResume() {
+  @Override
+  protected void onResume() {
     super.onResume();
     //registerReceiver(receiver, new IntentFilter(ISchedulers.ARIA_TASK_INFO_ACTION));
   }
 
-  @Override protected void onDestroy() {
+  @Override
+  protected void onDestroy() {
     super.onDestroy();
     //unregisterReceiver(receiver);
     Aria.download(this).unRegister();
   }
 
-  @Override protected void onCreate(Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
+  @Override
+  protected void init(Bundle savedInstanceState) {
+    super.init(savedInstanceState);
+    mStart = findViewById(R.id.start);
+    mStop = findViewById(R.id.stop);
+    mCancel = findViewById(R.id.cancel);
+    mRg = findViewById(R.id.speeds);
+    setTitle("单任务下载");
     Aria.download(this).register();
-    Log.d(TAG, "TAG========" + Aria.download(this).load(DOWNLOAD_URL).getTaskState() + "");
+    DownloadTarget target = Aria.download(this).load(DOWNLOAD_URL);
+    getBinding().setProgress(target.getPercent());
+    if (target.getTaskState() == IEntity.STATE_STOP) {
+      mStart.setText("恢复");
+      mStart.setTextColor(getResources().getColor(android.R.color.holo_blue_light));
+      setBtState(true);
+    } else if (target.isRunning()) {
+      setBtState(false);
+    }
+    getBinding().setFileSize(target.getConvertFileSize());
   }
 
   /**
@@ -111,12 +130,14 @@ public class SingleTaskActivity extends BaseActivity<ActivitySingleBinding> {
     //mStop.setEnabled(!state);
   }
 
-  @Override public boolean onCreateOptionsMenu(Menu menu) {
+  @Override
+  public boolean onCreateOptionsMenu(Menu menu) {
     getMenuInflater().inflate(R.menu.menu_single_task_activity, menu);
     return super.onCreateOptionsMenu(menu);
   }
 
-  @Override public boolean onMenuItemClick(MenuItem item) {
+  @Override
+  public boolean onMenuItemClick(MenuItem item) {
     int speed = -1;
     String msg = "";
     switch (item.getItemId()) {
@@ -151,25 +172,29 @@ public class SingleTaskActivity extends BaseActivity<ActivitySingleBinding> {
     return true;
   }
 
-  @Download.onWait void onWait(DownloadTask task) {
+  @Download.onWait
+  void onWait(DownloadTask task) {
     if (task.getKey().equals(DOWNLOAD_URL)) {
       Log.d(TAG, "wait ==> " + task.getDownloadEntity().getFileName());
     }
   }
 
-  @Download.onPre protected void onPre(DownloadTask task) {
+  @Download.onPre
+  protected void onPre(DownloadTask task) {
     if (task.getKey().equals(DOWNLOAD_URL)) {
       setBtState(false);
     }
   }
 
-  @Download.onTaskStart void taskStart(DownloadTask task) {
+  @Download.onTaskStart
+  void taskStart(DownloadTask task) {
     if (task.getKey().equals(DOWNLOAD_URL)) {
       getBinding().setFileSize(task.getConvertFileSize());
     }
   }
 
-  @Download.onTaskRunning protected void running(DownloadTask task) {
+  @Download.onTaskRunning
+  protected void running(DownloadTask task) {
     ALog.d(TAG, String.format("%s_running_%s", getClass().getName(), hashCode()));
     //if (task.getKey().equals(DOWNLOAD_URL)) {
     //Log.d(TAG, task.getKey());
@@ -183,14 +208,16 @@ public class SingleTaskActivity extends BaseActivity<ActivitySingleBinding> {
     //}
   }
 
-  @Download.onTaskResume void taskResume(DownloadTask task) {
+  @Download.onTaskResume
+  void taskResume(DownloadTask task) {
     if (task.getKey().equals(DOWNLOAD_URL)) {
       mStart.setText("暂停");
       setBtState(false);
     }
   }
 
-  @Download.onTaskStop void taskStop(DownloadTask task) {
+  @Download.onTaskStop
+  void taskStop(DownloadTask task) {
     if (task.getKey().equals(DOWNLOAD_URL)) {
       mStart.setText("恢复");
       setBtState(true);
@@ -198,7 +225,8 @@ public class SingleTaskActivity extends BaseActivity<ActivitySingleBinding> {
     }
   }
 
-  @Download.onTaskCancel void taskCancel(DownloadTask task) {
+  @Download.onTaskCancel
+  void taskCancel(DownloadTask task) {
     if (task.getKey().equals(DOWNLOAD_URL)) {
       getBinding().setProgress(0);
       Toast.makeText(SingleTaskActivity.this, "取消下载", Toast.LENGTH_SHORT).show();
@@ -210,11 +238,11 @@ public class SingleTaskActivity extends BaseActivity<ActivitySingleBinding> {
   }
 
   /**
-   *
    * @param task
    * @param e
    */
-  @Download.onTaskFail void taskFail(DownloadTask task, Exception e) {
+  @Download.onTaskFail
+  void taskFail(DownloadTask task, Exception e) {
     if (task.getKey().equals(DOWNLOAD_URL)) {
       Toast.makeText(SingleTaskActivity.this, "下载失败", Toast.LENGTH_SHORT).show();
       setBtState(true);
@@ -227,7 +255,8 @@ public class SingleTaskActivity extends BaseActivity<ActivitySingleBinding> {
     }
   }
 
-  @Download.onTaskComplete void taskComplete(DownloadTask task) {
+  @Download.onTaskComplete
+  void taskComplete(DownloadTask task) {
     //if (task.getKey().equals(DOWNLOAD_URL)) {
     getBinding().setProgress(100);
     Toast.makeText(SingleTaskActivity.this, "下载完成", Toast.LENGTH_SHORT).show();
@@ -246,31 +275,20 @@ public class SingleTaskActivity extends BaseActivity<ActivitySingleBinding> {
     //}
   }
 
-  @Download.onNoSupportBreakPoint public void onNoSupportBreakPoint(DownloadTask task) {
+  @Download.onNoSupportBreakPoint
+  public void onNoSupportBreakPoint(DownloadTask task) {
     Log.d(TAG, "该下载链接不支持断点");
     if (task.getKey().equals(DOWNLOAD_URL)) {
       T.showShort(SingleTaskActivity.this, "该下载链接不支持断点");
     }
   }
 
-  @Override protected int setLayoutId() {
+  @Override
+  protected int setLayoutId() {
     return R.layout.activity_single;
   }
 
-  @Override protected void init(Bundle savedInstanceState) {
-    super.init(savedInstanceState);
-    setTitle("单任务下载");
-    DownloadTarget target = Aria.download(this).load(DOWNLOAD_URL);
-    getBinding().setProgress(target.getPercent());
-    if (target.getTaskState() == IEntity.STATE_STOP) {
-      mStart.setText("恢复");
-      mStart.setTextColor(getResources().getColor(android.R.color.holo_blue_light));
-      setBtState(true);
-    } else if (target.isRunning()) {
-      setBtState(false);
-    }
-    getBinding().setFileSize(target.getConvertFileSize());
-  }
+
 
   public void onClick(View view) {
     switch (view.getId()) {
@@ -291,16 +309,23 @@ public class SingleTaskActivity extends BaseActivity<ActivitySingleBinding> {
     }
   }
 
+  int i = 1;
+
   private void startD() {
     //Aria.get(this).setLogLevel(ALog.LOG_CLOSE);
     //Aria.download(this).load("aaaa.apk");
     //String path = Environment.getExternalStorageDirectory().getPath() + "/ggsg11.ota";
-    String path = "/sdcard/ggsg11.mp4";
+    String path = String.format("/sdcard/ggsg11(%s).mp4", i);
+    //if (new File(path).exists()) {
+    //
+    //  i++;
+    //  path = String.format("/sdcard/ggsg11(%s).mp4", i);
+    //}
     //File file = new File(path);
     //if (file.exists()){
     //  file.delete();
     //}
-
+    Aria.download(SingleTaskActivity.this).load(DOWNLOAD_URL).resetState().save();
     Map<String, String> params = new HashMap<>();
     params.put("key", "value");
     params.put("filename", "CentOS-7-x86_64-Minimal-1804.iso");
@@ -323,7 +348,8 @@ public class SingleTaskActivity extends BaseActivity<ActivitySingleBinding> {
     //.add();
   }
 
-  @Override protected void onStop() {
+  @Override
+  protected void onStop() {
     super.onStop();
     //Aria.download(this).unRegister();
   }

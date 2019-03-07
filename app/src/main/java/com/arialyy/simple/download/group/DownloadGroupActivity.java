@@ -19,7 +19,6 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
 import android.view.View;
-import butterknife.Bind;
 import com.arialyy.annotations.DownloadGroup;
 import com.arialyy.aria.core.Aria;
 import com.arialyy.aria.core.download.DownloadEntity;
@@ -40,13 +39,14 @@ import java.util.List;
  */
 public class DownloadGroupActivity extends BaseActivity<ActivityDownloadGroupBinding> {
 
-  @Bind(R.id.child_list) SubStateLinearLayout mChildList;
+  SubStateLinearLayout mChildList;
   List<String> mUrls;
 
   @Override protected void init(Bundle savedInstanceState) {
     super.init(savedInstanceState);
     Aria.download(this).register();
     setTitle("任务组");
+    mChildList = getBinding().childList;
     mUrls = getModule(GroupModule.class).getUrls();
     DGTaskWrapper entity = Aria.download(this).getGroupTask(mUrls);
     if (entity != null && entity.getEntity() != null) {

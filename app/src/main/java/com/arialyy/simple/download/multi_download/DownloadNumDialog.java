@@ -22,7 +22,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
-import butterknife.Bind;
 import com.arialyy.simple.R;
 import com.arialyy.simple.base.BaseDialog;
 import com.arialyy.simple.databinding.DialogDownloadNumBinding;
@@ -34,8 +33,8 @@ import com.arialyy.simple.databinding.DialogDownloadNumBinding;
 @SuppressLint("ValidFragment") public class DownloadNumDialog
     extends BaseDialog<DialogDownloadNumBinding> implements RadioGroup.OnCheckedChangeListener {
   public static final int RESULT_CODE = 1001;
-  @Bind(R.id.cancel) Button mCancel;
-  @Bind(R.id.rg) RadioGroup mRg;
+  Button mCancel;
+  RadioGroup mRg;
 
   public DownloadNumDialog(Object obj) {
     super(obj);
@@ -47,6 +46,9 @@ import com.arialyy.simple.databinding.DialogDownloadNumBinding;
 
   @Override protected void init(Bundle savedInstanceState) {
     super.init(savedInstanceState);
+    mCancel = findViewById(R.id.cancel);
+    mRg = findViewById(R.id.rg);
+
     mCancel.setOnClickListener(new View.OnClickListener() {
       @Override public void onClick(View v) {
         dismiss();

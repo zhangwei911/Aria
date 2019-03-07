@@ -24,8 +24,6 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.TextView;
-import butterknife.Bind;
-import butterknife.OnClick;
 import com.arialyy.annotations.DownloadGroup;
 import com.arialyy.aria.core.Aria;
 import com.arialyy.aria.core.download.DownloadEntity;
@@ -41,10 +39,10 @@ import java.util.List;
  * Created by lyy on 2017/9/5.
  */
 @SuppressLint("ValidFragment") public class ChildHandleDialog
-    extends BaseDialog<DialogSubTaskHandlerBinding> {
-  @Bind(R.id.sub_task) TextView mSub;
-  @Bind(R.id.task_group) TextView mGroup;
-  @Bind(R.id.pb) HorizontalProgressBarWithNumber mPb;
+    extends BaseDialog<DialogSubTaskHandlerBinding> implements View.OnClickListener {
+  TextView mSub;
+  TextView mGroup;
+  HorizontalProgressBarWithNumber mPb;
   private String mGroupHash;
   private String mChildName;
   private List<String> mUrls;
@@ -71,6 +69,13 @@ import java.util.List;
   }
 
   private void initWidget() {
+    mSub = findViewById(R.id.sub_task);
+    mGroup = findViewById(R.id.task_group);
+    mPb = findViewById(R.id.pb);
+
+    findViewById(R.id.stop).setOnClickListener(this);
+    findViewById(R.id.start).setOnClickListener(this);
+    findViewById(R.id.cancel).setOnClickListener(this);
     mGroup.setText("任务组：" + mGroupHash);
     mSub.setText("子任务：" + mChildName);
     mPb.setProgress((int) (mChildEntity.getCurrentProgress() * 100 / mChildEntity.getFileSize()));
@@ -130,13 +135,20 @@ import java.util.List;
     return R.layout.dialog_sub_task_handler;
   }
 
-  @OnClick({ R.id.start, R.id.stop, R.id.cancel }) void onClick(View view) {
+  @Override
+  public void onClick(View view) {
     switch (view.getId()) {
       case R.id.start:
-        Aria.download(getContext()).loadGroup(mUrls).getSubTaskManager().startSubTask(mChildEntity.getUrl());
+        Aria.download(getContext())
+            .loadGroup(mUrls)
+            .getSubTaskManager()
+            .startSubTask(mChildEntity.getUrl());
         break;
       case R.id.stop:
-        Aria.download(getContext()).loadGroup(mUrls).getSubTaskManager().stopSubTask(mChildEntity.getUrl());
+        Aria.download(getContext())
+            .loadGroup(mUrls)
+            .getSubTaskManager()
+            .stopSubTask(mChildEntity.getUrl());
         break;
       //case R.id.cancel:
       //  Aria.download(this).load(mUrls).getSubTaskManager().cancelSubTask(mChildEntity.getUrl());

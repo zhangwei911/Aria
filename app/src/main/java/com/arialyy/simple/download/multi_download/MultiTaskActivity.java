@@ -23,7 +23,6 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
-import butterknife.Bind;
 import com.arialyy.annotations.Download;
 import com.arialyy.annotations.DownloadGroup;
 import com.arialyy.aria.core.Aria;
@@ -43,8 +42,8 @@ import java.util.List;
  * Created by Lyy on 2016/9/27.
  */
 public class MultiTaskActivity extends BaseActivity<ActivityMultiBinding> {
-  @Bind(R.id.list) RecyclerView mList;
-  @Bind(R.id.toolbar) Toolbar mBar;
+  RecyclerView mList;
+  Toolbar mBar;
   private FileListAdapter mAdapter;
   List<FileListEntity> mData = new ArrayList<>();
 
@@ -59,6 +58,8 @@ public class MultiTaskActivity extends BaseActivity<ActivityMultiBinding> {
     mData.addAll(getModule(DownloadModule.class).createGroupTestList());
     mData.addAll(getModule(DownloadModule.class).createMultiTestList());
     mAdapter = new FileListAdapter(this, mData);
+    mList = getBinding().list;
+    mBar = findViewById(R.id.toolbar);
     mList.setLayoutManager(new LinearLayoutManager(this));
     mList.setAdapter(mAdapter);
   }
@@ -79,7 +80,7 @@ public class MultiTaskActivity extends BaseActivity<ActivityMultiBinding> {
     }
   }
 
-  @Download.onWait void taskWait(DownloadTask task){
+  @Download.onWait void taskWait(DownloadTask task) {
     Log.d(TAG, "wait ==> " + task.getDownloadEntity().getFileName());
   }
 
@@ -103,7 +104,7 @@ public class MultiTaskActivity extends BaseActivity<ActivityMultiBinding> {
     mAdapter.updateBtState(task.getKey(), true);
   }
 
-  @Download.onTaskComplete void taskComplete(DownloadTask task){
+  @Download.onTaskComplete void taskComplete(DownloadTask task) {
     Log.d(TAG, FileUtil.getFileMD5(new File(task.getDownloadPath())));
   }
 

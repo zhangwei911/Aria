@@ -20,7 +20,6 @@ import android.support.v7.widget.RecyclerView;
 import android.util.SparseArray;
 import android.view.View;
 
-import butterknife.ButterKnife;
 
 /**
  * Created by lyy on 2015/12/3.
@@ -32,7 +31,7 @@ public class AbsHolder extends RecyclerView.ViewHolder {
 
     public AbsHolder(View itemView) {
         super(itemView);
-        ButterKnife.bind(this, itemView);
+        mView = itemView;
     }
 
     @SuppressWarnings("unchecked")

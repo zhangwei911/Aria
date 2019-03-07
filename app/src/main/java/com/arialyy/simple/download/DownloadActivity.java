@@ -23,8 +23,6 @@ import android.os.Bundle;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
-import butterknife.Bind;
-import com.arialyy.aria.core.Aria;
 import com.arialyy.frame.permission.OnPermissionCallback;
 import com.arialyy.frame.permission.PermissionManager;
 import com.arialyy.frame.util.show.T;
@@ -39,10 +37,10 @@ import com.arialyy.simple.download.service_download.DownloadService;
  * Created by Lyy on 2016/10/13.
  */
 public class DownloadActivity extends BaseActivity<ActivityDownloadMeanBinding> {
-  @Bind(R.id.single_task) Button mSigleBt;
-  @Bind(R.id.multi_task) Button mMultiBt;
-  @Bind(R.id.dialog_task) Button mDialogBt;
-  @Bind(R.id.pop_task) Button mPopBt;
+  Button mSigleBt;
+  Button mMultiBt;
+  Button mDialogBt;
+  Button mPopBt;
 
   @Override protected int setLayoutId() {
     return R.layout.activity_download_mean;
@@ -51,6 +49,10 @@ public class DownloadActivity extends BaseActivity<ActivityDownloadMeanBinding> 
   @Override protected void init(Bundle savedInstanceState) {
     super.init(savedInstanceState);
     setTitle("Aria下载");
+    mSigleBt = getBinding().singleTask;
+    mMultiBt = getBinding().multiTask;
+    mDialogBt = getBinding().dialogTask;
+    mPopBt = getBinding().popTask;
     if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
       setEnable(true);
     } else {  //6.0处理

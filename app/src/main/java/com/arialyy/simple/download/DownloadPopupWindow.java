@@ -23,8 +23,6 @@ import android.os.Environment;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-import butterknife.Bind;
-import butterknife.OnClick;
 import com.arialyy.annotations.Download;
 import com.arialyy.aria.core.Aria;
 import com.arialyy.aria.core.download.DownloadEntity;
@@ -38,13 +36,13 @@ import com.arialyy.simple.widget.HorizontalProgressBarWithNumber;
 /**
  * Created by AriaL on 2017/1/2.
  */
-public class DownloadPopupWindow extends AbsPopupWindow {
-  @Bind(R.id.progressBar) HorizontalProgressBarWithNumber mPb;
-  @Bind(R.id.start) Button mStart;
-  @Bind(R.id.stop) Button mStop;
-  @Bind(R.id.cancel) Button mCancel;
-  @Bind(R.id.size) TextView mSize;
-  @Bind(R.id.speed) TextView mSpeed;
+public class DownloadPopupWindow extends AbsPopupWindow implements View.OnClickListener {
+  private HorizontalProgressBarWithNumber mPb;
+  private Button mStart;
+  private Button mStop;
+  private Button mCancel;
+  private TextView mSize;
+  private TextView mSpeed;
 
   private static final String DOWNLOAD_URL =
       "http://static.gaoshouyou.com/d/25/57/2e25bd9d4557ba31e9beebacfaf9e804.apk";
@@ -59,6 +57,16 @@ public class DownloadPopupWindow extends AbsPopupWindow {
   }
 
   private void initWidget() {
+    mPb = mView.findViewById(R.id.progressBar);
+    mStart = mView.findViewById(R.id.start);
+    mStop = mView.findViewById(R.id.stop);
+    mCancel = mView.findViewById(R.id.cancel);
+    mSize = mView.findViewById(R.id.size);
+    mSpeed = mView.findViewById(R.id.speed);
+
+    mStart.setOnClickListener(this);
+    mStop.setOnClickListener(this);
+    mCancel.setOnClickListener(this);
     if (Aria.download(this).taskExists(DOWNLOAD_URL)) {
       DownloadTarget target = Aria.download(this).load(DOWNLOAD_URL);
       int p = (int) (target.getCurrentProgress() * 100 / target.getFileSize());
@@ -75,7 +83,8 @@ public class DownloadPopupWindow extends AbsPopupWindow {
     }
   }
 
-  @OnClick({ R.id.start, R.id.stop, R.id.cancel }) public void onClick(View view) {
+  @Override
+  public void onClick(View view) {
     switch (view.getId()) {
       case R.id.start:
         Aria.download(this)

@@ -18,7 +18,6 @@ package com.arialyy.simple.download.group;
 import android.os.Bundle;
 import android.os.Environment;
 import android.view.View;
-import butterknife.Bind;
 import com.arialyy.annotations.DownloadGroup;
 import com.arialyy.aria.core.Aria;
 import com.arialyy.aria.core.download.DownloadGroupEntity;
@@ -37,12 +36,13 @@ import com.arialyy.simple.widget.SubStateLinearLayout;
 public class FTPDirDownloadActivity extends BaseActivity<ActivityDownloadGroupBinding> {
   private static final String dir = "ftp://9.9.9.50:21/upload/测试";
 
-  @Bind(R.id.child_list) SubStateLinearLayout mChildList;
+   SubStateLinearLayout mChildList;
 
   @Override protected void init(Bundle savedInstanceState) {
     super.init(savedInstanceState);
     Aria.download(this).register();
     setTitle("FTP文件夹下载");
+    mChildList = findViewById(R.id.child_list);
     DGTaskWrapper entity = Aria.download(this).getFtpDirTask(dir);
     if (entity != null && entity.getEntity() != null) {
       DownloadGroupEntity groupEntity = entity.getEntity();

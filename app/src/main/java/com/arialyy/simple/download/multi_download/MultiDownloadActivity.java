@@ -22,7 +22,6 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import butterknife.Bind;
 import com.arialyy.annotations.Download;
 import com.arialyy.annotations.DownloadGroup;
 import com.arialyy.aria.core.Aria;
@@ -40,7 +39,7 @@ import java.util.List;
  * Created by AriaL on 2017/1/6.
  */
 public class MultiDownloadActivity extends BaseActivity<ActivityMultiDownloadBinding> {
-  @Bind(R.id.list) RecyclerView mList;
+  RecyclerView mList;
   private DownloadAdapter mAdapter;
   private List<AbsEntity> mData = new ArrayList<>();
 
@@ -57,6 +56,7 @@ public class MultiDownloadActivity extends BaseActivity<ActivityMultiDownloadBin
       mData.addAll(temps);
     }
     mAdapter = new DownloadAdapter(this, mData);
+    mList = getBinding().list;
     mList.setLayoutManager(new LinearLayoutManager(this));
     mList.setAdapter(mAdapter);
   }

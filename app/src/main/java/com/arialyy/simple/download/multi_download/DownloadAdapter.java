@@ -23,7 +23,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-import butterknife.Bind;
 import com.arialyy.aria.core.Aria;
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.download.DownloadGroupEntity;
@@ -78,7 +77,7 @@ public class DownloadAdapter extends AbsRVAdapter<AbsEntity, DownloadAdapter.Sim
     mPositions.put(entity.getUrl(), mPositions.size());
   }
 
-  @Override public int getItemViewType(int position) {
+  public int getItemViewType(int position) {
     AbsEntity entity = mData.get(position);
     if (entity instanceof DownloadEntity) return 1;
     if (entity instanceof DownloadGroupEntity) return 2;
@@ -205,9 +204,9 @@ public class DownloadAdapter extends AbsRVAdapter<AbsEntity, DownloadAdapter.Sim
     //删除按钮事件
     holder.cancel.setOnClickListener(new View.OnClickListener() {
       @Override public void onClick(View v) {
-//        mData.remove(entity);
+        //        mData.remove(entity);
         notifyDataSetChanged();
-//        cancel(entity);
+        //        cancel(entity);
         stop(entity);
       }
     });
@@ -321,23 +320,30 @@ public class DownloadAdapter extends AbsRVAdapter<AbsEntity, DownloadAdapter.Sim
   }
 
   class SimpleHolder extends AbsHolder {
-    @Bind(R.id.progressBar) HorizontalProgressBarWithNumber progress;
-    @Bind(R.id.bt) Button bt;
-    @Bind(R.id.speed) TextView speed;
-    @Bind(R.id.fileSize) TextView fileSize;
-    @Bind(R.id.del) TextView cancel;
-    @Bind(R.id.name) TextView name;
+    HorizontalProgressBarWithNumber progress;
+    Button bt;
+    TextView speed;
+    TextView fileSize;
+    TextView cancel;
+    TextView name;
 
     SimpleHolder(View itemView) {
       super(itemView);
+      progress = itemView.findViewById(R.id.progressBar);
+      bt = itemView.findViewById(R.id.bt);
+      speed = itemView.findViewById(R.id.speed);
+      fileSize = itemView.findViewById(R.id.fileSize);
+      cancel = itemView.findViewById(R.id.del);
+      name = itemView.findViewById(R.id.name);
     }
   }
 
   class GroupHolder extends SimpleHolder {
-    @Bind(R.id.child_list) SubStateLinearLayout childList;
+    SubStateLinearLayout childList;
 
     GroupHolder(View itemView) {
       super(itemView);
+      childList = itemView.findViewById(R.id.child_list);
     }
   }
 }

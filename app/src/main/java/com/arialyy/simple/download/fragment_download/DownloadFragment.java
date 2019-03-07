@@ -20,9 +20,6 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.view.View;
 import android.widget.Button;
-import android.widget.TextView;
-import butterknife.Bind;
-import butterknife.OnClick;
 import com.arialyy.annotations.Download;
 import com.arialyy.aria.core.download.DownloadTarget;
 import com.arialyy.aria.core.Aria;
@@ -37,14 +34,23 @@ import com.arialyy.simple.widget.HorizontalProgressBarWithNumber;
 /**
  * Created by lyy on 2017/1/4.
  */
-public class DownloadFragment extends AbsFragment<FragmentDownloadBinding> {
-  @Bind(R.id.start) Button mStart;
-  @Bind(R.id.stop) Button mStop;
-  @Bind(R.id.cancel) Button mCancel;
+public class DownloadFragment extends AbsFragment<FragmentDownloadBinding>
+    implements View.OnClickListener {
+  Button mStart;
+  Button mStop;
+  Button mCancel;
 
-  private static final String DOWNLOAD_URL = "https://res5.d.cn/2137e42d610b3488d9420c6421529386eee5bdbfd9be1fafe0a05d6dabaec8c156ddbd00581055bbaeac03904fb63310e80010680235d16bd4c040b50096a0c20dd1c4b0854529a1.apk";
+  private static final String DOWNLOAD_URL =
+      "https://res5.d.cn/2137e42d610b3488d9420c6421529386eee5bdbfd9be1fafe0a05d6dabaec8c156ddbd00581055bbaeac03904fb63310e80010680235d16bd4c040b50096a0c20dd1c4b0854529a1.apk";
 
   @Override protected void init(Bundle savedInstanceState) {
+    mStart = mRootView.findViewById(R.id.start);
+    mStop = mRootView.findViewById(R.id.stop);
+    mCancel = mRootView.findViewById(R.id.cancel);
+    mStart.setOnClickListener(this);
+    mStop.setOnClickListener(this);
+    mCancel.setOnClickListener(this);
+
     if (Aria.download(this).taskExists(DOWNLOAD_URL)) {
       DownloadTarget target = Aria.download(this).load(DOWNLOAD_URL);
       getBinding().setProgress(target.getPercent());
@@ -60,7 +66,7 @@ public class DownloadFragment extends AbsFragment<FragmentDownloadBinding> {
     Aria.download(this).register();
   }
 
-  @OnClick({ R.id.start, R.id.stop, R.id.cancel }) public void onClick(View view) {
+  public void onClick(View view) {
     switch (view.getId()) {
       case R.id.start:
         Aria.download(this)

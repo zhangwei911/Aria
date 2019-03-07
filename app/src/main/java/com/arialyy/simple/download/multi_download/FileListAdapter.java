@@ -21,7 +21,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
-import butterknife.Bind;
 import com.arialyy.aria.core.Aria;
 import com.arialyy.simple.R;
 import com.arialyy.simple.base.adapter.AbsHolder;
@@ -112,13 +111,17 @@ final class FileListAdapter extends AbsRVAdapter<FileListEntity, FileListAdapter
   }
 
   class FileListHolder extends AbsHolder {
-    @Bind(R.id.name) TextView name;
-    @Bind(R.id.download_url) TextView url;
-    @Bind(R.id.download_path) TextView path;
-    @Bind(R.id.bt) Button bt;
+    TextView name;
+    TextView url;
+    TextView path;
+    Button bt;
 
     FileListHolder(View itemView) {
       super(itemView);
+      name = getView(R.id.name);
+      url = getView(R.id.download_url);
+      path = getView(R.id.download_path);
+      bt = getView(R.id.bt);
     }
   }
 }

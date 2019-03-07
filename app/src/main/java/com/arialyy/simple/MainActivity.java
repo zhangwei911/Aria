@@ -19,8 +19,6 @@ package com.arialyy.simple;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import butterknife.OnClick;
-import com.arialyy.aria.core.Aria;
 import com.arialyy.simple.base.BaseActivity;
 import com.arialyy.simple.databinding.ActivityMainBinding;
 import com.arialyy.simple.download.DownloadActivity;
@@ -33,24 +31,29 @@ import com.arialyy.simple.upload.HttpUploadActivity;
 /**
  * Created by lyy on 2017/3/1.
  */
-public class MainActivity extends BaseActivity<ActivityMainBinding> {
+public class MainActivity extends BaseActivity<ActivityMainBinding>
+    implements View.OnClickListener {
 
   @Override protected void init(Bundle savedInstanceState) {
     super.init(savedInstanceState);
     setSupportActionBar(mBar);
     mBar.setTitle("Aria  Demo");
     getSupportActionBar().setDisplayHomeAsUpEnabled(false);
-
+    getBinding().download.setOnClickListener(this);
+    getBinding().upload.setOnClickListener(this);
+    getBinding().downloadTaskGroup.setOnClickListener(this);
+    getBinding().ftpDownload.setOnClickListener(this);
+    getBinding().ftpDirDownload.setOnClickListener(this);
+    getBinding().ftpUpload.setOnClickListener(this);
+    getBinding().kotlinDownload.setOnClickListener(this);
   }
 
   @Override protected int setLayoutId() {
     return R.layout.activity_main;
   }
 
-  @OnClick({
-      R.id.download, R.id.upload, R.id.download_task_group, R.id.ftp_download,
-      R.id.ftp_dir_download, R.id.ftp_upload, R.id.kotlin_download
-  }) public void funcation(View view) {
+  @Override
+  public void onClick(View view) {
     switch (view.getId()) {
       case R.id.download:
         startActivity(new Intent(this, DownloadActivity.class));

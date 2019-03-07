@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.view.View;
 import android.widget.Toast;
-import butterknife.OnClick;
 import com.arialyy.annotations.Download;
 import com.arialyy.aria.core.Aria;
 import com.arialyy.aria.core.download.DownloadEntity;
@@ -20,7 +19,7 @@ import com.arialyy.simple.databinding.DialogFragmentDownloadBinding;
  * Created by lyy on 2017/8/8.
  */
 @SuppressLint("ValidFragment") public class DownloadDialogFragment
-    extends BaseDialog<DialogFragmentDownloadBinding> {
+    extends BaseDialog<DialogFragmentDownloadBinding> implements View.OnClickListener{
 
   private static final String DOWNLOAD_URL =
       "http://res3.d.cn/android/new/game/2/78702/fzjh_1499390260312.apk?f=web_1";
@@ -37,6 +36,9 @@ import com.arialyy.simple.databinding.DialogFragmentDownloadBinding;
       getBinding().setFileSize(CommonUtil.formatFileSize(entity.getFileSize()));
       getBinding().setProgress((int) (entity.getCurrentProgress() * 100 / entity.getFileSize()));
     }
+    mRootView.findViewById(R.id.start).setOnClickListener(this);
+    mRootView.findViewById(R.id.stop).setOnClickListener(this);
+    mRootView.findViewById(R.id.cancel).setOnClickListener(this);
   }
 
   @Override protected int setLayoutId() {
@@ -93,7 +95,7 @@ import com.arialyy.simple.databinding.DialogFragmentDownloadBinding;
     T.showShort(getContext(), "该下载链接不支持断点");
   }
 
-  @OnClick({ R.id.start, R.id.stop, R.id.cancel }) public void onClick(View view) {
+  public void onClick(View view) {
     switch (view.getId()) {
       case R.id.start:
         Aria.download(getContext())

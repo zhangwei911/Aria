@@ -287,7 +287,7 @@ public class DownloadReceiver extends AbsReceiver {
    * @return {@code true}存在，{@code false} 不存在
    */
   public boolean taskExists(String downloadUrl) {
-    return DbEntity.checkDataExist(DTaskWrapper.class, "url=?", downloadUrl);
+    return DbEntity.checkDataExist(DownloadEntity.class, "url=?", downloadUrl);
   }
 
   /**

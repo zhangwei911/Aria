@@ -1,5 +1,10 @@
 ## 开发日志
-  + v_3.6
+  + v_3.6.2
+    - fix bug https://github.com/AriaLyy/Aria/issues/368
+    - 增加gradle 5.0支持
+  + v_3.6.1 (2019/3/5)
+    - fix bug https://github.com/AriaLyy/Aria/issues/367
+  + v_3.6 (2019/2/27)
     - 优化数据库写入\修改的速度
     - 精减任务实体的存储
     - 增加下载组合任务的配置
