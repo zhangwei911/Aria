@@ -82,7 +82,7 @@ abstract class BaseNormalTarget<TARGET extends BaseNormalTarget>
    * @return {@code true}任务存在
    */
   @Override public boolean taskExists() {
-    return DownloadTaskQueue.getInstance().getTask(mEntity.getKey()) != null;
+    return DbEntity.checkDataExist(DownloadEntity.class, "url=?", url);
   }
 
   /**
@@ -164,7 +164,8 @@ abstract class BaseNormalTarget<TARGET extends BaseNormalTarget>
         } else {
           ALog.w(TAG, "保存路径【" + filePath + "】已经被其它任务占用，当前任务将覆盖该路径的文件");
           CommonUtil.delTaskRecord(filePath, 1);
-          mTaskWrapper = TaskWrapperManager.getInstance().getHttpTaskWrapper(DTaskWrapper.class, url);
+          mTaskWrapper =
+              TaskWrapperManager.getInstance().getHttpTaskWrapper(DTaskWrapper.class, url);
         }
       }
       File oldFile = new File(mEntity.getDownloadPath());

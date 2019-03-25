@@ -22,6 +22,7 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.widget.AppCompatImageView;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -62,6 +63,8 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
     final List<NormalTo> data = getModule(CommonModule.class).getMainData();
     getBinding().list.setAdapter(
         new Adapter(this, data));
+    getBinding().list.addItemDecoration(
+        new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
     RvItemClickSupport.addTo(getBinding().list).setOnItemClickListener(
         new RvItemClickSupport.OnItemClickListener() {
           @Override public void onItemClicked(RecyclerView recyclerView, int position, View v) {
@@ -125,18 +128,19 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
     }
 
     @Override protected void bindData(Holder holder, int position, NormalTo item) {
-      holder.text.setText(item.title);
-      Log.d(TAG, item.icon + "");
+      holder.title.setText(item.title);
+      holder.desc.setText(item.desc);
       holder.image.setImageResource(item.icon);
     }
 
     private static class Holder extends AbsHolder {
-      TextView text;
+      TextView title, desc;
       AppCompatImageView image;
 
       Holder(View itemView) {
         super(itemView);
-        text = findViewById(R.id.text);
+        title = findViewById(R.id.title);
+        desc = findViewById(R.id.desc);
         image = findViewById(R.id.image);
       }
     }

@@ -51,6 +51,7 @@ dependencies {
   //    compile 'com.arialyy.aria:aria-core:3.3.16'
   //  annotationProcessor 'com.arialyy.aria:aria-compiler:3.3.16'
   debugApi 'com.amitshekhar.android:debug-db:1.0.0'
+  compile 'com.github.PhilJay:MPAndroidChart:v3.0.3'
   implementation project(':AppFrame')
 }
 repositories {

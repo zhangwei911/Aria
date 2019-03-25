@@ -20,6 +20,7 @@ import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import com.arialyy.aria.core.manager.TaskWrapperManager;
 import com.arialyy.aria.core.queue.UploadTaskQueue;
+import com.arialyy.aria.orm.DbEntity;
 import com.arialyy.aria.util.ALog;
 import java.io.File;
 
@@ -32,7 +33,8 @@ abstract class BaseNormalTarget<TARGET extends AbsUploadTarget>
   protected String mTempUrl;
 
   void initTarget(String filePath) {
-    mTaskWrapper = TaskWrapperManager.getInstance().getHttpTaskWrapper(UTaskWrapper.class, filePath);
+    mTaskWrapper =
+        TaskWrapperManager.getInstance().getHttpTaskWrapper(UTaskWrapper.class, filePath);
     mEntity = mTaskWrapper.getEntity();
     File file = new File(filePath);
     mEntity.setFileName(file.getName());
@@ -57,7 +59,7 @@ abstract class BaseNormalTarget<TARGET extends AbsUploadTarget>
    * @return {@code true}存在
    */
   @Override public boolean taskExists() {
-    return UploadTaskQueue.getInstance().getTask(mEntity.getFilePath()) != null;
+    return DbEntity.checkDataExist(UploadEntity.class, "key=?", mEntity.getFilePath());
   }
 
   /**

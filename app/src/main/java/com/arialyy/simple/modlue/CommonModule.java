@@ -17,10 +17,12 @@ package com.arialyy.simple.modlue;
 
 import android.content.Context;
 import android.content.Intent;
+import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.frame.module.AbsModule;
 import com.arialyy.simple.MainActivity;
 import com.arialyy.simple.R;
 import com.arialyy.simple.to.NormalTo;
+import com.github.mikephil.charting.data.Entry;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,6 +30,9 @@ import java.util.List;
  * 通用Modle块
  */
 public class CommonModule extends AbsModule {
+
+  private int mPosition;
+
   public CommonModule(Context context) {
     super(context);
   }
@@ -36,6 +41,21 @@ public class CommonModule extends AbsModule {
     Intent intent = new Intent(getContext(), clazz);
     intent.putExtra(MainActivity.KEY_MAIN_DATA, to);
     getContext().startActivity(intent);
+  }
+
+  /**
+   * 创建图表实体
+   */
+  public Entry createNewEntry(DownloadEntity entity) {
+    long speed = entity.getSpeed() / 1024;
+    boolean isKb = true;
+    if (speed > 1024) {
+      isKb = false;
+      speed /= 1024;
+    }
+    Entry entry = new Entry(mPosition, speed, isKb);
+    mPosition++;
+    return entry;
   }
 
   public List<NormalTo> getDownloadData() {
@@ -62,6 +82,7 @@ public class CommonModule extends AbsModule {
   public List<NormalTo> getMainData() {
     List<NormalTo> list = new ArrayList<>();
     String[] titles = getContext().getResources().getStringArray(R.array.main_items);
+    String[] descs = getContext().getResources().getStringArray(R.array.main_items_desc);
     int[] icons = new int[] {
         R.drawable.ic_http,
         R.drawable.ic_http,
@@ -75,6 +96,7 @@ public class CommonModule extends AbsModule {
       NormalTo to = new NormalTo();
       to.icon = icons[i];
       to.title = title;
+      to.desc = descs[i];
       i++;
       list.add(to);
     }

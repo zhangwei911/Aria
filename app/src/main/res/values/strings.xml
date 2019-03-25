@@ -10,6 +10,16 @@
     <item>FTP 文件夹下载</item>
     <item>FTP 文件上传</item>
   </string-array>
+
+  <string-array name="main_items_desc">
+    <item>单文件下载、多文件队列下载、各组件中使用</item>
+    <item>上传单个文件到服务器</item>
+    <item>多文件组合为一个组（如：封面、字幕、电影）</item>
+    <item>单文件下载、多文件队列下载</item>
+    <item>下载服务器上的某个FTP文件夹</item>
+    <item>上传单个文件到服务器</item>
+  </string-array>
+
   <string-array name="download_items">
     <item>单任务下载</item>
     <item>多任务下载</item>
@@ -17,6 +27,9 @@
     <item>Service中使用</item>
     <item>组件中使用</item>
   </string-array>
+
+  <string name="file_name">文件名: %1$s</string>
+  <string name="file_path">保存路径: %1$s</string>
 
 
   <string-array name="test_apk_download_url">

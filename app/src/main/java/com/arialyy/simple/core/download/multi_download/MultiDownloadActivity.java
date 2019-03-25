@@ -76,6 +76,10 @@ public class MultiDownloadActivity extends BaseActivity<ActivityMultiDownloadBin
     Log.d(TAG, task.getTaskName() + ", " + task.getState());
   }
 
+  @Download.onWait void onWait(DownloadTask task){
+    mAdapter.updateState(task.getEntity());
+  }
+
   @Download.onTaskStart void taskStart(DownloadTask task) {
     Log.d(TAG, task.getTaskName() + ", " + task.getState());
     mAdapter.updateState(task.getEntity());

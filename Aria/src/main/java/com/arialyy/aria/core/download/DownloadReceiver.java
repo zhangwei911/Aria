@@ -61,6 +61,7 @@ public class DownloadReceiver extends AbsReceiver {
    */
   @CheckResult
   public DownloadTarget load(DownloadEntity entity) {
+    CheckUtil.checkUrlInvalidThrow(entity.getUrl());
     return new DownloadTarget(entity, targetName);
   }
 
@@ -71,6 +72,7 @@ public class DownloadReceiver extends AbsReceiver {
    */
   @CheckResult
   public DownloadTarget load(@NonNull String url) {
+    CheckUtil.checkUrlInvalidThrow(url);
     return new DownloadTarget(url, targetName);
   }
 
@@ -102,6 +104,7 @@ public class DownloadReceiver extends AbsReceiver {
    */
   @CheckResult
   public FtpDownloadTarget loadFtp(DownloadEntity entity) {
+    CheckUtil.checkUrlInvalidThrow(entity.getUrl());
     return new FtpDownloadTarget(entity, targetName);
   }
 
@@ -110,6 +113,7 @@ public class DownloadReceiver extends AbsReceiver {
    */
   @CheckResult
   public FtpDownloadTarget loadFtp(@NonNull String url) {
+    CheckUtil.checkUrlInvalidThrow(url);
     return new FtpDownloadTarget(url, targetName);
   }
 
@@ -123,6 +127,7 @@ public class DownloadReceiver extends AbsReceiver {
   @Deprecated
   @CheckResult
   public DownloadGroupTarget load(DownloadGroupEntity groupEntity) {
+    CheckUtil.checkDownloadUrls(groupEntity.getUrls());
     return loadGroup(groupEntity);
   }
 
@@ -134,6 +139,7 @@ public class DownloadReceiver extends AbsReceiver {
    */
   @CheckResult
   public DownloadGroupTarget loadGroup(DownloadGroupEntity groupEntity) {
+    CheckUtil.checkDownloadUrls(groupEntity.getUrls());
     return new DownloadGroupTarget(groupEntity, targetName);
   }
 

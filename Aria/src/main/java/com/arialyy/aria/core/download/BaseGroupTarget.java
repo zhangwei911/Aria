@@ -71,7 +71,7 @@ abstract class BaseGroupTarget<TARGET extends BaseGroupTarget>
   }
 
   @Override public boolean taskExists() {
-    return DownloadGroupTaskQueue.getInstance().getTask(mEntity.getGroupHash()) != null;
+    return DbEntity.checkDataExist(DownloadGroupEntity.class, "groupHash=?", mGroupHash);
   }
 
   /**

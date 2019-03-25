@@ -123,7 +123,7 @@ public class SingleTaskActivity extends BaseActivity<ActivitySingleBinding> {
   private void setBtState(boolean state) {
     //mStart.setEnabled(state);
     //mStop.setEnabled(!state);
-  }
+  }DelegateUpdate
 
   @Override
   public boolean onCreateOptionsMenu(Menu menu) {

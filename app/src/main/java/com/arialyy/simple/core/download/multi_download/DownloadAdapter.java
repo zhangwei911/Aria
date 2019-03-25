@@ -168,6 +168,8 @@ public class DownloadAdapter extends AbsRVAdapter<AbsEntity, DownloadAdapter.Sim
     int color = android.R.color.holo_green_light;
     switch (entity.getState()) {
       case IEntity.STATE_WAIT:
+        str = "等待中";
+        break;
       case IEntity.STATE_OTHER:
       case IEntity.STATE_FAIL:
         str = "开始";

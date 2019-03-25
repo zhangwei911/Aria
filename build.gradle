@@ -5,6 +5,7 @@ buildscript {
     jcenter()
     mavenCentral()
     google()
+    maven { url 'https://jitpack.io' }
   }
   dependencies {
 //    classpath 'com.android.tools.build:gradle:2.3.3'
@@ -23,6 +24,7 @@ allprojects {
     jcenter()
     mavenCentral()
     google()
+    maven { url 'https://jitpack.io' }
   }
 
   tasks.withType(Javadoc) {
@@ -41,7 +43,7 @@ task clean(type: Delete) {
 ext {
   userOrg = 'arialyy'
   groupId = 'com.arialyy.aria'
-  publishVersion = '3.6.2_debug_5'
+  publishVersion = '3.6.2_debug_6'
 //  publishVersion = '1.0.4'  //FTP插件
   repoName='maven'
   desc = 'android 下载框架'
