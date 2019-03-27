@@ -77,8 +77,7 @@ public abstract class DbEntity {
    * @return 没有数据返回null
    */
   public static <T extends DbEntity> List<T> findAllData(Class<T> clazz) {
-    DelegateWrapper util = DelegateWrapper.getInstance();
-    return util.findAllData(clazz);
+    return DelegateWrapper.getInstance().findAllData(clazz);
   }
 
   /**
@@ -98,8 +97,25 @@ public abstract class DbEntity {
    * @return 没有数据返回null
    */
   public static <T extends DbEntity> List<T> findDatas(Class<T> clazz, String... expression) {
-    DelegateWrapper util = DelegateWrapper.getInstance();
-    return util.findData(clazz, expression);
+    return DelegateWrapper.getInstance().findData(clazz, expression);
+  }
+
+  /**
+   * 分页查询数据
+   * <code>
+   * DownloadEntity.findFirst(DownloadEntity.class, 0, 10, "downloadUrl=?", downloadUrl);
+   * </code>
+   *
+   * @param page 需要查询的页数，从1开始，如果page小于1 或 num 小于1，返回null
+   * @param num 每页返回的数量
+   * @return 没有数据返回null，如果页数大于总页数，返回null
+   */
+  public static <T extends DbEntity> List<T> findDatas(Class<T> clazz, int page, int num,
+      String... expression) {
+    if (page < 1 || num < 1) {
+      return null;
+    }
+    return DelegateWrapper.getInstance().findData(clazz, page, num, expression);
   }
 
   /**
@@ -111,8 +127,22 @@ public abstract class DbEntity {
    * @return 没有数据返回null
    */
   public static <T extends DbEntity> List<T> findDataByFuzzy(Class<T> clazz, String conditions) {
-    DelegateWrapper util = DelegateWrapper.getInstance();
-    return util.findDataByFuzzy(clazz, conditions);
+    return DelegateWrapper.getInstance().findDataByFuzzy(clazz, conditions);
+  }
+
+  /**
+   * 模糊查询一组数据
+   * <code>
+   * DownloadEntity.findDatas(DownloadEntity.class, "downloadUrl like http://");
+   * </code>
+   *
+   * @param page 需要查询的页数，从1开始，如果page小于1 或 num 小于1，返回null
+   * @param num 每页返回的数量
+   * @return 没有数据返回null，如果页数大于总页数，返回null
+   */
+  public static <T extends DbEntity> List<T> findDataByFuzzy(Class<T> clazz, int page, int num,
+      String conditions) {
+    return DelegateWrapper.getInstance().findDataByFuzzy(clazz, page, num, conditions);
   }
 
   /**

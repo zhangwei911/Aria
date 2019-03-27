@@ -29,6 +29,7 @@ import com.arialyy.aria.util.CommonUtil;
 import java.lang.reflect.Field;
 import java.net.URLDecoder;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -340,16 +341,38 @@ class DelegateFind extends AbsDelegate {
   <T extends DbEntity> List<T> findData(SQLiteDatabase db, Class<T> clazz, String... expression) {
     db = checkDb(db);
     CheckUtil.checkSqlExpression(expression);
-    String sql =
-        "SELECT rowid, * FROM " + CommonUtil.getClassName(clazz) + " WHERE " + expression[0] + " ";
-    sql = sql.replace("?", "%s");
-    Object[] params = new String[expression.length - 1];
-    for (int i = 0, len = params.length; i < len; i++) {
-      params[i] = String.format("'%s'", encodeStr(expression[i + 1]));
-    }
-    sql = String.format(sql, params);
+    String sql = String.format("SELECT rowid, * FROM %s WHERE %s", CommonUtil.getClassName(clazz),
+        expression[0]);
+    String[] params = new String[expression.length - 1];
+    System.arraycopy(expression, 1, params, 0, params.length);
+
     print(FIND_DATA, sql);
-    Cursor cursor = db.rawQuery(sql, null);
+    Cursor cursor = db.rawQuery(sql, params);
+    List<T> data = cursor.getCount() > 0 ? newInstanceEntity(clazz, cursor) : null;
+    closeCursor(cursor);
+    close(db);
+    return data;
+  }
+
+  /**
+   * 获取分页数据
+   */
+  <T extends DbEntity> List<T> findData(SQLiteDatabase db, Class<T> clazz, int page, int num,
+      String... expression) {
+    if (page < 1 || num < 1) {
+      return null;
+    }
+    db = checkDb(db);
+    CheckUtil.checkSqlExpression(expression);
+    String sql = String.format("SELECT rowid, * FROM %s WHERE %s LIMIT %s,%s",
+        CommonUtil.getClassName(clazz),
+        expression[0], (page - 1) * num, num);
+
+    String[] params = new String[expression.length - 1];
+    System.arraycopy(expression, 1, params, 0, params.length);
+
+    print(FIND_DATA, sql);
+    Cursor cursor = db.rawQuery(sql, params);
     List<T> data = cursor.getCount() > 0 ? newInstanceEntity(clazz, cursor) : null;
     closeCursor(cursor);
     close(db);
@@ -359,16 +382,17 @@ class DelegateFind extends AbsDelegate {
   /**
    * 模糊查寻数据
    */
-  <T extends DbEntity> List<T> findDataByFuzzy(SQLiteDatabase db, Class<T> clazz, String conditions) {
+  <T extends DbEntity> List<T> findDataByFuzzy(SQLiteDatabase db, Class<T> clazz,
+      String conditions) {
     db = checkDb(db);
-    if(TextUtils.isEmpty(conditions)){
+    if (TextUtils.isEmpty(conditions)) {
       throw new IllegalArgumentException("sql语句表达式不能为null或\"\"");
     }
-    if(!conditions.toUpperCase().contains("LIKE")){
+    if (!conditions.toUpperCase().contains("LIKE")) {
       throw new IllegalArgumentException("sql语句表达式未包含LIEK");
     }
-    String sql =
-            "SELECT rowid, * FROM " + CommonUtil.getClassName(clazz) + " WHERE "+conditions;
+    String sql = String.format("SELECT rowid, * FROM %s, WHERE %s", CommonUtil.getClassName(clazz),
+        conditions);
     print(FIND_DATA, sql);
     Cursor cursor = db.rawQuery(sql, null);
     List<T> data = cursor.getCount() > 0 ? newInstanceEntity(clazz, cursor) : null;
@@ -376,6 +400,32 @@ class DelegateFind extends AbsDelegate {
     close(db);
     return data;
   }
+
+  /**
+   * 分页、模糊搜索数据
+   */
+  <T extends DbEntity> List<T> findDataByFuzzy(SQLiteDatabase db, Class<T> clazz,
+      int page, int num, String conditions) {
+    if (page < 1 || num < 1) {
+      return null;
+    }
+    db = checkDb(db);
+    if (TextUtils.isEmpty(conditions)) {
+      throw new IllegalArgumentException("sql语句表达式不能为null或\"\"");
+    }
+    if (!conditions.toUpperCase().contains("LIKE")) {
+      throw new IllegalArgumentException("sql语句表达式未包含LIEK");
+    }
+    String sql = String.format("SELECT rowid, * FROM %s WHERE %s LIMIT %s,%s",
+        CommonUtil.getClassName(clazz), conditions, (page - 1) * num, num);
+    print(FIND_DATA, sql);
+    Cursor cursor = db.rawQuery(sql, null);
+    List<T> data = cursor.getCount() > 0 ? newInstanceEntity(clazz, cursor) : null;
+    closeCursor(cursor);
+    close(db);
+    return data;
+  }
+
   /**
    * 查找表的所有数据
    */
@@ -394,7 +444,8 @@ class DelegateFind extends AbsDelegate {
   /**
    * 根据数据游标创建一个具体的对象
    */
-  private synchronized <T extends DbEntity> List<T> newInstanceEntity(Class<T> clazz, Cursor cursor) {
+  private synchronized <T extends DbEntity> List<T> newInstanceEntity(Class<T> clazz,
+      Cursor cursor) {
     List<Field> fields = CommonUtil.getAllFields(clazz);
     List<T> entitys = new ArrayList<>();
     if (fields != null && fields.size() > 0) {

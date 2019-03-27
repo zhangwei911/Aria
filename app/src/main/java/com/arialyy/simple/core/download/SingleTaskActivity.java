@@ -30,6 +30,7 @@ import android.widget.Toast;
 
 import com.arialyy.annotations.Download;
 import com.arialyy.aria.core.Aria;
+import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.download.DownloadTarget;
 import com.arialyy.aria.core.download.DownloadTask;
 import com.arialyy.aria.core.inf.IEntity;
@@ -44,6 +45,7 @@ import com.arialyy.simple.databinding.ActivitySingleBinding;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class SingleTaskActivity extends BaseActivity<ActivitySingleBinding> {
@@ -123,7 +125,7 @@ public class SingleTaskActivity extends BaseActivity<ActivitySingleBinding> {
   private void setBtState(boolean state) {
     //mStart.setEnabled(state);
     //mStop.setEnabled(!state);
-  }DelegateUpdate
+  }
 
   @Override
   public boolean onCreateOptionsMenu(Menu menu) {
@@ -288,7 +290,9 @@ public class SingleTaskActivity extends BaseActivity<ActivitySingleBinding> {
   public void onClick(View view) {
     switch (view.getId()) {
       case R.id.start:
-        startD();
+        //startD();
+        List<DownloadEntity> list = Aria.download(this).getAllNotCompleteTask(5, 2);
+        ALog.d("Tag", list.size() + "");
         break;
       case R.id.stop:
         Aria.download(this).load(DOWNLOAD_URL).stop();
@@ -320,7 +324,7 @@ public class SingleTaskActivity extends BaseActivity<ActivitySingleBinding> {
     //if (file.exists()){
     //  file.delete();
     //}
-    Aria.download(SingleTaskActivity.this).load(DOWNLOAD_URL).resetState().save();
+    //Aria.download(SingleTaskActivity.this).load(DOWNLOAD_URL).resetState().save();
     Map<String, String> params = new HashMap<>();
     params.put("key", "value");
     params.put("filename", "CentOS-7-x86_64-Minimal-1804.iso");
@@ -339,7 +343,7 @@ public class SingleTaskActivity extends BaseActivity<ActivitySingleBinding> {
         //    + "\"id\":\"你的样子\"\n< > "
         //    + "}")
         //.resetState()
-        .start();
+        .save();
     //.add();
   }
 

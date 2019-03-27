@@ -42,6 +42,15 @@ public class CheckUtil {
   }
 
   /**
+   * 检查分页数据，需要查询的页数，从1开始，如果page小于1 或 num 小于1，则抛出{@link NullPointerException}
+   * @param page 从1 开始
+   * @param num  每页数量
+   */
+  public static void checkPageParams(int page, int num){
+    if (page < 1 || num < 1) throw new NullPointerException("page和num不能小于1");
+  }
+
+  /**
    * 检查sql的expression是否合法
    */
   public static void checkSqlExpression(String... expression) {

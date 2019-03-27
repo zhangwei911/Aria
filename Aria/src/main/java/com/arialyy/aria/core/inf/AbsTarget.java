@@ -193,7 +193,10 @@ public abstract class AbsTarget<TARGET extends AbsTarget, ENTITY extends AbsEnti
   public void save() {
     if (!checkEntity()) {
       ALog.e(TAG, "保存修改失败");
+    }else {
+      ALog.i(TAG, "保存成功");
     }
+
   }
 
   /**
