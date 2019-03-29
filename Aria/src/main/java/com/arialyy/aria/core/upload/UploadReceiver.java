@@ -106,12 +106,13 @@ public class UploadReceiver extends AbsReceiver {
   }
 
   /**
-   * 分页获取所有普通上传任务，如果页数大于总页数，返回null
+   * 分页获取所有普通上传任务
    * 获取未完成的普通任务列表{@link #getAllNotCompleteTask()}
    * 获取已经完成的普通任务列表{@link #getAllCompleteTask()}
    *
    * @param page 当前页，不能小于1
    * @param num 每页数量，不能小于1
+   * @return 如果页数大于总页数，返回null
    */
   public List<UploadEntity> getTaskList(int page, int num) {
     CheckUtil.checkPageParams(page, num);
@@ -128,10 +129,11 @@ public class UploadReceiver extends AbsReceiver {
   }
 
   /**
-   * 分页获取所有未完成的普通上传任务，如果页数大于总页数，返回null
+   * 分页获取所有未完成的普通上传任务
    *
    * @param page 当前页，不能小于1
    * @param num 每页数量，不能小于1
+   * @return 如果页数大于总页数，返回null
    */
   public List<UploadEntity> getAllNotCompleteTask(int page, int num) {
     CheckUtil.checkPageParams(page, num);
@@ -140,7 +142,7 @@ public class UploadReceiver extends AbsReceiver {
   }
 
   /**
-   * 获取所有已经完成的普通任务，如果页数大于总页数，返回null
+   * 获取所有已经完成的普通任务
    */
   public List<UploadEntity> getAllCompleteTask() {
     return DbEntity.findDatas(UploadEntity.class, "isGroupChild=? and isComplete=?", "false",
@@ -148,7 +150,11 @@ public class UploadReceiver extends AbsReceiver {
   }
 
   /**
-   * 分页获取所有已经完成的普通任务，如果页数大于总页数，返回null
+   * 分页获取所有已经完成的普通任务
+   *
+   * @param page 当前页，不能小于1
+   * @param num 每页数量，不能小于1
+   * @return 如果页数大于总页数，返回null
    */
   public List<UploadEntity> getAllCompleteTask(int page, int num) {
     CheckUtil.checkPageParams(page, num);

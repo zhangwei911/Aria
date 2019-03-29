@@ -2,6 +2,7 @@
   + v_3.6.2
     - fix bug https://github.com/AriaLyy/Aria/issues/368
     - 增加gradle 5.0支持
+    - fix bug https://github.com/AriaLyy/Aria/issues/374
   + v_3.6.1 (2019/3/5)
     - fix bug https://github.com/AriaLyy/Aria/issues/367
   + v_3.6 (2019/2/27)

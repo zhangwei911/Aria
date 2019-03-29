@@ -25,11 +25,15 @@ import com.arialyy.aria.util.ALog;
 import java.util.HashMap;
 import java.util.Map;
 
-class BaseTarget<TARGET extends AbsTarget> implements ITarget {
+/**
+ * HTTP参数委托
+ * @param <TARGET>
+ */
+class HttpDelegate<TARGET extends AbsTarget> implements ITarget {
   private static final String TAG = "PostDelegate";
   TARGET mTarget;
 
-  public BaseTarget(TARGET target){
+  HttpDelegate(TARGET target) {
     mTarget = target;
   }
 
@@ -63,18 +67,34 @@ class BaseTarget<TARGET extends AbsTarget> implements ITarget {
   }
 
   @Override public void start() {
-
+    mTarget.start();
   }
 
   @Override public void stop() {
-
+    mTarget.stop();
   }
 
   @Override public void resume() {
-
+    mTarget.resume();
   }
 
   @Override public void cancel() {
+    mTarget.cancel();
+  }
 
+  @Override public void save() {
+    mTarget.save();
+  }
+
+  @Override public void cancel(boolean removeFile) {
+    mTarget.cancel(removeFile);
+  }
+
+  @Override public void reTry() {
+    mTarget.reTry();
+  }
+
+  @Override public void reStart() {
+    mTarget.reStart();
   }
 }

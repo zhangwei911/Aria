@@ -65,6 +65,17 @@ public class DelegateWrapper {
   }
 
   /**
+   * 查询关联表数据
+   *
+   * @param expression 查询条件
+   */
+  <T extends AbsDbWrapper> List<T> findRelationData(Class<T> clazz, int page, int num,
+      String... expression) {
+    return mDManager.getDelegate(DelegateFind.class)
+        .findRelationData(mDb, clazz, page, num, expression);
+  }
+
+  /**
    * 检查某个字段的值是否存在
    *
    * @param expression 字段和值"url=xxx"

@@ -22,14 +22,14 @@ import com.arialyy.aria.core.inf.AbsTarget;
 import com.arialyy.aria.core.inf.ITarget;
 
 /**
- * FTP SSL/TSL配置
+ * FTP SSL/TSL 参数委托
  */
-public class FTPSConfig<TARGET extends AbsTarget> implements ITarget {
-  private final String TAG = "FTPSConfig";
+public class FTPSDelegate<TARGET extends AbsTarget> implements ITarget {
+  private final String TAG = "FTPSDelegate";
   private TARGET mTarget;
   private FtpUrlEntity mUrlEntity;
 
-  public FTPSConfig(TARGET target) {
+  public FTPSDelegate(TARGET target) {
     mTarget = target;
     mUrlEntity = mTarget.getTaskWrapper().asFtp().getUrlEntity();
   }
@@ -39,7 +39,7 @@ public class FTPSConfig<TARGET extends AbsTarget> implements ITarget {
    *
    * @param protocol {@link ProtocolType}
    */
-  public FTPSConfig setProtocol(@ProtocolType String protocol) {
+  public FTPSDelegate setProtocol(@ProtocolType String protocol) {
     if (TextUtils.isEmpty(protocol)) {
       throw new NullPointerException("协议为空");
     }
@@ -52,7 +52,7 @@ public class FTPSConfig<TARGET extends AbsTarget> implements ITarget {
    *
    * @param keyAlias 别名
    */
-  public FTPSConfig setAlias(String keyAlias) {
+  public FTPSDelegate setAlias(String keyAlias) {
     if (TextUtils.isEmpty(keyAlias)) {
       throw new NullPointerException("别名为空");
     }
@@ -65,7 +65,7 @@ public class FTPSConfig<TARGET extends AbsTarget> implements ITarget {
    *
    * @param storePass 私钥密码
    */
-  public FTPSConfig setStorePass(String storePass) {
+  public FTPSDelegate setStorePass(String storePass) {
     if (TextUtils.isEmpty(storePass)) {
       throw new NullPointerException("证书密码为空");
     }
@@ -78,7 +78,7 @@ public class FTPSConfig<TARGET extends AbsTarget> implements ITarget {
    *
    * @param storePath 证书路径
    */
-  public FTPSConfig setStorePath(String storePath) {
+  public FTPSDelegate setStorePath(String storePath) {
     if (TextUtils.isEmpty(storePath)) {
       throw new NullPointerException("证书路径为空");
     }
@@ -100,5 +100,21 @@ public class FTPSConfig<TARGET extends AbsTarget> implements ITarget {
 
   @Override public void cancel() {
     mTarget.cancel();
+  }
+
+  @Override public void save() {
+    mTarget.save();
+  }
+
+  @Override public void cancel(boolean removeFile) {
+    mTarget.cancel(removeFile);
+  }
+
+  @Override public void reTry() {
+    mTarget.reTry();
+  }
+
+  @Override public void reStart() {
+    mTarget.reStart();
   }
 }

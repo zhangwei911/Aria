@@ -19,7 +19,7 @@ import android.support.annotation.CheckResult;
 import com.arialyy.aria.core.AriaManager;
 import com.arialyy.aria.core.FtpUrlEntity;
 import com.arialyy.aria.core.command.normal.NormalCmdFactory;
-import com.arialyy.aria.core.common.ftp.FTPSConfig;
+import com.arialyy.aria.core.common.ftp.FTPSDelegate;
 import com.arialyy.aria.core.common.ftp.FtpDelegate;
 import com.arialyy.aria.core.common.ftp.FtpTaskDelegate;
 import com.arialyy.aria.core.inf.AbsTaskWrapper;
@@ -86,17 +86,17 @@ public class FtpUploadTarget extends BaseNormalTarget<FtpUploadTarget>
 
   /**
    * 是否是FTPS协议
-   * 如果是FTPS协议，需要使用{@link FTPSConfig#setStorePath(String)} 、{@link FTPSConfig#setAlias(String)}
+   * 如果是FTPS协议，需要使用{@link FTPSDelegate#setStorePath(String)} 、{@link FTPSDelegate#setAlias(String)}
    * 设置证书信息
    */
   @CheckResult
-  public FTPSConfig<FtpUploadTarget> asFtps() {
+  public FTPSDelegate<FtpUploadTarget> asFtps() {
     if (mTaskWrapper.asFtp().getUrlEntity() == null) {
       FtpUrlEntity urlEntity = new FtpUrlEntity();
       urlEntity.isFtps = true;
       mTaskWrapper.asFtp().setUrlEntity(urlEntity);
     }
-    return new FTPSConfig<>(this);
+    return new FTPSDelegate<>(this);
   }
 
   @CheckResult

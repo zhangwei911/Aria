@@ -190,13 +190,12 @@ public abstract class AbsTarget<TARGET extends AbsTarget, ENTITY extends AbsEnti
   /**
    * 保存修改
    */
-  public void save() {
+  @Override public void save() {
     if (!checkEntity()) {
       ALog.e(TAG, "保存修改失败");
-    }else {
+    } else {
       ALog.i(TAG, "保存成功");
     }
-
   }
 
   /**
@@ -220,7 +219,8 @@ public abstract class AbsTarget<TARGET extends AbsTarget, ENTITY extends AbsEnti
     if (checkEntity()) {
       AriaManager.getInstance(AriaManager.APP)
           .setCmd(
-              CommonUtil.createNormalCmd(mTaskWrapper, NormalCmdFactory.TASK_START, checkTaskType()))
+              CommonUtil.createNormalCmd(mTaskWrapper, NormalCmdFactory.TASK_START,
+                  checkTaskType()))
           .exe();
     }
   }
@@ -252,7 +252,8 @@ public abstract class AbsTarget<TARGET extends AbsTarget, ENTITY extends AbsEnti
     if (checkEntity()) {
       AriaManager.getInstance(AriaManager.APP)
           .setCmd(
-              CommonUtil.createNormalCmd(mTaskWrapper, NormalCmdFactory.TASK_START, checkTaskType()))
+              CommonUtil.createNormalCmd(mTaskWrapper, NormalCmdFactory.TASK_START,
+                  checkTaskType()))
           .exe();
     }
   }
@@ -272,7 +273,7 @@ public abstract class AbsTarget<TARGET extends AbsTarget, ENTITY extends AbsEnti
   /**
    * 任务重试
    */
-  public void reTry() {
+  @Override public void reTry() {
     if (checkEntity()) {
       List<ICmd> cmds = new ArrayList<>();
       int taskType = checkTaskType();
@@ -289,7 +290,7 @@ public abstract class AbsTarget<TARGET extends AbsTarget, ENTITY extends AbsEnti
    * @param removeFile {@code true} 不仅删除任务数据库记录，还会删除已经删除完成的文件
    * {@code false}如果任务已经完成，只删除任务数据库记录，
    */
-  public void cancel(boolean removeFile) {
+  @Override public void cancel(boolean removeFile) {
     if (checkEntity()) {
       CancelCmd cancelCmd =
           (CancelCmd) CommonUtil.createNormalCmd(mTaskWrapper, NormalCmdFactory.TASK_CANCEL,
@@ -302,7 +303,7 @@ public abstract class AbsTarget<TARGET extends AbsTarget, ENTITY extends AbsEnti
   /**
    * 重新下载
    */
-  public void reStart() {
+  @Override public void reStart() {
     if (checkEntity()) {
       cancel();
       start();

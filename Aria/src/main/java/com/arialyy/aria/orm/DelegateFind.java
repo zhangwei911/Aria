@@ -48,6 +48,53 @@ class DelegateFind extends AbsDelegate {
   }
 
   /**
+   * 获取{@link One}和{@link Many}注解的字段
+   *
+   * @return 返回[OneField, ManyField] ，如果注解依赖错误返回null
+   */
+  private Field[] getOneAndManyField(Class clazz) {
+    Field[] om = new Field[2];
+    Field[] fields = clazz.getDeclaredFields();
+    Field one = null, many = null;
+    boolean hasOne = false, hasMany = false;
+    for (Field field : fields) {
+      if (SqlUtil.isOne(field)) {
+        if (hasOne) {
+          ALog.w(TAG, "查询数据失败，实体中有多个@One 注解");
+          return null;
+        }
+        hasOne = true;
+        one = field;
+      }
+      if (SqlUtil.isMany(field)) {
+        if (hasMany) {
+          ALog.w(TAG, "查询数据失败，实体中有多个@Many 注解");
+          return null;
+        }
+        if (!field.getType().isAssignableFrom(List.class)) {
+          ALog.w(TAG, "查询数据失败，@Many 注解的类型不是List");
+          return null;
+        }
+        hasMany = true;
+        many = field;
+      }
+    }
+
+    if (one == null || many == null) {
+      ALog.w(TAG, "查询数据失败，实体中没有@One或@Many注解");
+      return null;
+    }
+
+    if (many.getType() != List.class) {
+      ALog.w(TAG, "查询数据失败，@Many注解的字段必须是List");
+      return null;
+    }
+    om[0] = one;
+    om[1] = many;
+    return om;
+  }
+
+  /**
    * 查找一对多的关联数据
    * 如果查找不到数据或实体没有被{@link Wrapper}注解，将返回null
    * 如果实体中没有{@link One}或{@link Many}注解，将返回null
@@ -56,45 +103,40 @@ class DelegateFind extends AbsDelegate {
    */
   <T extends AbsDbWrapper> List<T> findRelationData(SQLiteDatabase db, Class<T> clazz,
       String... expression) {
+    return exeRelationSql(db, clazz, -1, -1, expression);
+  }
+
+  /**
+   * 查找一对多的关联数据
+   * 如果查找不到数据或实体没有被{@link Wrapper}注解，将返回null
+   * 如果实体中没有{@link One}或{@link Many}注解，将返回null
+   * 如果实体中有多个{@link One}或{@link Many}注解，将返回nul
+   * {@link One} 的注解对象必须是{@link DbEntity}，{@link Many}的注解对象必须是List，并且List中的类型必须是{@link DbEntity}
+   */
+  <T extends AbsDbWrapper> List<T> findRelationData(SQLiteDatabase db, Class<T> clazz,
+      int page, int num, String... expression) {
+    if (page < 1 || num < 1) {
+      return null;
+    }
+    return exeRelationSql(db, clazz, page, num, expression);
+  }
+
+  /**
+   * 执行关联查询，如果不需要分页，page和num传-1
+   *
+   * @param page 当前页
+   * @param num 一页的数量
+   */
+  private <T extends AbsDbWrapper> List<T> exeRelationSql(SQLiteDatabase db, Class<T> clazz,
+      int page, int num, String... expression) {
     db = checkDb(db);
-
     if (SqlUtil.isWrapper(clazz)) {
+      Field[] om = getOneAndManyField(clazz);
+      if (om == null) {
+        return null;
+      }
       StringBuilder sb = new StringBuilder();
-      Field[] fields = clazz.getDeclaredFields();
-      Field one = null, many = null;
-      boolean hasOne = false, hasMany = false;
-      for (Field field : fields) {
-        if (SqlUtil.isOne(field)) {
-          if (hasOne) {
-            ALog.w(TAG, "查询数据失败，实体中有多个@One 注解");
-            return null;
-          }
-          hasOne = true;
-          one = field;
-        }
-        if (SqlUtil.isMany(field)) {
-          if (hasMany) {
-            ALog.w(TAG, "查询数据失败，实体中有多个@Many 注解");
-            return null;
-          }
-          if (!field.getType().isAssignableFrom(List.class)) {
-            ALog.w(TAG, "查询数据失败，@Many 注解的类型不是List");
-            return null;
-          }
-          hasMany = true;
-          many = field;
-        }
-      }
-
-      if (one == null || many == null) {
-        ALog.w(TAG, "查询数据失败，实体中没有@One或@Many注解");
-        return null;
-      }
-
-      if (many.getType() != List.class) {
-        ALog.w(TAG, "查询数据失败，@Many注解的字段必须是List");
-        return null;
-      }
+      Field one = om[0], many = om[1];
       try {
         Many m = many.getAnnotation(Many.class);
         Class parentClazz = Class.forName(one.getType().getName());
@@ -176,7 +218,10 @@ class DelegateFind extends AbsDelegate {
         } else {
           sql = sb.toString();
         }
-        //ALog.d(TAG, sql);
+        if (page != -1 && num != -1) {
+          sql = sql.concat(String.format(" LIMIT %s,%s", (page - 1) * num, num));
+        }
+
         print(RELATION, sql);
         Cursor cursor = db.rawQuery(sql, null);
         List<T> data =
@@ -189,7 +234,7 @@ class DelegateFind extends AbsDelegate {
         e.printStackTrace();
       }
     } else {
-      ALog.w(TAG, "查询数据失败，实体类没有使用@Wrapper 注解");
+      ALog.e(TAG, "查询数据失败，实体类没有使用@Wrapper 注解");
       return null;
     }
     return null;
@@ -346,12 +391,7 @@ class DelegateFind extends AbsDelegate {
     String[] params = new String[expression.length - 1];
     System.arraycopy(expression, 1, params, 0, params.length);
 
-    print(FIND_DATA, sql);
-    Cursor cursor = db.rawQuery(sql, params);
-    List<T> data = cursor.getCount() > 0 ? newInstanceEntity(clazz, cursor) : null;
-    closeCursor(cursor);
-    close(db);
-    return data;
+    return exeNormalDataSql(db, clazz, sql, params);
   }
 
   /**
@@ -371,12 +411,7 @@ class DelegateFind extends AbsDelegate {
     String[] params = new String[expression.length - 1];
     System.arraycopy(expression, 1, params, 0, params.length);
 
-    print(FIND_DATA, sql);
-    Cursor cursor = db.rawQuery(sql, params);
-    List<T> data = cursor.getCount() > 0 ? newInstanceEntity(clazz, cursor) : null;
-    closeCursor(cursor);
-    close(db);
-    return data;
+    return exeNormalDataSql(db, clazz, sql, params);
   }
 
   /**
@@ -393,12 +428,7 @@ class DelegateFind extends AbsDelegate {
     }
     String sql = String.format("SELECT rowid, * FROM %s, WHERE %s", CommonUtil.getClassName(clazz),
         conditions);
-    print(FIND_DATA, sql);
-    Cursor cursor = db.rawQuery(sql, null);
-    List<T> data = cursor.getCount() > 0 ? newInstanceEntity(clazz, cursor) : null;
-    closeCursor(cursor);
-    close(db);
-    return data;
+    return exeNormalDataSql(db, clazz, sql, null);
   }
 
   /**
@@ -418,12 +448,7 @@ class DelegateFind extends AbsDelegate {
     }
     String sql = String.format("SELECT rowid, * FROM %s WHERE %s LIMIT %s,%s",
         CommonUtil.getClassName(clazz), conditions, (page - 1) * num, num);
-    print(FIND_DATA, sql);
-    Cursor cursor = db.rawQuery(sql, null);
-    List<T> data = cursor.getCount() > 0 ? newInstanceEntity(clazz, cursor) : null;
-    closeCursor(cursor);
-    close(db);
-    return data;
+    return exeNormalDataSql(db, clazz, sql, null);
   }
 
   /**
@@ -431,10 +456,20 @@ class DelegateFind extends AbsDelegate {
    */
   <T extends DbEntity> List<T> findAllData(SQLiteDatabase db, Class<T> clazz) {
     db = checkDb(db);
-    StringBuilder sb = new StringBuilder();
-    sb.append("SELECT rowid, * FROM ").append(CommonUtil.getClassName(clazz));
-    print(FIND_ALL_DATA, sb.toString());
-    Cursor cursor = db.rawQuery(sb.toString(), null);
+    String sql = String.format("SELECT rowid, * FROM %s", CommonUtil.getClassName(clazz));
+    return exeNormalDataSql(db, clazz, sql, null);
+  }
+
+  /**
+   * 执行查询普通数据的sql语句，并创建对象
+   *
+   * @param sql sql 查询语句
+   * @param selectionArgs 查询参数，如何sql语句中查询条件含有'？'则该参数不能为空
+   */
+  private <T extends DbEntity> List<T> exeNormalDataSql(SQLiteDatabase db, Class<T> clazz,
+      String sql, String[] selectionArgs) {
+    print(FIND_DATA, sql);
+    Cursor cursor = db.rawQuery(sql, selectionArgs);
     List<T> data = cursor.getCount() > 0 ? newInstanceEntity(clazz, cursor) : null;
     closeCursor(cursor);
     close(db);

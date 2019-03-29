@@ -44,6 +44,7 @@ public class DownloadTarget extends BaseNormalTarget<DownloadTarget>
   /**
    * Post处理
    */
+  @CheckResult
   public PostDelegate asPost() {
     return new PostDelegate<>(this);
   }
@@ -51,6 +52,7 @@ public class DownloadTarget extends BaseNormalTarget<DownloadTarget>
   /**
    * get参数传递
    */
+  @CheckResult
   public GetDelegate asGet(){
     return new GetDelegate<>(this);
   }

@@ -38,4 +38,27 @@ public interface ITarget {
    * 取消下载
    */
   void cancel();
+
+  /**
+   * 保存修改
+   */
+  void save();
+
+  /**
+   * 删除任务
+   *
+   * @param removeFile {@code true} 不仅删除任务数据库记录，还会删除已经删除完成的文件
+   * {@code false}如果任务已经完成，只删除任务数据库记录，
+   */
+  void cancel(boolean removeFile);
+
+  /**
+   * 任务重试
+   */
+  void reTry();
+
+  /**
+   * 重新下载
+   */
+  void reStart();
 }

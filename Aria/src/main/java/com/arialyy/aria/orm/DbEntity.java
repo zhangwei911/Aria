@@ -30,21 +30,37 @@ public abstract class DbEntity {
 
   }
 
-  ///**
-  // * 保存关联数据
-  // */
-  //public static void saveRelationData(AbsDbWrapper wrapper) {
-  //  DelegateWrapper.getInstance().saveRelationData(wrapper);
-  //}
-
   /**
    * 查询关联数据
+   * <code>
+   * DbEntity.findRelationData(DGEntityWrapper.class, "downloadUrl=?", downloadUrl);
+   * </code>
    *
    * @param expression 查询条件
    */
   public static <T extends AbsDbWrapper> List<T> findRelationData(Class<T> clazz,
       String... expression) {
     return DelegateWrapper.getInstance().findRelationData(clazz, expression);
+  }
+
+  /**
+   * 分页查询关联数据
+   *
+   * <code>
+   * DbEntity.findRelationData(DGEntityWrapper.class, 0, 10, "downloadUrl=?", downloadUrl);
+   * </code>
+   *
+   * @param expression 查询条件
+   * @param page 需要查询的页数，从1开始，如果page小于1 或 num 小于1，返回null
+   * @param num 每页返回的数量
+   * @return 没有数据返回null，如果页数大于总页数，返回null
+   */
+  public static <T extends AbsDbWrapper> List<T> findRelationData(Class<T> clazz, int page, int num,
+      String... expression) {
+    if (page < 1 || num < 1) {
+      return null;
+    }
+    return DelegateWrapper.getInstance().findRelationData(clazz, page, num, expression);
   }
 
   /**
@@ -91,7 +107,7 @@ public abstract class DbEntity {
   /**
    * 查询一组数据
    * <code>
-   * DownloadEntity.findFirst(DownloadEntity.class, "downloadUrl=?", downloadUrl);
+   * DbEntity.findFirst(DownloadEntity.class, "downloadUrl=?", downloadUrl);
    * </code>
    *
    * @return 没有数据返回null
@@ -103,7 +119,7 @@ public abstract class DbEntity {
   /**
    * 分页查询数据
    * <code>
-   * DownloadEntity.findFirst(DownloadEntity.class, 0, 10, "downloadUrl=?", downloadUrl);
+   * DbEntity.findFirst(DownloadEntity.class, 0, 10, "downloadUrl=?", downloadUrl);
    * </code>
    *
    * @param page 需要查询的页数，从1开始，如果page小于1 或 num 小于1，返回null
@@ -121,7 +137,7 @@ public abstract class DbEntity {
   /**
    * 模糊查询一组数据
    * <code>
-   * DownloadEntity.findDatas(DownloadEntity.class, "downloadUrl like http://");
+   * DbEntity.findDataByFuzzy(DownloadEntity.class, "downloadUrl like http://");
    * </code>
    *
    * @return 没有数据返回null
@@ -133,7 +149,7 @@ public abstract class DbEntity {
   /**
    * 模糊查询一组数据
    * <code>
-   * DownloadEntity.findDatas(DownloadEntity.class, "downloadUrl like http://");
+   * DbEntity.findDataByFuzzy(DownloadEntity.class, 0, 10, "downloadUrl like http://");
    * </code>
    *
    * @param page 需要查询的页数，从1开始，如果page小于1 或 num 小于1，返回null
@@ -148,7 +164,7 @@ public abstract class DbEntity {
   /**
    * 查询一行数据
    * <code>
-   * DownloadEntity.findFirst(DownloadEntity.class, "downloadUrl=?", downloadUrl);
+   * DbEntity.findFirst(DownloadEntity.class, "downloadUrl=?", downloadUrl);
    * </code>
    *
    * @return 没有数据返回null
@@ -220,7 +236,7 @@ public abstract class DbEntity {
   /**
    * 根据条件删除数据
    * <code>
-   * DownloadEntity.deleteData(DownloadEntity.class, "downloadUrl=?", downloadUrl);
+   * DbEntity.deleteData(DownloadEntity.class, "downloadUrl=?", downloadUrl);
    * </code>
    */
   public static <T extends DbEntity> void deleteData(Class<T> clazz, String... expression) {
