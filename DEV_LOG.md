@@ -1,5 +1,5 @@
 ## 开发日志
-  + v_3.6.2
+  + v_3.6.2 (2019/4/1)
     - fix bug https://github.com/AriaLyy/Aria/issues/368
     - 增加gradle 5.0支持
     - fix bug https://github.com/AriaLyy/Aria/issues/374

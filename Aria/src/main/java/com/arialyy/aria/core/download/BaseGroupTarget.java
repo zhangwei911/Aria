@@ -165,6 +165,7 @@ abstract class BaseGroupTarget<TARGET extends BaseGroupTarget>
       }
       needModifyPath = true;
       mEntity.setDirPath(mDirPathTemp);
+      ALog.i(TAG, String.format("文件夹路径改变，将更新文件夹路径为：%s", mDirPathTemp));
     }
 
     return true;

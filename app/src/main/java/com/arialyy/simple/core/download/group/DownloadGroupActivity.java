@@ -87,7 +87,7 @@ public class DownloadGroupActivity extends BaseActivity<ActivityDownloadGroupBin
             .loadGroup(mUrls)
             .setDirPath(
                 //Environment.getExternalStorageDirectory().getPath() + "/Download/group_test_5")
-                Environment.getExternalStorageDirectory().getPath() + "/Download/group_test_1")
+                Environment.getExternalStorageDirectory().getPath() + "/Download/group_test_2")
             .setGroupAlias("任务组测试")
             //.setSubFileName(getModule(GroupModule.class).getSubName2())
             .setSubFileName(getModule(GroupModule.class).getSubName())
