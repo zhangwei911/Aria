@@ -20,6 +20,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -290,9 +291,9 @@ public class SingleTaskActivity extends BaseActivity<ActivitySingleBinding> {
   public void onClick(View view) {
     switch (view.getId()) {
       case R.id.start:
-        //startD();
-        List<DownloadEntity> list = Aria.download(this).getAllNotCompleteTask(5, 2);
-        ALog.d("Tag", list.size() + "");
+        startD();
+        //List<DownloadEntity> list = Aria.download(this).getAllNotCompleteTask(5, 2);
+        //ALog.d("Tag", list.size() + "");
         break;
       case R.id.stop:
         Aria.download(this).load(DOWNLOAD_URL).stop();
@@ -313,8 +314,8 @@ public class SingleTaskActivity extends BaseActivity<ActivitySingleBinding> {
   private void startD() {
     //Aria.get(this).setLogLevel(ALog.LOG_CLOSE);
     //Aria.download(this).load("aaaa.apk");
-    //String path = Environment.getExternalStorageDirectory().getPath() + "/ggsg11.ota";
-    String path = String.format("/sdcard/ggsg11(%s).mp4", i);
+    String path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/ggsg11.mp4";
+    //String path = String.format("/sdcard/ggsg11(%s).mp4", i);
     //if (new File(path).exists()) {
     //
     //  i++;
@@ -343,7 +344,7 @@ public class SingleTaskActivity extends BaseActivity<ActivitySingleBinding> {
         //    + "\"id\":\"你的样子\"\n< > "
         //    + "}")
         //.resetState()
-        .save();
+        .start();
     //.add();
   }
 

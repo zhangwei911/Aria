@@ -1,8 +1,11 @@
 ## 开发日志
+  + v_3.6.3 (2019/4/2)
+    - fix bug https://github.com/AriaLyy/Aria/issues/377
   + v_3.6.2 (2019/4/1)
     - fix bug https://github.com/AriaLyy/Aria/issues/368
     - 增加gradle 5.0支持
     - fix bug https://github.com/AriaLyy/Aria/issues/374
+    - 增加分页功能，详情见：https://aria.laoyuyu.me/aria_doc/api/task_list.html#%E4%BB%BB%E5%8A%A1%E5%88%97%E8%A1%A8%E5%88%86%E9%A1%B5%EF%BC%88362%E4%BB%A5%E4%B8%8A%E7%89%88%E6%9C%AC%E6%94%AF%E6%8C%81%EF%BC%89
   + v_3.6.1 (2019/3/5)
     - fix bug https://github.com/AriaLyy/Aria/issues/367
   + v_3.6 (2019/2/27)

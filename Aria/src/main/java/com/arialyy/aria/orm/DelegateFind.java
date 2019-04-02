@@ -469,7 +469,13 @@ class DelegateFind extends AbsDelegate {
   private <T extends DbEntity> List<T> exeNormalDataSql(SQLiteDatabase db, Class<T> clazz,
       String sql, String[] selectionArgs) {
     print(FIND_DATA, sql);
-    Cursor cursor = db.rawQuery(sql, selectionArgs);
+    String[] temp = new String[selectionArgs.length];
+    int i = 0;
+    for (String arg : selectionArgs){
+      temp[i] = encodeStr(arg);
+      i ++;
+    }
+    Cursor cursor = db.rawQuery(sql, temp);
     List<T> data = cursor.getCount() > 0 ? newInstanceEntity(clazz, cursor) : null;
     closeCursor(cursor);
     close(db);
