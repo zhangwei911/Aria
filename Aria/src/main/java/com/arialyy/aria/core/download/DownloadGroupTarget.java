@@ -52,7 +52,7 @@ public class DownloadGroupTarget extends BaseGroupTarget<DownloadGroupTarget> im
   private List<String> mSubNameTemp = new ArrayList<>();
 
   public DownloadGroupTarget(DownloadGroupEntity groupEntity, String targetName) {
-    this.mTargetName = targetName;
+    setTargetName(targetName);
     if (groupEntity.getUrls() != null && !groupEntity.getUrls().isEmpty()) {
       this.mUrls.addAll(groupEntity.getUrls());
     }
@@ -60,15 +60,15 @@ public class DownloadGroupTarget extends BaseGroupTarget<DownloadGroupTarget> im
   }
 
   DownloadGroupTarget(List<String> urls, String targetName) {
-    this.mTargetName = targetName;
+    setTargetName(targetName);
     this.mUrls = urls;
     init();
   }
 
   private void init() {
     mGroupHash = CommonUtil.getMd5Code(mUrls);
-    mTaskWrapper = TaskWrapperManager.getInstance().getDGTaskWrapper(DGTaskWrapper.class, mUrls);
-    mEntity = mTaskWrapper.getEntity();
+    setTaskWrapper(TaskWrapperManager.getInstance().getDGTaskWrapper(DGTaskWrapper.class, mUrls));
+    mEntity = getEntity();
     if (mEntity != null) {
       mDirPathTemp = mEntity.getDirPath();
     }
@@ -158,7 +158,7 @@ public class DownloadGroupTarget extends BaseGroupTarget<DownloadGroupTarget> im
       ALog.e(TAG, "修改子任务的文件名失败：列表为null");
       return this;
     }
-    if (subTaskFileName.size() != mTaskWrapper.getSubTaskWrapper().size()) {
+    if (subTaskFileName.size() != getTaskWrapper().getSubTaskWrapper().size()) {
       ALog.e(TAG, "修改子任务的文件名失败：子任务文件名列表数量和子任务的数量不匹配");
       return this;
     }
@@ -167,7 +167,7 @@ public class DownloadGroupTarget extends BaseGroupTarget<DownloadGroupTarget> im
     return this;
   }
 
-  @Override protected int getTargetType() {
+  @Override public int getTargetType() {
     return GROUP_HTTP;
   }
 
@@ -185,13 +185,13 @@ public class DownloadGroupTarget extends BaseGroupTarget<DownloadGroupTarget> im
         return false;
       }
 
-      if (mTaskWrapper.getEntity().getFileSize() == 0) {
+      if (getTaskWrapper().getEntity().getFileSize() == 0) {
         ALog.e(TAG, "组合任务必须设置文件文件大小");
         return false;
       }
 
-      if (mTaskWrapper.asHttp().getRequestEnum() == RequestEnum.POST) {
-        for (DTaskWrapper subTask : mTaskWrapper.getSubTaskWrapper()) {
+      if (getTaskWrapper().asHttp().getRequestEnum() == RequestEnum.POST) {
+        for (DTaskWrapper subTask : getTaskWrapper().getSubTaskWrapper()) {
           subTask.asHttp().setRequestEnum(RequestEnum.POST);
         }
       }
@@ -214,7 +214,7 @@ public class DownloadGroupTarget extends BaseGroupTarget<DownloadGroupTarget> im
    * 更新所有改动的子任务文件名
    */
   private void updateSingleSubFileName() {
-    List<DTaskWrapper> entities = mTaskWrapper.getSubTaskWrapper();
+    List<DTaskWrapper> entities = getTaskWrapper().getSubTaskWrapper();
     int i = 0;
     for (DTaskWrapper entity : entities) {
       if (i < mSubNameTemp.size()) {
@@ -316,7 +316,7 @@ public class DownloadGroupTarget extends BaseGroupTarget<DownloadGroupTarget> im
 
   @CheckResult
   @Override public DownloadGroupTarget addHeader(@NonNull String key, @NonNull String value) {
-    for (DTaskWrapper subTask : mTaskWrapper.getSubTaskWrapper()) {
+    for (DTaskWrapper subTask : getTaskWrapper().getSubTaskWrapper()) {
       mDelegate.addHeader(subTask, key, value);
     }
     return mDelegate.addHeader(key, value);
@@ -324,7 +324,7 @@ public class DownloadGroupTarget extends BaseGroupTarget<DownloadGroupTarget> im
 
   @CheckResult
   @Override public DownloadGroupTarget addHeaders(Map<String, String> headers) {
-    for (DTaskWrapper subTask : mTaskWrapper.getSubTaskWrapper()) {
+    for (DTaskWrapper subTask : getTaskWrapper().getSubTaskWrapper()) {
       mDelegate.addHeaders(subTask, headers);
     }
     return mDelegate.addHeaders(headers);

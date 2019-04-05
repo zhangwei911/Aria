@@ -18,6 +18,7 @@ package com.arialyy.aria.core.download;
 import android.support.annotation.CheckResult;
 import android.text.TextUtils;
 import com.arialyy.aria.core.inf.AbsEntity;
+import com.arialyy.aria.core.inf.AbsTarget;
 import com.arialyy.aria.core.manager.SubTaskManager;
 import com.arialyy.aria.core.queue.DownloadGroupTaskQueue;
 import com.arialyy.aria.orm.DbEntity;
@@ -30,7 +31,7 @@ import java.util.List;
  * Created by lyy on 2017/7/26.
  */
 abstract class BaseGroupTarget<TARGET extends BaseGroupTarget>
-    extends AbsDownloadTarget<TARGET, DownloadGroupEntity, DGTaskWrapper> {
+    extends AbsTarget<TARGET, DownloadGroupEntity, DGTaskWrapper> {
 
   /**
    * 组任务名
@@ -55,7 +56,7 @@ abstract class BaseGroupTarget<TARGET extends BaseGroupTarget>
   @CheckResult
   public SubTaskManager getSubTaskManager() {
     if (mSubTaskManager == null) {
-      mSubTaskManager = new SubTaskManager(mTargetName, mTaskWrapper);
+      mSubTaskManager = new SubTaskManager(getTargetName(), getTaskWrapper());
     }
     return mSubTaskManager;
   }
@@ -122,7 +123,7 @@ abstract class BaseGroupTarget<TARGET extends BaseGroupTarget>
    * @param newDirPath 新的文件夹路径
    */
   void reChangeDirPath(String newDirPath) {
-    List<DTaskWrapper> subTasks = mTaskWrapper.getSubTaskWrapper();
+    List<DTaskWrapper> subTasks = getTaskWrapper().getSubTaskWrapper();
     if (subTasks != null && !subTasks.isEmpty()) {
       List<DbEntity> des = new ArrayList<>();
       for (DTaskWrapper dte : subTasks) {

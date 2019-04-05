@@ -35,22 +35,22 @@ public class FtpDirDownloadTarget extends BaseGroupTarget<FtpDirDownloadTarget>
   private FtpDelegate<FtpDirDownloadTarget> mDelegate;
 
   FtpDirDownloadTarget(String url, String targetName) {
-    mTargetName = targetName;
+    setTargetName(targetName);
     init(url);
   }
 
   private void init(String key) {
     mGroupHash = key;
-    mTaskWrapper = TaskWrapperManager.getInstance().getFtpTaskWrapper(DGTaskWrapper.class, key);
-    mTaskWrapper.setRequestType(AbsTaskWrapper.D_FTP_DIR);
-    mEntity = mTaskWrapper.getEntity();
+    setTaskWrapper(TaskWrapperManager.getInstance().getFtpTaskWrapper(DGTaskWrapper.class, key));
+    getTaskWrapper().setRequestType(AbsTaskWrapper.D_FTP_DIR);
+    mEntity = getEntity();
     if (mEntity != null) {
       mDirPathTemp = mEntity.getDirPath();
     }
     mDelegate = new FtpDelegate<>(this);
   }
 
-  @Override protected int getTargetType() {
+  @Override public int getTargetType() {
     return GROUP_FTP_DIR;
   }
 
@@ -58,10 +58,10 @@ public class FtpDirDownloadTarget extends BaseGroupTarget<FtpDirDownloadTarget>
     boolean b = getTargetType() == GROUP_FTP_DIR && checkDirPath() && checkUrl();
     if (b) {
       mEntity.save();
-      if (mTaskWrapper.getSubTaskWrapper() != null) {
+      if (getTaskWrapper().getSubTaskWrapper() != null) {
         //初始化子项的登录信息
-        FtpUrlEntity tUrlEntity = mTaskWrapper.asFtp().getUrlEntity();
-        for (DTaskWrapper wrapper : mTaskWrapper.getSubTaskWrapper()) {
+        FtpUrlEntity tUrlEntity = getTaskWrapper().asFtp().getUrlEntity();
+        for (DTaskWrapper wrapper : getTaskWrapper().getSubTaskWrapper()) {
           FtpUrlEntity urlEntity = wrapper.asFtp().getUrlEntity();
           urlEntity.needLogin = tUrlEntity.needLogin;
           urlEntity.account = tUrlEntity.account;
@@ -78,12 +78,12 @@ public class FtpDirDownloadTarget extends BaseGroupTarget<FtpDirDownloadTarget>
         }
       }
     }
-    if (mTaskWrapper.asFtp().getUrlEntity().isFtps) {
-      if (TextUtils.isEmpty(mTaskWrapper.asFtp().getUrlEntity().storePath)) {
+    if (getTaskWrapper().asFtp().getUrlEntity().isFtps) {
+      if (TextUtils.isEmpty(getTaskWrapper().asFtp().getUrlEntity().storePath)) {
         ALog.e(TAG, "证书路径为空");
         return false;
       }
-      if (TextUtils.isEmpty(mTaskWrapper.asFtp().getUrlEntity().keyAlias)) {
+      if (TextUtils.isEmpty(getTaskWrapper().asFtp().getUrlEntity().keyAlias)) {
         ALog.e(TAG, "证书别名为空");
         return false;
       }
@@ -120,7 +120,7 @@ public class FtpDirDownloadTarget extends BaseGroupTarget<FtpDirDownloadTarget>
    */
   @CheckResult
   public FTPSDelegate<FtpDirDownloadTarget> asFtps() {
-    mTaskWrapper.asFtp().getUrlEntity().isFtps = true;
+    getTaskWrapper().asFtp().getUrlEntity().isFtps = true;
     return new FTPSDelegate<>(this);
   }
 

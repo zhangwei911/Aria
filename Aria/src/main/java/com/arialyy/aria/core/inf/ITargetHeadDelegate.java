@@ -13,35 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.arialyy.aria.core.upload;
-
-import com.arialyy.aria.core.inf.AbsTarget;
+package com.arialyy.aria.core.inf;
 
 /**
  * Created by AriaL on 2017/6/29.
- * 普通上传任务接收器
+ * 处理任务头部信息等设置等接口
  */
-abstract class AbsUploadTarget<TARGET extends AbsUploadTarget>
-    extends AbsTarget<TARGET, UploadEntity, UTaskWrapper> {
+public interface ITargetHeadDelegate {
 
-  /**
-   * 上传路径
-   */
-  private String mTempUrl;
-
-  @Override public void setTaskWrapper(UTaskWrapper mTaskWrapper) {
-    super.setTaskWrapper(mTaskWrapper);
-  }
-
-  String getTempUrl() {
-    return mTempUrl;
-  }
-
-  void setTempUrl(String tempUrl) {
-    this.mTempUrl = tempUrl;
-  }
-
-  void setEntity(UploadEntity entity) {
-    this.mEntity = entity;
-  }
 }

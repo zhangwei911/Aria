@@ -16,72 +16,40 @@
 package com.arialyy.aria.core.upload;
 
 import android.support.annotation.CheckResult;
-import com.arialyy.aria.core.AriaManager;
 import com.arialyy.aria.core.FtpUrlEntity;
-import com.arialyy.aria.core.command.normal.NormalCmdFactory;
 import com.arialyy.aria.core.common.ftp.FTPSDelegate;
 import com.arialyy.aria.core.common.ftp.FtpDelegate;
-import com.arialyy.aria.core.common.ftp.FtpTaskDelegate;
 import com.arialyy.aria.core.inf.AbsTaskWrapper;
 import com.arialyy.aria.core.inf.IFtpTarget;
-import com.arialyy.aria.util.CommonUtil;
 import java.net.Proxy;
 
 /**
  * Created by Aria.Lao on 2017/7/27.
  * ftp单任务上传
  */
-public class FtpUploadTarget extends BaseNormalTarget<FtpUploadTarget>
+public class FtpUploadTarget extends AbsUploadTarget<FtpUploadTarget>
     implements IFtpTarget<FtpUploadTarget> {
-  private FtpDelegate<FtpUploadTarget> mDelegate;
-
-  private String mAccount, mUser, mPw;
-  private boolean needLogin = false;
+  private FtpDelegate<FtpUploadTarget> mFtpDelegate;
+  private UNormalDelegate<FtpUploadTarget> mNormalDelegate;
 
   FtpUploadTarget(String filePath, String targetName) {
-    this.mTargetName = targetName;
-    initTask(filePath);
+    mNormalDelegate = new UNormalDelegate<>(this, filePath, targetName);
+    initTask();
   }
 
-  private void initTask(String filePath) {
-    initTarget(filePath);
-    mTaskWrapper.setRequestType(AbsTaskWrapper.U_FTP);
-    mDelegate = new FtpDelegate<>(this);
+  private void initTask() {
+    getTaskWrapper().setRequestType(AbsTaskWrapper.U_FTP);
+    mFtpDelegate = new FtpDelegate<>(this);
   }
 
   /**
-   * 添加任务
+   * 设置上传路径
+   *
+   * @param tempUrl 上传路径
    */
-  public void add() {
-    if (checkEntity()) {
-      AriaManager.getInstance(AriaManager.APP)
-          .setCmd(CommonUtil.createNormalCmd(mTaskWrapper, NormalCmdFactory.TASK_CREATE,
-              checkTaskType()))
-          .exe();
-    }
-  }
-
-  @Override protected boolean checkUrl() {
-    boolean b = super.checkUrl();
-    if (!b) {
-      return false;
-    }
-    FtpTaskDelegate taskDelegate = mTaskWrapper.asFtp();
-    FtpUrlEntity temp = taskDelegate.getUrlEntity();
-    FtpUrlEntity newEntity = CommonUtil.getFtpUrlInfo(mTempUrl);
-    if (temp != null) { //处理FTPS的信息
-      newEntity.isFtps = temp.isFtps;
-      newEntity.storePass = temp.storePass;
-      newEntity.keyAlias = temp.keyAlias;
-      newEntity.protocol = temp.protocol;
-      newEntity.storePath = temp.storePath;
-    }
-    taskDelegate.setUrlEntity(newEntity);
-    taskDelegate.getUrlEntity().account = mAccount;
-    taskDelegate.getUrlEntity().user = mUser;
-    taskDelegate.getUrlEntity().password = mPw;
-    taskDelegate.getUrlEntity().needLogin = needLogin;
-    return true;
+  public FtpUploadTarget setUploadUrl(String tempUrl) {
+    setTempUrl(tempUrl);
+    return this;
   }
 
   /**
@@ -91,35 +59,44 @@ public class FtpUploadTarget extends BaseNormalTarget<FtpUploadTarget>
    */
   @CheckResult
   public FTPSDelegate<FtpUploadTarget> asFtps() {
-    if (mTaskWrapper.asFtp().getUrlEntity() == null) {
+    if (getTaskWrapper().asFtp().getUrlEntity() == null) {
       FtpUrlEntity urlEntity = new FtpUrlEntity();
       urlEntity.isFtps = true;
-      mTaskWrapper.asFtp().setUrlEntity(urlEntity);
+      getTaskWrapper().asFtp().setUrlEntity(urlEntity);
     }
     return new FTPSDelegate<>(this);
   }
 
   @CheckResult
   @Override public FtpUploadTarget charSet(String charSet) {
-    return mDelegate.charSet(charSet);
+    return mFtpDelegate.charSet(charSet);
   }
 
   @Override public FtpUploadTarget login(String userName, String password) {
-    needLogin = true;
-    mUser = userName;
-    mPw = password;
-    return this;
+    return mFtpDelegate.login(userName, password);
   }
 
   @Override public FtpUploadTarget login(String userName, String password, String account) {
-    needLogin = true;
-    mUser = userName;
-    mPw = password;
-    mAccount = account;
-    return this;
+    return mFtpDelegate.login(userName, password, account);
   }
 
   @Override public FtpUploadTarget setProxy(Proxy proxy) {
-    return mDelegate.setProxy(proxy);
+    return mFtpDelegate.setProxy(proxy);
+  }
+
+  @Override protected boolean checkEntity() {
+    return mNormalDelegate.checkEntity();
+  }
+
+  @Override public boolean isRunning() {
+    return mNormalDelegate.isRunning();
+  }
+
+  @Override public boolean taskExists() {
+    return mNormalDelegate.taskExists();
+  }
+
+  @Override public int getTargetType() {
+    return FTP;
   }
 }

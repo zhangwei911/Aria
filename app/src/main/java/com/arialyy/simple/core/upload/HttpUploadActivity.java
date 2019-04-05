@@ -68,7 +68,7 @@ public class HttpUploadActivity extends BaseActivity<ActivityUploadBinding> {
     Aria.upload(HttpUploadActivity.this).load(FILE_PATH)
         .setUploadUrl(
             "http://lib-test.xzxyun.com:8042/Api/upload?data={\"type\":\"1\",\"fileType\":\".apk\"}")
-        //.setUploadUrl("http://192.168.1.6:8080/upload/sign_file/").setAttachment("file")
+        //.setTempUrl("http://192.168.1.6:8080/upload/sign_file/").setAttachment("file")
         //.addHeader("iplanetdirectorypro", "11a09102fb934ad0bc206f9c611d7933")
         .asPost()
         .start();

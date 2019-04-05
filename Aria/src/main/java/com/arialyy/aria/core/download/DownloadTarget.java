@@ -28,16 +28,17 @@ import java.util.Map;
  * Created by lyy on 2016/12/5.
  * https://github.com/AriaLyy/Aria
  */
-public class DownloadTarget extends BaseNormalTarget<DownloadTarget>
+public class DownloadTarget extends AbsDownloadTarget<DownloadTarget>
     implements IHttpHeaderDelegate<DownloadTarget> {
   private HttpHeaderDelegate<DownloadTarget> mHeaderDelegate;
+  private DNormalDelegate<DownloadTarget> mNormalDelegate;
 
   DownloadTarget(DownloadEntity entity, String targetName) {
     this(entity.getUrl(), targetName);
   }
 
   DownloadTarget(String url, String targetName) {
-    initTarget(url, targetName);
+    mNormalDelegate = new DNormalDelegate<>(this, url, targetName);
     mHeaderDelegate = new HttpHeaderDelegate<>(this);
   }
 
@@ -53,7 +54,7 @@ public class DownloadTarget extends BaseNormalTarget<DownloadTarget>
    * get参数传递
    */
   @CheckResult
-  public GetDelegate asGet(){
+  public GetDelegate asGet() {
     return new GetDelegate<>(this);
   }
 
@@ -65,7 +66,7 @@ public class DownloadTarget extends BaseNormalTarget<DownloadTarget>
    */
   @CheckResult
   public DownloadTarget useServerFileName(boolean use) {
-    mTaskWrapper.asHttp().setUseServerFileName(use);
+    getTaskWrapper().asHttp().setUseServerFileName(use);
     return this;
   }
 
@@ -90,7 +91,7 @@ public class DownloadTarget extends BaseNormalTarget<DownloadTarget>
    */
   @CheckResult
   public DownloadTarget setFilePath(@NonNull String filePath) {
-    mTempFilePath = filePath;
+    setTempFilePath(filePath);
     return this;
   }
 
@@ -100,12 +101,12 @@ public class DownloadTarget extends BaseNormalTarget<DownloadTarget>
    * 如果需要将test.zip改为game.zip，只需要重新设置文件路径为：/mnt/sdcard/game.zip
    *
    * @param filePath 路径必须为文件路径，不能为文件夹路径
-   * @param forceDownload {@code true}强制下载，不考虑未见路径是否被占用
+   * @param forceDownload {@code true}强制下载，不考虑文件路径是否被占用
    */
   @CheckResult
   public DownloadTarget setFilePath(@NonNull String filePath, boolean forceDownload) {
-    mTempFilePath = filePath;
-    this.forceDownload = forceDownload;
+    setTempFilePath(filePath);
+    setForceDownload(forceDownload);
     return this;
   }
 
@@ -116,7 +117,11 @@ public class DownloadTarget extends BaseNormalTarget<DownloadTarget>
     return mEntity.getDisposition();
   }
 
-  @Override protected int getTargetType() {
+  @Override public DownloadTarget updateUrl(String newUrl) {
+    return mNormalDelegate.updateUrl(newUrl);
+  }
+
+  @Override public int getTargetType() {
     return HTTP;
   }
 
@@ -140,4 +145,15 @@ public class DownloadTarget extends BaseNormalTarget<DownloadTarget>
     return mHeaderDelegate.addHeaders(headers);
   }
 
+  @Override protected boolean checkEntity() {
+    return mNormalDelegate.checkEntity();
+  }
+
+  @Override public boolean isRunning() {
+    return mNormalDelegate.isRunning();
+  }
+
+  @Override public boolean taskExists() {
+    return mNormalDelegate.taskExists();
+  }
 }

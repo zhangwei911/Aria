@@ -17,33 +17,35 @@ package com.arialyy.aria.core.download;
 
 import com.arialyy.aria.core.AriaManager;
 import com.arialyy.aria.core.command.normal.NormalCmdFactory;
-import com.arialyy.aria.core.inf.AbsEntity;
 import com.arialyy.aria.core.inf.AbsTarget;
-import com.arialyy.aria.core.inf.AbsTaskWrapper;
 import com.arialyy.aria.util.CommonUtil;
 
 /**
  * Created by lyy on 2017/2/28.
  */
-abstract class AbsDownloadTarget<TARGET extends AbsTarget, ENTITY extends AbsEntity, TASK_ENTITY extends AbsTaskWrapper>
-    extends AbsTarget<TARGET, ENTITY, TASK_ENTITY> {
-
-  static final int HTTP = 1;
-  static final int FTP = 2;
-  //HTTP任务组
-  static final int GROUP_HTTP = 3;
-  //FTP文件夹
-  static final int GROUP_FTP_DIR = 4;
+abstract class AbsDownloadTarget<TARGET extends AbsDownloadTarget>
+    extends AbsTarget<TARGET, DownloadEntity, DTaskWrapper> {
 
   /**
    * 设置的文件保存路径的临时变量
    */
-  String mTempFilePath;
+  private String mTempFilePath;
 
   /**
    * {@code true}强制下载，不考虑文件路径是否被占用
    */
-  boolean forceDownload = false;
+  private boolean forceDownload = false;
+  /**
+   * 资源地址
+   */
+  private String mUrl, mNewUrl;
+
+  /**
+   * 更新下载url
+   *
+   * @param newUrl 新的下载url
+   */
+  public abstract TARGET updateUrl(String newUrl);
 
   /**
    * 将任务设置为最高优先级任务，最高优先级任务有以下特点：
@@ -54,49 +56,66 @@ abstract class AbsDownloadTarget<TARGET extends AbsTarget, ENTITY extends AbsEnt
    * 5、如果下载队列中已经满了，则会停止队尾的任务，当高优先级任务完成后，该队尾任务将自动执行
    * 6、把任务设置为最高优先级任务后，将自动执行任务，不需要重新调用start()启动任务
    */
-  protected void setHighestPriority() {
+  public void setHighestPriority() {
     if (checkEntity()) {
       AriaManager.getInstance(AriaManager.APP)
-          .setCmd(CommonUtil.createNormalCmd(mTaskWrapper, NormalCmdFactory.TASK_HIGHEST_PRIORITY,
-              checkTaskType()))
+          .setCmd(
+              CommonUtil.createNormalCmd(getTaskWrapper(), NormalCmdFactory.TASK_HIGHEST_PRIORITY,
+                  checkTaskType()))
           .exe();
     }
   }
 
   /**
-   * 添加任务
+   * 是否强制下载文件 {@link DownloadTarget#setFilePath(String, boolean)}、
+   * {@link FtpDownloadTarget#setFilePath(String, boolean)}
+   *
+   * @return {@code true} 强制下载文件
    */
-  public void add() {
-    if (checkEntity()) {
-      AriaManager.getInstance(AriaManager.APP)
-          .setCmd(CommonUtil.createNormalCmd(mTaskWrapper, NormalCmdFactory.TASK_CREATE,
-              checkTaskType()))
-          .exe();
-    }
+  boolean isForceDownload() {
+    return forceDownload;
+  }
+
+  @Override public void setTaskWrapper(DTaskWrapper taskWrapper) {
+    super.setTaskWrapper(taskWrapper);
   }
 
   /**
-   * 获取任务文件大小
-   *
-   * @return 文件大小
+   * 文件保存路径的临时变量
    */
-  public long getFileSize() {
-    return getSize();
+  String getTempFilePath() {
+    return mTempFilePath;
   }
 
-  /**
-   * 获取单位转换后的文件大小
-   *
-   * @return 文件大小{@code xxx mb}
-   */
-  public String getConvertFileSize() {
-    return getConvertSize();
+  void setForceDownload(boolean forceDownload) {
+    this.forceDownload = forceDownload;
   }
 
-  /**
-   * 设置target类型
-   *
-   * @return {@link #HTTP}、{@link #FTP}、{@link #GROUP_HTTP}、{@link #GROUP_FTP_DIR}
-   */
-  protected abstract int getTargetType();
+  public String getUrl() {
+    return mUrl;
+  }
+
+  void setUrl(String url) {
+    this.mUrl = url;
+  }
+
+  String getNewUrl() {
+    return mNewUrl;
+  }
+
+  void setNewUrl(String newUrl) {
+    this.mNewUrl = newUrl;
+  }
+
+  void setTempFilePath(String mTempFilePath) {
+    this.mTempFilePath = mTempFilePath;
+  }
+
+  public void setEntity(DownloadEntity entity) {
+    mEntity = entity;
+  }
+
+  @Override public DownloadEntity getEntity() {
+    return super.getEntity();
+  }
 }

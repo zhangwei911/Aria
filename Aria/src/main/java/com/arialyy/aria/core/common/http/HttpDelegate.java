@@ -20,7 +20,7 @@ import com.arialyy.aria.core.download.DGTaskWrapper;
 import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.download.DownloadGroupTarget;
 import com.arialyy.aria.core.inf.AbsTarget;
-import com.arialyy.aria.core.inf.ITarget;
+import com.arialyy.aria.core.inf.ITargetHandler;
 import com.arialyy.aria.util.ALog;
 import java.util.HashMap;
 import java.util.Map;
@@ -29,7 +29,7 @@ import java.util.Map;
  * HTTP参数委托
  * @param <TARGET>
  */
-class HttpDelegate<TARGET extends AbsTarget> implements ITarget {
+class HttpDelegate<TARGET extends AbsTarget> implements ITargetHandler {
   private static final String TAG = "PostDelegate";
   TARGET mTarget;
 
@@ -64,6 +64,10 @@ class HttpDelegate<TARGET extends AbsTarget> implements ITarget {
       }
     }
     return mTarget;
+  }
+
+  @Override public void add() {
+    mTarget.add();
   }
 
   @Override public void start() {

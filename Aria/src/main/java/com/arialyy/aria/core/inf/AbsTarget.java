@@ -37,11 +37,12 @@ import java.util.List;
  * Created by AriaL on 2017/7/3.
  */
 public abstract class AbsTarget<TARGET extends AbsTarget, ENTITY extends AbsEntity, TASK_WRAPPER extends AbsTaskWrapper>
-    implements ITarget {
+    implements ITargetHandler {
+
   protected String TAG;
   protected ENTITY mEntity;
-  protected TASK_WRAPPER mTaskWrapper;
-  protected String mTargetName;
+  private TASK_WRAPPER mTaskWrapper;
+  private String mTargetName;
 
   protected AbsTarget() {
     TAG = CommonUtil.getClassName(this);
@@ -82,6 +83,22 @@ public abstract class AbsTarget<TARGET extends AbsTarget, ENTITY extends AbsEnti
     }
   }
 
+  public ENTITY getEntity() {
+    return mEntity;
+  }
+
+  public void setTaskWrapper(TASK_WRAPPER mTaskWrapper) {
+    this.mTaskWrapper = mTaskWrapper;
+  }
+
+  public String getTargetName() {
+    return mTargetName;
+  }
+
+  public void setTargetName(String mTargetName) {
+    this.mTargetName = mTargetName;
+  }
+
   /**
    * 获取任务实体
    */
@@ -103,7 +120,7 @@ public abstract class AbsTarget<TARGET extends AbsTarget, ENTITY extends AbsEnti
    *
    * @return 文件大小
    */
-  public long getSize() {
+  public long getFileSize() {
     return mEntity == null ? 0 : mEntity.getFileSize();
   }
 
@@ -112,7 +129,7 @@ public abstract class AbsTarget<TARGET extends AbsTarget, ENTITY extends AbsEnti
    *
    * @return 文件大小{@code xxx mb}
    */
-  public String getConvertSize() {
+  public String getConvertFileSize() {
     return mEntity == null ? "0b" : CommonUtil.formatFileSize(mEntity.getFileSize());
   }
 
@@ -211,6 +228,25 @@ public abstract class AbsTarget<TARGET extends AbsTarget, ENTITY extends AbsEnti
    * @return {@code true} 任务存在
    */
   public abstract boolean taskExists();
+
+  /**
+   * 设置target类型
+   *
+   * @return {@link #HTTP}、{@link #FTP}、{@link #GROUP_HTTP}、{@link #GROUP_FTP_DIR}
+   */
+  public abstract int getTargetType();
+
+  /**
+   * 添加任务
+   */
+  @Override public void add() {
+    if (checkEntity()) {
+      AriaManager.getInstance(AriaManager.APP)
+          .setCmd(CommonUtil.createNormalCmd(getTaskWrapper(), NormalCmdFactory.TASK_CREATE,
+              checkTaskType()))
+          .exe();
+    }
+  }
 
   /**
    * 开始任务

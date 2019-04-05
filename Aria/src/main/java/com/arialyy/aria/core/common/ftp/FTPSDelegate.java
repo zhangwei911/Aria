@@ -19,12 +19,12 @@ import android.text.TextUtils;
 import com.arialyy.aria.core.FtpUrlEntity;
 import com.arialyy.aria.core.common.ProtocolType;
 import com.arialyy.aria.core.inf.AbsTarget;
-import com.arialyy.aria.core.inf.ITarget;
+import com.arialyy.aria.core.inf.ITargetHandler;
 
 /**
  * FTP SSL/TSL 参数委托
  */
-public class FTPSDelegate<TARGET extends AbsTarget> implements ITarget {
+public class FTPSDelegate<TARGET extends AbsTarget> implements ITargetHandler {
   private final String TAG = "FTPSDelegate";
   private TARGET mTarget;
   private FtpUrlEntity mUrlEntity;
@@ -84,6 +84,10 @@ public class FTPSDelegate<TARGET extends AbsTarget> implements ITarget {
     }
     mUrlEntity.storePath = storePath;
     return this;
+  }
+
+  @Override public void add() {
+    mTarget.add();
   }
 
   @Override public void start() {
