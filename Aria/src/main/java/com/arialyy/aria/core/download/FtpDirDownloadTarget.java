@@ -30,7 +30,7 @@ import java.net.Proxy;
  * Created by Aria.Lao on 2017/7/26.
  * ftp文件夹下载
  */
-public class FtpDirDownloadTarget extends BaseGroupTarget<FtpDirDownloadTarget>
+public class FtpDirDownloadTarget extends AbsDGTarget<FtpDirDownloadTarget>
     implements IFtpTarget<FtpDirDownloadTarget> {
   private FtpDelegate<FtpDirDownloadTarget> mDelegate;
 
@@ -43,9 +43,8 @@ public class FtpDirDownloadTarget extends BaseGroupTarget<FtpDirDownloadTarget>
     mGroupHash = key;
     setTaskWrapper(TaskWrapperManager.getInstance().getFtpTaskWrapper(DGTaskWrapper.class, key));
     getTaskWrapper().setRequestType(AbsTaskWrapper.D_FTP_DIR);
-    mEntity = getEntity();
-    if (mEntity != null) {
-      mDirPathTemp = mEntity.getDirPath();
+    if (getEntity() != null) {
+      mDirPathTemp = getEntity().getDirPath();
     }
     mDelegate = new FtpDelegate<>(this);
   }
@@ -57,7 +56,7 @@ public class FtpDirDownloadTarget extends BaseGroupTarget<FtpDirDownloadTarget>
   @Override protected boolean checkEntity() {
     boolean b = getTargetType() == GROUP_FTP_DIR && checkDirPath() && checkUrl();
     if (b) {
-      mEntity.save();
+      getEntity().save();
       if (getTaskWrapper().getSubTaskWrapper() != null) {
         //初始化子项的登录信息
         FtpUrlEntity tUrlEntity = getTaskWrapper().asFtp().getUrlEntity();

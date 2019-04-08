@@ -23,22 +23,7 @@ import com.arialyy.aria.util.CommonUtil;
 /**
  * Created by lyy on 2017/2/28.
  */
-abstract class AbsDownloadTarget<TARGET extends AbsDownloadTarget>
-    extends AbsTarget<TARGET, DownloadEntity, DTaskWrapper> {
-
-  /**
-   * 设置的文件保存路径的临时变量
-   */
-  private String mTempFilePath;
-
-  /**
-   * {@code true}强制下载，不考虑文件路径是否被占用
-   */
-  private boolean forceDownload = false;
-  /**
-   * 资源地址
-   */
-  private String mUrl, mNewUrl;
+abstract class AbsDownloadTarget<TARGET extends AbsDownloadTarget> extends AbsTarget<TARGET> {
 
   /**
    * 更新下载url
@@ -66,56 +51,7 @@ abstract class AbsDownloadTarget<TARGET extends AbsDownloadTarget>
     }
   }
 
-  /**
-   * 是否强制下载文件 {@link DownloadTarget#setFilePath(String, boolean)}、
-   * {@link FtpDownloadTarget#setFilePath(String, boolean)}
-   *
-   * @return {@code true} 强制下载文件
-   */
-  boolean isForceDownload() {
-    return forceDownload;
-  }
-
-  @Override public void setTaskWrapper(DTaskWrapper taskWrapper) {
-    super.setTaskWrapper(taskWrapper);
-  }
-
-  /**
-   * 文件保存路径的临时变量
-   */
-  String getTempFilePath() {
-    return mTempFilePath;
-  }
-
-  void setForceDownload(boolean forceDownload) {
-    this.forceDownload = forceDownload;
-  }
-
-  public String getUrl() {
-    return mUrl;
-  }
-
-  void setUrl(String url) {
-    this.mUrl = url;
-  }
-
-  String getNewUrl() {
-    return mNewUrl;
-  }
-
-  void setNewUrl(String newUrl) {
-    this.mNewUrl = newUrl;
-  }
-
-  void setTempFilePath(String mTempFilePath) {
-    this.mTempFilePath = mTempFilePath;
-  }
-
-  public void setEntity(DownloadEntity entity) {
-    mEntity = entity;
-  }
-
   @Override public DownloadEntity getEntity() {
-    return super.getEntity();
+    return (DownloadEntity) super.getEntity();
   }
 }

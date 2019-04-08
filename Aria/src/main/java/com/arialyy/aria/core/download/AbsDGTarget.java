@@ -19,6 +19,7 @@ import android.support.annotation.CheckResult;
 import android.text.TextUtils;
 import com.arialyy.aria.core.inf.AbsEntity;
 import com.arialyy.aria.core.inf.AbsTarget;
+import com.arialyy.aria.core.inf.AbsTaskWrapper;
 import com.arialyy.aria.core.manager.SubTaskManager;
 import com.arialyy.aria.core.queue.DownloadGroupTaskQueue;
 import com.arialyy.aria.orm.DbEntity;
@@ -30,8 +31,7 @@ import java.util.List;
 /**
  * Created by lyy on 2017/7/26.
  */
-abstract class BaseGroupTarget<TARGET extends BaseGroupTarget>
-    extends AbsTarget<TARGET, DownloadGroupEntity, DGTaskWrapper> {
+abstract class AbsDGTarget<TARGET extends AbsDGTarget> extends AbsTarget<TARGET> {
 
   /**
    * 组任务名
@@ -61,30 +61,26 @@ abstract class BaseGroupTarget<TARGET extends BaseGroupTarget>
     return mSubTaskManager;
   }
 
+  @Override public DownloadGroupEntity getEntity() {
+    return (DownloadGroupEntity) super.getEntity();
+  }
+
+  @Override public DGTaskWrapper getTaskWrapper() {
+    return (DGTaskWrapper) super.getTaskWrapper();
+  }
+
   /**
    * 设置任务组别名
    */
   @CheckResult
   public TARGET setGroupAlias(String alias) {
     if (TextUtils.isEmpty(alias)) return (TARGET) this;
-    mEntity.setAlias(alias);
+    getEntity().setAlias(alias);
     return (TARGET) this;
   }
 
   @Override public boolean taskExists() {
     return DbEntity.checkDataExist(DownloadGroupEntity.class, "groupHash=?", mGroupHash);
-  }
-
-  /**
-   * 设置任务组的文件夹路径，该api后续会删除
-   *
-   * @param groupDirPath 任务组保存文件夹路径
-   * @deprecated {@link #setDirPath(String)} 请使用这个api
-   */
-  @Deprecated
-  @CheckResult
-  public TARGET setDownloadDirPath(String groupDirPath) {
-    return setDirPath(groupDirPath);
   }
 
   /**
@@ -113,7 +109,7 @@ abstract class BaseGroupTarget<TARGET extends BaseGroupTarget>
   }
 
   @Override public boolean isRunning() {
-    DownloadGroupTask task = DownloadGroupTaskQueue.getInstance().getTask(mEntity.getKey());
+    DownloadGroupTask task = DownloadGroupTaskQueue.getInstance().getTask(getEntity().getKey());
     return task != null && task.isRunning();
   }
 
@@ -160,12 +156,13 @@ abstract class BaseGroupTarget<TARGET extends BaseGroupTarget>
       return false;
     }
 
-    if (TextUtils.isEmpty(mEntity.getDirPath()) || !mEntity.getDirPath().equals(mDirPathTemp)) {
+    if (TextUtils.isEmpty(getEntity().getDirPath()) || !getEntity().getDirPath()
+        .equals(mDirPathTemp)) {
       if (!file.exists()) {
         file.mkdirs();
       }
       needModifyPath = true;
-      mEntity.setDirPath(mDirPathTemp);
+      getEntity().setDirPath(mDirPathTemp);
       ALog.i(TAG, String.format("文件夹路径改变，将更新文件夹路径为：%s", mDirPathTemp));
     }
 

@@ -13,15 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.arialyy.aria.core.upload;
+package com.arialyy.aria.exception;
 
-import com.arialyy.aria.core.inf.AbsTarget;
+public class ParamException extends RuntimeException {
+  private static final String ARIA_NET_EXCEPTION = "Aria Params Exception:";
 
-/**
- * Created by AriaL on 2017/6/29.
- * 普通上传任务接收器
- */
-abstract class AbsUploadTarget<TARGET extends AbsUploadTarget> extends AbsTarget<TARGET> {
-
-
+  public ParamException(String message) {
+    super(String.format("%s%s", ARIA_NET_EXCEPTION, message));
+  }
 }

@@ -22,16 +22,21 @@ import com.arialyy.aria.core.manager.TaskWrapperManager;
 import com.arialyy.aria.core.queue.UploadTaskQueue;
 import com.arialyy.aria.orm.DbEntity;
 import com.arialyy.aria.util.ALog;
+import com.arialyy.aria.util.CommonUtil;
 import java.io.File;
 
 /**
  * Created by Aria.Lao on 2019/4/5.
  * 普通上传任务通用功能处理
  */
-public class UNormalDelegate<TARGET extends AbsUploadTarget> implements ITargetNormal<TARGET> {
+class UNormalDelegate<TARGET extends AbsUploadTarget> implements ITargetNormal<TARGET> {
   private String TAG = "UNormalDelegate";
   private UploadEntity mEntity;
   private TARGET mTarget;
+  /**
+   * 上传路径
+   */
+  private String mTempUrl;
 
   UNormalDelegate(TARGET target, String filePath, String targetName) {
     mTarget = target;
@@ -47,12 +52,11 @@ public class UNormalDelegate<TARGET extends AbsUploadTarget> implements ITargetN
     mEntity.setFileSize(file.length());
     mTarget.setTargetName(targetName);
     mTarget.setTaskWrapper(taskWrapper);
-    mTarget.setEntity(mEntity);
-    mTarget.setTempUrl(mEntity.getUrl());
+    mTempUrl = mEntity.getUrl();
   }
 
   @Override public TARGET updateUrl(String newUrl) {
-    mTarget.setTempUrl(mEntity.getUrl());
+    mTempUrl = newUrl;
     return mTarget;
   }
 
@@ -113,7 +117,7 @@ public class UNormalDelegate<TARGET extends AbsUploadTarget> implements ITargetN
 
   @Override public boolean checkUrl() {
 
-    final String url = mTarget.getTempUrl();
+    final String url = mTempUrl;
     if (TextUtils.isEmpty(url)) {
       ALog.e(TAG, "上传失败，url为null");
       return false;
@@ -128,5 +132,14 @@ public class UNormalDelegate<TARGET extends AbsUploadTarget> implements ITargetN
     }
     mEntity.setUrl(url);
     return true;
+  }
+
+  void setTempUrl(String tempUrl) {
+    this.mTempUrl = tempUrl;
+    mTarget.getTaskWrapper().asFtp().setUrlEntity(CommonUtil.getFtpUrlInfo(tempUrl));
+  }
+
+  public String getTempUrl() {
+    return mTempUrl;
   }
 }

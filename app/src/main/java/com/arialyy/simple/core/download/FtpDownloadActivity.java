@@ -35,9 +35,9 @@ import java.io.File;
  * Ftp下载测试
  */
 public class FtpDownloadActivity extends BaseActivity<ActivityFtpDownloadBinding> {
-  //private final String URL = "ftp://192.168.1.9:21/下载/AriaPrj.zip";
+  private final String URL = "ftp://9.9.9.205:2121/Cyberduck-6.9.4.30164.zip";
   //private final String URL = "ftp://182.92.180.213:21/video/572fed5c2ad48_1024.jpg";
-  private final String URL = "ftp://182.92.180.213:21/DATA/20180205/rar/1111.rar";
+  //private final String URL = "ftp://182.92.180.213:21/DATA/20180205/rar/1111.rar";
   //private final String URL = "ftp://d:d@dygodj8.com:12311/咖啡风暴HD大陆公映意语中字[飘花www.piaohua.com].mp4";
 
   @Override protected void init(Bundle savedInstanceState) {

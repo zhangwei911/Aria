@@ -36,16 +36,20 @@ import java.util.List;
 /**
  * Created by AriaL on 2017/7/3.
  */
-public abstract class AbsTarget<TARGET extends AbsTarget, ENTITY extends AbsEntity, TASK_WRAPPER extends AbsTaskWrapper>
-    implements ITargetHandler {
+public abstract class AbsTarget<TARGET extends AbsTarget> implements ITargetHandler {
 
   protected String TAG;
-  protected ENTITY mEntity;
-  private TASK_WRAPPER mTaskWrapper;
+  private AbsEntity mEntity;
+  private AbsTaskWrapper mTaskWrapper;
   private String mTargetName;
 
   protected AbsTarget() {
     TAG = CommonUtil.getClassName(this);
+  }
+
+  public void setTaskWrapper(AbsTaskWrapper wrapper) {
+    mTaskWrapper = wrapper;
+    mEntity = wrapper.getEntity();
   }
 
   /**
@@ -83,12 +87,8 @@ public abstract class AbsTarget<TARGET extends AbsTarget, ENTITY extends AbsEnti
     }
   }
 
-  public ENTITY getEntity() {
+  public AbsEntity getEntity() {
     return mEntity;
-  }
-
-  public void setTaskWrapper(TASK_WRAPPER mTaskWrapper) {
-    this.mTaskWrapper = mTaskWrapper;
   }
 
   public String getTargetName() {
@@ -102,7 +102,7 @@ public abstract class AbsTarget<TARGET extends AbsTarget, ENTITY extends AbsEnti
   /**
    * 获取任务实体
    */
-  public TASK_WRAPPER getTaskWrapper() {
+  public AbsTaskWrapper getTaskWrapper() {
     return mTaskWrapper;
   }
 

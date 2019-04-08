@@ -26,7 +26,6 @@ import com.arialyy.aria.core.manager.TaskWrapperManager;
 import com.arialyy.aria.orm.DbEntity;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
-import java.io.File;
 import java.net.Proxy;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -38,7 +37,7 @@ import java.util.Set;
  * Created by AriaL on 2017/6/29.
  * 下载任务组
  */
-public class DownloadGroupTarget extends BaseGroupTarget<DownloadGroupTarget> implements
+public class DownloadGroupTarget extends AbsDGTarget<DownloadGroupTarget> implements
     IHttpHeaderDelegate<DownloadGroupTarget> {
   private HttpHeaderDelegate<DownloadGroupTarget> mDelegate;
   /**
@@ -68,9 +67,8 @@ public class DownloadGroupTarget extends BaseGroupTarget<DownloadGroupTarget> im
   private void init() {
     mGroupHash = CommonUtil.getMd5Code(mUrls);
     setTaskWrapper(TaskWrapperManager.getInstance().getDGTaskWrapper(DGTaskWrapper.class, mUrls));
-    mEntity = getEntity();
-    if (mEntity != null) {
-      mDirPathTemp = mEntity.getDirPath();
+    if (getEntity() != null) {
+      mDirPathTemp = getEntity().getDirPath();
     }
     mDelegate = new HttpHeaderDelegate<>(this);
   }
@@ -98,10 +96,10 @@ public class DownloadGroupTarget extends BaseGroupTarget<DownloadGroupTarget> im
     mUrls.clear();
     mUrls.addAll(urls);
     mGroupHash = CommonUtil.getMd5Code(urls);
-    mEntity.setGroupHash(mGroupHash);
-    mEntity.update();
-    if (mEntity.getSubEntities() != null && !mEntity.getSubEntities().isEmpty()) {
-      for (DownloadEntity de : mEntity.getSubEntities()) {
+    getEntity().setGroupHash(mGroupHash);
+    getEntity().update();
+    if (getEntity().getSubEntities() != null && !getEntity().getSubEntities().isEmpty()) {
+      for (DownloadEntity de : getEntity().getSubEntities()) {
         de.setGroupHash(mGroupHash);
         de.update();
       }
@@ -123,8 +121,8 @@ public class DownloadGroupTarget extends BaseGroupTarget<DownloadGroupTarget> im
       ALog.e(TAG, "文件大小不能小于 0");
       return this;
     }
-    if (mEntity.getFileSize() <= 1 || mEntity.getFileSize() != fileSize) {
-      mEntity.setFileSize(fileSize);
+    if (getEntity().getFileSize() <= 1 || getEntity().getFileSize() != fileSize) {
+      getEntity().setFileSize(fileSize);
     }
     return this;
   }
@@ -196,7 +194,7 @@ public class DownloadGroupTarget extends BaseGroupTarget<DownloadGroupTarget> im
         }
       }
 
-      mEntity.save();
+      getEntity().save();
 
       if (needModifyPath) {
         reChangeDirPath(mDirPathTemp);
@@ -266,7 +264,7 @@ public class DownloadGroupTarget extends BaseGroupTarget<DownloadGroupTarget> im
       }
     }
 
-    mEntity.setGroupHash(CommonUtil.getMd5Code(mUrls));
+    getEntity().setGroupHash(CommonUtil.getMd5Code(mUrls));
 
     return true;
   }
@@ -277,20 +275,15 @@ public class DownloadGroupTarget extends BaseGroupTarget<DownloadGroupTarget> im
   private void updateSingleSubFileName(DTaskWrapper taskEntity, String newName) {
     DownloadEntity entity = taskEntity.getEntity();
     if (!newName.equals(entity.getFileName())) {
-      String oldPath = mEntity.getDirPath() + "/" + entity.getFileName();
-      String newPath = mEntity.getDirPath() + "/" + newName;
+      String oldPath = getEntity().getDirPath() + "/" + entity.getFileName();
+      String newPath = getEntity().getDirPath() + "/" + newName;
       if (DbEntity.checkDataExist(DownloadEntity.class, "downloadPath=? or isComplete='true'",
           newPath)) {
         ALog.w(TAG, String.format("更新文件名失败，路径【%s】已存在或文件已下载", newPath));
         return;
       }
 
-      File oldFile = new File(oldPath);
-      if (oldFile.exists()) {
-        oldFile.renameTo(new File(newPath));
-      }
-
-      CommonUtil.modifyTaskRecord(oldFile.getPath(), newPath);
+      CommonUtil.modifyTaskRecord(oldPath, newPath);
       entity.setDownloadPath(newPath);
       entity.setFileName(newName);
       entity.update();

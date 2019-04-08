@@ -194,7 +194,7 @@ public abstract class DbEntity {
   /**
    * 保存多条数据，通过rowID来判断记录存在以否，如果数据库已有记录，则更新该记录；如果数据库中没有记录，则保存该记录
    */
-  public static void saveAll(List<DbEntity> entities) {
+  public static <T extends DbEntity> void saveAll(List<T> entities) {
     checkListData(entities);
     List<DbEntity> insertD = new ArrayList<>();
     List<DbEntity> updateD = new ArrayList<>();
@@ -205,9 +205,9 @@ public abstract class DbEntity {
         continue;
       }
       if (wrapper.isExist(entity.getClass(), entity.rowID)) {
-        insertD.add(entity);
-      } else {
         updateD.add(entity);
+      } else {
+        insertD.add(entity);
       }
     }
     if (!insertD.isEmpty()) {
@@ -220,7 +220,7 @@ public abstract class DbEntity {
   /**
    * 检查批量操作的列表数据，如果数据为空，抛出{@link NullPointerException}
    */
-  private static void checkListData(List<DbEntity> entities) {
+  private static <T extends DbEntity> void checkListData(List<T> entities) {
     if (entities == null || entities.isEmpty()) {
       throw new NullPointerException("列表数据为空");
     }

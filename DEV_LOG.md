@@ -1,4 +1,8 @@
 ## 开发日志
+  + v_3.6.4
+    - 优化任务接收器的代码结构
+    - 修复`DbEntity.saveAll()`失败的问题
+    - 修复分块任务重命名失败的问题
   + v_3.6.3 (2019/4/2)
     - fix bug https://github.com/AriaLyy/Aria/issues/377
   + v_3.6.2 (2019/4/1)

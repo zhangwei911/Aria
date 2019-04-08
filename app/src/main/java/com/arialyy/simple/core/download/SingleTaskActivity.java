@@ -312,23 +312,10 @@ public class SingleTaskActivity extends BaseActivity<ActivitySingleBinding> {
   int i = 1;
 
   private void startD() {
-    //Aria.get(this).setLogLevel(ALog.LOG_CLOSE);
-    //Aria.download(this).load("aaaa.apk");
-    String path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/ggsg11.mp4";
-    //String path = String.format("/sdcard/ggsg11(%s).mp4", i);
-    //if (new File(path).exists()) {
-    //
-    //  i++;
-    //  path = String.format("/sdcard/ggsg11(%s).mp4", i);
-    //}
-    //File file = new File(path);
-    //if (file.exists()){
-    //  file.delete();
-    //}
-    //Aria.download(SingleTaskActivity.this).load(DOWNLOAD_URL).resetState().save();
-    Map<String, String> params = new HashMap<>();
-    params.put("key", "value");
-    params.put("filename", "CentOS-7-x86_64-Minimal-1804.iso");
+    String path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/ggsg14.apk";
+    //Map<String, String> params = new HashMap<>();
+    //params.put("key", "value");
+    //params.put("filename", "CentOS-7-x86_64-Minimal-1804.iso");
     Aria.download(SingleTaskActivity.this)
         .load(DOWNLOAD_URL)
         //.addHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8")

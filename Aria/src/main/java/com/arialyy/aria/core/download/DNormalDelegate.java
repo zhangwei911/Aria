@@ -33,46 +33,60 @@ class DNormalDelegate<TARGET extends AbsDownloadTarget> implements ITargetNormal
   private final String TAG = "DNormalDelegate";
   private DownloadEntity mEntity;
 
-  private TARGET target;
+  private TARGET mTarget;
+  private String mNewUrl;
+  /**
+   * 设置的文件保存路径的临时变量
+   */
+  private String mTempFilePath;
+
+  /**
+   * {@code true}强制下载，不考虑文件路径是否被占用
+   */
+  private boolean forceDownload = false;
+  /**
+   * 资源地址
+   */
+  private String mUrl;
 
   DNormalDelegate(TARGET target, String url, String targetName) {
-    this.target = target;
+    this.mTarget = target;
     initTarget(url, targetName);
   }
 
   @Override public void initTarget(String url, String targetName) {
-    DTaskWrapper taskWrapper = TaskWrapperManager.getInstance().getHttpTaskWrapper(DTaskWrapper.class, url);
+    DTaskWrapper taskWrapper =
+        TaskWrapperManager.getInstance().getHttpTaskWrapper(DTaskWrapper.class, url);
     mEntity = taskWrapper.getEntity();
 
-    target.setUrl(url);
-    target.setTargetName(targetName);
-    target.setTaskWrapper(taskWrapper);
-    target.setEntity(mEntity);
+    mUrl = url;
+    mTarget.setTargetName(targetName);
+    mTarget.setTaskWrapper(taskWrapper);
     if (mEntity != null) {
-      target.setTempFilePath(mEntity.getDownloadPath());
+      mTempFilePath = mEntity.getDownloadPath();
     }
   }
 
   @Override public TARGET updateUrl(String newUrl) {
     if (TextUtils.isEmpty(newUrl)) {
-      ALog.e(TAG, "下载url更新失败，newUrl为null");
-      return target;
+      ALog.e(TAG, "url更新失败，newUrl为null");
+      return mTarget;
     }
-    if (target.getUrl().equals(newUrl)) {
-      ALog.e(TAG, "下载url更新失败，新的下载url和旧的url一致");
-      return target;
+    if (mUrl.equals(newUrl)) {
+      ALog.e(TAG, "url更新失败，新的下载url和旧的url一致");
+      return mTarget;
     }
-    target.setNewUrl(newUrl);
-    target.getTaskWrapper().setRefreshInfo(true);
-    return target;
+    mNewUrl = newUrl;
+    mTarget.getTaskWrapper().setRefreshInfo(true);
+    return mTarget;
   }
 
   @Override public DownloadEntity getEntity() {
-    return target.getEntity();
+    return mTarget.getEntity();
   }
 
   @Override public boolean taskExists() {
-    return DbEntity.checkDataExist(DownloadEntity.class, "url=?", target.getUrl());
+    return DbEntity.checkDataExist(DownloadEntity.class, "url=?", mUrl);
   }
 
   @Override public boolean isRunning() {
@@ -89,7 +103,7 @@ class DNormalDelegate<TARGET extends AbsDownloadTarget> implements ITargetNormal
   }
 
   @Override public boolean checkFilePath() {
-    String filePath = target.getTempFilePath();
+    String filePath = mTempFilePath;
     if (TextUtils.isEmpty(filePath)) {
       ALog.e(TAG, "下载失败，文件保存路径为null");
       return false;
@@ -99,10 +113,10 @@ class DNormalDelegate<TARGET extends AbsDownloadTarget> implements ITargetNormal
     }
     File file = new File(filePath);
     if (file.isDirectory()) {
-      if (target.getTargetType() == ITargetHandler.HTTP) {
+      if (mTarget.getTargetType() == ITargetHandler.HTTP) {
         ALog.e(TAG, "下载失败，保存路径【" + filePath + "】不能为文件夹，路径需要是完整的文件路径，如：/mnt/sdcard/game.zip");
         return false;
-      } else if (target.getTargetType() == ITargetHandler.FTP) {
+      } else if (mTarget.getTargetType() == ITargetHandler.FTP) {
         filePath += mEntity.getFileName();
       }
     } else {
@@ -116,15 +130,15 @@ class DNormalDelegate<TARGET extends AbsDownloadTarget> implements ITargetNormal
     if (!filePath.equals(mEntity.getDownloadPath())) {
       // 检查路径冲突
       if (DbEntity.checkDataExist(DownloadEntity.class, "downloadPath=?", filePath)) {
-        if (!target.isForceDownload()) {
+        if (!forceDownload) {
           ALog.e(TAG, "下载失败，保存路径【" + filePath + "】已经被其它任务占用，请设置其它保存路径");
           return false;
         } else {
           ALog.w(TAG, "保存路径【" + filePath + "】已经被其它任务占用，当前任务将覆盖该路径的文件");
           CommonUtil.delTaskRecord(filePath, 1);
-          target.setTaskWrapper(
+          mTarget.setTaskWrapper(
               TaskWrapperManager.getInstance()
-                  .getHttpTaskWrapper(DTaskWrapper.class, target.getUrl()));
+                  .getHttpTaskWrapper(DTaskWrapper.class, mUrl));
         }
       }
       File oldFile = new File(mEntity.getDownloadPath());
@@ -132,8 +146,13 @@ class DNormalDelegate<TARGET extends AbsDownloadTarget> implements ITargetNormal
       mEntity.setDownloadPath(filePath);
       mEntity.setFileName(newFile.getName());
       if (oldFile.exists()) {
-        oldFile.renameTo(newFile);
+        // 处理普通任务的重命名
         CommonUtil.modifyTaskRecord(oldFile.getPath(), newFile.getPath());
+        ALog.i(TAG, String.format("将任务重命名为：%s", newFile.getName()));
+      } else if (CommonUtil.blockTaskExists(oldFile.getPath())) {
+        // 处理分块任务的重命名
+        CommonUtil.modifyTaskRecord(oldFile.getPath(), newFile.getPath());
+        ALog.i(TAG, String.format("将分块任务重命名为：%s", newFile.getName()));
       }
     }
     return true;
@@ -153,9 +172,25 @@ class DNormalDelegate<TARGET extends AbsDownloadTarget> implements ITargetNormal
       ALog.e(TAG, "下载失败，url【" + url + "】不合法");
       return false;
     }
-    if (!TextUtils.isEmpty(target.getNewUrl())) {
-      mEntity.setUrl(target.getNewUrl());
+    if (!TextUtils.isEmpty(mNewUrl)) {
+      mEntity.setUrl(mNewUrl);
     }
     return true;
+  }
+
+  void setForceDownload(boolean forceDownload) {
+    this.forceDownload = forceDownload;
+  }
+
+  void setUrl(String url) {
+    this.mUrl = url;
+  }
+
+  String getUrl() {
+    return mUrl;
+  }
+
+  void setTempFilePath(String mTempFilePath) {
+    this.mTempFilePath = mTempFilePath;
   }
 }

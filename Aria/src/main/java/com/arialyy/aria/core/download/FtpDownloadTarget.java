@@ -45,9 +45,9 @@ public class FtpDownloadTarget extends AbsDownloadTarget<FtpDownloadTarget>
   }
 
   private void init() {
-    int lastIndex = getUrl().lastIndexOf("/");
-    mEntity.setFileName(getUrl().substring(lastIndex + 1));
-    getTaskWrapper().asFtp().setUrlEntity(CommonUtil.getFtpUrlInfo(getUrl()));
+    int lastIndex = mNormalDelegate.getUrl().lastIndexOf("/");
+    getEntity().setFileName(mNormalDelegate.getUrl().substring(lastIndex + 1));
+    getTaskWrapper().asFtp().setUrlEntity(CommonUtil.getFtpUrlInfo(mNormalDelegate.getUrl()));
     getTaskWrapper().setRequestType(AbsTaskWrapper.D_FTP);
 
     mFtpDelegate = new FtpDelegate<>(this);
@@ -106,7 +106,7 @@ public class FtpDownloadTarget extends AbsDownloadTarget<FtpDownloadTarget>
    */
   @CheckResult
   public FtpDownloadTarget setFilePath(@NonNull String filePath) {
-    setTempFilePath(filePath);
+    mNormalDelegate.setTempFilePath(filePath);
     return this;
   }
 
@@ -120,8 +120,8 @@ public class FtpDownloadTarget extends AbsDownloadTarget<FtpDownloadTarget>
    */
   @CheckResult
   public FtpDownloadTarget setFilePath(@NonNull String filePath, boolean forceDownload) {
-    setTempFilePath(filePath);
-    setForceDownload(forceDownload);
+    mNormalDelegate.setTempFilePath(filePath);
+    mNormalDelegate.setForceDownload(forceDownload);
     return this;
   }
 

@@ -71,18 +71,6 @@ public class DownloadTarget extends AbsDownloadTarget<DownloadTarget>
   }
 
   /**
-   * 设置文件存储路径
-   * 该api后续版本会删除
-   *
-   * @param downloadPath 文件保存路径
-   * @deprecated {@link #setFilePath(String)} 请使用这个api
-   */
-  @CheckResult
-  @Deprecated public DownloadTarget setDownloadPath(@NonNull String downloadPath) {
-    return setFilePath(downloadPath);
-  }
-
-  /**
    * 设置文件存储路径，如果需要修改新的文件名，修改路径便可。
    * 如：原文件路径 /mnt/sdcard/test.zip
    * 如果需要将test.zip改为game.zip，只需要重新设置文件路径为：/mnt/sdcard/game.zip
@@ -91,7 +79,7 @@ public class DownloadTarget extends AbsDownloadTarget<DownloadTarget>
    */
   @CheckResult
   public DownloadTarget setFilePath(@NonNull String filePath) {
-    setTempFilePath(filePath);
+    mNormalDelegate.setTempFilePath(filePath);
     return this;
   }
 
@@ -105,8 +93,8 @@ public class DownloadTarget extends AbsDownloadTarget<DownloadTarget>
    */
   @CheckResult
   public DownloadTarget setFilePath(@NonNull String filePath, boolean forceDownload) {
-    setTempFilePath(filePath);
-    setForceDownload(forceDownload);
+    mNormalDelegate.setTempFilePath(filePath);
+    mNormalDelegate.setForceDownload(forceDownload);
     return this;
   }
 
@@ -114,7 +102,7 @@ public class DownloadTarget extends AbsDownloadTarget<DownloadTarget>
    * 从header中获取文件描述信息
    */
   public String getContentDisposition() {
-    return mEntity.getDisposition();
+    return getEntity().getDisposition();
   }
 
   @Override public DownloadTarget updateUrl(String newUrl) {

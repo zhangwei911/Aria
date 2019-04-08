@@ -21,6 +21,7 @@ import com.arialyy.aria.core.common.ftp.FTPSDelegate;
 import com.arialyy.aria.core.common.ftp.FtpDelegate;
 import com.arialyy.aria.core.inf.AbsTaskWrapper;
 import com.arialyy.aria.core.inf.IFtpTarget;
+import com.arialyy.aria.util.CheckUtil;
 import java.net.Proxy;
 
 /**
@@ -48,7 +49,7 @@ public class FtpUploadTarget extends AbsUploadTarget<FtpUploadTarget>
    * @param tempUrl 上传路径
    */
   public FtpUploadTarget setUploadUrl(String tempUrl) {
-    setTempUrl(tempUrl);
+    mNormalDelegate.setTempUrl(tempUrl);
     return this;
   }
 
@@ -77,6 +78,7 @@ public class FtpUploadTarget extends AbsUploadTarget<FtpUploadTarget>
   }
 
   @Override public FtpUploadTarget login(String userName, String password, String account) {
+    CheckUtil.checkFtpUploadUrl(mNormalDelegate.getTempUrl());
     return mFtpDelegate.login(userName, password, account);
   }
 

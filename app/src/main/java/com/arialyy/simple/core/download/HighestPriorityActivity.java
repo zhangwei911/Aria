@@ -147,7 +147,7 @@ public class HighestPriorityActivity extends BaseActivity<ActivityHighestPriorit
         if (text.equals("重新开始？") || text.equals("开始")) {
           Aria.download(this)
               .load(DOWNLOAD_URL)
-              .setDownloadPath(Environment.getExternalStorageDirectory().getPath()
+              .setFilePath(Environment.getExternalStorageDirectory().getPath()
                   + "/Download/"
                   + mTaskName
                   + ".apk")

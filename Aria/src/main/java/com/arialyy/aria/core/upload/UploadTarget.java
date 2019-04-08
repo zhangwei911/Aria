@@ -51,7 +51,7 @@ public class UploadTarget extends AbsUploadTarget<UploadTarget>
    * @param tempUrl 上传路径
    */
   public UploadTarget setUploadUrl(String tempUrl) {
-    setTempUrl(tempUrl);
+    mNormalDelegate.setTempUrl(tempUrl);
     return this;
   }
 
