@@ -34,7 +34,7 @@ Aria有以下特点：
 
 * 多文件打包下载
 
-![多文件打包下载](https://github.com/AriaLyy/DownloadUtil/blob/master/img/group_task.gif)
+<img src="https://github.com/AriaLyy/DownloadUtil/blob/master/img/group_task.gif" width="360" height="640"/>
 
 
 ## 引入库
