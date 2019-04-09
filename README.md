@@ -25,12 +25,15 @@ Aria有以下特点：
 
 ## 示例
 * 多任务下载
+
 ![多任务下载](https://github.com/AriaLyy/DownloadUtil/blob/master/img/download_img.gif)
 
 * 速度限制
+
 ![网速下载限制](https://github.com/AriaLyy/DownloadUtil/blob/master/img/max_speed.gif)
 
 * 多文件打包下载
+
 ![多文件打包下载](https://github.com/AriaLyy/DownloadUtil/blob/master/img/group_task.gif)
 
 
