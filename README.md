@@ -7,8 +7,9 @@ Aria项目源于工作中遇到的一个文件下载管理的需求，当时被�
 Aria有以下特点：
  + 简单、方便
    - 可以在Activity、Service、Fragment、Dialog、popupWindow、Notification等组件中使用
-   - 支持HTTP\FTP断点续传、多任务自动调度
-   - 支持HTTP任务组\FTP文件夹，断点续传下载
+   - 支持HTTP\FTP断点续传下载、多任务自动调度
+   - 支持多文件打包下载，多文件共享同一进度（如：视频 + 封面 + 字幕）
+   - 支持下载FTP文件夹
    - 支持HTTP表单上传
    - 支持文件FTP断点续传上传
    - 支持FTPS/SFTP断点续传，[see](https://aria.laoyuyu.me/aria_doc/download/ftps.html)
@@ -23,12 +24,17 @@ Aria有以下特点：
 如果你觉得Aria对你有帮助，您的star和issues将是对我最大支持.`^_^`
 
 ## 示例
+* 多任务下载
 ![多任务下载](https://github.com/AriaLyy/DownloadUtil/blob/master/img/download_img.gif)
+
+* 速度限制
 ![网速下载限制](https://github.com/AriaLyy/DownloadUtil/blob/master/img/max_speed.gif)
-![下载任务组](https://github.com/AriaLyy/DownloadUtil/blob/master/img/download_group.gif)
+
+* 多文件打包下载
+![多文件打包下载](https://github.com/AriaLyy/DownloadUtil/blob/master/img/group_task.gif)
 
 
-## 下载
+## 引入库
 [![Core](https://api.bintray.com/packages/arialyy/maven/AriaApi/images/download.svg)](https://bintray.com/arialyy/maven/AriaApi/_latestVersion)
 [![Compiler](https://api.bintray.com/packages/arialyy/maven/AriaCompiler/images/download.svg)](https://bintray.com/arialyy/maven/AriaCompiler/_latestVersion)
 

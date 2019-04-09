@@ -30,7 +30,7 @@ import java.net.Proxy;
  * Created by lyy on 2016/12/5.
  * https://github.com/AriaLyy/Aria
  */
-public class FtpDownloadTarget extends AbsDownloadTarget<FtpDownloadTarget>
+public class FtpDownloadTarget extends AbsDTarget<FtpDownloadTarget>
     implements IFtpTarget<FtpDownloadTarget> {
   private FtpDelegate<FtpDownloadTarget> mFtpDelegate;
   private DNormalDelegate<FtpDownloadTarget> mNormalDelegate;

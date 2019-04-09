@@ -17,7 +17,7 @@ package com.arialyy.aria.core.download;
 
 import android.text.TextUtils;
 import com.arialyy.aria.core.inf.ITargetHandler;
-import com.arialyy.aria.core.inf.ITargetNormal;
+import com.arialyy.aria.core.inf.INormalTarget;
 import com.arialyy.aria.core.manager.TaskWrapperManager;
 import com.arialyy.aria.core.queue.DownloadTaskQueue;
 import com.arialyy.aria.orm.DbEntity;
@@ -29,7 +29,7 @@ import java.io.File;
  * Created by AriaL on 2019/4/5.
  * 普通下载任务通用功能处理
  */
-class DNormalDelegate<TARGET extends AbsDownloadTarget> implements ITargetNormal<TARGET> {
+class DNormalDelegate<TARGET extends AbsDTarget> implements INormalTarget {
   private final String TAG = "DNormalDelegate";
   private DownloadEntity mEntity;
 
@@ -54,7 +54,7 @@ class DNormalDelegate<TARGET extends AbsDownloadTarget> implements ITargetNormal
     initTarget(url, targetName);
   }
 
-  @Override public void initTarget(String url, String targetName) {
+  private void initTarget(String url, String targetName) {
     DTaskWrapper taskWrapper =
         TaskWrapperManager.getInstance().getHttpTaskWrapper(DTaskWrapper.class, url);
     mEntity = taskWrapper.getEntity();
@@ -67,7 +67,7 @@ class DNormalDelegate<TARGET extends AbsDownloadTarget> implements ITargetNormal
     }
   }
 
-  @Override public TARGET updateUrl(String newUrl) {
+  TARGET updateUrl(String newUrl) {
     if (TextUtils.isEmpty(newUrl)) {
       ALog.e(TAG, "url更新失败，newUrl为null");
       return mTarget;

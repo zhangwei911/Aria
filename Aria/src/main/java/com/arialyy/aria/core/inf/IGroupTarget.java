@@ -17,24 +17,9 @@ package com.arialyy.aria.core.inf;
 
 /**
  * Created by lyy on 2019/4/5.
- * 普通任务接收器功能接口
+ * 组合任务接收器功能接口
  */
-public interface ITargetNormal<TARGET extends AbsTarget> {
-
-  /**
-   * 通过地址初始化target
-   *
-   * @param url 下载url、上传url
-   * @param targetName 接收器名称
-   */
-  void initTarget(String url, String targetName);
-
-  /**
-   * 更新下载url
-   *
-   * @param newUrl 新的下载url
-   */
-  TARGET updateUrl(String newUrl);
+public interface IGroupTarget {
 
   /**
    * 获取实体
@@ -56,26 +41,18 @@ public interface ITargetNormal<TARGET extends AbsTarget> {
   boolean isRunning();
 
   /**
-   * 检查下载实体，判断实体是否合法 合法标准为：
-   * 1、下载路径不为null，并且下载路径是正常的http或ftp路径
-   * 2、保存路径不为null，并且保存路径是android文件系统路径
-   * 3、保存路径不能重复
+   * 检查实体是否合法
    *
    * @return {@code true}合法
    */
   boolean checkEntity();
 
   /**
-   * 检查并设置普通任务的文件保存路径
+   * 检查文件夹路径
+   * 1、文件夹路径不能为空
+   * 2、文件夹路径不能是文件
    *
-   * @return {@code true}保存路径合法
+   * @return {@code true} 合法
    */
-  boolean checkFilePath();
-
-  /**
-   * 检查普通任务的下载地址
-   *
-   * @return {@code true}地址合法
-   */
-  boolean checkUrl();
+  boolean checkDirPath();
 }

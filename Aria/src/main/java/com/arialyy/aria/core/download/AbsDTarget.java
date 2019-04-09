@@ -23,7 +23,7 @@ import com.arialyy.aria.util.CommonUtil;
 /**
  * Created by lyy on 2017/2/28.
  */
-abstract class AbsDownloadTarget<TARGET extends AbsDownloadTarget> extends AbsTarget<TARGET> {
+abstract class AbsDTarget<TARGET extends AbsDTarget> extends AbsTarget<TARGET> {
 
   /**
    * 更新下载url

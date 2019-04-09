@@ -28,7 +28,7 @@ import java.util.Map;
  * Created by lyy on 2016/12/5.
  * https://github.com/AriaLyy/Aria
  */
-public class DownloadTarget extends AbsDownloadTarget<DownloadTarget>
+public class DownloadTarget extends AbsDTarget<DownloadTarget>
     implements IHttpHeaderDelegate<DownloadTarget> {
   private HttpHeaderDelegate<DownloadTarget> mHeaderDelegate;
   private DNormalDelegate<DownloadTarget> mNormalDelegate;

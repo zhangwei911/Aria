@@ -17,7 +17,7 @@ package com.arialyy.aria.core.upload;
 
 import android.text.TextUtils;
 import com.arialyy.aria.core.inf.AbsEntity;
-import com.arialyy.aria.core.inf.ITargetNormal;
+import com.arialyy.aria.core.inf.INormalTarget;
 import com.arialyy.aria.core.manager.TaskWrapperManager;
 import com.arialyy.aria.core.queue.UploadTaskQueue;
 import com.arialyy.aria.orm.DbEntity;
@@ -29,7 +29,7 @@ import java.io.File;
  * Created by Aria.Lao on 2019/4/5.
  * 普通上传任务通用功能处理
  */
-class UNormalDelegate<TARGET extends AbsUploadTarget> implements ITargetNormal<TARGET> {
+class UNormalDelegate<TARGET extends AbsUploadTarget> implements INormalTarget {
   private String TAG = "UNormalDelegate";
   private UploadEntity mEntity;
   private TARGET mTarget;
@@ -43,7 +43,7 @@ class UNormalDelegate<TARGET extends AbsUploadTarget> implements ITargetNormal<T
     initTarget(filePath, targetName);
   }
 
-  @Override public void initTarget(String filePath, String targetName) {
+  private void initTarget(String filePath, String targetName) {
     UTaskWrapper taskWrapper =
         TaskWrapperManager.getInstance().getHttpTaskWrapper(UTaskWrapper.class, filePath);
     mEntity = taskWrapper.getEntity();
@@ -55,7 +55,7 @@ class UNormalDelegate<TARGET extends AbsUploadTarget> implements ITargetNormal<T
     mTempUrl = mEntity.getUrl();
   }
 
-  @Override public TARGET updateUrl(String newUrl) {
+  TARGET updateUrl(String newUrl) {
     mTempUrl = newUrl;
     return mTarget;
   }

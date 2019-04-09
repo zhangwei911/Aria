@@ -153,7 +153,7 @@ public class DownloadReceiver extends AbsReceiver {
     CheckUtil.checkUrlInvalidThrow(dirUrl);
     return new FtpDirDownloadTarget(dirUrl, targetName);
   }
-
+  
   /**
    * 将当前类注册到Aria
    */

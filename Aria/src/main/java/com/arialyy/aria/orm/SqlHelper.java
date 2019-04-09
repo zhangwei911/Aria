@@ -20,13 +20,8 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.text.TextUtils;
-import com.arialyy.aria.core.download.DTaskWrapper;
-import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.util.ALog;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,7 +37,7 @@ final class SqlHelper extends SQLiteOpenHelper {
 
   private DelegateCommon mDelegate;
 
-  static SqlHelper init(Context context) {
+  synchronized static SqlHelper init(Context context) {
     if (INSTANCE == null) {
       synchronized (SqlHelper.class) {
         DelegateCommon delegate = DelegateManager.getInstance().getDelegate(DelegateCommon.class);
@@ -56,8 +51,7 @@ final class SqlHelper extends SQLiteOpenHelper {
         db.execSQL("PRAGMA foreign_keys=ON;");
         Set<String> tables = DBConfig.mapping.keySet();
         for (String tableName : tables) {
-          Class clazz = null;
-          clazz = DBConfig.mapping.get(tableName);
+          Class clazz = DBConfig.mapping.get(tableName);
 
           if (!delegate.tableExists(db, clazz)) {
             delegate.createTable(db, clazz);
