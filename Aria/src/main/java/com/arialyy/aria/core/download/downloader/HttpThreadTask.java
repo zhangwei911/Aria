@@ -19,7 +19,6 @@ import com.arialyy.aria.core.common.AbsThreadTask;
 import com.arialyy.aria.core.common.RequestEnum;
 import com.arialyy.aria.core.common.StateConstance;
 import com.arialyy.aria.core.common.SubThreadConfig;
-import com.arialyy.aria.core.config.BaseTaskConfig;
 import com.arialyy.aria.core.config.DownloadConfig;
 import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.download.DownloadEntity;
@@ -30,6 +29,7 @@ import com.arialyy.aria.exception.TaskException;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.BufferedRandomAccessFile;
 import java.io.BufferedInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -44,6 +44,7 @@ import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
 import java.util.Map;
 import java.util.Set;
+import java.util.zip.GZIPInputStream;
 
 /**
  * Created by lyy on 2017/1/18. 下载线程
@@ -87,7 +88,12 @@ final class HttpThreadTask extends AbsThreadTask<DownloadEntity, DTaskWrapper> {
       ConnectionHelp.setConnectParam(taskDelegate, conn);
       conn.setConnectTimeout(getTaskConfig().getConnectTimeOut());
       conn.setReadTimeout(getTaskConfig().getIOTimeOut());  //设置读取流的等待时间,必须设置该参数
+      if (taskDelegate.isChunked()) {
+        conn.setDoInput(true);
+        conn.setChunkedStreamingMode(0);
+      }
       conn.connect();
+      // 传递参数
       if (taskDelegate.getRequestEnum() == RequestEnum.POST) {
         Map<String, String> params = taskDelegate.getParams();
         if (params != null) {
@@ -106,7 +112,9 @@ final class HttpThreadTask extends AbsThreadTask<DownloadEntity, DTaskWrapper> {
       }
 
       is = new BufferedInputStream(ConnectionHelp.convertInputStream(conn));
-      if (isOpenDynamicFile) {
+      if (taskDelegate.isChunked()) {
+        readChunked(is);
+      } else if (isOpenDynamicFile) {
         readDynamicFile(is);
       } else {
         //创建可设置位置的文件
@@ -114,11 +122,7 @@ final class HttpThreadTask extends AbsThreadTask<DownloadEntity, DTaskWrapper> {
             new BufferedRandomAccessFile(mConfig.TEMP_FILE, "rwd", getTaskConfig().getBuffSize());
         //设置每条线程写入文件的位置
         file.seek(mConfig.START_LOCATION);
-        if (taskDelegate.isChunked()) {
-          readChunk(is, file);
-        } else {
-          readNormal(is, file);
-        }
+        readNormal(is, file);
         handleComplete();
       }
     } catch (MalformedURLException e) {
@@ -149,6 +153,41 @@ final class HttpThreadTask extends AbsThreadTask<DownloadEntity, DTaskWrapper> {
       }
     }
     return this;
+  }
+
+  /**
+   * 读取chunked数据
+   */
+  private void readChunked(InputStream is) {
+    FileOutputStream fos = null;
+    try {
+      fos = new FileOutputStream(mConfig.TEMP_FILE, true);
+      byte[] buffer = new byte[getTaskConfig().getBuffSize()];
+      int len;
+      while (isLive() && (len = is.read(buffer)) != -1) {
+        if (isBreak()) {
+          break;
+        }
+        if (mSpeedBandUtil != null) {
+          mSpeedBandUtil.limitNextBytes(len);
+        }
+        fos.write(buffer, 0, len);
+        progress(len);
+      }
+      handleComplete();
+    } catch (IOException e) {
+      fail(mChildCurrentLocation, new AriaIOException(TAG,
+          String.format("文件下载失败，savePath: %s, url: %s", mEntity.getDownloadPath(), mConfig.URL),
+          e));
+    } finally {
+      if (fos != null) {
+        try {
+          fos.close();
+        } catch (IOException e) {
+          e.printStackTrace();
+        }
+      }
+    }
   }
 
   /**
@@ -211,16 +250,6 @@ final class HttpThreadTask extends AbsThreadTask<DownloadEntity, DTaskWrapper> {
   }
 
   /**
-   * 读取chunk模式的文件流
-   *
-   * @deprecated 暂时先这样处理，无chun
-   */
-  private void readChunk(InputStream is, BufferedRandomAccessFile file)
-      throws IOException {
-    readNormal(is, file);
-  }
-
-  /**
    * 读取普通的文件流
    */
   private void readNormal(InputStream is, BufferedRandomAccessFile file)
@@ -247,6 +276,12 @@ final class HttpThreadTask extends AbsThreadTask<DownloadEntity, DTaskWrapper> {
       return;
     }
     if (!checkBlock()) {
+      return;
+    }
+    if (mTaskWrapper.asHttp().isChunked()) {
+      ALog.i(TAG, "任务下载完成");
+      STATE.isRunning = false;
+      mListener.onComplete();
       return;
     }
 

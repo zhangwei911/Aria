@@ -18,6 +18,7 @@ package com.arialyy.aria.core.download;
 import android.support.annotation.CheckResult;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
+import com.arialyy.annotations.DownloadGroup;
 import com.arialyy.aria.core.AriaManager;
 import com.arialyy.aria.core.command.ICmd;
 import com.arialyy.aria.core.command.normal.CancelAllCmd;
@@ -33,6 +34,7 @@ import com.arialyy.aria.orm.DbEntity;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CheckUtil;
 import com.arialyy.aria.util.CommonUtil;
+import com.arialyy.aria.util.DbDataHelper;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -153,7 +155,7 @@ public class DownloadReceiver extends AbsReceiver {
     CheckUtil.checkUrlInvalidThrow(dirUrl);
     return new FtpDirDownloadTarget(dirUrl, targetName);
   }
-  
+
   /**
    * 将当前类注册到Aria
    */
@@ -231,62 +233,43 @@ public class DownloadReceiver extends AbsReceiver {
    * @return 如果url错误或查找不到数据，则返回null
    */
   public DownloadEntity getDownloadEntity(String downloadUrl) {
-    if (!CheckUtil.checkUrl(downloadUrl)) {
-      return null;
-    }
+    CheckUtil.checkUrl(downloadUrl);
     return DbEntity.findFirst(DownloadEntity.class, "url=? and isGroupChild='false'", downloadUrl);
   }
 
   /**
-   * 通过下载地址和文件保存路径获取下载任务实体
+   * 获取组合任务实在实体
    *
-   * @param downloadUrl 下载地址
-   * @return 如果url错误或查找不到数据，则返回null
+   * @param urls 组合任务的url
+   * @return 如果实体不存在，返回null
    */
-  public DTaskWrapper getDownloadTask(String downloadUrl) {
-    if (!CheckUtil.checkUrl(downloadUrl)) {
-      return null;
-    }
-    if (!taskExists(downloadUrl)) {
-      return null;
-    }
-    return TaskWrapperManager.getInstance().getHttpTaskWrapper(DTaskWrapper.class, downloadUrl);
+  public DownloadGroupEntity getDownloadGroupEntity(List<String> urls) {
+    CheckUtil.checkDownloadUrls(urls);
+    return DbDataHelper.getDGEntity(CommonUtil.getMd5Code(urls));
   }
 
   /**
-   * 通过下载链接获取保存在数据库的下载任务组实体
+   * 获取组合任务实在实体
    *
-   * @param urls 任务组子任务下载地址列表
-   * @return 返回对应的任务组实体；如果查找不到对应的数据或子任务列表为null，返回null
+   * @param key 组合任务的key，{@link DownloadGroupEntity#getKey()}
+   * @return 如果实体不存在，返回null
    */
-  public DGTaskWrapper getGroupTask(List<String> urls) {
-    if (urls == null || urls.isEmpty()) {
-      ALog.e(TAG, "获取任务组实体失败：任务组子任务下载地址列表为null");
-      return null;
+  public DownloadGroupEntity getDownloadGroupEntity(String key) {
+    if (TextUtils.isEmpty(key)) {
+      throw new IllegalArgumentException("key为空");
     }
-    if (!taskExists(urls)) {
-      return null;
-    }
-    return TaskWrapperManager.getInstance().getDGTaskWrapper(DGTaskWrapper.class, urls);
+    return DbDataHelper.getDGEntity(key);
   }
 
   /**
-   * 获取FTP文件夹下载任务实体
+   * 获取Ftp文件夹任务的实体
    *
-   * @param dirUrl FTP文件夹本地下载路径
-   * @return 返回对应的任务组实体；如果查找不到对应的数据或路径为null，返回null
+   * @param url ftp文件夹下载路径
+   * @return 如果实体不存在，返回null
    */
-  public DGTaskWrapper getFtpDirTask(String dirUrl) {
-    if (TextUtils.isEmpty(dirUrl)) {
-      ALog.e(TAG, "获取FTP文件夹实体失败：下载路径为null");
-      return null;
-    }
-    boolean b =
-        DownloadGroupEntity.findFirst(DownloadGroupEntity.class, "groupHash=?", dirUrl) != null;
-    if (!b) {
-      return null;
-    }
-    return TaskWrapperManager.getInstance().getFtpTaskWrapper(DGTaskWrapper.class, dirUrl);
+  public DownloadGroupEntity getFtpDirEntity(String url) {
+    CheckUtil.checkUrl(url);
+    return DbDataHelper.getDGEntity(url);
   }
 
   /**

@@ -44,14 +44,14 @@ class DGTaskWrapperFactory implements IGTEFactory<DownloadGroupEntity, DGTaskWra
   }
 
   @Override public DGTaskWrapper getGTE(String groupHash, List<String> urls) {
-    DownloadGroupEntity entity = DbDataHelper.getHttpDGEntity(groupHash, urls);
+    DownloadGroupEntity entity = DbDataHelper.getOrCreateHttpDGEntity(groupHash, urls);
     DGTaskWrapper wrapper = new DGTaskWrapper(entity);
     wrapper.setSubTaskWrapper(createDGSubTaskWrapper(entity));
     return wrapper;
   }
 
   @Override public DGTaskWrapper getFTE(String ftpUrl) {
-    DownloadGroupEntity entity = DbDataHelper.getFtpDGEntity(ftpUrl);
+    DownloadGroupEntity entity = DbDataHelper.getOrCreateFtpDGEntity(ftpUrl);
     DGTaskWrapper fte = new DGTaskWrapper(entity);
     fte.asFtp().setUrlEntity(CommonUtil.getFtpUrlInfo(ftpUrl));
 

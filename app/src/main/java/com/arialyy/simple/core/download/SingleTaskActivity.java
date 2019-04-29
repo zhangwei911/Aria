@@ -31,6 +31,7 @@ import android.widget.Toast;
 
 import com.arialyy.annotations.Download;
 import com.arialyy.aria.core.Aria;
+import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.download.DownloadTarget;
 import com.arialyy.aria.core.download.DownloadTask;
@@ -57,14 +58,11 @@ public class SingleTaskActivity extends BaseActivity<ActivitySingleBinding> {
       //"http://static.gaoshouyou.com/d/22/94/822260b849944492caadd2983f9bb624.apks";
       //"http://120.55.95.61:8811/ghcg/zg/武义总规纲要成果.zip";
       //"https://yizi-kejian.oss-cn-beijing.aliyuncs.com/qimeng/package1/qmtable11.zip";
-      "http://rs.0.gaoshouyou.com/d/04/1e/400423a7551e1f3f0eb1812afa1f9b44.apk";
+      //"http://rs.0.gaoshouyou.com/d/04/1e/400423a7551e1f3f0eb1812afa1f9b44.apk";
+      //"http://chargepile2.techsum.net/car-manage/file/download?path=2019-04-26/c0242efd18be4ecbb23911b1c509dcad--掌通各系统汇总.xls"; // 无长度的chunked
   //"http://58.210.9.131/tpk/sipgt//TDLYZTGH.tpk"; //chunked 下载
-  //"https://static.donguo.me/video/ip/course/pfys_1.mp4";
-  //"https://www.baidu.com/link?url=_LFCuTPtnzFxVJByJ504QymRywIA1Z_T5xUxe9ZLuxcGM0C_RcdpWyB1eGjbJC-e5wv5wAKM4WmLMAS5KeF6EZJHB8Va3YqZUiaErqK_pxm&wd=&eqid=e8583fe70002d126000000065a99f864";
-  //"https://d.pcs.baidu.com/file/a02c89a2d479d4fd2756f3313d42491d?fid=4232431903-250528-1114369760340736&dstime=1525491372&rt=sh&sign=FDtAERVY-DCb740ccc5511e5e8fedcff06b081203-3C13vkOkuk4TqXvVYW05zj1K0ao%3D&expires=8h&chkv=1&chkbd=0&chkpc=et&dp-logid=8651730921842106225&dp-callid=0&r=165533013";
-  //"http://apk500.bce.baidu-mgame.com/game/67000/67734/20170622040827_oem_5502845.apk?r=1";
+  "http://apk500.bce.baidu-mgame.com/game/67000/67734/20170622040827_oem_5502845.apk?r=1";
   //"https://dl.genymotion.com/releases/genymotion-2.12.1/genymotion-2.12.1-vbox.exe";
-  //"http://9.9.9.50:5000/download1";
   //"http://9.9.9.50:5000/download/CentOS-7-x86_64-Minimal-1804.iso";
   //"http://v2.qingdian1.com/m_20180730_991/2/2B9FB34A4BCD8CE61481D1C8418EFE36_1080P.m3u8";
   //"https://firmwareapi.azurewebsites.net/firmware-overview?name=A19_Filament_W_IMG0038_00102411-encrypted.ota";
@@ -236,18 +234,17 @@ public class SingleTaskActivity extends BaseActivity<ActivitySingleBinding> {
   }
 
   /**
-   * @param task
-   * @param e
+   *
    */
   @Download.onTaskFail
   void taskFail(DownloadTask task, Exception e) {
     if (task.getKey().equals(DOWNLOAD_URL)) {
       Toast.makeText(SingleTaskActivity.this, "下载失败", Toast.LENGTH_SHORT).show();
       setBtState(true);
-      Aria.download(this)
-          .load(DOWNLOAD_URL)
-          .updateUrl("http://120.55.95.61:8811/ghcg/zg/武义总规纲要成果.zip")
-          .start();
+      //Aria.download(this)
+      //    .load(DOWNLOAD_URL)
+      //    .updateUrl("http://120.55.95.61:8811/ghcg/zg/武义总规纲要成果.zip")
+      //    .start();
       //DOWNLOAD_URL = "http://120.55.95.61:8811/ghcg/zg/武义总规纲要成果.zip";
       //ALog.d(TAG, ALog.getExceptionString(e));
     }
@@ -262,9 +259,11 @@ public class SingleTaskActivity extends BaseActivity<ActivitySingleBinding> {
     //mCancel.setEnabled(false);
     setBtState(true);
     getBinding().setSpeed("");
-    L.d(TAG, "path ==> " + task.getDownloadEntity().getDownloadPath());
-    L.d(TAG, "md5Code ==> " + CommonUtil.getFileMD5(new File(task.getDownloadPath())));
-    L.d(TAG, "data ==> " + Aria.download(this).getDownloadEntity(DOWNLOAD_URL));
+    L.d(TAG, "path = " + task.getDownloadEntity().getDownloadPath());
+    L.d(TAG, "md5Code = " + CommonUtil.getFileMD5(new File(task.getDownloadPath())));
+    L.d(TAG, "data = " + Aria.download(this).getDownloadEntity(DOWNLOAD_URL));
+    DownloadEntity temp = Aria.download(this).getDownloadEntity(DOWNLOAD_URL);
+    L.d(TAG, "status = " + temp.getState() + ", isComplete = " + temp.isComplete());
     //Intent install = new Intent(Intent.ACTION_VIEW);
     //install.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
     //File apkFile = new File(task.getDownloadPath());
@@ -285,8 +284,6 @@ public class SingleTaskActivity extends BaseActivity<ActivitySingleBinding> {
   protected int setLayoutId() {
     return R.layout.activity_single;
   }
-
-
 
   public void onClick(View view) {
     switch (view.getId()) {
@@ -318,9 +315,9 @@ public class SingleTaskActivity extends BaseActivity<ActivitySingleBinding> {
     //params.put("filename", "CentOS-7-x86_64-Minimal-1804.iso");
     Aria.download(SingleTaskActivity.this)
         .load(DOWNLOAD_URL)
-        //.addHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8")
-        //.addHeader("Accept-Encoding", "gzip, deflate")
-        //.addHeader("DNT", "1")
+        //.addHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3")
+        .addHeader("Accept-Encoding", "gzip, deflate")
+        .addHeader("DNT", "1")
         //.addHeader("Cookie", "BAIDUID=648E5FF020CC69E8DD6F492D1068AAA9:FG=1; BIDUPSID=648E5FF020CC69E8DD6F492D1068AAA9; PSTM=1519099573; BD_UPN=12314753; locale=zh; BDSVRTM=0")
         .useServerFileName(true)
         .setFilePath(path, true)

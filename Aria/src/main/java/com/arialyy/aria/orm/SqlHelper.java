@@ -20,7 +20,9 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.os.Build;
 import com.arialyy.aria.util.ALog;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -33,7 +35,8 @@ import java.util.Set;
  */
 final class SqlHelper extends SQLiteOpenHelper {
   private static final String TAG = "SqlHelper";
-  static volatile SqlHelper INSTANCE = null;
+  private static volatile SqlHelper INSTANCE = null;
+  private Context mContext;
 
   private DelegateCommon mDelegate;
 
@@ -42,34 +45,51 @@ final class SqlHelper extends SQLiteOpenHelper {
       synchronized (SqlHelper.class) {
         DelegateCommon delegate = DelegateManager.getInstance().getDelegate(DelegateCommon.class);
         INSTANCE = new SqlHelper(context.getApplicationContext(), delegate);
-        SQLiteDatabase db = INSTANCE.getWritableDatabase();
-        db = delegate.checkDb(db);
-        // SQLite在3.6.19版本中开始支持外键约束，
-        // 而在Android中 2.1以前的版本使用的SQLite版本是3.5.9， 在2.2版本中使用的是3.6.22.
-        // 但是为了兼容以前的程序，默认并没有启用该功能，如果要启用该功能
-        // 需要使用如下语句：
-        db.execSQL("PRAGMA foreign_keys=ON;");
-        Set<String> tables = DBConfig.mapping.keySet();
-        for (String tableName : tables) {
-          Class clazz = DBConfig.mapping.get(tableName);
-
-          if (!delegate.tableExists(db, clazz)) {
-            delegate.createTable(db, clazz);
-          }
-        }
       }
     }
+    return INSTANCE;
+  }
+
+  static SqlHelper getInstance() {
     return INSTANCE;
   }
 
   private SqlHelper(Context context, DelegateCommon delegate) {
     super(DBConfig.SAVE_IN_SDCARD ? new DatabaseContext(context) : context, DBConfig.DB_NAME, null,
         DBConfig.VERSION);
+    mContext = context;
     mDelegate = delegate;
   }
 
-  @Override public void onCreate(SQLiteDatabase db) {
+  @Override public void onOpen(SQLiteDatabase db) {
+    super.onOpen(db);
+  }
 
+  @Override public void onConfigure(SQLiteDatabase db) {
+    super.onConfigure(db);
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+      db.setForeignKeyConstraintsEnabled(true);
+    } else {
+      // SQLite在3.6.19版本中开始支持外键约束，
+      // 而在Android中 2.1以前的版本使用的SQLite版本是3.5.9， 在2.2版本中使用的是3.6.22.
+      // 但是为了兼容以前的程序，默认并没有启用该功能，如果要启用该功能
+      // 需要使用如下语句：
+      db.execSQL("PRAGMA foreign_keys=ON;");
+    }
+    if (DBConfig.DEBUG) {
+      db.enableWriteAheadLogging();
+    }
+  }
+
+  @Override public void onCreate(SQLiteDatabase db) {
+    DelegateCommon delegate = DelegateManager.getInstance().getDelegate(DelegateCommon.class);
+    Set<String> tables = DBConfig.mapping.keySet();
+    for (String tableName : tables) {
+      Class clazz = DBConfig.mapping.get(tableName);
+      if (!delegate.tableExists(db, clazz)) {
+        delegate.createTable(db, clazz);
+      }
+    }
   }
 
   @Override public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
@@ -88,6 +108,34 @@ final class SqlHelper extends SQLiteOpenHelper {
     if (oldVersion > newVersion) {
       handleDbUpdate(db, null, null);
     }
+  }
+
+  /**
+   * 获取数据库连接
+   */
+  SQLiteDatabase getDb() {
+    SQLiteDatabase db;
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+      SQLiteDatabase.OpenParams params = new SQLiteDatabase.OpenParams.Builder().setOpenFlags(
+          SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE |
+              SQLiteDatabase.CREATE_IF_NECESSARY).build();
+      setOpenParams(params);
+      db = getWritableDatabase();
+    } else {
+      //SQLiteDatabase.openOrCreateDatabase()
+      File dbFile = mContext.getDatabasePath(DBConfig.DB_NAME);
+      if (!dbFile.exists()) {
+        db = getWritableDatabase();
+      } else {
+        // 触发一次SQLiteOpenHelper的流程，再使用NO_LOCALIZED_COLLATORS标志打开数据库
+        db = getReadableDatabase();
+        db.close();
+        db = SQLiteDatabase.openDatabase(dbFile.getPath(), null,
+            SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE |
+                SQLiteDatabase.CREATE_IF_NECESSARY);
+      }
+    }
+    return db;
   }
 
   /**
@@ -113,7 +161,6 @@ final class SqlHelper extends SQLiteOpenHelper {
       for (String tableName : tables) {
         Class clazz = DBConfig.mapping.get(tableName);
         if (mDelegate.tableExists(db, clazz)) {
-          db = mDelegate.checkDb(db);
           //修改表名为中介表名
           String alertSql = String.format("ALTER TABLE %s RENAME TO %s_temp", tableName, tableName);
           db.execSQL(alertSql);
@@ -181,8 +228,6 @@ final class SqlHelper extends SQLiteOpenHelper {
     } finally {
       db.endTransaction();
     }
-
-    mDelegate.close(db);
   }
 
   /**

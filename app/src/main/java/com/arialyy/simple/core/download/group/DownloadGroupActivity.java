@@ -48,16 +48,15 @@ public class DownloadGroupActivity extends BaseActivity<ActivityDownloadGroupBin
     setTitle("任务组");
     mChildList = getBinding().childList;
     mUrls = getModule(GroupModule.class).getUrls();
-    DGTaskWrapper entity = Aria.download(this).getGroupTask(mUrls);
-    if (entity != null && entity.getEntity() != null) {
-      DownloadGroupEntity groupEntity = entity.getEntity();
-      mChildList.addData(groupEntity.getSubEntities());
-      getBinding().setFileSize(groupEntity.getConvertFileSize());
-      if (groupEntity.getFileSize() == 0) {
+    DownloadGroupEntity entity = Aria.download(this).getDownloadGroupEntity(mUrls);
+    if (entity != null) {
+      mChildList.addData(entity.getSubEntities());
+      getBinding().setFileSize(entity.getConvertFileSize());
+      if (entity.getFileSize() == 0) {
         getBinding().setProgress(0);
       } else {
-        getBinding().setProgress(groupEntity.isComplete() ? 100
-            : (int) (groupEntity.getCurrentProgress() * 100 / groupEntity.getFileSize()));
+        getBinding().setProgress(entity.isComplete() ? 100
+            : (int) (entity.getCurrentProgress() * 100 / entity.getFileSize()));
       }
     }
 
@@ -82,7 +81,8 @@ public class DownloadGroupActivity extends BaseActivity<ActivityDownloadGroupBin
     switch (view.getId()) {
       case R.id.start:
         List<String> temp = new ArrayList<>();
-        temp.add("https://d.pcs.baidu.com/file/130335545f3f4d9cc38afe709c19af5a?fid=1411168371-250528-1010657263806840&dstime=1531134714&rt=sh&sign=FDtAERVY-DCb740ccc5511e5e8fedcff06b081203-h8KgJ6gl4oY9UR6NqvwJsT4nVSM%3D&expires=8h&chkv=1&chkbd=0&chkpc=et&dp-logid=4401996296756616039&dp-callid=0&r=279987343");
+        temp.add(
+            "https://d.pcs.baidu.com/file/130335545f3f4d9cc38afe709c19af5a?fid=1411168371-250528-1010657263806840&dstime=1531134714&rt=sh&sign=FDtAERVY-DCb740ccc5511e5e8fedcff06b081203-h8KgJ6gl4oY9UR6NqvwJsT4nVSM%3D&expires=8h&chkv=1&chkbd=0&chkpc=et&dp-logid=4401996296756616039&dp-callid=0&r=279987343");
         Aria.download(this)
             .loadGroup(mUrls)
             .setDirPath(

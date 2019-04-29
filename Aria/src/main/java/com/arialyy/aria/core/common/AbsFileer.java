@@ -141,10 +141,11 @@ public abstract class AbsFileer<ENTITY extends AbsNormalEntity, TASK_WRAPPER ext
     }
     resetState();
     mConstance.resetState();
+    ALog.d(TAG, "path: " + getFilePath());
     checkRecord();
     mConstance.isRunning = true;
     mConstance.TASK_RECORD = mRecord;
-    if (!mTaskWrapper.isSupportBP()) {
+    if (!mTaskWrapper.isSupportBP() || mTaskWrapper.asHttp().isChunked()) {
       mTotalThreadNum = 1;
     } else {
       mTotalThreadNum =
@@ -348,6 +349,7 @@ public abstract class AbsFileer<ENTITY extends AbsNormalEntity, TASK_WRAPPER ext
     if (mRecord.isOpenDynamicFile) {
       ThreadRecord tr = mRecord.threadRecords.get(0);
       if (tr == null) {
+        ALog.d(TAG, "线程记录为空，任务为新任务");
         mTaskWrapper.setNewTask(true);
         mTotalThreadNum = 1;
         return;
@@ -438,6 +440,7 @@ public abstract class AbsFileer<ENTITY extends AbsNormalEntity, TASK_WRAPPER ext
     if (records == null || records.size() == 0) {
       Properties pro = CommonUtil.loadConfig(mConfigFile);
       if (pro.isEmpty()) {
+        ALog.d(TAG, "老版本的线程记录为空，任务为新任务");
         mTaskWrapper.setNewTask(true);
         return;
       }
@@ -453,6 +456,7 @@ public abstract class AbsFileer<ENTITY extends AbsNormalEntity, TASK_WRAPPER ext
       }
       int threadNum = set.size();
       if (threadNum == 0) {
+        ALog.d(TAG, "线程数为空，任务为新任务");
         mTaskWrapper.setNewTask(true);
         return;
       }
@@ -495,6 +499,7 @@ public abstract class AbsFileer<ENTITY extends AbsNormalEntity, TASK_WRAPPER ext
         mRecord.dGroupHash = ((DownloadEntity) mTaskWrapper.getEntity()).getGroupHash();
       }
     }
+    ALog.d(TAG, String.format("初始化记录，任务为%s任务", isNewTask ? "新" : "旧"));
     mTaskWrapper.setNewTask(isNewTask);
   }
 
@@ -569,6 +574,10 @@ public abstract class AbsFileer<ENTITY extends AbsNormalEntity, TASK_WRAPPER ext
     long fileLength = mEntity.getFileSize();
     long blockSize = fileLength / mTotalThreadNum;
     Set<Integer> threads = new HashSet<>();
+    // 如果是新任务，检查下历史记录，如果有遗留的记录，删除并删除分块文件
+    if (mTaskWrapper.isNewTask()) {
+      CommonUtil.delTaskRecord(getFilePath(), 1, true);
+    }
 
     mRecord.fileLength = fileLength;
     if (mTaskWrapper.isNewTask() && !handleNewTask()) {

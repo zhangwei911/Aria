@@ -24,6 +24,7 @@ import com.arialyy.aria.core.inf.AbsTaskWrapper;
 import com.arialyy.aria.core.inf.IDownloadListener;
 import com.arialyy.aria.exception.BaseException;
 import com.arialyy.aria.exception.TaskException;
+import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.BufferedRandomAccessFile;
 import java.io.File;
 import java.io.IOException;
@@ -81,6 +82,20 @@ public class Downloader extends AbsFileer<DownloadEntity, DTaskWrapper> {
       }
     }
     return false;
+  }
+
+  /**
+   * 如果使用"Content-Disposition"中的文件名，需要更新{@link #mTempFile}的路径
+   */
+  void updateTempFile() {
+    if (!mTempFile.getPath().equals(mEntity.getDownloadPath())) {
+      if (!mTempFile.exists()) {
+        mTempFile = new File(mEntity.getDownloadPath());
+      } else {
+        boolean b = mTempFile.renameTo(new File(mEntity.getDownloadPath()));
+        ALog.d(TAG, String.format("更新tempFile文件名%s", b ? "成功" : "失败"));
+      }
+    }
   }
 
   @Override protected int getType() {

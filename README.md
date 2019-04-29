@@ -18,7 +18,7 @@ Aria有以下特点：
  + 支持[多线程分块下载](https://aria.laoyuyu.me/aria_doc/start/config.html)，能更有效的发挥机器IO性能
  + 支持300、301、302重定向下载链接下载
  + 下载支持文件长度动态增加，文件下载初始化时将不再占用过多的内存空间，见[动态长度配置](https://aria.laoyuyu.me/aria_doc/start/config.html#%E4%B8%8B%E8%BD%BD%E5%8A%A8%E6%80%81%E6%96%87%E4%BB%B6%E8%AF%B4%E6%98%8E)
- 
+
 [怎样使用Aria?](#使用)
 
 如果你觉得Aria对你有帮助，您的star和issues将是对我最大支持.`^_^`
@@ -97,7 +97,7 @@ protected void onCreate(Bundle savedInstanceState) {
 ```java
 //在这里处理任务执行中的状态，如进度进度条的刷新
 @Download.onTaskRunning protected void running(DownloadTask task) {
-	if(task.getUrl().eques(url)){
+	if(task.getKey().eques(url)){
 		....
 		可以通过url判断是否是指定任务的回调
 	}

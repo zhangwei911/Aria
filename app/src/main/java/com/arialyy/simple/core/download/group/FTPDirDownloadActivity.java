@@ -36,23 +36,22 @@ import com.arialyy.simple.widget.SubStateLinearLayout;
 public class FTPDirDownloadActivity extends BaseActivity<ActivityDownloadGroupBinding> {
   private static final String dir = "ftp://9.9.9.50:21/upload/测试";
 
-   SubStateLinearLayout mChildList;
+  SubStateLinearLayout mChildList;
 
   @Override protected void init(Bundle savedInstanceState) {
     super.init(savedInstanceState);
     Aria.download(this).register();
     setTitle("FTP文件夹下载");
     mChildList = findViewById(R.id.child_list);
-    DGTaskWrapper entity = Aria.download(this).getFtpDirTask(dir);
-    if (entity != null && entity.getEntity() != null) {
-      DownloadGroupEntity groupEntity = entity.getEntity();
-      mChildList.addData(groupEntity.getSubEntities());
-      getBinding().setFileSize(groupEntity.getConvertFileSize());
-      if (groupEntity.getFileSize() == 0) {
+    DownloadGroupEntity entity = Aria.download(this).getFtpDirEntity(dir);
+    if (entity != null) {
+      mChildList.addData(entity.getSubEntities());
+      getBinding().setFileSize(entity.getConvertFileSize());
+      if (entity.getFileSize() == 0) {
         getBinding().setProgress(0);
       } else {
-        getBinding().setProgress(groupEntity.isComplete() ? 100
-            : (int) (groupEntity.getCurrentProgress() * 100 / groupEntity.getFileSize()));
+        getBinding().setProgress(entity.isComplete() ? 100
+            : (int) (entity.getCurrentProgress() * 100 / entity.getFileSize()));
       }
     }
   }

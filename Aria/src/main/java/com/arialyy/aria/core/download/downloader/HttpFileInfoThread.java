@@ -36,6 +36,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
 import java.net.CookieManager;
 import java.net.HttpCookie;
 import java.net.HttpURLConnection;
@@ -77,7 +78,6 @@ public class HttpFileInfoThread implements Runnable {
       ConnectionHelp.setConnectParam(mTaskDelegate, conn);
       conn.setRequestProperty("Range", "bytes=" + 0 + "-");
       conn.setConnectTimeout(mConnectTimeOut);
-      //conn.setChunkedStreamingMode(0);
       conn.connect();
       handleConnect(conn);
     } catch (IOException e) {
@@ -149,20 +149,7 @@ public class HttpFileInfoThread implements Runnable {
     String disposition = conn.getHeaderField("Content-Disposition");
     if (mTaskDelegate.isUseServerFileName() && !TextUtils.isEmpty(disposition)) {
       mEntity.setDisposition(CommonUtil.encryptBASE64(disposition));
-      if (disposition.contains(";")) {
-        String[] infos = disposition.split(";");
-        for (String info : infos) {
-          if (info.startsWith("filename") && info.contains("=")) {
-            String[] temp = info.split("=");
-            if (temp.length > 1) {
-              String newName = URLDecoder.decode(temp[1], "utf-8").replaceAll("\"", "");
-              mEntity.setServerFileName(newName);
-              renameFile(newName);
-              break;
-            }
-          }
-        }
-      }
+      handleContentDisposition(disposition);
     }
     CookieManager msCookieManager = new CookieManager();
     List<String> cookiesHeader = headers.get("Set-Cookie");
@@ -241,6 +228,40 @@ public class HttpFileInfoThread implements Runnable {
   }
 
   /**
+   * 处理"Content-Disposition"参数
+   * <a href=https://cloud.tencent.com/developer/section/1189916>Content-Disposition</a></>
+   *
+   * @throws UnsupportedEncodingException
+   */
+  private void handleContentDisposition(String disposition) throws UnsupportedEncodingException {
+    if (disposition.contains(";")) {
+      String[] infos = disposition.split(";");
+      if (infos[0].equals("attachment")) {
+        for (String info : infos) {
+          if (info.startsWith("filename") && info.contains("=")) {
+            String[] temp = info.split("=");
+            if (temp.length > 1) {
+              String newName = URLDecoder.decode(temp[1], "utf-8").replaceAll("\"", "");
+              mEntity.setServerFileName(newName);
+              renameFile(newName);
+              break;
+            }
+          }
+        }
+      } else if (infos[0].equals("form-data") && infos.length > 2) {
+        String[] temp = infos[2].split("=");
+        if (temp.length > 1) {
+          String newName = URLDecoder.decode(temp[1], "utf-8").replaceAll("\"", "");
+          mEntity.setServerFileName(newName);
+          renameFile(newName);
+        }
+      } else {
+        ALog.w(TAG, "不识别的Content-Disposition参数");
+      }
+    }
+  }
+
+  /**
    * 重命名文件
    */
   private void renameFile(String newName) {
@@ -248,10 +269,12 @@ public class HttpFileInfoThread implements Runnable {
       ALog.w(TAG, "重命名失败【服务器返回的文件名为空】");
       return;
     }
+    ALog.d(TAG, String.format("文件重命名为：%s", newName));
     File oldFile = new File(mEntity.getDownloadPath());
     String newPath = oldFile.getParent() + "/" + newName;
     if (oldFile.exists()) {
-      oldFile.renameTo(new File(newPath));
+      boolean b = oldFile.renameTo(new File(newPath));
+      ALog.d(TAG, String.format("文件重命名%s", b ? "成功" : "失败"));
     }
     mEntity.setFileName(newName);
     mEntity.setDownloadPath(newPath);
@@ -269,7 +292,7 @@ public class HttpFileInfoThread implements Runnable {
       }
       return;
     }
-    if (!CheckUtil.checkUrl(newUrl)) {
+    if (!CheckUtil.checkUrlNotThrow(newUrl)) {
       failDownload(new TaskException(TAG, "下载失败，重定向url错误"), false);
       return;
     }
@@ -296,6 +319,7 @@ public class HttpFileInfoThread implements Runnable {
    */
   private boolean checkLen(long len) {
     if (len != mEntity.getFileSize()) {
+      ALog.d(TAG, "长度不一致，任务为新任务");
       mTaskWrapper.setNewTask(true);
     }
     return true;

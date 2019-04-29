@@ -163,27 +163,27 @@ class ConnectionHelp {
           "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36");
     }
     if (conn.getRequestProperty("Accept") == null) {
-      //StringBuilder accept = new StringBuilder();
-      //accept
-      //.append("image/gif, ")
-      //.append("image/jpeg, ")
-      //.append("image/pjpeg, ")
-      //.append("image/webp, ")
-      //.append("image/apng, ")
-      //.append("application/xml, ")
-      //.append("application/xaml+xml, ")
-      //.append("application/xhtml+xml, ")
-      //.append("application/x-shockwave-flash, ")
-      //.append("application/x-ms-xbap, ")
-      //.append("application/x-ms-application, ")
-      //.append("application/msword, ")
-      //.append("application/vnd.ms-excel, ")
-      //.append("application/vnd.ms-xpsdocument, ")
-      //.append("application/vnd.ms-powerpoint, ")
-      //.append("text/plain, ")
-      //.append("text/html, ")
-      //.append("*/*");
-      conn.setRequestProperty("Accept", "*/*");
+      StringBuilder accept = new StringBuilder();
+      accept.append("image/gif, ")
+          .append("image/jpeg, ")
+          .append("image/pjpeg, ")
+          .append("image/webp, ")
+          .append("image/apng, ")
+          .append("application/xml, ")
+          .append("application/xaml+xml, ")
+          .append("application/xhtml+xml, ")
+          .append("application/x-shockwave-flash, ")
+          .append("application/x-ms-xbap, ")
+          .append("application/x-ms-application, ")
+          .append("application/msword, ")
+          .append("application/vnd.ms-excel, ")
+          .append("application/vnd.ms-xpsdocument, ")
+          .append("application/vnd.ms-powerpoint, ")
+          .append("application/signed-exchange, ")
+          .append("text/plain, ")
+          .append("text/html, ")
+          .append("*/*");
+      conn.setRequestProperty("Accept", accept.toString());
     }
     //302获取重定向地址
     conn.setInstanceFollowRedirects(false);

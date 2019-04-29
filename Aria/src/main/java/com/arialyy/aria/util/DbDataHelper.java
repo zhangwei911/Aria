@@ -46,12 +46,26 @@ public class DbDataHelper {
   }
 
   /**
+   * 获取组合任务实体、ftpDir任务实体
+   *
+   * @param groupHash 组合任务Hash
+   * @return 实体不存在，返回null
+   */
+  public static DownloadGroupEntity getDGEntity(String groupHash) {
+    List<DGEntityWrapper> wrapper =
+        DbEntity.findRelationData(DGEntityWrapper.class, "DownloadGroupEntity.groupHash=?",
+            groupHash);
+
+    return wrapper == null ? null : wrapper.get(0).groupEntity;
+  }
+
+  /**
    * 获取组合任务实体 如果数据库不存在该实体，则新创建一个新的任务组实体
    *
    * @param groupHash 组合任务Hash
    * @param urls 子任务url列表
    */
-  public static DownloadGroupEntity getHttpDGEntity(String groupHash, List<String> urls) {
+  public static DownloadGroupEntity getOrCreateHttpDGEntity(String groupHash, List<String> urls) {
     List<DGEntityWrapper> wrapper =
         DbEntity.findRelationData(DGEntityWrapper.class, "DownloadGroupEntity.groupHash=?",
             groupHash);
@@ -96,7 +110,7 @@ public class DbDataHelper {
    *
    * @param ftpUrl ftp下载地址
    */
-  public static DownloadGroupEntity getFtpDGEntity(String ftpUrl) {
+  public static DownloadGroupEntity getOrCreateFtpDGEntity(String ftpUrl) {
     List<DGEntityWrapper> wrapper =
         DbEntity.findRelationData(DGEntityWrapper.class, "DownloadGroupEntity.groupHash=?",
             ftpUrl);

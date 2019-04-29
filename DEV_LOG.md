@@ -3,6 +3,13 @@
     - 优化任务接收器的代码结构
     - 修复`DbEntity.saveAll()`失败的问题
     - 修复分块任务重命名失败的问题
+    - fix bug https://github.com/AriaLyy/Aria/issues/379
+    - 移除`getDownloadTask(String url)`、`getGroupTask(List<String> urls)`、`getFtpDirTask(String path)`
+      等获取任务的api，如果你希望获取对应状态，请使用实体的状态判断，如：`getDownloadEntity()`、`getDownloadGroupEntity()`
+      `getFtpDirEntity()`
+    - fix bug https://github.com/AriaLyy/Aria/issues/388
+    - 修复使用`Content-Disposition`的文件名时，第一次下载无法重命名文件的问题
+    - 修复使用`Content-Disposition`的文件名时，多次重命名文件的问题
   + v_3.6.3 (2019/4/2)
     - fix bug https://github.com/AriaLyy/Aria/issues/377
   + v_3.6.2 (2019/4/1)
@@ -71,7 +78,7 @@
               .start();
       ```
      - 增加强制设置文件路径的api, https://github.com/AriaLyy/Aria/issues/311
-       ```
+       ```java
        Aria.download(SingleTaskActivity.this)
                      .load(DOWNLOAD_URL)
                      .setFilePath(path, true) // true表示忽略路径是否被占用

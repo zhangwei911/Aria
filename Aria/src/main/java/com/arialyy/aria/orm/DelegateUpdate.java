@@ -49,9 +49,7 @@ class DelegateUpdate extends AbsDelegate {
       params[i] = String.format("'%s'", encodeStr(expression[i + 1]));
     }
     sql = String.format(sql, params);
-    print(DEL_DATA, sql);
     db.execSQL(sql);
-    close(db);
   }
 
   /**
@@ -66,7 +64,6 @@ class DelegateUpdate extends AbsDelegate {
     } else {
       ALog.e(TAG, "更新记录失败，记录没有属性字段");
     }
-    close(db);
   }
 
   /**
@@ -139,7 +136,6 @@ class DelegateUpdate extends AbsDelegate {
     } else {
       ALog.e(TAG, "保存记录失败，记录没有属性字段");
     }
-    close(db);
   }
 
   /**

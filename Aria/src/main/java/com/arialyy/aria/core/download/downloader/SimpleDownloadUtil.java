@@ -126,6 +126,7 @@ public class SimpleDownloadUtil implements IUtil, Runnable {
       case AbsTaskWrapper.D_FTP:
         return new FtpFileInfoThread(mTaskWrapper, new OnFileInfoCallback() {
           @Override public void onComplete(String url, CompleteInfo info) {
+            mDownloader.updateTempFile();
             mDownloader.start();
           }
 
@@ -137,6 +138,7 @@ public class SimpleDownloadUtil implements IUtil, Runnable {
       case AbsTaskWrapper.D_HTTP:
         return new HttpFileInfoThread(mTaskWrapper, new OnFileInfoCallback() {
           @Override public void onComplete(String url, CompleteInfo info) {
+            mDownloader.updateTempFile();
             mDownloader.start();
           }
 

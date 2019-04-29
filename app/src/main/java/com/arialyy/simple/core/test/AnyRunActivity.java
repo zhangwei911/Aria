@@ -43,8 +43,6 @@ public class AnyRunActivity extends BaseActivity<ActivityTestBinding> {
     mBar.setVisibility(View.GONE);
     module = new AnyRunnModule(this);
     urls = getResources().getStringArray(R.array.group_urls);
-    DTaskWrapper entity = Aria.download(this).getDownloadTask(URL);
-    Log.d(TAG, entity + "");
   }
 
   public void onClick(View view) {

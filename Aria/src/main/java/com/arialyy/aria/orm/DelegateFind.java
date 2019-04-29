@@ -221,14 +221,11 @@ class DelegateFind extends AbsDelegate {
         if (page != -1 && num != -1) {
           sql = sql.concat(String.format(" LIMIT %s,%s", (page - 1) * num, num));
         }
-
-        print(RELATION, sql);
         Cursor cursor = db.rawQuery(sql, null);
         List<T> data =
             (List<T>) newInstanceEntity(clazz, parentClazz, childClazz, cursor, pColumn, cColumn,
                 pColumnAlias, cColumnAlias);
         closeCursor(cursor);
-        close(db);
         return data;
       } catch (ClassNotFoundException e) {
         e.printStackTrace();
@@ -468,7 +465,6 @@ class DelegateFind extends AbsDelegate {
    */
   private <T extends DbEntity> List<T> exeNormalDataSql(SQLiteDatabase db, Class<T> clazz,
       String sql, String[] selectionArgs) {
-    print(FIND_DATA, sql);
     String[] temp = new String[selectionArgs.length];
     int i = 0;
     for (String arg : selectionArgs){
@@ -478,7 +474,6 @@ class DelegateFind extends AbsDelegate {
     Cursor cursor = db.rawQuery(sql, temp);
     List<T> data = cursor.getCount() > 0 ? newInstanceEntity(clazz, cursor) : null;
     closeCursor(cursor);
-    close(db);
     return data;
   }
 
@@ -586,7 +581,6 @@ class DelegateFind extends AbsDelegate {
       i++;
     }
     cursor.close();
-    close(db);
     return ids;
   }
 
@@ -610,11 +604,9 @@ class DelegateFind extends AbsDelegate {
       sb.append(i >= wheres.length - 1 ? "" : ",");
       i++;
     }
-    print(ROW_ID, sb.toString());
     Cursor c = db.rawQuery(sb.toString(), null);
     int id = c.getColumnIndex("rowid");
     c.close();
-    close(db);
     return id;
   }
 
@@ -631,7 +623,6 @@ class DelegateFind extends AbsDelegate {
   boolean itemExist(SQLiteDatabase db, String tableName, long rowId) {
     db = checkDb(db);
     String sql = "SELECT rowid FROM " + tableName + " WHERE rowid=" + rowId;
-    print(ROW_ID, sql);
     Cursor cursor = db.rawQuery(sql, null);
     boolean isExist = cursor.getCount() > 0;
     cursor.close();

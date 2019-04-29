@@ -73,24 +73,27 @@ class DTaskWrapperFactory implements INormalTEFactory<DownloadEntity, DTaskWrapp
       entity.setDownloadPath(UUID.randomUUID().toString().replace("-", ""));  //设置临时路径
     }
     File file = new File(entity.getDownloadPath());
-    TaskRecord record =
-        TaskRecord.findFirst(TaskRecord.class, "filePath=?", entity.getDownloadPath());
-    if (record == null) {
-      resetEntity(entity);
-    } else {
-      if (record.isBlock) {
-        int count = 0;
-        for (int i = 0, len = record.threadNum; i < len; i++) {
-          File temp = new File(String.format(AbsFileer.SUB_PATH, record.filePath, i));
-          if (!temp.exists()) {
-            count++;
+
+    if (!entity.isComplete()) {
+      TaskRecord record =
+          TaskRecord.findFirst(TaskRecord.class, "filePath=?", entity.getDownloadPath());
+      if (record == null) {
+        resetEntity(entity);
+      } else {
+        if (record.isBlock) {
+          int count = 0;
+          for (int i = 0, len = record.threadNum; i < len; i++) {
+            File temp = new File(String.format(AbsFileer.SUB_PATH, record.filePath, i));
+            if (!temp.exists()) {
+              count++;
+            }
           }
-        }
-        if (count == record.threadNum) {
+          if (count == record.threadNum) {
+            resetEntity(entity);
+          }
+        } else if (!file.exists()) { // 非分块文件需要判断文件是否存在
           resetEntity(entity);
         }
-      } else if (!file.exists()) { // 非分块文件需要判断文件是否存在
-        resetEntity(entity);
       }
     }
     return entity;

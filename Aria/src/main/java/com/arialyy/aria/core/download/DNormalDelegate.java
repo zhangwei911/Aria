@@ -145,6 +145,10 @@ class DNormalDelegate<TARGET extends AbsDTarget> implements INormalTarget {
       File newFile = new File(filePath);
       mEntity.setDownloadPath(filePath);
       mEntity.setFileName(newFile.getName());
+      // 如过使用Content-Disposition中的文件名，将不会执行重命名工作
+      if (mTarget.getTaskWrapper().asHttp().isUseServerFileName()) {
+        return true;
+      }
       if (oldFile.exists()) {
         // 处理普通任务的重命名
         CommonUtil.modifyTaskRecord(oldFile.getPath(), newFile.getPath());

@@ -36,7 +36,7 @@ public class DelegateWrapper {
 
   private DelegateWrapper(Context context) {
     SqlHelper helper = SqlHelper.init(context.getApplicationContext());
-    mDb = helper.getWritableDatabase();
+    mDb = helper.getDb();
     mDManager = DelegateManager.getInstance();
   }
 

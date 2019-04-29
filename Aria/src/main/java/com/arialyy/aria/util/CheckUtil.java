@@ -128,11 +128,26 @@ public class CheckUtil {
   }
 
   /**
+   * 检测url是否合法，如果url不合法，将抛出{@link IllegalArgumentException}异常
+   */
+  public static void checkUrl(String url) {
+    if (TextUtils.isEmpty(url)) {
+      throw new NullPointerException("url为空");
+    } else if (!url.startsWith("http") && !url.startsWith("ftp")) {
+      throw new IllegalArgumentException(String.format("url【%s】错误", url));
+    }
+    int index = url.indexOf("://");
+    if (index == -1) {
+      throw new IllegalArgumentException(String.format("url【%s】不合法", url));
+    }
+  }
+
+  /**
    * 检测url是否合法
    *
    * @return {@code true} 合法，{@code false} 非法
    */
-  public static boolean checkUrl(String url) {
+  public static boolean checkUrlNotThrow(String url) {
     if (TextUtils.isEmpty(url)) {
       ALog.e(TAG, "url不能为null");
       return false;

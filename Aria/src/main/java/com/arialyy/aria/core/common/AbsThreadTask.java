@@ -316,7 +316,7 @@ public abstract class AbsThreadTask<ENTITY extends AbsNormalEntity, TASK_WRAPPER
    */
   protected void progress(long len) {
     synchronized (AriaManager.LOCK) {
-      if (STATE.CURRENT_LOCATION > mEntity.getFileSize()) {
+      if (STATE.CURRENT_LOCATION > mEntity.getFileSize() && !mTaskWrapper.asHttp().isChunked()) {
         String errorMsg =
             String.format("下载失败，下载长度超出文件真实长度；currentLocation=%s, fileSize=%s",
                 STATE.CURRENT_LOCATION,

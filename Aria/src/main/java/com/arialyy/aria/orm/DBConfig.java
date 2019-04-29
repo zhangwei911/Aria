@@ -33,6 +33,7 @@ import java.util.Map;
  */
 class DBConfig {
   /*adb pull /mnt/sdcard/Android/data/com.arialyy.simple/files/DB/AriaLyyDb d:/db*/
+  static boolean DEBUG = false;
   static Map<String, Class> mapping = new HashMap<>();
   static String DB_NAME;
   static int VERSION = 45;

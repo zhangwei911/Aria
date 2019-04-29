@@ -42,7 +42,6 @@ class DelegateCommon extends AbsDelegate {
   void dropTable(SQLiteDatabase db, String tableName) {
     db = checkDb(db);
     String deleteSQL = String.format("DROP TABLE IF EXISTS %s", tableName);
-    print(DROP_TABLE, deleteSQL);
     //db.beginTransaction();
     db.execSQL(deleteSQL);
     //db.setTransactionSuccessful();
@@ -71,7 +70,6 @@ class DelegateCommon extends AbsDelegate {
     return tableExists(db, CommonUtil.getClassName(clazz));
   }
 
-
   /**
    * 查找表是否存在
    *
@@ -85,7 +83,6 @@ class DelegateCommon extends AbsDelegate {
       String sql =
           String.format("SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name='%s'",
               tableName);
-      print(TABLE_EXISTS, sql);
       cursor = db.rawQuery(sql, null);
       if (cursor != null && cursor.moveToNext()) {
         int count = cursor.getInt(0);
@@ -97,7 +94,6 @@ class DelegateCommon extends AbsDelegate {
       e.printStackTrace();
     } finally {
       closeCursor(cursor);
-      close(db);
     }
     return false;
   }
@@ -119,11 +115,9 @@ class DelegateCommon extends AbsDelegate {
       params[i] = String.format("'%s'", encodeStr(expression[i + 1]));
     }
     sql = String.format(sql, params);
-    print(FIND_DATA, sql);
     Cursor cursor = db.rawQuery(sql, null);
     final boolean isExist = cursor.getCount() > 0;
     closeCursor(cursor);
-    close(db);
     return isExist;
   }
 
@@ -223,9 +217,7 @@ class DelegateCommon extends AbsDelegate {
 
       String str = sb.toString();
       str = str.substring(0, str.length() - 1) + ");";
-      print(CREATE_TABLE, str);
       db.execSQL(str);
     }
-    close(db);
   }
 }
