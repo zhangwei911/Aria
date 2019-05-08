@@ -55,6 +55,6 @@ class FtpFileInfoThread extends AbsFtpInfoThread<DownloadEntity, DTaskWrapper> {
       mTaskWrapper.setNewTask(true);
     }
     mEntity.setFileSize(mSize);
-    mCallback.onComplete(mEntity.getUrl(), new CompleteInfo(code));
+    mCallback.onComplete(mEntity.getUrl(), new CompleteInfo(code, mTaskWrapper));
   }
 }

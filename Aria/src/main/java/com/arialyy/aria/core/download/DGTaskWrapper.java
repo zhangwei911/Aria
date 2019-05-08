@@ -27,6 +27,8 @@ public class DGTaskWrapper extends AbsGroupTaskWrapper<DownloadGroupEntity, DTas
 
   private List<DTaskWrapper> subTaskEntities;
 
+  private boolean unknownSize = false;
+
   public DGTaskWrapper(DownloadGroupEntity entity) {
     super(entity);
   }
@@ -34,6 +36,14 @@ public class DGTaskWrapper extends AbsGroupTaskWrapper<DownloadGroupEntity, DTas
   @Override
   public void setSubTaskWrapper(List<DTaskWrapper> subTaskEntities) {
     this.subTaskEntities = subTaskEntities;
+  }
+
+  public boolean isUnknownSize() {
+    return unknownSize;
+  }
+
+  public void setUnknownSize(boolean unknownSize) {
+    this.unknownSize = unknownSize;
   }
 
   /**

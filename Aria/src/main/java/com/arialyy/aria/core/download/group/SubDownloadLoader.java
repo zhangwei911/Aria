@@ -19,6 +19,7 @@ import android.os.Handler;
 import com.arialyy.aria.core.common.CompleteInfo;
 import com.arialyy.aria.core.common.IUtil;
 import com.arialyy.aria.core.common.OnFileInfoCallback;
+import com.arialyy.aria.core.download.DGTaskWrapper;
 import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.download.downloader.Downloader;
@@ -39,7 +40,11 @@ class SubDownloadLoader implements IUtil {
   private Handler mSchedulers;
   private ChildDownloadListener mListener;
 
-  SubDownloadLoader(Handler schedulers, DTaskWrapper taskWrapper) {
+  /**
+   * @param schedulers 调度器
+   * @param needGetInfo {@code true} 需要获取文件信息。{@code false} 不需要获取文件信息
+   */
+  SubDownloadLoader(Handler schedulers, DTaskWrapper taskWrapper, boolean needGetInfo) {
     mWrapper = taskWrapper;
     mSchedulers = schedulers;
     mListener = new ChildDownloadListener(mSchedulers, SubDownloadLoader.this);

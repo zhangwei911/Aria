@@ -24,14 +24,12 @@ import com.arialyy.aria.core.Aria;
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.download.DownloadGroupEntity;
 import com.arialyy.aria.core.download.DownloadGroupTask;
-import com.arialyy.aria.core.download.DGTaskWrapper;
 import com.arialyy.frame.util.show.L;
 import com.arialyy.frame.util.show.T;
 import com.arialyy.simple.R;
 import com.arialyy.simple.base.BaseActivity;
 import com.arialyy.simple.databinding.ActivityDownloadGroupBinding;
 import com.arialyy.simple.widget.SubStateLinearLayout;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -80,9 +78,6 @@ public class DownloadGroupActivity extends BaseActivity<ActivityDownloadGroupBin
   public void onClick(View view) {
     switch (view.getId()) {
       case R.id.start:
-        List<String> temp = new ArrayList<>();
-        temp.add(
-            "https://d.pcs.baidu.com/file/130335545f3f4d9cc38afe709c19af5a?fid=1411168371-250528-1010657263806840&dstime=1531134714&rt=sh&sign=FDtAERVY-DCb740ccc5511e5e8fedcff06b081203-h8KgJ6gl4oY9UR6NqvwJsT4nVSM%3D&expires=8h&chkv=1&chkbd=0&chkpc=et&dp-logid=4401996296756616039&dp-callid=0&r=279987343");
         Aria.download(this)
             .loadGroup(mUrls)
             .setDirPath(
@@ -91,7 +86,8 @@ public class DownloadGroupActivity extends BaseActivity<ActivityDownloadGroupBin
             .setGroupAlias("任务组测试")
             //.setSubFileName(getModule(GroupModule.class).getSubName2())
             .setSubFileName(getModule(GroupModule.class).getSubName())
-            .setFileSize(114981416)
+            .unknownSize()
+            //.setFileSize(114981416)
             //.updateUrls(temp)
             .start();
         break;

@@ -56,7 +56,7 @@ public class DbDataHelper {
         DbEntity.findRelationData(DGEntityWrapper.class, "DownloadGroupEntity.groupHash=?",
             groupHash);
 
-    return wrapper == null ? null : wrapper.get(0).groupEntity;
+    return wrapper == null || wrapper.size() == 0 ? null : wrapper.get(0).groupEntity;
   }
 
   /**

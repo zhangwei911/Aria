@@ -220,7 +220,7 @@ public class HttpFileInfoThread implements Runnable {
     if (end) {
       mTaskDelegate.setChunked(isChunked);
       if (onFileInfoCallback != null) {
-        CompleteInfo info = new CompleteInfo(code);
+        CompleteInfo info = new CompleteInfo(code, mTaskWrapper);
         onFileInfoCallback.onComplete(mEntity.getUrl(), info);
       }
       mEntity.update();

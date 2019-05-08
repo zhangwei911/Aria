@@ -50,7 +50,7 @@ class FtpDirInfoThread extends AbsFtpInfoThread<DownloadGroupEntity, DGTaskWrapp
   @Override protected void onPreComplete(int code) {
     super.onPreComplete(code);
     mEntity.setFileSize(mSize);
-    mCallback.onComplete(mEntity.getKey(), new CompleteInfo(code));
+    mCallback.onComplete(mEntity.getKey(), new CompleteInfo(code, mTaskWrapper));
   }
 
   /**

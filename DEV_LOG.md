@@ -10,6 +10,7 @@
     - fix bug https://github.com/AriaLyy/Aria/issues/388
     - 修复使用`Content-Disposition`的文件名时，第一次下载无法重命名文件的问题
     - 修复使用`Content-Disposition`的文件名时，多次重命名文件的问题
+    - 组合任务新增`unknownSize()`，用于处理组合任务大小未知的情况，https://github.com/AriaLyy/Aria/issues/380
   + v_3.6.3 (2019/4/2)
     - fix bug https://github.com/AriaLyy/Aria/issues/377
   + v_3.6.2 (2019/4/1)

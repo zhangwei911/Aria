@@ -95,6 +95,7 @@ class FtpFileInfoThread extends AbsFtpInfoThread<UploadEntity, UTaskWrapper> {
 
   @Override protected void onPreComplete(int code) {
     super.onPreComplete(code);
-    mCallback.onComplete(mEntity.getKey(), new CompleteInfo(isComplete ? CODE_COMPLETE : code));
+    mCallback.onComplete(mEntity.getKey(),
+        new CompleteInfo(isComplete ? CODE_COMPLETE : code, mTaskWrapper));
   }
 }

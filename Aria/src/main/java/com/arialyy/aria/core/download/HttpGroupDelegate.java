@@ -114,8 +114,8 @@ class HttpGroupDelegate extends AbsGroupDelegate<DownloadGroupTarget> {
       return false;
     }
 
-    if (getTaskWrapper().getEntity().getFileSize() == 0) {
-      ALog.e(TAG, "组合任务必须设置文件文件大小");
+    if (!getTaskWrapper().isUnknownSize() && getTaskWrapper().getEntity().getFileSize() == 0) {
+      ALog.e(TAG, "组合任务必须设置文件文件大小，默认需要强制设置文件大小。如果无法获取到总长度，请调用#unknownSize()来标志该组合任务");
       return false;
     }
 

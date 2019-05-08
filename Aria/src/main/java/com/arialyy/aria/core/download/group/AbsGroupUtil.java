@@ -288,7 +288,15 @@ public abstract class AbsGroupUtil implements IUtil, Runnable {
    * 创建并启动子任务下载器
    */
   SubDownloadLoader createSubLoader(DTaskWrapper taskWrapper) {
-    SubDownloadLoader loader = new SubDownloadLoader(mScheduler, taskWrapper);
+    return createSubLoader(taskWrapper, true);
+  }
+
+  /**
+   * 创建并启动子任务下载器
+   * @param needGetFileInfo {@code true} 需要获取文件信息。{@code false} 不需要获取文件信息
+   */
+  SubDownloadLoader createSubLoader(DTaskWrapper taskWrapper, boolean needGetFileInfo) {
+    SubDownloadLoader loader = new SubDownloadLoader(mScheduler, taskWrapper, needGetFileInfo);
     mExeLoader.put(loader.getKey(), loader);
     mSubQueue.startTask(loader);
     return loader;

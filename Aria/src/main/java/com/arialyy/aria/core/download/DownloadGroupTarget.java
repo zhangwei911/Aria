@@ -78,7 +78,7 @@ public class DownloadGroupTarget extends AbsDGTarget<DownloadGroupTarget> implem
    * 任务组总任务大小，任务组是一个抽象的概念，没有真实的数据实体，任务组的大小是Aria动态获取子任务大小相加而得到的，
    * 如果你知道当前任务组总大小，你也可以调用该方法给任务组设置大小
    *
-   * 为了更好的用户体验，组合任务必须设置文件大小
+   * 为了更好的用户体验，组合任务最好设置文件大小，默认需要强制设置文件大小。如果无法获取到总长度，请调用{@link #unknownSize()}
    *
    * @param fileSize 任务组总大小
    */
@@ -91,6 +91,19 @@ public class DownloadGroupTarget extends AbsDGTarget<DownloadGroupTarget> implem
     if (getEntity().getFileSize() <= 1 || getEntity().getFileSize() != fileSize) {
       getEntity().setFileSize(fileSize);
     }
+    return this;
+  }
+
+  /**
+   * 如果无法获取到组合任务到总长度，请调用该方法，
+   * 请注意：
+   * 1、如果组合任务到子任务数过多，请不要使用该标志位，否则Aria将需要消耗大量的时间获取组合任务的总长度。
+   * 2、如果你的知道组合任务的总长度，请使用{@link #setFileSize(long)}设置组合任务的长度。
+   * 3、由于网络或其它原因的存在，这种方式获取的组合任务大小有可能是不准确的。
+   */
+  @CheckResult
+  public DownloadGroupTarget unknownSize() {
+    getTaskWrapper().setUnknownSize(true);
     return this;
   }
 

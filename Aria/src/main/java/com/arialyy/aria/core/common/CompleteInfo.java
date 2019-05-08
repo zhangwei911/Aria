@@ -15,6 +15,8 @@
  */
 package com.arialyy.aria.core.common;
 
+import com.arialyy.aria.core.inf.AbsTaskWrapper;
+
 /**
  * Created by AriaL on 2018/3/3.
  * 获取文件信息完成后 回调给下载线程的信息
@@ -25,7 +27,10 @@ public class CompleteInfo {
    */
   public int code;
 
-  public CompleteInfo(int code) {
+  public AbsTaskWrapper wrapper;
+
+  public CompleteInfo(int code, AbsTaskWrapper wrapper) {
     this.code = code;
+    this.wrapper = wrapper;
   }
 }

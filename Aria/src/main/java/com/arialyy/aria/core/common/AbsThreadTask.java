@@ -115,8 +115,7 @@ public abstract class AbsThreadTask<ENTITY extends AbsNormalEntity, TASK_WRAPPER
    * @return {@code true}存活
    */
   protected boolean isLive() {
-    Thread t = Thread.currentThread();
-    return !t.isInterrupted() && !isInterrupted;
+    return !Thread.currentThread().isInterrupted() && !isInterrupted;
   }
 
   /**
@@ -399,19 +398,22 @@ public abstract class AbsThreadTask<ENTITY extends AbsNormalEntity, TASK_WRAPPER
    * @param needRetry 是否可以重试
    */
   private void retryThis(boolean needRetry) {
-    if (!NetUtils.isConnected(AriaManager.APP) && !isNotNetRetry) {
-      ALog.w(TAG, String.format("任务【%s】thread__%s__重试失败，网络未连接", mConfig.TEMP_FILE.getName(),
-          mConfig.THREAD_ID));
-    }
-    if (mFailTimes < RETRY_NUM && needRetry && (NetUtils.isConnected(AriaManager.APP)
-        || isNotNetRetry) && !isBreak()) {
-      ALog.w(TAG,
-          String.format("任务【%s】thread__%s__正在重试", mConfig.TEMP_FILE.getName(), mConfig.THREAD_ID));
-      mFailTimes++;
-      handleRetryRecord();
-      ThreadTaskManager.getInstance().retryThread(AbsThreadTask.this);
-    } else {
-      handleFailState(!isBreak());
+    synchronized (AriaManager.LOCK) {
+      if (!NetUtils.isConnected(AriaManager.APP) && !isNotNetRetry) {
+        ALog.w(TAG, String.format("任务【%s】thread__%s__重试失败，网络未连接", mConfig.TEMP_FILE.getName(),
+            mConfig.THREAD_ID));
+      }
+      if (mFailTimes < RETRY_NUM && needRetry && (NetUtils.isConnected(AriaManager.APP)
+          || isNotNetRetry) && !isBreak()) {
+        ALog.w(TAG,
+            String.format("任务【%s】thread__%s__正在重试", mConfig.TEMP_FILE.getName(),
+                mConfig.THREAD_ID));
+        mFailTimes++;
+        handleRetryRecord();
+        ThreadTaskManager.getInstance().retryThread(AbsThreadTask.this);
+      } else {
+        handleFailState(!isBreak());
+      }
     }
   }
 

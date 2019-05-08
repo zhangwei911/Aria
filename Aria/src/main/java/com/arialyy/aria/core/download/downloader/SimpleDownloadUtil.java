@@ -107,6 +107,7 @@ public class SimpleDownloadUtil implements IUtil, Runnable {
     if (isStop || isCancel) {
       return;
     }
+    // 如果网址没有变，而服务器端端文件改变，以下代码就没有用了
     //if (mTaskWrapper.getEntity().getFileSize() <= 1
     //    || mTaskWrapper.isRefreshInfo()
     //    || mTaskWrapper.getRequestType() == AbsTaskWrapper.D_FTP
