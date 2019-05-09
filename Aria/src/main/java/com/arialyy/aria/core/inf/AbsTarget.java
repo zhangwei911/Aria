@@ -21,13 +21,11 @@ import com.arialyy.aria.core.AriaManager;
 import com.arialyy.aria.core.command.ICmd;
 import com.arialyy.aria.core.command.normal.CancelCmd;
 import com.arialyy.aria.core.command.normal.NormalCmdFactory;
-import com.arialyy.aria.core.common.TaskRecord;
 import com.arialyy.aria.core.download.DGTaskWrapper;
 import com.arialyy.aria.core.download.DownloadGroupEntity;
 import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.manager.TaskWrapperManager;
 import com.arialyy.aria.core.upload.UTaskWrapper;
-import com.arialyy.aria.orm.DbEntity;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
 import java.util.ArrayList;
@@ -73,15 +71,9 @@ public abstract class AbsTarget<TARGET extends AbsTarget> implements ITargetHand
       cancel();
     } else {
       if (mEntity instanceof AbsNormalEntity) {
-        TaskRecord record =
-            DbEntity.findFirst(TaskRecord.class, "TaskRecord.filePath=?", mTaskWrapper.getKey());
-        if (record != null) {
-          CommonUtil.delTaskRecord(record, mTaskWrapper.isRemoveFile(), (AbsNormalEntity) mEntity);
-        } else {
-          mEntity.deleteData();
-        }
+        CommonUtil.delTaskRecord((AbsNormalEntity) mEntity, mTaskWrapper.isRemoveFile());
       } else if (mEntity instanceof DownloadGroupEntity) {
-        CommonUtil.delGroupTaskRecord(mTaskWrapper.isRemoveFile(), ((DownloadGroupEntity) mEntity));
+        CommonUtil.delGroupTaskRecord(((DownloadGroupEntity) mEntity), mTaskWrapper.isRemoveFile());
       }
       TaskWrapperManager.getInstance().removeTaskWrapper(mEntity.getKey());
     }

@@ -57,7 +57,7 @@ public abstract class AbsFtpThreadTask<ENTITY extends AbsNormalEntity, TASK_ENTI
    */
   protected FTPClient createClient() {
     FTPClient client = null;
-    final FtpUrlEntity urlEntity = mTaskWrapper.asFtp().getUrlEntity();
+    final FtpUrlEntity urlEntity = getTaskWrapper().asFtp().getUrlEntity();
     if (urlEntity.validAddr == null) {
       try {
         InetAddress[] ips = InetAddress.getAllByName(urlEntity.hostName);
@@ -106,8 +106,8 @@ public abstract class AbsFtpThreadTask<ENTITY extends AbsNormalEntity, TASK_ENTI
       // 开启服务器对UTF-8的支持，如果服务器支持就用UTF-8编码
       charSet = "UTF-8";
       if (reply != FTPReply.COMMAND_IS_SUPERFLUOUS) {
-        if (!TextUtils.isEmpty(mTaskWrapper.asFtp().getCharSet())) {
-          charSet = mTaskWrapper.asFtp().getCharSet();
+        if (!TextUtils.isEmpty(getTaskWrapper().asFtp().getCharSet())) {
+          charSet = getTaskWrapper().asFtp().getCharSet();
         }
       }
       client.setControlEncoding(charSet);
@@ -116,7 +116,7 @@ public abstract class AbsFtpThreadTask<ENTITY extends AbsNormalEntity, TASK_ENTI
       client.enterLocalPassiveMode();
       client.setFileType(FTP.BINARY_FILE_TYPE);
       client.setControlKeepAliveTimeout(5000);
-      if (mTaskWrapper.asFtp().getUrlEntity().isFtps) {
+      if (getTaskWrapper().asFtp().getUrlEntity().isFtps) {
         ((FTPSClient) client).execPROT("P");
       }
     } catch (java.io.IOException e) {
@@ -150,7 +150,7 @@ public abstract class AbsFtpThreadTask<ENTITY extends AbsNormalEntity, TASK_ENTI
   private FTPClient connect(FTPClient client, InetAddress[] ips, int index, int port) {
     try {
       client.connect(ips[index], port);
-      mTaskWrapper.asFtp().getUrlEntity().validAddr = ips[index];
+      getTaskWrapper().asFtp().getUrlEntity().validAddr = ips[index];
       return client;
     } catch (java.io.IOException e) {
       try {

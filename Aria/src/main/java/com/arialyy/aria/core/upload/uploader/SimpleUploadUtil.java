@@ -18,6 +18,7 @@ package com.arialyy.aria.core.upload.uploader;
 import com.arialyy.aria.core.common.CompleteInfo;
 import com.arialyy.aria.core.common.IUtil;
 import com.arialyy.aria.core.common.OnFileInfoCallback;
+import com.arialyy.aria.core.inf.AbsEntity;
 import com.arialyy.aria.core.inf.AbsTaskWrapper;
 import com.arialyy.aria.core.inf.IUploadListener;
 import com.arialyy.aria.core.upload.UTaskWrapper;
@@ -61,7 +62,7 @@ public class SimpleUploadUtil implements IUtil, Runnable {
             }
           }
 
-          @Override public void onFail(String url, BaseException e, boolean needRetry) {
+          @Override public void onFail(AbsEntity entity, BaseException e, boolean needRetry) {
             mListener.onFail(needRetry, e);
           }
         }).start();

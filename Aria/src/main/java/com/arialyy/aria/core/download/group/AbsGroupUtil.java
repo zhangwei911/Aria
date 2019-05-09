@@ -18,6 +18,7 @@ package com.arialyy.aria.core.download.group;
 import android.os.Handler;
 import android.os.Looper;
 import com.arialyy.aria.core.common.IUtil;
+import com.arialyy.aria.core.common.http.HttpTaskDelegate;
 import com.arialyy.aria.core.config.Configuration;
 import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.download.DGTaskWrapper;
@@ -293,12 +294,31 @@ public abstract class AbsGroupUtil implements IUtil, Runnable {
 
   /**
    * 创建并启动子任务下载器
+   *
    * @param needGetFileInfo {@code true} 需要获取文件信息。{@code false} 不需要获取文件信息
    */
   SubDownloadLoader createSubLoader(DTaskWrapper taskWrapper, boolean needGetFileInfo) {
+    if (getTaskType() == HTTP_GROUP) {
+      cloneHeader(taskWrapper);
+    }
     SubDownloadLoader loader = new SubDownloadLoader(mScheduler, taskWrapper, needGetFileInfo);
     mExeLoader.put(loader.getKey(), loader);
     mSubQueue.startTask(loader);
     return loader;
+  }
+
+  /**
+   * 子任务使用父包裹器的属性
+   */
+  private void cloneHeader(DTaskWrapper taskWrapper) {
+    HttpTaskDelegate groupDelegate = mGTWrapper.asHttp();
+    HttpTaskDelegate subDelegate = taskWrapper.asHttp();
+
+    // 设置属性
+    subDelegate.setFileLenAdapter(groupDelegate.getFileLenAdapter());
+    subDelegate.setRequestEnum(groupDelegate.getRequestEnum());
+    subDelegate.setHeaders(groupDelegate.getHeaders());
+    subDelegate.setProxy(groupDelegate.getProxy());
+    subDelegate.setParams(groupDelegate.getParams());
   }
 }

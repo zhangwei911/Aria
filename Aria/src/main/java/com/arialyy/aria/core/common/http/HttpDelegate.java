@@ -27,7 +27,6 @@ import java.util.Map;
 
 /**
  * HTTP参数委托
- * @param <TARGET>
  */
 class HttpDelegate<TARGET extends AbsTarget> implements ITargetHandler {
   private static final String TAG = "PostDelegate";

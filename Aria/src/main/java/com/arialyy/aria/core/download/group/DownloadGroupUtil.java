@@ -20,8 +20,11 @@ import com.arialyy.aria.core.common.IUtil;
 import com.arialyy.aria.core.common.OnFileInfoCallback;
 import com.arialyy.aria.core.download.DGTaskWrapper;
 import com.arialyy.aria.core.download.DTaskWrapper;
+import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.download.downloader.HttpFileInfoThread;
+import com.arialyy.aria.core.inf.AbsEntity;
 import com.arialyy.aria.core.inf.IEntity;
+import com.arialyy.aria.exception.AriaIOException;
 import com.arialyy.aria.exception.BaseException;
 import com.arialyy.aria.util.ALog;
 import java.util.concurrent.ExecutorService;
@@ -84,6 +87,7 @@ public class DownloadGroupUtil extends AbsGroupUtil implements IUtil {
   private void getGroupSize() {
     new Thread(new Runnable() {
       int count;
+      int failCount;
 
       @Override public void run() {
         for (DTaskWrapper dTaskWrapper : mGTWrapper.getSubTaskWrapper()) {
@@ -91,13 +95,16 @@ public class DownloadGroupUtil extends AbsGroupUtil implements IUtil {
             @Override public void onComplete(String url, CompleteInfo info) {
               createSubLoader((DTaskWrapper) info.wrapper, false);
               count++;
-              checkGetSizeComplete(count);
+              checkGetSizeComplete(count, failCount);
             }
 
-            @Override public void onFail(String url, BaseException e, boolean needRetry) {
-              ALog.e(TAG, String.format("获取文件信息失败，url：%s", url));
+            @Override public void onFail(AbsEntity entity, BaseException e, boolean needRetry) {
+              ALog.e(TAG, String.format("获取文件信息失败，url：%s", ((DownloadEntity) entity).getUrl()));
               count++;
-              checkGetSizeComplete(count);
+              failCount++;
+              mListener.onSubFail((DownloadEntity) entity, new AriaIOException(TAG,
+                  String.format("子任务获取文件长度失败，url：%s", ((DownloadEntity) entity).getUrl())));
+              checkGetSizeComplete(count, failCount);
             }
           }));
         }
@@ -108,17 +115,20 @@ public class DownloadGroupUtil extends AbsGroupUtil implements IUtil {
   /**
    * 检查组合任务大小是否获取完成，获取完成后取消阻塞，并设置组合任务大小
    */
-  private void checkGetSizeComplete(int count) {
+  private void checkGetSizeComplete(int count, int failCount) {
     if (count == mGTWrapper.getSubTaskWrapper().size()) {
       long size = 0;
       for (DTaskWrapper wrapper : mGTWrapper.getSubTaskWrapper()) {
         size += wrapper.getEntity().getFileSize();
       }
       mGTWrapper.getEntity().setFileSize(size);
+      mGTWrapper.getEntity().update();
+    } else if (failCount == mGTWrapper.getSubTaskWrapper().size()) {
+      mListener.onFail(true, new AriaIOException(TAG, "获取子任务长度失败"));
+    }
 
-      synchronized (LOCK) {
-        LOCK.notify();
-      }
+    synchronized (LOCK) {
+      LOCK.notify();
     }
   }
 }

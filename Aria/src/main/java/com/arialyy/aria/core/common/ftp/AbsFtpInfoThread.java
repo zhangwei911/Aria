@@ -374,7 +374,7 @@ public abstract class AbsFtpInfoThread<ENTITY extends AbsEntity, TASK_WRAPPER ex
 
   private void failDownload(BaseException e, boolean needRetry) {
     if (mCallback != null) {
-      mCallback.onFail(mEntity.getKey(), e, needRetry);
+      mCallback.onFail(mEntity, e, needRetry);
     }
   }
 

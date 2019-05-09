@@ -16,6 +16,7 @@
 package com.arialyy.aria.core.common;
 
 import android.content.Context;
+import android.os.Looper;
 import android.util.SparseArray;
 import com.arialyy.aria.core.AriaManager;
 import com.arialyy.aria.core.download.BaseDListener;

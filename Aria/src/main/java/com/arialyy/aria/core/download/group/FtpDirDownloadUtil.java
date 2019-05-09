@@ -19,6 +19,7 @@ import com.arialyy.aria.core.common.CompleteInfo;
 import com.arialyy.aria.core.common.OnFileInfoCallback;
 import com.arialyy.aria.core.download.DGTaskWrapper;
 import com.arialyy.aria.core.download.DTaskWrapper;
+import com.arialyy.aria.core.inf.AbsEntity;
 import com.arialyy.aria.core.inf.IEntity;
 import com.arialyy.aria.exception.BaseException;
 
@@ -49,7 +50,7 @@ public class FtpDirDownloadUtil extends AbsGroupUtil {
           }
         }
 
-        @Override public void onFail(String url, BaseException e, boolean needRetry) {
+        @Override public void onFail(AbsEntity entity, BaseException e, boolean needRetry) {
           mListener.onFail(needRetry, e);
         }
       }).start();

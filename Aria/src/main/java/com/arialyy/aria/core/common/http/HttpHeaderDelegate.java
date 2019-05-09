@@ -17,10 +17,20 @@ package com.arialyy.aria.core.common.http;
 
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
+import com.arialyy.aria.core.AriaManager;
+import com.arialyy.aria.core.download.DGTaskWrapper;
+import com.arialyy.aria.core.download.DTaskWrapper;
+import com.arialyy.aria.core.inf.AbsHttpFileLenAdapter;
 import com.arialyy.aria.core.inf.AbsTarget;
 import com.arialyy.aria.core.inf.AbsTaskWrapper;
+import com.arialyy.aria.core.inf.IHttpFileLenAdapter;
 import com.arialyy.aria.core.inf.IHttpHeaderDelegate;
+import com.arialyy.aria.core.upload.UTaskWrapper;
 import com.arialyy.aria.util.ALog;
+import com.arialyy.aria.util.CommonUtil;
+import java.io.File;
+import java.io.ObjectInputStream;
+import java.io.Serializable;
 import java.net.Proxy;
 import java.util.Collection;
 import java.util.Map;
@@ -80,7 +90,31 @@ public class HttpHeaderDelegate<TARGET extends AbsTarget>
     return mTarget;
   }
 
-  public void addHeader(AbsTaskWrapper taskWrapper, String key, String value) {
+  public TARGET setFileLenAdapter(AbsHttpFileLenAdapter adapter) {
+    if (adapter == null) {
+      throw new IllegalArgumentException("adapter为空");
+    }
+    try {
+      adapter.clone();
+      mTarget.getTaskWrapper().asHttp().setFileLenAdapter((IHttpFileLenAdapter) adapter.clone());
+    } catch (CloneNotSupportedException e) {
+      e.printStackTrace();
+    }
+    //// 以下代码有问题，匿名内部类不能序列化
+    //String objPath = String.format("%s/obj_temp/%s", AriaManager.APP.getFilesDir().getPath(),
+    //    adapter.hashCode());
+    //CommonUtil.writeObjToFile(objPath, adapter);
+    //IHttpFileLenAdapter newAdapter = (IHttpFileLenAdapter) CommonUtil.readObjFromFile(objPath);
+    //File temp = new File(objPath);
+    //if (temp.exists()) {
+    //  temp.delete();
+    //}
+    //mTarget.getTaskWrapper().asHttp().setFileLenAdapter(newAdapter);
+
+    return mTarget;
+  }
+
+  private void addHeader(AbsTaskWrapper taskWrapper, String key, String value) {
     HttpTaskDelegate taskDelegate = taskWrapper.asHttp();
     if (taskDelegate.getHeaders().get(key) == null) {
       taskDelegate.getHeaders().put(key, value);
@@ -89,7 +123,7 @@ public class HttpHeaderDelegate<TARGET extends AbsTarget>
     }
   }
 
-  public void addHeaders(AbsTaskWrapper taskWrapper, Map<String, String> headers) {
+  private void addHeaders(AbsTaskWrapper taskWrapper, Map<String, String> headers) {
     HttpTaskDelegate taskDelegate = taskWrapper.asHttp();
      /*
       两个map比较逻辑

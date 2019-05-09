@@ -21,6 +21,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -36,6 +37,7 @@ import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.download.DownloadTarget;
 import com.arialyy.aria.core.download.DownloadTask;
 import com.arialyy.aria.core.inf.IEntity;
+import com.arialyy.aria.core.inf.IHttpFileLenAdapter;
 import com.arialyy.aria.core.scheduler.ISchedulers;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
@@ -58,8 +60,8 @@ public class SingleTaskActivity extends BaseActivity<ActivitySingleBinding> {
       //"http://static.gaoshouyou.com/d/22/94/822260b849944492caadd2983f9bb624.apks";
       //"http://120.55.95.61:8811/ghcg/zg/武义总规纲要成果.zip";
       //"https://yizi-kejian.oss-cn-beijing.aliyuncs.com/qimeng/package1/qmtable11.zip";
-      //"http://rs.0.gaoshouyou.com/d/04/1e/400423a7551e1f3f0eb1812afa1f9b44.apk";
-      "http://chargepile2.techsum.net/car-manage/file/download?path=2019-04-26/c0242efd18be4ecbb23911b1c509dcad--掌通各系统汇总.xls"; // 无长度的chunked
+      "http://rs.0.gaoshouyou.com/d/04/1e/400423a7551e1f3f0eb1812afa1f9b44.apk";
+  //"http://chargepile2.techsum.net/car-manage/file/download?path=2019-04-26/c0242efd18be4ecbb23911b1c509dcad--掌通各系统汇总.xls"; // 无长度的chunked
   //"http://58.210.9.131/tpk/sipgt//TDLYZTGH.tpk"; //chunked 下载
   //"http://apk500.bce.baidu-mgame.com/game/67000/67734/20170622040827_oem_5502845.apk?r=1";
   //"https://dl.genymotion.com/releases/genymotion-2.12.1/genymotion-2.12.1-vbox.exe";
@@ -262,8 +264,8 @@ public class SingleTaskActivity extends BaseActivity<ActivitySingleBinding> {
     L.d(TAG, "path = " + task.getDownloadEntity().getDownloadPath());
     L.d(TAG, "md5Code = " + CommonUtil.getFileMD5(new File(task.getDownloadPath())));
     L.d(TAG, "data = " + Aria.download(this).getDownloadEntity(DOWNLOAD_URL));
-    DownloadEntity temp = Aria.download(this).getDownloadEntity(DOWNLOAD_URL);
-    L.d(TAG, "status = " + temp.getState() + ", isComplete = " + temp.isComplete());
+    //DownloadEntity temp = Aria.download(this).getDownloadEntity(DOWNLOAD_URL);
+    //L.d(TAG, "status = " + temp.getState() + ", isComplete = " + temp.isComplete());
     //Intent install = new Intent(Intent.ACTION_VIEW);
     //install.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
     //File apkFile = new File(task.getDownloadPath());
@@ -289,15 +291,9 @@ public class SingleTaskActivity extends BaseActivity<ActivitySingleBinding> {
     switch (view.getId()) {
       case R.id.start:
         startD();
-        //List<DownloadEntity> list = Aria.download(this).getAllNotCompleteTask(5, 2);
-        //ALog.d("Tag", list.size() + "");
         break;
       case R.id.stop:
         Aria.download(this).load(DOWNLOAD_URL).stop();
-        //startActivity(new Intent(this, SingleTaskActivity.class));
-        //Aria.download(this).unRegister();
-        //Aria.download(this).load(DOWNLOAD_URL).removeRecord();
-        //Log.d(TAG, Aria.download(this).taskExists(DOWNLOAD_URL) + "");
         break;
       case R.id.cancel:
         Aria.download(this).load(DOWNLOAD_URL).cancel(true);
@@ -310,9 +306,6 @@ public class SingleTaskActivity extends BaseActivity<ActivitySingleBinding> {
 
   private void startD() {
     String path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/ggsg14.apk";
-    //Map<String, String> params = new HashMap<>();
-    //params.put("key", "value");
-    //params.put("filename", "CentOS-7-x86_64-Minimal-1804.iso");
     Aria.download(SingleTaskActivity.this)
         .load(DOWNLOAD_URL)
         //.addHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3")
@@ -321,6 +314,18 @@ public class SingleTaskActivity extends BaseActivity<ActivitySingleBinding> {
         //.addHeader("Cookie", "BAIDUID=648E5FF020CC69E8DD6F492D1068AAA9:FG=1; BIDUPSID=648E5FF020CC69E8DD6F492D1068AAA9; PSTM=1519099573; BD_UPN=12314753; locale=zh; BDSVRTM=0")
         .useServerFileName(true)
         .setFilePath(path, true)
+        .setFileLenAdapter(new IHttpFileLenAdapter() {
+          @Override public long handleFileLen(Map<String, List<String>> headers) {
+
+            List<String> sLength = headers.get("Content-Length");
+            if (sLength == null || sLength.isEmpty()) {
+              return -1;
+            }
+            String temp = sLength.get(0);
+
+            return Long.parseLong(temp);
+          }
+        })
         //.asGet()
         //.asPost()
         //.setParams(params)

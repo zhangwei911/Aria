@@ -134,7 +134,7 @@ class DownloadGroupListener
     mTaskWrapper.setState(state);
     mEntity.setState(state);
     if (state == IEntity.STATE_CANCEL) {
-      CommonUtil.delGroupTaskRecord(mTaskWrapper.isRemoveFile(), mEntity);
+      CommonUtil.delGroupTaskRecord(mEntity, mTaskWrapper.isRemoveFile());
       return;
     } else if (state == IEntity.STATE_STOP) {
       mEntity.setStopTime(System.currentTimeMillis());

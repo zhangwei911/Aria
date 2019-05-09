@@ -55,8 +55,8 @@ final class HttpThreadTask extends AbsThreadTask<DownloadEntity, DTaskWrapper> {
   HttpThreadTask(StateConstance constance, IDownloadListener listener,
       SubThreadConfig<DTaskWrapper> downloadInfo) {
     super(constance, listener, downloadInfo);
-    isOpenDynamicFile = STATE.TASK_RECORD.isOpenDynamicFile;
-    isBlock = STATE.TASK_RECORD.isBlock;
+    isOpenDynamicFile = getState().TASK_RECORD.isOpenDynamicFile;
+    isBlock = getState().TASK_RECORD.isBlock;
   }
 
   @Override public HttpThreadTask call() throws Exception {
@@ -69,17 +69,17 @@ final class HttpThreadTask extends AbsThreadTask<DownloadEntity, DTaskWrapper> {
     BufferedInputStream is = null;
     BufferedRandomAccessFile file = null;
     //当前子线程的下载位置
-    mChildCurrentLocation = mConfig.START_LOCATION;
+    mChildCurrentLocation = getConfig().START_LOCATION;
     try {
-      HttpTaskDelegate taskDelegate = mTaskWrapper.asHttp();
-      URL url = ConnectionHelp.handleUrl(mConfig.URL, taskDelegate);
+      HttpTaskDelegate taskDelegate = getTaskWrapper().asHttp();
+      URL url = ConnectionHelp.handleUrl(getConfig().URL, taskDelegate);
       conn = ConnectionHelp.handleConnection(url, taskDelegate);
-      if (mConfig.SUPPORT_BP) {
+      if (getConfig().SUPPORT_BP) {
         ALog.d(TAG,
-            String.format("任务【%s】线程__%s__开始下载【开始位置 : %s，结束位置：%s】", mConfig.TEMP_FILE.getName(),
-                mConfig.THREAD_ID, mConfig.START_LOCATION, mConfig.END_LOCATION));
-        conn.setRequestProperty("Range",
-            String.format("bytes=%s-%s", mConfig.START_LOCATION, (mConfig.END_LOCATION - 1)));
+            String.format("任务【%s】线程__%s__开始下载【开始位置 : %s，结束位置：%s】", getConfig().TEMP_FILE.getName(),
+                getConfig().THREAD_ID, getConfig().START_LOCATION, getConfig().END_LOCATION));
+        conn.setRequestProperty("Range", String.format("bytes=%s-%s", getConfig().START_LOCATION,
+            (getConfig().END_LOCATION - 1)));
       } else {
         ALog.w(TAG, "该下载不支持断点");
       }
@@ -117,24 +117,25 @@ final class HttpThreadTask extends AbsThreadTask<DownloadEntity, DTaskWrapper> {
       } else {
         //创建可设置位置的文件
         file =
-            new BufferedRandomAccessFile(mConfig.TEMP_FILE, "rwd", getTaskConfig().getBuffSize());
+            new BufferedRandomAccessFile(getConfig().TEMP_FILE, "rwd",
+                getTaskConfig().getBuffSize());
         //设置每条线程写入文件的位置
-        file.seek(mConfig.START_LOCATION);
+        file.seek(getConfig().START_LOCATION);
         readNormal(is, file);
         handleComplete();
       }
     } catch (MalformedURLException e) {
       fail(mChildCurrentLocation, new TaskException(TAG,
-          String.format("任务【%s】下载失败，filePath: %s, url: %s", mConfig.TEMP_FILE.getName(),
-              mEntity.getDownloadPath(), mEntity.getUrl()), e));
+          String.format("任务【%s】下载失败，filePath: %s, url: %s", getConfig().TEMP_FILE.getName(),
+              getEntity().getDownloadPath(), getEntity().getUrl()), e));
     } catch (IOException e) {
       fail(mChildCurrentLocation, new TaskException(TAG,
-          String.format("任务【%s】下载失败，filePath: %s, url: %s", mConfig.TEMP_FILE.getName(),
-              mEntity.getDownloadPath(), mEntity.getUrl()), e));
+          String.format("任务【%s】下载失败，filePath: %s, url: %s", getConfig().TEMP_FILE.getName(),
+              getEntity().getDownloadPath(), getEntity().getUrl()), e));
     } catch (Exception e) {
       fail(mChildCurrentLocation, new TaskException(TAG,
-          String.format("任务【%s】下载失败，filePath: %s, url: %s", mConfig.TEMP_FILE.getName(),
-              mEntity.getDownloadPath(), mEntity.getUrl()), e));
+          String.format("任务【%s】下载失败，filePath: %s, url: %s", getConfig().TEMP_FILE.getName(),
+              getEntity().getDownloadPath(), getEntity().getUrl()), e));
     } finally {
       try {
         if (file != null) {
@@ -159,7 +160,7 @@ final class HttpThreadTask extends AbsThreadTask<DownloadEntity, DTaskWrapper> {
   private void readChunked(InputStream is) {
     FileOutputStream fos = null;
     try {
-      fos = new FileOutputStream(mConfig.TEMP_FILE, true);
+      fos = new FileOutputStream(getConfig().TEMP_FILE, true);
       byte[] buffer = new byte[getTaskConfig().getBuffSize()];
       int len;
       while (isLive() && (len = is.read(buffer)) != -1) {
@@ -175,7 +176,7 @@ final class HttpThreadTask extends AbsThreadTask<DownloadEntity, DTaskWrapper> {
       handleComplete();
     } catch (IOException e) {
       fail(mChildCurrentLocation, new AriaIOException(TAG,
-          String.format("文件下载失败，savePath: %s, url: %s", mEntity.getDownloadPath(), mConfig.URL),
+          String.format("文件下载失败，savePath: %s, url: %s", getEntity().getDownloadPath(), getConfig().URL),
           e));
     } finally {
       if (fos != null) {
@@ -197,7 +198,7 @@ final class HttpThreadTask extends AbsThreadTask<DownloadEntity, DTaskWrapper> {
     ReadableByteChannel fic = null;
     try {
       int len;
-      fos = new FileOutputStream(mConfig.TEMP_FILE, true);
+      fos = new FileOutputStream(getConfig().TEMP_FILE, true);
       foc = fos.getChannel();
       fic = Channels.newChannel(is);
       ByteBuffer bf = ByteBuffer.allocate(getTaskConfig().getBuffSize());
@@ -210,8 +211,8 @@ final class HttpThreadTask extends AbsThreadTask<DownloadEntity, DTaskWrapper> {
         if (mSpeedBandUtil != null) {
           mSpeedBandUtil.limitNextBytes(len);
         }
-        if (mChildCurrentLocation + len >= mConfig.END_LOCATION) {
-          len = (int) (mConfig.END_LOCATION - mChildCurrentLocation);
+        if (mChildCurrentLocation + len >= getConfig().END_LOCATION) {
+          len = (int) (getConfig().END_LOCATION - mChildCurrentLocation);
           bf.flip();
           fos.write(bf.array(), 0, len);
           bf.compact();
@@ -227,7 +228,7 @@ final class HttpThreadTask extends AbsThreadTask<DownloadEntity, DTaskWrapper> {
       handleComplete();
     } catch (IOException e) {
       fail(mChildCurrentLocation, new AriaIOException(TAG,
-          String.format("文件下载失败，savePath: %s, url: %s", mEntity.getDownloadPath(), mConfig.URL),
+          String.format("文件下载失败，savePath: %s, url: %s", getEntity().getDownloadPath(), getConfig().URL),
           e));
     } finally {
       try {
@@ -276,48 +277,49 @@ final class HttpThreadTask extends AbsThreadTask<DownloadEntity, DTaskWrapper> {
     if (!checkBlock()) {
       return;
     }
-    if (mTaskWrapper.asHttp().isChunked()) {
+    if (getTaskWrapper().asHttp().isChunked()) {
       ALog.i(TAG, "任务下载完成");
-      STATE.isRunning = false;
+      getState().isRunning = false;
       mListener.onComplete();
       return;
     }
 
-    if (mChildCurrentLocation == mConfig.END_LOCATION) {
+    if (mChildCurrentLocation == getConfig().END_LOCATION) {
       //支持断点的处理
-      if (mConfig.SUPPORT_BP) {
+      if (getConfig().SUPPORT_BP) {
         ALog.i(TAG,
-            String.format("任务【%s】线程__%s__下载完毕", mConfig.TEMP_FILE.getName(), mConfig.THREAD_ID));
-        writeConfig(true, mConfig.END_LOCATION);
-        STATE.COMPLETE_THREAD_NUM++;
-        if (STATE.isComplete()) {
+            String.format("任务【%s】线程__%s__下载完毕", getConfig().TEMP_FILE.getName(),
+                getConfig().THREAD_ID));
+        writeConfig(true, getConfig().END_LOCATION);
+        getState().COMPLETE_THREAD_NUM++;
+        if (getState().isComplete()) {
           if (isBlock) {
             boolean success = mergeFile();
             if (!success) {
-              STATE.isRunning = false;
+              getState().isRunning = false;
               mListener.onFail(false, new TaskException(TAG,
-                  String.format("任务【%s】分块文件合并失败", mConfig.TEMP_FILE.getName())));
+                  String.format("任务【%s】分块文件合并失败", getConfig().TEMP_FILE.getName())));
               return;
             }
           }
-          STATE.TASK_RECORD.deleteData();
-          STATE.isRunning = false;
+          getState().TASK_RECORD.deleteData();
+          getState().isRunning = false;
           mListener.onComplete();
         }
-        if (STATE.isFail()) {
-          STATE.isRunning = false;
+        if (getState().isFail()) {
+          getState().isRunning = false;
           mListener.onFail(false,
               new TaskException(TAG,
-                  String.format("任务【%s】下载失败，filePath: %s, url: %s", mConfig.TEMP_FILE.getName(),
-                      mEntity.getDownloadPath(), mEntity.getUrl())));
+                  String.format("任务【%s】下载失败，filePath: %s, url: %s", getConfig().TEMP_FILE.getName(),
+                      getEntity().getDownloadPath(), getEntity().getUrl())));
         }
       } else {
         ALog.i(TAG, "任务下载完成");
-        STATE.isRunning = false;
+        getState().isRunning = false;
         mListener.onComplete();
       }
     } else {
-      STATE.FAIL_NUM++;
+      getState().FAIL_NUM++;
     }
   }
 
@@ -326,6 +328,6 @@ final class HttpThreadTask extends AbsThreadTask<DownloadEntity, DTaskWrapper> {
   }
 
   @Override protected DownloadConfig getTaskConfig() {
-    return mTaskWrapper.getConfig();
+    return getTaskWrapper().getConfig();
   }
 }

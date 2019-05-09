@@ -25,6 +25,7 @@ import com.arialyy.aria.core.common.RequestEnum;
 import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.common.http.HttpTaskDelegate;
+import com.arialyy.aria.core.inf.IHttpFileLenAdapter;
 import com.arialyy.aria.exception.AriaIOException;
 import com.arialyy.aria.exception.BaseException;
 import com.arialyy.aria.exception.TaskException;
@@ -109,22 +110,11 @@ public class HttpFileInfoThread implements Runnable {
       }
     }
 
-    long len = conn.getContentLength();
-    if (len < 0) {
-      String temp = conn.getHeaderField("Content-Length");
-      len = TextUtils.isEmpty(temp) ? -1 : Long.parseLong(temp);
-      // 某些服务，如果设置了conn.setRequestProperty("Range", "bytes=" + 0 + "-");
-      // 会返回 Content-Range: bytes 0-225427911/225427913
-      if (len < 0) {
-        temp = conn.getHeaderField("Content-Range");
-        if (TextUtils.isEmpty(temp)) {
-          len = -1;
-        } else {
-          int start = temp.indexOf("/");
-          len = Long.parseLong(temp.substring(start + 1));
-        }
-      }
+    IHttpFileLenAdapter lenAdapter = mTaskWrapper.asHttp().getFileLenAdapter();
+    if (lenAdapter == null) {
+      lenAdapter = new FileLenAdapter();
     }
+    long len = lenAdapter.handleFileLen(conn.getHeaderFields());
 
     if (!CommonUtil.checkSDMemorySpace(mEntity.getDownloadPath(), len)) {
       failDownload(new TaskException(TAG,
@@ -288,7 +278,7 @@ public class HttpFileInfoThread implements Runnable {
     if (TextUtils.isEmpty(newUrl) || newUrl.equalsIgnoreCase("null") || !newUrl.startsWith(
         "http")) {
       if (onFileInfoCallback != null) {
-        onFileInfoCallback.onFail(mEntity.getUrl(), new TaskException(TAG, "获取重定向链接失败"), false);
+        onFileInfoCallback.onFail(mEntity, new TaskException(TAG, "获取重定向链接失败"), false);
       }
       return;
     }
@@ -327,7 +317,32 @@ public class HttpFileInfoThread implements Runnable {
 
   private void failDownload(BaseException e, boolean needRetry) {
     if (onFileInfoCallback != null) {
-      onFileInfoCallback.onFail(mEntity.getUrl(), e, needRetry);
+      onFileInfoCallback.onFail(mEntity, e, needRetry);
+    }
+  }
+
+  private static class FileLenAdapter implements IHttpFileLenAdapter {
+
+    @Override public long handleFileLen(Map<String, List<String>> headers) {
+      List<String> sLength = headers.get("Content-Length");
+      if (sLength == null || sLength.isEmpty()) {
+        return -1;
+      }
+      String temp = sLength.get(0);
+      long len = TextUtils.isEmpty(temp) ? -1 : Long.parseLong(temp);
+      // 某些服务，如果设置了conn.setRequestProperty("Range", "bytes=" + 0 + "-");
+      // 会返回 Content-Range: bytes 0-225427911/225427913
+      if (len < 0) {
+        List<String> sRange = headers.get("Content-Range");
+        if (sRange == null || sRange.isEmpty()) {
+          len = -1;
+        } else {
+          int start = temp.indexOf("/");
+          len = Long.parseLong(temp.substring(start + 1));
+        }
+      }
+
+      return len;
     }
   }
 }

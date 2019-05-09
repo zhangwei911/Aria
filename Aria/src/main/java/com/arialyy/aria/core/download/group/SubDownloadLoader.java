@@ -24,6 +24,7 @@ import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.download.downloader.Downloader;
 import com.arialyy.aria.core.download.downloader.HttpFileInfoThread;
+import com.arialyy.aria.core.inf.AbsEntity;
 import com.arialyy.aria.core.inf.AbsTaskWrapper;
 import com.arialyy.aria.core.scheduler.ISchedulers;
 import com.arialyy.aria.exception.BaseException;
@@ -104,7 +105,7 @@ class SubDownloadLoader implements IUtil {
           mDownloader.start();
         }
 
-        @Override public void onFail(String url, BaseException e, boolean needRetry) {
+        @Override public void onFail(AbsEntity entity, BaseException e, boolean needRetry) {
           mSchedulers.obtainMessage(ISchedulers.FAIL, SubDownloadLoader.this);
         }
       })).start();

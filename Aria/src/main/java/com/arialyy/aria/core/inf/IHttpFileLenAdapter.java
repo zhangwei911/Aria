@@ -13,23 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.arialyy.aria.core.common;
+package com.arialyy.aria.core.inf;
 
-import com.arialyy.aria.core.inf.AbsEntity;
-import com.arialyy.aria.exception.BaseException;
+import java.io.Serializable;
+import java.net.URLConnection;
+import java.util.List;
+import java.util.Map;
 
-public interface OnFileInfoCallback {
+/**
+ * Http文件长度适配器
+ */
+public interface IHttpFileLenAdapter extends Serializable {
+  long serialVersionUID = 1L;
+
   /**
-   * 处理完成
+   * 同伙header中的数据获取文件长度
    *
-   * @param info 一些回调的信息
+   * @param headers header参数{@link URLConnection#getHeaderFields()}
+   * @return 文件长度
    */
-  void onComplete(String url, CompleteInfo info);
-
-  /**
-   * 请求失败
-   *
-   * @param e 错误信息
-   */
-  void onFail(AbsEntity entity, BaseException e, boolean needRetry);
+  long handleFileLen(Map<String, List<String>> headers);
 }

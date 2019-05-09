@@ -59,18 +59,18 @@ class HttpThreadTask extends AbsThreadTask<UploadEntity, UTaskWrapper> {
 
   @Override public HttpThreadTask call() throws Exception {
     super.call();
-    File uploadFile = new File(mEntity.getFilePath());
+    File uploadFile = new File(getEntity().getFilePath());
     if (!uploadFile.exists()) {
       fail(new TaskException(TAG,
-          String.format("上传失败，文件不存在；filePath: %s, url: %s", mEntity.getFilePath(),
-              mEntity.getUrl())));
+          String.format("上传失败，文件不存在；filePath: %s, url: %s", getEntity().getFilePath(),
+              getEntity().getUrl())));
       return this;
     }
     mListener.onPre();
     URL url;
     try {
-      url = new URL(mEntity.getUrl());
-      HttpTaskDelegate taskDelegate = mTaskWrapper.asHttp();
+      url = new URL(getEntity().getUrl());
+      HttpTaskDelegate taskDelegate = getTaskWrapper().asHttp();
       mHttpConn = (HttpURLConnection) url.openConnection();
       mHttpConn.setRequestMethod(taskDelegate.getRequestEnum().name);
       mHttpConn.setUseCaches(false);
@@ -100,12 +100,13 @@ class HttpThreadTask extends AbsThreadTask<UploadEntity, UTaskWrapper> {
         addFormField(writer, key, taskDelegate.getFormFields().get(key));
       }
       uploadFile(writer, taskDelegate.getAttachment(), uploadFile);
-      mTaskWrapper.getEntity().setResponseStr(finish(writer));
+      getEntity().setResponseStr(finish(writer));
       mListener.onComplete();
     } catch (Exception e) {
       e.printStackTrace();
       fail(new TaskException(TAG,
-          String.format("上传失败，filePath: %s, url: %s", mEntity.getFilePath(), mEntity.getUrl()), e));
+          String.format("上传失败，filePath: %s, url: %s", getEntity().getFilePath(),
+              getEntity().getUrl()), e));
     }
     return this;
   }
@@ -113,7 +114,7 @@ class HttpThreadTask extends AbsThreadTask<UploadEntity, UTaskWrapper> {
   private void fail(BaseException e1) {
     try {
       mListener.onFail(true, e1);
-      STATE.isRunning = false;
+      getState().isRunning = false;
       if (mOutputStream != null) {
         mOutputStream.close();
       }
@@ -132,7 +133,7 @@ class HttpThreadTask extends AbsThreadTask<UploadEntity, UTaskWrapper> {
         .append("\"")
         .append(LINE_END);
     writer.append("Content-Type: text/plain; charset=")
-        .append(mTaskWrapper.asHttp().getCharSet())
+        .append(getTaskWrapper().asHttp().getCharSet())
         .append(LINE_END);
     writer.append(LINE_END);
     writer.append(value).append(LINE_END);
@@ -151,11 +152,11 @@ class HttpThreadTask extends AbsThreadTask<UploadEntity, UTaskWrapper> {
     writer.append("Content-Disposition: form-data; name=\"")
         .append(attachment)
         .append("\"; filename=\"")
-        .append(mTaskWrapper.getEntity().getFileName())
+        .append(getEntity().getFileName())
         .append("\"")
         .append(LINE_END);
     writer.append("Content-Type: ")
-        .append(URLConnection.guessContentTypeFromName(mTaskWrapper.getEntity().getFileName()))
+        .append(URLConnection.guessContentTypeFromName(getEntity().getFileName()))
         .append(LINE_END);
     writer.append("Content-Transfer-Encoding: binary").append(LINE_END);
     writer.append(LINE_END);
@@ -165,9 +166,9 @@ class HttpThreadTask extends AbsThreadTask<UploadEntity, UTaskWrapper> {
     byte[] buffer = new byte[4096];
     int bytesRead;
     while ((bytesRead = inputStream.read(buffer)) != -1) {
-      STATE.CURRENT_LOCATION += bytesRead;
+      getState().CURRENT_LOCATION += bytesRead;
       mOutputStream.write(buffer, 0, bytesRead);
-      if (STATE.isCancel) {
+      if (getState().isCancel) {
         break;
       }
       if (mSpeedBandUtil != null) {
@@ -180,11 +181,11 @@ class HttpThreadTask extends AbsThreadTask<UploadEntity, UTaskWrapper> {
     inputStream.close();
     writer.append(LINE_END);
     writer.flush();
-    if (STATE.isCancel) {
-      STATE.isRunning = false;
+    if (getState().isCancel) {
+      getState().isRunning = false;
       return;
     }
-    STATE.isRunning = false;
+    getState().isRunning = false;
   }
 
   /**
@@ -224,6 +225,6 @@ class HttpThreadTask extends AbsThreadTask<UploadEntity, UTaskWrapper> {
   }
 
   @Override protected UploadConfig getTaskConfig() {
-    return mTaskWrapper.getConfig();
+    return getTaskWrapper().getConfig();
   }
 }

@@ -51,19 +51,19 @@ class FtpThreadTask extends AbsFtpThreadTask<UploadEntity, UTaskWrapper> {
   }
 
   @Override protected UploadConfig getTaskConfig() {
-    return mTaskWrapper.getConfig();
+    return getTaskWrapper().getConfig();
   }
 
   @Override public FtpThreadTask call() throws Exception {
     super.call();
     //当前子线程的下载位置
-    mChildCurrentLocation = mConfig.START_LOCATION;
+    mChildCurrentLocation = getConfig().START_LOCATION;
     FTPClient client = null;
     BufferedRandomAccessFile file = null;
     try {
       ALog.d(TAG,
-          String.format("任务【%s】线程__%s__开始上传【开始位置 : %s，结束位置：%s】", mConfig.TEMP_FILE.getName(),
-              mConfig.THREAD_ID, mConfig.START_LOCATION, mConfig.END_LOCATION));
+          String.format("任务【%s】线程__%s__开始上传【开始位置 : %s，结束位置：%s】", getConfig().TEMP_FILE.getName(),
+              getConfig().THREAD_ID, getConfig().START_LOCATION, getConfig().END_LOCATION));
       client = createClient();
       if (client == null) {
         return this;
@@ -71,43 +71,43 @@ class FtpThreadTask extends AbsFtpThreadTask<UploadEntity, UTaskWrapper> {
       initPath();
       client.makeDirectory(dir);
       client.changeWorkingDirectory(dir);
-      client.setRestartOffset(mConfig.START_LOCATION);
+      client.setRestartOffset(getConfig().START_LOCATION);
       int reply = client.getReplyCode();
       if (!FTPReply.isPositivePreliminary(reply) && reply != FTPReply.FILE_ACTION_OK) {
         fail(mChildCurrentLocation,
             new AriaIOException(TAG,
                 String.format("文件上传错误，错误码为：%s, msg：%s, filePath: %s", reply,
-                    client.getReplyString(), mEntity.getFilePath())));
+                    client.getReplyString(), getEntity().getFilePath())));
         client.disconnect();
         return this;
       }
 
-      file = new BufferedRandomAccessFile(mConfig.TEMP_FILE, "rwd", getTaskConfig().getBuffSize());
-      if (mConfig.START_LOCATION != 0) {
-        //file.skipBytes((int) mConfig.START_LOCATION);
-        file.seek(mConfig.START_LOCATION);
+      file = new BufferedRandomAccessFile(getConfig().TEMP_FILE, "rwd", getTaskConfig().getBuffSize());
+      if (getConfig().START_LOCATION != 0) {
+        //file.skipBytes((int) getConfig().START_LOCATION);
+        file.seek(getConfig().START_LOCATION);
       }
       boolean complete = upload(client, file);
       if (!complete || isBreak()) {
         return this;
       }
       ALog.i(TAG,
-          String.format("任务【%s】线程__%s__上传完毕", mConfig.TEMP_FILE.getName(), mConfig.THREAD_ID));
-      writeConfig(true, mConfig.END_LOCATION);
-      STATE.COMPLETE_THREAD_NUM++;
-      if (STATE.isComplete()) {
-        STATE.TASK_RECORD.deleteData();
-        STATE.isRunning = false;
+          String.format("任务【%s】线程__%s__上传完毕", getConfig().TEMP_FILE.getName(), getConfig().THREAD_ID));
+      writeConfig(true, getConfig().END_LOCATION);
+      getState().COMPLETE_THREAD_NUM++;
+      if (getState().isComplete()) {
+        getState().TASK_RECORD.deleteData();
+        getState().isRunning = false;
         mListener.onComplete();
       }
-      if (STATE.isFail()) {
-        STATE.isRunning = false;
+      if (getState().isFail()) {
+        getState().isRunning = false;
         mListener.onFail(false, new TaskException(TAG,
-            String.format("上传失败，filePath: %s, uploadUrl: %s", mEntity.getFilePath(), mConfig.URL)));
+            String.format("上传失败，filePath: %s, uploadUrl: %s", getEntity().getFilePath(), getConfig().URL)));
       }
     } catch (IOException e) {
       fail(mChildCurrentLocation, new AriaIOException(TAG,
-          String.format("上传失败，filePath: %s, uploadUrl: %s", mEntity.getFilePath(), mConfig.URL)));
+          String.format("上传失败，filePath: %s, uploadUrl: %s", getEntity().getFilePath(), getConfig().URL)));
     } catch (Exception e) {
       fail(mChildCurrentLocation, new AriaIOException(TAG, null, e));
     } finally {
@@ -126,10 +126,10 @@ class FtpThreadTask extends AbsFtpThreadTask<UploadEntity, UTaskWrapper> {
   }
 
   private void initPath() throws UnsupportedEncodingException {
-    dir = new String(mTaskWrapper.asFtp().getUrlEntity().remotePath.getBytes(charSet),
+    dir = new String(getTaskWrapper().asFtp().getUrlEntity().remotePath.getBytes(charSet),
         SERVER_CHARSET);
-    remotePath = new String(String.format("%s/%s", mTaskWrapper.asFtp().getUrlEntity().remotePath,
-        mEntity.getFileName()).getBytes(charSet), SERVER_CHARSET);
+    remotePath = new String(String.format("%s/%s", getTaskWrapper().asFtp().getUrlEntity().remotePath,
+        getEntity().getFileName()).getBytes(charSet), SERVER_CHARSET);
   }
 
   /**
@@ -163,7 +163,7 @@ class FtpThreadTask extends AbsFtpThreadTask<UploadEntity, UTaskWrapper> {
       });
     } catch (IOException e) {
       String msg = String.format("文件上传错误，错误码为：%s, msg：%s, filePath: %s", client.getReplyCode(),
-          client.getReplyString(), mEntity.getFilePath());
+          client.getReplyString(), getEntity().getFilePath());
       if (client.isConnected()) {
         client.disconnect();
       }
@@ -182,7 +182,7 @@ class FtpThreadTask extends AbsFtpThreadTask<UploadEntity, UTaskWrapper> {
         fail(mChildCurrentLocation,
             new AriaIOException(TAG,
                 String.format("文件上传错误，错误码为：%s, msg：%s, filePath: %s", reply,
-                    client.getReplyString(), mEntity.getFilePath())));
+                    client.getReplyString(), getEntity().getFilePath())));
       }
       if (client.isConnected()) {
         client.disconnect();

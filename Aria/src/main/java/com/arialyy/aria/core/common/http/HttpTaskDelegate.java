@@ -17,6 +17,7 @@
 package com.arialyy.aria.core.common.http;
 
 import com.arialyy.aria.core.common.RequestEnum;
+import com.arialyy.aria.core.inf.IHttpFileLenAdapter;
 import com.arialyy.aria.core.inf.ITargetHeadDelegate;
 import java.net.CookieManager;
 import java.net.Proxy;
@@ -80,6 +81,16 @@ public class HttpTaskDelegate implements ITargetHeadDelegate {
    * 文件上传表单
    */
   private Map<String, String> formFields = new HashMap<>();
+
+  private IHttpFileLenAdapter fileLenAdapter;
+
+  public IHttpFileLenAdapter getFileLenAdapter() {
+    return fileLenAdapter;
+  }
+
+  public void setFileLenAdapter(IHttpFileLenAdapter fileLenAdapter) {
+    this.fileLenAdapter = fileLenAdapter;
+  }
 
   public Map<String, String> getFormFields() {
     return formFields;

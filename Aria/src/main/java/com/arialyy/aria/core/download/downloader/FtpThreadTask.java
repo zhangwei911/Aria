@@ -48,31 +48,31 @@ class FtpThreadTask extends AbsFtpThreadTask<DownloadEntity, DTaskWrapper> {
   FtpThreadTask(StateConstance constance, IDownloadListener listener,
       SubThreadConfig<DTaskWrapper> downloadInfo) {
     super(constance, listener, downloadInfo);
-    isOpenDynamicFile = STATE.TASK_RECORD.isOpenDynamicFile;
-    isBlock = STATE.TASK_RECORD.isBlock;
+    isOpenDynamicFile = getState().TASK_RECORD.isOpenDynamicFile;
+    isBlock = getState().TASK_RECORD.isBlock;
   }
 
   @Override public FtpThreadTask call() throws Exception {
     super.call();
-    if (mConfig.THREAD_RECORD.isComplete) {
+    if (getConfig().THREAD_RECORD.isComplete) {
       handleComplete();
       return this;
     }
-    mChildCurrentLocation = mConfig.START_LOCATION;
+    mChildCurrentLocation = getConfig().START_LOCATION;
     FTPClient client = null;
     InputStream is = null;
 
     try {
       ALog.d(TAG,
-          String.format("任务【%s】线程__%s__开始下载【开始位置 : %s，结束位置：%s】", mConfig.TEMP_FILE.getName(),
-              mConfig.THREAD_ID, mConfig.START_LOCATION, mConfig.END_LOCATION));
+          String.format("任务【%s】线程__%s__开始下载【开始位置 : %s，结束位置：%s】", getConfig().TEMP_FILE.getName(),
+              getConfig().THREAD_ID, getConfig().START_LOCATION, getConfig().END_LOCATION));
       client = createClient();
       if (client == null) {
         fail(mChildCurrentLocation, new TaskException(TAG, "ftp client 创建失败"));
         return this;
       }
-      if (mConfig.START_LOCATION > 0) {
-        client.setRestartOffset(mConfig.START_LOCATION);
+      if (getConfig().START_LOCATION > 0) {
+        client.setRestartOffset(getConfig().START_LOCATION);
       }
       //发送第二次指令时，还需要再做一次判断
       int reply = client.getReplyCode();
@@ -84,7 +84,7 @@ class FtpThreadTask extends AbsFtpThreadTask<DownloadEntity, DTaskWrapper> {
         return this;
       }
       String remotePath =
-          new String(mTaskWrapper.asFtp().getUrlEntity().remotePath.getBytes(charSet),
+          new String(getTaskWrapper().asFtp().getUrlEntity().remotePath.getBytes(charSet),
               SERVER_CHARSET);
       ALog.i(TAG, String.format("remotePath【%s】", remotePath));
       is = client.retrieveFileStream(remotePath);
@@ -105,10 +105,10 @@ class FtpThreadTask extends AbsFtpThreadTask<DownloadEntity, DTaskWrapper> {
       }
     } catch (IOException e) {
       fail(mChildCurrentLocation,
-          new AriaIOException(TAG, String.format("下载失败【%s】", mConfig.URL), e));
+          new AriaIOException(TAG, String.format("下载失败【%s】", getConfig().URL), e));
     } catch (Exception e) {
       fail(mChildCurrentLocation,
-          new AriaIOException(TAG, String.format("下载失败【%s】", mConfig.URL), e));
+          new AriaIOException(TAG, String.format("下载失败【%s】", getConfig().URL), e));
     } finally {
       try {
         if (is != null) {
@@ -135,28 +135,28 @@ class FtpThreadTask extends AbsFtpThreadTask<DownloadEntity, DTaskWrapper> {
       return;
     }
     ALog.i(TAG,
-        String.format("任务【%s】线程__%s__下载完毕", mConfig.TEMP_FILE.getName(), mConfig.THREAD_ID));
-    writeConfig(true, mConfig.END_LOCATION);
-    STATE.COMPLETE_THREAD_NUM++;
-    if (STATE.isComplete()) {
+        String.format("任务【%s】线程__%s__下载完毕", getConfig().TEMP_FILE.getName(), getConfig().THREAD_ID));
+    writeConfig(true, getConfig().END_LOCATION);
+    getState().COMPLETE_THREAD_NUM++;
+    if (getState().isComplete()) {
       if (isBlock) {
         boolean success = mergeFile();
         if (!success) {
-          //ALog.e(TAG, String.format("任务【%s】分块文件合并失败", mConfig.TEMP_FILE.getName()));
-          STATE.isRunning = false;
+          //ALog.e(TAG, String.format("任务【%s】分块文件合并失败", getConfig().TEMP_FILE.getName()));
+          getState().isRunning = false;
           mListener.onFail(false,
-              new TaskException(TAG, String.format("任务【%s】分块文件合并失败", mConfig.TEMP_FILE.getName())));
+              new TaskException(TAG, String.format("任务【%s】分块文件合并失败", getConfig().TEMP_FILE.getName())));
           return;
         }
       }
-      STATE.TASK_RECORD.deleteData();
-      STATE.isRunning = false;
+      getState().TASK_RECORD.deleteData();
+      getState().isRunning = false;
       mListener.onComplete();
     }
-    if (STATE.isFail()) {
-      STATE.isRunning = false;
+    if (getState().isFail()) {
+      getState().isRunning = false;
       mListener.onFail(false,
-          new TaskException(TAG, String.format("任务【%s】下载失败", mConfig.TEMP_FILE.getName())));
+          new TaskException(TAG, String.format("任务【%s】下载失败", getConfig().TEMP_FILE.getName())));
     }
   }
 
@@ -169,7 +169,7 @@ class FtpThreadTask extends AbsFtpThreadTask<DownloadEntity, DTaskWrapper> {
     ReadableByteChannel fic = null;
     try {
       int len;
-      fos = new FileOutputStream(mConfig.TEMP_FILE, true);
+      fos = new FileOutputStream(getConfig().TEMP_FILE, true);
       foc = fos.getChannel();
       fic = Channels.newChannel(is);
       ByteBuffer bf = ByteBuffer.allocate(getTaskConfig().getBuffSize());
@@ -180,8 +180,8 @@ class FtpThreadTask extends AbsFtpThreadTask<DownloadEntity, DTaskWrapper> {
         if (mSpeedBandUtil != null) {
           mSpeedBandUtil.limitNextBytes(len);
         }
-        if (mChildCurrentLocation + len >= mConfig.END_LOCATION) {
-          len = (int) (mConfig.END_LOCATION - mChildCurrentLocation);
+        if (mChildCurrentLocation + len >= getConfig().END_LOCATION) {
+          len = (int) (getConfig().END_LOCATION - mChildCurrentLocation);
           bf.flip();
           fos.write(bf.array(), 0, len);
           bf.compact();
@@ -197,7 +197,7 @@ class FtpThreadTask extends AbsFtpThreadTask<DownloadEntity, DTaskWrapper> {
       handleComplete();
     } catch (IOException e) {
       fail(mChildCurrentLocation,
-          new AriaIOException(TAG, String.format("下载失败【%s】", mConfig.URL), e));
+          new AriaIOException(TAG, String.format("下载失败【%s】", getConfig().URL), e));
     } finally {
       try {
         if (fos != null) {
@@ -221,8 +221,8 @@ class FtpThreadTask extends AbsFtpThreadTask<DownloadEntity, DTaskWrapper> {
   private void readNormal(InputStream is) {
     BufferedRandomAccessFile file = null;
     try {
-      file = new BufferedRandomAccessFile(mConfig.TEMP_FILE, "rwd", getTaskConfig().getBuffSize());
-      file.seek(mConfig.START_LOCATION);
+      file = new BufferedRandomAccessFile(getConfig().TEMP_FILE, "rwd", getTaskConfig().getBuffSize());
+      file.seek(getConfig().START_LOCATION);
       byte[] buffer = new byte[getTaskConfig().getBuffSize()];
       int len;
       while (isLive() && (len = is.read(buffer)) != -1) {
@@ -232,8 +232,8 @@ class FtpThreadTask extends AbsFtpThreadTask<DownloadEntity, DTaskWrapper> {
         if (mSpeedBandUtil != null) {
           mSpeedBandUtil.limitNextBytes(len);
         }
-        if (mChildCurrentLocation + len >= mConfig.END_LOCATION) {
-          len = (int) (mConfig.END_LOCATION - mChildCurrentLocation);
+        if (mChildCurrentLocation + len >= getConfig().END_LOCATION) {
+          len = (int) (getConfig().END_LOCATION - mChildCurrentLocation);
           file.write(buffer, 0, len);
           progress(len);
           break;
@@ -244,7 +244,7 @@ class FtpThreadTask extends AbsFtpThreadTask<DownloadEntity, DTaskWrapper> {
       }
     } catch (IOException e) {
       fail(mChildCurrentLocation,
-          new AriaIOException(TAG, String.format("下载失败【%s】", mConfig.URL), e));
+          new AriaIOException(TAG, String.format("下载失败【%s】", getConfig().URL), e));
     } finally {
       try {
         if (file != null) {
@@ -261,6 +261,6 @@ class FtpThreadTask extends AbsFtpThreadTask<DownloadEntity, DTaskWrapper> {
   }
 
   @Override protected DownloadConfig getTaskConfig() {
-    return mTaskWrapper.getConfig();
+    return getTaskWrapper().getConfig();
   }
 }

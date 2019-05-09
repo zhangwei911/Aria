@@ -24,6 +24,7 @@ import com.arialyy.aria.core.Aria;
 import com.arialyy.frame.core.AbsFrame;
 import com.arialyy.simple.BuildConfig;
 import com.arialyy.simple.common.ConnectionChangeReceiver;
+import com.squareup.leakcanary.LeakCanary;
 
 /**
  * Created by Lyy on 2016/9/27.
@@ -44,11 +45,19 @@ public class BaseApplication extends Application {
           .build());
       StrictMode.setThreadPolicy(
           new StrictMode.ThreadPolicy.Builder().detectAll().penaltyLog().build());
-    }
-
-    registerReceiver(new ConnectionChangeReceiver(),
-        new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+      if (LeakCanary.isInAnalyzerProcess(this)) {//1
+        // This process is dedicated to LeakCanary for heap analysis.
+        // You should not init your app in this process.
+        return;
+      }
+      LeakCanary.install(this);
   }
+
+  registerReceiver(new ConnectionChangeReceiver(),
+        new
+
+  IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+}
 
   public static BaseApplication getApp() {
     return INSTANCE;

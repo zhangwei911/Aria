@@ -423,12 +423,12 @@ public class CommonUtil {
       tempUrl = url.substring(0, end);
       int tempEnd = tempUrl.lastIndexOf("/");
       if (tempEnd > 0) {
-        fileName = tempUrl.substring(tempEnd + 1, tempUrl.length());
+        fileName = tempUrl.substring(tempEnd + 1);
       }
     } else {
       int tempEnd = url.lastIndexOf("/");
       if (tempEnd > 0) {
-        fileName = url.substring(tempEnd + 1, url.length());
+        fileName = url.substring(tempEnd + 1);
       }
     }
     if (TextUtils.isEmpty(fileName)) {
@@ -592,7 +592,7 @@ public class CommonUtil {
    *
    * @param removeFile {@code true} 不仅删除任务数据库记录，还会删除已经删除完成的文件 {@code false}如果任务已经完成，只删除任务数据库记录
    */
-  public static void delGroupTaskRecord(boolean removeFile, DownloadGroupEntity groupEntity) {
+  public static void delGroupTaskRecord(DownloadGroupEntity groupEntity, boolean removeFile) {
     if (groupEntity == null) {
       ALog.e(TAG, "删除下载任务组记录失败，任务组实体为null");
       return;
@@ -641,37 +641,21 @@ public class CommonUtil {
    *
    * @param removeFile {@code true} 不仅删除任务数据库记录，还会删除已经完成的文件 {@code false}如果任务已经完成，只删除任务数据库记录
    */
-  public static void delTaskRecord(TaskRecord record, boolean removeFile, AbsNormalEntity dEntity) {
+  public static void delTaskRecord(AbsNormalEntity dEntity, boolean removeFile) {
     if (dEntity == null) return;
-    File file;
+    String filePath;
+    int type;
     if (dEntity instanceof DownloadEntity) {
-      file = new File(((DownloadEntity) dEntity).getDownloadPath());
+      type = 1;
+      filePath = ((DownloadEntity) dEntity).getDownloadPath();
     } else if (dEntity instanceof UploadEntity) {
-      file = new File(((UploadEntity) dEntity).getFilePath());
+      type = 2;
+      filePath = ((UploadEntity) dEntity).getFilePath();
     } else {
       ALog.w(TAG, "删除记录失败，未知类型");
       return;
     }
-    if (removeFile || !dEntity.isComplete()) {
-      // 删除分块文件
-      if (record.isBlock) {
-        for (int i = 0, len = record.threadNum; i < len; i++) {
-          File partFile = new File(String.format(AbsFileer.SUB_PATH, record.filePath, i));
-          if (partFile.exists()) {
-            partFile.delete();
-          }
-        }
-      }
-      if (file.exists()) {
-        file.delete();
-      }
-    }
-
-    if (record != null) {
-      record.deleteData();
-    }
-    //下载任务实体和下载实体为一对一关系，下载实体删除，任务实体自动删除
-    dEntity.deleteData();
+    delTaskRecord(filePath, type, removeFile);
   }
 
   /**
@@ -689,6 +673,8 @@ public class CommonUtil {
       throw new IllegalArgumentException("任务记录类型错误");
     }
     TaskRecord record = DbEntity.findFirst(TaskRecord.class, "filePath=?", filePath);
+    DbEntity.deleteData(ThreadRecord.class, "key=?", filePath);
+
     File file = new File(filePath);
     if (record == null) {
       ALog.w(TAG, "记录为空");
@@ -702,9 +688,9 @@ public class CommonUtil {
           }
         }
       }
-
       record.deleteData();
     }
+
     if (file.exists() && removeFile) {
       file.delete();
     }
@@ -1175,7 +1161,7 @@ public class CommonUtil {
       for (ThreadRecord tr : record.threadRecords) {
         tr.key = newPath;
         File blockFile = new File(String.format(AbsFileer.SUB_PATH, oldPath, tr.threadId));
-        if (blockFile.exists()){
+        if (blockFile.exists()) {
           blockFile.renameTo(new File(String.format(AbsFileer.SUB_PATH, newPath, tr.threadId)));
         }
       }

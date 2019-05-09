@@ -19,6 +19,8 @@ import android.support.annotation.CheckResult;
 import android.support.annotation.NonNull;
 import com.arialyy.aria.core.common.http.HttpHeaderDelegate;
 import com.arialyy.aria.core.common.http.PostDelegate;
+import com.arialyy.aria.core.inf.AbsHttpFileLenAdapter;
+import com.arialyy.aria.core.inf.IHttpFileLenAdapter;
 import com.arialyy.aria.core.inf.IHttpHeaderDelegate;
 import com.arialyy.aria.core.manager.TaskWrapperManager;
 import com.arialyy.aria.exception.ParamException;
@@ -157,6 +159,13 @@ public class DownloadGroupTarget extends AbsDGTarget<DownloadGroupTarget> implem
     return mGroupDelegate.setSubFileName(subTaskFileName);
   }
 
+  /**
+   * 如果你需要使用header中特定的key来设置文件长度，或有定制文件长度的需要，那么你可以通过该方法自行处理文件长度
+   */
+  public DownloadGroupTarget setFileLenAdapter(AbsHttpFileLenAdapter adapter) {
+    return mHeaderDelegate.setFileLenAdapter(adapter);
+  }
+
   @Override public int getTargetType() {
     return GROUP_HTTP;
   }
@@ -175,17 +184,11 @@ public class DownloadGroupTarget extends AbsDGTarget<DownloadGroupTarget> implem
 
   @CheckResult
   @Override public DownloadGroupTarget addHeader(@NonNull String key, @NonNull String value) {
-    for (DTaskWrapper subTask : getTaskWrapper().getSubTaskWrapper()) {
-      mHeaderDelegate.addHeader(subTask, key, value);
-    }
     return mHeaderDelegate.addHeader(key, value);
   }
 
   @CheckResult
   @Override public DownloadGroupTarget addHeaders(Map<String, String> headers) {
-    for (DTaskWrapper subTask : getTaskWrapper().getSubTaskWrapper()) {
-      mHeaderDelegate.addHeaders(subTask, headers);
-    }
     return mHeaderDelegate.addHeaders(headers);
   }
 
