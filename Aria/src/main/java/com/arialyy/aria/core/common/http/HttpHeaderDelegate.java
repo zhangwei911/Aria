@@ -94,12 +94,12 @@ public class HttpHeaderDelegate<TARGET extends AbsTarget>
     if (adapter == null) {
       throw new IllegalArgumentException("adapter为空");
     }
-    try {
-      adapter.clone();
-      mTarget.getTaskWrapper().asHttp().setFileLenAdapter((IHttpFileLenAdapter) adapter.clone());
-    } catch (CloneNotSupportedException e) {
-      e.printStackTrace();
-    }
+    //try {
+    //  adapter.clone();
+      mTarget.getTaskWrapper().asHttp().setFileLenAdapter((IHttpFileLenAdapter) adapter);
+    //} catch (CloneNotSupportedException e) {
+    //  e.printStackTrace();
+    //}
     //// 以下代码有问题，匿名内部类不能序列化
     //String objPath = String.format("%s/obj_temp/%s", AriaManager.APP.getFilesDir().getPath(),
     //    adapter.hashCode());

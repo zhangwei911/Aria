@@ -192,22 +192,20 @@ public abstract class AbsGroupUtil implements IUtil, Runnable {
   @Override public void stop() {
     isStop = true;
     closeTimer();
-    onStop();
-
-    Set<String> keys = mExeLoader.keySet();
-    mSubQueue.clear();
-
-    for (String key : keys) {
-      SubDownloadLoader loader = mExeLoader.get(key);
-      if (loader != null && loader.isRunning()) {
-        mSubQueue.stopTask(loader);
-      }
+    if (onStop()) {
+      return;
     }
-    mListener.onStop(mCurrentLocation);
+    mSubQueue.stopAllTask();
   }
 
-  protected void onStop() {
+  /**
+   * 子类的钩子
+   *
+   * @return 返回{@code true}，直接回调{@link IDownloadGroupListener#onStop(long)}
+   */
+  protected boolean onStop() {
 
+    return false;
   }
 
   @Override public void start() {

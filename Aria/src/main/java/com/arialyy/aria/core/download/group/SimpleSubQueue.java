@@ -44,6 +44,11 @@ class SimpleSubQueue implements ISubQueue<SubDownloadLoader> {
    */
   private int mExecSize;
 
+  /**
+   * 是否停止任务任务
+   */
+  private boolean isStopAll = false;
+
   private SimpleSubQueue() {
     mExecSize = Configuration.getInstance().dGroupCfg.getSubMaxTaskNum();
   }
@@ -52,8 +57,19 @@ class SimpleSubQueue implements ISubQueue<SubDownloadLoader> {
     return new SimpleSubQueue();
   }
 
-  public Map<String, SubDownloadLoader> getExec() {
+  Map<String, SubDownloadLoader> getExec() {
     return mExec;
+  }
+
+  /**
+   * 获取缓存队列大小
+   */
+  int getCacheSize() {
+    return mCache.size();
+  }
+
+  boolean isStopAll() {
+    return isStopAll;
   }
 
   @Override public void addTask(SubDownloadLoader fileer) {
@@ -64,6 +80,7 @@ class SimpleSubQueue implements ISubQueue<SubDownloadLoader> {
     if (mExec.size() < mExecSize) {
       mCache.remove(fileer.getKey());
       mExec.put(fileer.getKey(), fileer);
+      ALog.d(TAG, String.format("开始执行子任务：%s", fileer.getEntity().getFileName()));
       fileer.start();
     } else {
       ALog.d(TAG, String.format("执行队列已满，任务进入缓存器中，key: %s", fileer.getKey()));
@@ -74,6 +91,19 @@ class SimpleSubQueue implements ISubQueue<SubDownloadLoader> {
   @Override public void stopTask(SubDownloadLoader fileer) {
     fileer.stop();
     mExec.remove(fileer.getKey());
+  }
+
+  @Override public void stopAllTask() {
+    isStopAll = true;
+    ALog.d(TAG, "停止组合任务");
+    Set<String> keys = mExec.keySet();
+    for (String key : keys) {
+      SubDownloadLoader loader = mExec.get(key);
+      if (loader != null) {
+        ALog.d(TAG, String.format("停止子任务：%s", loader.getEntity().getFileName()));
+        loader.stop();
+      }
+    }
   }
 
   @Override public void modifyMaxExecNum(int num) {
@@ -102,7 +132,7 @@ class SimpleSubQueue implements ISubQueue<SubDownloadLoader> {
         }
         Collection<SubDownloadLoader> temp = mCache.values();
         mCache.clear();
-        ALog.d(TAG, String.format("测试, map size: %s", mCache.size()));
+        ALog.d(TAG, String.format("测试, cacheSize: %s", mCache.size()));
         for (SubDownloadLoader cache : caches) {
           addTask(cache);
         }

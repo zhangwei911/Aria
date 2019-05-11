@@ -90,18 +90,18 @@ public class DownloadGroupActivity extends BaseActivity<ActivityDownloadGroupBin
             //.setSubFileName(getModule(GroupModule.class).getSubName2())
             .setSubFileName(getModule(GroupModule.class).getSubName())
             .unknownSize()
-            .setFileLenAdapter(new AbsHttpFileLenAdapter() {
-              @Override public long handleFileLen(Map<String, List<String>> headers) {
-
-                List<String> sLength = headers.get("Content-Length");
-                if (sLength == null || sLength.isEmpty()) {
-                  return -1;
-                }
-                String temp = sLength.get(0);
-
-                return Long.parseLong(temp);
-              }
-            })
+            //.setFileLenAdapter(new AbsHttpFileLenAdapter() {
+            //  @Override public long handleFileLen(Map<String, List<String>> headers) {
+            //
+            //    List<String> sLength = headers.get("Content-Length");
+            //    if (sLength == null || sLength.isEmpty()) {
+            //      return -1;
+            //    }
+            //    String temp = sLength.get(0);
+            //
+            //    return Long.parseLong(temp);
+            //  }
+            //})
             //.setFileSize(114981416)
             //.updateUrls(temp)
             .start();
@@ -111,17 +111,6 @@ public class DownloadGroupActivity extends BaseActivity<ActivityDownloadGroupBin
         break;
       case R.id.cancel:
         Aria.download(this).loadGroup(mUrls).cancel(true);
-        //Aria.download(this).removeAllTask(true);
-        //mUrls = getModule(GroupModule.class).getUrls1();
-        //Aria.download(this)
-        //    .load(mUrls)
-        //    .setDownloadDirPath(
-        //        Environment.getExternalStorageDirectory().getPath() + "/Download/group_test_3")
-        //    .setGroupAlias("任务组测试")
-        //    .resetState()
-        //    .setSubFileName(getModule(GroupModule.class).getSubName())
-        //    //.setFileSize(32895492)
-        //    .start();
         break;
     }
   }

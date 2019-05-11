@@ -72,13 +72,16 @@ class StartCmd<T extends AbsTaskWrapper> extends AbsNormalCmd<T> {
         int state = task.getState();
         if (mQueue.getCurrentExePoolNum() < maxTaskNum) {
           if (state == IEntity.STATE_STOP
-              || task.getState() == IEntity.STATE_FAIL
-              || task.getState() == IEntity.STATE_OTHER
-              || task.getState() == IEntity.STATE_PRE
-              || task.getState() == IEntity.STATE_POST_PRE
-              || task.getState() == IEntity.STATE_COMPLETE) {
+              || state == IEntity.STATE_FAIL
+              || state == IEntity.STATE_OTHER
+              || state == IEntity.STATE_PRE
+              || state == IEntity.STATE_POST_PRE
+              || state == IEntity.STATE_COMPLETE) {
             resumeTask();
+          } else if (state == IEntity.STATE_RUNNING) {
+            ALog.w(TAG, String.format("任务【%s】已经在运行", task.getTaskName()));
           } else {
+            ALog.d(TAG, String.format("开始新任务, 任务状态：%s", state));
             startTask();
           }
         } else {

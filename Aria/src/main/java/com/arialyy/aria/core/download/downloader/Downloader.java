@@ -124,7 +124,6 @@ public class Downloader extends AbsFileer<DownloadEntity, DTaskWrapper> {
 
   private void failDownload(BaseException e) {
     closeTimer();
-    mConstance.isRunning = false;
     mListener.onFail(false, e);
   }
 }

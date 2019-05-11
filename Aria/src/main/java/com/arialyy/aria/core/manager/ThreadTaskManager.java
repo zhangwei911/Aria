@@ -71,6 +71,10 @@ public class ThreadTaskManager {
     temp.add(mExePool.submit(threadTask));
   }
 
+  public synchronized boolean taskIsRunning(String key){
+    return mThreadTasks.get(getKey(key)) != null;
+  }
+
   /**
    * 停止任务的所有线程
    *

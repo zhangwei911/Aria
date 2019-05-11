@@ -29,7 +29,6 @@ public class StateConstance {
   public int COMPLETE_THREAD_NUM = 0;
   public int START_THREAD_NUM;  //启动的线程数
   public long CURRENT_LOCATION = 0; //当前下载进度
-  public boolean isRunning = false;
   public boolean isCancel = false;
   public boolean isStop = false;
   public TaskRecord TASK_RECORD;
@@ -40,7 +39,6 @@ public class StateConstance {
   public void resetState() {
     isCancel = false;
     isStop = false;
-    isRunning = false;
     CANCEL_NUM = 0;
     STOP_NUM = 0;
     FAIL_NUM = 0;

@@ -279,7 +279,6 @@ final class HttpThreadTask extends AbsThreadTask<DownloadEntity, DTaskWrapper> {
     }
     if (getTaskWrapper().asHttp().isChunked()) {
       ALog.i(TAG, "任务下载完成");
-      getState().isRunning = false;
       mListener.onComplete();
       return;
     }
@@ -296,18 +295,15 @@ final class HttpThreadTask extends AbsThreadTask<DownloadEntity, DTaskWrapper> {
           if (isBlock) {
             boolean success = mergeFile();
             if (!success) {
-              getState().isRunning = false;
               mListener.onFail(false, new TaskException(TAG,
                   String.format("任务【%s】分块文件合并失败", getConfig().TEMP_FILE.getName())));
               return;
             }
           }
           getState().TASK_RECORD.deleteData();
-          getState().isRunning = false;
           mListener.onComplete();
         }
         if (getState().isFail()) {
-          getState().isRunning = false;
           mListener.onFail(false,
               new TaskException(TAG,
                   String.format("任务【%s】下载失败，filePath: %s, url: %s", getConfig().TEMP_FILE.getName(),
@@ -315,7 +311,6 @@ final class HttpThreadTask extends AbsThreadTask<DownloadEntity, DTaskWrapper> {
         }
       } else {
         ALog.i(TAG, "任务下载完成");
-        getState().isRunning = false;
         mListener.onComplete();
       }
     } else {

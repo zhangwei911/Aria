@@ -196,22 +196,11 @@ public abstract class AbsThreadTask<ENTITY extends AbsNormalEntity, TASK_WRAPPER
         writeConfig(false, currentTemp);
         if (getState().isStop()) {
           ALog.i(TAG, String.format("任务【%s】已中断", getConfig().TEMP_FILE.getName()));
-          getState().isRunning = false;
         }
       } else {
         ALog.i(TAG, String.format("任务【%s】已中断", getConfig().TEMP_FILE.getName()));
-        getState().isRunning = false;
       }
     }
-  }
-
-  /**
-   * 是否在运行
-   *
-   * @return {@code true}正在运行
-   */
-  public boolean isRunning() {
-    return getState().isRunning;
   }
 
   public boolean isInterrupted() {
@@ -316,14 +305,14 @@ public abstract class AbsThreadTask<ENTITY extends AbsNormalEntity, TASK_WRAPPER
             String.format("任务【%s】thread__%s__停止【当前线程停止位置：%s】", getConfig().TEMP_FILE.getName(),
                 getConfig().THREAD_ID, stopLocation));
         writeConfig(false, stopLocation);
+        //ALog.d(TAG, String.format("stop_thread_num=%s; start_thread_num=%s; complete_thread_num=%s",
+        //    getState().STOP_NUM, getState().START_THREAD_NUM, getState().COMPLETE_THREAD_NUM));
         if (getState().isStop()) {
           ALog.i(TAG, String.format("任务【%s】已停止", getConfig().TEMP_FILE.getName()));
-          getState().isRunning = false;
           mListener.onStop(getState().CURRENT_LOCATION);
         }
       } else {
         ALog.i(TAG, String.format("任务【%s】已停止", getConfig().TEMP_FILE.getName()));
-        getState().isRunning = false;
         mListener.onStop(getState().CURRENT_LOCATION);
       }
     }
@@ -371,12 +360,10 @@ public abstract class AbsThreadTask<ENTITY extends AbsNormalEntity, TASK_WRAPPER
             getConfig().TEMP_FILE.delete();
           }
           ALog.d(TAG, String.format("任务【%s】已取消", getConfig().TEMP_FILE.getName()));
-          getState().isRunning = false;
           mListener.onCancel();
         }
       } else {
         ALog.d(TAG, String.format("任务【%s】已取消", getConfig().TEMP_FILE.getName()));
-        getState().isRunning = false;
         mListener.onCancel();
       }
     }
@@ -501,7 +488,6 @@ public abstract class AbsThreadTask<ENTITY extends AbsNormalEntity, TASK_WRAPPER
   private void handleFailState(boolean taskNeedReTry) {
     getState().FAIL_NUM++;
     if (getState().isFail()) {
-      getState().isRunning = false;
       // 手动停止不进行fail回调
       if (!getState().isStop) {
         String errorMsg = String.format("任务【%s】执行失败", getConfig().TEMP_FILE.getName());

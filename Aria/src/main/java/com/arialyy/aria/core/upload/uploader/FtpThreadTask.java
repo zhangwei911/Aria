@@ -97,11 +97,9 @@ class FtpThreadTask extends AbsFtpThreadTask<UploadEntity, UTaskWrapper> {
       getState().COMPLETE_THREAD_NUM++;
       if (getState().isComplete()) {
         getState().TASK_RECORD.deleteData();
-        getState().isRunning = false;
         mListener.onComplete();
       }
       if (getState().isFail()) {
-        getState().isRunning = false;
         mListener.onFail(false, new TaskException(TAG,
             String.format("上传失败，filePath: %s, uploadUrl: %s", getEntity().getFilePath(), getConfig().URL)));
       }

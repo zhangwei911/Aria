@@ -40,6 +40,7 @@ class SubDownloadLoader implements IUtil {
   private DTaskWrapper mWrapper;
   private Handler mSchedulers;
   private ChildDownloadListener mListener;
+  private boolean needGetInfo;
 
   /**
    * @param schedulers 调度器
@@ -48,6 +49,7 @@ class SubDownloadLoader implements IUtil {
   SubDownloadLoader(Handler schedulers, DTaskWrapper taskWrapper, boolean needGetInfo) {
     mWrapper = taskWrapper;
     mSchedulers = schedulers;
+    this.needGetInfo = needGetInfo;
     mListener = new ChildDownloadListener(mSchedulers, SubDownloadLoader.this);
   }
 
@@ -91,24 +93,31 @@ class SubDownloadLoader implements IUtil {
   }
 
   @Override public void stop() {
-    if (mDownloader != null) {
+    if (mDownloader != null && isRunning()) {
       mDownloader.stop();
+    } else {
+      mSchedulers.obtainMessage(ISchedulers.STOP, this).sendToTarget();
     }
   }
 
   @Override public void start() {
     if (mWrapper.getRequestType() == AbsTaskWrapper.D_HTTP) {
-      new Thread(new HttpFileInfoThread(mWrapper, new OnFileInfoCallback() {
+      if (needGetInfo) {
+        new Thread(new HttpFileInfoThread(mWrapper, new OnFileInfoCallback() {
 
-        @Override public void onComplete(String url, CompleteInfo info) {
-          mDownloader = new Downloader(mListener, mWrapper);
-          mDownloader.start();
-        }
+          @Override public void onComplete(String url, CompleteInfo info) {
+            mDownloader = new Downloader(mListener, mWrapper);
+            mDownloader.start();
+          }
 
-        @Override public void onFail(AbsEntity entity, BaseException e, boolean needRetry) {
-          mSchedulers.obtainMessage(ISchedulers.FAIL, SubDownloadLoader.this);
-        }
-      })).start();
+          @Override public void onFail(AbsEntity entity, BaseException e, boolean needRetry) {
+            mSchedulers.obtainMessage(ISchedulers.FAIL, SubDownloadLoader.this);
+          }
+        })).start();
+      } else {
+        mDownloader = new Downloader(mListener, mWrapper);
+        mDownloader.start();
+      }
     } else if (mWrapper.getRequestType() == AbsTaskWrapper.D_FTP) {
       mDownloader = new Downloader(mListener, mWrapper);
       mDownloader.start();

@@ -214,6 +214,8 @@ public class HttpFileInfoThread implements Runnable {
         onFileInfoCallback.onComplete(mEntity.getUrl(), info);
       }
       mEntity.update();
+      // 销毁文件长度适配器
+      mTaskWrapper.asHttp().setFileLenAdapter(null);
     }
   }
 

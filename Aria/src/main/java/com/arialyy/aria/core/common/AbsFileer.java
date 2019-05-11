@@ -16,7 +16,6 @@
 package com.arialyy.aria.core.common;
 
 import android.content.Context;
-import android.os.Looper;
 import android.util.SparseArray;
 import com.arialyy.aria.core.AriaManager;
 import com.arialyy.aria.core.download.BaseDListener;
@@ -125,7 +124,7 @@ public abstract class AbsFileer<ENTITY extends AbsNormalEntity, TASK_WRAPPER ext
     if (mTask != null && mTask.size() != 0) {
       for (int i = 0; i < mTask.size(); i++) {
         AbsThreadTask task = mTask.get(i);
-        if (task != null && !task.isRunning()) {
+        if (task != null) {
           task.breakTask();
         }
       }
@@ -144,7 +143,6 @@ public abstract class AbsFileer<ENTITY extends AbsNormalEntity, TASK_WRAPPER ext
     mConstance.resetState();
     ALog.d(TAG, "path: " + getFilePath());
     checkRecord();
-    mConstance.isRunning = true;
     mConstance.TASK_RECORD = mRecord;
     if (!mTaskWrapper.isSupportBP() || mTaskWrapper.asHttp().isChunked()) {
       mTotalThreadNum = 1;
@@ -183,7 +181,7 @@ public abstract class AbsFileer<ENTITY extends AbsNormalEntity, TASK_WRAPPER ext
   }
 
   @Override public void run() {
-    if (mConstance.isRunning) {
+    if (isRunning()) {
       return;
     }
     startFlow();
@@ -205,6 +203,7 @@ public abstract class AbsFileer<ENTITY extends AbsNormalEntity, TASK_WRAPPER ext
    * 启动进度获取定时器
    */
   private synchronized void startTimer() {
+    ALog.d(TAG, "启动定时器");
     mTimer = new ScheduledThreadPoolExecutor(1);
     mTimer.scheduleWithFixedDelay(new Runnable() {
       @Override public void run() {
@@ -212,7 +211,7 @@ public abstract class AbsFileer<ENTITY extends AbsNormalEntity, TASK_WRAPPER ext
             || mConstance.isStop()
             || mConstance.isCancel()
             || mConstance.isFail()
-            || !mConstance.isRunning) {
+            || !isRunning()) {
           closeTimer();
         } else if (mConstance.CURRENT_LOCATION >= 0) {
           mListener.onProgress(mConstance.CURRENT_LOCATION);
@@ -252,7 +251,9 @@ public abstract class AbsFileer<ENTITY extends AbsNormalEntity, TASK_WRAPPER ext
   }
 
   public synchronized boolean isRunning() {
-    return mConstance.isRunning;
+    boolean b = ThreadTaskManager.getInstance().taskIsRunning(mTaskWrapper.getKey());
+    //ALog.d(TAG, "isRunning = " + b);
+    return b;
   }
 
   public synchronized void cancel() {
@@ -260,7 +261,6 @@ public abstract class AbsFileer<ENTITY extends AbsNormalEntity, TASK_WRAPPER ext
       return;
     }
     closeTimer();
-    mConstance.isRunning = false;
     mConstance.isCancel = true;
     new Thread(new Runnable() {
       @Override public void run() {
@@ -281,7 +281,6 @@ public abstract class AbsFileer<ENTITY extends AbsNormalEntity, TASK_WRAPPER ext
       return;
     }
     closeTimer();
-    mConstance.isRunning = false;
     mConstance.isStop = true;
     if (mConstance.isComplete()) return;
     new Thread(new Runnable() {
@@ -302,7 +301,7 @@ public abstract class AbsFileer<ENTITY extends AbsNormalEntity, TASK_WRAPPER ext
    * 直接调用的时候会自动启动线程执行
    */
   public synchronized void start() {
-    if (mConstance.isRunning) {
+    if (isRunning()) {
       return;
     }
     new Thread(this).start();
@@ -541,7 +540,6 @@ public abstract class AbsFileer<ENTITY extends AbsNormalEntity, TASK_WRAPPER ext
     if (mConstance.isComplete()) {
       mRecord.deleteData();
       mListener.onComplete();
-      mConstance.isRunning = false;
       return true;
     }
     return false;
@@ -628,6 +626,7 @@ public abstract class AbsFileer<ENTITY extends AbsNormalEntity, TASK_WRAPPER ext
       if (isNewTr) {
         mRecord.threadRecords.add(tr);
       }
+      //ALog.d(TAG, String.format("创建任务线程：%s，线程总数：%s", i, mTotalThreadNum));
       AbsThreadTask task = createSingThreadTask(i, startL, endL, fileLength, tr);
       if (task == null) return;
       mTask.put(i, task);

@@ -114,7 +114,6 @@ class HttpThreadTask extends AbsThreadTask<UploadEntity, UTaskWrapper> {
   private void fail(BaseException e1) {
     try {
       mListener.onFail(true, e1);
-      getState().isRunning = false;
       if (mOutputStream != null) {
         mOutputStream.close();
       }
@@ -181,11 +180,11 @@ class HttpThreadTask extends AbsThreadTask<UploadEntity, UTaskWrapper> {
     inputStream.close();
     writer.append(LINE_END);
     writer.flush();
-    if (getState().isCancel) {
-      getState().isRunning = false;
-      return;
-    }
-    getState().isRunning = false;
+    //if (getState().isCancel) {
+    //  getState().isRunning = false;
+    //  return;
+    //}
+    //getState().isRunning = false;
   }
 
   /**

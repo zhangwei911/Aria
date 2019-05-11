@@ -19,6 +19,7 @@ package com.arialyy.simple.core.download;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Environment;
 import android.text.TextUtils;
@@ -36,6 +37,7 @@ import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.download.DownloadTarget;
 import com.arialyy.aria.core.download.DownloadTask;
+import com.arialyy.aria.core.inf.AbsHttpFileLenAdapter;
 import com.arialyy.aria.core.inf.IEntity;
 import com.arialyy.aria.core.inf.IHttpFileLenAdapter;
 import com.arialyy.aria.core.scheduler.ISchedulers;
@@ -47,6 +49,10 @@ import com.arialyy.simple.R;
 import com.arialyy.simple.base.BaseActivity;
 import com.arialyy.simple.databinding.ActivitySingleBinding;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.bitmap_recycle.BitmapPool;
+import com.bumptech.glide.load.resource.bitmap.BitmapTransformation;
+import com.bumptech.glide.load.resource.transcode.BitmapBytesTranscoder;
 import java.io.File;
 import java.util.HashMap;
 import java.util.List;
@@ -72,6 +78,7 @@ public class SingleTaskActivity extends BaseActivity<ActivitySingleBinding> {
   Button mStop;
   Button mCancel;
   RadioGroup mRg;
+  DownloadTarget target;
 
   BroadcastReceiver receiver = new BroadcastReceiver() {
     @Override
@@ -106,26 +113,18 @@ public class SingleTaskActivity extends BaseActivity<ActivitySingleBinding> {
     mStop = findViewById(R.id.stop);
     mCancel = findViewById(R.id.cancel);
     mRg = findViewById(R.id.speeds);
+    mStop.setVisibility(View.GONE);
     setTitle("单任务下载");
     Aria.download(this).register();
-    DownloadTarget target = Aria.download(this).load(DOWNLOAD_URL);
+    target = Aria.download(this).load(DOWNLOAD_URL);
     getBinding().setProgress(target.getPercent());
     if (target.getTaskState() == IEntity.STATE_STOP) {
       mStart.setText("恢复");
-      mStart.setTextColor(getResources().getColor(android.R.color.holo_blue_light));
-      setBtState(true);
+      //mStart.setTextColor(getResources().getColor(android.R.color.holo_blue_light));
     } else if (target.isRunning()) {
-      setBtState(false);
+      mStart.setText("停止");
     }
     getBinding().setFileSize(target.getConvertFileSize());
-  }
-
-  /**
-   * 设置start 和 stop 按钮状态
-   */
-  private void setBtState(boolean state) {
-    //mStart.setEnabled(state);
-    //mStop.setEnabled(!state);
   }
 
   @Override
@@ -180,7 +179,7 @@ public class SingleTaskActivity extends BaseActivity<ActivitySingleBinding> {
   @Download.onPre
   protected void onPre(DownloadTask task) {
     if (task.getKey().equals(DOWNLOAD_URL)) {
-      setBtState(false);
+      mStart.setText("停止");
     }
   }
 
@@ -193,7 +192,7 @@ public class SingleTaskActivity extends BaseActivity<ActivitySingleBinding> {
 
   @Download.onTaskRunning
   protected void running(DownloadTask task) {
-    ALog.d(TAG, String.format("%s_running_%s", getClass().getName(), hashCode()));
+    //ALog.d(TAG, String.format("%s_running_%s", getClass().getName(), hashCode()));
     //if (task.getKey().equals(DOWNLOAD_URL)) {
     //Log.d(TAG, task.getKey());
     long len = task.getFileSize();
@@ -209,8 +208,7 @@ public class SingleTaskActivity extends BaseActivity<ActivitySingleBinding> {
   @Download.onTaskResume
   void taskResume(DownloadTask task) {
     if (task.getKey().equals(DOWNLOAD_URL)) {
-      mStart.setText("暂停");
-      setBtState(false);
+      mStart.setText("停止");
     }
   }
 
@@ -218,7 +216,6 @@ public class SingleTaskActivity extends BaseActivity<ActivitySingleBinding> {
   void taskStop(DownloadTask task) {
     if (task.getKey().equals(DOWNLOAD_URL)) {
       mStart.setText("恢复");
-      setBtState(true);
       getBinding().setSpeed("");
     }
   }
@@ -229,7 +226,6 @@ public class SingleTaskActivity extends BaseActivity<ActivitySingleBinding> {
       getBinding().setProgress(0);
       Toast.makeText(SingleTaskActivity.this, "取消下载", Toast.LENGTH_SHORT).show();
       mStart.setText("开始");
-      setBtState(true);
       getBinding().setSpeed("");
       Log.d(TAG, "cancel");
     }
@@ -242,24 +238,27 @@ public class SingleTaskActivity extends BaseActivity<ActivitySingleBinding> {
   void taskFail(DownloadTask task, Exception e) {
     if (task.getKey().equals(DOWNLOAD_URL)) {
       Toast.makeText(SingleTaskActivity.this, "下载失败", Toast.LENGTH_SHORT).show();
-      setBtState(true);
-      //Aria.download(this)
-      //    .load(DOWNLOAD_URL)
-      //    .updateUrl("http://120.55.95.61:8811/ghcg/zg/武义总规纲要成果.zip")
-      //    .start();
-      //DOWNLOAD_URL = "http://120.55.95.61:8811/ghcg/zg/武义总规纲要成果.zip";
-      //ALog.d(TAG, ALog.getExceptionString(e));
+      mStart.setText("开始");
     }
   }
 
   @Download.onTaskComplete
   void taskComplete(DownloadTask task) {
+    //Glide.with(this).load("").asBitmap().transform(new BitmapTransformation() {
+    //  @Override
+    //  protected Bitmap transform(BitmapPool pool, Bitmap toTransform, int outWidth, int outHeight) {
+    //    return null;
+    //  }
+    //
+    //  @Override public String getId() {
+    //    return null;
+    //  }
+    //})
     //if (task.getKey().equals(DOWNLOAD_URL)) {
     getBinding().setProgress(100);
     Toast.makeText(SingleTaskActivity.this, "下载完成", Toast.LENGTH_SHORT).show();
     mStart.setText("重新开始？");
     //mCancel.setEnabled(false);
-    setBtState(true);
     getBinding().setSpeed("");
     L.d(TAG, "path = " + task.getDownloadEntity().getDownloadPath());
     L.d(TAG, "md5Code = " + CommonUtil.getFileMD5(new File(task.getDownloadPath())));
@@ -290,7 +289,11 @@ public class SingleTaskActivity extends BaseActivity<ActivitySingleBinding> {
   public void onClick(View view) {
     switch (view.getId()) {
       case R.id.start:
-        startD();
+        if (target.isRunning()) {
+          Aria.download(this).load(DOWNLOAD_URL).stop();
+        } else {
+          startD();
+        }
         break;
       case R.id.stop:
         Aria.download(this).load(DOWNLOAD_URL).stop();
@@ -314,7 +317,7 @@ public class SingleTaskActivity extends BaseActivity<ActivitySingleBinding> {
         //.addHeader("Cookie", "BAIDUID=648E5FF020CC69E8DD6F492D1068AAA9:FG=1; BIDUPSID=648E5FF020CC69E8DD6F492D1068AAA9; PSTM=1519099573; BD_UPN=12314753; locale=zh; BDSVRTM=0")
         .useServerFileName(true)
         .setFilePath(path, true)
-        .setFileLenAdapter(new IHttpFileLenAdapter() {
+        .setFileLenAdapter(new AbsHttpFileLenAdapter() {
           @Override public long handleFileLen(Map<String, List<String>> headers) {
 
             List<String> sLength = headers.get("Content-Length");

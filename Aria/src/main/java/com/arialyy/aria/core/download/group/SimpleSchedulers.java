@@ -41,7 +41,7 @@ class SimpleSchedulers implements ISchedulers {
     mGState = state;
   }
 
-  public static SimpleSchedulers newInstance(GroupRunState state) {
+  static SimpleSchedulers newInstance(GroupRunState state) {
 
     return new SimpleSchedulers(state);
   }
@@ -75,7 +75,7 @@ class SimpleSchedulers implements ISchedulers {
   /**
    * 处理子任务失败的情况
    * 1、子任务失败次数大于等于配置的重试次数，才能认为子任务停止
-   * 2、stopNum + failNum + completeNum == subSize，则认为组合任务停止
+   * 2、stopNum + failNum + completeNum + cacheNum == subSize，则认为组合任务停止
    * 3、failNum == subSize，只有全部的子任务都失败了，才能任务组合任务失败
    */
   private synchronized void handleFail(final SubDownloadLoader loader) {
@@ -96,6 +96,7 @@ class SimpleSchedulers implements ISchedulers {
       if (mGState.getFailNum() == mGState.getSubSize()
           || mGState.getStopNum() + mGState.getFailNum() + mGState.getCompleteNum()
           == mGState.getSubSize()) {
+        mQueue.clear();
         mGState.isRunning = false;
         mGState.listener.onFail(true, new TaskException(TAG,
             String.format("任务组【%s】下载失败", mGState.getGroupHash())));
@@ -128,8 +129,12 @@ class SimpleSchedulers implements ISchedulers {
     mGState.listener.onSubStop(loader.getEntity());
     mGState.countStopNum(loader.getKey());
     if (mGState.getStopNum() == mGState.getSubSize()
-        || mGState.getStopNum() + mGState.getCompleteNum() + mGState.getFailNum()
+        || mGState.getStopNum()
+        + mGState.getCompleteNum()
+        + mGState.getFailNum()
+        + mQueue.getCacheSize()
         == mGState.getSubSize()) {
+      mQueue.clear();
       mGState.isRunning = false;
       mGState.listener.onStop(mGState.getProgress());
     } else {
@@ -158,6 +163,7 @@ class SimpleSchedulers implements ISchedulers {
       } else {
         mGState.listener.onStop(mGState.getProgress());
       }
+      mQueue.clear();
       mGState.isRunning = false;
     } else {
       startNext();
@@ -168,6 +174,9 @@ class SimpleSchedulers implements ISchedulers {
    * 如果有等待中的任务，则启动下一任务
    */
   private void startNext() {
+    if (mQueue.isStopAll()) {
+      return;
+    }
     SubDownloadLoader next = mQueue.getNextTask();
     if (next != null) {
       ALog.d(TAG, String.format("启动任务：%s", next.getEntity().getFileName()));

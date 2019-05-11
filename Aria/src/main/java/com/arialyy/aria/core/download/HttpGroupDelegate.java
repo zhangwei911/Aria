@@ -125,7 +125,7 @@ class HttpGroupDelegate extends AbsGroupDelegate<DownloadGroupTarget> {
       }
     }
 
-    getEntity().save();
+    saveEntity();
 
     if (isNeedModifyPath()) {
       reChangeDirPath(getDirPathTemp());
@@ -135,6 +135,11 @@ class HttpGroupDelegate extends AbsGroupDelegate<DownloadGroupTarget> {
       updateSingleSubFileName();
     }
     return true;
+  }
+
+  private void saveEntity(){
+    getEntity().save();
+    DbEntity.saveAll(getEntity().getSubEntities());
   }
 
   /**

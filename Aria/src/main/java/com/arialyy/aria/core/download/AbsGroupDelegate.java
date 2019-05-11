@@ -78,7 +78,7 @@ abstract class AbsGroupDelegate<TARGET extends AbsDGTarget> implements IGroupTar
   void reChangeDirPath(String newDirPath) {
     List<DTaskWrapper> subTasks = mWrapper.getSubTaskWrapper();
     if (subTasks != null && !subTasks.isEmpty()) {
-      List<DbEntity> des = new ArrayList<>();
+      List<DownloadEntity> des = new ArrayList<>();
       for (DTaskWrapper dte : subTasks) {
         DownloadEntity de = dte.getEntity();
         String oldPath = de.getDownloadPath();

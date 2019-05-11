@@ -191,6 +191,7 @@ public abstract class AbsTask<ENTITY extends AbsEntity, TASK_WRAPPER extends Abs
     if (mUtil.isRunning()) {
       mUtil.stop();
     } else {
+      ALog.d(TAG, "下载任务未执行");
       mListener.onStop(mEntity.getCurrentProgress());
     }
   }
