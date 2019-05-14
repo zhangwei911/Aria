@@ -125,8 +125,6 @@ class HttpGroupDelegate extends AbsGroupDelegate<DownloadGroupTarget> {
       }
     }
 
-    saveEntity();
-
     if (isNeedModifyPath()) {
       reChangeDirPath(getDirPathTemp());
     }
@@ -134,10 +132,11 @@ class HttpGroupDelegate extends AbsGroupDelegate<DownloadGroupTarget> {
     if (!mSubNameTemp.isEmpty()) {
       updateSingleSubFileName();
     }
+    saveEntity();
     return true;
   }
 
-  private void saveEntity(){
+  private void saveEntity() {
     getEntity().save();
     DbEntity.saveAll(getEntity().getSubEntities());
   }
@@ -148,10 +147,23 @@ class HttpGroupDelegate extends AbsGroupDelegate<DownloadGroupTarget> {
   private void updateSingleSubFileName() {
     List<DTaskWrapper> entities = getTaskWrapper().getSubTaskWrapper();
     int i = 0;
-    for (DTaskWrapper entity : entities) {
+    for (DTaskWrapper taskWrapper : entities) {
       if (i < mSubNameTemp.size()) {
         String newName = mSubNameTemp.get(i);
-        updateSingleSubFileName(entity, newName);
+        DownloadEntity entity = taskWrapper.getEntity();
+        if (!newName.equals(entity.getFileName())) {
+          String oldPath = getEntity().getDirPath() + "/" + entity.getFileName();
+          String newPath = getEntity().getDirPath() + "/" + newName;
+          if (DbEntity.checkDataExist(DownloadEntity.class, "downloadPath=? or isComplete='true'",
+              newPath)) {
+            ALog.w(TAG, String.format("更新文件名失败，路径【%s】已存在或文件已下载", newPath));
+            return;
+          }
+
+          CommonUtil.modifyTaskRecord(oldPath, newPath);
+          entity.setDownloadPath(newPath);
+          entity.setFileName(newName);
+        }
       }
       i++;
     }
@@ -201,27 +213,6 @@ class HttpGroupDelegate extends AbsGroupDelegate<DownloadGroupTarget> {
     getEntity().setGroupHash(CommonUtil.getMd5Code(mUrls));
 
     return true;
-  }
-
-  /**
-   * 更新单个子任务文件名
-   */
-  private void updateSingleSubFileName(DTaskWrapper taskEntity, String newName) {
-    DownloadEntity entity = taskEntity.getEntity();
-    if (!newName.equals(entity.getFileName())) {
-      String oldPath = getEntity().getDirPath() + "/" + entity.getFileName();
-      String newPath = getEntity().getDirPath() + "/" + newName;
-      if (DbEntity.checkDataExist(DownloadEntity.class, "downloadPath=? or isComplete='true'",
-          newPath)) {
-        ALog.w(TAG, String.format("更新文件名失败，路径【%s】已存在或文件已下载", newPath));
-        return;
-      }
-
-      CommonUtil.modifyTaskRecord(oldPath, newPath);
-      entity.setDownloadPath(newPath);
-      entity.setFileName(newName);
-      entity.update();
-    }
   }
 
   /**

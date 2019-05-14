@@ -24,6 +24,7 @@ import com.arialyy.aria.orm.annotation.Foreign;
  * 任务的线程记录
  */
 public class ThreadRecord extends DbEntity {
+
   @Foreign(parent = TaskRecord.class, column = "filePath", onUpdate = ActionPolicy.CASCADE, onDelete = ActionPolicy.CASCADE)
   public String key;
 
@@ -46,7 +47,7 @@ public class ThreadRecord extends DbEntity {
   /**
    * 线程id
    */
-  public int threadId = -1;
+  public int threadId = 0;
 
   /**
    * 分块长度

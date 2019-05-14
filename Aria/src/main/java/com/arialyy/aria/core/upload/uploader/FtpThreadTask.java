@@ -96,8 +96,7 @@ class FtpThreadTask extends AbsFtpThreadTask<UploadEntity, UTaskWrapper> {
       writeConfig(true, getConfig().END_LOCATION);
       getState().COMPLETE_THREAD_NUM++;
       if (getState().isComplete()) {
-        getState().TASK_RECORD.deleteData();
-        mListener.onComplete();
+        sendCompleteMsg();
       }
       if (getState().isFail()) {
         mListener.onFail(false, new TaskException(TAG,

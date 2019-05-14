@@ -76,6 +76,7 @@ abstract class AbsGroupDelegate<TARGET extends AbsDGTarget> implements IGroupTar
    * @param newDirPath 新的文件夹路径
    */
   void reChangeDirPath(String newDirPath) {
+    ALog.d(TAG, String.format("修改新路径为：%s", newDirPath));
     List<DTaskWrapper> subTasks = mWrapper.getSubTaskWrapper();
     if (subTasks != null && !subTasks.isEmpty()) {
       List<DownloadEntity> des = new ArrayList<>();
@@ -90,7 +91,6 @@ abstract class AbsGroupDelegate<TARGET extends AbsDGTarget> implements IGroupTar
         de.setDownloadPath(newPath);
         des.add(de);
       }
-      AbsEntity.saveAll(des);
     }
   }
 

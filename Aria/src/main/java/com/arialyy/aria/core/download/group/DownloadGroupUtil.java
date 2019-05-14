@@ -18,6 +18,7 @@ package com.arialyy.aria.core.download.group;
 import com.arialyy.aria.core.common.CompleteInfo;
 import com.arialyy.aria.core.common.IUtil;
 import com.arialyy.aria.core.common.OnFileInfoCallback;
+import com.arialyy.aria.core.common.http.HttpTaskDelegate;
 import com.arialyy.aria.core.download.DGTaskWrapper;
 import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.download.DownloadEntity;
@@ -49,11 +50,11 @@ public class DownloadGroupUtil extends AbsGroupUtil implements IUtil {
     return HTTP_GROUP;
   }
 
-  @Override public void onCancel() {
-    super.onCancel();
+  @Override public void onPreCancel() {
+    super.onPreCancel();
   }
 
-  @Override protected boolean onStop() {
+  @Override protected boolean onPreStop() {
     // 如果是isUnknownSize()标志，并且获取大小没有完成，则直接回调onStop
     if (mPool != null && !getLenComplete) {
       ALog.d(TAG, "获取长度未完成的情况下，停止组合任务");
@@ -83,7 +84,7 @@ public class DownloadGroupUtil extends AbsGroupUtil implements IUtil {
       } else {
         for (DTaskWrapper wrapper : mGTWrapper.getSubTaskWrapper()) {
           if (wrapper.getState() != IEntity.STATE_COMPLETE) {
-            createSubLoader(wrapper);
+            createAndStartSubLoader(wrapper);
           }
         }
       }
@@ -99,10 +100,16 @@ public class DownloadGroupUtil extends AbsGroupUtil implements IUtil {
       int failCount;
 
       @Override public void run() {
+        try {
+          Thread.sleep(2000);
+        } catch (InterruptedException e) {
+          e.printStackTrace();
+        }
         for (DTaskWrapper dTaskWrapper : mGTWrapper.getSubTaskWrapper()) {
+          cloneHeader(dTaskWrapper);
           mPool.submit(new HttpFileInfoThread(dTaskWrapper, new OnFileInfoCallback() {
             @Override public void onComplete(String url, CompleteInfo info) {
-              createSubLoader((DTaskWrapper) info.wrapper, false);
+              createAndStartSubLoader((DTaskWrapper) info.wrapper, false);
               count++;
               checkGetSizeComplete(count, failCount);
             }
@@ -133,15 +140,30 @@ public class DownloadGroupUtil extends AbsGroupUtil implements IUtil {
       mGTWrapper.getEntity().setConvertFileSize(CommonUtil.formatFileSize(size));
       mGTWrapper.getEntity().setFileSize(size);
       mGTWrapper.getEntity().update();
-      mGTWrapper.asHttp().setFileLenAdapter(null);
       getLenComplete = true;
       ALog.d(TAG, String.format("获取组合任务长度完成，len：%s", size));
     } else if (failCount == mGTWrapper.getSubTaskWrapper().size()) {
       mListener.onFail(true, new AriaIOException(TAG, "获取子任务长度失败"));
     }
 
+    mGTWrapper.asHttp().setFileLenAdapter(null);
     synchronized (LOCK) {
       LOCK.notify();
     }
+  }
+
+  /**
+   * 子任务使用父包裹器的属性
+   */
+  private void cloneHeader(DTaskWrapper taskWrapper) {
+    HttpTaskDelegate groupDelegate = mGTWrapper.asHttp();
+    HttpTaskDelegate subDelegate = taskWrapper.asHttp();
+
+    // 设置属性
+    subDelegate.setFileLenAdapter(groupDelegate.getFileLenAdapter());
+    subDelegate.setRequestEnum(groupDelegate.getRequestEnum());
+    subDelegate.setHeaders(groupDelegate.getHeaders());
+    subDelegate.setProxy(groupDelegate.getProxy());
+    subDelegate.setParams(groupDelegate.getParams());
   }
 }

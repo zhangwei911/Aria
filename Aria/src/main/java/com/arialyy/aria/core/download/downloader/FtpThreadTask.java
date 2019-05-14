@@ -147,8 +147,7 @@ class FtpThreadTask extends AbsFtpThreadTask<DownloadEntity, DTaskWrapper> {
           return;
         }
       }
-      getState().TASK_RECORD.deleteData();
-      mListener.onComplete();
+      sendCompleteMsg();
     }
     if (getState().isFail()) {
       mListener.onFail(false,

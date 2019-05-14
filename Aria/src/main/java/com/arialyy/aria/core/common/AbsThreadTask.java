@@ -22,6 +22,7 @@ import com.arialyy.aria.core.config.BaseTaskConfig;
 import com.arialyy.aria.core.config.DGroupConfig;
 import com.arialyy.aria.core.config.DownloadConfig;
 import com.arialyy.aria.core.config.UploadConfig;
+import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.inf.AbsNormalEntity;
 import com.arialyy.aria.core.inf.AbsTaskWrapper;
 import com.arialyy.aria.core.inf.IEventListener;
@@ -31,6 +32,7 @@ import com.arialyy.aria.exception.BaseException;
 import com.arialyy.aria.exception.FileException;
 import com.arialyy.aria.exception.TaskException;
 import com.arialyy.aria.util.ALog;
+import com.arialyy.aria.util.CommonUtil;
 import com.arialyy.aria.util.ErrorHelp;
 import com.arialyy.aria.util.FileUtil;
 import com.arialyy.aria.util.NetUtils;
@@ -272,8 +274,10 @@ public abstract class AbsThreadTask<ENTITY extends AbsNormalEntity, TASK_WRAPPER
     ThreadRecord tr = getThreadRecord();
     File blockFile = getBockFile();
     if (!blockFile.exists() || blockFile.length() != tr.blockLen) {
-      ALog.i(TAG, String.format("分块【%s】下载错误，即将重新下载该分块，开始位置：%s，结束位置：%s", blockFile.getName(),
-          tr.startLocation, tr.endLocation));
+      ALog.i(TAG,
+          String.format("分块【%s】错误，blockFileLen: %s, threadRect: %s; 即将重新下载该分块，开始位置：%s，结束位置：%s",
+              blockFile.getName(), blockFile.length(), tr.blockLen, tr.startLocation,
+              tr.endLocation));
       if (blockFile.exists()) {
         blockFile.delete();
         ALog.i(TAG, String.format("删除分块【%s】成功", blockFile.getName()));
@@ -405,14 +409,11 @@ public abstract class AbsThreadTask<ENTITY extends AbsNormalEntity, TASK_WRAPPER
    */
   private void retryThis(boolean needRetry) {
     if (!NetUtils.isConnected(AriaManager.APP) && !isNotNetRetry) {
-      ALog.w(TAG, String.format("任务【%s】thread__%s__重试失败，网络未连接", getConfig().TEMP_FILE.getName(),
-          getConfig().THREAD_ID));
+      ALog.w(TAG, String.format("任务【%s】重试失败，网络未连接", getConfig().TEMP_FILE.getName()));
     }
     if (mFailTimes < RETRY_NUM && needRetry && (NetUtils.isConnected(AriaManager.APP)
         || isNotNetRetry) && !isBreak()) {
-      ALog.w(TAG,
-          String.format("任务【%s】thread__%s__正在重试", getConfig().TEMP_FILE.getName(),
-              getConfig().THREAD_ID));
+      ALog.w(TAG, String.format("任务【%s】正在重试", getConfig().TEMP_FILE.getName()));
       mFailTimes++;
       handleRetryRecord();
       ThreadTaskManager.getInstance().retryThread(AbsThreadTask.this);
@@ -427,31 +428,56 @@ public abstract class AbsThreadTask<ENTITY extends AbsNormalEntity, TASK_WRAPPER
   private void handleRetryRecord() {
     if (getTaskRecord().isBlock) {
       ThreadRecord tr = getThreadRecord();
-      long block = getEntity().getFileSize() / getTaskRecord().threadRecords.size();
+      // 默认线程分块长度
+      long normalRectLen = getEntity().getFileSize() / getTaskRecord().threadRecords.size();
+      File temp = getBockFile();
 
-      File blockFile = getBockFile();
-      if (blockFile.length() > tr.blockLen) {
-        ALog.i(TAG, String.format("分块【%s】错误，将重新下载该分块", blockFile.getPath()));
-        blockFile.delete();
-        tr.startLocation = block * tr.threadId;
+      long blockFileLen = temp.length(); // 磁盘中的分块文件长度
+      long threadRect = tr.blockLen;     // 当前线程的区间
+
+      if (!temp.exists()) {
+        ALog.i(TAG, String.format("分块文件【%s】不存在，该分块将重新开始", temp.getName()));
         tr.isComplete = false;
         getConfig().START_LOCATION = tr.startLocation;
-      } else if (blockFile.length() < tr.blockLen) {
-        tr.startLocation = block * tr.threadId + blockFile.length();
-        tr.isComplete = false;
-        getConfig().START_LOCATION = tr.startLocation;
-        getState().CURRENT_LOCATION = getBlockRealTotalSize();
-        ALog.i(TAG, String.format("修正分块【%s】，开始位置：%s，当前进度：%s", blockFile.getPath(), tr.startLocation,
-            getState().CURRENT_LOCATION));
       } else {
-        getState().COMPLETE_THREAD_NUM++;
-        tr.isComplete = true;
+        /*
+         * 检查磁盘中的分块文件
+         */
+        if (blockFileLen > threadRect) {
+          ALog.i(TAG, String.format("分块【%s】错误，将重新下载该分块", temp.getName()));
+          temp.delete();
+          tr.startLocation = normalRectLen * tr.threadId;
+          tr.isComplete = false;
+          getConfig().START_LOCATION = tr.startLocation;
+        } else if (blockFileLen < tr.blockLen) {
+          tr.startLocation = normalRectLen * tr.threadId + blockFileLen;
+          tr.isComplete = false;
+          getConfig().START_LOCATION = tr.startLocation;
+          getState().CURRENT_LOCATION = getBlockRealTotalSize();
+          ALog.i(TAG,
+              String.format("修正分块【%s】，开始位置：%s，当前进度：%s", temp.getName(), tr.startLocation,
+                  getState().CURRENT_LOCATION));
+        } else {
+          ALog.i(TAG, String.format("分块【%s】已完成，更新记录", temp.getName()));
+          getState().COMPLETE_THREAD_NUM++;
+          tr.isComplete = true;
+        }
       }
       tr.update();
     } else {
       getConfig().START_LOCATION = mChildCurrentLocation == 0 ? getConfig().START_LOCATION
           : getConfig().THREAD_RECORD.startLocation;
     }
+  }
+
+  /**
+   * 发送任务完成的消息，并删除任务记录
+   */
+  protected synchronized void sendCompleteMsg() {
+    ALog.i(TAG, String.format("任务【%s】完成", mEntity.getFileName()));
+    CommonUtil.delTaskRecord(mEntity.getKey(), mEntity instanceof DownloadEntity ? 1 : 2, false,
+        false);
+    mListener.onComplete();
   }
 
   /**

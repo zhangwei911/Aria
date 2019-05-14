@@ -98,6 +98,8 @@ final class SqlHelper extends SQLiteOpenHelper {
         handle314AriaUpdate(db);
       } else if (oldVersion < 45) {
         handle360AriaUpdate(db);
+      } else if (oldVersion < 46) {
+        db.execSQL("UPDATE ThreadRecord SET threadId=0 WHERE threadId=-1");
       } else {
         handleDbUpdate(db, null, null);
       }

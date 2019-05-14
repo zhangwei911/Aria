@@ -24,8 +24,8 @@ import com.arialyy.aria.core.Aria;
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.download.DownloadGroupEntity;
 import com.arialyy.aria.core.download.DownloadGroupTask;
-import com.arialyy.aria.core.inf.AbsHttpFileLenAdapter;
 import com.arialyy.aria.core.inf.IHttpFileLenAdapter;
+import com.arialyy.aria.util.ALog;
 import com.arialyy.frame.util.show.L;
 import com.arialyy.frame.util.show.T;
 import com.arialyy.simple.R;
@@ -59,6 +59,7 @@ public class DownloadGroupActivity extends BaseActivity<ActivityDownloadGroupBin
         getBinding().setProgress(entity.isComplete() ? 100
             : (int) (entity.getCurrentProgress() * 100 / entity.getFileSize()));
       }
+      ALog.d(TAG, "size = " + entity.getSubEntities().size() + "; len = " + entity.getConvertFileSize());
     }
 
     mChildList.setOnItemClickListener(new SubStateLinearLayout.OnItemClickListener() {
@@ -90,18 +91,18 @@ public class DownloadGroupActivity extends BaseActivity<ActivityDownloadGroupBin
             //.setSubFileName(getModule(GroupModule.class).getSubName2())
             .setSubFileName(getModule(GroupModule.class).getSubName())
             .unknownSize()
-            //.setFileLenAdapter(new AbsHttpFileLenAdapter() {
-            //  @Override public long handleFileLen(Map<String, List<String>> headers) {
-            //
-            //    List<String> sLength = headers.get("Content-Length");
-            //    if (sLength == null || sLength.isEmpty()) {
-            //      return -1;
-            //    }
-            //    String temp = sLength.get(0);
-            //
-            //    return Long.parseLong(temp);
-            //  }
-            //})
+            .setFileLenAdapter(new IHttpFileLenAdapter() {
+              @Override public long handleFileLen(Map<String, List<String>> headers) {
+
+                List<String> sLength = headers.get("Content-Length");
+                if (sLength == null || sLength.isEmpty()) {
+                  return -1;
+                }
+                String temp = sLength.get(0);
+
+                return Long.parseLong(temp);
+              }
+            })
             //.setFileSize(114981416)
             //.updateUrls(temp)
             .start();

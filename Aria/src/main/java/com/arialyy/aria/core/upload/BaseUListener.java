@@ -36,7 +36,7 @@ class BaseUListener extends BaseListener<UploadEntity, UTaskWrapper, UploadTask>
     mTaskWrapper.setState(state);
     mEntity.setState(state);
     if (state == IEntity.STATE_CANCEL) {
-      CommonUtil.delTaskRecord(mEntity.getFilePath(), 2, mTaskWrapper.isRemoveFile());
+      CommonUtil.delTaskRecord(mEntity.getFilePath(), 2, mTaskWrapper.isRemoveFile(), true);
     } else if (state == IEntity.STATE_STOP) {
       mEntity.setStopTime(System.currentTimeMillis());
     } else if (state == IEntity.STATE_COMPLETE) {

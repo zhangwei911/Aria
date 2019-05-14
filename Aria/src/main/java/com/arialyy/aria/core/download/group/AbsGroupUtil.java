@@ -152,7 +152,7 @@ public abstract class AbsGroupUtil implements IUtil, Runnable {
   private SubDownloadLoader getDownloader(String url) {
     SubDownloadLoader d = mExeLoader.get(url);
     if (d == null) {
-      return createSubLoader(mCache.get(url));
+      return createAndStartSubLoader(mCache.get(url));
     }
     return d;
   }
@@ -172,38 +172,34 @@ public abstract class AbsGroupUtil implements IUtil, Runnable {
   @Override public void cancel() {
     isCancel = true;
     closeTimer();
-    onCancel();
-    Set<String> keys = mExeLoader.keySet();
-    mSubQueue.clear();
+    onPreCancel();
 
-    for (String key : keys) {
-      SubDownloadLoader loader = mExeLoader.get(key);
-      if (loader != null && loader.isRunning()) {
-        loader.cancel();
-      }
-    }
+    mSubQueue.removeAllTask();
     mListener.onCancel();
   }
 
-  public void onCancel() {
+  /**
+   * onCancel前的操作
+   */
+  public void onPreCancel() {
 
   }
 
   @Override public void stop() {
     isStop = true;
     closeTimer();
-    if (onStop()) {
+    if (onPreStop()) {
       return;
     }
     mSubQueue.stopAllTask();
   }
 
   /**
-   * 子类的钩子
+   * onStop前的操作
    *
    * @return 返回{@code true}，直接回调{@link IDownloadGroupListener#onStop(long)}
    */
-  protected boolean onStop() {
+  protected boolean onPreStop() {
 
     return false;
   }
@@ -286,8 +282,8 @@ public abstract class AbsGroupUtil implements IUtil, Runnable {
   /**
    * 创建并启动子任务下载器
    */
-  SubDownloadLoader createSubLoader(DTaskWrapper taskWrapper) {
-    return createSubLoader(taskWrapper, true);
+  SubDownloadLoader createAndStartSubLoader(DTaskWrapper taskWrapper) {
+    return createAndStartSubLoader(taskWrapper, true);
   }
 
   /**
@@ -295,28 +291,10 @@ public abstract class AbsGroupUtil implements IUtil, Runnable {
    *
    * @param needGetFileInfo {@code true} 需要获取文件信息。{@code false} 不需要获取文件信息
    */
-  SubDownloadLoader createSubLoader(DTaskWrapper taskWrapper, boolean needGetFileInfo) {
-    if (getTaskType() == HTTP_GROUP) {
-      cloneHeader(taskWrapper);
-    }
+  SubDownloadLoader createAndStartSubLoader(DTaskWrapper taskWrapper, boolean needGetFileInfo) {
     SubDownloadLoader loader = new SubDownloadLoader(mScheduler, taskWrapper, needGetFileInfo);
     mExeLoader.put(loader.getKey(), loader);
     mSubQueue.startTask(loader);
     return loader;
-  }
-
-  /**
-   * 子任务使用父包裹器的属性
-   */
-  private void cloneHeader(DTaskWrapper taskWrapper) {
-    HttpTaskDelegate groupDelegate = mGTWrapper.asHttp();
-    HttpTaskDelegate subDelegate = taskWrapper.asHttp();
-
-    // 设置属性
-    subDelegate.setFileLenAdapter(groupDelegate.getFileLenAdapter());
-    subDelegate.setRequestEnum(groupDelegate.getRequestEnum());
-    subDelegate.setHeaders(groupDelegate.getHeaders());
-    subDelegate.setProxy(groupDelegate.getProxy());
-    subDelegate.setParams(groupDelegate.getParams());
   }
 }

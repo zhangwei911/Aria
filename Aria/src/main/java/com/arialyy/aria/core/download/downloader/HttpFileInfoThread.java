@@ -89,6 +89,8 @@ public class HttpFileInfoThread implements Runnable {
       if (conn != null) {
         conn.disconnect();
       }
+      // 销毁文件长度适配器
+      mTaskWrapper.asHttp().setFileLenAdapter(null);
     }
   }
 
@@ -113,6 +115,8 @@ public class HttpFileInfoThread implements Runnable {
     IHttpFileLenAdapter lenAdapter = mTaskWrapper.asHttp().getFileLenAdapter();
     if (lenAdapter == null) {
       lenAdapter = new FileLenAdapter();
+    } else {
+      ALog.d(TAG, "使用自定义adapter");
     }
     long len = lenAdapter.handleFileLen(conn.getHeaderFields());
 
@@ -214,8 +218,6 @@ public class HttpFileInfoThread implements Runnable {
         onFileInfoCallback.onComplete(mEntity.getUrl(), info);
       }
       mEntity.update();
-      // 销毁文件长度适配器
-      mTaskWrapper.asHttp().setFileLenAdapter(null);
     }
   }
 

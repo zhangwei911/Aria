@@ -60,7 +60,7 @@ public class FtpDirDownloadUtil extends AbsGroupUtil {
   private void startDownload() {
     for (DTaskWrapper wrapper : mGTWrapper.getSubTaskWrapper()) {
       if (wrapper.getState() != IEntity.STATE_COMPLETE) {
-        createSubLoader(wrapper);
+        createAndStartSubLoader(wrapper);
       }
     }
   }

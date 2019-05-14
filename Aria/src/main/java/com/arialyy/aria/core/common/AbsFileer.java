@@ -212,6 +212,9 @@ public abstract class AbsFileer<ENTITY extends AbsNormalEntity, TASK_WRAPPER ext
             || mConstance.isCancel()
             || mConstance.isFail()
             || !isRunning()) {
+          if (mConstance.isComplete() || mConstance.isFail()) {
+            ThreadTaskManager.getInstance().removeTaskThread(mTaskWrapper.getKey());
+          }
           closeTimer();
         } else if (mConstance.CURRENT_LOCATION >= 0) {
           mListener.onProgress(mConstance.CURRENT_LOCATION);
@@ -251,9 +254,7 @@ public abstract class AbsFileer<ENTITY extends AbsNormalEntity, TASK_WRAPPER ext
   }
 
   public synchronized boolean isRunning() {
-    boolean b = ThreadTaskManager.getInstance().taskIsRunning(mTaskWrapper.getKey());
-    //ALog.d(TAG, "isRunning = " + b);
-    return b;
+    return ThreadTaskManager.getInstance().taskIsRunning(mTaskWrapper.getKey());
   }
 
   public synchronized void cancel() {
@@ -271,7 +272,7 @@ public abstract class AbsFileer<ENTITY extends AbsNormalEntity, TASK_WRAPPER ext
             task.cancel();
           }
         }
-        ThreadTaskManager.getInstance().stopTaskThread(mTaskWrapper.getKey());
+        ThreadTaskManager.getInstance().removeTaskThread(mTaskWrapper.getKey());
       }
     }).start();
   }
@@ -292,7 +293,7 @@ public abstract class AbsFileer<ENTITY extends AbsNormalEntity, TASK_WRAPPER ext
             task.stop();
           }
         }
-        ThreadTaskManager.getInstance().stopTaskThread(mTaskWrapper.getKey());
+        ThreadTaskManager.getInstance().removeTaskThread(mTaskWrapper.getKey());
       }
     }).start();
   }
@@ -382,13 +383,14 @@ public abstract class AbsFileer<ENTITY extends AbsNormalEntity, TASK_WRAPPER ext
   }
 
   /**
-   * 处理分块任务的记录
+   * 处理分块任务的记录，分块文件（blockFileLen）长度必须需要小于等于线程区间（threadRectLen）的长度
    */
   private void handleBlockRecord() {
-    final int threadNum = mRecord.threadRecords.size();
-    final long blockLen = mEntity.getFileSize() / threadNum;
-    int i = 0;
+    // 默认线程分块长度
+    long normalRectLen = mEntity.getFileSize() / mRecord.threadRecords.size();
     for (ThreadRecord tr : mRecord.threadRecords) {
+      long threadRect = tr.blockLen;
+
       File temp = new File(String.format(SUB_PATH, mRecord.filePath, tr.threadId));
       if (!temp.exists()) {
         ALog.i(TAG, String.format("分块文件【%s】不存在，该分块将重新开始", temp.getPath()));
@@ -398,33 +400,38 @@ public abstract class AbsFileer<ENTITY extends AbsNormalEntity, TASK_WRAPPER ext
         if (tr.isComplete) {
           mCompleteThreadNum++;
         } else {
-          long realLocation = i * blockLen + temp.length();
           ALog.i(TAG, String.format(
-              "startLocation = %s; endLocation = %s; block = %s; tempLen = %s; i = %s",
-              tr.startLocation, tr.endLocation, blockLen, temp.length(), i));
-          if (tr.endLocation == realLocation) {
+              "startLocation = %s; endLocation = %s; block = %s; tempLen = %s; threadId = %s",
+              tr.startLocation, tr.endLocation, threadRect, temp.length(), tr.threadId));
+
+          long blockFileLen = temp.length(); // 磁盘中的分块文件长度
+          /*
+           * 检查磁盘中的分块文件
+           */
+          if (blockFileLen > threadRect) {
+            ALog.i(TAG, String.format("分块【%s】错误，分块长度【%s】 > 线程区间长度【%s】，将重新开始该分块",
+                tr.threadId, blockFileLen, threadRect));
+            temp.delete();
+            tr.startLocation = tr.threadId * threadRect;
+            continue;
+          }
+
+          long realLocation =
+              tr.threadId * normalRectLen + blockFileLen; //正常情况下，该线程的startLocation的位置
+          /*
+           * 检查记录文件
+           */
+          if (blockFileLen == threadRect) {
             ALog.i(TAG, String.format("分块【%s】已完成，更新记录", temp.getPath()));
-            tr.startLocation = realLocation;
+            tr.startLocation = blockFileLen;
             tr.isComplete = true;
             mCompleteThreadNum++;
-          } else {
-            tr.isComplete = false;
-            if (realLocation == tr.startLocation) {
-              i++;
-              continue;
-            }
-            if (realLocation > tr.startLocation) {
-              ALog.i(TAG, String.format("修正分块【%s】的进度记录为：%s", temp.getPath(), realLocation));
-              tr.startLocation = realLocation;
-            } else {
-              ALog.i(TAG, String.format("分块【%s】错误，将重新开始该分块", temp.getPath()));
-              temp.delete();
-              tr.startLocation = i * blockLen;
-            }
+          } else if (tr.startLocation != realLocation) { // 处理记录小于分块文件长度的情况
+            ALog.i(TAG, String.format("修正分块【%s】的进度记录为：%s", temp.getPath(), realLocation));
+            tr.startLocation = realLocation;
           }
         }
       }
-      i++;
     }
     mTotalThreadNum = mRecord.threadRecords.size();
     mTaskWrapper.setNewTask(false);
@@ -517,13 +524,8 @@ public abstract class AbsFileer<ENTITY extends AbsNormalEntity, TASK_WRAPPER ext
   private void saveRecord() {
     mRecord.threadNum = mRecord.threadRecords.size();
     mRecord.save();
-    for (ThreadRecord tr : mRecord.threadRecords) {
-      tr.save();
-    }
-  }
-
-  public TaskRecord getRecord() {
-    return mRecord;
+    ALog.d(TAG, String.format("保存记录，线程记录数：%s", mRecord.threadRecords.size()));
+    DbEntity.saveAll(mRecord.threadRecords);
   }
 
   /**
@@ -573,10 +575,10 @@ public abstract class AbsFileer<ENTITY extends AbsNormalEntity, TASK_WRAPPER ext
     long fileLength = mEntity.getFileSize();
     long blockSize = fileLength / mTotalThreadNum;
     Set<Integer> threads = new HashSet<>();
-    // 如果是新任务，检查下历史记录，如果有遗留的记录，删除并删除分块文件
-    if (mTaskWrapper.isNewTask()) {
-      CommonUtil.delTaskRecord(getFilePath(), 1, true);
-    }
+    //// 如果是新任务，检查下历史记录，如果有遗留的记录，删除并删除分块文件
+    //if (mTaskWrapper.isNewTask()) {
+    //  CommonUtil.delTaskRecord(getFilePath(), 1, true);
+    //}
 
     mRecord.fileLength = fileLength;
     if (mTaskWrapper.isNewTask() && !handleNewTask()) {

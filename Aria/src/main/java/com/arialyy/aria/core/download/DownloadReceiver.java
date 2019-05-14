@@ -187,7 +187,7 @@ public class DownloadReceiver extends AbsReceiver {
    * 取消注册，如果是Activity或fragment，Aria会界面销毁时自动调用该方法，不需要你手动调用。
    * 注意事项：
    * 1、如果在activity中一定要调用该方法，那么请在{@code onDestroy()}中调用
-   * 2、不要在activity的{@code onStop()}中调用改方法
+   * 2、不要在activity的{@code onPreStop()}中调用改方法
    * 3、如果是Dialog或popupwindow，需要你在撤销界面时调用该方法
    * 4、如果你是在Module（非android组件类）中注册了Aria，那么你也需要在Module类中调用该方法，而不是在组件类中
    * 调用销毁，详情见

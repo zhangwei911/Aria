@@ -29,7 +29,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 /**
- * 线程管理器
+ * 线程任务管理器
  */
 public class ThreadTaskManager {
   private static volatile ThreadTaskManager INSTANCE = null;
@@ -80,7 +80,7 @@ public class ThreadTaskManager {
    *
    * @param key 任务对应的key{@link AbsTaskWrapper#getKey()}
    */
-  public synchronized void stopTaskThread(String key) {
+  public synchronized void removeTaskThread(String key) {
     if (mExePool.isShutdown()) {
       ALog.e(TAG, "线程池已经关闭");
       return;

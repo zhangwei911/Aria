@@ -13,6 +13,16 @@
     - 组合任务新增`unknownSize()`，用于处理组合任务大小未知的情况，https://github.com/AriaLyy/Aria/issues/380
     - 优化`AbsThreadTask`代码
     - 新增文件长度处理功能 https://github.com/AriaLyy/Aria/issues/393
+      ```java
+      .setFileLenAdapter(new IHttpFileLenAdapter() {
+        @Override public long handleFileLen(Map<String, List<String>> headers) {
+          ...
+          // 处理header中的文件长度
+
+          return fileLen;
+        }
+       })
+      ```
     - 修复组合任务多次回调`onStop`注解的问题
     - 优化`isRunning()`的逻辑，任务是否在执行的判断将更加准确
     - 修复多次重复快速点击`暂停、开始`时，任务有可能重复下载的问题

@@ -276,19 +276,20 @@ import org.xml.sax.SAXException;
   /**
    * 删除任务记录
    *
-   * @param type 需要删除的任务类型，1、表示单任务下载。2、表示任务组下载。3、单任务上传
-   * @param key 下载为保存路径、任务组为任务组名、上传为上传文件路径
+   * @param type 需要删除的任务类型，1、普通下载任务；2、组合任务；3、普通上传任务。
+   * @param key type为1时，key为保存路径；type为2时，key为组合任务hash；type为3时，key为文件上传路径。
+   * @param removeFile {@code true} 不仅删除任务数据库记录，还会删除已经删除完成的文件；{@code false}如果任务已经完成，只删除任务数据库记录。
    */
-  public void delRecord(int type, String key) {
+  public void delRecord(int type, String key, boolean removeFile) {
     switch (type) {
-      case 1:
-        DbEntity.deleteData(DownloadEntity.class, "url=? and isGroupChild='false'", key);
+      case 1: // 删除普通任务记录
+        CommonUtil.delTaskRecord(key, 1, removeFile, true);
         break;
       case 2:
-        DbEntity.deleteData(DownloadGroupEntity.class, "groupHash=?", key);
+        CommonUtil.delGroupTaskRecord(key, removeFile);
         break;
       case 3:
-        DbEntity.deleteData(UploadEntity.class, "filePath=?", key);
+        CommonUtil.delTaskRecord(key, 2);
         break;
     }
   }

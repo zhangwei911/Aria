@@ -19,7 +19,6 @@ import android.support.annotation.CheckResult;
 import android.support.annotation.NonNull;
 import com.arialyy.aria.core.common.http.HttpHeaderDelegate;
 import com.arialyy.aria.core.common.http.PostDelegate;
-import com.arialyy.aria.core.inf.AbsHttpFileLenAdapter;
 import com.arialyy.aria.core.inf.IHttpFileLenAdapter;
 import com.arialyy.aria.core.inf.IHttpHeaderDelegate;
 import com.arialyy.aria.core.manager.TaskWrapperManager;
@@ -162,7 +161,7 @@ public class DownloadGroupTarget extends AbsDGTarget<DownloadGroupTarget> implem
   /**
    * 如果你需要使用header中特定的key来设置文件长度，或有定制文件长度的需要，那么你可以通过该方法自行处理文件长度
    */
-  public DownloadGroupTarget setFileLenAdapter(AbsHttpFileLenAdapter adapter) {
+  public DownloadGroupTarget setFileLenAdapter(IHttpFileLenAdapter adapter) {
     return mHeaderDelegate.setFileLenAdapter(adapter);
   }
 

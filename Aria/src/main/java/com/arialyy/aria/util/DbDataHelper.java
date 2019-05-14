@@ -17,6 +17,7 @@ package com.arialyy.aria.util;
 
 import com.arialyy.aria.core.common.RecordWrapper;
 import com.arialyy.aria.core.common.TaskRecord;
+import com.arialyy.aria.core.common.ThreadRecord;
 import com.arialyy.aria.core.download.DGEntityWrapper;
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.download.DownloadGroupEntity;
@@ -37,12 +38,12 @@ public class DbDataHelper {
    * @return 没有记录返回null，有记录则返回任务记录
    */
   public static TaskRecord getTaskRecord(String filePath) {
-    List<RecordWrapper> records =
+    List<RecordWrapper> record =
         DbEntity.findRelationData(RecordWrapper.class, "TaskRecord.filePath=?", filePath);
-    if (records == null || records.size() == 0) {
+    if (record == null || record.size() == 0) {
       return null;
     }
-    return records.get(0).taskRecord;
+    return record.get(0).taskRecord;
   }
 
   /**

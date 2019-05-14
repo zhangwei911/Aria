@@ -55,7 +55,7 @@ public class BaseDListener extends BaseListener<DownloadEntity, DTaskWrapper, Do
     mEntity.setState(state);
 
     if (state == IEntity.STATE_CANCEL) {
-      CommonUtil.delTaskRecord(mEntity.getDownloadPath(), 1, mTaskWrapper.isRemoveFile());
+      CommonUtil.delTaskRecord(mEntity.getDownloadPath(), 1, mTaskWrapper.isRemoveFile(), true);
       return;
     } else if (state == IEntity.STATE_STOP) {
       mEntity.setStopTime(System.currentTimeMillis());

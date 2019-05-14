@@ -87,8 +87,10 @@ class SubDownloadLoader implements IUtil {
   }
 
   @Override public void cancel() {
-    if (mDownloader != null) {
+    if (mDownloader != null && isRunning()) {
       mDownloader.cancel();
+    } else {
+      mSchedulers.obtainMessage(ISchedulers.CANCEL, this).sendToTarget();
     }
   }
 

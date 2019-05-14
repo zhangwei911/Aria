@@ -19,6 +19,7 @@ package com.arialyy.aria.core.common.http;
 import com.arialyy.aria.core.common.RequestEnum;
 import com.arialyy.aria.core.inf.IHttpFileLenAdapter;
 import com.arialyy.aria.core.inf.ITargetHeadDelegate;
+import java.lang.ref.WeakReference;
 import java.net.CookieManager;
 import java.net.Proxy;
 import java.util.HashMap;

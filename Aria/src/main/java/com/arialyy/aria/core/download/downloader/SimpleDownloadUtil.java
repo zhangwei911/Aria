@@ -23,7 +23,6 @@ import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.inf.AbsEntity;
 import com.arialyy.aria.core.inf.AbsTaskWrapper;
 import com.arialyy.aria.core.inf.IDownloadListener;
-import com.arialyy.aria.core.inf.IEntity;
 import com.arialyy.aria.exception.BaseException;
 
 /**

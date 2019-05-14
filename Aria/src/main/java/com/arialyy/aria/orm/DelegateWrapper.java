@@ -117,7 +117,7 @@ public class DelegateWrapper {
   /**
    * 更新多条数据
    */
-  void updateManyData(List<DbEntity> dbEntitys) {
+  <T extends  DbEntity> void updateManyData(List<T> dbEntitys) {
     mDManager.getDelegate(DelegateUpdate.class).updateManyData(mDb, dbEntitys);
   }
 
@@ -182,7 +182,7 @@ public class DelegateWrapper {
   /**
    * 插入多条数据
    */
-  void insertManyData(List<DbEntity> dbEntitys) {
+  <T extends  DbEntity> void insertManyData(List<T> dbEntitys) {
     mDManager.getDelegate(DelegateUpdate.class).insertManyData(mDb, dbEntitys);
   }
 

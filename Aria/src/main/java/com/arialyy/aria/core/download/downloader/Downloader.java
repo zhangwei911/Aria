@@ -26,6 +26,7 @@ import com.arialyy.aria.exception.BaseException;
 import com.arialyy.aria.exception.TaskException;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.BufferedRandomAccessFile;
+import com.arialyy.aria.util.CommonUtil;
 import java.io.File;
 import java.io.IOException;
 
@@ -59,6 +60,14 @@ public class Downloader extends AbsFileer<DownloadEntity, DTaskWrapper> {
         mTempFile.delete();
       }
       //CommonUtil.createFile(mTempFile.getPath());
+    } else {
+      for (int i = 0; i < mTotalThreadNum; i++) {
+        File blockFile = new File(String.format(AbsFileer.SUB_PATH, mTempFile.getPath(), i));
+        if (blockFile.exists()) {
+          ALog.d(TAG, String.format("分块【%s】已经存在，将删除该分块", i));
+          blockFile.delete();
+        }
+      }
     }
     BufferedRandomAccessFile file = null;
     try {

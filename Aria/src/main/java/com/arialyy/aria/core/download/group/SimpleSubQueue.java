@@ -168,6 +168,18 @@ class SimpleSubQueue implements ISubQueue<SubDownloadLoader> {
     mCache.remove(fileer.getKey());
   }
 
+  @Override public void removeAllTask() {
+    ALog.d(TAG, "删除组合任务");
+    Set<String> keys = mExec.keySet();
+    for (String key : keys) {
+      SubDownloadLoader loader = mExec.get(key);
+      if (loader != null) {
+        ALog.d(TAG, String.format("停止子任务：%s", loader.getEntity().getFileName()));
+        loader.cancel();
+      }
+    }
+  }
+
   @Override public SubDownloadLoader getNextTask() {
     Iterator<String> keys = mCache.keySet().iterator();
     if (keys.hasNext()) {

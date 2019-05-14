@@ -178,7 +178,7 @@ public abstract class DbEntity {
   /**
    * 插入多条数据
    */
-  public static void insertManyData(List<DbEntity> entities) {
+  public static <T extends DbEntity> void insertManyData(List<T> entities) {
     checkListData(entities);
     DelegateWrapper.getInstance().insertManyData(entities);
   }
@@ -186,7 +186,7 @@ public abstract class DbEntity {
   /**
    * 修改多条数据
    */
-  public static void updateManyData(List<DbEntity> entities) {
+  public static <T extends DbEntity> void updateManyData(List<T> entities) {
     checkListData(entities);
     DelegateWrapper.getInstance().updateManyData(entities);
   }
@@ -196,10 +196,10 @@ public abstract class DbEntity {
    */
   public static <T extends DbEntity> void saveAll(List<T> entities) {
     checkListData(entities);
-    List<DbEntity> insertD = new ArrayList<>();
-    List<DbEntity> updateD = new ArrayList<>();
+    List<T> insertD = new ArrayList<>();
+    List<T> updateD = new ArrayList<>();
     DelegateWrapper wrapper = DelegateWrapper.getInstance();
-    for (DbEntity entity : entities) {
+    for (T entity : entities) {
       if (entity.rowID == -1) {
         insertD.add(entity);
         continue;
@@ -212,7 +212,8 @@ public abstract class DbEntity {
     }
     if (!insertD.isEmpty()) {
       wrapper.insertManyData(insertD);
-    } else {
+    }
+    if (!updateD.isEmpty()) {
       wrapper.updateManyData(updateD);
     }
   }

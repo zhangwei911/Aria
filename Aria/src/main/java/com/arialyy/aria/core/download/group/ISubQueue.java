@@ -63,9 +63,15 @@ interface ISubQueue<Fileer extends IUtil> {
   void removeTaskFromExecQ(Fileer fileer);
 
   /**
-   * 删除任务
+   * 删除任务，如果缓存队列中有等待中的任务，则启动等待中的任务
    */
   void removeTask(Fileer fileer);
+
+  /**
+   * 停止全部任务，停止所有正在执行的任务，并清空所有等待中的端服务
+   */
+  void removeAllTask();
+
 
   /**
    * 获取下一个任务

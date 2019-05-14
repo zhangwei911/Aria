@@ -176,7 +176,8 @@ final class HttpThreadTask extends AbsThreadTask<DownloadEntity, DTaskWrapper> {
       handleComplete();
     } catch (IOException e) {
       fail(mChildCurrentLocation, new AriaIOException(TAG,
-          String.format("文件下载失败，savePath: %s, url: %s", getEntity().getDownloadPath(), getConfig().URL),
+          String.format("文件下载失败，savePath: %s, url: %s", getEntity().getDownloadPath(),
+              getConfig().URL),
           e));
     } finally {
       if (fos != null) {
@@ -228,7 +229,8 @@ final class HttpThreadTask extends AbsThreadTask<DownloadEntity, DTaskWrapper> {
       handleComplete();
     } catch (IOException e) {
       fail(mChildCurrentLocation, new AriaIOException(TAG,
-          String.format("文件下载失败，savePath: %s, url: %s", getEntity().getDownloadPath(), getConfig().URL),
+          String.format("文件下载失败，savePath: %s, url: %s", getEntity().getDownloadPath(),
+              getConfig().URL),
           e));
     } finally {
       try {
@@ -278,8 +280,7 @@ final class HttpThreadTask extends AbsThreadTask<DownloadEntity, DTaskWrapper> {
       return;
     }
     if (getTaskWrapper().asHttp().isChunked()) {
-      ALog.i(TAG, "任务下载完成");
-      mListener.onComplete();
+      sendCompleteMsg();
       return;
     }
 
@@ -300,8 +301,7 @@ final class HttpThreadTask extends AbsThreadTask<DownloadEntity, DTaskWrapper> {
               return;
             }
           }
-          getState().TASK_RECORD.deleteData();
-          mListener.onComplete();
+          sendCompleteMsg();
         }
         if (getState().isFail()) {
           mListener.onFail(false,
@@ -310,8 +310,7 @@ final class HttpThreadTask extends AbsThreadTask<DownloadEntity, DTaskWrapper> {
                       getEntity().getDownloadPath(), getEntity().getUrl())));
         }
       } else {
-        ALog.i(TAG, "任务下载完成");
-        mListener.onComplete();
+        sendCompleteMsg();
       }
     } else {
       getState().FAIL_NUM++;

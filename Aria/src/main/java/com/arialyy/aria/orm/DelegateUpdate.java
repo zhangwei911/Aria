@@ -69,7 +69,7 @@ class DelegateUpdate extends AbsDelegate {
   /**
    * 更新多条记录
    */
-  synchronized void updateManyData(SQLiteDatabase db, List<DbEntity> dbEntities) {
+  synchronized <T extends  DbEntity> void updateManyData(SQLiteDatabase db, List<T> dbEntities) {
     db = checkDb(db);
     db.beginTransaction();
     try {

@@ -101,7 +101,7 @@ class HttpThreadTask extends AbsThreadTask<UploadEntity, UTaskWrapper> {
       }
       uploadFile(writer, taskDelegate.getAttachment(), uploadFile);
       getEntity().setResponseStr(finish(writer));
-      mListener.onComplete();
+      sendCompleteMsg();
     } catch (Exception e) {
       e.printStackTrace();
       fail(new TaskException(TAG,

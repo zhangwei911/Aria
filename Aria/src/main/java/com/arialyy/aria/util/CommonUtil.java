@@ -32,6 +32,7 @@ import com.arialyy.aria.core.command.group.GroupCmdFactory;
 import com.arialyy.aria.core.command.normal.AbsNormalCmd;
 import com.arialyy.aria.core.command.normal.NormalCmdFactory;
 import com.arialyy.aria.core.common.AbsFileer;
+import com.arialyy.aria.core.common.RecordWrapper;
 import com.arialyy.aria.core.common.TaskRecord;
 import com.arialyy.aria.core.common.ThreadRecord;
 import com.arialyy.aria.core.download.DownloadEntity;
@@ -592,28 +593,48 @@ public class CommonUtil {
    *
    * @param removeFile {@code true} 不仅删除任务数据库记录，还会删除已经删除完成的文件 {@code false}如果任务已经完成，只删除任务数据库记录
    */
+  public static void delGroupTaskRecord(String groupHash, boolean removeFile) {
+    if (TextUtils.isEmpty(groupHash)) {
+      ALog.e(TAG, "删除下载任务组记录失败，groupHash为null");
+      return;
+    }
+    DownloadGroupEntity groupEntity = DbDataHelper.getDGEntity(groupHash);
+
+    delGroupTaskRecord(groupEntity, removeFile);
+  }
+
+  /**
+   * 删除任务组记录
+   *
+   * @param removeFile {@code true} 不仅删除任务数据库记录，还会删除已经删除完成的文件 {@code false}如果任务已经完成，只删除任务数据库记录
+   */
   public static void delGroupTaskRecord(DownloadGroupEntity groupEntity, boolean removeFile) {
     if (groupEntity == null) {
       ALog.e(TAG, "删除下载任务组记录失败，任务组实体为null");
       return;
     }
-    List<TaskRecord> records =
-        DbEntity.findDatas(TaskRecord.class, "dGroupHash=?", groupEntity.getGroupHash());
+    List<RecordWrapper> records =
+        DbEntity.findRelationData(RecordWrapper.class, "dGroupHash=?", groupEntity.getGroupHash());
 
     if (records == null || records.isEmpty()) {
       ALog.w(TAG, "组任务记录删除失败，记录为null");
     } else {
-      for (TaskRecord record : records) {
+      for (RecordWrapper record : records) {
+        if (record == null || record.taskRecord == null) {
+          continue;
+        }
         // 删除分块文件
-        if (record.isBlock) {
-          for (int i = 0, len = record.threadNum; i < len; i++) {
-            File partFile = new File(String.format(AbsFileer.SUB_PATH, record.filePath, i));
+        if (record.taskRecord.isBlock) {
+          for (int i = 0, len = record.taskRecord.threadNum; i < len; i++) {
+            File partFile =
+                new File(String.format(AbsFileer.SUB_PATH, record.taskRecord.filePath, i));
             if (partFile.exists()) {
               partFile.delete();
             }
           }
         }
-        record.deleteData();
+        DbEntity.deleteData(ThreadRecord.class, "key=?", record.taskRecord.filePath);
+        record.taskRecord.deleteData();
       }
     }
 
@@ -632,12 +653,13 @@ public class CommonUtil {
       if (dir.exists() && (removeFile || !groupEntity.isComplete())) {
         dir.delete();
       }
-      groupEntity.deleteData();
     }
+    DbEntity.deleteData(DownloadEntity.class, "groupHash=?", groupEntity.getGroupHash());
+    DbEntity.deleteData(DownloadGroupEntity.class, "groupHash=?", groupEntity.getGroupHash());
   }
 
   /**
-   * 删除任务记录
+   * 删除任务记录，默认删除任务实体
    *
    * @param removeFile {@code true} 不仅删除任务数据库记录，还会删除已经完成的文件 {@code false}如果任务已经完成，只删除任务数据库记录
    */
@@ -655,7 +677,7 @@ public class CommonUtil {
       ALog.w(TAG, "删除记录失败，未知类型");
       return;
     }
-    delTaskRecord(filePath, type, removeFile);
+    delTaskRecord(filePath, type, removeFile, true);
   }
 
   /**
@@ -664,21 +686,28 @@ public class CommonUtil {
    * @param filePath 文件路径
    * @param removeFile {@code true} 不仅删除任务数据库记录，还会删除已经删除完成的文件 {@code false}如果任务已经完成，只删除任务数据库记录
    * @param type {@code 1}下载任务的记录，{@code 2} 上传任务的记录 {@code false}如果任务已经完成，只删除任务数据库记录
+   * @param removeEntity {@code true} 删除任务实体，
    */
-  public static void delTaskRecord(String filePath, int type, boolean removeFile) {
+  public static void delTaskRecord(String filePath, int type, boolean removeFile,
+      boolean removeEntity) {
     if (TextUtils.isEmpty(filePath)) {
       throw new NullPointerException("删除记录失败，文件路径为空");
     }
     if (type != 1 && type != 2) {
       throw new IllegalArgumentException("任务记录类型错误");
     }
-    TaskRecord record = DbEntity.findFirst(TaskRecord.class, "filePath=?", filePath);
-    DbEntity.deleteData(ThreadRecord.class, "key=?", filePath);
+    List<RecordWrapper> recordWrapper =
+        DbEntity.findRelationData(RecordWrapper.class, "filePath=?", filePath);
+    DbEntity.deleteData(ThreadRecord.class, "key=?", filePath); // 必须先获取完成数据再删除线程记录
 
     File file = new File(filePath);
-    if (record == null) {
+    if (recordWrapper == null
+        || recordWrapper.isEmpty()
+        || recordWrapper.get(0) == null
+        || recordWrapper.get(0).taskRecord == null) {
       ALog.w(TAG, "记录为空");
     } else {
+      TaskRecord record = recordWrapper.get(0).taskRecord;
       // 删除分块文件
       if (record.isBlock) {
         for (int i = 0, len = record.threadNum; i < len; i++) {
@@ -688,28 +717,31 @@ public class CommonUtil {
           }
         }
       }
+      // 删除任务记录
       record.deleteData();
     }
 
     if (file.exists() && removeFile) {
       file.delete();
     }
-    //下载任务实体和下载实体为一对一关系，下载实体删除，任务实体自动删除
-    if (type == 1) {
-      DbEntity.deleteData(DownloadEntity.class, "downloadPath=?", filePath);
-    } else {
-      DbEntity.deleteData(UploadEntity.class, "filePath=?", filePath);
+
+    if (removeEntity) {
+      if (type == 1) {
+        DbEntity.deleteData(DownloadEntity.class, "downloadPath=?", filePath);
+      } else {
+        DbEntity.deleteData(UploadEntity.class, "filePath=?", filePath);
+      }
     }
   }
 
   /**
-   * 删除任务记录，默认删除文件
+   * 删除任务记录，默认删除文件，删除任务实体
    *
    * @param filePath 文件路径
    * @param type {@code 1}下载任务的记录，{@code 2} 上传任务的记录 {@code false}如果任务已经完成，只删除任务数据库记录
    */
   public static void delTaskRecord(String filePath, int type) {
-    delTaskRecord(filePath, type, false);
+    delTaskRecord(filePath, type, false, true);
   }
 
   /**
@@ -925,9 +957,9 @@ public class CommonUtil {
    * 获取当前类里面的所在字段
    */
   public static Field[] getFields(Class clazz) {
-    Field[] fields = null;
+    Field[] fields;
     fields = clazz.getDeclaredFields();
-    if (fields == null || fields.length == 0) {
+    if (fields.length == 0) {
       Class superClazz = clazz.getSuperclass();
       if (superClazz != null) {
         fields = getFields(superClazz);
@@ -1016,7 +1048,7 @@ public class CommonUtil {
    * @return 对象名
    */
   public static String getClassName(Object obj) {
-    String arrays[] = obj.getClass().getName().split("\\.");
+    String[] arrays = obj.getClass().getName().split("\\.");
     return arrays[arrays.length - 1];
   }
 
@@ -1027,7 +1059,7 @@ public class CommonUtil {
    * @return 对象名
    */
   public static String getClassName(Class clazz) {
-    String arrays[] = clazz.getName().split("\\.");
+    String[] arrays = clazz.getName().split("\\.");
     return arrays[arrays.length - 1];
   }
 
@@ -1165,7 +1197,7 @@ public class CommonUtil {
           blockFile.renameTo(new File(String.format(AbsFileer.SUB_PATH, newPath, tr.threadId)));
         }
       }
-      DbEntity.saveAll(record.threadRecords);
+      DbEntity.updateManyData(record.threadRecords);
     }
   }
 
