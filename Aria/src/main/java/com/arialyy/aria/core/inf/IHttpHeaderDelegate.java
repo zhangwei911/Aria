@@ -22,7 +22,7 @@ import java.util.Map;
 
 /**
  * Created by laoyuyu on 2018/3/9.
- * HTTP Header功能接口
+ * D_HTTP Header功能接口
  */
 public interface IHttpHeaderDelegate<TARGET extends ITargetHandler> {
 

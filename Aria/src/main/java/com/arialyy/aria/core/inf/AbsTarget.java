@@ -15,6 +15,8 @@
  */
 package com.arialyy.aria.core.inf;
 
+import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.CheckResult;
 import android.text.TextUtils;
 import com.arialyy.aria.core.AriaManager;
@@ -25,6 +27,10 @@ import com.arialyy.aria.core.download.DGTaskWrapper;
 import com.arialyy.aria.core.download.DownloadGroupEntity;
 import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.manager.TaskWrapperManager;
+import com.arialyy.aria.core.scheduler.DownloadGroupSchedulers;
+import com.arialyy.aria.core.scheduler.DownloadSchedulers;
+import com.arialyy.aria.core.scheduler.ISchedulers;
+import com.arialyy.aria.core.scheduler.UploadSchedulers;
 import com.arialyy.aria.core.upload.UTaskWrapper;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
@@ -197,10 +203,40 @@ public abstract class AbsTarget<TARGET extends AbsTarget> implements ITargetHand
   }
 
   /**
+   * 如果检查实体失败，将错误回调
+   */
+  protected boolean checkConfig() {
+    boolean b = checkEntity();
+    ISchedulers schedulers = getScheduler();
+    if (!b && schedulers != null) {
+      new Handler(Looper.getMainLooper(), schedulers).obtainMessage(ISchedulers.FAIL,
+          new TempTask(mTaskWrapper, mEntity)).sendToTarget();
+    }
+
+    return b;
+  }
+
+  private ISchedulers getScheduler() {
+    int type = getTargetType();
+    switch (type) {
+      case D_FTP:
+      case D_HTTP:
+        return DownloadSchedulers.getInstance();
+      case U_FTP:
+      case U_HTTP:
+        return UploadSchedulers.getInstance();
+      case GROUP_HTTP:
+      case GROUP_FTP_DIR:
+        return DownloadGroupSchedulers.getInstance();
+    }
+    return null;
+  }
+
+  /**
    * 保存修改
    */
   @Override public void save() {
-    if (!checkEntity()) {
+    if (!checkConfig()) {
       ALog.e(TAG, "保存修改失败");
     } else {
       ALog.i(TAG, "保存成功");
@@ -224,7 +260,8 @@ public abstract class AbsTarget<TARGET extends AbsTarget> implements ITargetHand
   /**
    * 设置target类型
    *
-   * @return {@link #HTTP}、{@link #FTP}、{@link #GROUP_HTTP}、{@link #GROUP_FTP_DIR}
+   * @return {@link #D_HTTP}、{@link #U_HTTP}、{@link #D_FTP}、{@link #U_FTP}、{@link
+   * #GROUP_HTTP}、{@link #GROUP_FTP_DIR}
    */
   public abstract int getTargetType();
 
@@ -232,7 +269,7 @@ public abstract class AbsTarget<TARGET extends AbsTarget> implements ITargetHand
    * 添加任务
    */
   @Override public void add() {
-    if (checkEntity()) {
+    if (checkConfig()) {
       AriaManager.getInstance(AriaManager.APP)
           .setCmd(CommonUtil.createNormalCmd(getTaskWrapper(), NormalCmdFactory.TASK_CREATE,
               checkTaskType()))
@@ -244,7 +281,7 @@ public abstract class AbsTarget<TARGET extends AbsTarget> implements ITargetHand
    * 开始任务
    */
   @Override public void start() {
-    if (checkEntity()) {
+    if (checkConfig()) {
       AriaManager.getInstance(AriaManager.APP)
           .setCmd(
               CommonUtil.createNormalCmd(mTaskWrapper, NormalCmdFactory.TASK_START,
@@ -259,13 +296,13 @@ public abstract class AbsTarget<TARGET extends AbsTarget> implements ITargetHand
    * @see #stop()
    */
   @Deprecated public void pause() {
-    if (checkEntity()) {
+    if (checkConfig()) {
       stop();
     }
   }
 
   @Override public void stop() {
-    if (checkEntity()) {
+    if (checkConfig()) {
       AriaManager.getInstance(AriaManager.APP)
           .setCmd(
               CommonUtil.createNormalCmd(mTaskWrapper, NormalCmdFactory.TASK_STOP, checkTaskType()))
@@ -277,7 +314,7 @@ public abstract class AbsTarget<TARGET extends AbsTarget> implements ITargetHand
    * 恢复任务
    */
   @Override public void resume() {
-    if (checkEntity()) {
+    if (checkConfig()) {
       AriaManager.getInstance(AriaManager.APP)
           .setCmd(
               CommonUtil.createNormalCmd(mTaskWrapper, NormalCmdFactory.TASK_START,
@@ -290,7 +327,7 @@ public abstract class AbsTarget<TARGET extends AbsTarget> implements ITargetHand
    * 删除任务
    */
   @Override public void cancel() {
-    if (checkEntity()) {
+    if (checkConfig()) {
       AriaManager.getInstance(AriaManager.APP)
           .setCmd(CommonUtil.createNormalCmd(mTaskWrapper, NormalCmdFactory.TASK_CANCEL,
               checkTaskType()))
@@ -302,7 +339,7 @@ public abstract class AbsTarget<TARGET extends AbsTarget> implements ITargetHand
    * 任务重试
    */
   @Override public void reTry() {
-    if (checkEntity()) {
+    if (checkConfig()) {
       List<ICmd> cmds = new ArrayList<>();
       int taskType = checkTaskType();
       cmds.add(
@@ -319,7 +356,7 @@ public abstract class AbsTarget<TARGET extends AbsTarget> implements ITargetHand
    * {@code false}如果任务已经完成，只删除任务数据库记录，
    */
   @Override public void cancel(boolean removeFile) {
-    if (checkEntity()) {
+    if (checkConfig()) {
       CancelCmd cancelCmd =
           (CancelCmd) CommonUtil.createNormalCmd(mTaskWrapper, NormalCmdFactory.TASK_CANCEL,
               checkTaskType());
@@ -332,9 +369,80 @@ public abstract class AbsTarget<TARGET extends AbsTarget> implements ITargetHand
    * 重新下载
    */
   @Override public void reStart() {
-    if (checkEntity()) {
+    if (checkConfig()) {
       cancel();
       start();
+    }
+  }
+
+  private static class TempTask implements ITask {
+
+    private AbsTaskWrapper wrapper;
+    private AbsEntity entity;
+
+    private TempTask(AbsTaskWrapper wrapper, AbsEntity entity) {
+      this.wrapper = wrapper;
+      this.entity = entity;
+    }
+
+    @Override public int getTaskType() {
+      return TEMP;
+    }
+
+    @Override public int getState() {
+      return entity.getState();
+    }
+
+    @Override public String getKey() {
+      return entity.getKey();
+    }
+
+    @Override public boolean isRunning() {
+      return false;
+    }
+
+    @Override public AbsTaskWrapper getTaskWrapper() {
+      return wrapper;
+    }
+
+    @Override public void start() {
+
+    }
+
+    @Override public void stop() {
+
+    }
+
+    @Override public void stop(int type) {
+
+    }
+
+    @Override public void cancel() {
+
+    }
+
+    @Override public Object getExpand(String key) {
+      return null;
+    }
+
+    @Override public boolean isStop() {
+      return false;
+    }
+
+    @Override public boolean isCancel() {
+      return false;
+    }
+
+    @Override public boolean isNeedRetry() {
+      return false;
+    }
+
+    @Override public String getTaskName() {
+      return "TempTask";
+    }
+
+    @Override public int getSchedulerType() {
+      return TaskSchedulerType.TYPE_DEFAULT;
     }
   }
 }

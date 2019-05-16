@@ -22,13 +22,14 @@ import com.arialyy.aria.core.download.DownloadTask;
 import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.inf.AbsTask;
 import com.arialyy.aria.core.inf.AbsTaskWrapper;
+import com.arialyy.aria.core.inf.ITask;
 import com.arialyy.aria.core.upload.UploadTask;
 import com.arialyy.aria.core.upload.UTaskWrapper;
 
 /**
  * Created by lyy on 2016/8/16. 任务功能接口
  */
-public interface ITaskQueue<TASK extends AbsTask, TASK_WRAPPER extends AbsTaskWrapper> {
+public interface ITaskQueue<TASK extends ITask, TASK_WRAPPER extends AbsTaskWrapper> {
 
   /**
    * 通过key跑断任务是在存在

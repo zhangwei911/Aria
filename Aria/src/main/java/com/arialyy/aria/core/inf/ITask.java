@@ -42,6 +42,10 @@ public interface ITask<TASK_WRAPPER extends AbsTaskWrapper> {
    */
   int DOWNLOAD_GROUP_SUB = 4;
   /**
+   * 填充的
+   */
+  int TEMP = 5;
+  /**
    * 未知
    */
   int OTHER = -1;
@@ -95,39 +99,41 @@ public interface ITask<TASK_WRAPPER extends AbsTaskWrapper> {
   void cancel();
 
   /**
-   * 原始byte速度
+   * 读取扩展数据
    */
-  long getSpeed();
+  Object getExpand(String key);
 
   /**
-   * 转换单位后的速度
-   */
-  String getConvertSpeed();
-
-  /**
-   * 获取百分比进度
-   */
-  int getPercent();
-
-  /**
-   * 原始文件byte长度
-   */
-  long getFileSize();
-
-  /**
-   * 转换单位后的文件长度
-   */
-  String getConvertFileSize();
-
-  /**
-   * 获取当前进度
-   */
-  long getCurrentProgress();
-
-  /**
-   * 获取单位转换后的进度
+   * 任务是否停止了
    *
-   * @return 返回 3mb
+   * @return {@code true}任务已经停止
    */
-  String getConvertCurrentProgress();
+  boolean isStop();
+
+  /**
+   * 任务是否取消了
+   *
+   * @return {@code true}任务已经取消
+   */
+  boolean isCancel();
+
+  /**
+   * 任务是否需要重试
+   *
+   * @return {@code true}任务已经取消
+   */
+  boolean isNeedRetry();
+
+  /**
+   * 获取任务名，也就是文件名
+   */
+  String getTaskName();
+
+  /**
+   * 任务的调度类型
+   * {@link TaskSchedulerType}
+   */
+  int getSchedulerType();
+
+
 }

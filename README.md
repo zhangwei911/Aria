@@ -42,8 +42,8 @@ Aria有以下特点：
 [![Compiler](https://api.bintray.com/packages/arialyy/maven/AriaCompiler/images/download.svg)](https://bintray.com/arialyy/maven/AriaCompiler/_latestVersion)
 
 ```java
-compile 'com.arialyy.aria:aria-core:3.6.3'
-annotationProcessor 'com.arialyy.aria:aria-compiler:3.6.3'
+compile 'com.arialyy.aria:aria-core:3.6.4'
+annotationProcessor 'com.arialyy.aria:aria-compiler:3.6.4'
 ```
 如果出现android support依赖错误，请将 `compile 'com.arialyy.aria:aria-core:<last-version>'`替换为
 ```
@@ -113,12 +113,36 @@ protected void onCreate(Bundle savedInstanceState) {
 
 
 ### 版本日志
-* v3.6.3 (2019/4/2)
-  - fix bug https://github.com/AriaLyy/Aria/issues/368
-  - 增加gradle 5.0支持
-  - fix bug https://github.com/AriaLyy/Aria/issues/374
-  - fix bug https://github.com/AriaLyy/Aria/issues/377
-  - 增加分页获取任务列表api, 详情见：https://aria.laoyuyu.me/aria_doc/api/task_list.html#%E4%BB%BB%E5%8A%A1%E5%88%97%E8%A1%A8%E5%88%86%E9%A1%B5%EF%BC%88362%E4%BB%A5%E4%B8%8A%E7%89%88%E6%9C%AC%E6%94%AF%E6%8C%81%EF%BC%89
+ + v_3.6.4 (2019/5/16)
+    - 优化任务接收器的代码结构
+    - 修复`DbEntity.saveAll()`失败的问题
+    - 修复分块任务重命名失败的问题
+    - fix bug https://github.com/AriaLyy/Aria/issues/379
+    - 移除`getDownloadTask(String url)`、`getGroupTask(List<String> urls)`、`getFtpDirTask(String path)`
+      等获取任务的api，如果你希望获取对应状态，请使用实体的状态判断，如：`getDownloadEntity()`、`getDownloadGroupEntity()`
+      `getFtpDirEntity()`
+    - fix bug https://github.com/AriaLyy/Aria/issues/388
+    - 修复使用`Content-Disposition`的文件名时，第一次下载无法重命名文件的问题
+    - 修复使用`Content-Disposition`的文件名时，多次重命名文件的问题
+    - 组合任务新增`unknownSize()`，用于处理组合任务大小ø未知的情况，https://github.com/AriaLyy/Aria/issues/380
+    - 优化`AbsThreadTask`代码
+    - 新增文件长度处理功能 https://github.com/AriaLyy/Aria/issues/393
+      ```java
+      .setFileLenAdapter(new IHttpFileLenAdapter() {
+        @Override public long handleFileLen(Map<String, List<String>> headers) {
+          ...
+          // 处理header中的文件长度
+
+          return fileLen;
+        }
+       })
+      ```
+    - 修复组合任务多次回调`onStop`注解的问题
+    - 优化`isRunning()`的逻辑，任务是否在执行的判断将更加准确
+    - 修复多次重复快速点击`暂停、开始`时，任务有可能重复下载的问题
+    - 修复组合任务中没有等待中的只任务实体保存失败的问题
+    - 新增组合任务url重复检查 https://github.com/AriaLyy/Aria/issues/395
+    - 初始化任务时，如果url、path有错误将会回调`@Download.onTaskFail`、`@Upload.onTaskFail`、`@DownGroup.onTaskFail`
 
 [更多版本记录](https://github.com/AriaLyy/Aria/blob/master/DEV_LOG.md)
 

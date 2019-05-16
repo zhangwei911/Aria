@@ -29,7 +29,7 @@ import java.util.Set;
 
 /**
  * Created by laoyuyu on 2018/3/9.
- * HTTP header参数设置委托类
+ * D_HTTP header参数设置委托类
  */
 public class HttpHeaderDelegate<TARGET extends AbsTarget>
     implements IHttpHeaderDelegate<TARGET> {

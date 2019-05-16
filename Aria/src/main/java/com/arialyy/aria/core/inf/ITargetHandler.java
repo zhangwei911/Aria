@@ -20,12 +20,14 @@ package com.arialyy.aria.core.inf;
  * 任务接收器的控制接口，处理添加任务、开始任务、停止任务、删除任务等功能
  */
 public interface ITargetHandler {
-  int HTTP = 1;
-  int FTP = 2;
+  int D_HTTP = 1;
+  int U_HTTP = 2;
+  int U_FTP = 3;
+  int D_FTP = 4;
   //HTTP任务组
-  int GROUP_HTTP = 3;
+  int GROUP_HTTP = 5;
   //FTP文件夹
-  int GROUP_FTP_DIR = 4;
+  int GROUP_FTP_DIR = 6;
 
   /**
    * 添加任务

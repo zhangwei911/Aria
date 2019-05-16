@@ -22,6 +22,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
@@ -37,7 +38,6 @@ import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.download.DownloadTarget;
 import com.arialyy.aria.core.download.DownloadTask;
-import com.arialyy.aria.core.inf.AbsHttpFileLenAdapter;
 import com.arialyy.aria.core.inf.IEntity;
 import com.arialyy.aria.core.inf.IHttpFileLenAdapter;
 import com.arialyy.aria.core.scheduler.ISchedulers;
@@ -317,7 +317,7 @@ public class SingleTaskActivity extends BaseActivity<ActivitySingleBinding> {
         //.addHeader("Cookie", "BAIDUID=648E5FF020CC69E8DD6F492D1068AAA9:FG=1; BIDUPSID=648E5FF020CC69E8DD6F492D1068AAA9; PSTM=1519099573; BD_UPN=12314753; locale=zh; BDSVRTM=0")
         .useServerFileName(true)
         .setFilePath(path, true)
-        .setFileLenAdapter(new AbsHttpFileLenAdapter() {
+        .setFileLenAdapter(new IHttpFileLenAdapter() {
           @Override public long handleFileLen(Map<String, List<String>> headers) {
 
             List<String> sLength = headers.get("Content-Length");

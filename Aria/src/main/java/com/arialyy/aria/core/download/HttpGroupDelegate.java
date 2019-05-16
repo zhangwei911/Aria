@@ -22,6 +22,7 @@ import com.arialyy.aria.orm.DbEntity;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -61,11 +62,11 @@ class HttpGroupDelegate extends AbsGroupDelegate<DownloadGroupTarget> {
   @CheckResult
   DownloadGroupTarget setSubFileName(List<String> subTaskFileName) {
     if (subTaskFileName == null || subTaskFileName.isEmpty()) {
-      ALog.e(TAG, "修改子任务的文件名失败：列表为null");
+      ALog.w(TAG, "修改子任务的文件名失败：列表为null");
       return getTarget();
     }
     if (subTaskFileName.size() != getTaskWrapper().getSubTaskWrapper().size()) {
-      ALog.e(TAG, "修改子任务的文件名失败：子任务文件名列表数量和子任务的数量不匹配");
+      ALog.w(TAG, "修改子任务的文件名失败：子任务文件名列表数量和子任务的数量不匹配");
       return getTarget();
     }
     mSubNameTemp.clear();
@@ -179,6 +180,19 @@ class HttpGroupDelegate extends AbsGroupDelegate<DownloadGroupTarget> {
       ALog.e(TAG, "下载失败，子任务下载列表为null");
       return false;
     }
+
+    Set<String> repeated = new HashSet<>();
+    List<String> results = new ArrayList<>();
+    for (String url : mUrls) {
+      if (!repeated.add(url)) {
+        results.add(url);
+      }
+    }
+    if (!results.isEmpty()) {
+      ALog.e(TAG, String.format("组合任务中有url重复，重复的url：%s", Arrays.toString(results.toArray())));
+      return false;
+    }
+
     Set<Integer> delItem = new HashSet<>();
 
     int i = 0;
@@ -188,7 +202,6 @@ class HttpGroupDelegate extends AbsGroupDelegate<DownloadGroupTarget> {
         delItem.add(i);
         continue;
       } else if (!url.startsWith("http")) {
-        //} else if (!url.startsWith("http") && !url.startsWith("ftp")) {
         ALog.e(TAG, "子任务url【" + url + "】错误，即将删除该子任务。");
         delItem.add(i);
         continue;

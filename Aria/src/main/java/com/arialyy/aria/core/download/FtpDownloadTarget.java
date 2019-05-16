@@ -126,7 +126,7 @@ public class FtpDownloadTarget extends AbsDTarget<FtpDownloadTarget>
   }
 
   @Override public int getTargetType() {
-    return FTP;
+    return D_FTP;
   }
 
   @CheckResult

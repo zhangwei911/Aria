@@ -32,9 +32,9 @@ public abstract class AbsTask<ENTITY extends AbsEntity, TASK_WRAPPER extends Abs
   public static final String ERROR_INFO_KEY = "ERROR_INFO_KEY";
 
   /**
-   * 是否需要重试，默认为true
+   * 是否需要重试，默认为false
    */
-  public boolean needRetry = true;
+  private boolean needRetry = true;
   protected TASK_WRAPPER mTaskWrapper;
   protected Handler mOutHandler;
   protected Context mContext;
@@ -76,9 +76,18 @@ public abstract class AbsTask<ENTITY extends AbsEntity, TASK_WRAPPER extends Abs
     mExpand.put(key, obj);
   }
 
+  @Override public boolean isNeedRetry() {
+    return needRetry;
+  }
+
+  public void setNeedRetry(boolean needRetry) {
+    this.needRetry = needRetry;
+  }
+
   /**
    * 读取扩展数据
    */
+  @Override
   public Object getExpand(String key) {
     return mExpand.get(key);
   }
@@ -106,7 +115,7 @@ public abstract class AbsTask<ENTITY extends AbsEntity, TASK_WRAPPER extends Abs
   /**
    * 获取当前下载进度
    */
-  @Override public long getCurrentProgress() {
+  public long getCurrentProgress() {
     return mTaskWrapper.getEntity().getCurrentProgress();
   }
 
@@ -115,7 +124,7 @@ public abstract class AbsTask<ENTITY extends AbsEntity, TASK_WRAPPER extends Abs
    *
    * @return 如：已经下载3mb的大小，则返回{@code 3mb}
    */
-  @Override public String getConvertCurrentProgress() {
+  public String getConvertCurrentProgress() {
     if (mTaskWrapper.getEntity().getCurrentProgress() == 0) {
       return "0b";
     }
@@ -127,7 +136,7 @@ public abstract class AbsTask<ENTITY extends AbsEntity, TASK_WRAPPER extends Abs
    *
    * @return 如果文件长度为0，则返回0m，否则返回转换后的长度1b、1kb、1mb、1gb、1tb
    */
-  @Override public String getConvertFileSize() {
+  public String getConvertFileSize() {
     if (mTaskWrapper.getEntity().getFileSize() == 0) {
       return "0mb";
     }
@@ -137,7 +146,7 @@ public abstract class AbsTask<ENTITY extends AbsEntity, TASK_WRAPPER extends Abs
   /**
    * 获取文件大小
    */
-  @Override public long getFileSize() {
+  public long getFileSize() {
     return mTaskWrapper.getEntity().getFileSize();
   }
 
@@ -146,7 +155,7 @@ public abstract class AbsTask<ENTITY extends AbsEntity, TASK_WRAPPER extends Abs
    *
    * @return 返回百分比进度，如果文件长度为0，返回0
    */
-  @Override public int getPercent() {
+  public int getPercent() {
     if (mTaskWrapper.getEntity().getFileSize() == 0) {
       return 0;
     }
@@ -217,6 +226,7 @@ public abstract class AbsTask<ENTITY extends AbsEntity, TASK_WRAPPER extends Abs
   /**
    * 任务的调度类型
    */
+  @Override
   public int getSchedulerType() {
     return mSchedulerType;
   }
@@ -226,6 +236,7 @@ public abstract class AbsTask<ENTITY extends AbsEntity, TASK_WRAPPER extends Abs
    *
    * @return {@code true}任务已经取消
    */
+  @Override
   public boolean isCancel() {
     return isCancel;
   }
@@ -235,6 +246,7 @@ public abstract class AbsTask<ENTITY extends AbsEntity, TASK_WRAPPER extends Abs
    *
    * @return {@code true}任务已经停止
    */
+  @Override
   public boolean isStop() {
     return isStop;
   }
@@ -256,7 +268,7 @@ public abstract class AbsTask<ENTITY extends AbsEntity, TASK_WRAPPER extends Abs
    * </pre>
    * 才能生效
    */
-  @Override public long getSpeed() {
+  public long getSpeed() {
     return mTaskWrapper.getEntity().getSpeed();
   }
 
@@ -277,18 +289,13 @@ public abstract class AbsTask<ENTITY extends AbsEntity, TASK_WRAPPER extends Abs
    * </pre>
    * 才能生效
    */
-  @Override public String getConvertSpeed() {
+  public String getConvertSpeed() {
     return mTaskWrapper.getEntity().getConvertSpeed();
   }
 
   @Override public TASK_WRAPPER getTaskWrapper() {
     return mTaskWrapper;
   }
-
-  /**
-   * 获取任务名，也就是文件名
-   */
-  public abstract String getTaskName();
 
   public boolean isHighestPriorityTask() {
     return isHeighestTask;

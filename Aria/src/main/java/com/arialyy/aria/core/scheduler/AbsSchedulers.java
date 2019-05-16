@@ -45,7 +45,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Created by lyy on 2017/6/4. 事件调度器，用于处理任务状态的调度
  */
-abstract class AbsSchedulers<TASK_ENTITY extends AbsTaskWrapper, TASK extends AbsTask,
+abstract class AbsSchedulers<TASK_ENTITY extends AbsTaskWrapper, TASK extends ITask,
     QUEUE extends ITaskQueue<TASK, TASK_ENTITY>> implements ISchedulers {
   private final String TAG = "AbsSchedulers";
 
@@ -273,7 +273,8 @@ abstract class AbsSchedulers<TASK_ENTITY extends AbsTaskWrapper, TASK extends Ab
           listener.onTaskComplete(task);
           break;
         case FAIL:
-          listener.onTaskFail(task, (Exception) task.getExpand(AbsTask.ERROR_INFO_KEY));
+          listener.onTaskFail(task.getTaskType() == ITask.TEMP ? null : task,
+              (Exception) task.getExpand(AbsTask.ERROR_INFO_KEY));
           break;
         case NO_SUPPORT_BREAK_POINT:
           listener.onNoSupportBreakPoint(task);
@@ -290,12 +291,13 @@ abstract class AbsSchedulers<TASK_ENTITY extends AbsTaskWrapper, TASK extends Ab
     if (!canSend) {
       return;
     }
-    if (task.getTaskType() == ITask.DOWNLOAD || task.getTaskType() == ITask.DOWNLOAD_GROUP) {
+    int type = task.getTaskType();
+    if (type == ITask.DOWNLOAD || type == ITask.DOWNLOAD_GROUP) {
       AriaManager.APP.sendBroadcast(
-          createData(state, task.getTaskType(), task.getTaskWrapper().getEntity()));
-    } else if (task.getTaskType() == ITask.UPLOAD) {
+          createData(state, type, task.getTaskWrapper().getEntity()));
+    } else if (type == ITask.UPLOAD) {
       AriaManager.APP.sendBroadcast(
-          createData(state, task.getTaskType(), task.getTaskWrapper().getEntity()));
+          createData(state, type, task.getTaskWrapper().getEntity()));
     } else {
       ALog.w(TAG, "发送广播失败，没有对应的任务");
     }
@@ -326,7 +328,7 @@ abstract class AbsSchedulers<TASK_ENTITY extends AbsTaskWrapper, TASK extends Ab
    * @param task 下载任务
    */
   private void handleFailTask(final TASK task) {
-    if (!task.needRetry || task.isStop() || task.isCancel()) {
+    if (!task.isNeedRetry() || task.isStop() || task.isCancel()) {
       mQueue.removeTaskFormQueue(task.getKey());
       startNextTask(task);
       callback(FAIL, task);

@@ -148,7 +148,7 @@ public class DownloadGroupUtil extends AbsGroupUtil implements IUtil {
 
     mGTWrapper.asHttp().setFileLenAdapter(null);
     synchronized (LOCK) {
-      LOCK.notify();
+      LOCK.notifyAll();
     }
   }
 

@@ -118,7 +118,7 @@ public class DownloadTarget extends AbsDTarget<DownloadTarget>
   }
 
   @Override public int getTargetType() {
-    return HTTP;
+    return D_HTTP;
   }
 
   /**

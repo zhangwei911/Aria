@@ -22,6 +22,7 @@ import com.arialyy.aria.core.manager.TaskWrapperManager;
 import com.arialyy.aria.core.queue.DownloadTaskQueue;
 import com.arialyy.aria.orm.DbEntity;
 import com.arialyy.aria.util.ALog;
+import com.arialyy.aria.util.CheckUtil;
 import com.arialyy.aria.util.CommonUtil;
 import java.io.File;
 
@@ -113,10 +114,10 @@ class DNormalDelegate<TARGET extends AbsDTarget> implements INormalTarget {
     }
     File file = new File(filePath);
     if (file.isDirectory()) {
-      if (mTarget.getTargetType() == ITargetHandler.HTTP) {
+      if (mTarget.getTargetType() == ITargetHandler.D_HTTP) {
         ALog.e(TAG, "下载失败，保存路径【" + filePath + "】不能为文件夹，路径需要是完整的文件路径，如：/mnt/sdcard/game.zip");
         return false;
-      } else if (mTarget.getTargetType() == ITargetHandler.FTP) {
+      } else if (mTarget.getTargetType() == ITargetHandler.D_FTP) {
         filePath += mEntity.getFileName();
       }
     } else {
@@ -167,7 +168,7 @@ class DNormalDelegate<TARGET extends AbsDTarget> implements INormalTarget {
     if (TextUtils.isEmpty(url)) {
       ALog.e(TAG, "下载失败，url为null");
       return false;
-    } else if (!url.startsWith("http") && !url.startsWith("ftp")) {
+    } else if (!CheckUtil.checkUrlNotThrow(url)) {
       ALog.e(TAG, "下载失败，url【" + url + "】错误");
       return false;
     }

@@ -1,5 +1,5 @@
 ## 开发日志
-  + v_3.6.4
+  + v_3.6.4 (2019/5/16)
     - 优化任务接收器的代码结构
     - 修复`DbEntity.saveAll()`失败的问题
     - 修复分块任务重命名失败的问题
@@ -10,7 +10,7 @@
     - fix bug https://github.com/AriaLyy/Aria/issues/388
     - 修复使用`Content-Disposition`的文件名时，第一次下载无法重命名文件的问题
     - 修复使用`Content-Disposition`的文件名时，多次重命名文件的问题
-    - 组合任务新增`unknownSize()`，用于处理组合任务大小未知的情况，https://github.com/AriaLyy/Aria/issues/380
+    - 组合任务新增`unknownSize()`，用于处理组合任务大小ø未知的情况，https://github.com/AriaLyy/Aria/issues/380
     - 优化`AbsThreadTask`代码
     - 新增文件长度处理功能 https://github.com/AriaLyy/Aria/issues/393
       ```java
@@ -27,6 +27,8 @@
     - 优化`isRunning()`的逻辑，任务是否在执行的判断将更加准确
     - 修复多次重复快速点击`暂停、开始`时，任务有可能重复下载的问题
     - 修复组合任务中没有等待中的只任务实体保存失败的问题
+    - 新增组合任务url重复检查 https://github.com/AriaLyy/Aria/issues/395
+    - 初始化任务时，如果url、path有错误将会回调`@Download.onTaskFail`、`@Upload.onTaskFail`、`@DownGroup.onTaskFail`
   + v_3.6.3 (2019/4/2)
     - fix bug https://github.com/AriaLyy/Aria/issues/377
   + v_3.6.2 (2019/4/1)

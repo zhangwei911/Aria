@@ -120,6 +120,6 @@ public class UploadTarget extends AbsUploadTarget<UploadTarget>
   }
 
   @Override public int getTargetType() {
-    return HTTP;
+    return U_HTTP;
   }
 }

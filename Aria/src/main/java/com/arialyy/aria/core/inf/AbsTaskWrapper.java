@@ -40,11 +40,6 @@ public abstract class AbsTaskWrapper<ENTITY extends AbsEntity>
   private boolean refreshInfo = false;
 
   /**
-   * 任务状态，和Entity的state同步
-   */
-  private int state = IEntity.STATE_WAIT;
-
-  /**
    * 是否是新任务，{@code true} 新任务
    */
   private boolean isNewTask = false;
@@ -142,7 +137,6 @@ public abstract class AbsTaskWrapper<ENTITY extends AbsEntity>
   }
 
   public void setState(int state) {
-    this.state = state;
     entity.setState(state);
   }
 

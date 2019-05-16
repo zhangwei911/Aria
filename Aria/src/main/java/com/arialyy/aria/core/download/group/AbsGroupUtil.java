@@ -41,7 +41,7 @@ public abstract class AbsGroupUtil implements IUtil, Runnable {
    */
   int FTP_DIR = 0xa1;
   /**
-   * HTTP 任务组
+   * D_HTTP 任务组
    */
   int HTTP_GROUP = 0xa2;
 

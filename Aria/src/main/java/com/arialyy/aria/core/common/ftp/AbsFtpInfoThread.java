@@ -257,7 +257,7 @@ public abstract class AbsFtpInfoThread<ENTITY extends AbsEntity, TASK_WRAPPER ex
       charSet = "UTF-8";
       reply = client.sendCommand("OPTS UTF8", "ON");
       if (reply != FTPReply.COMMAND_IS_SUPERFLUOUS) {
-        ALog.i(TAG, "FTP 服务器不支持开启UTF8编码，尝试使用Aria手动设置的编码");
+        ALog.i(TAG, "D_FTP 服务器不支持开启UTF8编码，尝试使用Aria手动设置的编码");
         if (!TextUtils.isEmpty(mTaskWrapper.asFtp().getCharSet())) {
           charSet = mTaskWrapper.asFtp().getCharSet();
         }

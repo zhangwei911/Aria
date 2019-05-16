@@ -35,7 +35,7 @@ import java.io.File;
  * Ftp下载测试
  */
 public class FtpDownloadActivity extends BaseActivity<ActivityFtpDownloadBinding> {
-  private final String URL = "ftp://9.9.9.205:2121/Cyberduck-6.9.4.30164.zip";
+  private final String URL = "sftp://9.9.9.205:2222/Cyberduck-6.9.4.30164.zip";
   //private final String URL = "ftp://182.92.180.213:21/video/572fed5c2ad48_1024.jpg";
   //private final String URL = "ftp://182.92.180.213:21/DATA/20180205/rar/1111.rar";
   //private final String URL = "ftp://d:d@dygodj8.com:12311/咖啡风暴HD大陆公映意语中字[飘花www.piaohua.com].mp4";
@@ -60,8 +60,9 @@ public class FtpDownloadActivity extends BaseActivity<ActivityFtpDownloadBinding
     switch (view.getId()) {
       case R.id.start:
         Aria.download(this).loadFtp(URL)
-            .login("lao", "123456")
-            .setFilePath("/mnt/sdcard/").start();
+            .login("N0rI", "0qcK")
+            .setFilePath("/mnt/sdcard/", true)
+            .start();
         break;
       case R.id.stop:
         Aria.download(this).loadFtp(URL).stop();

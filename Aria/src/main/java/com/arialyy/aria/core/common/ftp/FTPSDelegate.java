@@ -22,7 +22,7 @@ import com.arialyy.aria.core.inf.AbsTarget;
 import com.arialyy.aria.core.inf.ITargetHandler;
 
 /**
- * FTP SSL/TSL 参数委托
+ * D_FTP SSL/TSL 参数委托
  */
 public class FTPSDelegate<TARGET extends AbsTarget> implements ITargetHandler {
   private final String TAG = "FTPSDelegate";

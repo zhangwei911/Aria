@@ -110,7 +110,7 @@ public abstract class BaseListener<ENTITY extends AbsEntity, TASK_WRAPPER extend
     mEntity.setFailNum(mEntity.getFailNum() + 1);
     saveData(IEntity.STATE_FAIL, mEntity.getCurrentProgress());
     handleSpeed(0);
-    mTask.needRetry = needRetry;
+    mTask.setNeedRetry(needRetry);
     mTask.putExpand(AbsTask.ERROR_INFO_KEY, e);
     sendInState2Target(ISchedulers.FAIL);
     e.printStackTrace();

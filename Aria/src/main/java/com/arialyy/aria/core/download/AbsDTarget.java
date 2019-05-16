@@ -42,7 +42,7 @@ abstract class AbsDTarget<TARGET extends AbsDTarget> extends AbsTarget<TARGET> {
    * 6、把任务设置为最高优先级任务后，将自动执行任务，不需要重新调用start()启动任务
    */
   public void setHighestPriority() {
-    if (checkEntity()) {
+    if (checkConfig()) {
       AriaManager.getInstance(AriaManager.APP)
           .setCmd(
               CommonUtil.createNormalCmd(getTaskWrapper(), NormalCmdFactory.TASK_HIGHEST_PRIORITY,

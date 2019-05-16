@@ -99,6 +99,6 @@ public class FtpUploadTarget extends AbsUploadTarget<FtpUploadTarget>
   }
 
   @Override public int getTargetType() {
-    return FTP;
+    return U_FTP;
   }
 }

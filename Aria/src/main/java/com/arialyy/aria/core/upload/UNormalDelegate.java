@@ -22,6 +22,7 @@ import com.arialyy.aria.core.manager.TaskWrapperManager;
 import com.arialyy.aria.core.queue.UploadTaskQueue;
 import com.arialyy.aria.orm.DbEntity;
 import com.arialyy.aria.util.ALog;
+import com.arialyy.aria.util.CheckUtil;
 import com.arialyy.aria.util.CommonUtil;
 import java.io.File;
 
@@ -121,7 +122,7 @@ class UNormalDelegate<TARGET extends AbsUploadTarget> implements INormalTarget {
     if (TextUtils.isEmpty(url)) {
       ALog.e(TAG, "上传失败，url为null");
       return false;
-    } else if (!url.startsWith("http") && !url.startsWith("ftp")) {
+    } else if (!CheckUtil.checkUrlNotThrow(url)) {
       ALog.e(TAG, "上传失败，url【" + url + "】错误");
       return false;
     }

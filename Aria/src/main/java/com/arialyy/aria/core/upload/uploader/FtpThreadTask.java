@@ -35,7 +35,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
 /**
- * Created by Aria.Lao on 2017/7/28. FTP 单线程上传任务，需要FTP 服务器给用户打开append和write的权限
+ * Created by Aria.Lao on 2017/7/28. D_FTP 单线程上传任务，需要FTP 服务器给用户打开append和write的权限
  */
 class FtpThreadTask extends AbsFtpThreadTask<UploadEntity, UTaskWrapper> {
   private final String TAG = "FtpThreadTask";

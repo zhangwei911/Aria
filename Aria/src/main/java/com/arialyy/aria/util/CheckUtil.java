@@ -118,7 +118,7 @@ public class CheckUtil {
   public static void checkUrlInvalidThrow(String url) {
     if (TextUtils.isEmpty(url)) {
       throw new IllegalArgumentException("url不能为null");
-    } else if (!url.startsWith("http") && !url.startsWith("ftp")) {
+    } else if (!url.startsWith("http") && !url.startsWith("ftp") && !url.startsWith("sftp")) {
       throw new IllegalArgumentException("url错误");
     }
     int index = url.indexOf("://");
@@ -133,7 +133,7 @@ public class CheckUtil {
   public static void checkUrl(String url) {
     if (TextUtils.isEmpty(url)) {
       throw new NullPointerException("url为空");
-    } else if (!url.startsWith("http") && !url.startsWith("ftp")) {
+    } else if (!url.startsWith("http") && !url.startsWith("ftp") && !url.startsWith("sftp")) {
       throw new IllegalArgumentException(String.format("url【%s】错误", url));
     }
     int index = url.indexOf("://");
@@ -151,7 +151,7 @@ public class CheckUtil {
     if (TextUtils.isEmpty(url)) {
       ALog.e(TAG, "url不能为null");
       return false;
-    } else if (!url.startsWith("http") && !url.startsWith("ftp")) {
+    } else if (!url.startsWith("http") && !url.startsWith("ftp") && !url.startsWith("sftp")) {
       ALog.e(TAG, "url【" + url + "】错误");
       return false;
     }
