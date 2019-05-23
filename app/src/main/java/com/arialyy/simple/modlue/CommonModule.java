@@ -65,6 +65,7 @@ public class CommonModule extends AbsModule {
         R.drawable.ic_http,
         R.drawable.ic_http_group,
         R.drawable.ic_top,
+        R.drawable.ic_kotlin,
         R.drawable.ic_server,
         R.drawable.ic_windows
     };

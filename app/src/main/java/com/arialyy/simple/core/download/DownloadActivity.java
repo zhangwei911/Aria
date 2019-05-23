@@ -72,6 +72,7 @@ public class DownloadActivity extends BaseActivity<ActivityDownloadMeanBinding> 
                 module.startNextActivity(data.get(position), HighestPriorityActivity.class);
                 break;
               case 3:
+                module.startNextActivity(data.get(position), KotlinDownloadActivity.class);
                 break;
               case 4:
                 break;

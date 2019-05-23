@@ -20,6 +20,8 @@ import android.util.Log;
 import android.view.View;
 import com.arialyy.annotations.Upload;
 import com.arialyy.aria.core.Aria;
+import com.arialyy.aria.core.common.ftp.FtpInterceptHandler;
+import com.arialyy.aria.core.common.ftp.IFtpUploadInterceptor;
 import com.arialyy.aria.core.upload.UploadEntity;
 import com.arialyy.aria.core.upload.UploadTask;
 import com.arialyy.aria.util.CommonUtil;
@@ -29,6 +31,7 @@ import com.arialyy.simple.R;
 import com.arialyy.simple.base.BaseActivity;
 import com.arialyy.simple.databinding.ActivityFtpUploadBinding;
 import java.io.File;
+import java.util.List;
 
 /**
  * Created by lyy on 2017/7/28. Ftp 文件上传demo
@@ -56,7 +59,17 @@ public class FtpUploadActivity extends BaseActivity<ActivityFtpUploadBinding> {
   public void onClick(View view) {
     switch (view.getId()) {
       case R.id.start:
-        Aria.upload(this).loadFtp(FILE_PATH).setUploadUrl(URL).login("lao", "123456").start();
+        Aria.upload(this).loadFtp(FILE_PATH).setUploadUrl(URL).setUploadInterceptor(
+            new IFtpUploadInterceptor() {
+
+              @Override
+              public FtpInterceptHandler onIntercept(UploadEntity entity, List<String> fileList) {
+                FtpInterceptHandler.Builder builder = new FtpInterceptHandler.Builder();
+                builder.coverServerFile();
+                //builder.resetFileName("test");
+                return builder.build();
+              }
+            }).login("lao", "123456").start();
         break;
       case R.id.stop:
         Aria.upload(this).loadFtp(FILE_PATH).stop();
