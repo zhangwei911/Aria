@@ -17,6 +17,7 @@ package com.arialyy.aria.core.upload;
 
 import android.text.TextUtils;
 import com.arialyy.aria.core.inf.AbsEntity;
+import com.arialyy.aria.core.common.ftp.IFtpUploadInterceptor;
 import com.arialyy.aria.core.inf.INormalTarget;
 import com.arialyy.aria.core.manager.TaskWrapperManager;
 import com.arialyy.aria.core.queue.UploadTaskQueue;
@@ -61,6 +62,14 @@ class UNormalDelegate<TARGET extends AbsUploadTarget> implements INormalTarget {
     return mTarget;
   }
 
+  TARGET setUploadInterceptor(IFtpUploadInterceptor uploadInterceptor) {
+    if (uploadInterceptor == null) {
+      throw new NullPointerException("ftp拦截器为空");
+    }
+    mTarget.getTaskWrapper().asFtp().setUploadInterceptor(uploadInterceptor);
+    return mTarget;
+  }
+
   @Override public AbsEntity getEntity() {
     return mEntity;
   }
@@ -82,10 +91,10 @@ class UNormalDelegate<TARGET extends AbsUploadTarget> implements INormalTarget {
     if (mTarget.getTaskWrapper().asFtp().getUrlEntity() != null && mTarget.getTaskWrapper()
         .asFtp()
         .getUrlEntity().isFtps) {
-      //if (TextUtils.isEmpty(mTaskWrapper.getUrlEntity().storePath)) {
-      //  ALog.e(TAG, "证书路径为空");
-      //  return false;
-      //}
+      if (TextUtils.isEmpty(mTarget.getTaskWrapper().asFtp().getUrlEntity().storePath)) {
+        ALog.e(TAG, "证书路径为空");
+        return false;
+      }
       if (TextUtils.isEmpty(mTarget.getTaskWrapper().asFtp().getUrlEntity().keyAlias)) {
         ALog.e(TAG, "证书别名为空");
         return false;

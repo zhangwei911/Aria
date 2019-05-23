@@ -37,6 +37,7 @@ public class SimpleUploadUtil implements IUtil, Runnable {
   private UTaskWrapper mTaskWrapper;
   private IUploadListener mListener;
   private Uploader mUploader;
+  private boolean isStop = false, isCancel = false;
 
   public SimpleUploadUtil(UTaskWrapper taskWrapper, IUploadListener listener) {
     mTaskWrapper = taskWrapper;
@@ -90,14 +91,19 @@ public class SimpleUploadUtil implements IUtil, Runnable {
   }
 
   @Override public void cancel() {
+    isCancel = true;
     mUploader.cancel();
   }
 
   @Override public void stop() {
+    isStop = true;
     mUploader.stop();
   }
 
   @Override public void start() {
+    if (isStop || isCancel) {
+      return;
+    }
     new Thread(this).start();
   }
 

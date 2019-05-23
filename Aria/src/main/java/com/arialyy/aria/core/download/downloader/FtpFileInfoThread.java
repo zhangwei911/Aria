@@ -44,7 +44,7 @@ class FtpFileInfoThread extends AbsFtpInfoThread<DownloadEntity, DTaskWrapper> {
     }
   }
 
-  @Override protected String setRemotePath() {
+  @Override protected String getRemotePath() {
     return mTaskWrapper.asFtp().getUrlEntity().remotePath;
   }
 

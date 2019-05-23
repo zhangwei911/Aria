@@ -23,6 +23,7 @@ import com.arialyy.aria.core.AriaManager;
 import com.arialyy.aria.core.command.ICmd;
 import com.arialyy.aria.core.command.normal.CancelCmd;
 import com.arialyy.aria.core.command.normal.NormalCmdFactory;
+import com.arialyy.aria.core.command.normal.ReStartCmd;
 import com.arialyy.aria.core.download.DGTaskWrapper;
 import com.arialyy.aria.core.download.DownloadGroupEntity;
 import com.arialyy.aria.core.download.DTaskWrapper;
@@ -79,7 +80,7 @@ public abstract class AbsTarget<TARGET extends AbsTarget> implements ITargetHand
       if (mEntity instanceof AbsNormalEntity) {
         CommonUtil.delTaskRecord((AbsNormalEntity) mEntity, mTaskWrapper.isRemoveFile());
       } else if (mEntity instanceof DownloadGroupEntity) {
-        CommonUtil.delGroupTaskRecord(((DownloadGroupEntity) mEntity), mTaskWrapper.isRemoveFile());
+        CommonUtil.delGroupTaskRecord(((DownloadGroupEntity) mEntity), mTaskWrapper.isRemoveFile(), true);
       }
       TaskWrapperManager.getInstance().removeTaskWrapper(mEntity.getKey());
     }
@@ -370,8 +371,10 @@ public abstract class AbsTarget<TARGET extends AbsTarget> implements ITargetHand
    */
   @Override public void reStart() {
     if (checkConfig()) {
-      cancel();
-      start();
+      ReStartCmd cmd =
+          (ReStartCmd) CommonUtil.createNormalCmd(mTaskWrapper, NormalCmdFactory.TASK_RESTART,
+              checkTaskType());
+      AriaManager.getInstance(AriaManager.APP).setCmd(cmd).exe();
     }
   }
 
@@ -409,6 +412,10 @@ public abstract class AbsTarget<TARGET extends AbsTarget> implements ITargetHand
 
     }
 
+    @Override public void start(int type) {
+
+    }
+
     @Override public void stop() {
 
     }
@@ -418,6 +425,10 @@ public abstract class AbsTarget<TARGET extends AbsTarget> implements ITargetHand
     }
 
     @Override public void cancel() {
+
+    }
+
+    @Override public void cancel(int type) {
 
     }
 

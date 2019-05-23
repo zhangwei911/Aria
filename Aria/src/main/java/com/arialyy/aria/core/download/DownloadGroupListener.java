@@ -21,6 +21,7 @@ import com.arialyy.aria.core.common.BaseListener;
 import com.arialyy.aria.core.download.group.IDownloadGroupListener;
 import com.arialyy.aria.core.inf.GroupSendParams;
 import com.arialyy.aria.core.inf.IEntity;
+import com.arialyy.aria.core.inf.TaskSchedulerType;
 import com.arialyy.aria.core.scheduler.ISchedulers;
 import com.arialyy.aria.exception.BaseException;
 import com.arialyy.aria.util.ALog;
@@ -134,7 +135,8 @@ class DownloadGroupListener
     mTaskWrapper.setState(state);
     mEntity.setState(state);
     if (state == IEntity.STATE_CANCEL) {
-      CommonUtil.delGroupTaskRecord(mEntity, mTaskWrapper.isRemoveFile());
+      CommonUtil.delGroupTaskRecord(mEntity, mTaskWrapper.isRemoveFile(),
+          getTask().getSchedulerType() != TaskSchedulerType.TYPE_CANCEL_AND_NOT_NOTIFY);
       return;
     } else if (state == IEntity.STATE_STOP) {
       mEntity.setStopTime(System.currentTimeMillis());

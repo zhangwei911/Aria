@@ -17,6 +17,7 @@
 package com.arialyy.aria.core.manager;
 
 import com.arialyy.aria.core.common.AbsThreadTask;
+import com.arialyy.aria.core.inf.AbsTask;
 import com.arialyy.aria.core.inf.AbsTaskWrapper;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
@@ -24,25 +25,26 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * 线程任务管理器
  */
 public class ThreadTaskManager {
   private static volatile ThreadTaskManager INSTANCE = null;
-  private static final Object LOCK = new Object();
   private final String TAG = "ThreadTaskManager";
   private ExecutorService mExePool;
-  private Map<String, Set<Future>> mThreadTasks = new HashMap<>();
+  private Map<String, Set<FutureContainer>> mThreadTasks = new ConcurrentHashMap<>();
+  private static final ReentrantLock LOCK = new ReentrantLock();
 
-  public static ThreadTaskManager getInstance() {
+  public static synchronized ThreadTaskManager getInstance() {
     if (INSTANCE == null) {
-      synchronized (LOCK) {
-        INSTANCE = new ThreadTaskManager();
-      }
+      INSTANCE = new ThreadTaskManager();
     }
     return INSTANCE;
   }
@@ -57,21 +59,37 @@ public class ThreadTaskManager {
    * @param key 任务对应的key{@link AbsTaskWrapper#getKey()}
    * @param threadTask 线程任务{@link AbsThreadTask}
    */
-  public synchronized void startThread(String key, AbsThreadTask threadTask) {
-    if (mExePool.isShutdown()) {
-      ALog.e(TAG, "线程池已经关闭");
-      return;
+  public void startThread(String key, AbsThreadTask threadTask) {
+    try {
+      LOCK.tryLock(2, TimeUnit.SECONDS);
+      if (mExePool.isShutdown()) {
+        ALog.e(TAG, "线程池已经关闭");
+        return;
+      }
+      key = getKey(key);
+      Set<FutureContainer> temp = mThreadTasks.get(key);
+      if (temp == null) {
+        temp = new HashSet<>();
+        mThreadTasks.put(key, temp);
+      }
+      FutureContainer container = new FutureContainer();
+      container.threadTask = threadTask;
+      container.future = mExePool.submit(threadTask);
+      temp.add(container);
+    } catch (Exception e) {
+      e.printStackTrace();
+    } finally {
+      LOCK.unlock();
     }
-    key = getKey(key);
-    Set<Future> temp = mThreadTasks.get(key);
-    if (temp == null) {
-      temp = new HashSet<>();
-      mThreadTasks.put(key, temp);
-    }
-    temp.add(mExePool.submit(threadTask));
   }
 
-  public synchronized boolean taskIsRunning(String key){
+  /**
+   * 任务是否在执行
+   *
+   * @param key 任务的key{@link AbsTask#getKey()}
+   * @return {@code true} 任务正在运行
+   */
+  public boolean taskIsRunning(String key) {
     return mThreadTasks.get(getKey(key)) != null;
   }
 
@@ -80,29 +98,31 @@ public class ThreadTaskManager {
    *
    * @param key 任务对应的key{@link AbsTaskWrapper#getKey()}
    */
-  public synchronized void removeTaskThread(String key) {
-    if (mExePool.isShutdown()) {
-      ALog.e(TAG, "线程池已经关闭");
-      return;
-    }
-    key = getKey(key);
-    Set<Future> temp = mThreadTasks.get(key);
-    if (temp != null && temp.size() > 0) {
-      try {
-        for (Future future : temp) {
-          if (future.isDone() || future.isCancelled()) {
+  public void removeTaskThread(String key) {
+    try {
+
+      LOCK.tryLock(2, TimeUnit.SECONDS);
+      if (mExePool.isShutdown()) {
+        ALog.e(TAG, "线程池已经关闭");
+        return;
+      }
+      key = getKey(key);
+      Set<FutureContainer> temp = mThreadTasks.get(key);
+      if (temp != null && temp.size() > 0) {
+        for (FutureContainer container : temp) {
+          if (container.future.isDone() || container.future.isCancelled()) {
             continue;
           }
-          AbsThreadTask task = (AbsThreadTask) future.get();
-          task.setInterrupted(true);
-          future.cancel(true);
+          container.threadTask.setInterrupted(true);
         }
-      } catch (Exception e) {
-        ALog.e(TAG, e);
+        temp.clear();
       }
-      temp.clear();
+      mThreadTasks.remove(key);
+    } catch (Exception e) {
+      e.printStackTrace();
+    } finally {
+      LOCK.unlock();
     }
-    mThreadTasks.remove(key);
   }
 
   /**
@@ -110,21 +130,28 @@ public class ThreadTaskManager {
    *
    * @param task 线程任务
    */
-  public synchronized void retryThread(AbsThreadTask task) {
-    if (mExePool.isShutdown()) {
-      ALog.e(TAG, "线程池已经关闭");
-      return;
-    }
+  public void retryThread(AbsThreadTask task) {
     try {
-      if (task == null || task.isInterrupted()) {
-        ALog.e(TAG, "线程为空或线程已经中断");
+      LOCK.tryLock(2, TimeUnit.SECONDS);
+      if (mExePool.isShutdown()) {
+        ALog.e(TAG, "线程池已经关闭");
         return;
       }
+      try {
+        if (task == null || task.isInterrupted()) {
+          ALog.e(TAG, "线程为空或线程已经中断");
+          return;
+        }
+      } catch (Exception e) {
+        ALog.e(TAG, e);
+        return;
+      }
+      mExePool.submit(task);
     } catch (Exception e) {
-      ALog.e(TAG, e);
-      return;
+      e.printStackTrace();
+    } finally {
+      LOCK.unlock();
     }
-    mExePool.submit(task);
   }
 
   /**
@@ -135,5 +162,10 @@ public class ThreadTaskManager {
    */
   private String getKey(String key) {
     return CommonUtil.getStrMd5(key);
+  }
+
+  private class FutureContainer {
+    Future future;
+    AbsThreadTask threadTask;
   }
 }

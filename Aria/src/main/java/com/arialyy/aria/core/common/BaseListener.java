@@ -55,6 +55,10 @@ public abstract class BaseListener<ENTITY extends AbsEntity, TASK_WRAPPER extend
     mLastSaveTime = System.currentTimeMillis();
   }
 
+  protected TASK getTask() {
+    return mTask;
+  }
+
   @Override public void onPre() {
     saveData(IEntity.STATE_PRE, -1);
     sendInState2Target(ISchedulers.PRE);
@@ -103,7 +107,10 @@ public abstract class BaseListener<ENTITY extends AbsEntity, TASK_WRAPPER extend
   @Override public void onCancel() {
     saveData(IEntity.STATE_CANCEL, -1);
     handleSpeed(0);
-    sendInState2Target(ISchedulers.CANCEL);
+    if (mTask.getSchedulerType() != TaskSchedulerType.TYPE_CANCEL_AND_NOT_NOTIFY) {
+      ALog.d(TAG, "删除任务完成");
+      sendInState2Target(ISchedulers.CANCEL);
+    }
   }
 
   @Override public void onFail(boolean needRetry, BaseException e) {

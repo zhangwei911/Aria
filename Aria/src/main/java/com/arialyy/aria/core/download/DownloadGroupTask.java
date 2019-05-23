@@ -19,6 +19,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.text.TextUtils;
 import com.arialyy.aria.core.AriaManager;
+import com.arialyy.aria.core.common.IUtil;
 import com.arialyy.aria.core.download.group.DownloadGroupUtil;
 import com.arialyy.aria.core.download.group.FtpDirDownloadUtil;
 import com.arialyy.aria.core.download.group.IDownloadGroupListener;
@@ -38,14 +39,6 @@ public class DownloadGroupTask extends AbsGroupTask<DownloadGroupEntity, DGTaskW
     mOutHandler = outHandler;
     mContext = AriaManager.APP;
     mListener = new DownloadGroupListener(this, mOutHandler);
-    switch (taskWrapper.getRequestType()) {
-      case AbsTaskWrapper.D_HTTP:
-        mUtil = new DownloadGroupUtil((IDownloadGroupListener) mListener, mTaskWrapper);
-        break;
-      case AbsTaskWrapper.D_FTP_DIR:
-        mUtil = new FtpDirDownloadUtil((IDownloadGroupListener) mListener, mTaskWrapper);
-        break;
-    }
   }
 
   public DownloadGroupEntity getEntity() {
@@ -59,6 +52,16 @@ public class DownloadGroupTask extends AbsGroupTask<DownloadGroupEntity, DGTaskW
 
   @Override public int getTaskType() {
     return DOWNLOAD_GROUP;
+  }
+
+  @Override protected synchronized IUtil createUtil() {
+    switch (mTaskWrapper.getRequestType()) {
+      case AbsTaskWrapper.D_HTTP:
+        return new DownloadGroupUtil((IDownloadGroupListener) mListener, mTaskWrapper);
+      case AbsTaskWrapper.D_FTP_DIR:
+        return new FtpDirDownloadUtil((IDownloadGroupListener) mListener, mTaskWrapper);
+    }
+    return null;
   }
 
   public static class Builder {

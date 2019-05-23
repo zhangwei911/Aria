@@ -34,8 +34,8 @@ public abstract class AbsGroupTask<ENTITY extends AbsEntity, TASK_ENTITY extends
    * @param url 子任务下载地址
    */
   public void startSubTask(String url) {
-    if (mUtil != null) {
-      ((AbsGroupUtil) mUtil).startSubTask(url);
+    if (getUtil() != null) {
+      ((AbsGroupUtil) getUtil()).startSubTask(url);
     }
   }
 
@@ -45,8 +45,8 @@ public abstract class AbsGroupTask<ENTITY extends AbsEntity, TASK_ENTITY extends
    * @param url 子任务下载地址
    */
   public void stopSubTask(String url) {
-    if (mUtil != null) {
-      ((AbsGroupUtil) mUtil).stopSubTask(url);
+    if (getUtil() != null) {
+      ((AbsGroupUtil) getUtil()).stopSubTask(url);
     }
   }
 }

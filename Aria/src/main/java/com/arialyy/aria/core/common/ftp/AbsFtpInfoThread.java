@@ -34,7 +34,7 @@ import com.arialyy.aria.core.inf.AbsTaskWrapper;
 import com.arialyy.aria.core.upload.UploadEntity;
 import com.arialyy.aria.exception.AriaIOException;
 import com.arialyy.aria.exception.BaseException;
-import com.arialyy.aria.exception.FileException;
+import com.arialyy.aria.exception.FileNotFoundException;
 import com.arialyy.aria.exception.TaskException;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.Regular;
@@ -79,11 +79,11 @@ public abstract class AbsFtpInfoThread<ENTITY extends AbsEntity, TASK_WRAPPER ex
   }
 
   /**
-   * 设置请求的远程文件路径
+   * 获取请求的远程文件路径
    *
    * @return 远程文件路径
    */
-  protected abstract String setRemotePath();
+  protected abstract String getRemotePath();
 
   @Override
   public void run() {
@@ -97,7 +97,7 @@ public abstract class AbsFtpInfoThread<ENTITY extends AbsEntity, TASK_WRAPPER ex
         return;
       }
       String remotePath =
-          new String(setRemotePath().getBytes(charSet), AbsFtpThreadTask.SERVER_CHARSET);
+          new String(getRemotePath().getBytes(charSet), AbsFtpThreadTask.SERVER_CHARSET);
       if (mTaskDelegate.getUrlEntity().isFtps) {
         ((FTPSClient) client).execPROT("P");
         //((FTPSClient) client).enterLocalActiveMode();
@@ -105,9 +105,6 @@ public abstract class AbsFtpInfoThread<ENTITY extends AbsEntity, TASK_WRAPPER ex
       FTPFile[] files = client.listFiles(remotePath);
       boolean isExist = files.length != 0;
       if (!isExist && !isUpload) {
-        failDownload(new FileException(TAG,
-            String.format("文件不存在，url: %s, remotePath：%s", mTaskDelegate.getUrlEntity().url,
-                remotePath)), false);
         int i = remotePath.lastIndexOf(File.separator);
         FTPFile[] files1;
         if (i == -1) {
@@ -117,7 +114,7 @@ public abstract class AbsFtpInfoThread<ENTITY extends AbsEntity, TASK_WRAPPER ex
         }
         if (files1.length > 0) {
           ALog.i(TAG,
-              String.format("路径【%s】下的文件列表 ===================================", setRemotePath()));
+              String.format("路径【%s】下的文件列表 ===================================", getRemotePath()));
           for (FTPFile file : files1) {
             ALog.d(TAG, file.toString());
           }
@@ -127,13 +124,22 @@ public abstract class AbsFtpInfoThread<ENTITY extends AbsEntity, TASK_WRAPPER ex
           ALog.w(TAG, String.format("获取文件列表失败，msg：%s", client.getReplyString()));
         }
         client.disconnect();
+
+        failDownload(new FileNotFoundException(TAG,
+            String.format("文件不存在，url: %s, remotePath：%s", mTaskDelegate.getUrlEntity().url,
+                remotePath)), false);
         return;
       }
 
-      // 检查ftp文件是否被打开
+      // 处理拦截功能
+      if (!onInterceptor(client, files)) {
+        client.disconnect();
+        failDownload(new AriaIOException(TAG, "拦截器处理任务失败"), false);
+        return;
+      }
 
       //为了防止编码错乱，需要使用原始字符串
-      mSize = getFileSize(files, client, setRemotePath());
+      mSize = getFileSize(files, client, getRemotePath());
       int reply = client.getReplyCode();
       if (!FTPReply.isPositiveCompletion(reply)) {
         if (isUpload) {
@@ -160,6 +166,16 @@ public abstract class AbsFtpInfoThread<ENTITY extends AbsEntity, TASK_WRAPPER ex
     } finally {
       closeClient(client);
     }
+  }
+
+  /**
+   * 处理拦截
+   *
+   * @param ftpFiles remotePath路径下的所有文件
+   * @return {@code false} 拦截器处理任务失败，{@code} 拦截器处理任务成功
+   */
+  protected boolean onInterceptor(FTPClient client, FTPFile[] ftpFiles) {
+    return true;
   }
 
   /**
@@ -249,7 +265,8 @@ public abstract class AbsFtpInfoThread<ENTITY extends AbsEntity, TASK_WRAPPER ex
         client.disconnect();
         failDownload(new AriaIOException(TAG,
                 String.format("无法连接到ftp服务器，filePath: %s, url: %s, errorCode: %s, errorMsg：%s",
-                    mEntity.getKey(), mTaskDelegate.getUrlEntity().url, reply, client.getReplyString())),
+                    mEntity.getKey(), mTaskDelegate.getUrlEntity().url, reply,
+                    client.getReplyString())),
             true);
         return null;
       }
@@ -367,7 +384,7 @@ public abstract class AbsFtpInfoThread<ENTITY extends AbsEntity, TASK_WRAPPER ex
    * 处理FTP文件信息
    *
    * @param remotePath ftp服务器文件夹路径
-   * @param ftpFile    ftp服务器上对应的文件
+   * @param ftpFile ftp服务器上对应的文件
    */
   protected void handleFile(String remotePath, FTPFile ftpFile) {
   }

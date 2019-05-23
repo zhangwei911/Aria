@@ -36,6 +36,19 @@ public class FtpTaskDelegate implements ITargetHeadDelegate {
    */
   private String charSet = "utf-8";
 
+  /**
+   * 上传拦截器
+   */
+  private IFtpUploadInterceptor uploadInterceptor;
+
+  public IFtpUploadInterceptor getUploadInterceptor() {
+    return uploadInterceptor;
+  }
+
+  public void setUploadInterceptor(IFtpUploadInterceptor uploadInterceptor) {
+    this.uploadInterceptor = uploadInterceptor;
+  }
+
   public FtpUrlEntity getUrlEntity() {
     return urlEntity;
   }

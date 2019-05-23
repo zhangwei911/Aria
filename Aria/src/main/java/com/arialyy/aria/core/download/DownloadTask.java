@@ -19,6 +19,7 @@ package com.arialyy.aria.core.download;
 import android.os.Handler;
 import android.os.Looper;
 import com.arialyy.aria.core.AriaManager;
+import com.arialyy.aria.core.common.IUtil;
 import com.arialyy.aria.core.download.downloader.SimpleDownloadUtil;
 import com.arialyy.aria.core.inf.AbsNormalTask;
 import com.arialyy.aria.core.inf.IDownloadListener;
@@ -37,7 +38,6 @@ public class DownloadTask extends AbsNormalTask<DownloadEntity, DTaskWrapper> {
     mOutHandler = outHandler;
     mContext = AriaManager.APP;
     mListener = new BaseDListener(this, mOutHandler);
-    mUtil = new SimpleDownloadUtil(taskWrapper, (IDownloadListener) mListener);
     mEntity = taskWrapper.getEntity();
   }
 
@@ -81,6 +81,10 @@ public class DownloadTask extends AbsNormalTask<DownloadEntity, DTaskWrapper> {
 
   @Override public String getTaskName() {
     return mEntity.getFileName();
+  }
+
+  @Override protected synchronized IUtil createUtil() {
+    return new SimpleDownloadUtil(mTaskWrapper, (IDownloadListener) mListener);
   }
 
   public static class Builder {

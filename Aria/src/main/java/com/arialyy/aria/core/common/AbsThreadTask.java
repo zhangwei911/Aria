@@ -359,6 +359,10 @@ public abstract class AbsThreadTask<ENTITY extends AbsNormalEntity, TASK_WRAPPER
         ALog.d(TAG,
             String.format("任务【%s】thread__%s__取消", getConfig().TEMP_FILE.getName(),
                 getConfig().THREAD_ID));
+        //ALog.d(TAG, "cancel_num = "
+        //    + getState().CANCEL_NUM
+        //    + ", start_thread_num = "
+        //    + getState().START_THREAD_NUM);
         if (getState().isCancel()) {
           if (getConfig().TEMP_FILE.exists() && !(getEntity() instanceof UploadEntity)) {
             getConfig().TEMP_FILE.delete();
@@ -413,6 +417,8 @@ public abstract class AbsThreadTask<ENTITY extends AbsNormalEntity, TASK_WRAPPER
     }
     if (mFailTimes < RETRY_NUM && needRetry && (NetUtils.isConnected(AriaManager.APP)
         || isNotNetRetry) && !isBreak()) {
+      ALog.d(TAG, String.format("isCancel: %s, isStop: %s, isBreak: %s", getState().isCancel,
+          getState().isStop, taskBreak));
       ALog.w(TAG, String.format("任务【%s】正在重试", getConfig().TEMP_FILE.getName()));
       mFailTimes++;
       handleRetryRecord();

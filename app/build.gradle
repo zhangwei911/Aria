@@ -1,7 +1,7 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
-//apply plugin: 'kotlin-kapt'
+apply plugin: 'kotlin-kapt'
 
 android {
   compileSdkVersion rootProject.ext.compileSdkVersion
@@ -46,8 +46,9 @@ dependencies {
   testImplementation 'junit:junit:4.12'
   implementation "com.android.support:appcompat-v7:${rootProject.ext.supportLibVersion}"
   implementation "com.android.support:design:${rootProject.ext.supportLibVersion}"
+  implementation "org.jetbrains.kotlin:kotlin-stdlib:${rootProject.ext.kotlin_version}"
   api project(':Aria')
-  annotationProcessor project(':AriaCompiler')
+  kapt project(':AriaCompiler')
   //      compile 'com.arialyy.aria:aria-core:3.4.0'
   //    annotationProcessor 'com.arialyy.aria:aria-compiler:3.4'
 

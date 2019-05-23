@@ -15,17 +15,25 @@
  */
 package com.arialyy.aria.core.upload.uploader;
 
+import android.text.TextUtils;
+import aria.apache.commons.net.ftp.FTPClient;
 import aria.apache.commons.net.ftp.FTPFile;
 import com.arialyy.aria.core.common.ftp.AbsFtpInfoThread;
 import com.arialyy.aria.core.common.CompleteInfo;
 import com.arialyy.aria.core.common.OnFileInfoCallback;
 import com.arialyy.aria.core.common.TaskRecord;
 import com.arialyy.aria.core.common.ThreadRecord;
+import com.arialyy.aria.core.common.ftp.AbsFtpThreadTask;
+import com.arialyy.aria.core.common.ftp.FtpInterceptHandler;
+import com.arialyy.aria.core.common.ftp.IFtpUploadInterceptor;
+import com.arialyy.aria.core.queue.UploadTaskQueue;
 import com.arialyy.aria.core.upload.UTaskWrapper;
 import com.arialyy.aria.core.upload.UploadEntity;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.DbDataHelper;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Aria.Lao on 2017/9/26.
@@ -35,13 +43,71 @@ class FtpFileInfoThread extends AbsFtpInfoThread<UploadEntity, UTaskWrapper> {
   private static final String TAG = "FtpUploadFileInfoThread";
   static final int CODE_COMPLETE = 0xab1;
   private boolean isComplete = false;
+  private String remotePath;
+  /**
+   * true 使用拦截器，false 不使用拦截器
+   */
+  private boolean useInterceptor = false;
 
   FtpFileInfoThread(UTaskWrapper taskEntity, OnFileInfoCallback callback) {
     super(taskEntity, callback);
   }
 
-  @Override protected String setRemotePath() {
-    return mTaskWrapper.asFtp().getUrlEntity().remotePath + "/" + mEntity.getFileName();
+  @Override protected String getRemotePath() {
+    return remotePath == null ?
+        mTaskWrapper.asFtp().getUrlEntity().remotePath + "/" + mEntity.getFileName() : remotePath;
+  }
+
+  @Override protected boolean onInterceptor(FTPClient client, FTPFile[] ftpFiles) {
+    try {
+      IFtpUploadInterceptor interceptor = mTaskWrapper.asFtp().getUploadInterceptor();
+      if (interceptor != null) {
+        useInterceptor = true;
+        List<String> files = new ArrayList<>();
+        for (FTPFile ftpFile : ftpFiles) {
+          if (ftpFile.isDirectory()) {
+            continue;
+          }
+          files.add(ftpFile.getName());
+        }
+
+        FtpInterceptHandler interceptHandler = interceptor.onIntercept(mEntity, files);
+
+        if (interceptHandler.isStopUpload()) {
+          // TODO: 2019-05-22 操作任务停止
+          return true;
+        }
+
+        /*
+          处理远端有同名文件的情况
+         */
+        if (files.contains(mEntity.getFileName())) {
+          if (interceptHandler.isCoverServerFile()) {
+            ALog.i(TAG, String.format("远端已拥有同名文件，将覆盖该文件，文件名：%s", mEntity.getFileName()));
+            boolean b = client.deleteFile(
+                new String(getRemotePath().getBytes(charSet), AbsFtpThreadTask.SERVER_CHARSET));
+            ALog.d(TAG,
+                String.format("删除文件%s，code: %s， msg: %s", b ? "成功" : "失败", client.getReplyCode(),
+                    client.getReplyString()));
+          } else if (!TextUtils.isEmpty(interceptHandler.getNewFileName())) {
+            ALog.i(TAG, String.format("远端已拥有同名文件，将修改remotePath，文件名：%s，remotePath：%s",
+                mEntity.getFileName(), interceptHandler.getNewFileName()));
+            remotePath = mTaskWrapper.asFtp().getUrlEntity().remotePath
+                + "/"
+                + interceptHandler.getNewFileName();
+            client.disconnect();
+            run();
+          }
+        }
+      }
+    } catch (IOException e) {
+      e.printStackTrace();
+      return false;
+    } finally {
+      mTaskWrapper.asFtp().setUploadInterceptor(null);
+    }
+
+    return true;
   }
 
   /**
@@ -54,7 +120,7 @@ class FtpFileInfoThread extends AbsFtpInfoThread<UploadEntity, UTaskWrapper> {
    */
   @Override protected void handleFile(String remotePath, FTPFile ftpFile) {
     super.handleFile(remotePath, ftpFile);
-    if (ftpFile != null) {
+    if (ftpFile != null && !useInterceptor) {
       //远程文件已完成
       if (ftpFile.getSize() == mEntity.getFileSize()) {
         isComplete = true;

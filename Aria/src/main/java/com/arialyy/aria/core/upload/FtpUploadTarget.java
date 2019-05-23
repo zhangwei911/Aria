@@ -16,11 +16,13 @@
 package com.arialyy.aria.core.upload;
 
 import android.support.annotation.CheckResult;
+import android.support.annotation.NonNull;
 import com.arialyy.aria.core.FtpUrlEntity;
 import com.arialyy.aria.core.common.ftp.FTPSDelegate;
 import com.arialyy.aria.core.common.ftp.FtpDelegate;
 import com.arialyy.aria.core.inf.AbsTaskWrapper;
 import com.arialyy.aria.core.inf.IFtpTarget;
+import com.arialyy.aria.core.common.ftp.IFtpUploadInterceptor;
 import com.arialyy.aria.util.CheckUtil;
 import java.net.Proxy;
 
@@ -51,6 +53,14 @@ public class FtpUploadTarget extends AbsUploadTarget<FtpUploadTarget>
   public FtpUploadTarget setUploadUrl(String tempUrl) {
     mNormalDelegate.setTempUrl(tempUrl);
     return this;
+  }
+
+  /**
+   * FTP文件上传拦截器，如果远端已有同名文件，可使用该拦截器控制覆盖文件或修改该文件上传到服务器端端的文件名
+   */
+  @CheckResult
+  public FtpUploadTarget setUploadInterceptor(@NonNull IFtpUploadInterceptor uploadInterceptor) {
+    return mNormalDelegate.setUploadInterceptor(uploadInterceptor);
   }
 
   /**

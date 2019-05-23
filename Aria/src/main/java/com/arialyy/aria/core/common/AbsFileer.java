@@ -258,23 +258,20 @@ public abstract class AbsFileer<ENTITY extends AbsNormalEntity, TASK_WRAPPER ext
   }
 
   public synchronized void cancel() {
+    ALog.d(TAG, "constance hash: " + mConstance.hashCode());
     if (mConstance.isCancel) {
+      ALog.d(TAG, String.format("任务【%s】正在删除，删除任务失败", mTaskWrapper.getKey()));
       return;
     }
     closeTimer();
     mConstance.isCancel = true;
-    new Thread(new Runnable() {
-      @Override public void run() {
-
-        for (int i = 0; i < mTask.size(); i++) {
-          AbsThreadTask task = mTask.get(i);
-          if (task != null) {
-            task.cancel();
-          }
-        }
-        ThreadTaskManager.getInstance().removeTaskThread(mTaskWrapper.getKey());
+    for (int i = 0; i < mTask.size(); i++) {
+      AbsThreadTask task = mTask.get(i);
+      if (task != null) {
+        task.cancel();
       }
-    }).start();
+    }
+    ThreadTaskManager.getInstance().removeTaskThread(mTaskWrapper.getKey());
   }
 
   public synchronized void stop() {
@@ -284,18 +281,13 @@ public abstract class AbsFileer<ENTITY extends AbsNormalEntity, TASK_WRAPPER ext
     closeTimer();
     mConstance.isStop = true;
     if (mConstance.isComplete()) return;
-    new Thread(new Runnable() {
-      @Override public void run() {
-
-        for (int i = 0; i < mTask.size(); i++) {
-          AbsThreadTask task = mTask.get(i);
-          if (task != null && !task.isThreadComplete()) {
-            task.stop();
-          }
-        }
-        ThreadTaskManager.getInstance().removeTaskThread(mTaskWrapper.getKey());
+    for (int i = 0; i < mTask.size(); i++) {
+      AbsThreadTask task = mTask.get(i);
+      if (task != null && !task.isThreadComplete()) {
+        task.stop();
       }
-    }).start();
+    }
+    ThreadTaskManager.getInstance().removeTaskThread(mTaskWrapper.getKey());
   }
 
   /**
@@ -303,6 +295,7 @@ public abstract class AbsFileer<ENTITY extends AbsNormalEntity, TASK_WRAPPER ext
    */
   public synchronized void start() {
     if (isRunning()) {
+      ALog.d(TAG, String.format("任务【%s】正在执行，启动任务失败", mTaskWrapper.getKey()));
       return;
     }
     new Thread(this).start();

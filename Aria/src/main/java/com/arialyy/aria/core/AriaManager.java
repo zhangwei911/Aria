@@ -23,6 +23,8 @@ import android.app.Dialog;
 import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.widget.PopupWindow;
@@ -80,6 +82,7 @@ import org.xml.sax.SAXException;
   private UploadConfig mUConfig;
   private AppConfig mAConfig;
   private DGroupConfig mDGConfig;
+  private Handler mAriaHandler;
   private File[] files;
 
   private AriaManager(Context context) {
@@ -139,6 +142,13 @@ import org.xml.sax.SAXException;
       String temp = String.format(sql, clazz.getSimpleName());
       DbEntity.exeSql(temp);
     }
+  }
+
+  public synchronized Handler getAriaHandler() {
+    if (mAriaHandler == null){
+      mAriaHandler = new Handler(Looper.getMainLooper());
+    }
+    return mAriaHandler;
   }
 
   public Map<String, AbsReceiver> getReceiver() {

@@ -19,6 +19,7 @@ import android.os.Handler;
 import com.arialyy.aria.core.common.BaseListener;
 import com.arialyy.aria.core.inf.IEntity;
 import com.arialyy.aria.core.inf.IUploadListener;
+import com.arialyy.aria.core.inf.TaskSchedulerType;
 import com.arialyy.aria.util.CommonUtil;
 
 /**
@@ -36,7 +37,8 @@ class BaseUListener extends BaseListener<UploadEntity, UTaskWrapper, UploadTask>
     mTaskWrapper.setState(state);
     mEntity.setState(state);
     if (state == IEntity.STATE_CANCEL) {
-      CommonUtil.delTaskRecord(mEntity.getFilePath(), 2, mTaskWrapper.isRemoveFile(), true);
+      CommonUtil.delTaskRecord(mEntity.getFilePath(), 2, mTaskWrapper.isRemoveFile(),
+          getTask().getSchedulerType() != TaskSchedulerType.TYPE_CANCEL_AND_NOT_NOTIFY);
     } else if (state == IEntity.STATE_STOP) {
       mEntity.setStopTime(System.currentTimeMillis());
     } else if (state == IEntity.STATE_COMPLETE) {

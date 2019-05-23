@@ -62,6 +62,11 @@ public class NormalCmdFactory extends AbsCmdFactory<AbsTaskWrapper, AbsNormalCmd
    * 删除所有任务，
    */
   public static final int TASK_CANCEL_ALL = 0xb9;
+  /**
+   * 重启任务
+   */
+  public static final int TASK_RESTART = 0xba;
+
   private static volatile NormalCmdFactory INSTANCE = null;
 
   private NormalCmdFactory() {
@@ -103,6 +108,8 @@ public class NormalCmdFactory extends AbsCmdFactory<AbsTaskWrapper, AbsNormalCmd
         return new ResumeAllCmd<>(entity, taskType);
       case TASK_CANCEL_ALL:
         return new CancelAllCmd<>(entity, taskType);
+      case TASK_RESTART:
+        return new ReStartCmd<>(entity, taskType);
       default:
         return null;
     }

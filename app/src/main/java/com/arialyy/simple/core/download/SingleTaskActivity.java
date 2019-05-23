@@ -64,9 +64,10 @@ public class SingleTaskActivity extends BaseActivity<ActivitySingleBinding> {
       //"http://kotlinlang.org/docs/kotlin-docs.pdf";
       //"https://atom-installer.github.com/v1.13.0/AtomSetup.exe?s=1484074138&ext=.exe";
       //"http://static.gaoshouyou.com/d/22/94/822260b849944492caadd2983f9bb624.apks";
+      "http://hzdown.muzhiwan.com/2017/05/08/nl.noio.kingdom_59104935e56f0.apk";
       //"http://120.55.95.61:8811/ghcg/zg/武义总规纲要成果.zip";
       //"https://yizi-kejian.oss-cn-beijing.aliyuncs.com/qimeng/package1/qmtable11.zip";
-      "http://rs.0.gaoshouyou.com/d/04/1e/400423a7551e1f3f0eb1812afa1f9b44.apk";
+      //"http://rs.0.gaoshouyou.com/d/04/1e/400423a7551e1f3f0eb1812afa1f9b44.apk";
   //"http://chargepile2.techsum.net/car-manage/file/download?path=2019-04-26/c0242efd18be4ecbb23911b1c509dcad--掌通各系统汇总.xls"; // 无长度的chunked
   //"http://58.210.9.131/tpk/sipgt//TDLYZTGH.tpk"; //chunked 下载
   //"http://apk500.bce.baidu-mgame.com/game/67000/67734/20170622040827_oem_5502845.apk?r=1";
@@ -299,7 +300,8 @@ public class SingleTaskActivity extends BaseActivity<ActivitySingleBinding> {
         Aria.download(this).load(DOWNLOAD_URL).stop();
         break;
       case R.id.cancel:
-        Aria.download(this).load(DOWNLOAD_URL).cancel(true);
+        Aria.download(this).load(DOWNLOAD_URL).reStart();
+        //Aria.download(this).load(DOWNLOAD_URL).cancel(true);
         //Aria.download(this).load(DOWNLOAD_URL).removeRecord();
         break;
     }

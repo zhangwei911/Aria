@@ -600,7 +600,7 @@ public class CommonUtil {
     }
     DownloadGroupEntity groupEntity = DbDataHelper.getDGEntity(groupHash);
 
-    delGroupTaskRecord(groupEntity, removeFile);
+    delGroupTaskRecord(groupEntity, removeFile, true);
   }
 
   /**
@@ -608,7 +608,8 @@ public class CommonUtil {
    *
    * @param removeFile {@code true} 不仅删除任务数据库记录，还会删除已经删除完成的文件 {@code false}如果任务已经完成，只删除任务数据库记录
    */
-  public static void delGroupTaskRecord(DownloadGroupEntity groupEntity, boolean removeFile) {
+  public static void delGroupTaskRecord(DownloadGroupEntity groupEntity, boolean removeFile,
+      boolean removeEntity) {
     if (groupEntity == null) {
       ALog.e(TAG, "删除下载任务组记录失败，任务组实体为null");
       return;
@@ -654,8 +655,10 @@ public class CommonUtil {
         dir.delete();
       }
     }
-    DbEntity.deleteData(DownloadEntity.class, "groupHash=?", groupEntity.getGroupHash());
-    DbEntity.deleteData(DownloadGroupEntity.class, "groupHash=?", groupEntity.getGroupHash());
+    if (removeEntity) {
+      DbEntity.deleteData(DownloadEntity.class, "groupHash=?", groupEntity.getGroupHash());
+      DbEntity.deleteData(DownloadGroupEntity.class, "groupHash=?", groupEntity.getGroupHash());
+    }
   }
 
   /**

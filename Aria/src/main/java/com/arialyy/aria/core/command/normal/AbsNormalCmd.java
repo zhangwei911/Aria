@@ -42,7 +42,6 @@ public abstract class AbsNormalCmd<T extends AbsTaskWrapper> extends AbsCmd<T> {
    */
   boolean canExeCmd = true;
 
-  private AbsTask tempTask = null;
   int taskType;
 
   /**
@@ -82,9 +81,7 @@ public abstract class AbsNormalCmd<T extends AbsTaskWrapper> extends AbsCmd<T> {
    * 发送等待状态
    */
   void sendWaitState() {
-    if (tempTask != null) {
-      sendWaitState(tempTask);
-    }
+    sendWaitState(getTask());
   }
 
   /**
@@ -108,16 +105,14 @@ public abstract class AbsNormalCmd<T extends AbsTaskWrapper> extends AbsCmd<T> {
    * 停止任务
    */
   void stopTask() {
-    if (tempTask == null) createTask();
-    mQueue.stopTask(tempTask);
+    mQueue.stopTask(getTask());
   }
 
   /**
    * 删除任务
    */
   void removeTask() {
-    if (tempTask == null) createTask();
-    mQueue.cancelTask(tempTask);
+    mQueue.cancelTask(getTask());
   }
 
   /**
@@ -135,14 +130,14 @@ public abstract class AbsNormalCmd<T extends AbsTaskWrapper> extends AbsCmd<T> {
    * 启动任务
    */
   void startTask() {
-    mQueue.startTask(tempTask);
+    mQueue.startTask(getTask());
   }
 
   /**
    * 恢复任务
    */
   void resumeTask() {
-    mQueue.resumeTask(tempTask);
+    mQueue.resumeTask(getTask());
   }
 
   /**
@@ -160,8 +155,7 @@ public abstract class AbsNormalCmd<T extends AbsTaskWrapper> extends AbsCmd<T> {
    * @return 执行任务
    */
   AbsTask getTask() {
-    tempTask = mQueue.getTask(mTaskWrapper.getEntity().getKey());
-    return tempTask;
+    return mQueue.getTask(mTaskWrapper.getEntity().getKey());
   }
 
   /**
@@ -170,8 +164,7 @@ public abstract class AbsNormalCmd<T extends AbsTaskWrapper> extends AbsCmd<T> {
    * @return 执行任务
    */
   AbsTask getTask(AbsEntity entity) {
-    tempTask = mQueue.getTask(entity.getKey());
-    return tempTask;
+    return mQueue.getTask(entity.getKey());
   }
 
   /**
@@ -180,8 +173,7 @@ public abstract class AbsNormalCmd<T extends AbsTaskWrapper> extends AbsCmd<T> {
    * @return 创建的任务
    */
   AbsTask createTask() {
-    tempTask = mQueue.createTask(mTaskWrapper);
-    return tempTask;
+    return mQueue.createTask(mTaskWrapper);
   }
 
   /**

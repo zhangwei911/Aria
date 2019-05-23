@@ -18,6 +18,8 @@ package com.arialyy.aria.core.inf;
 import android.content.Context;
 import android.os.Handler;
 import android.text.TextUtils;
+import com.arialyy.aria.core.Aria;
+import com.arialyy.aria.core.AriaManager;
 import com.arialyy.aria.core.common.IUtil;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
@@ -40,7 +42,7 @@ public abstract class AbsTask<ENTITY extends AbsEntity, TASK_WRAPPER extends Abs
   protected Context mContext;
   boolean isHeighestTask = false;
   private boolean isCancel = false, isStop = false;
-  protected IUtil mUtil;
+  private IUtil mUtil;
   /**
    * 扩展信息
    */
@@ -60,6 +62,15 @@ public abstract class AbsTask<ENTITY extends AbsEntity, TASK_WRAPPER extends Abs
 
   public Handler getOutHandler() {
     return mOutHandler;
+  }
+
+  protected abstract IUtil createUtil();
+
+  protected synchronized IUtil getUtil() {
+    if (mUtil == null) {
+      mUtil = createUtil();
+    }
+    return mUtil;
   }
 
   /**
@@ -98,8 +109,8 @@ public abstract class AbsTask<ENTITY extends AbsEntity, TASK_WRAPPER extends Abs
    * @param speed 单位为：kb
    */
   public void setMaxSpeed(int speed) {
-    if (mUtil != null) {
-      mUtil.setMaxSpeed(speed);
+    if (getUtil() != null) {
+      getUtil().setMaxSpeed(speed);
     }
   }
 
@@ -183,10 +194,25 @@ public abstract class AbsTask<ENTITY extends AbsEntity, TASK_WRAPPER extends Abs
   }
 
   @Override public void start() {
-    if (mUtil.isRunning()) {
+    start(TaskSchedulerType.TYPE_DEFAULT);
+  }
+
+  @Override public void start(@TaskSchedulerType int type) {
+    mSchedulerType = type;
+    if (type == TaskSchedulerType.TYPE_START_AND_RESET_STATE) {
+      if (getUtil().isRunning()) {
+        ALog.e(TAG, String.format("任务【%s】重启失败", getTaskName()));
+        return;
+      }
+      mUtil = createUtil();
+      mUtil.start();
+      ALog.d(TAG, String.format("任务【%s】重启成功", getTaskName()));
+      return;
+    }
+    if (getUtil().isRunning()) {
       ALog.d(TAG, "任务正在下载");
     } else {
-      mUtil.start();
+      getUtil().start();
     }
   }
 
@@ -197,8 +223,8 @@ public abstract class AbsTask<ENTITY extends AbsEntity, TASK_WRAPPER extends Abs
   @Override public void stop(@TaskSchedulerType int type) {
     isStop = true;
     mSchedulerType = type;
-    if (mUtil.isRunning()) {
-      mUtil.stop();
+    if (getUtil().isRunning()) {
+      getUtil().stop();
     } else {
       ALog.d(TAG, "下载任务未执行");
       mListener.onStop(mEntity.getCurrentProgress());
@@ -206,11 +232,16 @@ public abstract class AbsTask<ENTITY extends AbsEntity, TASK_WRAPPER extends Abs
   }
 
   @Override public void cancel() {
+    cancel(TaskSchedulerType.TYPE_DEFAULT);
+  }
+
+  @Override public void cancel(@TaskSchedulerType int type) {
     isCancel = true;
-    if (!mUtil.isRunning()) {
+    mSchedulerType = type;
+    if (!getUtil().isRunning()) {
       mListener.onCancel();
     } else {
-      mUtil.cancel();
+      getUtil().cancel();
     }
   }
 
@@ -220,7 +251,7 @@ public abstract class AbsTask<ENTITY extends AbsEntity, TASK_WRAPPER extends Abs
    * @return {@code true} 正在下载
    */
   @Override public boolean isRunning() {
-    return mUtil.isRunning();
+    return getUtil().isRunning();
   }
 
   /**

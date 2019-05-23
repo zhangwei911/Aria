@@ -79,7 +79,17 @@ public interface ITask<TASK_WRAPPER extends AbsTaskWrapper> {
    */
   TASK_WRAPPER getTaskWrapper();
 
+  /**
+   * 启动任务
+   */
   void start();
+
+  /**
+   * 启动任务
+   *
+   * @param type {@link TaskSchedulerType}
+   */
+  void start(@TaskSchedulerType int type);
 
   /**
    * 停止任务
@@ -89,14 +99,21 @@ public interface ITask<TASK_WRAPPER extends AbsTaskWrapper> {
   /**
    * 停止任务
    *
-   * @param type {@code 0}默认操作，{@code 1}停止任务不自动执行下一任务
+   * @param type {@link TaskSchedulerType}
    */
-  void stop(int type);
+  void stop(@TaskSchedulerType int type);
 
   /**
    * 删除任务
    */
   void cancel();
+
+  /**
+   * 停止任务
+   *
+   * @param type {@link TaskSchedulerType}
+   */
+  void cancel(@TaskSchedulerType int type);
 
   /**
    * 读取扩展数据
@@ -134,6 +151,4 @@ public interface ITask<TASK_WRAPPER extends AbsTaskWrapper> {
    * {@link TaskSchedulerType}
    */
   int getSchedulerType();
-
-
 }

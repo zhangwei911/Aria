@@ -194,16 +194,26 @@ abstract class AbsSchedulers<TASK_ENTITY extends AbsTaskWrapper, TASK extends IT
         if (task.getState() == IEntity.STATE_WAIT) {
           break;
         }
+        mQueue.removeTaskFormQueue(task.getKey());
+        if (mQueue.getCurrentExePoolNum() < mQueue.getMaxTaskNum()) {
+          ALog.d(TAG, String.format("停止任务【%s】成功，尝试开始下一任务", task.getTaskName()));
+          startNextTask(task);
+        } else {
+          ALog.d(TAG, String.format("停止任务【%s】成功", task.getTaskName()));
+        }
+        break;
       case CANCEL:
         mQueue.removeTaskFormQueue(task.getKey());
         if (mQueue.getCurrentExePoolNum() < mQueue.getMaxTaskNum()) {
-          ALog.d(TAG, "stop_next");
+          ALog.d(TAG, String.format("删除任务【%s】成功，尝试开始下一任务", task.getTaskName()));
           startNextTask(task);
+        } else {
+          ALog.d(TAG, String.format("删除任务【%s】成功", task.getTaskName()));
         }
         break;
       case COMPLETE:
         mQueue.removeTaskFormQueue(task.getKey());
-        ALog.d(TAG, "complete_next");
+        ALog.d(TAG, String.format("任务【%s】处理完成", task.getTaskName()));
         startNextTask(task);
         break;
       case FAIL:
