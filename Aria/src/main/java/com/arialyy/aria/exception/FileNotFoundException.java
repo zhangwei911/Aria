@@ -26,7 +26,7 @@ public class FileNotFoundException extends BaseException {
     super(tag, String.format("%s%s", ARIA_FILE_EXCEPTION, detailMessage));
   }
 
-  public FileNotFoundException(String tag, String message, Exception e){
+  public FileNotFoundException(String tag, String message, Exception e) {
     super(tag, message, e);
   }
 }

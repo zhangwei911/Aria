@@ -17,6 +17,7 @@ package com.arialyy.aria.core.upload;
 
 import android.os.Handler;
 import android.os.Looper;
+import com.arialyy.aria.core.common.IUtil;
 import com.arialyy.aria.core.inf.AbsNormalTask;
 import com.arialyy.aria.core.inf.IUploadListener;
 import com.arialyy.aria.core.scheduler.ISchedulers;
@@ -31,7 +32,6 @@ public class UploadTask extends AbsNormalTask<UploadEntity, UTaskWrapper> {
     mTaskWrapper = taskWrapper;
     mOutHandler = outHandler;
     mListener = new BaseUListener(this, mOutHandler);
-    mUtil = new SimpleUploadUtil(taskWrapper, (IUploadListener) mListener);
   }
 
   @Override public int getTaskType() {
@@ -48,6 +48,10 @@ public class UploadTask extends AbsNormalTask<UploadEntity, UTaskWrapper> {
 
   @Override public String getTaskName() {
     return mTaskWrapper.getEntity().getFileName();
+  }
+
+  @Override protected synchronized IUtil createUtil() {
+    return new SimpleUploadUtil(mTaskWrapper, (IUploadListener) mListener);
   }
 
   public static class Builder {

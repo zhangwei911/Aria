@@ -20,7 +20,6 @@ import java.util.List;
 
 /**
  * FTP文件上传拦截器，如果远端已有同名文件，可使用该拦截器控制覆盖文件或修改该文件上传到服务器端端文件名
- * simple
  * <pre>
  *   <code>
  *     Aria.upload(this)
