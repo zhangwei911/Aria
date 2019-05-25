@@ -15,12 +15,14 @@
  */
 package com.arialyy.aria.core.upload.uploader;
 
+import android.text.TextUtils;
 import aria.apache.commons.net.ftp.FTPClient;
 import aria.apache.commons.net.ftp.FTPReply;
 import aria.apache.commons.net.ftp.OnFtpInputStreamListener;
 import com.arialyy.aria.core.common.StateConstance;
 import com.arialyy.aria.core.common.SubThreadConfig;
 import com.arialyy.aria.core.common.ftp.AbsFtpThreadTask;
+import com.arialyy.aria.core.common.ftp.FtpTaskDelegate;
 import com.arialyy.aria.core.config.BaseTaskConfig;
 import com.arialyy.aria.core.config.DownloadConfig;
 import com.arialyy.aria.core.config.UploadConfig;
@@ -31,6 +33,7 @@ import com.arialyy.aria.exception.AriaIOException;
 import com.arialyy.aria.exception.TaskException;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.BufferedRandomAccessFile;
+import com.arialyy.aria.util.CommonUtil;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
@@ -82,7 +85,8 @@ class FtpThreadTask extends AbsFtpThreadTask<UploadEntity, UTaskWrapper> {
         return this;
       }
 
-      file = new BufferedRandomAccessFile(getConfig().TEMP_FILE, "rwd", getTaskConfig().getBuffSize());
+      file =
+          new BufferedRandomAccessFile(getConfig().TEMP_FILE, "rwd", getTaskConfig().getBuffSize());
       if (getConfig().START_LOCATION != 0) {
         //file.skipBytes((int) getConfig().START_LOCATION);
         file.seek(getConfig().START_LOCATION);
@@ -92,7 +96,8 @@ class FtpThreadTask extends AbsFtpThreadTask<UploadEntity, UTaskWrapper> {
         return this;
       }
       ALog.i(TAG,
-          String.format("任务【%s】线程__%s__上传完毕", getConfig().TEMP_FILE.getName(), getConfig().THREAD_ID));
+          String.format("任务【%s】线程__%s__上传完毕", getConfig().TEMP_FILE.getName(),
+              getConfig().THREAD_ID));
       writeConfig(true, getConfig().END_LOCATION);
       getState().COMPLETE_THREAD_NUM++;
       if (getState().isComplete()) {
@@ -100,11 +105,13 @@ class FtpThreadTask extends AbsFtpThreadTask<UploadEntity, UTaskWrapper> {
       }
       if (getState().isFail()) {
         mListener.onFail(false, new TaskException(TAG,
-            String.format("上传失败，filePath: %s, uploadUrl: %s", getEntity().getFilePath(), getConfig().URL)));
+            String.format("上传失败，filePath: %s, uploadUrl: %s", getEntity().getFilePath(),
+                getConfig().URL)));
       }
     } catch (IOException e) {
       fail(mChildCurrentLocation, new AriaIOException(TAG,
-          String.format("上传失败，filePath: %s, uploadUrl: %s", getEntity().getFilePath(), getConfig().URL)));
+          String.format("上传失败，filePath: %s, uploadUrl: %s", getEntity().getFilePath(),
+              getConfig().URL)));
     } catch (Exception e) {
       fail(mChildCurrentLocation, new AriaIOException(TAG, null, e));
     } finally {
@@ -123,10 +130,17 @@ class FtpThreadTask extends AbsFtpThreadTask<UploadEntity, UTaskWrapper> {
   }
 
   private void initPath() throws UnsupportedEncodingException {
-    dir = new String(getTaskWrapper().asFtp().getUrlEntity().remotePath.getBytes(charSet),
-        SERVER_CHARSET);
-    remotePath = new String(String.format("%s/%s", getTaskWrapper().asFtp().getUrlEntity().remotePath,
-        getEntity().getFileName()).getBytes(charSet), SERVER_CHARSET);
+    FtpTaskDelegate delegate = getTaskWrapper().asFtp();
+    dir = CommonUtil.convertFtpChar(charSet, delegate.getUrlEntity().remotePath);
+
+    String fileName =
+        TextUtils.isEmpty(delegate.getNewFileName()) ? CommonUtil.convertFtpChar(charSet,
+            getEntity().getFileName())
+            : CommonUtil.convertFtpChar(charSet, delegate.getNewFileName());
+
+    remotePath =
+        CommonUtil.convertFtpChar(charSet,
+            String.format("%s/%s", delegate.getUrlEntity().remotePath, fileName));
   }
 
   /**

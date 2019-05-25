@@ -42,10 +42,6 @@ public abstract class AbsFtpThreadTask<ENTITY extends AbsNormalEntity, TASK_ENTI
     extends AbsThreadTask<ENTITY, TASK_ENTITY> {
   private final String TAG = "AbsFtpThreadTask";
   protected String charSet;
-  /**
-   * D_FTP 服务器编码
-   */
-  public static String SERVER_CHARSET = "ISO-8859-1";
 
   protected AbsFtpThreadTask(StateConstance constance, IEventListener listener,
       SubThreadConfig<TASK_ENTITY> info) {

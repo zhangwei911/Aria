@@ -41,6 +41,19 @@ public class FtpTaskDelegate implements ITargetHeadDelegate {
    */
   private IFtpUploadInterceptor uploadInterceptor;
 
+  /**
+   * 上传到服务器文件的新文件名{@link FtpInterceptHandler#getNewFileName()}
+   */
+  private String newFileName;
+
+  public String getNewFileName() {
+    return newFileName;
+  }
+
+  public void setNewFileName(String newFileName) {
+    this.newFileName = newFileName;
+  }
+
   public IFtpUploadInterceptor getUploadInterceptor() {
     return uploadInterceptor;
   }

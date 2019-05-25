@@ -2,6 +2,17 @@
   <string name="app_name">Aria</string>
   <string name="action_settings">Settings</string>
 
+  <string name="url">URL: %1$s</string>
+  <string name="file_name">文件名: %1$s</string>
+  <string name="file_path">文件路径: %1$s</string>
+  <string name="enter">确认</string>
+  <string name="cancel">取消</string>
+  <string name="modify_url_dialog_title">修改URL</string>
+  <string name="stop">停止</string>
+  <string name="start">开始</string>
+  <string name="resume">恢复</string>
+  <string name="delete">删除</string>
+
   <string-array name="main_items">
     <item>http 下载</item>
     <item>http 上传</item>
@@ -28,9 +39,6 @@
     <item>Service中使用</item>
     <item>组件中使用</item>
   </string-array>
-
-  <string name="file_name">文件名: %1$s</string>
-  <string name="file_path">保存路径: %1$s</string>
 
 
   <string-array name="test_apk_download_url">

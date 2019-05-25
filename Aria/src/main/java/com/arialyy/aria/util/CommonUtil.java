@@ -78,6 +78,19 @@ import java.util.regex.Pattern;
  */
 public class CommonUtil {
   private static final String TAG = "CommonUtil";
+  public static final String SERVER_CHARSET = "ISO-8859-1";
+
+  /**
+   * 将字符串转换为Ftp服务器默认的ISO-8859-1编码
+   *
+   * @param charSet 原字符串编码s
+   * @param str 需要转换的字符串
+   * @return 转换后的字符串
+   */
+  public static String convertFtpChar(String charSet, String str)
+      throws UnsupportedEncodingException {
+    return new String(str.getBytes(charSet), SERVER_CHARSET);
+  }
 
   /**
    * 检查分块任务是否存在

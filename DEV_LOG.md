@@ -1,6 +1,7 @@
 ## 开发日志
   + v_3.6.5
     - fix bug https://github.com/AriaLyy/Aria/issues/403
+    - 新增ftp上传拦截器 https://github.com/AriaLyy/Aria/issues/402
   + v_3.6.4 (2019/5/16)
     - 优化任务接收器的代码结构
     - 修复`DbEntity.saveAll()`失败的问题

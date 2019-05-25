@@ -18,7 +18,7 @@ package com.arialyy.aria.core.common.ftp;
 import android.text.TextUtils;
 
 /**
- * Ftp上传拦截器处理
+ * Ftp上传拦截器处理，只针对新任务有效
  *
  * 如果使用者同时实现{@link Builder#resetFileName(String)}和{@link Builder#coverServerFile}，
  * 将默认使用{@link Builder#coverServerFile}
@@ -29,8 +29,6 @@ public class FtpInterceptHandler {
 
   private String newFileName;
 
-  private boolean stopUpload;
-
   private FtpInterceptHandler() {
   }
 
@@ -40,10 +38,6 @@ public class FtpInterceptHandler {
 
   public String getNewFileName() {
     return newFileName;
-  }
-
-  public boolean isStopUpload() {
-    return stopUpload;
   }
 
   public static final class Builder {
@@ -87,9 +81,7 @@ public class FtpInterceptHandler {
      */
     public FtpInterceptHandler build() {
       FtpInterceptHandler handler = new FtpInterceptHandler();
-      if (stopUpload) {
-        handler.stopUpload = true;
-      } else if (coverServerFile) {
+      if (coverServerFile) {
         handler.coverServerFile = true;
       } else if (!TextUtils.isEmpty(newFileName)) {
         handler.newFileName = newFileName;

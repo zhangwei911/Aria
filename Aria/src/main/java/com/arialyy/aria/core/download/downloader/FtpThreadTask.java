@@ -29,6 +29,7 @@ import com.arialyy.aria.exception.AriaIOException;
 import com.arialyy.aria.exception.TaskException;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.BufferedRandomAccessFile;
+import com.arialyy.aria.util.CommonUtil;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -84,8 +85,7 @@ class FtpThreadTask extends AbsFtpThreadTask<DownloadEntity, DTaskWrapper> {
         return this;
       }
       String remotePath =
-          new String(getTaskWrapper().asFtp().getUrlEntity().remotePath.getBytes(charSet),
-              SERVER_CHARSET);
+          CommonUtil.convertFtpChar(charSet, getTaskWrapper().asFtp().getUrlEntity().remotePath);
       ALog.i(TAG, String.format("remotePath【%s】", remotePath));
       is = client.retrieveFileStream(remotePath);
       reply = client.getReplyCode();
@@ -135,7 +135,8 @@ class FtpThreadTask extends AbsFtpThreadTask<DownloadEntity, DTaskWrapper> {
       return;
     }
     ALog.i(TAG,
-        String.format("任务【%s】线程__%s__下载完毕", getConfig().TEMP_FILE.getName(), getConfig().THREAD_ID));
+        String.format("任务【%s】线程__%s__下载完毕", getConfig().TEMP_FILE.getName(),
+            getConfig().THREAD_ID));
     writeConfig(true, getConfig().END_LOCATION);
     getState().COMPLETE_THREAD_NUM++;
     if (getState().isComplete()) {
@@ -143,7 +144,8 @@ class FtpThreadTask extends AbsFtpThreadTask<DownloadEntity, DTaskWrapper> {
         boolean success = mergeFile();
         if (!success) {
           mListener.onFail(false,
-              new TaskException(TAG, String.format("任务【%s】分块文件合并失败", getConfig().TEMP_FILE.getName())));
+              new TaskException(TAG,
+                  String.format("任务【%s】分块文件合并失败", getConfig().TEMP_FILE.getName())));
           return;
         }
       }
@@ -216,7 +218,8 @@ class FtpThreadTask extends AbsFtpThreadTask<DownloadEntity, DTaskWrapper> {
   private void readNormal(InputStream is) {
     BufferedRandomAccessFile file = null;
     try {
-      file = new BufferedRandomAccessFile(getConfig().TEMP_FILE, "rwd", getTaskConfig().getBuffSize());
+      file =
+          new BufferedRandomAccessFile(getConfig().TEMP_FILE, "rwd", getTaskConfig().getBuffSize());
       file.seek(getConfig().START_LOCATION);
       byte[] buffer = new byte[getTaskConfig().getBuffSize()];
       int len;

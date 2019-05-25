@@ -37,6 +37,7 @@ import com.arialyy.aria.exception.BaseException;
 import com.arialyy.aria.exception.FileNotFoundException;
 import com.arialyy.aria.exception.TaskException;
 import com.arialyy.aria.util.ALog;
+import com.arialyy.aria.util.CommonUtil;
 import com.arialyy.aria.util.Regular;
 import com.arialyy.aria.util.SSLContextUtil;
 
@@ -96,8 +97,7 @@ public abstract class AbsFtpInfoThread<ENTITY extends AbsEntity, TASK_WRAPPER ex
         ALog.e(TAG, String.format("任务【%s】失败", mTaskDelegate.getUrlEntity().url));
         return;
       }
-      String remotePath =
-          new String(getRemotePath().getBytes(charSet), AbsFtpThreadTask.SERVER_CHARSET);
+      String remotePath = CommonUtil.convertFtpChar(charSet, getRemotePath());
       if (mTaskDelegate.getUrlEntity().isFtps) {
         ((FTPSClient) client).execPROT("P");
         //((FTPSClient) client).enterLocalActiveMode();
@@ -123,7 +123,7 @@ public abstract class AbsFtpInfoThread<ENTITY extends AbsEntity, TASK_WRAPPER ex
         } else {
           ALog.w(TAG, String.format("获取文件列表失败，msg：%s", client.getReplyString()));
         }
-        client.disconnect();
+        closeClient(client);
 
         failDownload(new FileNotFoundException(TAG,
             String.format("文件不存在，url: %s, remotePath：%s", mTaskDelegate.getUrlEntity().url,
@@ -133,8 +133,8 @@ public abstract class AbsFtpInfoThread<ENTITY extends AbsEntity, TASK_WRAPPER ex
 
       // 处理拦截功能
       if (!onInterceptor(client, files)) {
-        client.disconnect();
-        failDownload(new AriaIOException(TAG, "拦截器处理任务失败"), false);
+        closeClient(client);
+        ALog.d(TAG, "拦截器处理完成任务，任务将不再执行");
         return;
       }
 
@@ -146,7 +146,7 @@ public abstract class AbsFtpInfoThread<ENTITY extends AbsEntity, TASK_WRAPPER ex
           //服务器上没有该文件路径，表示该任务为新的上传任务
           mTaskWrapper.setNewTask(true);
         } else {
-          client.disconnect();
+          closeClient(client);
           failDownload(new AriaIOException(TAG,
               String.format("获取文件信息错误，url: %s, errorCode：%s, errorMsg：%s",
                   mTaskDelegate.getUrlEntity().url, reply, client.getReplyString())), true);
@@ -172,7 +172,7 @@ public abstract class AbsFtpInfoThread<ENTITY extends AbsEntity, TASK_WRAPPER ex
    * 处理拦截
    *
    * @param ftpFiles remotePath路径下的所有文件
-   * @return {@code false} 拦截器处理任务失败，{@code} 拦截器处理任务成功
+   * @return {@code false} 拦截器处理完成任务，任务将不再执行，{@code true} 拦截器处理任务完成任务，任务继续执行
    */
   protected boolean onInterceptor(FTPClient client, FTPFile[] ftpFiles) {
     return true;
@@ -293,7 +293,7 @@ public abstract class AbsFtpInfoThread<ENTITY extends AbsEntity, TASK_WRAPPER ex
     return client;
   }
 
-  private void closeClient(FTPClient client) {
+  protected void closeClient(FTPClient client) {
     try {
       if (client != null && client.isConnected()) {
         client.disconnect();
@@ -372,8 +372,7 @@ public abstract class AbsFtpInfoThread<ENTITY extends AbsEntity, TASK_WRAPPER ex
         ALog.d(TAG, "isValid = " + file.isValid());
         handleFile(path + file.getName(), file);
       } else {
-        String remotePath =
-            new String((path + file.getName()).getBytes(charSet), AbsFtpThreadTask.SERVER_CHARSET);
+        String remotePath = CommonUtil.convertFtpChar(charSet, path + file.getName());
         size += getFileSize(client.listFiles(remotePath), client, path + file.getName());
       }
     }

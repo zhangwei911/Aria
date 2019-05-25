@@ -23,13 +23,12 @@ import com.arialyy.aria.core.common.CompleteInfo;
 import com.arialyy.aria.core.common.OnFileInfoCallback;
 import com.arialyy.aria.core.common.TaskRecord;
 import com.arialyy.aria.core.common.ThreadRecord;
-import com.arialyy.aria.core.common.ftp.AbsFtpThreadTask;
 import com.arialyy.aria.core.common.ftp.FtpInterceptHandler;
 import com.arialyy.aria.core.common.ftp.IFtpUploadInterceptor;
-import com.arialyy.aria.core.queue.UploadTaskQueue;
 import com.arialyy.aria.core.upload.UTaskWrapper;
 import com.arialyy.aria.core.upload.UploadEntity;
 import com.arialyy.aria.util.ALog;
+import com.arialyy.aria.util.CommonUtil;
 import com.arialyy.aria.util.DbDataHelper;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -59,6 +58,10 @@ class FtpFileInfoThread extends AbsFtpInfoThread<UploadEntity, UTaskWrapper> {
   }
 
   @Override protected boolean onInterceptor(FTPClient client, FTPFile[] ftpFiles) {
+    // 旧任务将不做处理，否则断点续传上传将失效
+    if (!mTaskWrapper.isNewTask()) {
+      return true;
+    }
     try {
       IFtpUploadInterceptor interceptor = mTaskWrapper.asFtp().getUploadInterceptor();
       if (interceptor != null) {
@@ -73,30 +76,26 @@ class FtpFileInfoThread extends AbsFtpInfoThread<UploadEntity, UTaskWrapper> {
 
         FtpInterceptHandler interceptHandler = interceptor.onIntercept(mEntity, files);
 
-        if (interceptHandler.isStopUpload()) {
-          // TODO: 2019-05-22 操作任务停止
-          return true;
-        }
-
         /*
           处理远端有同名文件的情况
          */
         if (files.contains(mEntity.getFileName())) {
           if (interceptHandler.isCoverServerFile()) {
             ALog.i(TAG, String.format("远端已拥有同名文件，将覆盖该文件，文件名：%s", mEntity.getFileName()));
-            boolean b = client.deleteFile(
-                new String(getRemotePath().getBytes(charSet), AbsFtpThreadTask.SERVER_CHARSET));
+            boolean b = client.deleteFile(CommonUtil.convertFtpChar(charSet, getRemotePath()));
             ALog.d(TAG,
                 String.format("删除文件%s，code: %s， msg: %s", b ? "成功" : "失败", client.getReplyCode(),
                     client.getReplyString()));
           } else if (!TextUtils.isEmpty(interceptHandler.getNewFileName())) {
-            ALog.i(TAG, String.format("远端已拥有同名文件，将修改remotePath，文件名：%s，remotePath：%s",
+            ALog.i(TAG, String.format("远端已拥有同名文件，将修改remotePath，原文件名：%s，新文件名：%s",
                 mEntity.getFileName(), interceptHandler.getNewFileName()));
             remotePath = mTaskWrapper.asFtp().getUrlEntity().remotePath
                 + "/"
                 + interceptHandler.getNewFileName();
-            client.disconnect();
+            mTaskWrapper.asFtp().setNewFileName(interceptHandler.getNewFileName());
+            closeClient(client);
             run();
+            return false;
           }
         }
       }
