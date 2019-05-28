@@ -45,7 +45,7 @@ import java.util.List;
     if (!AndroidVersionUtil.hasM()) {
       return;
     }
-    requestPermission(obj, "", requestCode, permission);
+    requestPermission(obj, requestCode, "", permission);
   }
 
   /**
@@ -53,7 +53,7 @@ import java.util.List;
    *
    * @param hint 如果框对话框包含”不再询问“选择框的时候的提示用语。
    */
-  public void requestPermission(Object obj, String hint, int requestCode, String... permission) {
+  public void requestPermission(Object obj, int requestCode, String hint, String... permission) {
     if (!AndroidVersionUtil.hasM() || permission == null || permission.length == 0) {
       return;
     }
@@ -72,12 +72,12 @@ import java.util.List;
       for (String str : permission) {
         if (fragment != null) {
           if (fragment.shouldShowRequestPermissionRationale(str)) {
-            T.showShort(fragment.getContext(), hint);
+            T.showLong(fragment.getContext(), hint);
             break;
           }
         } else {
           if (activity.shouldShowRequestPermissionRationale(str)) {
-            T.showShort(activity, hint);
+            T.showLong(activity, hint);
             break;
           }
         }

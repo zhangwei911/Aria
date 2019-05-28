@@ -3,13 +3,15 @@ package com.arialyy.frame.cache;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
+
 import com.arialyy.frame.util.DrawableUtil;
 import com.arialyy.frame.util.show.L;
 import com.google.gson.Gson;
+
 import java.io.UnsupportedEncodingException;
 
 /**
- * Created by “AriaLyy@outlook.com” on 2015/4/9.
+ * Created by AriaLyy on 2015/4/9.
  * 缓存工具
  */
 public class CacheUtil extends AbsCache {
@@ -17,32 +19,28 @@ public class CacheUtil extends AbsCache {
 
   /**
    * 默认使用默认路径
+   *
+   * @param useMemory 是否使用内存缓存
    */
-  private CacheUtil(Context context) {
-    this(context, DEFAULT_DIR);
+  public CacheUtil(Context context, boolean useMemory) {
+    super(context, useMemory);
   }
 
   /**
    * 指定缓存文件夹
    *
-   * @param cacheDir 缓存文件夹名
+   * @param useMemory 是否使用内存缓存
+   * @param cacheDir 缓存文件夹
    */
-  private CacheUtil(Context context, @NonNull String cacheDir) {
-    super(context, cacheDir);
+  public CacheUtil(Context context, boolean useMemory, @NonNull String cacheDir) {
+    super(context, useMemory, cacheDir);
   }
 
   /**
-   * 是否使用内存缓存
+   * 设置是否使用内存缓存
    */
-  private void setUseMemoryCache(boolean openMemoryCache) {
-    setUseMemory(openMemoryCache);
-  }
-
-  /**
-   * 是否使用磁场缓存
-   */
-  private void setUseDiskCache(boolean openDiskCache) {
-    setUseMemory(openDiskCache);
+  public void setUseMemoryCache(boolean useMemoryCache) {
+    setUseMemory(useMemoryCache);
   }
 
   /**
@@ -180,15 +178,14 @@ public class CacheUtil extends AbsCache {
   /**
    * 删除所有缓存
    */
-  public void clearCache() {
-    super.clearCache();
+  public void removeAll() {
+    clearCache();
   }
 
   /**
    * 关闭磁盘缓存
    */
   public void close() {
-    closeMemoryCache();
     closeDiskCache();
   }
 
@@ -197,66 +194,5 @@ public class CacheUtil extends AbsCache {
    */
   public long getCacheSize() {
     return super.getCacheSize();
-  }
-
-  public static class Builder {
-    boolean openDiskCache = false;
-    boolean openMemoryCache = false;
-    String cacheDirName = DEFAULT_DIR;
-    long diskCacheSize = NORMAL_DISK_CACHE_CAPACITY;
-    int memoryCacheSize = MEMORY_CACHE_SIZE;
-    Context context;
-
-    public Builder(Context context) {
-      this.context = context;
-    }
-
-    /**
-     * 打开磁盘缓存
-     */
-    public Builder openDiskCache() {
-      openDiskCache = true;
-      return this;
-    }
-
-    /**
-     * 打开内存缓存
-     */
-    public Builder openMemoryCache() {
-      openMemoryCache = true;
-      return this;
-    }
-
-    /**
-     * 缓存文件夹名，只需要写文件夹名
-     */
-    public Builder setCacheDirName(String cacheDirName) {
-      this.cacheDirName = cacheDirName;
-      return this;
-    }
-
-    /**
-     * 设置磁盘缓存大小
-     */
-    public Builder setDiskCacheSize(long cacheSize) {
-      this.diskCacheSize = cacheSize;
-      return this;
-    }
-
-    /**
-     * 设置内存缓存大小
-     */
-    public Builder setMemoryCacheSize(int cacheSize) {
-      this.memoryCacheSize = cacheSize;
-      return this;
-    }
-
-    public CacheUtil build() {
-      CacheUtil util = new CacheUtil(context);
-      util.setUseMemoryCache(openMemoryCache);
-      util.setUseDiskCache(openDiskCache);
-      util.setMemoryCacheSize(memoryCacheSize);
-      return new CacheUtil(context, cacheDirName);
-    }
   }
 }

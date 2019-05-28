@@ -36,7 +36,7 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 
 /**
- * Created by “AriaLyy@outlook.com” on 2015/11/5.
+ * Created by lyy on 2015/11/5.
  * 网络连接工具
  */
 public class HttpUtil {
@@ -56,7 +56,7 @@ public class HttpUtil {
 
   private HttpUtil(Context context) {
     mContext = context;
-    mCacheUtil = new CacheUtil.Builder(context).openDiskCache().build();
+    mCacheUtil = new CacheUtil(mContext, false);
     mHandler = new Handler(Looper.getMainLooper());
   }
 
@@ -110,10 +110,12 @@ public class HttpUtil {
    * @param key 上传文件键值
    */
   public void uploadFile(@NonNull final String url, @NonNull final String filePath,
-      @NonNull final String key, final String contentType, final Map<String, String> header,
+      @NonNull final String key,
+      final String contentType, final Map<String, String> header,
       @NonNull final IResponse absResponse) {
     new Thread(new Runnable() {
-      @Override public void run() {
+      @Override
+      public void run() {
         File file = new File(filePath);
         String BOUNDARY = UUID.randomUUID().toString(); // 边界标识 随机生成
         String PREFIX = "--", LINE_END = "\r\n";
@@ -131,9 +133,10 @@ public class HttpUtil {
           conn.setRequestProperty("Content-Type", CONTENT_TYPE + ";boundary=" + BOUNDARY);
 
           if (header != null && header.size() > 0) {
-            Set<String> keys = header.keySet();
-            for (String key : keys) {
-              conn.setRequestProperty(key, header.get(key));
+            Set set = header.entrySet();
+            for (Object aSet : set) {
+              Map.Entry entry = (Map.Entry) aSet;
+              conn.setRequestProperty(entry.getKey() + "", entry.getValue() + "");
             }
           }
           OutputStream outputSteam = conn.getOutputStream();
@@ -193,12 +196,13 @@ public class HttpUtil {
     L.v(TAG, "请求链接 >>>> " + url);
     String requestUrl = url;
     if (params != null && params.size() > 0) {
-      Set<String> keys = params.keySet();
+      Set set = params.entrySet();
       int i = 0;
       requestUrl += "?";
-      for (String key : keys) {
+      for (Object aSet : set) {
         i++;
-        requestUrl += key + "=" + params.get(key) + (i < params.size() ? "&" : "");
+        Map.Entry entry = (Map.Entry) aSet;
+        requestUrl += entry.getKey() + "=" + entry.getValue() + (i < params.size() ? "&" : "");
       }
       L.v(TAG, "请求参数为 >>>> ");
       L.m(params);
@@ -213,7 +217,8 @@ public class HttpUtil {
 
     //请求加入调度
     call.enqueue(new Callback() {
-      @Override public void onFailure(Call call, IOException e) {
+      @Override
+      public void onFailure(Call call, IOException e) {
         L.e(TAG, "请求链接【" + url + "】失败");
         String data = null;
         if (useCache) {
@@ -228,7 +233,8 @@ public class HttpUtil {
         }
       }
 
-      @Override public void onResponse(Call call, Response response) throws IOException {
+      @Override
+      public void onResponse(Call call, Response response) throws IOException {
         String data = response.body().string();
         L.d(TAG, "数据获取成功，获取到的数据为 >>>> ");
         L.j(data);
@@ -256,18 +262,20 @@ public class HttpUtil {
     //头数据
     Headers.Builder hb = new Headers.Builder();
     if (header != null && header.size() > 0) {
-      Set<String> keys = header.keySet();
-      for (String key : keys) {
-        hb.add(key, header.get(key));
+      Set set = header.entrySet();
+      for (Object aSet : set) {
+        Map.Entry entry = (Map.Entry) aSet;
+        hb.add(entry.getKey() + "", entry.getValue() + "");
       }
       L.v(TAG, "请求的头数据为 >>>> ");
       L.m(header);
     }
     //请求参数
     if (params != null && params.size() > 0) {
-      Set<String> keys = params.keySet();
-      for (String key : keys) {
-        formB.add(key, params.get(key));
+      Set set = params.entrySet();
+      for (Object aSet : set) {
+        Map.Entry entry = (Map.Entry) aSet;
+        formB.add(entry.getKey() + "", entry.getValue() + "");
       }
       L.v(TAG, "请求参数为 >>>> ");
       L.m(params);
@@ -279,7 +287,8 @@ public class HttpUtil {
         new Request.Builder().url(url).post(formB.build()).headers(hb.build()).build();
     Call call = client.newCall(request);
     call.enqueue(new Callback() {
-      @Override public void onFailure(Call call, IOException e) {
+      @Override
+      public void onFailure(Call call, IOException e) {
         L.e(TAG, "请求链接【" + url + "】失败");
         String data = null;
         if (useCache) {
@@ -294,7 +303,8 @@ public class HttpUtil {
         }
       }
 
-      @Override public void onResponse(Call call, Response response) throws IOException {
+      @Override
+      public void onResponse(Call call, Response response) throws IOException {
         String data = response.body().string();
         L.d(TAG, "数据获取成功，获取到的数据为 >>>>");
         L.j(data);
@@ -309,7 +319,8 @@ public class HttpUtil {
 
   private void setOnError(final Object error, final IResponse response) {
     mHandler.post(new Runnable() {
-      @Override public void run() {
+      @Override
+      public void run() {
         response.onError(error);
       }
     });
@@ -317,7 +328,8 @@ public class HttpUtil {
 
   private void setOnResponse(final String data, final IResponse response) {
     mHandler.post(new Runnable() {
-      @Override public void run() {
+      @Override
+      public void run() {
         response.onResponse(data);
       }
     });
@@ -328,11 +340,13 @@ public class HttpUtil {
    */
   public static class AbsResponse implements IResponse {
 
-    @Override public void onResponse(String data) {
+    @Override
+    public void onResponse(String data) {
 
     }
 
-    @Override public void onError(Object error) {
+    @Override
+    public void onError(Object error) {
 
     }
   }

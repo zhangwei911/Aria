@@ -2,11 +2,13 @@ package com.arialyy.frame.core;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Looper;
 import android.text.TextUtils;
 
 import com.arialyy.frame.http.HttpUtil;
+import com.arialyy.frame.permission.PermissionManager;
 import com.arialyy.frame.util.AndroidUtils;
 import com.arialyy.frame.util.CalendarUtils;
 import com.arialyy.frame.util.FileUtil;
@@ -64,7 +66,8 @@ final class CrashHandler implements Thread.UncaughtExceptionHandler {
     mPramKey = key;
   }
 
-  @Override public void uncaughtException(Thread thread, Throwable ex) {
+  @Override
+  public void uncaughtException(Thread thread, Throwable ex) {
     if (!handleException(ex) && mDefaultHandler != null) {
       mDefaultHandler.uncaughtException(thread, ex);
     } else {
@@ -90,7 +93,8 @@ final class CrashHandler implements Thread.UncaughtExceptionHandler {
     }
     //在这里处理崩溃逻辑,将不再显示FC对话框
     new Thread() {
-      @Override public void run() {
+      @Override
+      public void run() {
         Looper.prepare();
         T.showLong(mContext, "很抱歉，程序出现异常，即将退出");
         Looper.loop();
@@ -111,8 +115,8 @@ final class CrashHandler implements Thread.UncaughtExceptionHandler {
     info.systemVersionCode = Build.VERSION.SDK_INT;
     info.phoneModel = Build.MODEL;
     info.exceptionMsg = FL.getExceptionString(ex);
-    if (AndroidUtils.checkPermission(mContext, Manifest.permission.INTERNET)
-        && AndroidUtils.checkPermission(mContext, Manifest.permission.ACCESS_NETWORK_STATE)) {
+    if (AndroidUtils.checkPermission(mContext, Manifest.permission.INTERNET) &&
+        AndroidUtils.checkPermission(mContext, Manifest.permission.ACCESS_NETWORK_STATE)) {
       if (NetUtils.isConnected(mContext) && !TextUtils.isEmpty(mServerHost) && !TextUtils.isEmpty(
           mPramKey)) {
         String objStr = new Gson().toJson(info);

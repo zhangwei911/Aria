@@ -42,6 +42,11 @@
     <activity android:name=".core.upload.HttpUploadActivity"/>
     <activity android:name=".core.upload.FtpUploadActivity"/>
     <activity android:name=".core.download.KotlinDownloadActivity"/>
+    <activity
+        android:name=".core.FullScreenCodeActivity"
+        android:theme="@style/FullScreen"
+        android:screenOrientation="landscape"
+        android:windowSoftInputMode="stateHidden|adjustResize"/>
 
     <service android:name=".core.download.service_download.DownloadService"/>
 

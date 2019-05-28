@@ -21,6 +21,7 @@ import android.databinding.BindingAdapter;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.DrawableRes;
 import android.support.v7.widget.AppCompatImageView;
+import android.text.Html;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
@@ -78,7 +79,7 @@ public class SvgTextView extends RelativeLayout {
     icon.setImageResource(drawable);
   }
 
-  public void setText(CharSequence text) {
-    textView.setText(text);
+  public void setText(String text) {
+    textView.setText(Html.fromHtml(text));
   }
 }

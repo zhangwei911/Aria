@@ -29,7 +29,6 @@ import com.arialyy.frame.util.show.L;
 
 import java.lang.reflect.Field;
 
-
 /**
  * Created by lyy on 2015/11/4.
  * 基础Fragment

@@ -99,7 +99,15 @@ public class DownloadEntity extends AbsNormalEntity implements Parcelable {
     this.groupHash = groupHash;
   }
 
+  /**
+   * 后面会删除该方法，请使用{@link #getFilePath()}
+   */
+  @Deprecated
   public String getDownloadPath() {
+    return downloadPath;
+  }
+
+  public String getFilePath() {
     return downloadPath;
   }
 

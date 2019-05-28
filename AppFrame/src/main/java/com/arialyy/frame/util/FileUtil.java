@@ -1,17 +1,19 @@
 package com.arialyy.frame.util;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
+import android.media.MediaMetadataRetriever;
+import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
-
 import com.arialyy.frame.util.show.FL;
 import com.arialyy.frame.util.show.L;
-
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -29,6 +31,8 @@ import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Enumeration;
+import java.util.Formatter;
+import java.util.Locale;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -40,10 +44,21 @@ public class FileUtil {
   private static final String MB = "MB";
   private static final String GB = "GB";
 
-  private FileUtil() {
-  }
-
   private static final String TAG = "FileUtil";
+
+  //android获取一个用于打开HTML文件的intent
+  public static Intent getHtmlFileIntent(String Path) {
+    File file = new File(Path);
+    Uri uri = Uri.parse(file.toString())
+        .buildUpon()
+        .encodedAuthority("com.android.htmlfileprovider")
+        .scheme("content")
+        .encodedPath(file.toString())
+        .build();
+    Intent intent = new Intent("android.intent.action.VIEW");
+    intent.setDataAndType(uri, "text/html");
+    return intent;
+  }
 
   /**
    * 获取文件夹大小
@@ -465,8 +480,8 @@ public class FileUtil {
     if (dir.isDirectory()) {
       String[] children = dir.list();
       // 递归删除目录中的子目录下
-      for (int i = 0; i < children.length; i++) {
-        boolean success = deleteDir(new File(dir, children[i]));
+      for (String aChildren : children) {
+        boolean success = deleteDir(new File(dir, aChildren));
         if (!success) {
           return false;
         }

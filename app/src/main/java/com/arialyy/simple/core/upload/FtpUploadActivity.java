@@ -15,11 +15,11 @@
  */
 package com.arialyy.simple.core.upload;
 
+import android.arch.lifecycle.Observer;
 import android.content.Intent;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.support.v4.content.FileProvider;
+import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.View;
 import com.arialyy.annotations.Upload;
@@ -28,38 +28,64 @@ import com.arialyy.aria.core.common.ftp.FtpInterceptHandler;
 import com.arialyy.aria.core.common.ftp.IFtpUploadInterceptor;
 import com.arialyy.aria.core.upload.UploadEntity;
 import com.arialyy.aria.core.upload.UploadTask;
+import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
 import com.arialyy.frame.util.FileUtil;
 import com.arialyy.frame.util.show.T;
-import com.arialyy.simple.BuildConfig;
 import com.arialyy.simple.R;
 import com.arialyy.simple.base.BaseActivity;
 import com.arialyy.simple.common.ModifyUrlDialog;
 import com.arialyy.simple.databinding.ActivityFtpUploadBinding;
+import com.arialyy.simple.util.AppUtil;
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
+import android.arch.lifecycle.ViewModelProviders;
 
 /**
  * Created by lyy on 2017/7/28. Ftp 文件上传demo
  */
 public class FtpUploadActivity extends BaseActivity<ActivityFtpUploadBinding> {
   private final int OPEN_FILE_MANAGER_CODE = 0xB1;
-  private String mFilePath = "/mnt/sdcard/AriaPrj.rar";
-  private String mUrl = "ftp://9.9.9.205:2121/aa/你好";
+  private String mFilePath;
+  private String mUrl;
+  private UploadModule mModule;
 
   @Override protected void init(Bundle savedInstanceState) {
     setTile("D_FTP 文件上传");
     super.init(savedInstanceState);
     Aria.upload(this).register();
-    UploadEntity entity = Aria.upload(this).getUploadEntity(mFilePath);
-    if (entity != null) {
-      getBinding().setFileSize(CommonUtil.formatFileSize(entity.getFileSize()));
-      getBinding().setProgress(entity.isComplete() ? 100
-          : (int) (entity.getCurrentProgress() * 100 / entity.getFileSize()));
-    }
-    getBinding().setUrl(mUrl);
-    getBinding().setFilePath(mFilePath);
+
     getBinding().setViewModel(this);
+    setUI();
+  }
+
+  private void setUI() {
+    mModule = ViewModelProviders.of(this).get(UploadModule.class);
+    mModule.getFtpInfo(this).observe(this, new Observer<UploadEntity>() {
+      @Override public void onChanged(@Nullable UploadEntity entity) {
+        if (entity != null) {
+          if (entity.getFileSize() != 0) {
+            getBinding().setFileSize(CommonUtil.formatFileSize(entity.getFileSize()));
+            getBinding().setProgress(entity.isComplete() ? 100
+                : (int) (entity.getCurrentProgress() * 100 / entity.getFileSize()));
+          }
+          getBinding().setUrl(entity.getUrl());
+          getBinding().setFilePath(entity.getFilePath());
+          mUrl = entity.getUrl();
+          mFilePath = entity.getFilePath();
+        }
+      }
+    });
+    setHelpCode();
+  }
+
+  private void setHelpCode() {
+    try {
+      getBinding().codeView.setSource(AppUtil.getHelpCode(this, "FtpUpload.java"));
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
   }
 
   @Override protected int setLayoutId() {
@@ -73,23 +99,7 @@ public class FtpUploadActivity extends BaseActivity<ActivityFtpUploadBinding> {
   }
 
   public void chooseFilePath() {
-
-    File parentFile = new File(mFilePath);
-    Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-    Uri uri;
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-      uri = FileProvider.getUriForFile(this,
-          BuildConfig.APPLICATION_ID + ".provider",
-          parentFile.getParentFile());
-    } else {
-      uri = Uri.fromFile(parentFile.getParentFile());
-    }
-
-    intent.setDataAndType(uri, "*/*");
-    intent.addCategory(Intent.CATEGORY_OPENABLE);
-    intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-
-    startActivityForResult(intent, OPEN_FILE_MANAGER_CODE);
+    AppUtil.chooseFile(this, new File(mFilePath), null, OPEN_FILE_MANAGER_CODE);
   }
 
   public void onClick(View view) {
@@ -169,8 +179,7 @@ public class FtpUploadActivity extends BaseActivity<ActivityFtpUploadBinding> {
   @Override protected void dataCallback(int result, Object data) {
     super.dataCallback(result, data);
     if (result == ModifyUrlDialog.MODIFY_URL_DIALOG_RESULT) {
-      mUrl = String.valueOf(data);
-      getBinding().setUrl(mUrl);
+      mModule.updateFtpUrl(this, String.valueOf(data));
     }
   }
 
@@ -178,7 +187,12 @@ public class FtpUploadActivity extends BaseActivity<ActivityFtpUploadBinding> {
     super.onActivityResult(requestCode, resultCode, data);
     if (requestCode == OPEN_FILE_MANAGER_CODE && resultCode == RESULT_OK) {
       Uri uri = data.getData();
-      //Toast.makeText(this, "文件路径：" + uri.getPath(), Toast.LENGTH_SHORT).show();
+      if (uri != null) {
+        mModule.updateFtpFilePath(this, uri.getPath());
+        ALog.d(TAG, String.format("选择的文件路径：%s", uri.getPath()));
+      } else {
+        ALog.d(TAG, "没有选择文件");
+      }
     }
   }
 }

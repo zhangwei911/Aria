@@ -1,13 +1,22 @@
 package com.arialyy.frame.module;
 
 import android.content.Context;
-
 import android.databinding.ViewDataBinding;
+import android.text.TextUtils;
+import android.util.SparseIntArray;
+import android.view.View;
+
 import com.arialyy.frame.core.AbsActivity;
 import com.arialyy.frame.core.BindingFactory;
 import com.arialyy.frame.module.inf.ModuleListener;
+import com.arialyy.frame.util.ObjUtil;
 import com.arialyy.frame.util.StringUtil;
 import com.arialyy.frame.util.show.L;
+
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by AriaLyy on 2015/2/3.
@@ -46,7 +55,9 @@ public class AbsModule {
    * @param moduleListener Module监听
    */
   public void setModuleListener(ModuleListener moduleListener) {
-    if (moduleListener == null) throw new NullPointerException("ModuleListener不能为空");
+      if (moduleListener == null) {
+          throw new NullPointerException("ModuleListener不能为空");
+      }
     this.mModuleListener = moduleListener;
   }
 
@@ -126,7 +137,8 @@ public class AbsModule {
    *
    * @param method 回调的方法名
    */
-  @Deprecated protected void callback(String method) {
+  @Deprecated
+  protected void callback(String method) {
     mModuleListener.callback(method);
   }
 
@@ -137,7 +149,8 @@ public class AbsModule {
    * @param dataClassType 回调数据类型
    * @param data 回调数据
    */
-  @Deprecated protected void callback(String method, Class<?> dataClassType, Object data) {
+  @Deprecated
+  protected void callback(String method, Class<?> dataClassType, Object data) {
     mModuleListener.callback(method, dataClassType, data);
   }
 }

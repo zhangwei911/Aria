@@ -9,11 +9,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.PopupWindow;
-
 import com.arialyy.frame.module.AbsModule;
 import com.arialyy.frame.module.IOCProxy;
 import com.arialyy.frame.util.StringUtil;
-
 
 /**
  * Created by lyy on 2015/12/3.
@@ -22,7 +20,7 @@ import com.arialyy.frame.util.StringUtil;
 public abstract class AbsPopupWindow extends PopupWindow {
 
   protected String TAG;
-  private static Context mContext;
+  private Context mContext;
   private Drawable mBackground;
   protected View mView;
   private Object mObj;
@@ -62,14 +60,14 @@ public abstract class AbsPopupWindow extends PopupWindow {
     TAG = StringUtil.getClassName(this);
     // 设置SelectPicPopupWindow弹出窗体的宽
     setWidth(ViewGroup.LayoutParams.MATCH_PARENT);
-    // 设置SelectPicPopupWindow弹出窗体的高
-    setHeight(ViewGroup.LayoutParams.MATCH_PARENT);
+    //// 设置SelectPicPopupWindow弹出窗体的高
+    setHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
     setFocusable(true);
     // 设置SelectPicPopupWindow弹出窗体动画效果
     //        setAnimationStyle(R.style.wisdom_anim_style);
     // 实例化一个ColorDrawable颜色为半透明
     if (mBackground == null) {
-      mBackground = new ColorDrawable(Color.parseColor("#7f000000"));
+      mBackground = new ColorDrawable(Color.parseColor("#4f000000"));
     }
     // 设置SelectPicPopupWindow弹出窗体的背景
     setBackgroundDrawable(mBackground);

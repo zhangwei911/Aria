@@ -8,6 +8,7 @@ import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+
 import com.arialyy.frame.module.AbsModule;
 import com.arialyy.frame.module.IOCProxy;
 import com.arialyy.frame.temp.AbsTempView;
@@ -17,25 +18,26 @@ import com.arialyy.frame.util.StringUtil;
 import com.arialyy.frame.util.show.T;
 
 /**
- * Created by “AriaLyy@outlook.com” on 2015/11/3.
+ * Created by lyy on 2015/11/3.
  * 所有的 Activity都应该继承这个类
  */
 public abstract class AbsActivity<VB extends ViewDataBinding> extends AppCompatActivity
     implements OnTempBtClickListener {
   protected String TAG = "";
-  protected AbsFrame mAm;
-  protected View mRootView;
-  protected AbsTempView mTempView;
-  protected boolean useTempView = true;
   private VB mBind;
   private IOCProxy mProxy;
   /**
    * 第一次点击返回的系统时间
    */
   private long mFirstClickTime = 0;
+  protected AbsFrame mAm;
+  protected View mRootView;
   private ModuleFactory mModuleF;
+  protected AbsTempView mTempView;
+  protected boolean useTempView = true;
 
-  @Override protected void onCreate(Bundle savedInstanceState) {
+  @Override
+  protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     initialization();
     init(savedInstanceState);
@@ -52,12 +54,6 @@ public abstract class AbsActivity<VB extends ViewDataBinding> extends AppCompatA
     if (useTempView) {
       mTempView = new TempView(this);
       mTempView.setBtListener(this);
-    }
-  }
-
-  protected void reNewModule() {
-    if (mModuleF == null) {
-      mModuleF = ModuleFactory.newInstance();
     }
   }
 
@@ -115,7 +111,8 @@ public abstract class AbsActivity<VB extends ViewDataBinding> extends AppCompatA
    */
   protected void hintTempView(int delay) {
     new Handler().postDelayed(new Runnable() {
-      @Override public void run() {
+      @Override
+      public void run() {
         if (mTempView == null || !useTempView) {
           return;
         }
@@ -126,11 +123,13 @@ public abstract class AbsActivity<VB extends ViewDataBinding> extends AppCompatA
     }, delay);
   }
 
-  @Override public void onBtTempClick(View view, int type) {
+  @Override
+  public void onBtTempClick(View view, int type) {
 
   }
 
-  @Override protected void onDestroy() {
+  @Override
+  protected void onDestroy() {
     super.onDestroy();
   }
 
@@ -138,7 +137,8 @@ public abstract class AbsActivity<VB extends ViewDataBinding> extends AppCompatA
 
   }
 
-  @Override public void finish() {
+  @Override
+  public void finish() {
     super.finish();
     mAm.removeActivity(this);
   }
@@ -228,13 +228,15 @@ public abstract class AbsActivity<VB extends ViewDataBinding> extends AppCompatA
     mAm.exitApp(false);
   }
 
-  @Override public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+  @Override
+  public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
       @NonNull int[] grantResults) {
     super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     PermissionHelp.getInstance().handlePermissionCallback(requestCode, permissions, grantResults);
   }
 
-  @Override protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+  @Override
+  protected void onActivityResult(int requestCode, int resultCode, Intent data) {
     super.onActivityResult(requestCode, resultCode, data);
     PermissionHelp.getInstance()
         .handleSpecialPermissionCallback(this, requestCode, resultCode, data);

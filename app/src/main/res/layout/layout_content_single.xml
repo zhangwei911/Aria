@@ -96,12 +96,5 @@
           />
     </LinearLayout>
 
-    <TextView
-        android:id="@+id/speed_hint"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/handle_bar"
-        />
-
   </RelativeLayout>
 </layout>

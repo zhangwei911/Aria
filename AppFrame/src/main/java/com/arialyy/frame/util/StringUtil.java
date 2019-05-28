@@ -276,7 +276,7 @@ public class StringUtil {
   public static double strToDouble(String str) {
     // double d = Double.parseDouble(str);
 
-		/* 以下代码处理精度问题 */
+    /* 以下代码处理精度问题 */
     BigDecimal bDeci = new BigDecimal(str);
     // BigDecimal chushu =new BigDecimal(100000000);
     // BigDecimal result =bDeci.divide(chushu,new

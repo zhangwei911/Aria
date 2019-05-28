@@ -13,8 +13,9 @@ public class RegularExpression {
   /**
    * 视频
    */
-  public static String VIDEO = "^(.*)\\.(mpeg-4|h.264|h.265|rmvb|xvid|vp6|h.263|mpeg-1|mpeg-2|avi|"
-      + "mov|mkv|flv|3gp|3g2|asf|wmv|mp4|m4v|tp|ts|mtp|m2t)$";
+  public static String VIDEO =
+      "^(.*)\\.(mpeg-4|h.264|h.265|rmvb|xvid|vp6|h.263|mpeg-1|mpeg-2|avi|" +
+          "mov|mkv|flv|3gp|3g2|asf|wmv|mp4|m4v|tp|ts|mtp|m2t)$";
   /**
    * 音频
    */

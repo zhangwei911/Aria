@@ -1,9 +1,9 @@
 package com.arialyy.frame.core;
 
-
 import android.databinding.ViewDataBinding;
+
+import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created by lyy on 2016/9/16.
@@ -12,7 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class BindingFactory {
   private final String TAG = "BindingFactory";
 
-  private Map<Integer, ViewDataBinding> mBindings = new ConcurrentHashMap<>();
+  private Map<Integer, ViewDataBinding> mBindings = new HashMap<>();
 
   private BindingFactory() {
 

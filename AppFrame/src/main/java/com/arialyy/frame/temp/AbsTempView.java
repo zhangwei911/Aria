@@ -10,7 +10,6 @@ import android.widget.LinearLayout;
 import com.arialyy.frame.util.StringUtil;
 import com.arialyy.frame.util.show.L;
 
-
 /**
  * Created by lyy on 2016/4/27.
  * 抽象的填充类
@@ -57,7 +56,8 @@ public abstract class AbsTempView extends LinearLayout implements ITempView {
     }
   }
 
-  @Override public void setType(int type) {
+  @Override
+  public void setType(int type) {
     mType = type;
     if (type == LOADING) {
       onLoading();

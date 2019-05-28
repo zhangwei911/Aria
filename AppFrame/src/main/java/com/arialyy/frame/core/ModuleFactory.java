@@ -8,7 +8,6 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created by lyy on 2015/8/31.
@@ -18,7 +17,7 @@ public class ModuleFactory {
 
   private final String TAG = "ModuleFactory";
 
-  private Map<Integer, AbsModule> mModules = new ConcurrentHashMap<>();
+  private Map<Integer, AbsModule> mModules = new HashMap<>();
 
   private ModuleFactory() {
 
@@ -50,7 +49,6 @@ public class ModuleFactory {
     Object[] params = { context };
     try {
       Constructor<T> con = clazz.getConstructor(paramTypes);
-      con.setAccessible(true);
       T module = con.newInstance(params);
       mModules.put(clazz.hashCode(), module);
       return module;

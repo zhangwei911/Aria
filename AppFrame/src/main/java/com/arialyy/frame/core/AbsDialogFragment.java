@@ -18,6 +18,7 @@ import com.arialyy.frame.module.IOCProxy;
 import com.arialyy.frame.util.StringUtil;
 import com.lyy.frame.R;
 
+
 /**
  * Created by lyy on 2015/11/4.
  * DialogFragment
@@ -61,15 +62,15 @@ public abstract class AbsDialogFragment<VB extends ViewDataBinding> extends Dial
     return mRootView;
   }
 
-  public <V extends View> V findViewById(@IdRes int id) {
-    return mRootView.findViewById(id);
-  }
-
   @Override public void onAttach(Activity activity) {
     super.onAttach(activity);
     if (activity instanceof AbsActivity) {
       mActivity = (AbsActivity) activity;
     }
+  }
+
+  public <T extends View> T findViewById(@IdRes int id){
+    return mRootView.findViewById(id);
   }
 
   private void initFragment() {

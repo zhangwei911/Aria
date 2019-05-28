@@ -43,9 +43,11 @@ public abstract class BaseActivity<VB extends ViewDataBinding> extends AbsActivi
   @Override protected void init(Bundle savedInstanceState) {
     super.init(savedInstanceState);
     mBar = findViewById(R.id.toolbar);
-    setSupportActionBar(mBar);
-    getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-    mBar.setOnMenuItemClickListener(this);
+    if (mBar != null) {
+      setSupportActionBar(mBar);
+      getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+      mBar.setOnMenuItemClickListener(this);
+    }
   }
 
   protected void setTile(String title) {

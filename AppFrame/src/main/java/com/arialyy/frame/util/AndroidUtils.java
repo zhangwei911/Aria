@@ -1,11 +1,8 @@
 package com.arialyy.frame.util;
 
-import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.ActivityManager;
-import android.app.AlarmManager;
-import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -21,13 +18,14 @@ import android.os.Environment;
 import android.os.StatFs;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.FileProvider;
 import android.telephony.TelephonyManager;
-import android.text.format.Formatter;
 import android.util.DisplayMetrics;
 import android.view.WindowManager;
+
 import com.arialyy.frame.util.show.FL;
 import com.arialyy.frame.util.show.L;
+
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.File;
@@ -48,35 +46,18 @@ public class AndroidUtils {
 
   }
 
-  private static final float DENSITY = Resources.getSystem().getDisplayMetrics().density;
-
-  // 获得机身可用内存
-  public static String getRomAvailableSize(Context context) {
-    File path = Environment.getDataDirectory();
-    StatFs stat = new StatFs(path.getPath());
-    long blockSize = stat.getBlockSize();
-    long availableBlocks = stat.getAvailableBlocks();
-    return Formatter.formatFileSize(context, blockSize * availableBlocks);
-  }
-
   /**
-   * 重启app
+   * 应用市场是否存在
+   *
+   * @return {@code true}存在
    */
-  public static void reStartApp(Context context) {
-    Intent intent = context.getPackageManager()
-        .getLaunchIntentForPackage(context.getPackageName());
-    PendingIntent restartIntent =
-        PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_ONE_SHOT);
-    AlarmManager mgr = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-    mgr.set(AlarmManager.RTC, System.currentTimeMillis() + 1000, restartIntent); // 1秒钟后重启应用
-    System.exit(0);
-  }
+  public static boolean hasAnyMarket(Context context) {
+    Intent intent = new Intent();
+    intent.setData(Uri.parse("market://details?id=android.browser"));
+    List list = context.getPackageManager()
+        .queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY);
 
-  /**
-   * 另外一种dp转PX方法
-   */
-  public static int dp2px(int dp) {
-    return Math.round(dp * DENSITY);
+    return list != null && list.size() > 0;
   }
 
   /**
@@ -149,6 +130,14 @@ public class AndroidUtils {
   }
 
   /**
+   * 获取未安装软件包的包名
+   */
+  public static PackageInfo getApkPackageInfo(Context context, String apkPath) {
+    PackageManager pm = context.getPackageManager();
+    return pm.getPackageArchiveInfo(apkPath, PackageManager.GET_ACTIVITIES);
+  }
+
+  /**
    * 判断是否安装
    */
   public static boolean apkIsInstall(Context context, String apkPath) {
@@ -196,8 +185,6 @@ public class AndroidUtils {
   public static void startOtherApp(Context context, String packageName) {
     PackageManager pm = context.getPackageManager();
     Intent launcherIntent = pm.getLaunchIntentForPackage(packageName);
-    launcherIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-    //launcherIntent.addCategory(Intent.CATEGORY_LAUNCHER);
     context.startActivity(launcherIntent);
   }
 
@@ -445,8 +432,8 @@ public class AndroidUtils {
    * 安装APP
    */
   public static void install(Context context, File file) {
-    L.e(TAG, "install Apk:" + file.getName());
-    context.startActivity(getInstallIntent(file));
+    FL.e(TAG, "install Apk:" + file.getName());
+    context.startActivity(getInstallIntent(context, file));
   }
 
   /**
@@ -464,11 +451,18 @@ public class AndroidUtils {
   /**
    * 获取安装应用的Intent
    */
-  public static Intent getInstallIntent(File file) {
+  public static Intent getInstallIntent(Context context, File file) {
     Intent intent = new Intent();
-    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
     intent.setAction(Intent.ACTION_VIEW);
-    intent.setDataAndType(Uri.fromFile(file), "application/vnd.android.package-archive");
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+      intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+      Uri contentUri =
+          FileProvider.getUriForFile(context, context.getPackageName() + ".fileProvider", file);
+      intent.setDataAndType(contentUri, "application/vnd.android.package-archive");
+    } else {
+      intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+      intent.setDataAndType(Uri.fromFile(file), "application/vnd.android.package-archive");
+    }
     return intent;
   }
 
@@ -516,22 +510,6 @@ public class AndroidUtils {
    */
   public static DisplayMetrics getDisplayMetrics(Context context) {
     return context.getResources().getDisplayMetrics();
-  }
-
-  /**
-   * 获取电话号码
-   */
-  public static String getLocalPhoneNumber(Context context) {
-    if (ActivityCompat.checkSelfPermission(context, Manifest.permission.READ_SMS)
-        != PackageManager.PERMISSION_GRANTED
-        && ActivityCompat.checkSelfPermission(context, Manifest.permission.READ_PHONE_NUMBERS)
-        != PackageManager.PERMISSION_GRANTED
-        && ActivityCompat.checkSelfPermission(context, Manifest.permission.READ_PHONE_STATE)
-        != PackageManager.PERMISSION_GRANTED) {
-      String line1Number = getTelephonyManager(context).getLine1Number();
-      return line1Number == null ? "" : line1Number;
-    }
-    return null;
   }
 
   /**

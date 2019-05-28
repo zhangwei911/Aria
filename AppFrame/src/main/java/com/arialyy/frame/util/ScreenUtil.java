@@ -44,7 +44,8 @@ public class ScreenUtil {
    *
    * @param greyScale true:灰度
    */
-  @TargetApi(Build.VERSION_CODES.HONEYCOMB) public void setGreyScale(View v, boolean greyScale) {
+  @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+  public void setGreyScale(View v, boolean greyScale) {
     if (greyScale) {
       // Create a paint object with 0 saturation (black and white)
       ColorMatrix cm = new ColorMatrix();
@@ -63,7 +64,8 @@ public class ScreenUtil {
    * 获得屏幕高度
    */
   public int getScreenWidth(Context context) {
-    WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+    WindowManager wm = (WindowManager) context
+        .getSystemService(Context.WINDOW_SERVICE);
     DisplayMetrics outMetrics = new DisplayMetrics();
     wm.getDefaultDisplay().getMetrics(outMetrics);
     return outMetrics.widthPixels;
@@ -73,7 +75,8 @@ public class ScreenUtil {
    * 获得屏幕宽度
    */
   public int getScreenHeight(Context context) {
-    WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+    WindowManager wm = (WindowManager) context
+        .getSystemService(Context.WINDOW_SERVICE);
     DisplayMetrics outMetrics = new DisplayMetrics();
     wm.getDefaultDisplay().getMetrics(outMetrics);
     return outMetrics.heightPixels;
@@ -88,7 +91,8 @@ public class ScreenUtil {
     try {
       Class<?> clazz = Class.forName("com.android.internal.R$dimen");
       Object object = clazz.newInstance();
-      int height = Integer.parseInt(clazz.getField("status_bar_height").get(object).toString());
+      int height = Integer.parseInt(clazz.getField("status_bar_height")
+          .get(object).toString());
       statusHeight = context.getResources().getDimensionPixelSize(height);
     } catch (Exception e) {
       e.printStackTrace();
@@ -134,7 +138,8 @@ public class ScreenUtil {
     int width = getScreenWidth(activity);
     int height = getScreenHeight(activity);
     Bitmap bp = null;
-    bp = Bitmap.createBitmap(bmp, 0, statusBarHeight, width, height - statusBarHeight);
+    bp = Bitmap.createBitmap(bmp, 0, statusBarHeight, width, height
+        - statusBarHeight);
     view.destroyDrawingCache();
     return bp;
   }
@@ -145,9 +150,9 @@ public class ScreenUtil {
   public boolean isAutoBrightness(ContentResolver aContentResolver) {
     boolean automicBrightness = false;
     try {
-      automicBrightness =
-          Settings.System.getInt(aContentResolver, Settings.System.SCREEN_BRIGHTNESS_MODE)
-              == Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC;
+      automicBrightness = Settings.System.getInt(aContentResolver,
+          Settings.System.SCREEN_BRIGHTNESS_MODE)
+          == Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC;
     } catch (Settings.SettingNotFoundException e) {
       e.printStackTrace();
     }
@@ -161,7 +166,8 @@ public class ScreenUtil {
     int nowBrightnessValue = 0;
     ContentResolver resolver = activity.getContentResolver();
     try {
-      nowBrightnessValue = Settings.System.getInt(resolver, Settings.System.SCREEN_BRIGHTNESS);
+      nowBrightnessValue = Settings.System.getInt(
+          resolver, Settings.System.SCREEN_BRIGHTNESS);
     } catch (Exception e) {
       e.printStackTrace();
     }
@@ -184,7 +190,8 @@ public class ScreenUtil {
    * 停止自动亮度调节
    */
   public void stopAutoBrightness(Activity activity) {
-    Settings.System.putInt(activity.getContentResolver(), Settings.System.SCREEN_BRIGHTNESS_MODE,
+    Settings.System.putInt(activity.getContentResolver(),
+        Settings.System.SCREEN_BRIGHTNESS_MODE,
         Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL);
   }
 
@@ -192,7 +199,8 @@ public class ScreenUtil {
    * 开启亮度自动调节
    */
   public void startAutoBrightness(Activity activity) {
-    Settings.System.putInt(activity.getContentResolver(), Settings.System.SCREEN_BRIGHTNESS_MODE,
+    Settings.System.putInt(activity.getContentResolver(),
+        Settings.System.SCREEN_BRIGHTNESS_MODE,
         Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC);
   }
 
@@ -200,8 +208,10 @@ public class ScreenUtil {
    * 保存亮度设置状态
    */
   public void saveBrightness(ContentResolver resolver, int brightness) {
-    Uri uri = Settings.System.getUriFor("screen_brightness");
-    Settings.System.putInt(resolver, "screen_brightness", brightness);
+    Uri uri = Settings.System
+        .getUriFor("screen_brightness");
+    Settings.System.putInt(resolver, "screen_brightness",
+        brightness);
     // resolver.registerContentObserver(uri, true, myContentObserver);
     resolver.notifyChange(uri, null);
   }

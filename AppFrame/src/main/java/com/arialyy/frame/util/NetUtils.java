@@ -36,7 +36,7 @@ public class NetUtils {
   public static final int NETWORK_TYPE_WIFI = 4;
 
   private NetUtils() {
-        /* cannot be instantiated */
+    /* cannot be instantiated */
     throw new UnsupportedOperationException("cannot be instantiated");
   }
 
@@ -75,8 +75,9 @@ public class NetUtils {
         netWorkType = NETWORK_TYPE_WIFI;
       } else if (type.equalsIgnoreCase("MOBILE")) {
         String proxyHost = android.net.Proxy.getDefaultHost();
-        netWorkType = TextUtils.isEmpty(proxyHost) ? (isFastMobileNetwork(context) ? NETWORK_TYPE_3G
-            : NETWORK_TYPE_2G) : NETWORK_TYPE_WAP;
+        netWorkType = TextUtils.isEmpty(proxyHost)
+            ? (isFastMobileNetwork(context) ? NETWORK_TYPE_3G : NETWORK_TYPE_2G)
+            : NETWORK_TYPE_WAP;
       }
     } else {
       netWorkType = NETWORK_TYPE_INVALID;

@@ -54,8 +54,7 @@ public class ModuleFactory {
    * @return true : key已经和value对应，false : key没有和value对应
    */
   private boolean checkKey(int key, AbsModule.OnCallback callback) {
-    return mKeyIndex.indexOfKey(key) != -1
-        || mKeyIndex.indexOfValue(callback.hashCode()) != -1
+    return mKeyIndex.indexOfKey(key) != -1 || mKeyIndex.indexOfValue(callback.hashCode()) != -1
         && mKeyIndex.valueAt(callback.hashCode()) == key;
   }
 }

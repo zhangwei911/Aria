@@ -25,7 +25,8 @@ public class DialogSimpleModule extends AbsModule {
   /**
    * 可设置参数和回调名的回调函数
    */
-  @Deprecated public void onDialog(String methodName, Class<?> param, Object data) {
+  @Deprecated
+  public void onDialog(String methodName, Class<?> param, Object data) {
     callback(methodName, param, data);
   }
 
@@ -34,7 +35,8 @@ public class DialogSimpleModule extends AbsModule {
    *
    * @param b 需要回调的数据
    */
-  @Deprecated public void onDialog(Bundle b) {
+  @Deprecated
+  public void onDialog(Bundle b) {
     callback("onDialog", Bundle.class, b);
   }
 }

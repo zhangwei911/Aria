@@ -1,5 +1,5 @@
 apply plugin: 'com.android.library'
-//apply plugin: 'com.neenbedankt.android-apt'
+
 android {
   compileSdkVersion rootProject.ext.compileSdkVersion
   buildToolsVersion rootProject.ext.buildToolsVersion
@@ -7,8 +7,10 @@ android {
   defaultConfig {
     minSdkVersion rootProject.ext.minSdkVersion
     targetSdkVersion rootProject.ext.targetSdkVersion
-    versionCode 61
+    versionCode 1
     versionName "1.0"
+
+    testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
   }
   buildTypes {
     release {
@@ -22,18 +24,25 @@ android {
 }
 
 dependencies {
-  implementation fileTree(include: ['*.jar'], dir: 'libs')
-  testImplementation 'junit:junit:4.12'
-  implementation "com.android.support:appcompat-v7:${rootProject.ext.supportLibVersion}"
-  implementation 'com.google.code.gson:gson:2.7'
-  //    compile 'com.squareup.retrofit2:retrofit:2.1.0'
-  //    compile 'com.squareup.retrofit2:adapter-rxjava:2.1.0'
-  //    compile 'com.squareup.retrofit2:converter-gson:2.1.0'
+  compile fileTree(dir: 'libs', include: ['*.jar'])
+  androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+    exclude group: 'com.android.support', module: 'support-annotations'
+  })
+  testCompile 'junit:junit:4.12'
+  api "com.android.support:appcompat-v7:${rootProject.ext.supportLibVersion}"
+  api 'com.google.code.gson:gson:2.8.2'
+  api 'io.reactivex:rxandroid:1.2.0'
+  api 'io.reactivex:rxjava:1.1.5'
   implementation 'com.squareup.okhttp3:okhttp:3.2.0'
-  //    compile 'com.squareup.okhttp3:logging-interceptor:3.2.0'
-  //    compile 'com.google.dagger:dagger:2.5'
-  //    apt 'com.google.dagger:dagger-compiler:2.5'
-  //    provided 'javax.annotation:jsr250-api:1.0'
-}
+  implementation 'com.squareup.retrofit2:retrofit:2.1.0'
+  implementation 'com.squareup.retrofit2:adapter-rxjava:2.1.0'
+  implementation 'com.squareup.retrofit2:converter-gson:2.1.0'
+  implementation 'com.squareup.okhttp3:logging-interceptor:3.2.0'
+  implementation 'com.github.franmontiel:PersistentCookieJar:v1.0.1'
+  implementation 'com.android.support:multidex:1.0.3'
 
-//apply from: 'jcenter.gradle'
+  api "android.arch.lifecycle:runtime:${rootProject.ext.lifecycleVersion}"
+  api "android.arch.lifecycle:extensions:${rootProject.ext.lifecycleVersion}"
+  annotationProcessor "android.arch.lifecycle:compiler:${rootProject.ext.lifecycleVersion}"
+
+}

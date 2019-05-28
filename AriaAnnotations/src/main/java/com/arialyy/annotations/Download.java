@@ -39,7 +39,7 @@ import java.lang.annotation.Target;
   /**
    * "@Download.onPre"注解，下载队列已经满了，继续创建新任务，将会回调该方法
    */
-  @Retention(RetentionPolicy.CLASS) @Target(ElementType.METHOD) @interface onWait{
+  @Retention(RetentionPolicy.CLASS) @Target(ElementType.METHOD) @interface onWait {
     String[] value() default { AriaConstance.NO_URL };
   }
 
@@ -108,9 +108,11 @@ import java.lang.annotation.Target;
 
   /**
    * "@Download.onNoSupportBreakPoint"注解，如果该任务不支持断点，Aria会调用该方法
+   *
+   * @deprecated 该注解将在后续版本删除
    */
-  @Retention(RetentionPolicy.CLASS) @Target(ElementType.METHOD)
-  @interface onNoSupportBreakPoint {
+  @Deprecated
+  @Retention(RetentionPolicy.CLASS) @Target(ElementType.METHOD) @interface onNoSupportBreakPoint {
     String[] value() default { AriaConstance.NO_URL };
   }
 }

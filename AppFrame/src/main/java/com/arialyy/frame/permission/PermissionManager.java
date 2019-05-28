@@ -85,8 +85,10 @@ import java.util.List;
    * @param obj Activity || Fragment
    * @param permission 权限
    */
-  public void requestPermission(Object obj, OnPermissionCallback callback, String... permission) {
-    requestPermission(obj, "", callback, registerCallback(obj, callback, permission));
+  public PermissionManager requestPermission(Object obj, OnPermissionCallback callback,
+      String... permission) {
+    requestPermissionAndHint(obj, callback, "", registerCallback(obj, callback, permission));
+    return this;
   }
 
   /**
@@ -96,9 +98,9 @@ import java.util.List;
    * @param hint 如果框对话框包含“不再询问”选择框的时候的提示用语。
    * @param permission 权限
    */
-  private void requestPermission(Object obj, String hint, OnPermissionCallback callback,
+  public void requestPermissionAndHint(Object obj, OnPermissionCallback callback, String hint,
       String... permission) {
-    mPu.requestPermission(obj, hint, 0, registerCallback(obj, callback, permission));
+    mPu.requestPermission(obj, 0, hint, registerCallback(obj, callback, permission));
   }
 
   private void registerCallback(OnPermissionCallback callback, int hashCode) {

@@ -50,7 +50,8 @@ public class IOCProxy implements ModuleListener {
    * @param result 返回码
    * @param data 回调数据
    */
-  @Override public void callback(int result, Object data) {
+  @Override
+  public void callback(int result, Object data) {
     synchronized (this) {
       try {
         Method m = ReflectionUtil.getMethod(mObj.getClass(), mMethod, int.class, Object.class);
@@ -69,7 +70,9 @@ public class IOCProxy implements ModuleListener {
    *
    * @param method 方法名
    */
-  @Override @Deprecated public void callback(String method) {
+  @Override
+  @Deprecated
+  public void callback(String method) {
     synchronized (this) {
       try {
         Method m = mObj.getClass().getDeclaredMethod(method);
@@ -93,7 +96,9 @@ public class IOCProxy implements ModuleListener {
    * @param dataClassType 参数类型,如 int.class
    * @param data 数据
    */
-  @Override @Deprecated public void callback(String method, Class<?> dataClassType, Object data) {
+  @Override
+  @Deprecated
+  public void callback(String method, Class<?> dataClassType, Object data) {
     synchronized (this) {
       try {
         Method m = mObj.getClass().getDeclaredMethod(method, dataClassType);

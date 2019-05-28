@@ -9,7 +9,7 @@ import android.util.TypedValue;
  */
 public class DensityUtils {
   private DensityUtils() {
-        /* cannot be instantiated */
+    /* cannot be instantiated */
     throw new UnsupportedOperationException("cannot be instantiated");
   }
 
@@ -26,16 +26,16 @@ public class DensityUtils {
    * dp转px
    */
   public static int dp2px(Context context, float dpVal) {
-    return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dpVal,
-        context.getResources().getDisplayMetrics());
+    return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+        dpVal, context.getResources().getDisplayMetrics());
   }
 
   /**
    * sp转px
    */
   public static int sp2px(Context context, float spVal) {
-    return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, spVal,
-        context.getResources().getDisplayMetrics());
+    return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP,
+        spVal, context.getResources().getDisplayMetrics());
   }
 
   /**

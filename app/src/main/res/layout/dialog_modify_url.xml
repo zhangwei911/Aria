@@ -41,8 +41,9 @@
         android:layout_marginRight="16dp"
         android:layout_marginTop="16dp"
         android:background="@android:color/transparent"
+        android:hint="@string/url_hint"
         android:lineSpacingMultiplier="1.2"
-        android:text="@{text}"
+        android:text="@={text}"
         android:textColor="#000"
         android:textSize="16sp"
         />

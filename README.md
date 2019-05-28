@@ -71,7 +71,7 @@ __注意：3.5.4以下版本升级时，需要更新[配置文件]！！(https:/
   ```java
   Aria.download(this)
       .load(DOWNLOAD_URL)     //读取下载地址
-      .setDownloadPath(DOWNLOAD_PATH) //设置文件保存的完整路径
+      .setFilePath(DOWNLOAD_PATH) //设置文件保存的完整路径
       .start();   //启动下载
   ```
 

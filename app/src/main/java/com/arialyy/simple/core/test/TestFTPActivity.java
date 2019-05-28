@@ -3,9 +3,9 @@ package com.arialyy.simple.core.test;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import com.arialyy.annotations.Upload;
+import com.arialyy.annotations.Download;
 import com.arialyy.aria.core.Aria;
-import com.arialyy.aria.core.upload.UploadTask;
+import com.arialyy.aria.core.download.DownloadTask;
 import com.arialyy.aria.util.CommonUtil;
 import com.arialyy.simple.R;
 import com.arialyy.simple.base.BaseActivity;
@@ -13,16 +13,14 @@ import com.arialyy.simple.databinding.ActivityTestBinding;
 import java.io.File;
 
 /**
- * Created by Administrator on 2018/4/12.
+ * Created by lyy on 2019/5/28.
+ * Ftp 下载
+ * <a href="https://aria.laoyuyu.me/aria_doc/">文档</>
  */
-
 public class TestFTPActivity extends BaseActivity<ActivityTestBinding> {
   String TAG = "TestFTPActivity";
-  //String URL = "http://58.210.9.131/tpk/sipgt//TDLYZTGH.tpk"; //chunked 下载
-  //private final String URL = "ftp://192.168.1.3:21/download//AriaPrj.rar";
-  private final String FILE_PATH = "/mnt/sdcard/mmm.mp4";
-  private final String URL = "ftps://9.9.9.59:990/aa/你好";
-
+  private final String URL = "ftp://192.168.1.3:21/download//AriaPrj.rar";
+  private final String FILE_PATH = "/mnt/sdcard/AriaPrj.rar";
 
   @Override protected int setLayoutId() {
     return R.layout.activity_test;
@@ -31,65 +29,62 @@ public class TestFTPActivity extends BaseActivity<ActivityTestBinding> {
   @Override protected void init(Bundle savedInstanceState) {
     super.init(savedInstanceState);
     mBar.setVisibility(View.GONE);
-    Aria.upload(this).register();
-    Aria.upload(this).setMaxSpeed(128);
+    Aria.download(this).register();
   }
 
-  @Upload.onWait void onWait(UploadTask task) {
+  @Download.onWait void onWait(DownloadTask task) {
     Log.d(TAG, "wait ==> " + task.getEntity().getFileName());
   }
 
-  @Upload.onPre protected void onPre(UploadTask task) {
+  @Download.onPre protected void onPre(DownloadTask task) {
     Log.d(TAG, "onPre");
   }
 
-  @Upload.onTaskStart void taskStart(UploadTask task) {
+  @Download.onTaskStart void taskStart(DownloadTask task) {
     Log.d(TAG, "onStart");
   }
 
-  @Upload.onTaskRunning protected void running(UploadTask task) {
+  @Download.onTaskRunning protected void running(DownloadTask task) {
     Log.d(TAG, "running，speed=" + task.getConvertSpeed());
   }
 
-  @Upload.onTaskResume void taskResume(UploadTask task) {
+  @Download.onTaskResume void taskResume(DownloadTask task) {
     Log.d(TAG, "resume");
   }
 
-  @Upload.onTaskStop void taskStop(UploadTask task) {
+  @Download.onTaskStop void taskStop(DownloadTask task) {
     Log.d(TAG, "stop");
   }
 
-  @Upload.onTaskCancel void taskCancel(UploadTask task) {
+  @Download.onTaskCancel void taskCancel(DownloadTask task) {
     Log.d(TAG, "cancel");
   }
 
-  @Upload.onTaskFail void taskFail(UploadTask task) {
+  @Download.onTaskFail void taskFail(DownloadTask task) {
     Log.d(TAG, "fail");
   }
 
-  @Upload.onTaskComplete void taskComplete(UploadTask task) {
+  @Download.onTaskComplete void taskComplete(DownloadTask task) {
     Log.d(TAG, "complete, md5 => " + CommonUtil.getFileMD5(new File(task.getKey())));
   }
 
   public void onClick(View view) {
     switch (view.getId()) {
       case R.id.start:
-        Aria.upload(this)
-            .loadFtp(FILE_PATH)
+        Aria.download(this)
+            .loadFtp(URL)
+            .setFilePath(FILE_PATH)
             .login("lao", "123456")
-            .setUploadUrl(URL)
-            .asFtps()
-            .setStorePath("/mnt/sdcard/Download/server.crt")
-            .setAlias("www.laoyuyu.me")
+            //.asFtps() // ftps 配置
+            //.setStorePath("/mnt/sdcard/Download/server.crt") //设置证书路径
+            // .setAlias("www.laoyuyu.me") // 设置证书别名
             .start();
-        //Uri uri = Uri.parse("ftp://z:z@dygod18.com:21211/[电影天堂www.dy2018.com]猩球崛起3：终极之战BD国英双语中英双字.mkv");
-        //ALog.d(TAG, "sh = " + uri.getScheme() + ", user = " + uri.getUserInfo() + ", host = " + uri.getHost() + ", port = " + uri.getPort() + " remotePath = " + uri.getPath());
         break;
       case R.id.stop:
-        Aria.upload(this).loadFtp(FILE_PATH).stop();
+        Aria.download(this).loadFtp(FILE_PATH).stop();
         break;
       case R.id.cancel:
-        Aria.upload(this).loadFtp(FILE_PATH).cancel();
+        Aria.download(this).loadFtp(FILE_PATH).cancel();
         break;
     }
   }

@@ -140,7 +140,9 @@ public class AESEncryption {
    * AES算法的秘钥要求16位
    */
   public static String toHex(byte[] buf) {
-    if (buf == null) return "";
+    if (buf == null) {
+      return "";
+    }
     StringBuffer result = new StringBuffer(2 * buf.length);
     for (byte aBuf : buf) {
       appendHex(result, aBuf);

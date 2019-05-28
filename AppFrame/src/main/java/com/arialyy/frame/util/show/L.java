@@ -32,7 +32,7 @@ public class L {
   static int JSON_INDENT = 4;
 
   private L() {
-        /* cannot be instantiated */
+    /* cannot be instantiated */
     throw new UnsupportedOperationException("cannot be instantiated");
   }
 
@@ -108,73 +108,99 @@ public class L {
 
   // 下面四个是默认tag的函数
   public static void i(String... msg) {
-    if (isDebug) printLog(I, msg);
+    if (isDebug) {
+      printLog(I, msg);
+    }
   }
 
   public static void d(String... msg) {
-    if (isDebug) printLog(D, msg);
+    if (isDebug) {
+      printLog(D, msg);
+    }
   }
 
   public static void w(String... msg) {
-    if (isDebug) printLog(W, msg);
+    if (isDebug) {
+      printLog(W, msg);
+    }
   }
 
   public static void e(String... msg) {
-    if (isDebug) printLog(E, msg);
-  }
-
-  public static void e(Throwable tr) {
-    if (isDebug) printLog(E, FL.getExceptionString(tr));
+    if (isDebug) {
+      printLog(E, msg);
+    }
   }
 
   public static void v(String... msg) {
-    if (isDebug) printLog(V, msg);
+    if (isDebug) {
+      printLog(V, msg);
+    }
   }
 
   // 下面是传入自定义tag的函数
   public static void i(String tag, String msg) {
-    if (isDebug) Log.i(tag, msg);
+    if (isDebug) {
+      Log.i(tag, msg);
+    }
   }
 
   public static void d(String tag, String msg) {
-    if (isDebug) Log.d(tag, msg);
+    if (isDebug) {
+      Log.d(tag, msg);
+    }
   }
 
   public static void w(String tag, String msg) {
-    if (isDebug) Log.w(tag, msg);
+    if (isDebug) {
+      Log.w(tag, msg);
+    }
   }
 
   public static void e(String tag, String msg) {
-    if (isDebug) Log.e(tag, msg);
+    if (isDebug) {
+      Log.e(tag, msg);
+    }
   }
 
   public static void v(String tag, String msg) {
-    if (isDebug) Log.v(tag, msg);
+    if (isDebug) {
+      Log.v(tag, msg);
+    }
   }
 
   //带异常的
   public static void i(String tag, String msg, Throwable tr) {
-    if (isDebug) Log.i(tag, msg, tr);
+    if (isDebug) {
+      Log.i(tag, msg, tr);
+    }
   }
 
   public static void d(String tag, String msg, Throwable tr) {
-    if (isDebug) Log.d(tag, msg, tr);
+    if (isDebug) {
+      Log.d(tag, msg, tr);
+    }
   }
 
   public static void w(String tag, String msg, Throwable tr) {
-    if (isDebug) Log.w(tag, msg, tr);
+    if (isDebug) {
+      Log.w(tag, msg, tr);
+    }
   }
 
   public static void e(String tag, String msg, Throwable tr) {
-    if (isDebug) Log.e(tag, msg, tr);
+    if (isDebug) {
+      Log.e(tag, msg, tr);
+    }
   }
 
   public static void v(String tag, String msg, Throwable tr) {
-    if (isDebug) Log.v(tag, msg, tr);
+    if (isDebug) {
+      Log.v(tag, msg, tr);
+    }
   }
 
   /**
-   * 统一打印
+   * 同意打印
    */
   private static void printHunk(char type, String str) {
     switch (type) {

@@ -14,5 +14,6 @@
   <dimen name="text_size_biggest">18sp</dimen>
 
   <dimen name="icon_size">24dp</dimen>
+  <dimen name="bar_height">48dp</dimen>
 
 </resources>

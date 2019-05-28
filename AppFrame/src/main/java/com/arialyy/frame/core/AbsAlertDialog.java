@@ -3,9 +3,9 @@ package com.arialyy.frame.core;
 import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
-
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
+
 import com.arialyy.frame.module.AbsModule;
 import com.arialyy.frame.module.IOCProxy;
 import com.arialyy.frame.util.StringUtil;
@@ -34,12 +34,15 @@ public abstract class AbsAlertDialog extends DialogFragment {
     mObj = obj;
   }
 
-  @Override public void onCreate(Bundle savedInstanceState) {
+  @Override
+  public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     initDialog();
   }
 
-  @NonNull @Override public Dialog onCreateDialog(Bundle savedInstanceState) {
+  @NonNull
+  @Override
+  public Dialog onCreateDialog(Bundle savedInstanceState) {
     return mDialog;
   }
 
@@ -98,13 +101,15 @@ public abstract class AbsAlertDialog extends DialogFragment {
 
   protected abstract void dataCallback(int result, Object obj);
 
-  @Override public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+  @Override
+  public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
       @NonNull int[] grantResults) {
     super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     PermissionHelp.getInstance().handlePermissionCallback(requestCode, permissions, grantResults);
   }
 
-  @Override public void onActivityResult(int requestCode, int resultCode, Intent data) {
+  @Override
+  public void onActivityResult(int requestCode, int resultCode, Intent data) {
     super.onActivityResult(requestCode, resultCode, data);
     PermissionHelp.getInstance()
         .handleSpecialPermissionCallback(getContext(), requestCode, resultCode, data);

@@ -23,7 +23,7 @@ import com.arialyy.simple.base.BaseDialog;
 import com.arialyy.simple.databinding.DialogModifyUrlBinding;
 
 /**
- * Created by AriaL on 2017/6/3.
+ * Created by AriaL on 2019/5/27.
  */
 @SuppressLint("ValidFragment") public class ModifyUrlDialog
     extends BaseDialog<DialogModifyUrlBinding> {
@@ -48,7 +48,9 @@ import com.arialyy.simple.databinding.DialogModifyUrlBinding;
     });
     getBinding().enter.setOnClickListener(new View.OnClickListener() {
       @Override public void onClick(View v) {
+        mText = getBinding().getText();
         getSimplerModule().onDialog(MODIFY_URL_DIALOG_RESULT, mText);
+        dismiss();
       }
     });
     getBinding().edit.post(new Runnable() {
