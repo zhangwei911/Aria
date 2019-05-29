@@ -19,7 +19,7 @@ import android.text.TextUtils;
 import com.arialyy.aria.core.AriaManager;
 import com.arialyy.aria.core.common.ProtocolType;
 import com.arialyy.aria.core.common.RequestEnum;
-import com.arialyy.aria.core.common.http.HttpTaskDelegate;
+import com.arialyy.aria.core.common.http.HttpTaskConfig;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
 import com.arialyy.aria.util.SSLContextUtil;
@@ -52,7 +52,7 @@ class ConnectionHelp {
    *
    * @throws MalformedURLException
    */
-  static URL handleUrl(String url, HttpTaskDelegate taskDelegate) throws MalformedURLException {
+  static URL handleUrl(String url, HttpTaskConfig taskDelegate) throws MalformedURLException {
     Map<String, String> params = taskDelegate.getParams();
     if (params != null && taskDelegate.getRequestEnum() == RequestEnum.GET) {
       if (url.contains("?")) {
@@ -98,7 +98,7 @@ class ConnectionHelp {
    *
    * @throws IOException
    */
-  static HttpURLConnection handleConnection(URL url, HttpTaskDelegate taskDelegate)
+  static HttpURLConnection handleConnection(URL url, HttpTaskConfig taskDelegate)
       throws IOException {
     HttpURLConnection conn;
     URLConnection urlConn;
@@ -130,7 +130,7 @@ class ConnectionHelp {
    *
    * @throws ProtocolException
    */
-  static HttpURLConnection setConnectParam(HttpTaskDelegate delegate, HttpURLConnection conn) {
+  static HttpURLConnection setConnectParam(HttpTaskConfig delegate, HttpURLConnection conn) {
     if (delegate.getRequestEnum() == RequestEnum.POST) {
       conn.setDoInput(true);
       conn.setDoOutput(true);

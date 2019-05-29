@@ -15,49 +15,44 @@
  */
 package com.arialyy.aria.core.inf;
 
-import com.arialyy.aria.core.download.DownloadGroupEntity;
-
 /**
- * 组合任务实体包裹器，用于加载和任务相关的参数，如：组合任务实体{@link DownloadGroupEntity}、header头部
+ * Created by lyy on 2019/4/5.
+ * 组合任务配置处理
  */
-public interface ITaskWrapper<ENTITY extends AbsEntity> {
+public interface IGroupConfigHandler {
 
   /**
-   * HTTP单任务载
+   * 获取实体
    */
-  int D_HTTP = 1;
-  /**
-   * HTTP任务组下载
-   */
-  int DG_HTTP = 2;
+  AbsEntity getEntity();
 
   /**
-   * FTP单文件下载
+   * 任务是否存在
+   *
+   * @return {@code true}任务存在，{@code false} 任务不存在
    */
-  int D_FTP = 3;
-  /**
-   * FTP文件夹下载，为避免登录过多，子任务由单线程进行处理
-   */
-  int D_FTP_DIR = 4;
+  boolean taskExists();
 
   /**
-   * HTTP单文件上传
+   * 任务是否在执行
+   *
+   * @return {@code true} 任务正在执行，{@code false} 任务没有执行
    */
-  int U_HTTP = 5;
-  /**
-   * FTP单文件上传
-   */
-  int U_FTP = 6;
+  boolean isRunning();
 
   /**
-   * M3u8文件
+   * 检查实体是否合法
+   *
+   * @return {@code true}合法
    */
-  int M3U8_FILE = 7;
+  boolean checkEntity();
 
   /**
-   * m3u8直播
+   * 检查文件夹路径
+   * 1、文件夹路径不能为空
+   * 2、文件夹路径不能是文件
+   *
+   * @return {@code true} 合法
    */
-  int M3U8_LIVE = 8;
-
-  ENTITY getEntity();
+  boolean checkDirPath();
 }

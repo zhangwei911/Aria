@@ -15,21 +15,22 @@
  */
 package com.arialyy.aria.core.download.m3u8;
 
-import com.arialyy.aria.core.common.BaseDelegate;
-import com.arialyy.aria.core.inf.AbsTarget;
-import com.arialyy.aria.core.inf.AbsTaskWrapper;
-
 /**
- * m3u8 委托
+ * m3u8直播参数设置
  */
-public class M3U8Delegate<TARGET extends AbsTarget> extends BaseDelegate<TARGET> {
+public class M3U8LiveDelegate {
 
-  public M3U8Delegate(TARGET target) {
-    super(target);
-    mTarget.getTaskWrapper().setRequestType(AbsTaskWrapper.M3U8_FILE);
+  M3U8LiveDelegate(M3U8Delegate delegate){
+
   }
 
-  //public M3U8LiveDelegate asLive(){
-  //  return
-  //}
+  /**
+   * 设置缓存目录
+   * @param cacheDir 缓存目录路径
+   * @return
+   */
+  public M3U8LiveDelegate setCacheDir(String cacheDir){
+    return this;
+  }
+
 }

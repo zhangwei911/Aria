@@ -33,21 +33,21 @@ import java.net.Proxy;
 public class FtpDownloadTarget extends AbsDTarget<FtpDownloadTarget>
     implements IFtpTarget<FtpDownloadTarget> {
   private FtpDelegate<FtpDownloadTarget> mFtpDelegate;
-  private DNormalDelegate<FtpDownloadTarget> mNormalDelegate;
+  private DNormalConfigHandler<FtpDownloadTarget> mConfigHandler;
 
   FtpDownloadTarget(DownloadEntity entity, String targetName) {
     this(entity.getUrl(), targetName);
   }
 
   FtpDownloadTarget(String url, String targetName) {
-    mNormalDelegate = new DNormalDelegate<>(this, url, targetName);
+    mConfigHandler = new DNormalConfigHandler<>(this, url, targetName);
     init();
   }
 
   private void init() {
-    int lastIndex = mNormalDelegate.getUrl().lastIndexOf("/");
-    getEntity().setFileName(mNormalDelegate.getUrl().substring(lastIndex + 1));
-    getTaskWrapper().asFtp().setUrlEntity(CommonUtil.getFtpUrlInfo(mNormalDelegate.getUrl()));
+    int lastIndex = mConfigHandler.getUrl().lastIndexOf("/");
+    getEntity().setFileName(mConfigHandler.getUrl().substring(lastIndex + 1));
+    getTaskWrapper().asFtp().setUrlEntity(CommonUtil.getFtpUrlInfo(mConfigHandler.getUrl()));
     getTaskWrapper().setRequestType(AbsTaskWrapper.D_FTP);
 
     mFtpDelegate = new FtpDelegate<>(this);
@@ -75,15 +75,15 @@ public class FtpDownloadTarget extends AbsDTarget<FtpDownloadTarget>
         return false;
       }
     }
-    return mNormalDelegate.checkEntity();
+    return mConfigHandler.checkEntity();
   }
 
   @Override public boolean isRunning() {
-    return mNormalDelegate.isRunning();
+    return mConfigHandler.isRunning();
   }
 
   @Override public boolean taskExists() {
-    return mNormalDelegate.taskExists();
+    return mConfigHandler.taskExists();
   }
 
   /**
@@ -106,7 +106,7 @@ public class FtpDownloadTarget extends AbsDTarget<FtpDownloadTarget>
    */
   @CheckResult
   public FtpDownloadTarget setFilePath(@NonNull String filePath) {
-    mNormalDelegate.setTempFilePath(filePath);
+    mConfigHandler.setTempFilePath(filePath);
     return this;
   }
 
@@ -120,8 +120,8 @@ public class FtpDownloadTarget extends AbsDTarget<FtpDownloadTarget>
    */
   @CheckResult
   public FtpDownloadTarget setFilePath(@NonNull String filePath, boolean forceDownload) {
-    mNormalDelegate.setTempFilePath(filePath);
-    mNormalDelegate.setForceDownload(forceDownload);
+    mConfigHandler.setTempFilePath(filePath);
+    mConfigHandler.setForceDownload(forceDownload);
     return this;
   }
 
@@ -150,6 +150,6 @@ public class FtpDownloadTarget extends AbsDTarget<FtpDownloadTarget>
   }
 
   @Override public FtpDownloadTarget updateUrl(String newUrl) {
-    return mNormalDelegate.updateUrl(newUrl);
+    return mConfigHandler.updateUrl(newUrl);
   }
 }

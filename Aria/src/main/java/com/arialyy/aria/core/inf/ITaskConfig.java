@@ -13,23 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.arialyy.aria.core.download.m3u8;
-
-import com.arialyy.aria.core.common.BaseDelegate;
-import com.arialyy.aria.core.inf.AbsTarget;
-import com.arialyy.aria.core.inf.AbsTaskWrapper;
+package com.arialyy.aria.core.inf;
 
 /**
- * m3u8 委托
+ * Created by AriaL on 2017/6/29.
+ * 任务信息设置接口
  */
-public class M3U8Delegate<TARGET extends AbsTarget> extends BaseDelegate<TARGET> {
+public interface ITaskConfig {
 
-  public M3U8Delegate(TARGET target) {
-    super(target);
-    mTarget.getTaskWrapper().setRequestType(AbsTaskWrapper.M3U8_FILE);
-  }
-
-  //public M3U8LiveDelegate asLive(){
-  //  return
-  //}
 }

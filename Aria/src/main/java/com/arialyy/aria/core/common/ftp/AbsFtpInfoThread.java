@@ -60,7 +60,7 @@ public abstract class AbsFtpInfoThread<ENTITY extends AbsEntity, TASK_WRAPPER ex
   private final String TAG = "AbsFtpInfoThread";
   protected ENTITY mEntity;
   protected TASK_WRAPPER mTaskWrapper;
-  private FtpTaskDelegate mTaskDelegate;
+  private FtpTaskConfig mTaskDelegate;
   private int mConnectTimeOut;
   protected OnFileInfoCallback mCallback;
   protected long mSize = 0;

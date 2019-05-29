@@ -24,7 +24,7 @@ import com.arialyy.aria.core.common.OnFileInfoCallback;
 import com.arialyy.aria.core.common.RequestEnum;
 import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.download.DownloadEntity;
-import com.arialyy.aria.core.common.http.HttpTaskDelegate;
+import com.arialyy.aria.core.common.http.HttpTaskConfig;
 import com.arialyy.aria.core.inf.IHttpFileLenAdapter;
 import com.arialyy.aria.exception.AriaIOException;
 import com.arialyy.aria.exception.BaseException;
@@ -58,7 +58,7 @@ public class HttpFileInfoThread implements Runnable {
   private DTaskWrapper mTaskWrapper;
   private int mConnectTimeOut;
   private OnFileInfoCallback onFileInfoCallback;
-  private HttpTaskDelegate mTaskDelegate;
+  private HttpTaskConfig mTaskDelegate;
 
   public HttpFileInfoThread(DTaskWrapper taskWrapper, OnFileInfoCallback callback) {
     this.mTaskWrapper = taskWrapper;

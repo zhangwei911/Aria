@@ -17,6 +17,7 @@ package com.arialyy.aria.core.common.ftp;
 
 import android.text.TextUtils;
 import com.arialyy.aria.core.FtpUrlEntity;
+import com.arialyy.aria.core.common.BaseDelegate;
 import com.arialyy.aria.core.common.ProtocolType;
 import com.arialyy.aria.core.inf.AbsTarget;
 import com.arialyy.aria.core.inf.ITargetHandler;
@@ -24,13 +25,12 @@ import com.arialyy.aria.core.inf.ITargetHandler;
 /**
  * D_FTP SSL/TSL 参数委托
  */
-public class FTPSDelegate<TARGET extends AbsTarget> implements ITargetHandler {
-  private final String TAG = "FTPSDelegate";
-  private TARGET mTarget;
+public class FTPSDelegate<TARGET extends AbsTarget> extends BaseDelegate<TARGET> {
+
   private FtpUrlEntity mUrlEntity;
 
   public FTPSDelegate(TARGET target) {
-    mTarget = target;
+    super(target);
     mUrlEntity = mTarget.getTaskWrapper().asFtp().getUrlEntity();
   }
 

@@ -18,7 +18,7 @@ package com.arialyy.aria.core.download.group;
 import com.arialyy.aria.core.common.CompleteInfo;
 import com.arialyy.aria.core.common.IUtil;
 import com.arialyy.aria.core.common.OnFileInfoCallback;
-import com.arialyy.aria.core.common.http.HttpTaskDelegate;
+import com.arialyy.aria.core.common.http.HttpTaskConfig;
 import com.arialyy.aria.core.download.DGTaskWrapper;
 import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.download.DownloadEntity;
@@ -156,8 +156,8 @@ public class DownloadGroupUtil extends AbsGroupUtil implements IUtil {
    * 子任务使用父包裹器的属性
    */
   private void cloneHeader(DTaskWrapper taskWrapper) {
-    HttpTaskDelegate groupDelegate = mGTWrapper.asHttp();
-    HttpTaskDelegate subDelegate = taskWrapper.asHttp();
+    HttpTaskConfig groupDelegate = mGTWrapper.asHttp();
+    HttpTaskConfig subDelegate = taskWrapper.asHttp();
 
     // 设置属性
     subDelegate.setFileLenAdapter(groupDelegate.getFileLenAdapter());

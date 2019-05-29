@@ -18,10 +18,9 @@ package com.arialyy.aria.core.download;
 import android.support.annotation.CheckResult;
 import android.support.annotation.NonNull;
 import com.arialyy.aria.core.common.http.GetDelegate;
-import com.arialyy.aria.core.common.http.HttpHeaderDelegate;
+import com.arialyy.aria.core.common.http.HttpDelegate;
 import com.arialyy.aria.core.common.http.PostDelegate;
 import com.arialyy.aria.core.inf.IHttpFileLenAdapter;
-import com.arialyy.aria.core.inf.IHttpHeaderDelegate;
 import java.net.Proxy;
 import java.util.Map;
 
@@ -29,18 +28,17 @@ import java.util.Map;
  * Created by lyy on 2016/12/5.
  * https://github.com/AriaLyy/Aria
  */
-public class DownloadTarget extends AbsDTarget<DownloadTarget>
-    implements IHttpHeaderDelegate<DownloadTarget> {
-  private HttpHeaderDelegate<DownloadTarget> mHeaderDelegate;
-  private DNormalDelegate<DownloadTarget> mNormalDelegate;
+public class DownloadTarget extends AbsDTarget<DownloadTarget> {
+  private HttpDelegate<DownloadTarget> mHttpDelegate;
+  private DNormalConfigHandler<DownloadTarget> mConfigHandler;
 
   DownloadTarget(DownloadEntity entity, String targetName) {
     this(entity.getUrl(), targetName);
   }
 
   DownloadTarget(String url, String targetName) {
-    mNormalDelegate = new DNormalDelegate<>(this, url, targetName);
-    mHeaderDelegate = new HttpHeaderDelegate<>(this);
+    mConfigHandler = new DNormalConfigHandler<>(this, url, targetName);
+    mHttpDelegate = new HttpDelegate<>(this);
   }
 
   /**
@@ -48,15 +46,17 @@ public class DownloadTarget extends AbsDTarget<DownloadTarget>
    */
   @CheckResult
   public PostDelegate asPost() {
-    return new PostDelegate<>(this);
+    mHttpDelegate = new PostDelegate<>(this);
+    return (PostDelegate) mHttpDelegate;
   }
 
   /**
-   * get参数传递
+   * get处理
    */
   @CheckResult
   public GetDelegate asGet() {
-    return new GetDelegate<>(this);
+    mHttpDelegate = new GetDelegate<>(this);
+    return (GetDelegate) mHttpDelegate;
   }
 
   /**
@@ -80,7 +80,7 @@ public class DownloadTarget extends AbsDTarget<DownloadTarget>
    */
   @CheckResult
   public DownloadTarget setFilePath(@NonNull String filePath) {
-    mNormalDelegate.setTempFilePath(filePath);
+    mConfigHandler.setTempFilePath(filePath);
     return this;
   }
 
@@ -94,8 +94,8 @@ public class DownloadTarget extends AbsDTarget<DownloadTarget>
    */
   @CheckResult
   public DownloadTarget setFilePath(@NonNull String filePath, boolean forceDownload) {
-    mNormalDelegate.setTempFilePath(filePath);
-    mNormalDelegate.setForceDownload(forceDownload);
+    mConfigHandler.setTempFilePath(filePath);
+    mConfigHandler.setForceDownload(forceDownload);
     return this;
   }
 
@@ -103,7 +103,7 @@ public class DownloadTarget extends AbsDTarget<DownloadTarget>
    * 如果你需要使用header中特定的key来设置文件长度，或有定制文件长度的需要，那么你可以通过该方法自行处理文件长度
    */
   public DownloadTarget setFileLenAdapter(IHttpFileLenAdapter adapter) {
-    return mHeaderDelegate.setFileLenAdapter(adapter);
+    return mHttpDelegate.setFileLenAdapter(adapter);
   }
 
   /**
@@ -114,7 +114,7 @@ public class DownloadTarget extends AbsDTarget<DownloadTarget>
   }
 
   @Override public DownloadTarget updateUrl(String newUrl) {
-    return mNormalDelegate.updateUrl(newUrl);
+    return mConfigHandler.updateUrl(newUrl);
   }
 
   @Override public int getTargetType() {
@@ -127,29 +127,29 @@ public class DownloadTarget extends AbsDTarget<DownloadTarget>
    * @param proxy {@link Proxy}
    */
   @CheckResult
-  @Override public DownloadTarget setUrlProxy(Proxy proxy) {
-    return mHeaderDelegate.setUrlProxy(proxy);
+  public DownloadTarget setUrlProxy(Proxy proxy) {
+    return mHttpDelegate.setUrlProxy(proxy);
   }
 
   @CheckResult
-  @Override public DownloadTarget addHeader(@NonNull String key, @NonNull String value) {
-    return mHeaderDelegate.addHeader(key, value);
+  public DownloadTarget addHeader(@NonNull String key, @NonNull String value) {
+    return mHttpDelegate.addHeader(key, value);
   }
 
   @CheckResult
-  @Override public DownloadTarget addHeaders(Map<String, String> headers) {
-    return mHeaderDelegate.addHeaders(headers);
+  public DownloadTarget addHeaders(Map<String, String> headers) {
+    return mHttpDelegate.addHeaders(headers);
   }
 
   @Override protected boolean checkEntity() {
-    return mNormalDelegate.checkEntity();
+    return mConfigHandler.checkEntity();
   }
 
   @Override public boolean isRunning() {
-    return mNormalDelegate.isRunning();
+    return mConfigHandler.isRunning();
   }
 
   @Override public boolean taskExists() {
-    return mNormalDelegate.taskExists();
+    return mConfigHandler.taskExists();
   }
 }

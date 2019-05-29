@@ -15,8 +15,8 @@
  */
 package com.arialyy.aria.core.inf;
 
-import com.arialyy.aria.core.common.ftp.FtpTaskDelegate;
-import com.arialyy.aria.core.common.http.HttpTaskDelegate;
+import com.arialyy.aria.core.common.ftp.FtpTaskConfig;
+import com.arialyy.aria.core.common.http.HttpTaskConfig;
 import com.arialyy.aria.core.config.BaseTaskConfig;
 import com.arialyy.aria.core.config.DGroupConfig;
 import com.arialyy.aria.core.config.DownloadConfig;
@@ -31,8 +31,8 @@ import com.arialyy.aria.core.upload.UploadEntity;
 public abstract class AbsTaskWrapper<ENTITY extends AbsEntity>
     implements ITaskWrapper<ENTITY> {
 
-  private HttpTaskDelegate httpTaskDelegate;
-  private FtpTaskDelegate ftpTaskDelegate;
+  private HttpTaskConfig httpTaskConfig;
+  private FtpTaskConfig ftpTaskConfig;
 
   /**
    * 刷新信息 {@code true} 重新刷新下载信息
@@ -94,21 +94,21 @@ public abstract class AbsTaskWrapper<ENTITY extends AbsEntity>
   /**
    * 设置或获取HTTP任务相关参数
    */
-  public HttpTaskDelegate asHttp() {
-    if (httpTaskDelegate == null) {
-      httpTaskDelegate = new HttpTaskDelegate();
+  public HttpTaskConfig asHttp() {
+    if (httpTaskConfig == null) {
+      httpTaskConfig = new HttpTaskConfig();
     }
-    return httpTaskDelegate;
+    return httpTaskConfig;
   }
 
   /**
    * 设置或获取FTP任务相关参数
    */
-  public FtpTaskDelegate asFtp() {
-    if (ftpTaskDelegate == null) {
-      ftpTaskDelegate = new FtpTaskDelegate();
+  public FtpTaskConfig asFtp() {
+    if (ftpTaskConfig == null) {
+      ftpTaskConfig = new FtpTaskConfig();
     }
-    return ftpTaskDelegate;
+    return ftpTaskConfig;
   }
 
   /**

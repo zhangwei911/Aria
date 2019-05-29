@@ -18,8 +18,7 @@ package com.arialyy.aria.core.upload.uploader;
 import com.arialyy.aria.core.common.AbsThreadTask;
 import com.arialyy.aria.core.common.StateConstance;
 import com.arialyy.aria.core.common.SubThreadConfig;
-import com.arialyy.aria.core.common.http.HttpTaskDelegate;
-import com.arialyy.aria.core.config.BaseTaskConfig;
+import com.arialyy.aria.core.common.http.HttpTaskConfig;
 import com.arialyy.aria.core.config.UploadConfig;
 import com.arialyy.aria.core.inf.IUploadListener;
 import com.arialyy.aria.core.upload.UTaskWrapper;
@@ -70,7 +69,7 @@ class HttpThreadTask extends AbsThreadTask<UploadEntity, UTaskWrapper> {
     URL url;
     try {
       url = new URL(getEntity().getUrl());
-      HttpTaskDelegate taskDelegate = getTaskWrapper().asHttp();
+      HttpTaskConfig taskDelegate = getTaskWrapper().asHttp();
       mHttpConn = (HttpURLConnection) url.openConnection();
       mHttpConn.setRequestMethod(taskDelegate.getRequestEnum().name);
       mHttpConn.setUseCaches(false);

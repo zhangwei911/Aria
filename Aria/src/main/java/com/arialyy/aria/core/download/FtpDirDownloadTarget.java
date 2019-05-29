@@ -29,7 +29,7 @@ import java.net.Proxy;
 public class FtpDirDownloadTarget extends AbsDGTarget<FtpDirDownloadTarget>
     implements IFtpTarget<FtpDirDownloadTarget> {
   private FtpDelegate<FtpDirDownloadTarget> mFtpDelegate;
-  private FtpDirDelegate mDirDelegate;
+  private FtpDirConfigHandler mConfigHandler;
 
   FtpDirDownloadTarget(String url, String targetName) {
     setTargetName(targetName);
@@ -37,7 +37,7 @@ public class FtpDirDownloadTarget extends AbsDGTarget<FtpDirDownloadTarget>
   }
 
   private void init(String key) {
-    mDirDelegate = new FtpDirDelegate(this,
+    mConfigHandler = new FtpDirConfigHandler(this,
         TaskWrapperManager.getInstance().getFtpTaskWrapper(DGTaskWrapper.class, key));
     mFtpDelegate = new FtpDelegate<>(this);
   }
@@ -47,15 +47,15 @@ public class FtpDirDownloadTarget extends AbsDGTarget<FtpDirDownloadTarget>
   }
 
   @Override protected boolean checkEntity() {
-    return mDirDelegate.checkEntity();
+    return mConfigHandler.checkEntity();
   }
 
   @Override public boolean isRunning() {
-    return mDirDelegate.isRunning();
+    return mConfigHandler.isRunning();
   }
 
   @Override public boolean taskExists() {
-    return mDirDelegate.taskExists();
+    return mConfigHandler.taskExists();
   }
 
   /**
@@ -79,7 +79,7 @@ public class FtpDirDownloadTarget extends AbsDGTarget<FtpDirDownloadTarget>
    */
   @CheckResult
   public FtpDirDownloadTarget setDirPath(String dirPath) {
-    return mDirDelegate.setDirPath(dirPath);
+    return mConfigHandler.setDirPath(dirPath);
   }
 
   /**

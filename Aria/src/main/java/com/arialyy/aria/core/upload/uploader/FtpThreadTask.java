@@ -22,9 +22,7 @@ import aria.apache.commons.net.ftp.OnFtpInputStreamListener;
 import com.arialyy.aria.core.common.StateConstance;
 import com.arialyy.aria.core.common.SubThreadConfig;
 import com.arialyy.aria.core.common.ftp.AbsFtpThreadTask;
-import com.arialyy.aria.core.common.ftp.FtpTaskDelegate;
-import com.arialyy.aria.core.config.BaseTaskConfig;
-import com.arialyy.aria.core.config.DownloadConfig;
+import com.arialyy.aria.core.common.ftp.FtpTaskConfig;
 import com.arialyy.aria.core.config.UploadConfig;
 import com.arialyy.aria.core.inf.IEventListener;
 import com.arialyy.aria.core.upload.UploadEntity;
@@ -130,7 +128,7 @@ class FtpThreadTask extends AbsFtpThreadTask<UploadEntity, UTaskWrapper> {
   }
 
   private void initPath() throws UnsupportedEncodingException {
-    FtpTaskDelegate delegate = getTaskWrapper().asFtp();
+    FtpTaskConfig delegate = getTaskWrapper().asFtp();
     dir = CommonUtil.convertFtpChar(charSet, delegate.getUrlEntity().remotePath);
 
     String fileName =

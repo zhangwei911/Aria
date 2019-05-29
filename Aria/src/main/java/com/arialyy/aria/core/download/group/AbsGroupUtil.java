@@ -18,7 +18,6 @@ package com.arialyy.aria.core.download.group;
 import android.os.Handler;
 import android.os.Looper;
 import com.arialyy.aria.core.common.IUtil;
-import com.arialyy.aria.core.common.http.HttpTaskDelegate;
 import com.arialyy.aria.core.config.Configuration;
 import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.download.DGTaskWrapper;

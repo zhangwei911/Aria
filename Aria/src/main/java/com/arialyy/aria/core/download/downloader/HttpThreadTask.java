@@ -22,7 +22,7 @@ import com.arialyy.aria.core.common.SubThreadConfig;
 import com.arialyy.aria.core.config.DownloadConfig;
 import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.download.DownloadEntity;
-import com.arialyy.aria.core.common.http.HttpTaskDelegate;
+import com.arialyy.aria.core.common.http.HttpTaskConfig;
 import com.arialyy.aria.core.inf.IDownloadListener;
 import com.arialyy.aria.exception.AriaIOException;
 import com.arialyy.aria.exception.TaskException;
@@ -71,7 +71,7 @@ final class HttpThreadTask extends AbsThreadTask<DownloadEntity, DTaskWrapper> {
     //当前子线程的下载位置
     mChildCurrentLocation = getConfig().START_LOCATION;
     try {
-      HttpTaskDelegate taskDelegate = getTaskWrapper().asHttp();
+      HttpTaskConfig taskDelegate = getTaskWrapper().asHttp();
       URL url = ConnectionHelp.handleUrl(getConfig().URL, taskDelegate);
       conn = ConnectionHelp.handleConnection(url, taskDelegate);
       if (getConfig().SUPPORT_BP) {

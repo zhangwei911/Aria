@@ -33,10 +33,10 @@ import java.net.Proxy;
 public class FtpUploadTarget extends AbsUploadTarget<FtpUploadTarget>
     implements IFtpTarget<FtpUploadTarget> {
   private FtpDelegate<FtpUploadTarget> mFtpDelegate;
-  private UNormalDelegate<FtpUploadTarget> mNormalDelegate;
+  private UNormalConfigHandler<FtpUploadTarget> mConfigHandler;
 
   FtpUploadTarget(String filePath, String targetName) {
-    mNormalDelegate = new UNormalDelegate<>(this, filePath, targetName);
+    mConfigHandler = new UNormalConfigHandler<>(this, filePath, targetName);
     initTask();
   }
 
@@ -51,7 +51,7 @@ public class FtpUploadTarget extends AbsUploadTarget<FtpUploadTarget>
    * @param tempUrl 上传路径
    */
   public FtpUploadTarget setUploadUrl(String tempUrl) {
-    mNormalDelegate.setTempUrl(tempUrl);
+    mConfigHandler.setTempUrl(tempUrl);
     return this;
   }
 
@@ -60,7 +60,7 @@ public class FtpUploadTarget extends AbsUploadTarget<FtpUploadTarget>
    */
   @CheckResult
   public FtpUploadTarget setUploadInterceptor(@NonNull IFtpUploadInterceptor uploadInterceptor) {
-    return mNormalDelegate.setUploadInterceptor(uploadInterceptor);
+    return mConfigHandler.setUploadInterceptor(uploadInterceptor);
   }
 
   /**
@@ -88,7 +88,7 @@ public class FtpUploadTarget extends AbsUploadTarget<FtpUploadTarget>
   }
 
   @Override public FtpUploadTarget login(String userName, String password, String account) {
-    CheckUtil.checkFtpUploadUrl(mNormalDelegate.getTempUrl());
+    CheckUtil.checkFtpUploadUrl(mConfigHandler.getTempUrl());
     return mFtpDelegate.login(userName, password, account);
   }
 
@@ -97,15 +97,15 @@ public class FtpUploadTarget extends AbsUploadTarget<FtpUploadTarget>
   }
 
   @Override protected boolean checkEntity() {
-    return mNormalDelegate.checkEntity();
+    return mConfigHandler.checkEntity();
   }
 
   @Override public boolean isRunning() {
-    return mNormalDelegate.isRunning();
+    return mConfigHandler.isRunning();
   }
 
   @Override public boolean taskExists() {
-    return mNormalDelegate.taskExists();
+    return mConfigHandler.taskExists();
   }
 
   @Override public int getTargetType() {

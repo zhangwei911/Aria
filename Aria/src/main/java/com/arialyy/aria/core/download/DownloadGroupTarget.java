@@ -17,10 +17,10 @@ package com.arialyy.aria.core.download;
 
 import android.support.annotation.CheckResult;
 import android.support.annotation.NonNull;
-import com.arialyy.aria.core.common.http.HttpHeaderDelegate;
+import com.arialyy.aria.core.common.http.GetDelegate;
+import com.arialyy.aria.core.common.http.HttpDelegate;
 import com.arialyy.aria.core.common.http.PostDelegate;
 import com.arialyy.aria.core.inf.IHttpFileLenAdapter;
-import com.arialyy.aria.core.inf.IHttpHeaderDelegate;
 import com.arialyy.aria.core.manager.TaskWrapperManager;
 import com.arialyy.aria.exception.ParamException;
 import com.arialyy.aria.util.ALog;
@@ -32,10 +32,9 @@ import java.util.Map;
  * Created by AriaL on 2017/6/29.
  * 下载任务组
  */
-public class DownloadGroupTarget extends AbsDGTarget<DownloadGroupTarget> implements
-    IHttpHeaderDelegate<DownloadGroupTarget> {
-  private HttpHeaderDelegate<DownloadGroupTarget> mHeaderDelegate;
-  private HttpGroupDelegate mGroupDelegate;
+public class DownloadGroupTarget extends AbsDGTarget<DownloadGroupTarget> {
+  private HttpDelegate<DownloadGroupTarget> mHttpDelegate;
+  private HttpGroupConfigHandler mConfigHandler;
 
   DownloadGroupTarget(DownloadGroupEntity groupEntity, String targetName) {
     setTargetName(targetName);
@@ -52,9 +51,9 @@ public class DownloadGroupTarget extends AbsDGTarget<DownloadGroupTarget> implem
   }
 
   private void init(List<String> urls) {
-    mGroupDelegate = new HttpGroupDelegate(this,
+    mConfigHandler = new HttpGroupConfigHandler(this,
         TaskWrapperManager.getInstance().getDGTaskWrapper(DGTaskWrapper.class, urls));
-    mHeaderDelegate = new HttpHeaderDelegate<>(this);
+    mHttpDelegate = new HttpDelegate<>(this);
   }
 
   /**
@@ -62,7 +61,17 @@ public class DownloadGroupTarget extends AbsDGTarget<DownloadGroupTarget> implem
    */
   @CheckResult
   public PostDelegate asPost() {
-    return new PostDelegate<>(this);
+    mHttpDelegate = new PostDelegate<>(this);
+    return (PostDelegate) mHttpDelegate;
+  }
+
+  /**
+   * get处理
+   */
+  @CheckResult
+  public GetDelegate asGet() {
+    mHttpDelegate = new GetDelegate<>(this);
+    return (GetDelegate) mHttpDelegate;
   }
 
   /**
@@ -72,7 +81,7 @@ public class DownloadGroupTarget extends AbsDGTarget<DownloadGroupTarget> implem
    */
   @CheckResult
   public DownloadGroupTarget updateUrls(List<String> urls) {
-    return mGroupDelegate.updateUrls(urls);
+    return mConfigHandler.updateUrls(urls);
   }
 
   /**
@@ -113,7 +122,7 @@ public class DownloadGroupTarget extends AbsDGTarget<DownloadGroupTarget> implem
    */
   @CheckResult
   public DownloadGroupTarget setGroupUrl(List<String> urls) {
-    return mGroupDelegate.setGroupUrl(urls);
+    return mConfigHandler.setGroupUrl(urls);
   }
 
   /**
@@ -147,7 +156,7 @@ public class DownloadGroupTarget extends AbsDGTarget<DownloadGroupTarget> implem
    */
   @CheckResult
   public DownloadGroupTarget setDirPath(String dirPath) {
-    return mGroupDelegate.setDirPath(dirPath);
+    return mConfigHandler.setDirPath(dirPath);
   }
 
   /**
@@ -155,14 +164,14 @@ public class DownloadGroupTarget extends AbsDGTarget<DownloadGroupTarget> implem
    */
   @CheckResult
   public DownloadGroupTarget setSubFileName(List<String> subTaskFileName) {
-    return mGroupDelegate.setSubFileName(subTaskFileName);
+    return mConfigHandler.setSubFileName(subTaskFileName);
   }
 
   /**
    * 如果你需要使用header中特定的key来设置文件长度，或有定制文件长度的需要，那么你可以通过该方法自行处理文件长度
    */
   public DownloadGroupTarget setFileLenAdapter(IHttpFileLenAdapter adapter) {
-    return mHeaderDelegate.setFileLenAdapter(adapter);
+    return mHttpDelegate.setFileLenAdapter(adapter);
   }
 
   @Override public int getTargetType() {
@@ -170,29 +179,29 @@ public class DownloadGroupTarget extends AbsDGTarget<DownloadGroupTarget> implem
   }
 
   @Override protected boolean checkEntity() {
-    return mGroupDelegate.checkEntity();
+    return mConfigHandler.checkEntity();
   }
 
   @Override public boolean isRunning() {
-    return mGroupDelegate.isRunning();
+    return mConfigHandler.isRunning();
   }
 
   @Override public boolean taskExists() {
-    return mGroupDelegate.taskExists();
+    return mConfigHandler.taskExists();
   }
 
   @CheckResult
-  @Override public DownloadGroupTarget addHeader(@NonNull String key, @NonNull String value) {
-    return mHeaderDelegate.addHeader(key, value);
+  public DownloadGroupTarget addHeader(@NonNull String key, @NonNull String value) {
+    return mHttpDelegate.addHeader(key, value);
   }
 
   @CheckResult
-  @Override public DownloadGroupTarget addHeaders(Map<String, String> headers) {
-    return mHeaderDelegate.addHeaders(headers);
+  public DownloadGroupTarget addHeaders(Map<String, String> headers) {
+    return mHttpDelegate.addHeaders(headers);
   }
 
   @CheckResult
-  @Override public DownloadGroupTarget setUrlProxy(Proxy proxy) {
-    return mHeaderDelegate.setUrlProxy(proxy);
+  public DownloadGroupTarget setUrlProxy(Proxy proxy) {
+    return mHttpDelegate.setUrlProxy(proxy);
   }
 }
