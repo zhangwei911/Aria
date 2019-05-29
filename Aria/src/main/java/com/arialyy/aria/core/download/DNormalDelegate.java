@@ -128,7 +128,7 @@ class DNormalDelegate<TARGET extends AbsDTarget> implements INormalTarget {
     }
 
     //设置文件保存路径，如果新文件路径和旧文件路径不同，则修改路径
-    if (!filePath.equals(mEntity.getDownloadPath())) {
+    if (!filePath.equals(mEntity.getFilePath())) {
       // 检查路径冲突
       if (DbEntity.checkDataExist(DownloadEntity.class, "downloadPath=?", filePath)) {
         if (!forceDownload) {

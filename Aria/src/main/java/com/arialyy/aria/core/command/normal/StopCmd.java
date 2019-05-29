@@ -36,6 +36,7 @@ class StopCmd<T extends AbsTaskWrapper> extends AbsNormalCmd<T> {
     AbsTask task = getTask();
     if (task == null) {
       if (mTaskWrapper.getEntity().getState() == IEntity.STATE_RUNNING) {
+        createTask();
         stopTask();
       } else {
         ALog.w(TAG, "停止命令执行失败，【调度器中没有该任务】");

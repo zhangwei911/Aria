@@ -15,62 +15,108 @@
  */
 package com.arialyy.simple.core.download;
 
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.View;
 import com.arialyy.annotations.Download;
 import com.arialyy.aria.core.Aria;
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.download.DownloadTask;
+import com.arialyy.aria.core.download.FtpDownloadTarget;
+import com.arialyy.aria.core.inf.IEntity;
+import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
 import com.arialyy.frame.util.show.L;
 import com.arialyy.frame.util.show.T;
 import com.arialyy.simple.R;
 import com.arialyy.simple.base.BaseActivity;
+import com.arialyy.simple.common.DirChooseDialog;
+import com.arialyy.simple.common.ModifyUrlDialog;
 import com.arialyy.simple.databinding.ActivityFtpDownloadBinding;
+import com.arialyy.simple.util.AppUtil;
 import java.io.File;
+import java.io.IOException;
 
 /**
  * Created by lyy on 2017/7/25.
- * Ftp下载测试
+ * Ftp下载
  */
 public class FtpDownloadActivity extends BaseActivity<ActivityFtpDownloadBinding> {
-  private final String URL = "ftp://9.9.9.205:2121/Cyberduck-6.9.4.30164.zip";
-  //private final String URL = "ftp://182.92.180.213:21/video/572fed5c2ad48_1024.jpg";
-  //private final String URL = "ftp://182.92.180.213:21/DATA/20180205/rar/1111.rar";
-  //private final String URL = "ftp://d:d@dygodj8.com:12311/咖啡风暴HD大陆公映意语中字[飘花www.piaohua.com].mp4";
+  private String mUrl, mFilePath;
+  private FtpDownloadModule mModule;
+  private FtpDownloadTarget mTarget;
 
   @Override protected void init(Bundle savedInstanceState) {
     super.init(savedInstanceState);
     setTitle("FTP文件下载");
     Aria.download(this).register();
-    DownloadEntity entity = Aria.download(this).getDownloadEntity(URL);
-    if (entity != null) {
-      getBinding().setFileSize(entity.getConvertFileSize());
-      if (entity.getFileSize() == 0) {
-        getBinding().setProgress(0);
-      } else {
-        getBinding().setProgress(entity.isComplete() ? 100
-            : (int) (entity.getCurrentProgress() * 100 / entity.getFileSize()));
+    mModule = ViewModelProviders.of(this).get(FtpDownloadModule.class);
+
+    mModule.getFtpDownloadInfo(this).observe(this, new Observer<DownloadEntity>() {
+
+      @Override public void onChanged(@Nullable DownloadEntity entity) {
+        if (entity == null) {
+          return;
+        }
+        mTarget = Aria.download(FtpDownloadActivity.this).loadFtp(entity.getUrl());
+        if (mTarget.getTaskState() == IEntity.STATE_STOP) {
+          getBinding().setStateStr(getString(R.string.resume));
+        } else if (mTarget.isRunning()) {
+          getBinding().setStateStr(getString(R.string.stop));
+        }
+
+        if (entity.getFileSize() != 0) {
+          getBinding().setFileSize(CommonUtil.formatFileSize(entity.getFileSize()));
+          getBinding().setProgress(entity.isComplete() ? 100
+              : (int) (entity.getCurrentProgress() * 100 / entity.getFileSize()));
+        }
+        getBinding().setUrl(entity.getUrl());
+        getBinding().setFilePath(entity.getFilePath());
+        mUrl = entity.getUrl();
+        mFilePath = entity.getFilePath();
       }
+    });
+    getBinding().setViewModel(this);
+    try {
+      getBinding().codeView.setSource(AppUtil.getHelpCode(this, "FtpDownload.java"));
+    } catch (IOException e) {
+      e.printStackTrace();
     }
   }
 
   public void onClick(View view) {
     switch (view.getId()) {
       case R.id.start:
-        Aria.download(this).loadFtp(URL)
-            .login("N0rI", "0qcK")
-            .setFilePath("/mnt/sdcard/", true)
-            .start();
-        break;
-      case R.id.stop:
-        Aria.download(this).loadFtp(URL).stop();
+        if (mTarget.isRunning()) {
+          getBinding().setStateStr(getString(R.string.resume));
+          Aria.download(this).loadFtp(mUrl).stop();
+        } else {
+          getBinding().setStateStr(getString(R.string.stop));
+          Aria.download(this).loadFtp(mUrl).login("N0rI", "0qcK")
+              .setFilePath(mFilePath, true)
+              .start();
+        }
         break;
       case R.id.cancel:
-        Aria.download(this).loadFtp(URL).cancel();
+        Aria.download(this).loadFtp(mUrl).cancel();
         break;
     }
+  }
+
+  public void chooseUrl() {
+    ModifyUrlDialog dialog =
+        new ModifyUrlDialog(this, getString(R.string.modify_url_dialog_title), mUrl);
+    dialog.show(getSupportFragmentManager(), "ModifyUrlDialog");
+  }
+
+  public void chooseFilePath() {
+    DirChooseDialog dirChooseDialog = new DirChooseDialog(this);
+    dirChooseDialog.show(getSupportFragmentManager(), "DirChooseDialog");
   }
 
   @Download.onPre() protected void onPre(DownloadTask task) {
@@ -119,4 +165,14 @@ public class FtpDownloadActivity extends BaseActivity<ActivityFtpDownloadBinding
   @Override protected int setLayoutId() {
     return R.layout.activity_ftp_download;
   }
+
+  @Override protected void dataCallback(int result, Object data) {
+    super.dataCallback(result, data);
+    if (result == ModifyUrlDialog.MODIFY_URL_DIALOG_RESULT) {
+      mModule.uploadUrl(this, String.valueOf(data));
+    }else if (result == DirChooseDialog.DIR_CHOOSE_DIALOG_RESULT) {
+      mModule.updateFilePath(this, String.valueOf(data));
+    }
+  }
+
 }

@@ -135,8 +135,14 @@ class DownloadGroupListener
     mTaskWrapper.setState(state);
     mEntity.setState(state);
     if (state == IEntity.STATE_CANCEL) {
-      CommonUtil.delGroupTaskRecord(mEntity, mTaskWrapper.isRemoveFile(),
-          getTask().getSchedulerType() != TaskSchedulerType.TYPE_CANCEL_AND_NOT_NOTIFY);
+      int sType = getTask().getSchedulerType();
+      if (sType == TaskSchedulerType.TYPE_CANCEL_AND_NOT_NOTIFY) {
+        mEntity.setComplete(false);
+        mEntity.setState(IEntity.STATE_WAIT);
+        CommonUtil.delGroupTaskRecord(mEntity, mTaskWrapper.isRemoveFile(), false);
+      } else {
+        CommonUtil.delGroupTaskRecord(mEntity, mTaskWrapper.isRemoveFile(), true);
+      }
       return;
     } else if (state == IEntity.STATE_STOP) {
       mEntity.setStopTime(System.currentTimeMillis());

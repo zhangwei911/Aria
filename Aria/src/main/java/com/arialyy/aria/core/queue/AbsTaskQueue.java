@@ -71,6 +71,10 @@ public abstract class AbsTaskQueue<TASK extends AbsTask, TASK_WRAPPER extends Ab
    * @param task 需要恢复的任务
    */
   @Override public void resumeTask(TASK task) {
+    if (task == null){
+      ALog.w(TAG, "resume task fail, task is null");
+      return;
+    }
     if (mExecutePool.size() >= getMaxTaskNum()) {
       task.getTaskWrapper().getEntity().setState(IEntity.STATE_WAIT);
       mCachePool.putTaskToFirst(task);
@@ -204,12 +208,19 @@ public abstract class AbsTaskQueue<TASK extends AbsTask, TASK_WRAPPER extends Ab
    * @param task {@link DownloadTask}、{@link UploadTask}、{@link DownloadGroupTask}
    */
   void addTask(TASK task) {
+    if (task == null){
+      ALog.w(TAG, "add task fail, task is null");
+      return;
+    }
     if (!mCachePool.taskExits(task.getKey())) {
       mCachePool.putTask(task);
     }
   }
 
   @Override public void startTask(TASK task) {
+    if (task == null){
+      ALog.w(TAG, "start fail, task is null");
+    }
     if (mExecutePool.taskExits(task.getKey())) {
       ALog.w(TAG, String.format("任务【%s】执行中", task.getKey()));
       return;
@@ -221,6 +232,10 @@ public abstract class AbsTaskQueue<TASK extends AbsTask, TASK_WRAPPER extends Ab
   }
 
   @Override public void stopTask(TASK task) {
+    if (task == null) {
+      ALog.w(TAG, "stop fail, task is null");
+      return;
+    }
     int state = task.getState();
     boolean canStop = false;
     switch (state) {
@@ -267,7 +282,7 @@ public abstract class AbsTaskQueue<TASK extends AbsTask, TASK_WRAPPER extends Ab
 
   @Override public void reTryStart(TASK task) {
     if (task == null) {
-      ALog.e(TAG, "任务重试失败，原因：task 为null");
+      ALog.e(TAG, "reTry fail, task is null");
       return;
     }
 

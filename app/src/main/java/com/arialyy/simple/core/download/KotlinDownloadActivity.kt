@@ -53,7 +53,7 @@ class KotlinDownloadActivity : BaseActivity<ActivitySingleKotlinBinding>() {
 
   private var mUrl: String? = null
   private var mFilePath: String? = null
-  private var mModule: DownloadModule1? = null
+  private var mModule: HttpDownloadModule? = null
   private var mTarget: DownloadTarget? = null
 
   internal var receiver: BroadcastReceiver = object : BroadcastReceiver() {
@@ -93,8 +93,8 @@ class KotlinDownloadActivity : BaseActivity<ActivitySingleKotlinBinding>() {
     Aria.download(this)
         .register()
     mModule = ViewModelProviders.of(this)
-        .get(DownloadModule1::class.java)
-    mModule!!.getSingDownloadInfo(this)
+        .get(HttpDownloadModule::class.java)
+    mModule!!.getHttpDownloadInfo(this)
         .observe(this, Observer { entity ->
           if (entity == null) {
             return@Observer

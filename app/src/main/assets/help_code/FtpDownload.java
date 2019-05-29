@@ -19,7 +19,7 @@ import java.io.File;
 public class FtpDownload extends BaseActivity<ActivityTestBinding> {
   String TAG = "TestFTPActivity";
   private final String URL = "ftp://192.168.1.3:21/download//AriaPrj.rar";
-  private final String FILE_PATH = "/mnt/sdcard/AriaPrj.rar";
+  private final String FILE_PATH = "/mnt/sdcard/";
 
   @Override protected int setLayoutId() {
     return R.layout.activity_test;

@@ -81,7 +81,11 @@ public abstract class AbsNormalCmd<T extends AbsTaskWrapper> extends AbsCmd<T> {
    * 发送等待状态
    */
   void sendWaitState() {
-    sendWaitState(getTask());
+    AbsTask task = getTask();
+    if (task == null) {
+      task = createTask();
+    }
+    sendWaitState(task);
   }
 
   /**
@@ -105,14 +109,22 @@ public abstract class AbsNormalCmd<T extends AbsTaskWrapper> extends AbsCmd<T> {
    * 停止任务
    */
   void stopTask() {
-    mQueue.stopTask(getTask());
+    AbsTask task = getTask();
+    if (task == null) {
+      task = createTask();
+    }
+    mQueue.stopTask(task);
   }
 
   /**
    * 删除任务
    */
   void removeTask() {
-    mQueue.cancelTask(getTask());
+    AbsTask task = getTask();
+    if (task == null) {
+      task = createTask();
+    }
+    mQueue.cancelTask(task);
   }
 
   /**
@@ -130,14 +142,22 @@ public abstract class AbsNormalCmd<T extends AbsTaskWrapper> extends AbsCmd<T> {
    * 启动任务
    */
   void startTask() {
-    mQueue.startTask(getTask());
+    AbsTask task = getTask();
+    if (task == null){
+      task = createTask();
+    }
+    mQueue.startTask(task);
   }
 
   /**
    * 恢复任务
    */
   void resumeTask() {
-    mQueue.resumeTask(getTask());
+    AbsTask task = getTask();
+    if (task == null){
+      task = createTask();
+    }
+    mQueue.resumeTask(task);
   }
 
   /**

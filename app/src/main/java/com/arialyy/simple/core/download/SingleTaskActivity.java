@@ -55,7 +55,7 @@ public class SingleTaskActivity extends BaseActivity<ActivitySingleBinding> {
 
   private String mUrl;
   private String mFilePath;
-  private DownloadModule1 mModule;
+  private HttpDownloadModule mModule;
   private DownloadTarget mTarget;
 
   BroadcastReceiver receiver = new BroadcastReceiver() {
@@ -89,8 +89,8 @@ public class SingleTaskActivity extends BaseActivity<ActivitySingleBinding> {
     super.init(savedInstanceState);
     setTitle("单任务下载");
     Aria.download(this).register();
-    mModule = ViewModelProviders.of(this).get(DownloadModule1.class);
-    mModule.getSingDownloadInfo(this).observe(this, new Observer<DownloadEntity>() {
+    mModule = ViewModelProviders.of(this).get(HttpDownloadModule.class);
+    mModule.getHttpDownloadInfo(this).observe(this, new Observer<DownloadEntity>() {
 
       @Override public void onChanged(@Nullable DownloadEntity entity) {
         if (entity == null) {
@@ -194,6 +194,7 @@ public class SingleTaskActivity extends BaseActivity<ActivitySingleBinding> {
   void taskStart(DownloadTask task) {
     if (task.getKey().equals(mUrl)) {
       getBinding().setFileSize(task.getConvertFileSize());
+      ALog.d(TAG, "isComplete = " + task.isComplete() + ", state = " + task.getState());
     }
   }
 
@@ -236,9 +237,6 @@ public class SingleTaskActivity extends BaseActivity<ActivitySingleBinding> {
     }
   }
 
-  /**
-   *
-   */
   @Download.onTaskFail
   void taskFail(DownloadTask task, Exception e) {
     if (task.getKey().equals(mUrl)) {
@@ -273,9 +271,6 @@ public class SingleTaskActivity extends BaseActivity<ActivitySingleBinding> {
         } else {
           startD();
         }
-        break;
-      case R.id.stop:
-        Aria.download(this).load(mUrl).stop();
         break;
       case R.id.cancel:
         Aria.download(this).load(mUrl).cancel(true);

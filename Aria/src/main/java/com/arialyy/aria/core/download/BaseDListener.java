@@ -56,8 +56,15 @@ public class BaseDListener extends BaseListener<DownloadEntity, DTaskWrapper, Do
     mEntity.setState(state);
 
     if (state == IEntity.STATE_CANCEL) {
-      CommonUtil.delTaskRecord(mEntity.getDownloadPath(), 1, mTaskWrapper.isRemoveFile(),
-          getTask().getSchedulerType() != TaskSchedulerType.TYPE_CANCEL_AND_NOT_NOTIFY);
+      int sType = getTask().getSchedulerType();
+      if (sType == TaskSchedulerType.TYPE_CANCEL_AND_NOT_NOTIFY) {
+        mEntity.setComplete(false);
+        mEntity.setState(IEntity.STATE_WAIT);
+        CommonUtil.delTaskRecord(mEntity.getFilePath(), 1, mTaskWrapper.isRemoveFile(), false);
+      } else {
+        CommonUtil.delTaskRecord(mEntity.getFilePath(), 1, mTaskWrapper.isRemoveFile(), true);
+      }
+
       return;
     } else if (state == IEntity.STATE_STOP) {
       mEntity.setStopTime(System.currentTimeMillis());

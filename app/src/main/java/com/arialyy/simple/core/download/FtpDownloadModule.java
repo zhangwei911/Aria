@@ -19,6 +19,7 @@ package com.arialyy.simple.core.download;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.content.Context;
+import android.net.Uri;
 import android.os.Environment;
 import android.text.TextUtils;
 import com.arialyy.aria.core.Aria;
@@ -28,35 +29,35 @@ import com.arialyy.frame.base.BaseViewModule;
 import com.arialyy.simple.util.AppUtil;
 import java.io.File;
 
-public class DownloadModule1 extends BaseViewModule {
-  private final String DOWNLOAD_URL_KEY = "DOWNLOAD_URL_KEY";
-  private final String DOWNLOAD_PATH_KEY = "DOWNLOAD_PATH_KEY";
+public class FtpDownloadModule extends BaseViewModule {
+  private final String FTP_URL_KEY = "FTP_URL_KEY";
+  private final String FTP_PATH_KEY = "FTP_PATH_KEY";
 
-  private final String defUrl =
-      "http://hzdown.muzhiwan.com/2017/05/08/nl.noio.kingdom_59104935e56f0.apk";
-  private final String defFilePath =
+  private final String ftpDefUrl = "ftp://9.9.9.205:2121/Cyberduck-6.9.4.30164.zip";
+  private final String ftpDefPath =
       Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getPath();
 
   private MutableLiveData<DownloadEntity> liveData = new MutableLiveData<>();
   private DownloadEntity singDownloadInfo;
 
   /**
+   * xx
    * 单任务下载的信息
    */
-  LiveData<DownloadEntity> getSingDownloadInfo(Context context) {
-    String url = AppUtil.getConfigValue(context, DOWNLOAD_URL_KEY, defUrl);
-    String filePath = AppUtil.getConfigValue(context, DOWNLOAD_PATH_KEY, defFilePath);
+  LiveData<DownloadEntity> getFtpDownloadInfo(Context context) {
+    String url = AppUtil.getConfigValue(context, FTP_URL_KEY, ftpDefUrl);
+    String filePath = AppUtil.getConfigValue(context, FTP_PATH_KEY, ftpDefPath);
 
     singDownloadInfo = Aria.download(context).getDownloadEntity(url);
     if (singDownloadInfo == null) {
       singDownloadInfo = new DownloadEntity();
       singDownloadInfo.setUrl(url);
-      File temp = new File(defFilePath);
-      singDownloadInfo.setDownloadPath(filePath);
-      singDownloadInfo.setFileName(temp.getName());
+      String name = getFileName(ftpDefUrl);
+      singDownloadInfo.setFileName(name);
+      singDownloadInfo.setFilePath(filePath + name);
     } else {
-      AppUtil.setConfigValue(context, DOWNLOAD_PATH_KEY, singDownloadInfo.getDownloadPath());
-      AppUtil.setConfigValue(context, DOWNLOAD_URL_KEY, singDownloadInfo.getUrl());
+      AppUtil.setConfigValue(context, FTP_PATH_KEY, singDownloadInfo.getFilePath());
+      AppUtil.setConfigValue(context, FTP_URL_KEY, singDownloadInfo.getUrl());
     }
     liveData.postValue(singDownloadInfo);
 
@@ -66,17 +67,15 @@ public class DownloadModule1 extends BaseViewModule {
   /**
    * 更新文件保存路径
    *
-   * @param filePath 文件保存路径
+   * @param dirPath 文件保存文件夹
    */
-  void updateFilePath(Context context, String filePath) {
-    if (TextUtils.isEmpty(filePath)) {
+  void updateFilePath(Context context, String dirPath) {
+    if (TextUtils.isEmpty(dirPath)) {
       ALog.e(TAG, "文件保存路径为空");
       return;
     }
-    File temp = new File(filePath);
-    AppUtil.setConfigValue(context, DOWNLOAD_PATH_KEY, filePath);
-    singDownloadInfo.setFileName(temp.getName());
-    singDownloadInfo.setDownloadPath(filePath);
+    AppUtil.setConfigValue(context, FTP_PATH_KEY, dirPath);
+    singDownloadInfo.setFilePath(dirPath + singDownloadInfo.getFileName());
     liveData.postValue(singDownloadInfo);
   }
 
@@ -88,8 +87,25 @@ public class DownloadModule1 extends BaseViewModule {
       ALog.e(TAG, "下载地址为空");
       return;
     }
-    AppUtil.setConfigValue(context, DOWNLOAD_URL_KEY, url);
+    AppUtil.setConfigValue(context, FTP_URL_KEY, url);
+    File file = new File(singDownloadInfo.getFilePath());
+    String name = getFileName(url);
+    singDownloadInfo.setFilePath(file.getParent() + name);
+    singDownloadInfo.setFileName(name);
     singDownloadInfo.setUrl(url);
     liveData.postValue(singDownloadInfo);
+  }
+
+  /**
+   * 通过url获取文件名
+   *
+   * @param url ftp地址
+   * @return "/aria.text"
+   */
+  private String getFileName(String url) {
+    Uri uri = Uri.parse(url);
+    String path = uri.getPath();
+    int index = path.lastIndexOf("/");
+    return path.substring(index);
   }
 }
