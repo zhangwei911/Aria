@@ -13,27 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.arialyy.aria.core.common;
+package com.arialyy.aria.core.download.m3u8;
 
-import android.os.Handler;
-import com.arialyy.aria.core.inf.AbsTaskWrapper;
-import java.io.File;
+import java.util.List;
 
 /**
- * 子线程下载信息类
+ * M3U8 #EXTINF 信息处理器
  */
-public class SubThreadConfig<TASK_WRAPPER extends AbsTaskWrapper> {
+public interface IM3U8UrlExtInfHandler {
 
-  public TASK_WRAPPER taskWrapper;
-  public boolean isBlock = false;
-  // 启动的线程
-  public int startThreadNum;
-  public String url;
-  public File tempFile;
-  // 线程记录
-  public ThreadRecord record;
-  // 状态处理器
-  public Handler stateHandler;
-  // 动态文件
-  public boolean isOpenDynamicFile;
+  /**
+   * 处理#EXTINF信息，对于某些服务器，返回的切片信息有可能是相对地址，因此，你需要自行转换为可下载http连接
+   *
+   * @param extInf #EXTINF 切片信息列表
+   * @return 根据切片信息转换后的http连接列表，如果你的切片信息是可以直接下载的http连接，直接返回extInf便可
+   */
+  List<String> handler(List<String> extInf);
 }

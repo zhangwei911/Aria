@@ -44,7 +44,7 @@ import javax.net.ssl.SSLSocketFactory;
 /**
  * Created by lyy on 2017/1/18. 链接帮助类
  */
-class ConnectionHelp {
+public class ConnectionHelp {
   private static final String TAG = "ConnectionHelp";
 
   /**
@@ -52,7 +52,8 @@ class ConnectionHelp {
    *
    * @throws MalformedURLException
    */
-  static URL handleUrl(String url, HttpTaskConfig taskDelegate) throws MalformedURLException {
+  public static URL handleUrl(String url, HttpTaskConfig taskDelegate)
+      throws MalformedURLException {
     Map<String, String> params = taskDelegate.getParams();
     if (params != null && taskDelegate.getRequestEnum() == RequestEnum.GET) {
       if (url.contains("?")) {
@@ -79,7 +80,7 @@ class ConnectionHelp {
    * @return {@link GZIPInputStream}、{@link InflaterInputStream}
    * @throws IOException
    */
-  static InputStream convertInputStream(HttpURLConnection connection) throws IOException {
+  public static InputStream convertInputStream(HttpURLConnection connection) throws IOException {
     String encoding = connection.getHeaderField("Content-Encoding");
     if (TextUtils.isEmpty(encoding)) {
       return connection.getInputStream();
@@ -98,7 +99,7 @@ class ConnectionHelp {
    *
    * @throws IOException
    */
-  static HttpURLConnection handleConnection(URL url, HttpTaskConfig taskDelegate)
+  public static HttpURLConnection handleConnection(URL url, HttpTaskConfig taskDelegate)
       throws IOException {
     HttpURLConnection conn;
     URLConnection urlConn;
@@ -130,7 +131,7 @@ class ConnectionHelp {
    *
    * @throws ProtocolException
    */
-  static HttpURLConnection setConnectParam(HttpTaskConfig delegate, HttpURLConnection conn) {
+  public static HttpURLConnection setConnectParam(HttpTaskConfig delegate, HttpURLConnection conn) {
     if (delegate.getRequestEnum() == RequestEnum.POST) {
       conn.setDoInput(true);
       conn.setDoOutput(true);

@@ -54,19 +54,21 @@ public class SimpleUploadUtil implements IUtil, Runnable {
     mListener.onPre();
     switch (mTaskWrapper.getRequestType()) {
       case AbsTaskWrapper.U_FTP:
-        new FtpFileInfoThread(mTaskWrapper, new OnFileInfoCallback() {
-          @Override public void onComplete(String url, CompleteInfo info) {
-            if (info.code == FtpFileInfoThread.CODE_COMPLETE) {
-              mListener.onComplete();
-            } else {
-              mUploader.start();
-            }
-          }
+        FtpFileInfoThread infoThread =
+            new FtpFileInfoThread(mTaskWrapper, new OnFileInfoCallback() {
+              @Override public void onComplete(String url, CompleteInfo info) {
+                if (info.code == FtpFileInfoThread.CODE_COMPLETE) {
+                  mListener.onComplete();
+                } else {
+                  mUploader.start();
+                }
+              }
 
-          @Override public void onFail(AbsEntity entity, BaseException e, boolean needRetry) {
-            mListener.onFail(needRetry, e);
-          }
-        }).start();
+              @Override public void onFail(AbsEntity entity, BaseException e, boolean needRetry) {
+                mListener.onFail(needRetry, e);
+              }
+            });
+        new Thread(infoThread).start();
         break;
       case AbsTaskWrapper.U_HTTP:
         mUploader.start();

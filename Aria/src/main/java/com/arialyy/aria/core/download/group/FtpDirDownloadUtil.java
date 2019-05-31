@@ -43,7 +43,8 @@ public class FtpDirDownloadUtil extends AbsGroupUtil {
     if (mGTWrapper.getEntity().getFileSize() > 1) {
       startDownload();
     } else {
-      new FtpDirInfoThread(mGTWrapper, new OnFileInfoCallback() {
+
+      FtpDirInfoThread infoThread = new FtpDirInfoThread(mGTWrapper, new OnFileInfoCallback() {
         @Override public void onComplete(String url, CompleteInfo info) {
           if (info.code >= 200 && info.code < 300) {
             startDownload();
@@ -53,7 +54,8 @@ public class FtpDirDownloadUtil extends AbsGroupUtil {
         @Override public void onFail(AbsEntity entity, BaseException e, boolean needRetry) {
           mListener.onFail(needRetry, e);
         }
-      }).start();
+      });
+      new Thread(infoThread).start();
     }
   }
 

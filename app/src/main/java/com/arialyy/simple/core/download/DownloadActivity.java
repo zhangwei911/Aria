@@ -16,14 +16,14 @@
 
 package com.arialyy.simple.core.download;
 
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v7.widget.AppCompatImageView;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
-import android.view.Gravity;
 import android.view.View;
 import android.widget.TextView;
 import com.arialyy.simple.MainActivity;
@@ -33,11 +33,10 @@ import com.arialyy.simple.base.adapter.AbsHolder;
 import com.arialyy.simple.base.adapter.AbsRVAdapter;
 import com.arialyy.simple.base.adapter.RvItemClickSupport;
 import com.arialyy.simple.databinding.ActivityDownloadMeanBinding;
-import com.arialyy.simple.core.download.fragment_download.FragmentActivity;
 import com.arialyy.simple.core.download.multi_download.MultiTaskActivity;
-import com.arialyy.simple.core.download.service_download.DownloadService;
 import com.arialyy.simple.modlue.CommonModule;
 import com.arialyy.simple.to.NormalTo;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -54,25 +53,42 @@ public class DownloadActivity extends BaseActivity<ActivityDownloadMeanBinding> 
     super.init(savedInstanceState);
     mTo = getIntent().getParcelableExtra(MainActivity.KEY_MAIN_DATA);
     setTitle(mTo.title);
-    final List<NormalTo> data = getModule(CommonModule.class).getDownloadData();
+
+    final List<NormalTo> data = new ArrayList<>();
     getBinding().list.setLayoutManager(new GridLayoutManager(this, 2));
-    getBinding().list.setAdapter(new Adapter(this, data));
+    final Adapter adapter = new Adapter(this, data);
+    getBinding().list.setAdapter(adapter);
+    final CommonModule module = ViewModelProviders.of(this).get(CommonModule.class);
+
+    module.getDownloadData(this).observe(this,
+        new Observer<List<NormalTo>>() {
+          @Override public void onChanged(@Nullable List<NormalTo> normalTos) {
+            if (normalTos != null) {
+              data.addAll(normalTos);
+              adapter.notifyDataSetChanged();
+            }
+          }
+        });
+
     RvItemClickSupport.addTo(getBinding().list).setOnItemClickListener(
         new RvItemClickSupport.OnItemClickListener() {
           @Override public void onItemClicked(RecyclerView recyclerView, int position, View v) {
-            CommonModule module = getModule(CommonModule.class);
             switch (position) {
               case 0:
-                module.startNextActivity(data.get(position), SingleTaskActivity.class);
+                module.startNextActivity(DownloadActivity.this, data.get(position),
+                    SingleTaskActivity.class);
                 break;
               case 1:
-                module.startNextActivity(data.get(position), MultiTaskActivity.class);
+                module.startNextActivity(DownloadActivity.this, data.get(position),
+                    MultiTaskActivity.class);
                 break;
               case 2:
-                module.startNextActivity(data.get(position), HighestPriorityActivity.class);
+                module.startNextActivity(DownloadActivity.this, data.get(position),
+                    HighestPriorityActivity.class);
                 break;
               case 3:
-                module.startNextActivity(data.get(position), KotlinDownloadActivity.class);
+                module.startNextActivity(DownloadActivity.this, data.get(position),
+                    KotlinDownloadActivity.class);
                 break;
               case 4:
                 break;
@@ -80,41 +96,6 @@ public class DownloadActivity extends BaseActivity<ActivityDownloadMeanBinding> 
           }
         });
   }
-
-  //public void onClick(View view) {
-  //  switch (view.getId()) {
-  //    case R.id.highest_priority:
-  //      startActivity(new Intent(this, HighestPriorityActivity.class));
-  //      break;
-  //    case R.id.service:
-  //      startService(new Intent(this, DownloadService.class));
-  //      break;
-  //    case R.id.single_task:
-  //      startActivity(new Intent(this, SingleTaskActivity.class));
-  //      break;
-  //    case R.id.multi_task:
-  //      startActivity(new Intent(this, MultiTaskActivity.class));
-  //      break;
-  //    case R.id.dialog_task:
-  //      DownloadDialog dialog = new DownloadDialog(this);
-  //
-  //      dialog.show();
-  //      //DownloadDialogFragment dialog = new DownloadDialogFragment(this);
-  //      //dialog.show(getSupportFragmentManager(), "dialog");
-  //      break;
-  //    case R.id.pop_task:
-  //      DownloadPopupWindow pop = new DownloadPopupWindow(this);
-  //      pop.showAtLocation(mRootView, Gravity.CENTER_VERTICAL, 0, 0);
-  //      break;
-  //    case R.id.fragment_task:
-  //      startActivity(new Intent(this, FragmentActivity.class));
-  //      break;
-  //    case R.id.notification:
-  //      //SimpleNotification notification = new SimpleNotification(this);
-  //      //notification.start();
-  //      break;
-  //  }
-  //}
 
   private static class Adapter extends AbsRVAdapter<NormalTo, Adapter.Holder> {
 

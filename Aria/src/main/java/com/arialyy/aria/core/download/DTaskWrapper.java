@@ -17,6 +17,7 @@ package com.arialyy.aria.core.download;
 
 import com.arialyy.aria.core.config.Configuration;
 import com.arialyy.aria.core.config.DownloadConfig;
+import com.arialyy.aria.core.download.m3u8.M3U8TaskConfig;
 import com.arialyy.aria.core.inf.AbsTaskWrapper;
 
 /**
@@ -34,8 +35,17 @@ public class DTaskWrapper extends AbsTaskWrapper<DownloadEntity> {
    */
   private boolean isGroupTask = false;
 
+  private M3U8TaskConfig m3u8TaskConfig;
+
   public DTaskWrapper(DownloadEntity entity) {
     super(entity);
+  }
+
+  public M3U8TaskConfig asM3U8() {
+    if (m3u8TaskConfig == null) {
+      m3u8TaskConfig = new M3U8TaskConfig();
+    }
+    return m3u8TaskConfig;
   }
 
   /**

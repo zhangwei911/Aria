@@ -15,7 +15,7 @@
  */
 package com.arialyy.aria.core.manager;
 
-import com.arialyy.aria.core.common.AbsFileer;
+import com.arialyy.aria.core.common.RecordHandler;
 import com.arialyy.aria.core.common.TaskRecord;
 import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.download.DownloadEntity;
@@ -83,7 +83,7 @@ class DTaskWrapperFactory implements INormalTEFactory<DownloadEntity, DTaskWrapp
         if (record.isBlock) {
           int count = 0;
           for (int i = 0, len = record.threadNum; i < len; i++) {
-            File temp = new File(String.format(AbsFileer.SUB_PATH, record.filePath, i));
+            File temp = new File(String.format(RecordHandler.SUB_PATH, record.filePath, i));
             if (!temp.exists()) {
               count++;
             }

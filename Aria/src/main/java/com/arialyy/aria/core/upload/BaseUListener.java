@@ -17,6 +17,7 @@ package com.arialyy.aria.core.upload;
 
 import android.os.Handler;
 import com.arialyy.aria.core.common.BaseListener;
+import com.arialyy.aria.core.common.RecordHandler;
 import com.arialyy.aria.core.inf.IEntity;
 import com.arialyy.aria.core.inf.IUploadListener;
 import com.arialyy.aria.core.inf.TaskSchedulerType;
@@ -32,26 +33,16 @@ class BaseUListener extends BaseListener<UploadEntity, UTaskWrapper, UploadTask>
     super(task, outHandler);
   }
 
-  @Override
-  protected void saveData(int state, long location) {
-    mTaskWrapper.setState(state);
-    mEntity.setState(state);
-    if (state == IEntity.STATE_CANCEL) {
-      int sType = getTask().getSchedulerType();
-      if (sType == TaskSchedulerType.TYPE_CANCEL_AND_NOT_NOTIFY) {
-        mEntity.setComplete(false);
-        mEntity.setState(IEntity.STATE_WAIT);
-        CommonUtil.delTaskRecord(mEntity.getFilePath(), 2, mTaskWrapper.isRemoveFile(), false);
-      } else {
-        CommonUtil.delTaskRecord(mEntity.getFilePath(), 2, mTaskWrapper.isRemoveFile(), true);
-      }
-    } else if (state == IEntity.STATE_STOP) {
-      mEntity.setStopTime(System.currentTimeMillis());
-    } else if (state == IEntity.STATE_COMPLETE) {
-      handleComplete();
-    } else if (location > 0) {
-      mEntity.setCurrentProgress(location);
+  @Override protected void handleCancel() {
+    int sType = getTask().getSchedulerType();
+    if (sType == TaskSchedulerType.TYPE_CANCEL_AND_NOT_NOTIFY) {
+      mEntity.setComplete(false);
+      mEntity.setState(IEntity.STATE_WAIT);
+      CommonUtil.delTaskRecord(mEntity.getFilePath(), RecordHandler.TYPE_UPLOAD,
+          mTaskWrapper.isRemoveFile(), false);
+    } else {
+      CommonUtil.delTaskRecord(mEntity.getFilePath(), RecordHandler.TYPE_UPLOAD,
+          mTaskWrapper.isRemoveFile(), true);
     }
-    mEntity.update();
   }
 }

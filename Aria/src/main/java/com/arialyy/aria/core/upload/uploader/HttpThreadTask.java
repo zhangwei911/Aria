@@ -16,11 +16,9 @@
 package com.arialyy.aria.core.upload.uploader;
 
 import com.arialyy.aria.core.common.AbsThreadTask;
-import com.arialyy.aria.core.common.StateConstance;
 import com.arialyy.aria.core.common.SubThreadConfig;
 import com.arialyy.aria.core.common.http.HttpTaskConfig;
 import com.arialyy.aria.core.config.UploadConfig;
-import com.arialyy.aria.core.inf.IUploadListener;
 import com.arialyy.aria.core.upload.UTaskWrapper;
 import com.arialyy.aria.core.upload.UploadEntity;
 import com.arialyy.aria.exception.BaseException;
@@ -51,9 +49,8 @@ class HttpThreadTask extends AbsThreadTask<UploadEntity, UTaskWrapper> {
   private HttpURLConnection mHttpConn;
   private OutputStream mOutputStream;
 
-  HttpThreadTask(StateConstance constance, IUploadListener listener,
-      SubThreadConfig<UTaskWrapper> uploadInfo) {
-    super(constance, listener, uploadInfo);
+  HttpThreadTask(SubThreadConfig<UTaskWrapper> config) {
+    super(config);
   }
 
   @Override public HttpThreadTask call() throws Exception {
@@ -65,7 +62,6 @@ class HttpThreadTask extends AbsThreadTask<UploadEntity, UTaskWrapper> {
               getEntity().getUrl())));
       return this;
     }
-    mListener.onPre();
     URL url;
     try {
       url = new URL(getEntity().getUrl());
@@ -112,7 +108,7 @@ class HttpThreadTask extends AbsThreadTask<UploadEntity, UTaskWrapper> {
 
   private void fail(BaseException e1) {
     try {
-      mListener.onFail(true, e1);
+      sendFailMsg(e1);
       if (mOutputStream != null) {
         mOutputStream.close();
       }
@@ -164,9 +160,9 @@ class HttpThreadTask extends AbsThreadTask<UploadEntity, UTaskWrapper> {
     byte[] buffer = new byte[4096];
     int bytesRead;
     while ((bytesRead = inputStream.read(buffer)) != -1) {
-      getState().CURRENT_LOCATION += bytesRead;
+      progress(bytesRead);
       mOutputStream.write(buffer, 0, bytesRead);
-      if (getState().isCancel) {
+      if (isCancel) {
         break;
       }
       if (mSpeedBandUtil != null) {

@@ -88,6 +88,9 @@ public class HttpTaskConfig implements ITaskConfig {
     return fileLenAdapter;
   }
 
+  /**
+   * 如果是匿名内部类，完成后需要将adapter设置为空，否则会出现内存泄漏
+   */
   public void setFileLenAdapter(IHttpFileLenAdapter fileLenAdapter) {
     this.fileLenAdapter = fileLenAdapter;
   }

@@ -18,6 +18,7 @@ package com.arialyy.aria.core.download;
 import android.os.Handler;
 
 import com.arialyy.aria.core.common.BaseListener;
+import com.arialyy.aria.core.common.RecordHandler;
 import com.arialyy.aria.core.inf.IDownloadListener;
 import com.arialyy.aria.core.inf.IEntity;
 import com.arialyy.aria.core.inf.TaskSchedulerType;
@@ -29,7 +30,6 @@ import com.arialyy.aria.util.CommonUtil;
  */
 public class BaseDListener extends BaseListener<DownloadEntity, DTaskWrapper, DownloadTask>
     implements IDownloadListener {
-  private static final String TAG = "BaseDListener";
 
   BaseDListener(DownloadTask task, Handler outHandler) {
     super(task, outHandler);
@@ -50,30 +50,16 @@ public class BaseDListener extends BaseListener<DownloadEntity, DTaskWrapper, Do
     }
   }
 
-  @Override
-  protected void saveData(int state, long location) {
-    mTaskWrapper.setState(state);
-    mEntity.setState(state);
-
-    if (state == IEntity.STATE_CANCEL) {
-      int sType = getTask().getSchedulerType();
-      if (sType == TaskSchedulerType.TYPE_CANCEL_AND_NOT_NOTIFY) {
-        mEntity.setComplete(false);
-        mEntity.setState(IEntity.STATE_WAIT);
-        CommonUtil.delTaskRecord(mEntity.getFilePath(), 1, mTaskWrapper.isRemoveFile(), false);
-      } else {
-        CommonUtil.delTaskRecord(mEntity.getFilePath(), 1, mTaskWrapper.isRemoveFile(), true);
-      }
-
-      return;
-    } else if (state == IEntity.STATE_STOP) {
-      mEntity.setStopTime(System.currentTimeMillis());
-    } else if (state == IEntity.STATE_COMPLETE) {
-      handleComplete();
+  @Override protected void handleCancel() {
+    int sType = getTask().getSchedulerType();
+    if (sType == TaskSchedulerType.TYPE_CANCEL_AND_NOT_NOTIFY) {
+      mEntity.setComplete(false);
+      mEntity.setState(IEntity.STATE_WAIT);
+      CommonUtil.delTaskRecord(mEntity.getFilePath(), RecordHandler.TYPE_DOWNLOAD,
+          mTaskWrapper.isRemoveFile(), false);
+    } else {
+      CommonUtil.delTaskRecord(mEntity.getFilePath(), RecordHandler.TYPE_DOWNLOAD,
+          mTaskWrapper.isRemoveFile(), true);
     }
-    if (location > 0) {
-      mEntity.setCurrentProgress(location);
-    }
-    mEntity.update();
   }
 }

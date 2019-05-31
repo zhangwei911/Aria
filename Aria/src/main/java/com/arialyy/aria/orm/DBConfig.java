@@ -36,7 +36,7 @@ class DBConfig {
   static boolean DEBUG = false;
   static Map<String, Class> mapping = new HashMap<>();
   static String DB_NAME;
-  static int VERSION = 46;
+  static int VERSION = 47;
 
   /**
    * 是否将数据库保存在Sd卡，{@code true} 是

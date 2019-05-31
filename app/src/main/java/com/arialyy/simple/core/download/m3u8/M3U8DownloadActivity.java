@@ -14,13 +14,10 @@
  * limitations under the License.
  */
 
-package com.arialyy.simple.core.download;
+package com.arialyy.simple.core.download.m3u8;
 
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -28,7 +25,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
-
 import com.arialyy.annotations.Download;
 import com.arialyy.aria.core.Aria;
 import com.arialyy.aria.core.download.DownloadEntity;
@@ -36,7 +32,6 @@ import com.arialyy.aria.core.download.DownloadTarget;
 import com.arialyy.aria.core.download.DownloadTask;
 import com.arialyy.aria.core.inf.IEntity;
 import com.arialyy.aria.core.inf.IHttpFileLenAdapter;
-import com.arialyy.aria.core.scheduler.ISchedulers;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
 import com.arialyy.frame.util.show.T;
@@ -44,60 +39,31 @@ import com.arialyy.simple.R;
 import com.arialyy.simple.base.BaseActivity;
 import com.arialyy.simple.common.ModifyPathDialog;
 import com.arialyy.simple.common.ModifyUrlDialog;
-import com.arialyy.simple.databinding.ActivitySingleBinding;
-
-import com.arialyy.simple.util.AppUtil;
+import com.arialyy.simple.databinding.ActivityM3u8Binding;
 import java.io.File;
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
-public class SingleTaskActivity extends BaseActivity<ActivitySingleBinding> {
+public class M3U8DownloadActivity extends BaseActivity<ActivityM3u8Binding> {
 
   private String mUrl;
   private String mFilePath;
-  private HttpDownloadModule mModule;
+  private M3U8Module mModule;
   private DownloadTarget mTarget;
-
-  BroadcastReceiver receiver = new BroadcastReceiver() {
-    @Override
-    public void onReceive(Context context, Intent intent) {
-      if (intent.getAction().equals(ISchedulers.ARIA_TASK_INFO_ACTION)) {
-        ALog.d(TAG, "state = " + intent.getIntExtra(ISchedulers.TASK_STATE, -1));
-        ALog.d(TAG, "type = " + intent.getIntExtra(ISchedulers.TASK_TYPE, -1));
-        ALog.d(TAG, "speed = " + intent.getLongExtra(ISchedulers.TASK_SPEED, -1));
-        ALog.d(TAG, "percent = " + intent.getIntExtra(ISchedulers.TASK_PERCENT, -1));
-        ALog.d(TAG, "entity = " + intent.getParcelableExtra(ISchedulers.TASK_ENTITY).toString());
-      }
-    }
-  };
-
-  @Override
-  protected void onResume() {
-    super.onResume();
-    //registerReceiver(receiver, new IntentFilter(ISchedulers.ARIA_TASK_INFO_ACTION));
-  }
-
-  @Override
-  protected void onDestroy() {
-    super.onDestroy();
-    //unregisterReceiver(receiver);
-    Aria.download(this).unRegister();
-  }
 
   @Override
   protected void init(Bundle savedInstanceState) {
     super.init(savedInstanceState);
     setTitle("单任务下载");
     Aria.download(this).register();
-    mModule = ViewModelProviders.of(this).get(HttpDownloadModule.class);
+    mModule = ViewModelProviders.of(this).get(M3U8Module.class);
     mModule.getHttpDownloadInfo(this).observe(this, new Observer<DownloadEntity>() {
 
       @Override public void onChanged(@Nullable DownloadEntity entity) {
         if (entity == null) {
           return;
         }
-        mTarget = Aria.download(SingleTaskActivity.this).load(entity.getUrl());
+        mTarget = Aria.download(M3U8DownloadActivity.this).load(entity.getUrl());
         if (mTarget.getTaskState() == IEntity.STATE_STOP) {
           getBinding().setStateStr(getString(R.string.resume));
         } else if (mTarget.isRunning()) {
@@ -116,11 +82,6 @@ public class SingleTaskActivity extends BaseActivity<ActivitySingleBinding> {
       }
     });
     getBinding().setViewModel(this);
-    try {
-      getBinding().codeView.setSource(AppUtil.getHelpCode(this, "HttpDownload.java"));
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
   }
 
   public void chooseUrl() {
@@ -242,7 +203,8 @@ public class SingleTaskActivity extends BaseActivity<ActivitySingleBinding> {
   @Download.onTaskFail
   void taskFail(DownloadTask task, Exception e) {
     if (task.getKey().equals(mUrl)) {
-      Toast.makeText(SingleTaskActivity.this, getString(R.string.download_fail), Toast.LENGTH_SHORT)
+      Toast.makeText(M3U8DownloadActivity.this, getString(R.string.download_fail),
+          Toast.LENGTH_SHORT)
           .show();
       getBinding().setStateStr(getString(R.string.start));
     }
@@ -252,7 +214,7 @@ public class SingleTaskActivity extends BaseActivity<ActivitySingleBinding> {
   void taskComplete(DownloadTask task) {
     if (task.getKey().equals(mUrl)) {
       getBinding().setProgress(100);
-      Toast.makeText(SingleTaskActivity.this, getString(R.string.download_success),
+      Toast.makeText(M3U8DownloadActivity.this, getString(R.string.download_success),
           Toast.LENGTH_SHORT).show();
       getBinding().setStateStr(getString(R.string.re_start));
       getBinding().setSpeed("");
@@ -262,7 +224,7 @@ public class SingleTaskActivity extends BaseActivity<ActivitySingleBinding> {
 
   @Override
   protected int setLayoutId() {
-    return R.layout.activity_single;
+    return R.layout.activity_m3u8;
   }
 
   public void onClick(View view) {
@@ -281,26 +243,11 @@ public class SingleTaskActivity extends BaseActivity<ActivitySingleBinding> {
   }
 
   private void startD() {
-    Aria.download(SingleTaskActivity.this)
+    Aria.download(M3U8DownloadActivity.this)
         .load(mUrl)
-        //.addHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3")
-        //.addHeader("Accept-Encoding", "gzip, deflate")
-        //.addHeader("DNT", "1")
-        //.addHeader("Cookie", "BAIDUID=648E5FF020CC69E8DD6F492D1068AAA9:FG=1; BIDUPSID=648E5FF020CC69E8DD6F492D1068AAA9; PSTM=1519099573; BD_UPN=12314753; locale=zh; BDSVRTM=0")
         .useServerFileName(true)
         .setFilePath(mFilePath, true)
-        .setFileLenAdapter(new IHttpFileLenAdapter() {
-          @Override public long handleFileLen(Map<String, List<String>> headers) {
-
-            List<String> sLength = headers.get("Content-Length");
-            if (sLength == null || sLength.isEmpty()) {
-              return -1;
-            }
-            String temp = sLength.get(0);
-
-            return Long.parseLong(temp);
-          }
-        })
+        .asM3U8()
         .start();
   }
 

@@ -16,8 +16,10 @@
 package com.arialyy.aria.core.download;
 
 import android.text.TextUtils;
+import com.arialyy.aria.core.common.RecordHandler;
 import com.arialyy.aria.core.inf.ITargetHandler;
 import com.arialyy.aria.core.inf.IConfigHandler;
+import com.arialyy.aria.core.inf.ITaskWrapper;
 import com.arialyy.aria.core.manager.TaskWrapperManager;
 import com.arialyy.aria.core.queue.DownloadTaskQueue;
 import com.arialyy.aria.orm.DbEntity;
@@ -100,6 +102,10 @@ class DNormalConfigHandler<TARGET extends AbsDTarget> implements IConfigHandler 
     if (b) {
       mEntity.save();
     }
+    if (mTarget.getTaskWrapper().getRequestType() == ITaskWrapper.M3U8_FILE
+        && mEntity.getFileSize() == 0) {
+      ALog.e(TAG, "由于m3u8协议的特殊性质，你需要设置文件长度才能获取到正确的下载进度百分比。设置方法：asM3U8().setFileSize(xxx)");
+    }
     return b;
   }
 
@@ -109,13 +115,14 @@ class DNormalConfigHandler<TARGET extends AbsDTarget> implements IConfigHandler 
       ALog.e(TAG, "下载失败，文件保存路径为null");
       return false;
     } else if (!filePath.startsWith("/")) {
-      ALog.e(TAG, "下载失败，文件保存路径【" + filePath + "】错误");
+      ALog.e(TAG, String.format("下载失败，文件保存路径【%s】错误", filePath));
       return false;
     }
     File file = new File(filePath);
     if (file.isDirectory()) {
       if (mTarget.getTargetType() == ITargetHandler.D_HTTP) {
-        ALog.e(TAG, "下载失败，保存路径【" + filePath + "】不能为文件夹，路径需要是完整的文件路径，如：/mnt/sdcard/game.zip");
+        ALog.e(TAG,
+            String.format("下载失败，保存路径【%s】不能为文件夹，路径需要是完整的文件路径，如：/mnt/sdcard/game.zip", filePath));
         return false;
       } else if (mTarget.getTargetType() == ITargetHandler.D_FTP) {
         filePath += mEntity.getFileName();
@@ -132,11 +139,11 @@ class DNormalConfigHandler<TARGET extends AbsDTarget> implements IConfigHandler 
       // 检查路径冲突
       if (DbEntity.checkDataExist(DownloadEntity.class, "downloadPath=?", filePath)) {
         if (!forceDownload) {
-          ALog.e(TAG, "下载失败，保存路径【" + filePath + "】已经被其它任务占用，请设置其它保存路径");
+          ALog.e(TAG, String.format("下载失败，保存路径【%s】已经被其它任务占用，请设置其它保存路径", filePath));
           return false;
         } else {
-          ALog.w(TAG, "保存路径【" + filePath + "】已经被其它任务占用，当前任务将覆盖该路径的文件");
-          CommonUtil.delTaskRecord(filePath, 1);
+          ALog.w(TAG, String.format("保存路径【%s】已经被其它任务占用，当前任务将覆盖该路径的文件", filePath));
+          CommonUtil.delTaskRecord(filePath, RecordHandler.TYPE_DOWNLOAD);
           mTarget.setTaskWrapper(
               TaskWrapperManager.getInstance()
                   .getHttpTaskWrapper(DTaskWrapper.class, mUrl));
@@ -144,7 +151,7 @@ class DNormalConfigHandler<TARGET extends AbsDTarget> implements IConfigHandler 
       }
       File oldFile = new File(mEntity.getDownloadPath());
       File newFile = new File(filePath);
-      mEntity.setDownloadPath(filePath);
+      mEntity.setFilePath(filePath);
       mEntity.setFileName(newFile.getName());
       // 如过使用Content-Disposition中的文件名，将不会执行重命名工作
       if (mTarget.getTaskWrapper().asHttp().isUseServerFileName()) {

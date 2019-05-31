@@ -29,6 +29,8 @@ import java.util.List;
  * 任务上传或下载的任务记录
  */
 public class TaskRecord extends DbEntity {
+  public static final int TYPE_HTTP_FTP = 0;
+  public static final int TYPE_M3U8 = 1;
 
   @Ignore
   public List<ThreadRecord> threadRecords;
@@ -84,4 +86,10 @@ public class TaskRecord extends DbEntity {
    * {@code true}是，{@code false}不是
    */
   public boolean isOpenDynamicFile = false;
+
+  /**
+   * 线程类型
+   * {@link #TYPE_HTTP_FTP}、{@link #TYPE_M3U8}
+   */
+  public int taskType = 0;
 }

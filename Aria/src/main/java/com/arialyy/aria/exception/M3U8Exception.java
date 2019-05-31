@@ -13,27 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.arialyy.aria.core.common;
+package com.arialyy.aria.exception;
 
-import android.os.Handler;
-import com.arialyy.aria.core.inf.AbsTaskWrapper;
-import java.io.File;
+public class M3U8Exception extends BaseException{
+  private static final String M3U8_EXCEPTION = "M3U8 Exception:";
 
-/**
- * 子线程下载信息类
- */
-public class SubThreadConfig<TASK_WRAPPER extends AbsTaskWrapper> {
+  public M3U8Exception(String tag, String message) {
+    super(tag, String.format("%s%s", M3U8_EXCEPTION, message));
+  }
 
-  public TASK_WRAPPER taskWrapper;
-  public boolean isBlock = false;
-  // 启动的线程
-  public int startThreadNum;
-  public String url;
-  public File tempFile;
-  // 线程记录
-  public ThreadRecord record;
-  // 状态处理器
-  public Handler stateHandler;
-  // 动态文件
-  public boolean isOpenDynamicFile;
+  public M3U8Exception(String tag, String message, Exception e){
+    super(tag, message, e);
+  }
 }

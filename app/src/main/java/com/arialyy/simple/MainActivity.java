@@ -17,15 +17,16 @@
 package com.arialyy.simple;
 
 import android.Manifest;
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
-import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v7.widget.AppCompatImageView;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import com.arialyy.frame.permission.OnPermissionCallback;
@@ -35,6 +36,7 @@ import com.arialyy.simple.base.BaseActivity;
 import com.arialyy.simple.base.adapter.AbsHolder;
 import com.arialyy.simple.base.adapter.AbsRVAdapter;
 import com.arialyy.simple.base.adapter.RvItemClickSupport;
+import com.arialyy.simple.core.download.m3u8.M3U8DownloadActivity;
 import com.arialyy.simple.databinding.ActivityMainBinding;
 import com.arialyy.simple.core.download.DownloadActivity;
 import com.arialyy.simple.core.download.FtpDownloadActivity;
@@ -44,6 +46,7 @@ import com.arialyy.simple.core.upload.FtpUploadActivity;
 import com.arialyy.simple.core.upload.HttpUploadActivity;
 import com.arialyy.simple.modlue.CommonModule;
 import com.arialyy.simple.to.NormalTo;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -60,33 +63,53 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
     getSupportActionBar().setDisplayHomeAsUpEnabled(false);
 
     getBinding().list.setLayoutManager(new LinearLayoutManager(this));
-    final List<NormalTo> data = getModule(CommonModule.class).getMainData();
-    getBinding().list.setAdapter(
-        new Adapter(this, data));
+    final List<NormalTo> data = new ArrayList<>();
+    final Adapter adapter = new Adapter(this, data);
+    getBinding().list.setAdapter(adapter);
     getBinding().list.addItemDecoration(
         new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
+
+    final CommonModule module = ViewModelProviders.of(this).get(CommonModule.class);
+    module.getMainData(this).observe(this, new Observer<List<NormalTo>>() {
+      @Override public void onChanged(@Nullable List<NormalTo> normalTos) {
+        if (normalTos != null) {
+          data.addAll(normalTos);
+          adapter.notifyDataSetChanged();
+        }
+      }
+    });
+
     RvItemClickSupport.addTo(getBinding().list).setOnItemClickListener(
         new RvItemClickSupport.OnItemClickListener() {
           @Override public void onItemClicked(RecyclerView recyclerView, int position, View v) {
-            CommonModule module = getModule(CommonModule.class);
             switch (position) {
               case 0:
-                module.startNextActivity(data.get(position), DownloadActivity.class);
+                module.startNextActivity(MainActivity.this, data.get(position),
+                    DownloadActivity.class);
                 break;
               case 1:
-                module.startNextActivity(data.get(position), HttpUploadActivity.class);
+                module.startNextActivity(MainActivity.this, data.get(position),
+                    HttpUploadActivity.class);
                 break;
               case 2:
-                module.startNextActivity(data.get(position), DownloadGroupActivity.class);
+                module.startNextActivity(MainActivity.this, data.get(position),
+                    DownloadGroupActivity.class);
                 break;
               case 3:
-                module.startNextActivity(data.get(position), FtpDownloadActivity.class);
+                module.startNextActivity(MainActivity.this, data.get(position),
+                    FtpDownloadActivity.class);
                 break;
               case 4:
-                module.startNextActivity(data.get(position), FTPDirDownloadActivity.class);
+                module.startNextActivity(MainActivity.this, data.get(position),
+                    FTPDirDownloadActivity.class);
                 break;
               case 5:
-                module.startNextActivity(data.get(position), FtpUploadActivity.class);
+                module.startNextActivity(MainActivity.this, data.get(position),
+                    FtpUploadActivity.class);
+                break;
+              case 6:
+                module.startNextActivity(MainActivity.this, data.get(position),
+                    M3U8DownloadActivity.class);
                 break;
             }
           }

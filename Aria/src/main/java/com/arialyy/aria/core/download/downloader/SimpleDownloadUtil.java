@@ -29,7 +29,7 @@ import com.arialyy.aria.exception.BaseException;
  * Created by lyy on 2015/8/25.
  * D_HTTP\FTP单任务下载工具
  */
-public class SimpleDownloadUtil implements IUtil, Runnable {
+public class SimpleDownloadUtil implements IUtil {
   private String TAG = "SimpleDownloadUtil";
   private IDownloadListener mListener;
   private Downloader mDownloader;
@@ -84,7 +84,17 @@ public class SimpleDownloadUtil implements IUtil, Runnable {
     if (isStop || isCancel) {
       return;
     }
-    new Thread(this).start();
+    mListener.onPre();
+    // 如果网址没有变，而服务器端端文件改变，以下代码就没有用了
+    //if (mTaskWrapper.getEntity().getFileSize() <= 1
+    //    || mTaskWrapper.isRefreshInfo()
+    //    || mTaskWrapper.getRequestType() == AbsTaskWrapper.D_FTP
+    //    || mTaskWrapper.getState() == IEntity.STATE_FAIL) {
+    //  new Thread(createInfoThread()).start();
+    //} else {
+    //  mDownloader.start();
+    //}
+    new Thread(createInfoThread()).start();
   }
 
   @Override public void resume() {
@@ -100,23 +110,6 @@ public class SimpleDownloadUtil implements IUtil, Runnable {
       return;
     }
     mListener.onFail(needRetry, e);
-  }
-
-  @Override public void run() {
-    mListener.onPre();
-    if (isStop || isCancel) {
-      return;
-    }
-    // 如果网址没有变，而服务器端端文件改变，以下代码就没有用了
-    //if (mTaskWrapper.getEntity().getFileSize() <= 1
-    //    || mTaskWrapper.isRefreshInfo()
-    //    || mTaskWrapper.getRequestType() == AbsTaskWrapper.D_FTP
-    //    || mTaskWrapper.getState() == IEntity.STATE_FAIL) {
-    //  new Thread(createInfoThread()).start();
-    //} else {
-    //  mDownloader.start();
-    //}
-    new Thread(createInfoThread()).start();
   }
 
   /**

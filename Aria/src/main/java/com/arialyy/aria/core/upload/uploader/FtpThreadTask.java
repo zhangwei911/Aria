@@ -19,16 +19,13 @@ import android.text.TextUtils;
 import aria.apache.commons.net.ftp.FTPClient;
 import aria.apache.commons.net.ftp.FTPReply;
 import aria.apache.commons.net.ftp.OnFtpInputStreamListener;
-import com.arialyy.aria.core.common.StateConstance;
 import com.arialyy.aria.core.common.SubThreadConfig;
 import com.arialyy.aria.core.common.ftp.AbsFtpThreadTask;
 import com.arialyy.aria.core.common.ftp.FtpTaskConfig;
 import com.arialyy.aria.core.config.UploadConfig;
-import com.arialyy.aria.core.inf.IEventListener;
 import com.arialyy.aria.core.upload.UploadEntity;
 import com.arialyy.aria.core.upload.UTaskWrapper;
 import com.arialyy.aria.exception.AriaIOException;
-import com.arialyy.aria.exception.TaskException;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.BufferedRandomAccessFile;
 import com.arialyy.aria.util.CommonUtil;
@@ -42,9 +39,8 @@ class FtpThreadTask extends AbsFtpThreadTask<UploadEntity, UTaskWrapper> {
   private final String TAG = "FtpThreadTask";
   private String dir, remotePath;
 
-  FtpThreadTask(StateConstance constance, IEventListener listener,
-      SubThreadConfig<UTaskWrapper> info) {
-    super(constance, listener, info);
+  FtpThreadTask(SubThreadConfig<UTaskWrapper> config) {
+    super(config);
   }
 
   @Override public int getMaxSpeed() {
@@ -57,14 +53,12 @@ class FtpThreadTask extends AbsFtpThreadTask<UploadEntity, UTaskWrapper> {
 
   @Override public FtpThreadTask call() throws Exception {
     super.call();
-    //当前子线程的下载位置
-    mChildCurrentLocation = getConfig().START_LOCATION;
     FTPClient client = null;
     BufferedRandomAccessFile file = null;
     try {
       ALog.d(TAG,
-          String.format("任务【%s】线程__%s__开始上传【开始位置 : %s，结束位置：%s】", getConfig().TEMP_FILE.getName(),
-              getConfig().THREAD_ID, getConfig().START_LOCATION, getConfig().END_LOCATION));
+          String.format("任务【%s】线程__%s__开始上传【开始位置 : %s，结束位置：%s】", getFileName(),
+              mRecord.threadId, mRecord.startLocation, mRecord.endLocation));
       client = createClient();
       if (client == null) {
         return this;
@@ -72,7 +66,7 @@ class FtpThreadTask extends AbsFtpThreadTask<UploadEntity, UTaskWrapper> {
       initPath();
       client.makeDirectory(dir);
       client.changeWorkingDirectory(dir);
-      client.setRestartOffset(getConfig().START_LOCATION);
+      client.setRestartOffset(mRecord.startLocation);
       int reply = client.getReplyCode();
       if (!FTPReply.isPositivePreliminary(reply) && reply != FTPReply.FILE_ACTION_OK) {
         fail(mChildCurrentLocation,
@@ -84,32 +78,22 @@ class FtpThreadTask extends AbsFtpThreadTask<UploadEntity, UTaskWrapper> {
       }
 
       file =
-          new BufferedRandomAccessFile(getConfig().TEMP_FILE, "rwd", getTaskConfig().getBuffSize());
-      if (getConfig().START_LOCATION != 0) {
+          new BufferedRandomAccessFile(getConfig().tempFile, "rwd", getTaskConfig().getBuffSize());
+      if (mRecord.startLocation != 0) {
         //file.skipBytes((int) getConfig().START_LOCATION);
-        file.seek(getConfig().START_LOCATION);
+        file.seek(mRecord.startLocation);
       }
       boolean complete = upload(client, file);
       if (!complete || isBreak()) {
         return this;
       }
-      ALog.i(TAG,
-          String.format("任务【%s】线程__%s__上传完毕", getConfig().TEMP_FILE.getName(),
-              getConfig().THREAD_ID));
-      writeConfig(true, getConfig().END_LOCATION);
-      getState().COMPLETE_THREAD_NUM++;
-      if (getState().isComplete()) {
-        sendCompleteMsg();
-      }
-      if (getState().isFail()) {
-        mListener.onFail(false, new TaskException(TAG,
-            String.format("上传失败，filePath: %s, uploadUrl: %s", getEntity().getFilePath(),
-                getConfig().URL)));
-      }
+      ALog.i(TAG, String.format("任务【%s】线程__%s__上传完毕", getFileName(), mRecord.threadId));
+      writeConfig(true, mRecord.endLocation);
+      sendCompleteMsg();
     } catch (IOException e) {
       fail(mChildCurrentLocation, new AriaIOException(TAG,
           String.format("上传失败，filePath: %s, uploadUrl: %s", getEntity().getFilePath(),
-              getConfig().URL)));
+              getConfig().url)));
     } catch (Exception e) {
       fail(mChildCurrentLocation, new AriaIOException(TAG, null, e));
     } finally {

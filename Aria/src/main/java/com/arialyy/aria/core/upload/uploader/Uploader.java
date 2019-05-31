@@ -16,8 +16,8 @@
 package com.arialyy.aria.core.upload.uploader;
 
 import com.arialyy.aria.core.AriaManager;
-import com.arialyy.aria.core.common.AbsFileer;
 import com.arialyy.aria.core.common.AbsThreadTask;
+import com.arialyy.aria.core.common.NormalFileer;
 import com.arialyy.aria.core.common.SubThreadConfig;
 import com.arialyy.aria.core.inf.AbsTaskWrapper;
 import com.arialyy.aria.core.inf.IUploadListener;
@@ -29,7 +29,7 @@ import java.io.File;
  * Created by Aria.Lao on 2017/7/27.
  * 文件上传器
  */
-class Uploader extends AbsFileer<UploadEntity, UTaskWrapper> {
+class Uploader extends NormalFileer<UploadEntity, UTaskWrapper> {
 
   Uploader(IUploadListener listener, UTaskWrapper taskEntity) {
     super(listener, taskEntity);
@@ -42,20 +42,12 @@ class Uploader extends AbsFileer<UploadEntity, UTaskWrapper> {
     return true;
   }
 
-  @Override protected int getType() {
-    return UPLOAD;
-  }
-
-  @Override protected int setNewTaskThreadNum() {
-    return 1;
-  }
-
   @Override protected AbsThreadTask selectThreadTask(SubThreadConfig<UTaskWrapper> config) {
     switch (mTaskWrapper.getRequestType()) {
       case AbsTaskWrapper.U_FTP:
-        return new FtpThreadTask(mConstance, mListener, config);
+        return new FtpThreadTask(config);
       case AbsTaskWrapper.U_HTTP:
-        return new HttpThreadTask(mConstance, (IUploadListener) mListener, config);
+        return new HttpThreadTask(config);
     }
     return null;
   }

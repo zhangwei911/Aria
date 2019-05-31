@@ -15,52 +15,37 @@
  */
 package com.arialyy.simple.modlue;
 
+import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.MutableLiveData;
 import android.content.Context;
 import android.content.Intent;
-import com.arialyy.aria.core.download.DownloadEntity;
-import com.arialyy.frame.module.AbsModule;
+import com.arialyy.frame.base.BaseViewModule;
 import com.arialyy.simple.MainActivity;
 import com.arialyy.simple.R;
 import com.arialyy.simple.to.NormalTo;
-import com.github.mikephil.charting.data.Entry;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * 通用Modle块
  */
-public class CommonModule extends AbsModule {
+public class CommonModule extends BaseViewModule {
 
   private int mPosition;
+  private MutableLiveData<List<NormalTo>> mLiveData = new MutableLiveData<>();
 
-  public CommonModule(Context context) {
-    super(context);
+  public CommonModule() {
   }
 
-  public void startNextActivity(NormalTo to, Class clazz) {
-    Intent intent = new Intent(getContext(), clazz);
+  public void startNextActivity(Context context, NormalTo to, Class clazz) {
+    Intent intent = new Intent(context, clazz);
     intent.putExtra(MainActivity.KEY_MAIN_DATA, to);
-    getContext().startActivity(intent);
+    context.startActivity(intent);
   }
 
-  /**
-   * 创建图表实体
-   */
-  public Entry createNewEntry(DownloadEntity entity) {
-    long speed = entity.getSpeed() / 1024;
-    boolean isKb = true;
-    if (speed > 1024) {
-      isKb = false;
-      speed /= 1024;
-    }
-    Entry entry = new Entry(mPosition, speed, isKb);
-    mPosition++;
-    return entry;
-  }
-
-  public List<NormalTo> getDownloadData() {
+  public LiveData<List<NormalTo>> getDownloadData(Context context) {
     List<NormalTo> list = new ArrayList<>();
-    String[] titles = getContext().getResources().getStringArray(R.array.download_items);
+    String[] titles = context.getResources().getStringArray(R.array.download_items);
     int[] icons = new int[] {
         R.drawable.ic_http,
         R.drawable.ic_http_group,
@@ -77,20 +62,22 @@ public class CommonModule extends AbsModule {
       i++;
       list.add(to);
     }
-    return list;
+    mLiveData.postValue(list);
+    return mLiveData;
   }
 
-  public List<NormalTo> getMainData() {
+  public LiveData<List<NormalTo>> getMainData(Context context) {
     List<NormalTo> list = new ArrayList<>();
-    String[] titles = getContext().getResources().getStringArray(R.array.main_items);
-    String[] descs = getContext().getResources().getStringArray(R.array.main_items_desc);
+    String[] titles = context.getResources().getStringArray(R.array.main_items);
+    String[] descs = context.getResources().getStringArray(R.array.main_items_desc);
     int[] icons = new int[] {
         R.drawable.ic_http,
         R.drawable.ic_http,
         R.drawable.ic_http_group,
         R.drawable.ic_ftp,
         R.drawable.ic_ftp_dir,
-        R.drawable.ic_ftp
+        R.drawable.ic_ftp,
+        R.drawable.ic_ts
     };
     int i = 0;
     for (String title : titles) {
@@ -101,6 +88,7 @@ public class CommonModule extends AbsModule {
       i++;
       list.add(to);
     }
-    return list;
+    mLiveData.postValue(list);
+    return mLiveData;
   }
 }

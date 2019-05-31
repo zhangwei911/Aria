@@ -18,11 +18,13 @@ package com.arialyy.aria.core.download;
 import android.os.Handler;
 
 import com.arialyy.aria.core.common.BaseListener;
+import com.arialyy.aria.core.common.RecordHandler;
 import com.arialyy.aria.core.download.group.IDownloadGroupListener;
 import com.arialyy.aria.core.inf.GroupSendParams;
 import com.arialyy.aria.core.inf.IEntity;
 import com.arialyy.aria.core.inf.TaskSchedulerType;
 import com.arialyy.aria.core.scheduler.ISchedulers;
+import com.arialyy.aria.core.upload.UploadEntity;
 import com.arialyy.aria.exception.BaseException;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
@@ -34,7 +36,6 @@ import com.arialyy.aria.util.ErrorHelp;
 class DownloadGroupListener
     extends BaseListener<DownloadGroupEntity, DGTaskWrapper, DownloadGroupTask>
     implements IDownloadGroupListener {
-  private final String TAG = "DownloadGroupListener";
   private GroupSendParams<DownloadGroupTask, DownloadEntity> mSeedEntity;
 
   DownloadGroupListener(DownloadGroupTask task, Handler outHandler) {
@@ -74,8 +75,10 @@ class DownloadGroupListener
   public void onSubFail(DownloadEntity subEntity, BaseException e) {
     saveCurrentLocation();
     sendInState2Target(ISchedulers.SUB_FAIL, subEntity);
-    e.printStackTrace();
-    ErrorHelp.saveError(e.getTag(), "", ALog.getExceptionString(e));
+    if (e != null) {
+      e.printStackTrace();
+      ErrorHelp.saveError(e.getTag(), "", ALog.getExceptionString(e));
+    }
   }
 
   @Override
@@ -99,6 +102,24 @@ class DownloadGroupListener
       mSeedEntity.entity = subEntity;
       outHandler.get().obtainMessage(state, ISchedulers.IS_SUB_TASK, 0, mSeedEntity).sendToTarget();
     }
+    saveSubState(state, subEntity);
+  }
+
+  private void saveSubState(int state, DownloadEntity subEntity) {
+    subEntity.setState(state);
+    if (state == IEntity.STATE_STOP) {
+      subEntity.setStopTime(System.currentTimeMillis());
+    } else if (state == IEntity.STATE_COMPLETE) {
+      subEntity.setComplete(true);
+      subEntity.setCompleteTime(System.currentTimeMillis());
+      subEntity.setCurrentProgress(subEntity.getFileSize());
+      subEntity.setPercent(100);
+      subEntity.setConvertSpeed("0kb/s");
+      subEntity.setSpeed(0);
+      ALog.i(TAG, String.format("任务【%s】完成，将删除线程任务记录", mEntity.getKey()));
+      CommonUtil.delTaskRecord(subEntity.getKey(), RecordHandler.TYPE_DOWNLOAD, false, false);
+    }
+    subEntity.update();
   }
 
   private void saveCurrentLocation() {
@@ -130,28 +151,14 @@ class DownloadGroupListener
 
   }
 
-  @Override
-  protected void saveData(int state, long location) {
-    mTaskWrapper.setState(state);
-    mEntity.setState(state);
-    if (state == IEntity.STATE_CANCEL) {
-      int sType = getTask().getSchedulerType();
-      if (sType == TaskSchedulerType.TYPE_CANCEL_AND_NOT_NOTIFY) {
-        mEntity.setComplete(false);
-        mEntity.setState(IEntity.STATE_WAIT);
-        CommonUtil.delGroupTaskRecord(mEntity, mTaskWrapper.isRemoveFile(), false);
-      } else {
-        CommonUtil.delGroupTaskRecord(mEntity, mTaskWrapper.isRemoveFile(), true);
-      }
-      return;
-    } else if (state == IEntity.STATE_STOP) {
-      mEntity.setStopTime(System.currentTimeMillis());
-    } else if (state == IEntity.STATE_COMPLETE) {
-      handleComplete();
+  @Override protected void handleCancel() {
+    int sType = getTask().getSchedulerType();
+    if (sType == TaskSchedulerType.TYPE_CANCEL_AND_NOT_NOTIFY) {
+      mEntity.setComplete(false);
+      mEntity.setState(IEntity.STATE_WAIT);
+      CommonUtil.delGroupTaskRecord(mEntity, mTaskWrapper.isRemoveFile(), false);
+    } else {
+      CommonUtil.delGroupTaskRecord(mEntity, mTaskWrapper.isRemoveFile(), true);
     }
-    if (location > 0) {
-      mEntity.setCurrentProgress(location);
-    }
-    mEntity.update();
   }
 }

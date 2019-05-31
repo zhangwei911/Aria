@@ -192,10 +192,6 @@ public abstract class AbsFtpInfoThread<ENTITY extends AbsEntity, TASK_WRAPPER ex
     return false;
   }
 
-  public void start() {
-    new Thread(this).start();
-  }
-
   protected void onPreComplete(int code) {
 
   }

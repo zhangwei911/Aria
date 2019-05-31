@@ -30,6 +30,7 @@ import android.support.v4.app.Fragment;
 import android.widget.PopupWindow;
 import com.arialyy.aria.core.command.ICmd;
 import com.arialyy.aria.core.common.QueueMod;
+import com.arialyy.aria.core.common.RecordHandler;
 import com.arialyy.aria.core.config.AppConfig;
 import com.arialyy.aria.core.config.DGroupConfig;
 import com.arialyy.aria.core.config.DownloadConfig;
@@ -145,7 +146,7 @@ import org.xml.sax.SAXException;
   }
 
   public synchronized Handler getAriaHandler() {
-    if (mAriaHandler == null){
+    if (mAriaHandler == null) {
       mAriaHandler = new Handler(Looper.getMainLooper());
     }
     return mAriaHandler;
@@ -293,13 +294,13 @@ import org.xml.sax.SAXException;
   public void delRecord(int type, String key, boolean removeFile) {
     switch (type) {
       case 1: // 删除普通任务记录
-        CommonUtil.delTaskRecord(key, 1, removeFile, true);
+        CommonUtil.delTaskRecord(key, RecordHandler.TYPE_DOWNLOAD, removeFile, true);
         break;
       case 2:
         CommonUtil.delGroupTaskRecord(key, removeFile);
         break;
       case 3:
-        CommonUtil.delTaskRecord(key, 2);
+        CommonUtil.delTaskRecord(key, RecordHandler.TYPE_UPLOAD);
         break;
     }
   }

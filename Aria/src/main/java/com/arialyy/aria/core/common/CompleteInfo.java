@@ -29,6 +29,12 @@ public class CompleteInfo {
 
   public AbsTaskWrapper wrapper;
 
+  public Object obj;
+
+  public CompleteInfo() {
+
+  }
+
   public CompleteInfo(int code, AbsTaskWrapper wrapper) {
     this.code = code;
     this.wrapper = wrapper;

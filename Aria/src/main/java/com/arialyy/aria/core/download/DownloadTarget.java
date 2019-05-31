@@ -20,6 +20,7 @@ import android.support.annotation.NonNull;
 import com.arialyy.aria.core.common.http.GetDelegate;
 import com.arialyy.aria.core.common.http.HttpDelegate;
 import com.arialyy.aria.core.common.http.PostDelegate;
+import com.arialyy.aria.core.download.m3u8.M3U8Delegate;
 import com.arialyy.aria.core.inf.IHttpFileLenAdapter;
 import java.net.Proxy;
 import java.util.Map;
@@ -57,6 +58,11 @@ public class DownloadTarget extends AbsDTarget<DownloadTarget> {
   public GetDelegate asGet() {
     mHttpDelegate = new GetDelegate<>(this);
     return (GetDelegate) mHttpDelegate;
+  }
+
+  @CheckResult
+  public M3U8Delegate<DownloadTarget> asM3U8() {
+    return new M3U8Delegate<>(this);
   }
 
   /**

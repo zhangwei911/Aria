@@ -25,6 +25,7 @@ import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.download.downloader.HttpFileInfoThread;
 import com.arialyy.aria.core.inf.AbsEntity;
 import com.arialyy.aria.core.inf.IEntity;
+import com.arialyy.aria.core.inf.IHttpFileLenAdapter;
 import com.arialyy.aria.exception.AriaIOException;
 import com.arialyy.aria.exception.BaseException;
 import com.arialyy.aria.util.ALog;
@@ -145,8 +146,10 @@ public class DownloadGroupUtil extends AbsGroupUtil implements IUtil {
     } else if (failCount == mGTWrapper.getSubTaskWrapper().size()) {
       mListener.onFail(true, new AriaIOException(TAG, "获取子任务长度失败"));
     }
-
-    mGTWrapper.asHttp().setFileLenAdapter(null);
+    IHttpFileLenAdapter lenAdapter = mGTWrapper.asHttp().getFileLenAdapter();
+    if (lenAdapter != null && lenAdapter.getClass().isAnonymousClass()) {
+      mGTWrapper.asHttp().setFileLenAdapter(null);
+    }
     synchronized (LOCK) {
       LOCK.notifyAll();
     }

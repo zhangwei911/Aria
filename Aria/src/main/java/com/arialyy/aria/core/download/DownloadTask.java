@@ -21,10 +21,11 @@ import android.os.Looper;
 import com.arialyy.aria.core.AriaManager;
 import com.arialyy.aria.core.common.IUtil;
 import com.arialyy.aria.core.download.downloader.SimpleDownloadUtil;
+import com.arialyy.aria.core.download.m3u8.M3U8FileUtil;
 import com.arialyy.aria.core.inf.AbsNormalTask;
 import com.arialyy.aria.core.inf.IDownloadListener;
+import com.arialyy.aria.core.inf.ITaskWrapper;
 import com.arialyy.aria.core.scheduler.ISchedulers;
-import java.io.File;
 
 /**
  * Created by lyy on 2016/8/11.
@@ -44,14 +45,18 @@ public class DownloadTask extends AbsNormalTask<DownloadEntity, DTaskWrapper> {
   /**
    * 获取文件保存路径
    *
-   * @return 如果路径不存在，返回null
+   * @deprecated 后续版本将删除该方法，请使用{@link #getFilePath()}
    */
+  @Deprecated
   public String getDownloadPath() {
-    File file = new File(mEntity.getDownloadPath());
-    if (!file.exists()) {
-      return null;
-    }
-    return mEntity.getDownloadPath();
+    return getFilePath();
+  }
+
+  /**
+   * 获取文件保存路径
+   */
+  public String getFilePath() {
+    return mEntity.getFilePath();
   }
 
   public DownloadEntity getEntity() {
@@ -84,7 +89,11 @@ public class DownloadTask extends AbsNormalTask<DownloadEntity, DTaskWrapper> {
   }
 
   @Override protected synchronized IUtil createUtil() {
-    return new SimpleDownloadUtil(mTaskWrapper, (IDownloadListener) mListener);
+    if (mTaskWrapper.getRequestType() == ITaskWrapper.D_HTTP){
+      return new SimpleDownloadUtil(mTaskWrapper, (IDownloadListener) mListener);
+    }else {
+      return new M3U8FileUtil(mTaskWrapper, (IDownloadListener) mListener);
+    }
   }
 
   public static class Builder {

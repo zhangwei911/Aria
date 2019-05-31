@@ -24,7 +24,7 @@ public interface OnFileInfoCallback {
    *
    * @param info 一些回调的信息
    */
-  void onComplete(String url, CompleteInfo info);
+  void onComplete(String key, CompleteInfo info);
 
   /**
    * 请求失败

@@ -13,15 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.arialyy.aria.core.download.downloader;
+package com.arialyy.aria.core.download.m3u8;
 
 import com.arialyy.aria.core.common.AbsThreadTask;
 import com.arialyy.aria.core.common.RequestEnum;
 import com.arialyy.aria.core.common.SubThreadConfig;
+import com.arialyy.aria.core.common.http.HttpTaskConfig;
 import com.arialyy.aria.core.config.DownloadConfig;
 import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.download.DownloadEntity;
-import com.arialyy.aria.core.common.http.HttpTaskConfig;
+import com.arialyy.aria.core.download.downloader.ConnectionHelp;
 import com.arialyy.aria.exception.AriaIOException;
 import com.arialyy.aria.exception.TaskException;
 import com.arialyy.aria.util.ALog;
@@ -39,20 +40,21 @@ import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 /**
  * Created by lyy on 2017/1/18. 下载线程
  */
-final class HttpThreadTask extends AbsThreadTask<DownloadEntity, DTaskWrapper> {
+final class M3U8ThreadTask extends AbsThreadTask<DownloadEntity, DTaskWrapper> {
   private final String TAG = "HttpThreadTask";
 
-  HttpThreadTask(SubThreadConfig<DTaskWrapper> config) {
+  M3U8ThreadTask(SubThreadConfig<DTaskWrapper> config) {
     super(config);
   }
 
-  @Override public HttpThreadTask call() throws Exception {
+  @Override public M3U8ThreadTask call() throws Exception {
     super.call();
     if (mRecord.isComplete) {
       handleComplete();
@@ -60,20 +62,11 @@ final class HttpThreadTask extends AbsThreadTask<DownloadEntity, DTaskWrapper> {
     }
     HttpURLConnection conn = null;
     BufferedInputStream is = null;
-    BufferedRandomAccessFile file = null;
     try {
       HttpTaskConfig taskDelegate = getTaskWrapper().asHttp();
       URL url = ConnectionHelp.handleUrl(getConfig().url, taskDelegate);
       conn = ConnectionHelp.handleConnection(url, taskDelegate);
-      if (mTaskWrapper.isSupportBP()) {
-        ALog.d(TAG,
-            String.format("任务【%s】线程__%s__开始下载【开始位置 : %s，结束位置：%s】", getFileName(),
-                mRecord.threadId, mRecord.startLocation, mRecord.endLocation));
-        conn.setRequestProperty("Range", String.format("bytes=%s-%s", mRecord.startLocation,
-            (mRecord.endLocation - 1)));
-      } else {
-        ALog.w(TAG, "该下载不支持断点");
-      }
+      ALog.d(TAG, String.format("分片【%s】开始下载", mRecord.threadId));
       ConnectionHelp.setConnectParam(taskDelegate, conn);
       conn.setConnectTimeout(getTaskConfig().getConnectTimeOut());
       conn.setReadTimeout(getTaskConfig().getIOTimeOut());  //设置读取流的等待时间,必须设置该参数
@@ -82,6 +75,9 @@ final class HttpThreadTask extends AbsThreadTask<DownloadEntity, DTaskWrapper> {
         conn.setChunkedStreamingMode(0);
       }
       conn.connect();
+      //Map<String, List<String>> header = conn.getHeaderFields();
+      //int code = conn.getResponseCode();
+      //String msg = conn.getResponseMessage();
       // 传递参数
       if (taskDelegate.getRequestEnum() == RequestEnum.POST) {
         Map<String, String> params = taskDelegate.getParams();
@@ -105,33 +101,21 @@ final class HttpThreadTask extends AbsThreadTask<DownloadEntity, DTaskWrapper> {
         readChunked(is);
       } else if (getConfig().isOpenDynamicFile) {
         readDynamicFile(is);
-      } else {
-        //创建可设置位置的文件
-        file =
-            new BufferedRandomAccessFile(getConfig().tempFile, "rwd",
-                getTaskConfig().getBuffSize());
-        //设置每条线程写入文件的位置
-        file.seek(mRecord.startLocation);
-        readNormal(is, file);
-        handleComplete();
       }
     } catch (MalformedURLException e) {
       fail(mChildCurrentLocation, new TaskException(TAG,
-          String.format("任务【%s】下载失败，filePath: %s, url: %s", getFileName(),
-              getEntity().getDownloadPath(), getEntity().getUrl()), e));
+          String.format("分片【%s】下载失败，filePath: %s, url: %s", mRecord.threadId,
+              getConfig().tempFile.getPath(), getEntity().getUrl()), e));
     } catch (IOException e) {
       fail(mChildCurrentLocation, new TaskException(TAG,
-          String.format("任务【%s】下载失败，filePath: %s, url: %s", getFileName(),
-              getEntity().getDownloadPath(), getEntity().getUrl()), e));
+          String.format("分片【%s】下载失败，filePath: %s, url: %s", mRecord.threadId,
+              getConfig().tempFile.getPath(), getEntity().getUrl()), e));
     } catch (Exception e) {
       fail(mChildCurrentLocation, new TaskException(TAG,
-          String.format("任务【%s】下载失败，filePath: %s, url: %s", getFileName(),
-              getEntity().getDownloadPath(), getEntity().getUrl()), e));
+          String.format("分片【%s】下载失败，filePath: %s, url: %s", mRecord.threadId,
+              getConfig().tempFile.getPath(), getEntity().getUrl()), e));
     } finally {
       try {
-        if (file != null) {
-          file.close();
-        }
         if (is != null) {
           is.close();
         }
@@ -167,7 +151,7 @@ final class HttpThreadTask extends AbsThreadTask<DownloadEntity, DTaskWrapper> {
       handleComplete();
     } catch (IOException e) {
       fail(mChildCurrentLocation, new AriaIOException(TAG,
-          String.format("文件下载失败，savePath: %s, url: %s", getEntity().getDownloadPath(),
+          String.format("文件下载失败，savePath: %s, url: %s", getConfig().tempFile.getPath(),
               getConfig().url),
           e));
     } finally {
@@ -203,24 +187,15 @@ final class HttpThreadTask extends AbsThreadTask<DownloadEntity, DTaskWrapper> {
         if (mSpeedBandUtil != null) {
           mSpeedBandUtil.limitNextBytes(len);
         }
-        if (mChildCurrentLocation + len >= mRecord.endLocation) {
-          len = (int) (mRecord.endLocation - mChildCurrentLocation);
-          bf.flip();
-          fos.write(bf.array(), 0, len);
-          bf.compact();
-          progress(len);
-          break;
-        } else {
-          bf.flip();
-          foc.write(bf);
-          bf.compact();
-          progress(len);
-        }
+        bf.flip();
+        foc.write(bf);
+        bf.compact();
+        progress(len);
       }
       handleComplete();
     } catch (IOException e) {
       fail(mChildCurrentLocation, new AriaIOException(TAG,
-          String.format("文件下载失败，savePath: %s, url: %s", getEntity().getDownloadPath(),
+          String.format("文件下载失败，savePath: %s, url: %s", getConfig().tempFile.getPath(),
               getConfig().url),
           e));
     } finally {
@@ -242,32 +217,10 @@ final class HttpThreadTask extends AbsThreadTask<DownloadEntity, DTaskWrapper> {
   }
 
   /**
-   * 读取普通的文件流
-   */
-  private void readNormal(InputStream is, BufferedRandomAccessFile file)
-      throws IOException {
-    byte[] buffer = new byte[getTaskConfig().getBuffSize()];
-    int len;
-    while (isLive() && (len = is.read(buffer)) != -1) {
-      if (isBreak()) {
-        break;
-      }
-      if (mSpeedBandUtil != null) {
-        mSpeedBandUtil.limitNextBytes(len);
-      }
-      file.write(buffer, 0, len);
-      progress(len);
-    }
-  }
-
-  /**
    * 处理完成配置文件的更新或事件回调
    */
   private void handleComplete() {
     if (isBreak()) {
-      return;
-    }
-    if (!checkBlock()) {
       return;
     }
     if (getTaskWrapper().asHttp().isChunked()) {
@@ -277,7 +230,7 @@ final class HttpThreadTask extends AbsThreadTask<DownloadEntity, DTaskWrapper> {
 
     //支持断点的处理
     if (mTaskWrapper.isSupportBP()) {
-      writeConfig(true, mRecord.endLocation);
+      writeConfig(true, getConfig().tempFile.length());
       sendCompleteMsg();
     } else {
       sendCompleteMsg();
