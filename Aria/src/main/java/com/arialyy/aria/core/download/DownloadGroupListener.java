@@ -34,7 +34,6 @@ import com.arialyy.aria.util.ErrorHelp;
 class DownloadGroupListener
     extends BaseListener<DownloadGroupEntity, DGTaskWrapper, DownloadGroupTask>
     implements IDownloadGroupListener {
-  private final String TAG = "DownloadGroupListener";
   private GroupSendParams<DownloadGroupTask, DownloadEntity> mSeedEntity;
 
   DownloadGroupListener(DownloadGroupTask task, Handler outHandler) {
@@ -130,28 +129,14 @@ class DownloadGroupListener
 
   }
 
-  @Override
-  protected void saveData(int state, long location) {
-    mTaskWrapper.setState(state);
-    mEntity.setState(state);
-    if (state == IEntity.STATE_CANCEL) {
-      int sType = getTask().getSchedulerType();
-      if (sType == TaskSchedulerType.TYPE_CANCEL_AND_NOT_NOTIFY) {
-        mEntity.setComplete(false);
-        mEntity.setState(IEntity.STATE_WAIT);
-        CommonUtil.delGroupTaskRecord(mEntity, mTaskWrapper.isRemoveFile(), false);
-      } else {
-        CommonUtil.delGroupTaskRecord(mEntity, mTaskWrapper.isRemoveFile(), true);
-      }
-      return;
-    } else if (state == IEntity.STATE_STOP) {
-      mEntity.setStopTime(System.currentTimeMillis());
-    } else if (state == IEntity.STATE_COMPLETE) {
-      handleComplete();
+  @Override protected void handleCancel() {
+    int sType = getTask().getSchedulerType();
+    if (sType == TaskSchedulerType.TYPE_CANCEL_AND_NOT_NOTIFY) {
+      mEntity.setComplete(false);
+      mEntity.setState(IEntity.STATE_WAIT);
+      CommonUtil.delGroupTaskRecord(mEntity, mTaskWrapper.isRemoveFile(), false);
+    } else {
+      CommonUtil.delGroupTaskRecord(mEntity, mTaskWrapper.isRemoveFile(), true);
     }
-    if (location > 0) {
-      mEntity.setCurrentProgress(location);
-    }
-    mEntity.update();
   }
 }

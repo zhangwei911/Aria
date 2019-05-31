@@ -16,6 +16,8 @@
 package com.arialyy.aria.core.common;
 
 import android.os.Handler;
+import com.arialyy.aria.core.download.DownloadEntity;
+import com.arialyy.aria.core.download.DownloadGroupEntity;
 import com.arialyy.aria.core.inf.AbsEntity;
 import com.arialyy.aria.core.inf.AbsTask;
 import com.arialyy.aria.core.inf.AbsTaskWrapper;
@@ -23,6 +25,7 @@ import com.arialyy.aria.core.inf.IEntity;
 import com.arialyy.aria.core.inf.IEventListener;
 import com.arialyy.aria.core.inf.TaskSchedulerType;
 import com.arialyy.aria.core.scheduler.ISchedulers;
+import com.arialyy.aria.core.upload.UploadEntity;
 import com.arialyy.aria.exception.BaseException;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
@@ -32,7 +35,7 @@ import java.lang.ref.WeakReference;
 public abstract class BaseListener<ENTITY extends AbsEntity, TASK_WRAPPER extends AbsTaskWrapper<ENTITY>,
     TASK extends AbsTask<ENTITY, TASK_WRAPPER>>
     implements IEventListener {
-  private static final String TAG = "BaseListener";
+  protected static String TAG;
   private static final int RUN_SAVE_INTERVAL = 5 * 1000;  //5s保存一次下载中的进度
   protected WeakReference<Handler> outHandler;
   private long mLastLen;   //上一次发送长度
@@ -53,6 +56,7 @@ public abstract class BaseListener<ENTITY extends AbsEntity, TASK_WRAPPER extend
     mUpdateInterval = mTaskWrapper.getConfig().getUpdateInterval();
     mLastLen = mEntity.getCurrentProgress();
     mLastSaveTime = System.currentTimeMillis();
+    TAG = CommonUtil.getClassName(getClass());
   }
 
   protected TASK getTask() {
@@ -120,8 +124,10 @@ public abstract class BaseListener<ENTITY extends AbsEntity, TASK_WRAPPER extend
     mTask.setNeedRetry(needRetry);
     mTask.putExpand(AbsTask.ERROR_INFO_KEY, e);
     sendInState2Target(ISchedulers.FAIL);
-    e.printStackTrace();
-    ErrorHelp.saveError(e.getTag(), "", ALog.getExceptionString(e));
+    if (e != null) {
+      e.printStackTrace();
+      ErrorHelp.saveError(e.getTag(), "", ALog.getExceptionString(e));
+    }
   }
 
   private void handleSpeed(long speed) {
@@ -137,13 +143,29 @@ public abstract class BaseListener<ENTITY extends AbsEntity, TASK_WRAPPER extend
         : mEntity.getCurrentProgress() * 100 / mEntity.getFileSize()));
   }
 
-  protected void handleComplete() {
+  /**
+   * 处理任务完成后的情况
+   */
+  private void handleComplete() {
     mEntity.setComplete(true);
     mEntity.setCompleteTime(System.currentTimeMillis());
     mEntity.setCurrentProgress(mEntity.getFileSize());
     mEntity.setPercent(100);
     handleSpeed(0);
+    ALog.i(TAG, String.format("任务【%s】完成，将删除线程任务记录", mEntity.getKey()));
+    if (mEntity instanceof DownloadGroupEntity) {
+      CommonUtil.delGroupTaskRecord((DownloadGroupEntity) mEntity, false, false);
+    } else if (mEntity instanceof DownloadEntity) {
+      CommonUtil.delTaskRecord(mEntity.getKey(), RecordHandler.TYPE_DOWNLOAD, false, false);
+    } else if (mEntity instanceof UploadEntity) {
+      CommonUtil.delTaskRecord(mEntity.getKey(), RecordHandler.TYPE_UPLOAD, false, false);
+    }
   }
+
+  /**
+   * 处理任务取消
+   */
+  protected abstract void handleCancel();
 
   /**
    * 将任务状态发送给下载器
@@ -156,5 +178,21 @@ public abstract class BaseListener<ENTITY extends AbsEntity, TASK_WRAPPER extend
     }
   }
 
-  protected abstract void saveData(int state, long location);
+  protected void saveData(int state, long location) {
+    mEntity.setState(state);
+    mEntity.setComplete(false);
+
+    if (state == IEntity.STATE_CANCEL) {
+      handleCancel();
+      return;
+    } else if (state == IEntity.STATE_STOP) {
+      mEntity.setStopTime(System.currentTimeMillis());
+    } else if (state == IEntity.STATE_COMPLETE) {
+      handleComplete();
+    }
+    if (location > 0) {
+      mEntity.setCurrentProgress(location);
+    }
+    mEntity.update();
+  }
 }

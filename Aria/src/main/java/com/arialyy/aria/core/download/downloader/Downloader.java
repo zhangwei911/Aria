@@ -17,6 +17,7 @@ package com.arialyy.aria.core.download.downloader;
 
 import com.arialyy.aria.core.common.AbsFileer;
 import com.arialyy.aria.core.common.AbsThreadTask;
+import com.arialyy.aria.core.common.RecordHandler;
 import com.arialyy.aria.core.common.SubThreadConfig;
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.download.DTaskWrapper;
@@ -26,7 +27,6 @@ import com.arialyy.aria.exception.BaseException;
 import com.arialyy.aria.exception.TaskException;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.BufferedRandomAccessFile;
-import com.arialyy.aria.util.CommonUtil;
 import java.io.File;
 import java.io.IOException;
 
@@ -38,20 +38,8 @@ public class Downloader extends AbsFileer<DownloadEntity, DTaskWrapper> {
 
   public Downloader(IDownloadListener listener, DTaskWrapper taskWrapper) {
     super(listener, taskWrapper);
-    mTempFile = new File(mEntity.getDownloadPath());
+    mTempFile = new File(mEntity.getFilePath());
     setUpdateInterval(taskWrapper.getConfig().getUpdateInterval());
-  }
-
-  /**
-   * 小于1m的文件或是任务组的子任务、线程数都是1
-   */
-  @Override protected int setNewTaskThreadNum() {
-    int threadNum = mTaskWrapper.getConfig().getThreadNum();
-    return mEntity.getFileSize() <= SUB_LEN
-        || mTaskWrapper.isGroupTask()
-        || threadNum == 1
-        ? 1
-        : threadNum;
   }
 
   @Override protected boolean handleNewTask() {
@@ -62,7 +50,7 @@ public class Downloader extends AbsFileer<DownloadEntity, DTaskWrapper> {
       //CommonUtil.createFile(mTempFile.getPath());
     } else {
       for (int i = 0; i < mTotalThreadNum; i++) {
-        File blockFile = new File(String.format(AbsFileer.SUB_PATH, mTempFile.getPath(), i));
+        File blockFile = new File(String.format(RecordHandler.SUB_PATH, mTempFile.getPath(), i));
         if (blockFile.exists()) {
           ALog.d(TAG, String.format("分块【%s】已经存在，将删除该分块", i));
           blockFile.delete();
@@ -97,18 +85,14 @@ public class Downloader extends AbsFileer<DownloadEntity, DTaskWrapper> {
    * 如果使用"Content-Disposition"中的文件名，需要更新{@link #mTempFile}的路径
    */
   void updateTempFile() {
-    if (!mTempFile.getPath().equals(mEntity.getDownloadPath())) {
+    if (!mTempFile.getPath().equals(mEntity.getFilePath())) {
       if (!mTempFile.exists()) {
-        mTempFile = new File(mEntity.getDownloadPath());
+        mTempFile = new File(mEntity.getFilePath());
       } else {
         boolean b = mTempFile.renameTo(new File(mEntity.getDownloadPath()));
         ALog.d(TAG, String.format("更新tempFile文件名%s", b ? "成功" : "失败"));
       }
     }
-  }
-
-  @Override protected int getType() {
-    return DOWNLOAD;
   }
 
   @Override protected void onPostPre() {
@@ -124,9 +108,9 @@ public class Downloader extends AbsFileer<DownloadEntity, DTaskWrapper> {
     switch (mTaskWrapper.getRequestType()) {
       case AbsTaskWrapper.D_FTP:
       case AbsTaskWrapper.D_FTP_DIR:
-        return new FtpThreadTask(mConstance, (IDownloadListener) mListener, config);
+        return new FtpThreadTask(config);
       case AbsTaskWrapper.D_HTTP:
-        return new HttpThreadTask(mConstance, (IDownloadListener) mListener, config);
+        return new HttpThreadTask(config);
     }
     return null;
   }

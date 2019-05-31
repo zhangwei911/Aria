@@ -23,11 +23,9 @@ import aria.apache.commons.net.ftp.FTPSClient;
 import com.arialyy.aria.core.FtpUrlEntity;
 import com.arialyy.aria.core.common.AbsThreadTask;
 import com.arialyy.aria.core.common.ProtocolType;
-import com.arialyy.aria.core.common.StateConstance;
 import com.arialyy.aria.core.common.SubThreadConfig;
 import com.arialyy.aria.core.inf.AbsNormalEntity;
 import com.arialyy.aria.core.inf.AbsTaskWrapper;
-import com.arialyy.aria.core.inf.IEventListener;
 import com.arialyy.aria.exception.AriaIOException;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.SSLContextUtil;
@@ -38,14 +36,13 @@ import javax.net.ssl.SSLContext;
 /**
  * Created by lyy on 2017/9/26. FTP单任务父类
  */
-public abstract class AbsFtpThreadTask<ENTITY extends AbsNormalEntity, TASK_ENTITY extends AbsTaskWrapper<ENTITY>>
-    extends AbsThreadTask<ENTITY, TASK_ENTITY> {
+public abstract class AbsFtpThreadTask<ENTITY extends AbsNormalEntity, TASK_WRAPPER extends AbsTaskWrapper<ENTITY>>
+    extends AbsThreadTask<ENTITY, TASK_WRAPPER> {
   private final String TAG = "AbsFtpThreadTask";
   protected String charSet;
 
-  protected AbsFtpThreadTask(StateConstance constance, IEventListener listener,
-      SubThreadConfig<TASK_ENTITY> info) {
-    super(constance, listener, info);
+  protected AbsFtpThreadTask(SubThreadConfig<TASK_WRAPPER> config) {
+    super(config);
   }
 
   /**

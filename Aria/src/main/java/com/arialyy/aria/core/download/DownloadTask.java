@@ -44,14 +44,18 @@ public class DownloadTask extends AbsNormalTask<DownloadEntity, DTaskWrapper> {
   /**
    * 获取文件保存路径
    *
-   * @return 如果路径不存在，返回null
+   * @deprecated 后续版本将删除该方法，请使用{@link #getFilePath()}
    */
+  @Deprecated
   public String getDownloadPath() {
-    File file = new File(mEntity.getDownloadPath());
-    if (!file.exists()) {
-      return null;
-    }
-    return mEntity.getDownloadPath();
+    return getFilePath();
+  }
+
+  /**
+   * 获取文件保存路径
+   */
+  public String getFilePath() {
+    return mEntity.getFilePath();
   }
 
   public DownloadEntity getEntity() {

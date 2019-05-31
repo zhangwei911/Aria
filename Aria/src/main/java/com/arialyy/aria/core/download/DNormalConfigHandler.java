@@ -16,6 +16,7 @@
 package com.arialyy.aria.core.download;
 
 import android.text.TextUtils;
+import com.arialyy.aria.core.common.RecordHandler;
 import com.arialyy.aria.core.inf.ITargetHandler;
 import com.arialyy.aria.core.inf.IConfigHandler;
 import com.arialyy.aria.core.manager.TaskWrapperManager;
@@ -136,7 +137,7 @@ class DNormalConfigHandler<TARGET extends AbsDTarget> implements IConfigHandler 
           return false;
         } else {
           ALog.w(TAG, "保存路径【" + filePath + "】已经被其它任务占用，当前任务将覆盖该路径的文件");
-          CommonUtil.delTaskRecord(filePath, 1);
+          CommonUtil.delTaskRecord(filePath, RecordHandler.TYPE_DOWNLOAD);
           mTarget.setTaskWrapper(
               TaskWrapperManager.getInstance()
                   .getHttpTaskWrapper(DTaskWrapper.class, mUrl));
@@ -144,7 +145,7 @@ class DNormalConfigHandler<TARGET extends AbsDTarget> implements IConfigHandler 
       }
       File oldFile = new File(mEntity.getDownloadPath());
       File newFile = new File(filePath);
-      mEntity.setDownloadPath(filePath);
+      mEntity.setFilePath(filePath);
       mEntity.setFileName(newFile.getName());
       // 如过使用Content-Disposition中的文件名，将不会执行重命名工作
       if (mTarget.getTaskWrapper().asHttp().isUseServerFileName()) {

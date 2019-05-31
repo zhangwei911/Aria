@@ -31,7 +31,7 @@ import com.arialyy.aria.core.command.group.AbsGroupCmd;
 import com.arialyy.aria.core.command.group.GroupCmdFactory;
 import com.arialyy.aria.core.command.normal.AbsNormalCmd;
 import com.arialyy.aria.core.command.normal.NormalCmdFactory;
-import com.arialyy.aria.core.common.AbsFileer;
+import com.arialyy.aria.core.common.RecordHandler;
 import com.arialyy.aria.core.common.RecordWrapper;
 import com.arialyy.aria.core.common.TaskRecord;
 import com.arialyy.aria.core.common.ThreadRecord;
@@ -99,7 +99,7 @@ public class CommonUtil {
    * @return {@code true} 分块文件存在
    */
   public static boolean blockTaskExists(String filePath) {
-    return new File(String.format(AbsFileer.SUB_PATH, filePath, 0)).exists();
+    return new File(String.format(RecordHandler.SUB_PATH, filePath, 0)).exists();
   }
 
   /**
@@ -604,7 +604,8 @@ public class CommonUtil {
   /**
    * 删除任务组记录
    *
-   * @param removeFile {@code true} 不仅删除任务数据库记录，还会删除已经删除完成的文件 {@code false}如果任务已经完成，只删除任务数据库记录
+   * @param removeFile {@code true} 无论任务是否完成，都会删除记录和文件；
+   * {@code false} 如果任务已经完成，则只删除记录，不删除文件；任务未完成，记录和文件都会删除。
    */
   public static void delGroupTaskRecord(String groupHash, boolean removeFile) {
     if (TextUtils.isEmpty(groupHash)) {
@@ -619,7 +620,8 @@ public class CommonUtil {
   /**
    * 删除任务组记录
    *
-   * @param removeFile {@code true} 不仅删除任务数据库记录，还会删除已经删除完成的文件 {@code false}如果任务已经完成，只删除任务数据库记录
+   * @param removeFile {@code true} 无论任务是否完成，都会删除记录和文件；
+   * {@code false} 如果任务已经完成，则只删除记录，不删除文件；任务未完成，记录和文件都会删除。
    */
   public static void delGroupTaskRecord(DownloadGroupEntity groupEntity, boolean removeFile,
       boolean removeEntity) {
@@ -641,7 +643,7 @@ public class CommonUtil {
         if (record.taskRecord.isBlock) {
           for (int i = 0, len = record.taskRecord.threadNum; i < len; i++) {
             File partFile =
-                new File(String.format(AbsFileer.SUB_PATH, record.taskRecord.filePath, i));
+                new File(String.format(RecordHandler.SUB_PATH, record.taskRecord.filePath, i));
             if (partFile.exists()) {
               partFile.delete();
             }
@@ -655,13 +657,14 @@ public class CommonUtil {
     List<DownloadEntity> subs = groupEntity.getSubEntities();
     if (subs != null) {
       for (DownloadEntity sub : subs) {
-        File file = new File(sub.getDownloadPath());
+        File file = new File(sub.getFilePath());
         if (file.exists() && (removeFile || !sub.isComplete())) {
           file.delete();
         }
       }
     }
 
+    // 删除文件夹
     if (!TextUtils.isEmpty(groupEntity.getDirPath())) {
       File dir = new File(groupEntity.getDirPath());
       if (dir.exists() && (removeFile || !groupEntity.isComplete())) {
@@ -677,17 +680,19 @@ public class CommonUtil {
   /**
    * 删除任务记录，默认删除任务实体
    *
-   * @param removeFile {@code true} 不仅删除任务数据库记录，还会删除已经完成的文件 {@code false}如果任务已经完成，只删除任务数据库记录
+   * @param removeFile{@code true} 无论任务是否完成，都会删除记录和文件；
+   * {@code false} 如果是下载任务，并且任务已经完成，则只删除记录，不删除文件；任务未完成，记录和文件都会删除。
+   * 如果是上传任务，无论任务是否完成，都只删除记录
    */
   public static void delTaskRecord(AbsNormalEntity dEntity, boolean removeFile) {
     if (dEntity == null) return;
     String filePath;
     int type;
     if (dEntity instanceof DownloadEntity) {
-      type = 1;
+      type = RecordHandler.TYPE_DOWNLOAD;
       filePath = ((DownloadEntity) dEntity).getDownloadPath();
     } else if (dEntity instanceof UploadEntity) {
-      type = 2;
+      type = RecordHandler.TYPE_UPLOAD;
       filePath = ((UploadEntity) dEntity).getFilePath();
     } else {
       ALog.w(TAG, "删除记录失败，未知类型");
@@ -700,8 +705,11 @@ public class CommonUtil {
    * 删除任务记录，默认删除文件
    *
    * @param filePath 文件路径
-   * @param removeFile {@code true} 不仅删除任务数据库记录，还会删除已经删除完成的文件 {@code false}如果任务已经完成，只删除任务数据库记录
-   * @param type {@code 1}下载任务的记录，{@code 2} 上传任务的记录 {@code false}如果任务已经完成，只删除任务数据库记录
+   * @param removeFile {@code true} 无论任务是否完成，都会删除记录和文件；
+   * {@code false} 如果是下载任务，并且任务已经完成，则只删除记录，不删除文件；任务未完成，记录和文件都会删除。
+   * 如果是上传任务，无论任务是否完成，都只删除记录
+   * @param type {@link RecordHandler#TYPE_DOWNLOAD}下载任务的记录，{@link RecordHandler#TYPE_UPLOAD}
+   * 上传任务的记录
    * @param removeEntity {@code true} 删除任务实体，
    */
   public static void delTaskRecord(String filePath, int type, boolean removeFile,
@@ -714,31 +722,43 @@ public class CommonUtil {
     }
     List<RecordWrapper> recordWrapper =
         DbEntity.findRelationData(RecordWrapper.class, "filePath=?", filePath);
-    DbEntity.deleteData(ThreadRecord.class, "key=?", filePath); // 必须先获取完成数据再删除线程记录
 
     File file = new File(filePath);
     if (recordWrapper == null
         || recordWrapper.isEmpty()
         || recordWrapper.get(0) == null
         || recordWrapper.get(0).taskRecord == null) {
-      ALog.w(TAG, "记录为空");
+      ALog.w(TAG, String.format("记录为空，filePath: %s", filePath));
     } else {
       TaskRecord record = recordWrapper.get(0).taskRecord;
       // 删除分块文件
       if (record.isBlock) {
         for (int i = 0, len = record.threadNum; i < len; i++) {
-          File partFile = new File(String.format(AbsFileer.SUB_PATH, record.filePath, i));
+          File partFile = new File(String.format(RecordHandler.SUB_PATH, record.filePath, i));
           if (partFile.exists()) {
             partFile.delete();
           }
         }
+      } else if (type == RecordHandler.TYPE_DOWNLOAD) { // 处理单线程任务没有完成的情况
+        if (record.threadRecords != null && !record.threadRecords.isEmpty()) {
+          ThreadRecord tr = record.threadRecords.get(0);
+          if (!tr.isComplete && file.exists()) {
+            file.delete();
+          }
+        } else {
+          if (file.exists()) {
+            file.delete();
+          }
+        }
+      } else { // 处理上传的情况
+        if (file.exists() && removeFile) {
+          file.delete();
+        }
       }
-      // 删除任务记录
-      record.deleteData();
-    }
 
-    if (file.exists() && removeFile) {
-      file.delete();
+      // 删除任务记录
+      DbEntity.deleteData(ThreadRecord.class, "key=?", filePath); // 必须先获取完成数据再删除线程记录
+      record.deleteData();
     }
 
     if (removeEntity) {
@@ -754,7 +774,8 @@ public class CommonUtil {
    * 删除任务记录，默认删除文件，删除任务实体
    *
    * @param filePath 文件路径
-   * @param type {@code 1}下载任务的记录，{@code 2} 上传任务的记录 {@code false}如果任务已经完成，只删除任务数据库记录
+   * @param type {@link RecordHandler#TYPE_DOWNLOAD}下载任务的记录，{@link RecordHandler#TYPE_UPLOAD}
+   * 上传任务的记录
    */
   public static void delTaskRecord(String filePath, int type) {
     delTaskRecord(filePath, type, false, true);
@@ -1208,9 +1229,9 @@ public class CommonUtil {
     if (record.threadRecords != null && !record.threadRecords.isEmpty()) {
       for (ThreadRecord tr : record.threadRecords) {
         tr.key = newPath;
-        File blockFile = new File(String.format(AbsFileer.SUB_PATH, oldPath, tr.threadId));
+        File blockFile = new File(String.format(RecordHandler.SUB_PATH, oldPath, tr.threadId));
         if (blockFile.exists()) {
-          blockFile.renameTo(new File(String.format(AbsFileer.SUB_PATH, newPath, tr.threadId)));
+          blockFile.renameTo(new File(String.format(RecordHandler.SUB_PATH, newPath, tr.threadId)));
         }
       }
       DbEntity.updateManyData(record.threadRecords);

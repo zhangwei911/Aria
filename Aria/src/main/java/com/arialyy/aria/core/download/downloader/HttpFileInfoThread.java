@@ -141,9 +141,14 @@ public class HttpFileInfoThread implements Runnable {
     }
     Map<String, List<String>> headers = conn.getHeaderFields();
     String disposition = conn.getHeaderField("Content-Disposition");
-    if (mTaskDelegate.isUseServerFileName() && !TextUtils.isEmpty(disposition)) {
-      mEntity.setDisposition(CommonUtil.encryptBASE64(disposition));
-      handleContentDisposition(disposition);
+
+    if (mTaskDelegate.isUseServerFileName()) {
+      if (!TextUtils.isEmpty(disposition)) {
+        mEntity.setDisposition(CommonUtil.encryptBASE64(disposition));
+        handleContentDisposition(disposition);
+      } else {
+        ALog.w(TAG, "Content-Disposition对于端字段为空，使用服务器端文件名失败");
+      }
     }
     CookieManager msCookieManager = new CookieManager();
     List<String> cookiesHeader = headers.get("Set-Cookie");
@@ -264,14 +269,15 @@ public class HttpFileInfoThread implements Runnable {
       return;
     }
     ALog.d(TAG, String.format("文件重命名为：%s", newName));
-    File oldFile = new File(mEntity.getDownloadPath());
+    File oldFile = new File(mEntity.getFilePath());
     String newPath = oldFile.getParent() + "/" + newName;
     if (oldFile.exists()) {
       boolean b = oldFile.renameTo(new File(newPath));
       ALog.d(TAG, String.format("文件重命名%s", b ? "成功" : "失败"));
     }
     mEntity.setFileName(newName);
-    mEntity.setDownloadPath(newPath);
+    mEntity.setFilePath(newPath);
+    CommonUtil.modifyTaskRecord(oldFile.getPath(), newPath);
   }
 
   /**

@@ -47,6 +47,7 @@ import com.arialyy.simple.common.ModifyUrlDialog;
 import com.arialyy.simple.databinding.ActivitySingleBinding;
 
 import com.arialyy.simple.util.AppUtil;
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -201,6 +202,7 @@ public class SingleTaskActivity extends BaseActivity<ActivitySingleBinding> {
   @Download.onTaskRunning
   protected void running(DownloadTask task) {
     if (task.getKey().equals(mUrl)) {
+      ALog.d(TAG, "isRunning");
       //Log.d(TAG, task.getKey());
       long len = task.getFileSize();
       if (len == 0) {
@@ -248,13 +250,13 @@ public class SingleTaskActivity extends BaseActivity<ActivitySingleBinding> {
 
   @Download.onTaskComplete
   void taskComplete(DownloadTask task) {
-
     if (task.getKey().equals(mUrl)) {
       getBinding().setProgress(100);
       Toast.makeText(SingleTaskActivity.this, getString(R.string.download_success),
           Toast.LENGTH_SHORT).show();
       getBinding().setStateStr(getString(R.string.re_start));
       getBinding().setSpeed("");
+      ALog.d(TAG, "md5: " + CommonUtil.getFileMD5(new File(task.getFilePath())));
     }
   }
 

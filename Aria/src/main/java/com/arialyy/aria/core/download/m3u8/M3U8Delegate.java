@@ -29,7 +29,26 @@ public class M3U8Delegate<TARGET extends AbsTarget> extends BaseDelegate<TARGET>
     mTarget.getTaskWrapper().setRequestType(AbsTaskWrapper.M3U8_FILE);
   }
 
-  //public M3U8LiveDelegate asLive(){
-  //  return
-  //}
+  /**
+   * 选择需要下载的码率，默认下载最大码率
+   *
+   * @param bandWidth 指定的码率
+   */
+  public M3U8Delegate setBandWidth(int bandWidth) {
+    return this;
+  }
+
+  /**
+   * 处理直播类的下载
+   */
+  public M3U8LiveDelegate<TARGET> asLive() {
+    return new M3U8LiveDelegate<>(mTarget);
+  }
+
+  /**
+   * 处理需要解码的ts文件
+   */
+  public M3U8Delegate setDecodeAdapter() {
+    return this;
+  }
 }
