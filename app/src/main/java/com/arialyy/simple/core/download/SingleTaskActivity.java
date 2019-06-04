@@ -256,7 +256,7 @@ public class SingleTaskActivity extends BaseActivity<ActivitySingleBinding> {
           Toast.LENGTH_SHORT).show();
       getBinding().setStateStr(getString(R.string.re_start));
       getBinding().setSpeed("");
-      ALog.d(TAG, "md5: " + CommonUtil.getFileMD5(new File(task.getDownloadPath())));
+      ALog.d(TAG, "md5: " + CommonUtil.getFileMD5(new File(task.getFilePath())));
     }
   }
 

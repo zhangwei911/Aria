@@ -70,6 +70,7 @@ public class M3U8FileInfoThread implements Runnable {
       ConnectionHelp.setConnectParam(mTaskDelegate, conn);
       conn.setConnectTimeout(mConnectTimeOut);
       conn.connect();
+      Map<String, List<String>> head = conn.getHeaderFields();
       handleConnect(conn);
     } catch (IOException e) {
       e.printStackTrace();

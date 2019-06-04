@@ -41,7 +41,7 @@ public class M3U8Delegate<TARGET extends AbsTarget> extends BaseDelegate<TARGET>
   }
 
   /**
-   * 设置文件长度，由于m3u8协议的特殊性，你需要设置文件长度才能获取到正确的下载进度百分比
+   * 设置文件长度，由于m3u8协议的特殊性质，你需要设置文件长度才能获取到正确的下载进度百分比
    *
    * @param fileSize 文件长度
    */
