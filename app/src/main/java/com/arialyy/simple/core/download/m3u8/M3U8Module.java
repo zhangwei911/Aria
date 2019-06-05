@@ -31,11 +31,13 @@ import java.io.File;
 public class M3U8Module extends BaseViewModule {
   private final String M3U8_URL_KEY = "M3U8_URL_KEY";
   private final String M3U8_PATH_KEY = "M3U8_PATH_KEY";
-
-  private final String defUrl = "https://www.gaoya123.cn/2019/1557993797897.m3u8";
+  // m3u8测试集合：http://www.voidcn.com/article/p-snaliarm-ct.html
+  //private final String defUrl = "https://www.gaoya123.cn/2019/1557993797897.m3u8";
+  // 多码率地址：
+  private final String defUrl = "http://devimages.apple.com/iphone/samples/bipbop/bipbopall.m3u8";
   private final String filePath =
       Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getPath()
-          + "/1557993797897.m3u8";
+          + "/1557993797897.ts";
 
   private MutableLiveData<DownloadEntity> liveData = new MutableLiveData<>();
   private DownloadEntity singDownloadInfo;

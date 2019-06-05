@@ -23,6 +23,7 @@ import com.arialyy.aria.core.inf.AbsTask;
 import com.arialyy.aria.core.inf.AbsTaskWrapper;
 import com.arialyy.aria.core.inf.IEntity;
 import com.arialyy.aria.core.inf.IEventListener;
+import com.arialyy.aria.core.inf.ITaskWrapper;
 import com.arialyy.aria.core.inf.TaskSchedulerType;
 import com.arialyy.aria.core.scheduler.ISchedulers;
 import com.arialyy.aria.core.upload.UploadEntity;
@@ -30,6 +31,7 @@ import com.arialyy.aria.exception.BaseException;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
 import com.arialyy.aria.util.ErrorHelp;
+import com.arialyy.aria.util.RecordUtil;
 import java.lang.ref.WeakReference;
 
 public abstract class BaseListener<ENTITY extends AbsEntity, TASK_WRAPPER extends AbsTaskWrapper<ENTITY>,
@@ -139,8 +141,10 @@ public abstract class BaseListener<ENTITY extends AbsEntity, TASK_WRAPPER extend
     }
     mEntity.setSpeed(speed < 0 ? 0 : speed);
 
-    mEntity.setPercent((int) (mEntity.getFileSize() <= 0 ? 0
-        : mEntity.getCurrentProgress() * 100 / mEntity.getFileSize()));
+    if (mTaskWrapper.getRequestType() != ITaskWrapper.M3U8_FILE) {
+      mEntity.setPercent((int) (mEntity.getFileSize() <= 0 ? 0
+          : mEntity.getCurrentProgress() * 100 / mEntity.getFileSize()));
+    }
   }
 
   /**
@@ -154,11 +158,11 @@ public abstract class BaseListener<ENTITY extends AbsEntity, TASK_WRAPPER extend
     handleSpeed(0);
     ALog.i(TAG, String.format("任务【%s】完成，将删除线程任务记录", mEntity.getKey()));
     if (mEntity instanceof DownloadGroupEntity) {
-      CommonUtil.delGroupTaskRecord((DownloadGroupEntity) mEntity, false, false);
+      RecordUtil.delGroupTaskRecord((DownloadGroupEntity) mEntity, false, false);
     } else if (mEntity instanceof DownloadEntity) {
-      CommonUtil.delTaskRecord(mEntity.getKey(), RecordHandler.TYPE_DOWNLOAD, false, false);
+      RecordUtil.delTaskRecord(mEntity.getKey(), RecordHandler.TYPE_DOWNLOAD, false, false);
     } else if (mEntity instanceof UploadEntity) {
-      CommonUtil.delTaskRecord(mEntity.getKey(), RecordHandler.TYPE_UPLOAD, false, false);
+      RecordUtil.delTaskRecord(mEntity.getKey(), RecordHandler.TYPE_UPLOAD, false, false);
     }
   }
 

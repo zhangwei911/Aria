@@ -15,6 +15,7 @@
  */
 package com.arialyy.aria.core.download.m3u8;
 
+import android.text.TextUtils;
 import com.arialyy.aria.core.common.CompleteInfo;
 import com.arialyy.aria.core.common.IUtil;
 import com.arialyy.aria.core.common.OnFileInfoCallback;
@@ -44,10 +45,12 @@ public class M3U8FileUtil implements IUtil {
   private IDownloadListener mListener;
   private boolean isStop = false, isCancel = false;
   private List<String> mUrls = new ArrayList<>();
+  private M3U8FileLoader mLoader;
 
   public M3U8FileUtil(DTaskWrapper wrapper, IDownloadListener listener) {
     mWrapper = wrapper;
     mListener = listener;
+    mLoader = new M3U8FileLoader(mListener, mWrapper);
   }
 
   @Override public String getKey() {
@@ -63,15 +66,17 @@ public class M3U8FileUtil implements IUtil {
   }
 
   @Override public boolean isRunning() {
-    return false;
+    return mLoader.isRunning();
   }
 
   @Override public void cancel() {
     isCancel = true;
+    mLoader.cancel();
   }
 
   @Override public void stop() {
     isStop = true;
+    mLoader.stop();
   }
 
   @Override public void start() {
@@ -88,18 +93,23 @@ public class M3U8FileUtil implements IUtil {
   }
 
   @Override public void setMaxSpeed(int speed) {
-
+    mLoader.setMaxSpeed(speed);
   }
 
   private Runnable createInfoThread() {
     if (mWrapper.getRequestType() == ITaskWrapper.M3U8_FILE) {
       return new M3U8FileInfoThread(mWrapper, new OnFileInfoCallback() {
         @Override public void onComplete(String key, CompleteInfo info) {
-          IM3U8UrlExtInfHandler handler = mWrapper.asM3U8().getExtInfHandler();
+          ITsUrlConverter handler = mWrapper.asM3U8().getTsUrlConverter();
           if (handler != null) {
-            mUrls.addAll(handler.handler((List<String>) info.obj));
+            if (TextUtils.isEmpty(mWrapper.asM3U8().getBandWidthUrl())) {
+              mUrls.addAll(handler.convert(mWrapper.getEntity().getUrl(), (List<String>) info.obj));
+            } else {
+              mUrls.addAll(
+                  handler.convert(mWrapper.asM3U8().getBandWidthUrl(), (List<String>) info.obj));
+            }
             if (handler.getClass().isAnonymousClass()) {
-              mWrapper.asM3U8().setExtInfHandler(null);
+              mWrapper.asM3U8().setTsUrlConverter(null);
             }
           } else {
             mUrls.addAll((Collection<? extends String>) info.obj);
@@ -112,7 +122,7 @@ public class M3U8FileUtil implements IUtil {
             return;
           }
           mWrapper.asM3U8().setUrls(mUrls);
-          new M3U8FileLoader(mListener, mWrapper).start();
+          mLoader.start();
         }
 
         @Override public void onFail(AbsEntity entity, BaseException e, boolean needRetry) {

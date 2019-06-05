@@ -32,6 +32,7 @@ import com.arialyy.aria.exception.TaskException;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CheckUtil;
 import com.arialyy.aria.util.CommonUtil;
+import com.arialyy.aria.util.RecordUtil;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -280,7 +281,7 @@ public class HttpFileInfoThread implements Runnable {
     }
     mEntity.setFileName(newName);
     mEntity.setFilePath(newPath);
-    CommonUtil.modifyTaskRecord(oldFile.getPath(), newPath);
+    RecordUtil.modifyTaskRecord(oldFile.getPath(), newPath);
   }
 
   /**
@@ -303,6 +304,7 @@ public class HttpFileInfoThread implements Runnable {
     mEntity.setRedirect(true);
     mEntity.setRedirectUrl(newUrl);
     String cookies = conn.getHeaderField("Set-Cookie");
+    conn.disconnect();
     URL url = ConnectionHelp.handleUrl(newUrl, mTaskDelegate);
     conn = ConnectionHelp.handleConnection(url, mTaskDelegate);
     ConnectionHelp.setConnectParam(mTaskDelegate, conn);

@@ -24,11 +24,11 @@ import com.arialyy.aria.core.inf.GroupSendParams;
 import com.arialyy.aria.core.inf.IEntity;
 import com.arialyy.aria.core.inf.TaskSchedulerType;
 import com.arialyy.aria.core.scheduler.ISchedulers;
-import com.arialyy.aria.core.upload.UploadEntity;
 import com.arialyy.aria.exception.BaseException;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
 import com.arialyy.aria.util.ErrorHelp;
+import com.arialyy.aria.util.RecordUtil;
 
 /**
  * Created by Aria.Lao on 2017/7/20. 任务组下载事件
@@ -117,7 +117,7 @@ class DownloadGroupListener
       subEntity.setConvertSpeed("0kb/s");
       subEntity.setSpeed(0);
       ALog.i(TAG, String.format("任务【%s】完成，将删除线程任务记录", mEntity.getKey()));
-      CommonUtil.delTaskRecord(subEntity.getKey(), RecordHandler.TYPE_DOWNLOAD, false, false);
+      RecordUtil.delTaskRecord(subEntity.getKey(), RecordHandler.TYPE_DOWNLOAD, false, false);
     }
     subEntity.update();
   }
@@ -156,9 +156,9 @@ class DownloadGroupListener
     if (sType == TaskSchedulerType.TYPE_CANCEL_AND_NOT_NOTIFY) {
       mEntity.setComplete(false);
       mEntity.setState(IEntity.STATE_WAIT);
-      CommonUtil.delGroupTaskRecord(mEntity, mTaskWrapper.isRemoveFile(), false);
+      RecordUtil.delGroupTaskRecord(mEntity, mTaskWrapper.isRemoveFile(), false);
     } else {
-      CommonUtil.delGroupTaskRecord(mEntity, mTaskWrapper.isRemoveFile(), true);
+      RecordUtil.delGroupTaskRecord(mEntity, mTaskWrapper.isRemoveFile(), true);
     }
   }
 }

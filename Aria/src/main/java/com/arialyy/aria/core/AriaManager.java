@@ -50,6 +50,7 @@ import com.arialyy.aria.orm.DelegateWrapper;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.AriaCrashHandler;
 import com.arialyy.aria.util.CommonUtil;
+import com.arialyy.aria.util.RecordUtil;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -294,13 +295,13 @@ import org.xml.sax.SAXException;
   public void delRecord(int type, String key, boolean removeFile) {
     switch (type) {
       case 1: // 删除普通任务记录
-        CommonUtil.delTaskRecord(key, RecordHandler.TYPE_DOWNLOAD, removeFile, true);
+        RecordUtil.delTaskRecord(key, RecordHandler.TYPE_DOWNLOAD, removeFile, true);
         break;
       case 2:
-        CommonUtil.delGroupTaskRecord(key, removeFile);
+        RecordUtil.delGroupTaskRecord(key, removeFile);
         break;
       case 3:
-        CommonUtil.delTaskRecord(key, RecordHandler.TYPE_UPLOAD);
+        RecordUtil.delTaskRecord(key, RecordHandler.TYPE_UPLOAD);
         break;
     }
   }

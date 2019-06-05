@@ -18,6 +18,7 @@ package com.arialyy.simple.core.download.m3u8;
 
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -30,6 +31,8 @@ import com.arialyy.aria.core.Aria;
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.download.DownloadTarget;
 import com.arialyy.aria.core.download.DownloadTask;
+import com.arialyy.aria.core.download.m3u8.IBandWidthUrlConverter;
+import com.arialyy.aria.core.download.m3u8.ITsUrlConverter;
 import com.arialyy.aria.core.inf.IEntity;
 import com.arialyy.aria.core.inf.IHttpFileLenAdapter;
 import com.arialyy.aria.util.ALog;
@@ -41,6 +44,7 @@ import com.arialyy.simple.common.ModifyPathDialog;
 import com.arialyy.simple.common.ModifyUrlDialog;
 import com.arialyy.simple.databinding.ActivityM3u8Binding;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -54,7 +58,7 @@ public class M3U8DownloadActivity extends BaseActivity<ActivityM3u8Binding> {
   @Override
   protected void init(Bundle savedInstanceState) {
     super.init(savedInstanceState);
-    setTitle("单任务下载");
+    setTitle(getString(R.string.m3u8_file));
     Aria.download(this).register();
     mModule = ViewModelProviders.of(this).get(M3U8Module.class);
     mModule.getHttpDownloadInfo(this).observe(this, new Observer<DownloadEntity>() {
@@ -72,9 +76,8 @@ public class M3U8DownloadActivity extends BaseActivity<ActivityM3u8Binding> {
 
         if (entity.getFileSize() != 0) {
           getBinding().setFileSize(CommonUtil.formatFileSize(entity.getFileSize()));
-          getBinding().setProgress(entity.isComplete() ? 100
-              : (int) (entity.getCurrentProgress() * 100 / entity.getFileSize()));
         }
+        getBinding().setProgress(entity.getPercent());
         getBinding().setUrl(entity.getUrl());
         getBinding().setFilePath(entity.getFilePath());
         mUrl = entity.getUrl();
@@ -164,13 +167,7 @@ public class M3U8DownloadActivity extends BaseActivity<ActivityM3u8Binding> {
   protected void running(DownloadTask task) {
     if (task.getKey().equals(mUrl)) {
       ALog.d(TAG, "isRunning");
-      //Log.d(TAG, task.getKey());
-      long len = task.getFileSize();
-      if (len == 0) {
-        getBinding().setProgress(0);
-      } else {
-        getBinding().setProgress(task.getPercent());
-      }
+      getBinding().setProgress(task.getPercent());
       getBinding().setSpeed(task.getConvertSpeed());
     }
   }
@@ -230,6 +227,7 @@ public class M3U8DownloadActivity extends BaseActivity<ActivityM3u8Binding> {
   public void onClick(View view) {
     switch (view.getId()) {
       case R.id.start:
+        ALog.d(TAG, "isRunning = " + mTarget.isRunning());
         if (mTarget.isRunning()) {
           Aria.download(this).load(mUrl).stop();
         } else {
@@ -248,6 +246,24 @@ public class M3U8DownloadActivity extends BaseActivity<ActivityM3u8Binding> {
         .useServerFileName(true)
         .setFilePath(mFilePath, true)
         .asM3U8()
+        .setBandWidthUrlConverter(new IBandWidthUrlConverter() {
+          @Override public String convert(String bandWidthUrl) {
+            int index = mUrl.lastIndexOf("/");
+            return mUrl.substring(0, index + 1) + bandWidthUrl;
+          }
+        })
+        .setTsUrlConvert(new ITsUrlConverter() {
+          @Override public List<String> convert(String m3u8Url, List<String> tsUrls) {
+            int index = m3u8Url.lastIndexOf("/");
+            String parentUrl = m3u8Url.substring(0, index + 1);
+            List<String> newUrls = new ArrayList<>();
+            for (String url : tsUrls) {
+              newUrls.add(parentUrl + url);
+            }
+
+            return newUrls;
+          }
+        })
         .start();
   }
 

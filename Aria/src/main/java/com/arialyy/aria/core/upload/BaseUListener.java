@@ -21,7 +21,7 @@ import com.arialyy.aria.core.common.RecordHandler;
 import com.arialyy.aria.core.inf.IEntity;
 import com.arialyy.aria.core.inf.IUploadListener;
 import com.arialyy.aria.core.inf.TaskSchedulerType;
-import com.arialyy.aria.util.CommonUtil;
+import com.arialyy.aria.util.RecordUtil;
 
 /**
  * 下载监听类
@@ -38,10 +38,10 @@ class BaseUListener extends BaseListener<UploadEntity, UTaskWrapper, UploadTask>
     if (sType == TaskSchedulerType.TYPE_CANCEL_AND_NOT_NOTIFY) {
       mEntity.setComplete(false);
       mEntity.setState(IEntity.STATE_WAIT);
-      CommonUtil.delTaskRecord(mEntity.getFilePath(), RecordHandler.TYPE_UPLOAD,
+      RecordUtil.delTaskRecord(mEntity.getFilePath(), RecordHandler.TYPE_UPLOAD,
           mTaskWrapper.isRemoveFile(), false);
     } else {
-      CommonUtil.delTaskRecord(mEntity.getFilePath(), RecordHandler.TYPE_UPLOAD,
+      RecordUtil.delTaskRecord(mEntity.getFilePath(), RecordHandler.TYPE_UPLOAD,
           mTaskWrapper.isRemoveFile(), true);
     }
   }

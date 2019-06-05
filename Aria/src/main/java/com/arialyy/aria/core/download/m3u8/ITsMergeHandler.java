@@ -18,15 +18,15 @@ package com.arialyy.aria.core.download.m3u8;
 import java.util.List;
 
 /**
- * M3U8 #EXTINF 信息处理器
+ * Ts文件合并处理，如果你希望使用自行处理ts文件的合并，你可以实现该接口
  */
-public interface IM3U8UrlExtInfHandler {
+public interface ITsMergeHandler {
 
   /**
-   * 处理#EXTINF信息，对于某些服务器，返回的切片信息有可能是相对地址，因此，你需要自行转换为可下载http连接
+   * 合并ts文件
    *
-   * @param extInf #EXTINF 切片信息列表
-   * @return 根据切片信息转换后的http连接列表，如果你的切片信息是可以直接下载的http连接，直接返回extInf便可
+   * @param tsPath ts文件列表
+   * @return {@code true} 合并成功
    */
-  List<String> handler(List<String> extInf);
+  boolean merge(List<String> tsPath);
 }

@@ -21,6 +21,7 @@ import com.arialyy.aria.core.common.RequestEnum;
 import com.arialyy.aria.orm.DbEntity;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
+import com.arialyy.aria.util.RecordUtil;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -161,8 +162,8 @@ class HttpGroupConfigHandler extends AbsGroupConfigHandler<DownloadGroupTarget> 
             return;
           }
 
-          CommonUtil.modifyTaskRecord(oldPath, newPath);
-          entity.setDownloadPath(newPath);
+          RecordUtil.modifyTaskRecord(oldPath, newPath);
+          entity.setFilePath(newPath);
           entity.setFileName(newName);
         }
       }

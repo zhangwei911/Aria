@@ -27,6 +27,7 @@ import com.arialyy.aria.orm.DbEntity;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
 import com.arialyy.aria.util.DbDataHelper;
+import com.arialyy.aria.util.RecordUtil;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -42,6 +43,7 @@ public class RecordHandler {
 
   public static final int TYPE_DOWNLOAD = 1;
   public static final int TYPE_UPLOAD = 2;
+  public static final int TYPE_M3U8_FILE = 3;
 
   private static final String STATE = "_state_";
   private static final String RECORD = "_record_";
@@ -113,6 +115,7 @@ public class RecordHandler {
     DTaskWrapper wrapper = (DTaskWrapper) mTaskWrapper;
     String cacheDir = wrapper.asM3U8().getCacheDir();
     long currentProgress = 0;
+    int completeNum = 0;
     for (ThreadRecord record : mRecord.threadRecords) {
       File temp = new File(M3U8FileLoader.getTsFilePath(cacheDir, record.threadId));
       if (!record.isComplete) {
@@ -120,17 +123,19 @@ public class RecordHandler {
           temp.delete();
         }
         record.startLocation = 0;
-        ALog.d(TAG, String.format("分片【%s】未完成，将重新下载该分片", record.threadId));
+        //ALog.d(TAG, String.format("分片【%s】未完成，将重新下载该分片", record.threadId));
       } else {
         if (!temp.exists()) {
           record.startLocation = 0;
           record.isComplete = false;
           ALog.w(TAG, String.format("分片【%s】不存在，将重新下载该分片", record.threadId));
         } else {
+          completeNum++;
           currentProgress += temp.length();
         }
       }
     }
+    wrapper.asM3U8().setCompleteNum(completeNum);
     wrapper.getEntity().setCurrentProgress(currentProgress);
   }
 
@@ -318,7 +323,7 @@ public class RecordHandler {
           endL = mEntity.getFileSize();
         }
         tr.endLocation = endL;
-        tr.blockLen = CommonUtil.getBlockLen(mEntity.getFileSize(), i, mRecord.threadNum);
+        tr.blockLen = RecordUtil.getBlockLen(mEntity.getFileSize(), i, mRecord.threadNum);
       }
       mRecord.threadRecords.add(tr);
     }

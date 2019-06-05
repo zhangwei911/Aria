@@ -30,6 +30,7 @@ public abstract class NormalFileer<ENTITY extends AbsNormalEntity, TASK_WRAPPER 
   private ThreadStateManager mStateManager;
   private Handler mStateHandler;
   protected int mTotalThreadNum; //总线程数
+  private int mStartThreadNum; //启动的线程数
 
   protected NormalFileer(IEventListener listener, TASK_WRAPPER wrapper) {
     super(listener, wrapper);
@@ -52,11 +53,11 @@ public abstract class NormalFileer<ENTITY extends AbsNormalEntity, TASK_WRAPPER 
    *
    * @param maxSpeed 单位为：kb
    */
+  @Override
   public void setMaxSpeed(int maxSpeed) {
-    for (int i = 0; i < mTotalThreadNum; i++) {
-      AbsThreadTask task = getTaskList().get(i);
-      if (task != null) {
-        task.setMaxSpeed(maxSpeed);
+    for (AbsThreadTask task : getTaskList().values()) {
+      if (task != null && mStartThreadNum > 0) {
+        task.setMaxSpeed(maxSpeed / mStartThreadNum);
       }
     }
   }
@@ -112,10 +113,9 @@ public abstract class NormalFileer<ENTITY extends AbsNormalEntity, TASK_WRAPPER 
       return;
     }
 
-    int startNum = mRecord.threadNum;
     for (ThreadRecord tr : mRecord.threadRecords) {
       if (!tr.isComplete) {
-        startNum++;
+        mStartThreadNum++;
       }
     }
 
@@ -143,7 +143,7 @@ public abstract class NormalFileer<ENTITY extends AbsNormalEntity, TASK_WRAPPER 
       }
       ALog.d(TAG, String.format("任务【%s】线程__%s__恢复任务", mEntity.getFileName(), i));
 
-      AbsThreadTask task = createSingThreadTask(tr, startNum);
+      AbsThreadTask task = createSingThreadTask(tr, mStartThreadNum);
       if (task == null) return;
       getTaskList().put(tr.threadId, task);
     }
@@ -168,8 +168,8 @@ public abstract class NormalFileer<ENTITY extends AbsNormalEntity, TASK_WRAPPER 
     } else {
       mListener.onStart(mStateManager.getCurrentProgress());
     }
-    for (int i = 0; i < getTaskList().size(); i++) {
-      ThreadTaskManager.getInstance().startThread(mTaskWrapper.getKey(), getTaskList().get(i));
+    for (AbsThreadTask task : getTaskList().values()) {
+      ThreadTaskManager.getInstance().startThread(mTaskWrapper.getKey(), task);
     }
   }
 

@@ -24,6 +24,7 @@
   <string name="url_hint">url</string>
   <string name="name">NAME: </string>
   <string name="modify_file_path">修改文件路径</string>
+  <string name="m3u8_file">M3U8点播文件下载</string>
 
 
   <string name="error_file_name_null">文件名为空</string>

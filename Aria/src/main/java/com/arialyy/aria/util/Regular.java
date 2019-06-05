@@ -25,4 +25,9 @@ public interface Regular {
    * 匹配window.location.replace
    */
   String REG_WINLOD_REPLACE = "replace\\(\".*\"\\)";
+
+  /**
+   * 匹配BANDWIDTH
+   */
+  String BANDWIDTH = "[0-9]{3,}";
 }

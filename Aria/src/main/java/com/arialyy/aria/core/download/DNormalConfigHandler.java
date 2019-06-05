@@ -25,7 +25,7 @@ import com.arialyy.aria.core.queue.DownloadTaskQueue;
 import com.arialyy.aria.orm.DbEntity;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CheckUtil;
-import com.arialyy.aria.util.CommonUtil;
+import com.arialyy.aria.util.RecordUtil;
 import java.io.File;
 
 /**
@@ -102,11 +102,29 @@ class DNormalConfigHandler<TARGET extends AbsDTarget> implements IConfigHandler 
     if (b) {
       mEntity.save();
     }
-    if (mTarget.getTaskWrapper().getRequestType() == ITaskWrapper.M3U8_FILE
-        && mEntity.getFileSize() == 0) {
-      ALog.e(TAG, "由于m3u8协议的特殊性质，你需要设置文件长度才能获取到正确的下载进度百分比。设置方法：asM3U8().setFileSize(xxx)");
+    if (mTarget.getTaskWrapper().getRequestType() == ITaskWrapper.M3U8_FILE) {
+      checkM3u8();
     }
     return b;
+  }
+
+  private void checkM3u8() {
+    File file = new File(mTempFilePath);
+    DTaskWrapper wrapper = (DTaskWrapper) mTarget.getTaskWrapper();
+    if (wrapper.getRequestType() == ITaskWrapper.M3U8_FILE) {
+      // 缓存文件夹格式：问文件夹/.文件名_码率
+      wrapper.asM3U8()
+          .setCacheDir(String.format("%s/.%s_%s", file.getPath(), file.getName(),
+              wrapper.asM3U8().getBandWidth()));
+    }
+    if (mEntity.getFileSize() == 0) {
+      ALog.w(TAG, "由于m3u8协议的特殊性质，无法获取到正确到文件长度，因此你需要自行设置文件大小：asM3U8().setFileSize(xxx)");
+    }
+
+    if (wrapper.asM3U8().getBandWidthUrlConverter() != null
+        && wrapper.asM3U8().getBandWidth() == 0) {
+      ALog.w(TAG, "你已经设置了码率url转换器，但是没有设置码率，Aria框架将采用第一个获取到的码率");
+    }
   }
 
   @Override public boolean checkFilePath() {
@@ -120,7 +138,8 @@ class DNormalConfigHandler<TARGET extends AbsDTarget> implements IConfigHandler 
     }
     File file = new File(filePath);
     if (file.isDirectory()) {
-      if (mTarget.getTargetType() == ITargetHandler.D_HTTP) {
+      if (mTarget.getTargetType() == ITargetHandler.D_HTTP
+          || mTarget.getTaskWrapper().getRequestType() == ITaskWrapper.M3U8_FILE) {
         ALog.e(TAG,
             String.format("下载失败，保存路径【%s】不能为文件夹，路径需要是完整的文件路径，如：/mnt/sdcard/game.zip", filePath));
         return false;
@@ -143,13 +162,13 @@ class DNormalConfigHandler<TARGET extends AbsDTarget> implements IConfigHandler 
           return false;
         } else {
           ALog.w(TAG, String.format("保存路径【%s】已经被其它任务占用，当前任务将覆盖该路径的文件", filePath));
-          CommonUtil.delTaskRecord(filePath, RecordHandler.TYPE_DOWNLOAD);
+          RecordUtil.delTaskRecord(filePath, RecordHandler.TYPE_DOWNLOAD);
           mTarget.setTaskWrapper(
               TaskWrapperManager.getInstance()
                   .getHttpTaskWrapper(DTaskWrapper.class, mUrl));
         }
       }
-      File oldFile = new File(mEntity.getDownloadPath());
+      File oldFile = new File(mEntity.getFilePath());
       File newFile = new File(filePath);
       mEntity.setFilePath(filePath);
       mEntity.setFileName(newFile.getName());
@@ -159,11 +178,11 @@ class DNormalConfigHandler<TARGET extends AbsDTarget> implements IConfigHandler 
       }
       if (oldFile.exists()) {
         // 处理普通任务的重命名
-        CommonUtil.modifyTaskRecord(oldFile.getPath(), newFile.getPath());
+        RecordUtil.modifyTaskRecord(oldFile.getPath(), newFile.getPath());
         ALog.i(TAG, String.format("将任务重命名为：%s", newFile.getName()));
-      } else if (CommonUtil.blockTaskExists(oldFile.getPath())) {
+      } else if (RecordUtil.blockTaskExists(oldFile.getPath())) {
         // 处理分块任务的重命名
-        CommonUtil.modifyTaskRecord(oldFile.getPath(), newFile.getPath());
+        RecordUtil.modifyTaskRecord(oldFile.getPath(), newFile.getPath());
         ALog.i(TAG, String.format("将分块任务重命名为：%s", newFile.getName()));
       }
     }

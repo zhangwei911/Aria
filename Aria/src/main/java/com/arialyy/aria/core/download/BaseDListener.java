@@ -24,6 +24,7 @@ import com.arialyy.aria.core.inf.IEntity;
 import com.arialyy.aria.core.inf.TaskSchedulerType;
 import com.arialyy.aria.core.scheduler.ISchedulers;
 import com.arialyy.aria.util.CommonUtil;
+import com.arialyy.aria.util.RecordUtil;
 
 /**
  * 下载监听类
@@ -55,10 +56,10 @@ public class BaseDListener extends BaseListener<DownloadEntity, DTaskWrapper, Do
     if (sType == TaskSchedulerType.TYPE_CANCEL_AND_NOT_NOTIFY) {
       mEntity.setComplete(false);
       mEntity.setState(IEntity.STATE_WAIT);
-      CommonUtil.delTaskRecord(mEntity.getFilePath(), RecordHandler.TYPE_DOWNLOAD,
+      RecordUtil.delTaskRecord(mEntity.getFilePath(), RecordHandler.TYPE_DOWNLOAD,
           mTaskWrapper.isRemoveFile(), false);
     } else {
-      CommonUtil.delTaskRecord(mEntity.getFilePath(), RecordHandler.TYPE_DOWNLOAD,
+      RecordUtil.delTaskRecord(mEntity.getFilePath(), RecordHandler.TYPE_DOWNLOAD,
           mTaskWrapper.isRemoveFile(), true);
     }
   }

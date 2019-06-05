@@ -35,6 +35,7 @@ import com.arialyy.aria.core.scheduler.UploadSchedulers;
 import com.arialyy.aria.core.upload.UTaskWrapper;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
+import com.arialyy.aria.util.RecordUtil;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -78,9 +79,9 @@ public abstract class AbsTarget<TARGET extends AbsTarget> implements ITargetHand
       cancel();
     } else {
       if (mEntity instanceof AbsNormalEntity) {
-        CommonUtil.delTaskRecord((AbsNormalEntity) mEntity, mTaskWrapper.isRemoveFile());
+        RecordUtil.delTaskRecord((AbsNormalEntity) mEntity, mTaskWrapper.isRemoveFile());
       } else if (mEntity instanceof DownloadGroupEntity) {
-        CommonUtil.delGroupTaskRecord(((DownloadGroupEntity) mEntity), mTaskWrapper.isRemoveFile(), true);
+        RecordUtil.delGroupTaskRecord(((DownloadGroupEntity) mEntity), mTaskWrapper.isRemoveFile(), true);
       }
       TaskWrapperManager.getInstance().removeTaskWrapper(mEntity.getKey());
     }

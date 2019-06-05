@@ -160,13 +160,13 @@ public abstract class AbsThreadTask<ENTITY extends AbsNormalEntity, TASK_WRAPPER
   protected abstract BaseTaskConfig getTaskConfig();
 
   /**
-   * 设置最大下载速度
+   * 设置当前线程最大下载速度
    *
    * @param speed 单位为：kb
    */
   public void setMaxSpeed(int speed) {
     if (mSpeedBandUtil != null) {
-      mSpeedBandUtil.setMaxRate(speed / mConfig.startThreadNum);
+      mSpeedBandUtil.setMaxRate(speed);
     }
   }
 
@@ -252,18 +252,20 @@ public abstract class AbsThreadTask<ENTITY extends AbsNormalEntity, TASK_WRAPPER
    * 停止任务
    */
   public void stop() {
-    synchronized (AriaManager.LOCK) {
-      isStop = true;
+    isStop = true;
+    sendState(IThreadState.STATE_STOP, null);
+    if (mTaskWrapper.getRequestType() == ITaskWrapper.M3U8_FILE) {
+      writeConfig(false, getConfig().tempFile.length());
+      ALog.i(TAG, String.format("任务【%s】已停止", getFileName()));
+    } else {
       if (mTaskWrapper.isSupportBP()) {
         final long stopLocation = mChildCurrentLocation;
-        sendState(IThreadState.STATE_STOP, null);
         ALog.d(TAG,
             String.format("任务【%s】thread__%s__停止【当前线程停止位置：%s】", getFileName(),
                 mRecord.threadId, stopLocation));
         writeConfig(false, stopLocation);
       } else {
         ALog.i(TAG, String.format("任务【%s】已停止", getFileName()));
-        sendState(IThreadState.STATE_STOP, null);
       }
     }
   }
@@ -302,12 +304,10 @@ public abstract class AbsThreadTask<ENTITY extends AbsNormalEntity, TASK_WRAPPER
    * 取消任务
    */
   public void cancel() {
-    synchronized (AriaManager.LOCK) {
-      isCancel = true;
-      sendState(IThreadState.STATE_CANCEL, null);
-      ALog.d(TAG,
-          String.format("任务【%s】thread__%s__取消", getFileName(), mRecord.threadId));
-    }
+    isCancel = true;
+    sendState(IThreadState.STATE_CANCEL, null);
+    ALog.d(TAG,
+        String.format("任务【%s】thread__%s__取消", getFileName(), mRecord.threadId));
   }
 
   /**

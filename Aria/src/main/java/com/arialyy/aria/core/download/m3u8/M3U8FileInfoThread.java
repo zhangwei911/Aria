@@ -29,6 +29,7 @@ import com.arialyy.aria.exception.M3U8Exception;
 import com.arialyy.aria.exception.TaskException;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CheckUtil;
+import com.arialyy.aria.util.Regular;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -36,12 +37,14 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * 解析url中获取到到m3u信息
  * https://www.cnblogs.com/renhui/p/10351870.html
+ * https://blog.csdn.net/Guofengpu/article/details/54922865
  */
 public class M3U8FileInfoThread implements Runnable {
   private final String TAG = "M3U8FileInfoThread";
@@ -70,7 +73,6 @@ public class M3U8FileInfoThread implements Runnable {
       ConnectionHelp.setConnectParam(mTaskDelegate, conn);
       conn.setConnectTimeout(mConnectTimeOut);
       conn.connect();
-      Map<String, List<String>> head = conn.getHeaderFields();
       handleConnect(conn);
     } catch (IOException e) {
       e.printStackTrace();
@@ -91,20 +93,28 @@ public class M3U8FileInfoThread implements Runnable {
         return;
       }
       List<String> extInf = new ArrayList<>();
-      boolean isDes = false;
       while ((line = reader.readLine()) != null) {
         if (line.startsWith("#EXT-X-ENDLIST")) {
           break;
         }
         if (line.startsWith("#EXTINF")) {
-          isDes = true;
-        } else if (isDes) {
-          extInf.add(line);
-          isDes = false;
+          extInf.add(reader.readLine());
+        } else if (line.startsWith("#EXT-X-STREAM-INF")) {
+          int setBand = mTaskWrapper.asM3U8().getBandWidth();
+          int bandWidth = getBandWidth(line);
+          if (setBand == 0) {
+            handleBandWidth(conn, reader.readLine());
+          } else if (bandWidth == setBand) {
+            handleBandWidth(conn, reader.readLine());
+          } else {
+            failDownload(String.format("【%s】码率不存在", bandWidth), false);
+          }
+          return;
         }
       }
+
       if (extInf.isEmpty()) {
-        failDownload("获取M3U8下载地址列表失败", false);
+        failDownload(String.format("获取M3U8下载地址列表失败，url: %s", mEntity.getUrl()), false);
         return;
       }
       CompleteInfo info = new CompleteInfo();
@@ -121,6 +131,20 @@ public class M3U8FileInfoThread implements Runnable {
     } else {
       failDownload(String.format("不支持的响应，code: %s", code), true);
     }
+  }
+
+  /**
+   * 读取bandwidth
+   */
+  private int getBandWidth(String line) {
+    Pattern p = Pattern.compile(Regular.BANDWIDTH);
+
+    Matcher m = p.matcher(line);
+
+    if (m.find()) {
+      return Integer.parseInt(m.group());
+    }
+    return 0;
   }
 
   /**
@@ -143,7 +167,37 @@ public class M3U8FileInfoThread implements Runnable {
     mEntity.setRedirect(true);
     mEntity.setRedirectUrl(newUrl);
     String cookies = conn.getHeaderField("Set-Cookie");
+    conn.disconnect(); // 关闭上一个连接
     URL url = ConnectionHelp.handleUrl(newUrl, mTaskDelegate);
+    conn = ConnectionHelp.handleConnection(url, mTaskDelegate);
+    ConnectionHelp.setConnectParam(mTaskDelegate, conn);
+    conn.setRequestProperty("Cookie", cookies);
+    conn.setConnectTimeout(mConnectTimeOut);
+    conn.connect();
+    handleConnect(conn);
+    conn.disconnect();
+  }
+
+  /**
+   * 处理码率
+   */
+  private void handleBandWidth(HttpURLConnection conn, String bandWidthM3u8Url) throws IOException {
+    IBandWidthUrlConverter converter = mTaskWrapper.asM3U8().getBandWidthUrlConverter();
+    if (converter != null) {
+      bandWidthM3u8Url = converter.convert(bandWidthM3u8Url);
+      if (converter.getClass().isAnonymousClass()) {
+        mTaskWrapper.asM3U8().setBandWidthUrlConverter(null);
+      }
+      if (!bandWidthM3u8Url.startsWith("http")) {
+        failDownload(String.format("码率转换器转换后的url地址无效，转换后的url：%s", bandWidthM3u8Url), false);
+        return;
+      }
+    }
+    mTaskWrapper.asM3U8().setBandWidthUrl(bandWidthM3u8Url);
+    ALog.d(TAG, String.format("新码率url：%s", bandWidthM3u8Url));
+    String cookies = conn.getHeaderField("Set-Cookie");
+    conn.disconnect();    // 关闭上一个连接
+    URL url = ConnectionHelp.handleUrl(bandWidthM3u8Url, mTaskDelegate);
     conn = ConnectionHelp.handleConnection(url, mTaskDelegate);
     ConnectionHelp.setConnectParam(mTaskDelegate, conn);
     conn.setRequestProperty("Cookie", cookies);

@@ -30,19 +30,111 @@ public class M3U8TaskConfig {
   /**
    * #EXTINF 标签信息处理器
    */
-  private IM3U8UrlExtInfHandler extInfHandler;
+  private ITsUrlConverter tsUrlConverter;
 
   /**
    * 缓存目录
    */
   private String cacheDir;
 
-  public IM3U8UrlExtInfHandler getExtInfHandler() {
-    return extInfHandler;
+  /**
+   * 是否合并ts文件 {@code true} 合并ts文件为一个
+   */
+  private boolean mergeFile = true;
+
+  /**
+   * 合并处理器
+   */
+  private ITsMergeHandler mergeHandler;
+
+  /**
+   * 已完成的ts分片数量
+   */
+  private int completeNum = 0;
+
+  /**
+   * 视频时长，单位s
+   */
+  private long duration;
+
+  /**
+   * 码率
+   */
+  private int bandWidth = 0;
+
+  /**
+   * 码率url转换器
+   */
+  private IBandWidthUrlConverter bandWidthUrlConverter;
+
+  /**
+   * 码率地址
+   */
+  private String bandWidthUrl;
+
+  public String getBandWidthUrl() {
+    return bandWidthUrl;
   }
 
-  public void setExtInfHandler(IM3U8UrlExtInfHandler extInfHandler) {
-    this.extInfHandler = extInfHandler;
+  public void setBandWidthUrl(String bandWidthUrl) {
+    this.bandWidthUrl = bandWidthUrl;
+  }
+
+  public IBandWidthUrlConverter getBandWidthUrlConverter() {
+    return bandWidthUrlConverter;
+  }
+
+  public void setBandWidthUrlConverter(
+      IBandWidthUrlConverter bandWidthUrlConverter) {
+    this.bandWidthUrlConverter = bandWidthUrlConverter;
+  }
+
+  public int getBandWidth() {
+    return bandWidth;
+  }
+
+  public void setBandWidth(int bandWidth) {
+    this.bandWidth = bandWidth;
+  }
+
+  public long getDuration() {
+    return duration;
+  }
+
+  public void setDuration(long duration) {
+    this.duration = duration;
+  }
+
+  public int getCompleteNum() {
+    return completeNum;
+  }
+
+  public void setCompleteNum(int completeNum) {
+    this.completeNum = completeNum;
+  }
+
+  public boolean isMergeFile() {
+    return mergeFile;
+  }
+
+  public void setMergeFile(boolean mergeFile) {
+    this.mergeFile = mergeFile;
+  }
+
+  public ITsMergeHandler getMergeHandler() {
+    return mergeHandler;
+  }
+
+  public void setMergeHandler(ITsMergeHandler mergeHandler) {
+    this.mergeHandler = mergeHandler;
+  }
+
+  public ITsUrlConverter getTsUrlConverter() {
+    return tsUrlConverter;
+  }
+
+  public void setTsUrlConverter(ITsUrlConverter tsUrlConverter) {
+    this.tsUrlConverter = tsUrlConverter;
   }
 
   public List<String> getUrls() {

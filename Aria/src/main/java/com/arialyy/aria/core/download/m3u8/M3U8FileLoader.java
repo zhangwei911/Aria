@@ -54,7 +54,7 @@ public class M3U8FileLoader extends AbsFileer<DownloadEntity, DTaskWrapper> {
   private ReentrantLock LOCK = new ReentrantLock();
   private Condition mCondition = LOCK.newCondition();
 
-  protected M3U8FileLoader(IEventListener listener, DTaskWrapper wrapper) {
+  M3U8FileLoader(IEventListener listener, DTaskWrapper wrapper) {
     super(listener, wrapper);
   }
 
@@ -91,6 +91,7 @@ public class M3U8FileLoader extends AbsFileer<DownloadEntity, DTaskWrapper> {
     new Thread(new Runnable() {
       @Override public void run() {
         int index = 0;
+        String cacheDir = getCacheDir();
         while (!isBreak()) {
           try {
             LOCK.lock();
@@ -104,7 +105,7 @@ public class M3U8FileLoader extends AbsFileer<DownloadEntity, DTaskWrapper> {
                 continue;
               }
 
-              M3U8ThreadTask task = createThreadTask(getCacheDir(), tr);
+              M3U8ThreadTask task = createThreadTask(cacheDir, tr);
               getTaskList().put(tr.threadId, task);
               mFlagQueue.offer(startThreadTask(task));
             }
@@ -119,6 +120,21 @@ public class M3U8FileLoader extends AbsFileer<DownloadEntity, DTaskWrapper> {
         }
       }
     }).start();
+  }
+
+  @Override protected void setMaxSpeed(int maxSpeed) {
+    // TODO: 2019-06-05 暂不支持
+
+  }
+
+  @Override protected void onStop() {
+    super.onStop();
+    //notifyLock();
+  }
+
+  @Override protected void onCancel() {
+    super.onCancel();
+    //notifyLock();
   }
 
   private void notifyLock() {
@@ -209,6 +225,7 @@ public class M3U8FileLoader extends AbsFileer<DownloadEntity, DTaskWrapper> {
         case STATE_STOP:
           mStopNum++;
           if (isStop()) {
+            ALog.d(TAG, "任务停止");
             mListener.onStop(mProgress);
             quitLooper();
           }
@@ -216,7 +233,7 @@ public class M3U8FileLoader extends AbsFileer<DownloadEntity, DTaskWrapper> {
         case STATE_CANCEL:
           mCancelNum++;
           if (isCancel()) {
-            ALog.d(TAG, "icCancel");
+            ALog.d(TAG, "任务取消");
             mListener.onCancel();
             quitLooper();
           }
@@ -232,11 +249,11 @@ public class M3U8FileLoader extends AbsFileer<DownloadEntity, DTaskWrapper> {
           break;
         case STATE_COMPLETE:
           mCompleteNum++;
-          ALog.d(TAG, "完成");
+          handlerPercent();
           notifyLock();
           if (isComplete()) {
             ALog.d(TAG, "isComplete, completeNum = " + mCompleteNum);
-            if (mTaskRecord.isBlock) {
+            if (mTaskWrapper.asM3U8().isMergeFile()) {
               if (mergeFile()) {
                 mListener.onComplete();
               } else {
@@ -255,9 +272,21 @@ public class M3U8FileLoader extends AbsFileer<DownloadEntity, DTaskWrapper> {
       return false;
     }
 
+    /**
+     * 设置进度
+     */
+    private void handlerPercent() {
+      int completeNum = mTaskWrapper.asM3U8().getCompleteNum();
+      completeNum++;
+      mTaskWrapper.asM3U8().setCompleteNum(completeNum);
+      int percent = completeNum * 100 / mTaskRecord.threadRecords.size();
+      mEntity.setPercent(percent);
+      mEntity.update();
+    }
+
     @Override public boolean isStop() {
       printInfo("isStop");
-      return mStartThreadNum == mStopNum + mFailNum + mCompleteNum;
+      return mStopNum == mFlagQueue.size();
     }
 
     @Override public boolean isFail() {
@@ -272,7 +301,7 @@ public class M3U8FileLoader extends AbsFileer<DownloadEntity, DTaskWrapper> {
 
     @Override public boolean isCancel() {
       printInfo("isCancel");
-      return mStartThreadNum == mCancelNum + mFailNum + mCompleteNum;
+      return mCancelNum == mFlagQueue.size();
     }
 
     @Override public long getCurrentProgress() {
@@ -293,27 +322,32 @@ public class M3U8FileLoader extends AbsFileer<DownloadEntity, DTaskWrapper> {
      * @return {@code true} 合并成功，{@code false}合并失败
      */
     private boolean mergeFile() {
+      ITsMergeHandler mergeHandler = mTaskWrapper.asM3U8().getMergeHandler();
       String cacheDir = getCacheDir();
-
       List<String> partPath = new ArrayList<>();
-
       for (ThreadRecord tr : mTaskRecord.threadRecords) {
         partPath.add(getTsFilePath(cacheDir, tr.threadId));
       }
-
-      boolean isSuccess = FileUtil.mergeFile(mTaskRecord.filePath, partPath);
+      boolean isSuccess;
+      if (mergeHandler != null) {
+        isSuccess = mergeHandler.merge(partPath);
+        if (mergeHandler.getClass().isAnonymousClass()) {
+          mTaskWrapper.asM3U8().setMergeHandler(null);
+        }
+      } else {
+        isSuccess = FileUtil.mergeFile(mTaskRecord.filePath, partPath);
+      }
       if (isSuccess) {
+        // 合并成功，删除缓存文件
         for (String pp : partPath) {
           File f = new File(pp);
           if (f.exists()) {
             f.delete();
           }
         }
-        File targetFile = new File(mTaskRecord.filePath);
-        if (targetFile.exists() && targetFile.length() > mTaskRecord.fileLength) {
-          ALog.e(TAG, String.format("任务【%s】分块文件合并失败，下载长度超出文件真实长度，downloadLen: %s，fileSize: %s",
-              targetFile.getName(), targetFile.length(), mTaskRecord.fileLength));
-          return false;
+        File cDir = new File(cacheDir);
+        if (cDir.exists()) {
+          cDir.delete();
         }
         return true;
       } else {

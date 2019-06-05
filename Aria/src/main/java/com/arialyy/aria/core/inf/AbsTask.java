@@ -18,8 +18,6 @@ package com.arialyy.aria.core.inf;
 import android.content.Context;
 import android.os.Handler;
 import android.text.TextUtils;
-import com.arialyy.aria.core.Aria;
-import com.arialyy.aria.core.AriaManager;
 import com.arialyy.aria.core.common.IUtil;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
@@ -167,11 +165,7 @@ public abstract class AbsTask<ENTITY extends AbsEntity, TASK_WRAPPER extends Abs
    * @return 返回百分比进度，如果文件长度为0，返回0
    */
   public int getPercent() {
-    if (mTaskWrapper.getEntity().getFileSize() == 0) {
-      return 0;
-    }
-    return (int) (mTaskWrapper.getEntity().getCurrentProgress() * 100 / mTaskWrapper.getEntity()
-        .getFileSize());
+    return mEntity.getPercent();
   }
 
   /**
@@ -180,8 +174,7 @@ public abstract class AbsTask<ENTITY extends AbsEntity, TASK_WRAPPER extends Abs
    * @return {@link IEntity}
    */
   public int getState() {
-    return mTaskWrapper.getEntity() == null ? IEntity.STATE_OTHER
-        : mTaskWrapper.getEntity().getState();
+    return mTaskWrapper.getState();
   }
 
   /**

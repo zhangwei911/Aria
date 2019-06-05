@@ -17,11 +17,9 @@ package com.arialyy.aria.core.download.m3u8;
 
 import com.arialyy.aria.core.common.BaseDelegate;
 import com.arialyy.aria.core.download.DTaskWrapper;
-import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.inf.AbsTarget;
 import com.arialyy.aria.core.inf.AbsTaskWrapper;
 import com.arialyy.aria.util.ALog;
-import java.io.File;
 
 /**
  * m3u8 委托
@@ -33,15 +31,29 @@ public class M3U8Delegate<TARGET extends AbsTarget> extends BaseDelegate<TARGET>
     super(target);
     mTaskWrapper = (DTaskWrapper) mTarget.getTaskWrapper();
     mTaskWrapper.setRequestType(AbsTaskWrapper.M3U8_FILE);
-    String filePath = mTaskWrapper.getEntity().getFilePath();
-    File file = new File(filePath);
-    if (!file.isDirectory()) {
-      mTaskWrapper.asM3U8().setCacheDir(file.getParent() + "/." + file.getName());
-    }
   }
 
   /**
-   * 设置文件长度，由于m3u8协议的特殊性质，你需要设置文件长度才能获取到正确的下载进度百分比
+   * 是否合并ts文件，默认合并ts
+   *
+   * @param merge {@code true}合并所有ts文件为一个
+   */
+  public M3U8Delegate merge(boolean merge) {
+    mTaskWrapper.asM3U8().setMergeFile(merge);
+    return this;
+  }
+
+  /**
+   * 如果你希望使用自行处理ts文件的合并，可以使用{@link ITsMergeHandler}处理ts文件的合并
+   * 需要注意的是：只有{@link #merge(boolean)}设置合并ts文件，该方法才会生效
+   */
+  public M3U8Delegate setMergeHandler(ITsMergeHandler handler) {
+    mTaskWrapper.asM3U8().setMergeHandler(handler);
+    return this;
+  }
+
+  /**
+   * 由于m3u8协议的特殊性质，无法获取到正确到文件长度，因此你需要自行设置文件大小
    *
    * @param fileSize 文件长度
    */
@@ -55,21 +67,34 @@ public class M3U8Delegate<TARGET extends AbsTarget> extends BaseDelegate<TARGET>
   }
 
   /**
-   * 如果你的#EXTINF信息是相对路径或有其它需求，你需要设置extinf处理器，将#EXTINF中的切片信息转换为可下载的http连接
+   * M3U8 ts 文件url转换器，对于某些服务器，返回的ts地址可以是相对地址，也可能是处理过的
+   * 对于这种情况，你需要使用url转换器将地址转换为可正常访问的http地址
    *
-   * @param handler {@link IM3U8UrlExtInfHandler}
+   * @param converter {@link ITsUrlConverter}
    */
-  public M3U8Delegate setExtInfHandler(IM3U8UrlExtInfHandler handler) {
-    mTaskWrapper.asM3U8().setExtInfHandler(handler);
+  public M3U8Delegate setTsUrlConvert(ITsUrlConverter converter) {
+    mTaskWrapper.asM3U8().setTsUrlConverter(converter);
     return this;
   }
 
   /**
-   * 选择需要下载的码率，默认下载最大码率
+   * 选择需要下载的码率，默认下载的码率
    *
    * @param bandWidth 指定的码率
    */
   public M3U8Delegate setBandWidth(int bandWidth) {
+    mTaskWrapper.asM3U8().setBandWidth(bandWidth);
+    return this;
+  }
+
+  /**
+   * M3U8 bandWidth 码率url转换器，对于某些服务器，返回的ts地址可以是相对地址，也可能是处理过的，
+   * 对于这种情况，你需要使用url转换器将地址转换为可正常访问的http地址
+   *
+   * @param converter {@link IBandWidthUrlConverter}
+   */
+  public M3U8Delegate setBandWidthUrlConverter(IBandWidthUrlConverter converter) {
+    mTaskWrapper.asM3U8().setBandWidthUrlConverter(converter);
     return this;
   }
 
@@ -80,10 +105,10 @@ public class M3U8Delegate<TARGET extends AbsTarget> extends BaseDelegate<TARGET>
     return new M3U8LiveDelegate<>(mTarget);
   }
 
-  /**
-   * 处理需要解码的ts文件
-   */
-  public M3U8Delegate setDecodeAdapter() {
-    return this;
-  }
+  ///**
+  // * 处理需要解码的ts文件
+  // */
+  //public M3U8Delegate setDecodeAdapter() {
+  //  return this;
+  //}
 }

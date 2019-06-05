@@ -17,7 +17,6 @@ package com.arialyy.aria.core.common;
 
 import android.content.Context;
 import android.os.Looper;
-import android.util.SparseArray;
 import com.arialyy.aria.core.AriaManager;
 import com.arialyy.aria.core.inf.AbsNormalEntity;
 import com.arialyy.aria.core.inf.AbsTaskWrapper;
@@ -26,6 +25,8 @@ import com.arialyy.aria.core.manager.ThreadTaskManager;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -42,7 +43,7 @@ public abstract class AbsFileer<ENTITY extends AbsNormalEntity, TASK_WRAPPER ext
   protected Context mContext;
   protected File mTempFile; //文件
 
-  private SparseArray<AbsThreadTask> mTask = new SparseArray<>();
+  private Map<Integer, AbsThreadTask> mTask = new HashMap<>();
   private ScheduledThreadPoolExecutor mTimer;
 
   /**
@@ -68,6 +69,11 @@ public abstract class AbsFileer<ENTITY extends AbsNormalEntity, TASK_WRAPPER ext
    */
   protected abstract void handleTask();
 
+  /**
+   * 设置最大下载速度
+   */
+  protected abstract void setMaxSpeed(int maxSpeed);
+
   public String getKey() {
     return mTaskWrapper.getKey();
   }
@@ -76,7 +82,7 @@ public abstract class AbsFileer<ENTITY extends AbsNormalEntity, TASK_WRAPPER ext
     return mEntity;
   }
 
-  public SparseArray<AbsThreadTask> getTaskList() {
+  public Map<Integer, AbsThreadTask> getTaskList() {
     return mTask;
   }
 
@@ -86,8 +92,7 @@ public abstract class AbsFileer<ENTITY extends AbsNormalEntity, TASK_WRAPPER ext
   private void resetState() {
     closeTimer();
     if (mTask != null && mTask.size() != 0) {
-      for (int i = 0; i < mTask.size(); i++) {
-        AbsThreadTask task = mTask.get(i);
+      for (AbsThreadTask task : mTask.values()) {
         if (task != null) {
           task.breakTask();
         }
@@ -203,13 +208,17 @@ public abstract class AbsFileer<ENTITY extends AbsNormalEntity, TASK_WRAPPER ext
     }
     closeTimer();
     isCancel = true;
-    for (int i = 0; i < mTask.size(); i++) {
-      AbsThreadTask task = mTask.get(i);
-      if (task != null) {
+    onCancel();
+    for (AbsThreadTask task : mTask.values()) {
+      if (task != null && !task.isThreadComplete()) {
         task.cancel();
       }
     }
     ThreadTaskManager.getInstance().removeTaskThread(mTaskWrapper.getKey());
+  }
+
+  protected void onCancel() {
+
   }
 
   public synchronized void stop() {
@@ -218,14 +227,18 @@ public abstract class AbsFileer<ENTITY extends AbsNormalEntity, TASK_WRAPPER ext
     }
     closeTimer();
     isStop = true;
+    onStop();
     if (mStateManager.isComplete()) return;
-    for (int i = 0; i < mTask.size(); i++) {
-      AbsThreadTask task = mTask.get(i);
+    for (AbsThreadTask task : mTask.values()) {
       if (task != null && !task.isThreadComplete()) {
         task.stop();
       }
     }
     ThreadTaskManager.getInstance().removeTaskThread(mTaskWrapper.getKey());
+  }
+
+  protected void onStop() {
+
   }
 
   /**
