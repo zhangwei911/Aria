@@ -18,7 +18,6 @@ package com.arialyy.simple.core.download.m3u8;
 
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -32,9 +31,8 @@ import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.download.DownloadTarget;
 import com.arialyy.aria.core.download.DownloadTask;
 import com.arialyy.aria.core.download.m3u8.IBandWidthUrlConverter;
-import com.arialyy.aria.core.download.m3u8.ITsUrlConverter;
+import com.arialyy.aria.core.download.m3u8.IVodTsUrlConverter;
 import com.arialyy.aria.core.inf.IEntity;
-import com.arialyy.aria.core.inf.IHttpFileLenAdapter;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
 import com.arialyy.frame.util.show.T;
@@ -42,17 +40,16 @@ import com.arialyy.simple.R;
 import com.arialyy.simple.base.BaseActivity;
 import com.arialyy.simple.common.ModifyPathDialog;
 import com.arialyy.simple.common.ModifyUrlDialog;
-import com.arialyy.simple.databinding.ActivityM3u8Binding;
+import com.arialyy.simple.databinding.ActivityM3u8VodBinding;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
-public class M3U8DownloadActivity extends BaseActivity<ActivityM3u8Binding> {
+public class M3U8VodDownloadActivity extends BaseActivity<ActivityM3u8VodBinding> {
 
   private String mUrl;
   private String mFilePath;
-  private M3U8Module mModule;
+  private M3U8VodModule mModule;
   private DownloadTarget mTarget;
 
   @Override
@@ -60,14 +57,14 @@ public class M3U8DownloadActivity extends BaseActivity<ActivityM3u8Binding> {
     super.init(savedInstanceState);
     setTitle(getString(R.string.m3u8_file));
     Aria.download(this).register();
-    mModule = ViewModelProviders.of(this).get(M3U8Module.class);
+    mModule = ViewModelProviders.of(this).get(M3U8VodModule.class);
     mModule.getHttpDownloadInfo(this).observe(this, new Observer<DownloadEntity>() {
 
       @Override public void onChanged(@Nullable DownloadEntity entity) {
         if (entity == null) {
           return;
         }
-        mTarget = Aria.download(M3U8DownloadActivity.this).load(entity.getUrl());
+        mTarget = Aria.download(M3U8VodDownloadActivity.this).load(entity.getUrl());
         if (mTarget.getTaskState() == IEntity.STATE_STOP) {
           getBinding().setStateStr(getString(R.string.resume));
         } else if (mTarget.isRunning()) {
@@ -200,7 +197,7 @@ public class M3U8DownloadActivity extends BaseActivity<ActivityM3u8Binding> {
   @Download.onTaskFail
   void taskFail(DownloadTask task, Exception e) {
     if (task.getKey().equals(mUrl)) {
-      Toast.makeText(M3U8DownloadActivity.this, getString(R.string.download_fail),
+      Toast.makeText(M3U8VodDownloadActivity.this, getString(R.string.download_fail),
           Toast.LENGTH_SHORT)
           .show();
       getBinding().setStateStr(getString(R.string.start));
@@ -211,7 +208,7 @@ public class M3U8DownloadActivity extends BaseActivity<ActivityM3u8Binding> {
   void taskComplete(DownloadTask task) {
     if (task.getKey().equals(mUrl)) {
       getBinding().setProgress(100);
-      Toast.makeText(M3U8DownloadActivity.this, getString(R.string.download_success),
+      Toast.makeText(M3U8VodDownloadActivity.this, getString(R.string.download_success),
           Toast.LENGTH_SHORT).show();
       getBinding().setStateStr(getString(R.string.re_start));
       getBinding().setSpeed("");
@@ -221,7 +218,7 @@ public class M3U8DownloadActivity extends BaseActivity<ActivityM3u8Binding> {
 
   @Override
   protected int setLayoutId() {
-    return R.layout.activity_m3u8;
+    return R.layout.activity_m3u8_vod;
   }
 
   public void onClick(View view) {
@@ -241,7 +238,7 @@ public class M3U8DownloadActivity extends BaseActivity<ActivityM3u8Binding> {
   }
 
   private void startD() {
-    Aria.download(M3U8DownloadActivity.this)
+    Aria.download(M3U8VodDownloadActivity.this)
         .load(mUrl)
         .useServerFileName(true)
         .setFilePath(mFilePath, true)
@@ -252,7 +249,7 @@ public class M3U8DownloadActivity extends BaseActivity<ActivityM3u8Binding> {
             return mUrl.substring(0, index + 1) + bandWidthUrl;
           }
         })
-        .setTsUrlConvert(new ITsUrlConverter() {
+        .setTsUrlConvert(new IVodTsUrlConverter() {
           @Override public List<String> convert(String m3u8Url, List<String> tsUrls) {
             int index = m3u8Url.lastIndexOf("/");
             String parentUrl = m3u8Url.substring(0, index + 1);
@@ -265,12 +262,6 @@ public class M3U8DownloadActivity extends BaseActivity<ActivityM3u8Binding> {
           }
         })
         .start();
-  }
-
-  @Override
-  protected void onStop() {
-    super.onStop();
-    //Aria.download(this).unRegister();
   }
 
   @Override protected void dataCallback(int result, Object data) {

@@ -22,7 +22,7 @@ import com.arialyy.aria.core.common.TaskRecord;
 import com.arialyy.aria.core.common.ThreadRecord;
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.download.DownloadGroupEntity;
-import com.arialyy.aria.core.download.m3u8.M3U8FileLoader;
+import com.arialyy.aria.core.download.m3u8.BaseM3U8Loader;
 import com.arialyy.aria.core.inf.AbsEntity;
 import com.arialyy.aria.core.inf.AbsNormalEntity;
 import com.arialyy.aria.core.upload.UploadEntity;
@@ -149,7 +149,7 @@ public class RecordUtil {
      * 处理任务未完成的情况
      */
     if (!entity.isComplete()) {
-      if (record.taskType == TaskRecord.TYPE_M3U8) { // 删除ts分片文件
+      if (record.taskType == TaskRecord.TYPE_M3U8_VOD) { // 删除ts分片文件
         String cacheDir = null;
         if (!targetFile.isDirectory()) {
           cacheDir = targetFile.getParent() + "/." + targetFile.getName();
@@ -207,7 +207,7 @@ public class RecordUtil {
      * 处理任务未完成的情况
      */
     if (!entity.isComplete()) {
-      if (record.taskType == TaskRecord.TYPE_M3U8) { // 删除ts分片文件
+      if (record.taskType == TaskRecord.TYPE_M3U8_VOD) { // 删除ts分片文件
         String cacheDir = null;
         if (!targetFile.isDirectory()) {
           cacheDir = targetFile.getParent() + "/." + targetFile.getName();
@@ -289,7 +289,7 @@ public class RecordUtil {
     if (!TextUtils.isEmpty(cacheDir)) {
       List<String> partPath = new ArrayList<>();
       for (ThreadRecord tr : record.threadRecords) {
-        partPath.add(M3U8FileLoader.getTsFilePath(cacheDir, tr.threadId));
+        partPath.add(BaseM3U8Loader.getTsFilePath(cacheDir, tr.threadId));
       }
       for (String pp : partPath) {
         File f = new File(pp);

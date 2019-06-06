@@ -97,10 +97,6 @@ public class SimpleDownloadUtil implements IUtil {
     new Thread(createInfoThread()).start();
   }
 
-  @Override public void resume() {
-    start();
-  }
-
   @Override public void setMaxSpeed(int speed) {
     mDownloader.setMaxSpeed(speed);
   }

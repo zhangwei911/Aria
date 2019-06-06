@@ -30,7 +30,8 @@ import java.util.List;
  */
 public class TaskRecord extends DbEntity {
   public static final int TYPE_HTTP_FTP = 0;
-  public static final int TYPE_M3U8 = 1;
+  public static final int TYPE_M3U8_VOD = 1;
+  public static final int TYPE_M3U8_LIVE = 2;
 
   @Ignore
   public List<ThreadRecord> threadRecords;
@@ -89,7 +90,7 @@ public class TaskRecord extends DbEntity {
 
   /**
    * 线程类型
-   * {@link #TYPE_HTTP_FTP}、{@link #TYPE_M3U8}
+   * {@link #TYPE_HTTP_FTP}、{@link #TYPE_M3U8_VOD}
    */
   public int taskType = 0;
 }

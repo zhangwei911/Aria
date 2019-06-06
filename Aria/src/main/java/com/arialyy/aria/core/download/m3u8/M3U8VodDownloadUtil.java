@@ -22,10 +22,8 @@ import com.arialyy.aria.core.common.OnFileInfoCallback;
 import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.inf.AbsEntity;
 import com.arialyy.aria.core.inf.IDownloadListener;
-import com.arialyy.aria.core.inf.ITaskWrapper;
 import com.arialyy.aria.exception.BaseException;
 import com.arialyy.aria.exception.M3U8Exception;
-import com.arialyy.aria.util.ALog;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -38,19 +36,19 @@ import java.util.List;
  * 3、完成所有分片下载后，合并ts文件
  * 4、删除该隐藏文件夹
  */
-public class M3U8FileUtil implements IUtil {
+public class M3U8VodDownloadUtil implements IUtil {
   private final String TAG = "M3U8DownloadUtil";
 
   private DTaskWrapper mWrapper;
   private IDownloadListener mListener;
   private boolean isStop = false, isCancel = false;
   private List<String> mUrls = new ArrayList<>();
-  private M3U8FileLoader mLoader;
+  private M3U8VodLoader mLoader;
 
-  public M3U8FileUtil(DTaskWrapper wrapper, IDownloadListener listener) {
+  public M3U8VodDownloadUtil(DTaskWrapper wrapper, IDownloadListener listener) {
     mWrapper = wrapper;
     mListener = listener;
-    mLoader = new M3U8FileLoader(mListener, mWrapper);
+    mLoader = new M3U8VodLoader(mListener, mWrapper);
   }
 
   @Override public String getKey() {
@@ -84,57 +82,49 @@ public class M3U8FileUtil implements IUtil {
       return;
     }
     mListener.onPre();
-
-    new Thread(createInfoThread()).start();
-  }
-
-  @Override public void resume() {
-    start();
+    getVodInfo();
   }
 
   @Override public void setMaxSpeed(int speed) {
     mLoader.setMaxSpeed(speed);
   }
 
-  private Runnable createInfoThread() {
-    if (mWrapper.getRequestType() == ITaskWrapper.M3U8_FILE) {
-      return new M3U8FileInfoThread(mWrapper, new OnFileInfoCallback() {
-        @Override public void onComplete(String key, CompleteInfo info) {
-          ITsUrlConverter handler = mWrapper.asM3U8().getTsUrlConverter();
-          if (handler != null) {
-            if (TextUtils.isEmpty(mWrapper.asM3U8().getBandWidthUrl())) {
-              mUrls.addAll(handler.convert(mWrapper.getEntity().getUrl(), (List<String>) info.obj));
-            } else {
-              mUrls.addAll(
-                  handler.convert(mWrapper.asM3U8().getBandWidthUrl(), (List<String>) info.obj));
-            }
-            if (handler.getClass().isAnonymousClass()) {
-              mWrapper.asM3U8().setTsUrlConverter(null);
-            }
+  /**
+   * 获取点播文件信息
+   */
+  private void getVodInfo() {
+    M3U8InfoThread thread = new M3U8InfoThread(mWrapper, new OnFileInfoCallback() {
+      @Override public void onComplete(String key, CompleteInfo info) {
+        IVodTsUrlConverter converter = mWrapper.asM3U8().getVodUrlConverter();
+        if (converter != null) {
+          if (TextUtils.isEmpty(mWrapper.asM3U8().getBandWidthUrl())) {
+            mUrls.addAll(converter.convert(mWrapper.getEntity().getUrl(), (List<String>) info.obj));
           } else {
-            mUrls.addAll((Collection<? extends String>) info.obj);
+            mUrls.addAll(
+                converter.convert(mWrapper.asM3U8().getBandWidthUrl(), (List<String>) info.obj));
           }
-          if (mUrls.isEmpty()) {
-            failDownload(new M3U8Exception(TAG, "获取地址失败"), false);
-            return;
-          } else if (!mUrls.get(0).startsWith("http")) {
-            failDownload(new M3U8Exception(TAG, "地址错误，请使用IM3U8UrlExtInfHandler处理你的url信息"), false);
-            return;
+          if (converter.getClass().isAnonymousClass()) {
+            mWrapper.asM3U8().setVodUrlConverter(null);
           }
-          mWrapper.asM3U8().setUrls(mUrls);
-          mLoader.start();
+        } else {
+          mUrls.addAll((Collection<? extends String>) info.obj);
         }
+        if (mUrls.isEmpty()) {
+          failDownload(new M3U8Exception(TAG, "获取地址失败"), false);
+          return;
+        } else if (!mUrls.get(0).startsWith("http")) {
+          failDownload(new M3U8Exception(TAG, "地址错误，请使用IM3U8UrlExtInfHandler处理你的url信息"), false);
+          return;
+        }
+        mWrapper.asM3U8().setUrls(mUrls);
+        mLoader.start();
+      }
 
-        @Override public void onFail(AbsEntity entity, BaseException e, boolean needRetry) {
-          failDownload(e, needRetry);
-        }
-      });
-    } else if (mWrapper.getRequestType() == ITaskWrapper.M3U8_LIVE) {
-      return null;
-    } else {
-      ALog.e(TAG, "不支持的类型");
-      return null;
-    }
+      @Override public void onFail(AbsEntity entity, BaseException e, boolean needRetry) {
+        failDownload(e, needRetry);
+      }
+    });
+    new Thread(thread).start();
   }
 
   private void failDownload(BaseException e, boolean needRetry) {

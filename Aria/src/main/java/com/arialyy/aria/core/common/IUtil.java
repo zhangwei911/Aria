@@ -67,11 +67,6 @@ public interface IUtil {
   void start();
 
   /**
-   * 从上次断点恢复
-   */
-  void resume();
-
-  /**
    * 设置最大下载/上传速度
    *
    * @param speed 单位：kb

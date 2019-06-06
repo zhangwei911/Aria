@@ -56,12 +56,12 @@ public class ThreadRecord extends DbEntity {
 
   /**
    * 线程类型
-   * {@link TaskRecord#TYPE_HTTP_FTP}、{@link TaskRecord#TYPE_M3U8}
+   * {@link TaskRecord#TYPE_HTTP_FTP}、{@link TaskRecord#TYPE_M3U8_VOD}
    */
   public int threadType = 0;
 
   /**
-   * m3u8文件的下载地址
+   * ts文件的下载地址
    */
-  public String m3u8url;
+  public String tsUrl;
 }

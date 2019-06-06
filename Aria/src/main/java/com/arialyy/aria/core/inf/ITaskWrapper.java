@@ -50,9 +50,9 @@ public interface ITaskWrapper<ENTITY extends AbsEntity> {
   int U_FTP = 6;
 
   /**
-   * M3u8文件
+   * M3u8点播
    */
-  int M3U8_FILE = 7;
+  int M3U8_VOD = 7;
 
   /**
    * m3u8直播

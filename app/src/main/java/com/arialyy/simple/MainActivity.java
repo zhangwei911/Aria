@@ -36,7 +36,8 @@ import com.arialyy.simple.base.BaseActivity;
 import com.arialyy.simple.base.adapter.AbsHolder;
 import com.arialyy.simple.base.adapter.AbsRVAdapter;
 import com.arialyy.simple.base.adapter.RvItemClickSupport;
-import com.arialyy.simple.core.download.m3u8.M3U8DownloadActivity;
+import com.arialyy.simple.core.download.m3u8.M3U8LiveDownloadActivity;
+import com.arialyy.simple.core.download.m3u8.M3U8VodDownloadActivity;
 import com.arialyy.simple.databinding.ActivityMainBinding;
 import com.arialyy.simple.core.download.DownloadActivity;
 import com.arialyy.simple.core.download.FtpDownloadActivity;
@@ -109,7 +110,11 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
                 break;
               case 6:
                 module.startNextActivity(MainActivity.this, data.get(position),
-                    M3U8DownloadActivity.class);
+                    M3U8VodDownloadActivity.class);
+                break;
+              case 7:
+                module.startNextActivity(MainActivity.this, data.get(position),
+                    M3U8LiveDownloadActivity.class);
                 break;
             }
           }

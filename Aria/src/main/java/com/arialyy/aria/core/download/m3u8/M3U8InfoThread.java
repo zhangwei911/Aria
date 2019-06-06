@@ -25,13 +25,18 @@ import com.arialyy.aria.core.common.http.HttpTaskConfig;
 import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.download.downloader.ConnectionHelp;
+import com.arialyy.aria.core.inf.ITaskWrapper;
 import com.arialyy.aria.exception.M3U8Exception;
 import com.arialyy.aria.exception.TaskException;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CheckUtil;
+import com.arialyy.aria.util.CommonUtil;
 import com.arialyy.aria.util.Regular;
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -42,19 +47,28 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * 解析url中获取到到m3u信息
+ * 解析url中获取到到m3u8文件信息
  * https://www.cnblogs.com/renhui/p/10351870.html
  * https://blog.csdn.net/Guofengpu/article/details/54922865
  */
-public class M3U8FileInfoThread implements Runnable {
+final class M3U8InfoThread implements Runnable {
   private final String TAG = "M3U8FileInfoThread";
   private DownloadEntity mEntity;
   private DTaskWrapper mTaskWrapper;
   private int mConnectTimeOut;
   private OnFileInfoCallback onFileInfoCallback;
+  private OnGetLivePeerCallback onGetPeerCallback;
   private HttpTaskConfig mTaskDelegate;
+  /**
+   * 是否停止获取切片信息，{@code true}停止获取切片信息
+   */
+  private boolean isStop = false;
 
-  public M3U8FileInfoThread(DTaskWrapper taskWrapper, OnFileInfoCallback callback) {
+  interface OnGetLivePeerCallback {
+    void onGetPeer(String url);
+  }
+
+  M3U8InfoThread(DTaskWrapper taskWrapper, OnFileInfoCallback callback) {
     this.mTaskWrapper = taskWrapper;
     mEntity = taskWrapper.getEntity();
     mConnectTimeOut =
@@ -93,12 +107,24 @@ public class M3U8FileInfoThread implements Runnable {
         return;
       }
       List<String> extInf = new ArrayList<>();
+      boolean isLive = mTaskWrapper.getRequestType() == ITaskWrapper.M3U8_LIVE;
       while ((line = reader.readLine()) != null) {
+        if (isStop){
+          break;
+        }
         if (line.startsWith("#EXT-X-ENDLIST")) {
           break;
         }
+        ALog.d(TAG, line);
         if (line.startsWith("#EXTINF")) {
-          extInf.add(reader.readLine());
+          String info = reader.readLine();
+          if (isLive) {
+            if (onGetPeerCallback != null) {
+              onGetPeerCallback.onGetPeer(info);
+            }
+          } else {
+            extInf.add(info);
+          }
         } else if (line.startsWith("#EXT-X-STREAM-INF")) {
           int setBand = mTaskWrapper.asM3U8().getBandWidth();
           int bandWidth = getBandWidth(line);
@@ -110,10 +136,12 @@ public class M3U8FileInfoThread implements Runnable {
             failDownload(String.format("【%s】码率不存在", bandWidth), false);
           }
           return;
+        } else if (line.startsWith("EXT-X-KEY")) {
+          getKeyInfo(line);
         }
       }
 
-      if (extInf.isEmpty()) {
+      if (!isLive && extInf.isEmpty()) {
         failDownload(String.format("获取M3U8下载地址列表失败，url: %s", mEntity.getUrl()), false);
         return;
       }
@@ -134,13 +162,47 @@ public class M3U8FileInfoThread implements Runnable {
   }
 
   /**
+   * 是否停止获取切片信息，{@code true}停止获取切片信息
+   */
+  public void setStop(boolean isStop) {
+    this.isStop = isStop;
+  }
+
+  /**
+   * 直播切片信息获取回调
+   */
+  public void setOnGetPeerCallback(OnGetLivePeerCallback peerCallback) {
+    onGetPeerCallback = peerCallback;
+  }
+
+  /**
+   * 获取加密的密钥信息
+   */
+  private void getKeyInfo(String line) {
+    String temp = line.substring(line.indexOf(":") + 1);
+    String[] params = temp.split(",");
+    M3U8KeyInfo keyInfo = new M3U8KeyInfo();
+    for (String param : params) {
+      if (param.startsWith("METHOD")) {
+        keyInfo.method = param.split("=")[1];
+      } else if (param.startsWith("URI")) {
+        keyInfo.keyUrl = param.split("=")[1].replaceAll("\"", "");
+        keyInfo.keyPath = new File(mEntity.getFilePath()).getParent() + "/" + CommonUtil.getStrMd5(
+            keyInfo.keyUrl) + ".key";
+      } else if (param.startsWith("IV")) {
+        keyInfo.iv = param.split("=")[1];
+      }
+    }
+    mTaskWrapper.asM3U8().setKeyInfo(keyInfo);
+    DownloadKey(keyInfo);
+  }
+
+  /**
    * 读取bandwidth
    */
   private int getBandWidth(String line) {
     Pattern p = Pattern.compile(Regular.BANDWIDTH);
-
     Matcher m = p.matcher(line);
-
     if (m.find()) {
       return Integer.parseInt(m.group());
     }
@@ -209,5 +271,47 @@ public class M3U8FileInfoThread implements Runnable {
 
   private void failDownload(String errorInfo, boolean needRetry) {
     onFileInfoCallback.onFail(mEntity, new M3U8Exception(TAG, errorInfo), needRetry);
+  }
+
+  /**
+   * 密钥不存在，下载密钥
+   */
+  private void DownloadKey(M3U8KeyInfo info) {
+    HttpURLConnection conn = null;
+    FileOutputStream fos = null;
+    try {
+      File keyF = new File(info.keyPath);
+      if (!keyF.exists()) {
+        ALog.d(TAG, "密钥不存在，下载密钥");
+        CommonUtil.createFile(keyF.getPath());
+      } else {
+        return;
+      }
+      URL url = ConnectionHelp.handleUrl(info.keyUrl, mTaskDelegate);
+      conn = ConnectionHelp.handleConnection(url, mTaskDelegate);
+      ConnectionHelp.setConnectParam(mTaskDelegate, conn);
+      conn.setConnectTimeout(mConnectTimeOut);
+      conn.connect();
+      InputStream is = conn.getInputStream();
+      fos = new FileOutputStream(keyF);
+      byte[] buffer = new byte[1024];
+      int len;
+      while ((len = is.read(buffer)) != -1) {
+        fos.write(buffer, 0, len);
+      }
+    } catch (Exception e) {
+      e.printStackTrace();
+    } finally {
+      try {
+        if (fos != null) {
+          fos.close();
+        }
+        if (conn != null) {
+          conn.disconnect();
+        }
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+    }
   }
 }

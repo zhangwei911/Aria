@@ -77,7 +77,8 @@ public class CommonModule extends BaseViewModule {
         R.drawable.ic_ftp,
         R.drawable.ic_ftp_dir,
         R.drawable.ic_ftp,
-        R.drawable.ic_ts
+        R.drawable.ic_ts,
+        R.drawable.ic_live
     };
     int i = 0;
     for (String title : titles) {

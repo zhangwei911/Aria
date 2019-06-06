@@ -18,7 +18,7 @@ package com.arialyy.aria.core.common;
 import com.arialyy.aria.core.config.Configuration;
 import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.download.DownloadEntity;
-import com.arialyy.aria.core.download.m3u8.M3U8FileLoader;
+import com.arialyy.aria.core.download.m3u8.BaseM3U8Loader;
 import com.arialyy.aria.core.inf.AbsNormalEntity;
 import com.arialyy.aria.core.inf.AbsTaskWrapper;
 import com.arialyy.aria.core.inf.ITaskWrapper;
@@ -43,7 +43,8 @@ public class RecordHandler {
 
   public static final int TYPE_DOWNLOAD = 1;
   public static final int TYPE_UPLOAD = 2;
-  public static final int TYPE_M3U8_FILE = 3;
+  public static final int TYPE_M3U8_VOD = 3;
+  public static final int TYPE_M3U8_LIVE = 4;
 
   private static final String STATE = "_state_";
   private static final String RECORD = "_record_";
@@ -88,8 +89,10 @@ public class RecordHandler {
           initRecord(false);
         }
 
-        if (mTaskWrapper.getRequestType() == ITaskWrapper.M3U8_FILE) {
+        if (mTaskWrapper.getRequestType() == ITaskWrapper.M3U8_VOD) {
           handleM3U8Record();
+        } else if (mTaskWrapper.getRequestType() == ITaskWrapper.M3U8_LIVE) {
+          ALog.i(TAG, "直播下载不处理历史记录");
         } else {
           if (mRecord.isBlock) {
             handleBlockRecord();
@@ -117,7 +120,7 @@ public class RecordHandler {
     long currentProgress = 0;
     int completeNum = 0;
     for (ThreadRecord record : mRecord.threadRecords) {
-      File temp = new File(M3U8FileLoader.getTsFilePath(cacheDir, record.threadId));
+      File temp = new File(BaseM3U8Loader.getTsFilePath(cacheDir, record.threadId));
       if (!record.isComplete) {
         if (temp.exists()) {
           temp.delete();
@@ -301,9 +304,12 @@ public class RecordHandler {
       mRecord = createTaskRecord(getNewTaskThreadNum());
     }
     mTaskWrapper.setNewTask(true);
-    // 处理线程区间记录
     int requestType = mTaskWrapper.getRequestType();
+    if (requestType == ITaskWrapper.M3U8_LIVE) {
+      return;
+    }
     long blockSize = mEntity.getFileSize() / mRecord.threadNum;
+    // 处理线程区间记录
     for (int i = 0; i < mRecord.threadNum; i++) {
       long startL = i * blockSize, endL = (i + 1) * blockSize;
       ThreadRecord tr;
@@ -312,10 +318,10 @@ public class RecordHandler {
       tr.threadId = i;
       tr.startLocation = startL;
       tr.isComplete = false;
-      if (requestType == ITaskWrapper.M3U8_FILE) {
+      if (requestType == ITaskWrapper.M3U8_VOD) {
         tr.startLocation = 0;
-        tr.threadType = TaskRecord.TYPE_M3U8;
-        tr.m3u8url = ((DTaskWrapper) mTaskWrapper).asM3U8().getUrls().get(i);
+        tr.threadType = TaskRecord.TYPE_M3U8_VOD;
+        tr.tsUrl = ((DTaskWrapper) mTaskWrapper).asM3U8().getUrls().get(i);
       } else {
         tr.threadType = TaskRecord.TYPE_HTTP_FTP;
         //最后一个线程的结束位置即为文件的总长度
@@ -340,26 +346,30 @@ public class RecordHandler {
     record.filePath = getFilePath();
     record.threadRecords = new ArrayList<>();
     record.threadNum = threadNum;
-    // 处理分块和动态文件参数
-    if (getRecordType() == TYPE_DOWNLOAD) {
-      record.isBlock = threadNum > 1 && Configuration.getInstance().downloadCfg.isUseBlock();
-      // 线程数为1，或者使用了分块，则认为是使用动态长度文件
-      record.isOpenDynamicFile = threadNum == 1 || record.isBlock;
-    } else {
-      record.isBlock = false;
-    }
-    if (mTaskWrapper.getRequestType() == ITaskWrapper.M3U8_FILE) {
-      record.taskType = TaskRecord.TYPE_M3U8;
+    int requestType = mTaskWrapper.getRequestType();
+    if (requestType == ITaskWrapper.M3U8_VOD) {
+      record.taskType = TaskRecord.TYPE_M3U8_VOD;
+      record.isOpenDynamicFile = true;
+    } else if (requestType == ITaskWrapper.M3U8_LIVE) {
+      record.taskType = TaskRecord.TYPE_M3U8_LIVE;
       record.isOpenDynamicFile = true;
     } else {
+      if (getRecordType() == TYPE_DOWNLOAD) {
+        record.isBlock = threadNum > 1 && Configuration.getInstance().downloadCfg.isUseBlock();
+        // 线程数为1，或者使用了分块，则认为是使用动态长度文件
+        record.isOpenDynamicFile = threadNum == 1 || record.isBlock;
+      } else {
+        record.isBlock = false;
+      }
       record.taskType = TaskRecord.TYPE_HTTP_FTP;
-    }
-    record.isGroupRecord = mEntity.isGroupChild();
-    if (record.isGroupRecord) {
-      if (mEntity instanceof DownloadEntity) {
-        record.dGroupHash = ((DownloadEntity) mEntity).getGroupHash();
+      record.isGroupRecord = mEntity.isGroupChild();
+      if (record.isGroupRecord) {
+        if (mEntity instanceof DownloadEntity) {
+          record.dGroupHash = ((DownloadEntity) mEntity).getGroupHash();
+        }
       }
     }
+
     return record;
   }
 
@@ -369,7 +379,9 @@ public class RecordHandler {
   private void saveRecord() {
     mRecord.threadNum = mRecord.threadRecords.size();
     mRecord.save();
-    DbEntity.saveAll(mRecord.threadRecords);
+    if (mRecord.threadRecords != null && !mRecord.threadRecords.isEmpty()) {
+      DbEntity.saveAll(mRecord.threadRecords);
+    }
     ALog.d(TAG, String.format("保存记录，线程记录数：%s", mRecord.threadRecords.size()));
   }
 
@@ -405,8 +417,11 @@ public class RecordHandler {
    */
   private int getNewTaskThreadNum() {
     if (getRecordType() == TYPE_DOWNLOAD) {
-      if (mTaskWrapper.getRequestType() == ITaskWrapper.M3U8_FILE) {
+      if (mTaskWrapper.getRequestType() == ITaskWrapper.M3U8_VOD) {
         return ((DTaskWrapper) mTaskWrapper).asM3U8().getUrls().size();
+      }
+      if (mTaskWrapper.getRequestType() == ITaskWrapper.M3U8_LIVE) {
+        return 1;
       }
       if (!mTaskWrapper.isSupportBP() || mTaskWrapper.asHttp().isChunked()) {
         return 1;

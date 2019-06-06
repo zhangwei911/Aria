@@ -47,7 +47,8 @@
         android:screenOrientation="landscape"
         android:theme="@style/FullScreen"
         android:windowSoftInputMode="stateHidden|adjustResize"/>
-    <activity android:name=".core.download.m3u8.M3U8DownloadActivity"/>
+    <activity android:name=".core.download.m3u8.M3U8VodDownloadActivity"/>
+    <activity android:name=".core.download.m3u8.M3U8LiveDownloadActivity"/>
 
     <service android:name=".core.download.service_download.DownloadService"/>
 

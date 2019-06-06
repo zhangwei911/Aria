@@ -252,10 +252,6 @@ public abstract class AbsFileer<ENTITY extends AbsNormalEntity, TASK_WRAPPER ext
     new Thread(this).start();
   }
 
-  public void resume() {
-    start();
-  }
-
   /**
    * 重试任务
    */

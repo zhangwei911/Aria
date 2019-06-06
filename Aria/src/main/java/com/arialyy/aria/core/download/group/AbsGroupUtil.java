@@ -220,10 +220,6 @@ public abstract class AbsGroupUtil implements IUtil, Runnable {
 
   }
 
-  @Override public void resume() {
-    start();
-  }
-
   @Override public void setMaxSpeed(int speed) {
     Set<String> keys = mSubQueue.getExec().keySet();
     for (String key : keys) {

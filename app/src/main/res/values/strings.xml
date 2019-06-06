@@ -25,6 +25,7 @@
   <string name="name">NAME: </string>
   <string name="modify_file_path">修改文件路径</string>
   <string name="m3u8_file">M3U8点播文件下载</string>
+  <string name="m3u8_live">M3U8直播文件下载</string>
 
 
   <string name="error_file_name_null">文件名为空</string>
@@ -37,6 +38,7 @@
     <item>FTP 文件夹下载</item>
     <item>FTP 文件上传</item>
     <item>M3U8 点播文件下载</item>
+    <item>M3U8 直播文件下载</item>
   </string-array>
 
   <string-array name="main_items_desc">
@@ -47,6 +49,7 @@
     <item>下载服务器上的某个FTP文件夹</item>
     <item>上传单个文件到服务器</item>
     <item>下载M3U8点播文件</item>
+    <item>下载M3U8直播文件</item>
   </string-array>
 
   <string-array name="download_items">

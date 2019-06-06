@@ -15,20 +15,28 @@
  */
 package com.arialyy.aria.core.download.m3u8;
 
-import android.support.annotation.Nullable;
-import java.util.List;
-
 /**
- * Ts文件合并处理，如果你希望使用自行处理ts文件的合并，你可以实现该接口
+ * m3u8加密密钥信息
  */
-public interface ITsMergeHandler {
+public class M3U8KeyInfo {
 
   /**
-   * 合并ts文件
-   *
-   * @param keyInfo ts文件加密信息，如果ts文件不是加密的，该字段为空
-   * @param tsPath ts文件列表
-   * @return {@code true} 合并成功
+   * 加密key保存地址
    */
-  boolean merge(@Nullable M3U8KeyInfo keyInfo, List<String> tsPath);
+  public String keyPath;
+
+  /**
+   * 加密key的下载地址
+   */
+  public String keyUrl;
+
+  /**
+   * 加密算法
+   */
+  public String method;
+
+  /**
+   * key的iv值
+   */
+  public String iv;
 }

@@ -254,7 +254,7 @@ public abstract class AbsThreadTask<ENTITY extends AbsNormalEntity, TASK_WRAPPER
   public void stop() {
     isStop = true;
     sendState(IThreadState.STATE_STOP, null);
-    if (mTaskWrapper.getRequestType() == ITaskWrapper.M3U8_FILE) {
+    if (mTaskWrapper.getRequestType() == ITaskWrapper.M3U8_VOD) {
       writeConfig(false, getConfig().tempFile.length());
       ALog.i(TAG, String.format("任务【%s】已停止", getFileName()));
     } else {
@@ -329,7 +329,7 @@ public abstract class AbsThreadTask<ENTITY extends AbsNormalEntity, TASK_WRAPPER
     if (ex != null) {
       ALog.e(TAG, ALog.getExceptionString(ex));
     }
-    if (mTaskWrapper.getRequestType() == ITaskWrapper.M3U8_FILE) {
+    if (mTaskWrapper.getRequestType() == ITaskWrapper.M3U8_VOD) {
       writeConfig(false, 0);
     } else {
       if (mTaskWrapper.isSupportBP()) {

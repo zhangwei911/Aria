@@ -30,7 +30,7 @@ public class M3U8TaskConfig {
   /**
    * #EXTINF 标签信息处理器
    */
-  private ITsUrlConverter tsUrlConverter;
+  private IVodTsUrlConverter vodUrlConverter;
 
   /**
    * 缓存目录
@@ -71,6 +71,33 @@ public class M3U8TaskConfig {
    * 码率地址
    */
   private String bandWidthUrl;
+
+  /**
+   * ts密钥信息
+   */
+  private M3U8KeyInfo keyInfo;
+
+  /**
+   * 直播下载，ts url转换器
+   */
+  private ILiveTsUrlConverter liveTsUrlConverter;
+
+  public ILiveTsUrlConverter getLiveTsUrlConverter() {
+    return liveTsUrlConverter;
+  }
+
+  public void setLiveTsUrlConverter(
+      ILiveTsUrlConverter liveTsUrlConverter) {
+    this.liveTsUrlConverter = liveTsUrlConverter;
+  }
+
+  public M3U8KeyInfo getKeyInfo() {
+    return keyInfo;
+  }
+
+  public void setKeyInfo(M3U8KeyInfo keyInfo) {
+    this.keyInfo = keyInfo;
+  }
 
   public String getBandWidthUrl() {
     return bandWidthUrl;
@@ -129,12 +156,12 @@ public class M3U8TaskConfig {
     this.mergeHandler = mergeHandler;
   }
 
-  public ITsUrlConverter getTsUrlConverter() {
-    return tsUrlConverter;
+  public IVodTsUrlConverter getVodUrlConverter() {
+    return vodUrlConverter;
   }
 
-  public void setTsUrlConverter(ITsUrlConverter tsUrlConverter) {
-    this.tsUrlConverter = tsUrlConverter;
+  public void setVodUrlConverter(IVodTsUrlConverter vodUrlConverter) {
+    this.vodUrlConverter = vodUrlConverter;
   }
 
   public List<String> getUrls() {

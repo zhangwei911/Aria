@@ -15,17 +15,18 @@
  */
 package com.arialyy.aria.core.download.m3u8;
 
-import android.support.annotation.IntDef;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-
 /**
- * 直播协议
+ * M3U8 直播下载，ts url转换器，对于某些服务器，返回的ts地址可以是相对地址，也可能是处理过的
+ * 对于这种情况，你需要使用url转换器将地址转换为可正常访问的http地址
  */
-@IntDef({
-    LiveProtocol.HLS
-})
-@Retention(RetentionPolicy.SOURCE)
-public @interface LiveProtocol {
-  int HLS = 1;
+public interface ILiveTsUrlConverter {
+
+  /**
+   * 处理#EXTINF信息，对于某些服务器，返回的切片信息有可能是相对地址，因此，你需要自行转换为可下载http连接
+   *
+   * @param m3u8Url m3u8文件下载地址
+   * @param tsUrl ts文件下载地址
+   * @return 转换后的http地址
+   */
+  String convert(String m3u8Url, String tsUrl);
 }

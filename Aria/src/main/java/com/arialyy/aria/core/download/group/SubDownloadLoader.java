@@ -128,10 +128,6 @@ class SubDownloadLoader implements IUtil {
     }
   }
 
-  @Override public void resume() {
-    start();
-  }
-
   @Override public void setMaxSpeed(int speed) {
     if (mDownloader != null) {
       mDownloader.setMaxSpeed(speed);

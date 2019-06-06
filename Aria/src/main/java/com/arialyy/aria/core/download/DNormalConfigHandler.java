@@ -102,23 +102,29 @@ class DNormalConfigHandler<TARGET extends AbsDTarget> implements IConfigHandler 
     if (b) {
       mEntity.save();
     }
-    if (mTarget.getTaskWrapper().getRequestType() == ITaskWrapper.M3U8_FILE) {
-      checkM3u8();
+    if (mTarget.getTaskWrapper().getRequestType() == ITaskWrapper.M3U8_VOD
+        || mTarget.getTaskWrapper().getRequestType() == ITaskWrapper.M3U8_LIVE) {
+      checkM3U8();
     }
     return b;
   }
 
-  private void checkM3u8() {
+  private void checkM3U8() {
     File file = new File(mTempFilePath);
     DTaskWrapper wrapper = (DTaskWrapper) mTarget.getTaskWrapper();
-    if (wrapper.getRequestType() == ITaskWrapper.M3U8_FILE) {
-      // 缓存文件夹格式：问文件夹/.文件名_码率
-      wrapper.asM3U8()
-          .setCacheDir(String.format("%s/.%s_%s", file.getPath(), file.getName(),
-              wrapper.asM3U8().getBandWidth()));
-    }
-    if (mEntity.getFileSize() == 0) {
-      ALog.w(TAG, "由于m3u8协议的特殊性质，无法获取到正确到文件长度，因此你需要自行设置文件大小：asM3U8().setFileSize(xxx)");
+    // 缓存文件夹格式：问文件夹/.文件名_码率
+    wrapper.asM3U8()
+        .setCacheDir(String.format("%s/.%s_%s", file.getParent(), file.getName(),
+            wrapper.asM3U8().getBandWidth()));
+    if (wrapper.getRequestType() == ITaskWrapper.M3U8_VOD) {
+      if (mEntity.getFileSize() == 0) {
+        ALog.w(TAG, "由于m3u8协议的特殊性质，无法获取到正确到文件长度，因此你需要自行设置文件大小：asM3U8().setFileSize(xxx)");
+      }
+    } else if (wrapper.getRequestType() == ITaskWrapper.M3U8_LIVE) {
+      if (file.exists()) {
+        ALog.w(TAG, "对于直播来说，每次下载都是一个新文件，所以你需要设置新都文件路径，否则Aria框架将会覆盖已下载的文件");
+        file.delete();
+      }
     }
 
     if (wrapper.asM3U8().getBandWidthUrlConverter() != null
@@ -139,7 +145,7 @@ class DNormalConfigHandler<TARGET extends AbsDTarget> implements IConfigHandler 
     File file = new File(filePath);
     if (file.isDirectory()) {
       if (mTarget.getTargetType() == ITargetHandler.D_HTTP
-          || mTarget.getTaskWrapper().getRequestType() == ITaskWrapper.M3U8_FILE) {
+          || mTarget.getTaskWrapper().getRequestType() == ITaskWrapper.M3U8_VOD) {
         ALog.e(TAG,
             String.format("下载失败，保存路径【%s】不能为文件夹，路径需要是完整的文件路径，如：/mnt/sdcard/game.zip", filePath));
         return false;
@@ -164,16 +170,17 @@ class DNormalConfigHandler<TARGET extends AbsDTarget> implements IConfigHandler 
           ALog.w(TAG, String.format("保存路径【%s】已经被其它任务占用，当前任务将覆盖该路径的文件", filePath));
           RecordUtil.delTaskRecord(filePath, RecordHandler.TYPE_DOWNLOAD);
           mTarget.setTaskWrapper(
-              TaskWrapperManager.getInstance()
-                  .getHttpTaskWrapper(DTaskWrapper.class, mUrl));
+              TaskWrapperManager.getInstance().getHttpTaskWrapper(DTaskWrapper.class, mUrl));
         }
       }
       File oldFile = new File(mEntity.getFilePath());
       File newFile = new File(filePath);
       mEntity.setFilePath(filePath);
       mEntity.setFileName(newFile.getName());
+
       // 如过使用Content-Disposition中的文件名，将不会执行重命名工作
-      if (mTarget.getTaskWrapper().asHttp().isUseServerFileName()) {
+      if (mTarget.getTaskWrapper().asHttp().isUseServerFileName()
+          || mTarget.getTaskWrapper().getRequestType() == ITaskWrapper.M3U8_LIVE) {
         return true;
       }
       if (oldFile.exists()) {

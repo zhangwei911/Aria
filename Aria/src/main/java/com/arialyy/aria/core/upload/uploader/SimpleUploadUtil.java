@@ -109,10 +109,6 @@ public class SimpleUploadUtil implements IUtil, Runnable {
     new Thread(this).start();
   }
 
-  @Override public void resume() {
-    mUploader.cancel();
-  }
-
   @Override public void setMaxSpeed(int speed) {
     mUploader.setMaxSpeed(speed);
   }

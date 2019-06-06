@@ -30,7 +30,7 @@ public class M3U8Delegate<TARGET extends AbsTarget> extends BaseDelegate<TARGET>
   public M3U8Delegate(TARGET target) {
     super(target);
     mTaskWrapper = (DTaskWrapper) mTarget.getTaskWrapper();
-    mTaskWrapper.setRequestType(AbsTaskWrapper.M3U8_FILE);
+    mTaskWrapper.setRequestType(AbsTaskWrapper.M3U8_VOD);
   }
 
   /**
@@ -70,10 +70,10 @@ public class M3U8Delegate<TARGET extends AbsTarget> extends BaseDelegate<TARGET>
    * M3U8 ts 文件url转换器，对于某些服务器，返回的ts地址可以是相对地址，也可能是处理过的
    * 对于这种情况，你需要使用url转换器将地址转换为可正常访问的http地址
    *
-   * @param converter {@link ITsUrlConverter}
+   * @param converter {@link IVodTsUrlConverter}
    */
-  public M3U8Delegate setTsUrlConvert(ITsUrlConverter converter) {
-    mTaskWrapper.asM3U8().setTsUrlConverter(converter);
+  public M3U8Delegate setTsUrlConvert(IVodTsUrlConverter converter) {
+    mTaskWrapper.asM3U8().setVodUrlConverter(converter);
     return this;
   }
 
@@ -104,11 +104,4 @@ public class M3U8Delegate<TARGET extends AbsTarget> extends BaseDelegate<TARGET>
   public M3U8LiveDelegate<TARGET> asLive() {
     return new M3U8LiveDelegate<>(mTarget);
   }
-
-  ///**
-  // * 处理需要解码的ts文件
-  // */
-  //public M3U8Delegate setDecodeAdapter() {
-  //  return this;
-  //}
 }

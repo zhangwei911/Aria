@@ -16,6 +16,7 @@
 package com.arialyy.aria.core.download.m3u8;
 
 import com.arialyy.aria.core.common.BaseDelegate;
+import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.inf.AbsTarget;
 import com.arialyy.aria.core.inf.AbsTaskWrapper;
 
@@ -29,20 +30,14 @@ public class M3U8LiveDelegate<TARGET extends AbsTarget> extends BaseDelegate<TAR
     mTarget.getTaskWrapper().setRequestType(AbsTaskWrapper.M3U8_LIVE);
   }
 
-
   /**
-   * 设置缓存目录
+   * M3U8 ts 文件url转换器，对于某些服务器，返回的ts地址可以是相对地址，也可能是处理过的
+   * 对于这种情况，你需要使用url转换器将地址转换为可正常访问的http地址
    *
-   * @param cacheDir 缓存目录路径
+   * @param converter {@link ILiveTsUrlConverter}
    */
-  public M3U8LiveDelegate setCacheDir(String cacheDir) {
-    return this;
-  }
-
-  /**
-   * 设置直播传输协议，{@link LiveProtocol}
-   */
-  public M3U8LiveDelegate setProtocol(@LiveProtocol int protocol) {
+  public M3U8LiveDelegate setLiveTsUrlConvert(ILiveTsUrlConverter converter) {
+    ((DTaskWrapper) mTarget.getTaskWrapper()).asM3U8().setLiveTsUrlConverter(converter);
     return this;
   }
 }

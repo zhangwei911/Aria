@@ -28,16 +28,14 @@ import com.arialyy.frame.base.BaseViewModule;
 import com.arialyy.simple.util.AppUtil;
 import java.io.File;
 
-public class M3U8Module extends BaseViewModule {
-  private final String M3U8_URL_KEY = "M3U8_URL_KEY";
-  private final String M3U8_PATH_KEY = "M3U8_PATH_KEY";
-  // m3u8测试集合：http://www.voidcn.com/article/p-snaliarm-ct.html
-  //private final String defUrl = "https://www.gaoya123.cn/2019/1557993797897.m3u8";
+public class M3U8LiveModule extends BaseViewModule {
+  private final String M3U8_LIVE_URL_KEY = "M3U8_LIVE_URL_KEY";
+  private final String M3U8_LIVE_PATH_KEY = "M3U8_LIVE_PATH_KEY";
   // 多码率地址：
-  private final String defUrl = "http://devimages.apple.com/iphone/samples/bipbop/bipbopall.m3u8";
+  private final String defUrl = "http://ivi.bupt.edu.cn/hls/cctv6hd.m3u8";
   private final String filePath =
       Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getPath()
-          + "/1557993797897.ts";
+          + "/live.ts";
 
   private MutableLiveData<DownloadEntity> liveData = new MutableLiveData<>();
   private DownloadEntity singDownloadInfo;
@@ -46,19 +44,19 @@ public class M3U8Module extends BaseViewModule {
    * 单任务下载的信息
    */
   LiveData<DownloadEntity> getHttpDownloadInfo(Context context) {
-    String url = AppUtil.getConfigValue(context, M3U8_URL_KEY, defUrl);
-    String filePath = AppUtil.getConfigValue(context, M3U8_PATH_KEY, this.filePath);
+    String url = AppUtil.getConfigValue(context, M3U8_LIVE_URL_KEY, defUrl);
+    String filePath = AppUtil.getConfigValue(context, M3U8_LIVE_PATH_KEY, this.filePath);
 
     singDownloadInfo = Aria.download(context).getDownloadEntity(url);
     if (singDownloadInfo == null) {
       singDownloadInfo = new DownloadEntity();
       singDownloadInfo.setUrl(url);
       File temp = new File(this.filePath);
-      singDownloadInfo.setDownloadPath(filePath);
+      singDownloadInfo.setFilePath(filePath);
       singDownloadInfo.setFileName(temp.getName());
     } else {
-      AppUtil.setConfigValue(context, M3U8_PATH_KEY, singDownloadInfo.getDownloadPath());
-      AppUtil.setConfigValue(context, M3U8_URL_KEY, singDownloadInfo.getUrl());
+      AppUtil.setConfigValue(context, M3U8_LIVE_PATH_KEY, singDownloadInfo.getDownloadPath());
+      AppUtil.setConfigValue(context, M3U8_LIVE_URL_KEY, singDownloadInfo.getUrl());
     }
     liveData.postValue(singDownloadInfo);
 
@@ -76,9 +74,9 @@ public class M3U8Module extends BaseViewModule {
       return;
     }
     File temp = new File(filePath);
-    AppUtil.setConfigValue(context, M3U8_PATH_KEY, filePath);
+    AppUtil.setConfigValue(context, M3U8_LIVE_PATH_KEY, filePath);
     singDownloadInfo.setFileName(temp.getName());
-    singDownloadInfo.setDownloadPath(filePath);
+    singDownloadInfo.setFilePath(filePath);
     liveData.postValue(singDownloadInfo);
   }
 
@@ -90,7 +88,7 @@ public class M3U8Module extends BaseViewModule {
       ALog.e(TAG, "下载地址为空");
       return;
     }
-    AppUtil.setConfigValue(context, M3U8_URL_KEY, url);
+    AppUtil.setConfigValue(context, M3U8_LIVE_URL_KEY, url);
     singDownloadInfo.setUrl(url);
     liveData.postValue(singDownloadInfo);
   }
