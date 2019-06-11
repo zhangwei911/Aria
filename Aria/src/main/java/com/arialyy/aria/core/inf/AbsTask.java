@@ -27,7 +27,7 @@ import java.util.Map;
 /**
  * Created by AriaL on 2017/6/29.
  */
-public abstract class AbsTask<ENTITY extends AbsEntity, TASK_WRAPPER extends AbsTaskWrapper>
+public abstract class AbsTask<TASK_WRAPPER extends AbsTaskWrapper>
     implements ITask<TASK_WRAPPER> {
   public static final String ERROR_INFO_KEY = "ERROR_INFO_KEY";
 
@@ -51,7 +51,6 @@ public abstract class AbsTask<ENTITY extends AbsEntity, TASK_WRAPPER extends Abs
   @TaskSchedulerType
   private int mSchedulerType = TaskSchedulerType.TYPE_DEFAULT;
   protected IEventListener mListener;
-  protected ENTITY mEntity;
   protected String TAG;
 
   protected AbsTask() {
@@ -165,7 +164,7 @@ public abstract class AbsTask<ENTITY extends AbsEntity, TASK_WRAPPER extends Abs
    * @return 返回百分比进度，如果文件长度为0，返回0
    */
   public int getPercent() {
-    return mEntity.getPercent();
+    return mTaskWrapper.getEntity().getPercent();
   }
 
   /**
@@ -220,7 +219,7 @@ public abstract class AbsTask<ENTITY extends AbsEntity, TASK_WRAPPER extends Abs
       getUtil().stop();
     } else {
       ALog.d(TAG, "下载任务未执行");
-      mListener.onStop(mEntity.getCurrentProgress());
+      mListener.onStop(mTaskWrapper.getEntity().getCurrentProgress());
     }
   }
 

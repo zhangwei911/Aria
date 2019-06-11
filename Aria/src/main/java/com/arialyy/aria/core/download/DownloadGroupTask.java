@@ -32,7 +32,7 @@ import com.arialyy.aria.util.CheckUtil;
  * Created by AriaL on 2017/6/27.
  * 任务组任务
  */
-public class DownloadGroupTask extends AbsGroupTask<DownloadGroupEntity, DGTaskWrapper> {
+public class DownloadGroupTask extends AbsGroupTask<DGTaskWrapper> {
 
   private DownloadGroupTask(DGTaskWrapper taskWrapper, Handler outHandler) {
     mTaskWrapper = taskWrapper;

@@ -82,6 +82,19 @@ public class M3U8TaskConfig {
    */
   private ILiveTsUrlConverter liveTsUrlConverter;
 
+  /**
+   * 直播的m3u8文件更新间隔
+   */
+  private long liveUpdateInterval = 10 * 1000;
+
+  public long getLiveUpdateInterval() {
+    return liveUpdateInterval;
+  }
+
+  public void setLiveUpdateInterval(long liveUpdateInterval) {
+    this.liveUpdateInterval = liveUpdateInterval;
+  }
+
   public ILiveTsUrlConverter getLiveTsUrlConverter() {
     return liveTsUrlConverter;
   }

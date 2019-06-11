@@ -35,7 +35,7 @@ import com.arialyy.aria.util.RecordUtil;
 import java.lang.ref.WeakReference;
 
 public abstract class BaseListener<ENTITY extends AbsEntity, TASK_WRAPPER extends AbsTaskWrapper<ENTITY>,
-    TASK extends AbsTask<ENTITY, TASK_WRAPPER>>
+    TASK extends AbsTask<TASK_WRAPPER>>
     implements IEventListener {
   protected static String TAG;
   private static final int RUN_SAVE_INTERVAL = 5 * 1000;  //5s保存一次下载中的进度

@@ -17,7 +17,7 @@ package com.arialyy.aria.core.inf;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import com.arialyy.aria.orm.annotation.Primary;
+import com.arialyy.aria.orm.annotation.Unique;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,7 +28,7 @@ public abstract class AbsGroupEntity extends AbsEntity implements Parcelable {
   /**
    * 组名，组名为任务地址相加的url的Md5
    */
-  @Primary protected String groupHash;
+  @Unique protected String groupHash;
 
   /**
    * 任务组别名
@@ -38,7 +38,7 @@ public abstract class AbsGroupEntity extends AbsEntity implements Parcelable {
   /**
    * 任务组下载文件的文件夹地址
    */
-  private String dirPath;
+  @Unique private String dirPath;
 
   /**
    * 子任务url地址

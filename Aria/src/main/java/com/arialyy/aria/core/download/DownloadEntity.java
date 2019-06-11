@@ -21,9 +21,7 @@ import android.os.Parcelable;
 import android.text.TextUtils;
 import com.arialyy.aria.core.inf.AbsNormalEntity;
 import com.arialyy.aria.core.inf.AbsTaskWrapper;
-import com.arialyy.aria.orm.ActionPolicy;
-import com.arialyy.aria.orm.annotation.Foreign;
-import com.arialyy.aria.orm.annotation.Primary;
+import com.arialyy.aria.orm.annotation.Unique;
 import com.arialyy.aria.util.CommonUtil;
 
 /**
@@ -31,13 +29,11 @@ import com.arialyy.aria.util.CommonUtil;
  * 下载实体
  */
 public class DownloadEntity extends AbsNormalEntity implements Parcelable {
-  @Primary private String downloadPath; //保存路径
+  @Unique private String downloadPath; //保存路径
 
   /**
    * 所属任务组
    */
-  @Foreign(parent = DownloadGroupEntity.class, column = "groupHash",
-      onUpdate = ActionPolicy.CASCADE, onDelete = ActionPolicy.CASCADE)
   private String groupHash;
 
   /**

@@ -15,9 +15,8 @@
  */
 package com.arialyy.aria.core.common;
 
-import android.content.Context;
 import android.os.Looper;
-import com.arialyy.aria.core.AriaManager;
+import android.util.SparseArray;
 import com.arialyy.aria.core.inf.AbsNormalEntity;
 import com.arialyy.aria.core.inf.AbsTaskWrapper;
 import com.arialyy.aria.core.inf.IEventListener;
@@ -25,8 +24,6 @@ import com.arialyy.aria.core.manager.ThreadTaskManager;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
 import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -40,10 +37,9 @@ public abstract class AbsFileer<ENTITY extends AbsNormalEntity, TASK_WRAPPER ext
   protected IEventListener mListener;
   protected TASK_WRAPPER mTaskWrapper;
   protected ENTITY mEntity;
-  protected Context mContext;
-  protected File mTempFile; //文件
+  protected File mTempFile;
 
-  private Map<Integer, AbsThreadTask> mTask = new HashMap<>();
+  private SparseArray<AbsThreadTask> mTask = new SparseArray<>();
   private ScheduledThreadPoolExecutor mTimer;
 
   /**
@@ -58,7 +54,6 @@ public abstract class AbsFileer<ENTITY extends AbsNormalEntity, TASK_WRAPPER ext
     mListener = listener;
     mTaskWrapper = wrapper;
     mEntity = mTaskWrapper.getEntity();
-    mContext = AriaManager.APP;
     TAG = CommonUtil.getClassName(getClass());
   }
 
@@ -82,7 +77,7 @@ public abstract class AbsFileer<ENTITY extends AbsNormalEntity, TASK_WRAPPER ext
     return mEntity;
   }
 
-  public Map<Integer, AbsThreadTask> getTaskList() {
+  public SparseArray<AbsThreadTask> getTaskList() {
     return mTask;
   }
 
@@ -92,10 +87,8 @@ public abstract class AbsFileer<ENTITY extends AbsNormalEntity, TASK_WRAPPER ext
   private void resetState() {
     closeTimer();
     if (mTask != null && mTask.size() != 0) {
-      for (AbsThreadTask task : mTask.values()) {
-        if (task != null) {
-          task.breakTask();
-        }
+      for (int i = 0; i < mTask.size(); i++) {
+        mTask.valueAt(i).breakTask();
       }
       mTask.clear();
     }
@@ -152,10 +145,9 @@ public abstract class AbsFileer<ENTITY extends AbsNormalEntity, TASK_WRAPPER ext
             || mStateManager.isStop()
             || mStateManager.isCancel()
             || mStateManager.isFail()
-            || !isRunning()) {
-          if (mStateManager.isComplete() || mStateManager.isFail()) {
-            ThreadTaskManager.getInstance().removeTaskThread(mTaskWrapper.getKey());
-          }
+            || !isRunning()
+            || isBreak()) {
+          ThreadTaskManager.getInstance().removeTaskThread(mTaskWrapper.getKey());
           closeTimer();
         } else if (mStateManager.getCurrentProgress() >= 0) {
           mListener.onProgress(mStateManager.getCurrentProgress());
@@ -209,7 +201,8 @@ public abstract class AbsFileer<ENTITY extends AbsNormalEntity, TASK_WRAPPER ext
     closeTimer();
     isCancel = true;
     onCancel();
-    for (AbsThreadTask task : mTask.values()) {
+    for (int i = 0; i < mTask.size(); i++) {
+      AbsThreadTask task = mTask.valueAt(i);
       if (task != null && !task.isThreadComplete()) {
         task.cancel();
       }
@@ -229,7 +222,8 @@ public abstract class AbsFileer<ENTITY extends AbsNormalEntity, TASK_WRAPPER ext
     isStop = true;
     onStop();
     if (mStateManager.isComplete()) return;
-    for (AbsThreadTask task : mTask.values()) {
+    for (int i = 0; i < mTask.size(); i++) {
+      AbsThreadTask task = mTask.valueAt(i);
       if (task != null && !task.isThreadComplete()) {
         task.stop();
       }

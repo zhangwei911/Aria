@@ -136,6 +136,9 @@ public class MultiTaskActivity extends BaseActivity<ActivityMultiBinding> {
   }
 
   @DownloadGroup.onTaskFail void groupTaskFail(DownloadGroupTask task) {
+    if (task == null){
+      return;
+    }
     mAdapter.updateBtState(task.getKey(), true);
     Log.d(TAG, String.format("group【%s】fail", task.getTaskName()));
   }

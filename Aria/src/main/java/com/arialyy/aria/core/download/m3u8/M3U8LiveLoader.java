@@ -100,7 +100,7 @@ public class M3U8LiveLoader extends BaseM3U8Loader {
   }
 
   @Override protected void setMaxSpeed(int maxSpeed) {
-    // TODO: 2019-06-06 展不支持
+    // TODO: 2019-06-06 暂不支持
   }
 
   private void notifyLock() {
@@ -199,7 +199,7 @@ public class M3U8LiveLoader extends BaseM3U8Loader {
   }
 
   /**
-   * M3U8线程状态管理
+   * M3U8线程状态管理，直播不处理停止状态、删除、失败的状态
    */
   private class LiveStateManager implements IThreadState {
     private final String TAG = "M3U8ThreadStateManager";
@@ -208,8 +208,6 @@ public class M3U8LiveLoader extends BaseM3U8Loader {
      * 任务状态回调
      */
     private IEventListener mListener;
-    private int mCancelNum = 0; // 已经取消的线程的数
-    private int mStopNum = 0;  // 已经停止的线程数
     private long mProgress; //当前总进度
     private Looper mLooper;
 
@@ -232,7 +230,6 @@ public class M3U8LiveLoader extends BaseM3U8Loader {
     @Override public boolean handleMessage(Message msg) {
       switch (msg.what) {
         case STATE_STOP:
-          mStopNum++;
           if (isStop()) {
             ALog.d(TAG, "任务停止");
             mListener.onStop(mProgress);
@@ -240,7 +237,6 @@ public class M3U8LiveLoader extends BaseM3U8Loader {
           }
           break;
         case STATE_CANCEL:
-          mCancelNum++;
           if (isCancel()) {
             ALog.d(TAG, "任务取消");
             mListener.onCancel();
@@ -258,23 +254,18 @@ public class M3U8LiveLoader extends BaseM3U8Loader {
     }
 
     @Override public boolean isStop() {
-      // 某些服务器后一次性发送多个ts地址，所以不能简单使用mStopNum == mFlagQueue.size();判断状态
-      //return mStopNum == mFlagQueue.size();
       return false;
     }
 
     @Override public boolean isFail() {
-      // 直播下载不处理失败的切片
       return false;
     }
 
     @Override public boolean isComplete() {
-      // 直播不处理完成
       return false;
     }
 
     @Override public boolean isCancel() {
-      //return mCancelNum == mFlagQueue.size();
       return false;
     }
 

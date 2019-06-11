@@ -15,13 +15,10 @@
  */
 package com.arialyy.aria.core.common;
 
-import com.arialyy.aria.core.download.DownloadGroupEntity;
-import com.arialyy.aria.orm.ActionPolicy;
 import com.arialyy.aria.orm.DbEntity;
-import com.arialyy.aria.orm.annotation.Foreign;
 import com.arialyy.aria.orm.annotation.Ignore;
 import com.arialyy.aria.orm.annotation.NoNull;
-import com.arialyy.aria.orm.annotation.Primary;
+import com.arialyy.aria.orm.annotation.Unique;
 import java.util.List;
 
 /**
@@ -44,7 +41,7 @@ public class TaskRecord extends DbEntity {
   /**
    * 任务文件路径
    */
-  @Primary
+  @Unique
   public String filePath;
 
   /**
@@ -67,7 +64,6 @@ public class TaskRecord extends DbEntity {
   /**
    * 下载任务组名
    */
-  @Foreign(parent = DownloadGroupEntity.class, column = "groupHash", onUpdate = ActionPolicy.CASCADE, onDelete = ActionPolicy.CASCADE)
   public String dGroupHash;
 
   /**

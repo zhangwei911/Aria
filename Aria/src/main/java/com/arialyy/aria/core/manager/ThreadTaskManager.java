@@ -100,7 +100,6 @@ public class ThreadTaskManager {
    */
   public void removeTaskThread(String key) {
     try {
-
       LOCK.tryLock(2, TimeUnit.SECONDS);
       if (mExePool.isShutdown()) {
         ALog.e(TAG, "线程池已经关闭");
@@ -118,6 +117,45 @@ public class ThreadTaskManager {
         temp.clear();
       }
       mThreadTasks.remove(key);
+    } catch (Exception e) {
+      e.printStackTrace();
+    } finally {
+      LOCK.unlock();
+    }
+  }
+
+  /**
+   * 删除单个线程任务
+   *
+   * @param key 任务的key
+   * @param task 线程任务
+   */
+  public void removeSingleTaskThread(String key, AbsThreadTask task) {
+    try {
+      LOCK.tryLock(2, TimeUnit.SECONDS);
+      if (mExePool.isShutdown()) {
+        ALog.e(TAG, "线程池已经关闭");
+        return;
+      }
+      if (task == null) {
+        ALog.e(TAG, "线程任务为空");
+        return;
+      }
+      key = getKey(key);
+      Set<FutureContainer> temp = mThreadTasks.get(key);
+      if (temp != null && temp.size() > 0) {
+        FutureContainer tempC = null;
+        for (FutureContainer container : temp) {
+          if (container.threadTask == task) {
+            tempC = container;
+            break;
+          }
+        }
+        if (tempC != null) {
+          task.setInterrupted(true);
+          temp.remove(tempC);
+        }
+      }
     } catch (Exception e) {
       e.printStackTrace();
     } finally {

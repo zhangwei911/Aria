@@ -25,7 +25,6 @@ import com.arialyy.aria.core.inf.AbsTarget;
 import com.arialyy.aria.core.inf.AbsTaskWrapper;
 import com.arialyy.aria.core.inf.IHttpFileLenAdapter;
 import com.arialyy.aria.core.inf.IHttpHeaderDelegate;
-import com.arialyy.aria.core.inf.ITargetHandler;
 import com.arialyy.aria.util.ALog;
 import java.net.Proxy;
 import java.util.Collection;

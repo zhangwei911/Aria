@@ -55,7 +55,8 @@ public abstract class NormalFileer<ENTITY extends AbsNormalEntity, TASK_WRAPPER 
    */
   @Override
   public void setMaxSpeed(int maxSpeed) {
-    for (AbsThreadTask task : getTaskList().values()) {
+    for (int i = 0; i < getTaskList().size(); i++) {
+      AbsThreadTask task = getTaskList().valueAt(i);
       if (task != null && mStartThreadNum > 0) {
         task.setMaxSpeed(maxSpeed / mStartThreadNum);
       }
@@ -168,8 +169,9 @@ public abstract class NormalFileer<ENTITY extends AbsNormalEntity, TASK_WRAPPER 
     } else {
       mListener.onStart(mStateManager.getCurrentProgress());
     }
-    for (AbsThreadTask task : getTaskList().values()) {
-      ThreadTaskManager.getInstance().startThread(mTaskWrapper.getKey(), task);
+
+    for (int i = 0; i < getTaskList().size(); i++) {
+      ThreadTaskManager.getInstance().startThread(mTaskWrapper.getKey(), getTaskList().valueAt(i));
     }
   }
 

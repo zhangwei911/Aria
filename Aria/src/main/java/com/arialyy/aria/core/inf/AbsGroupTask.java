@@ -21,8 +21,8 @@ import com.arialyy.aria.core.download.group.AbsGroupUtil;
  * Created by AriaL on 2017/6/29.
  * 任务组任务抽象类
  */
-public abstract class AbsGroupTask<ENTITY extends AbsEntity, TASK_ENTITY extends AbsGroupTaskWrapper>
-    extends AbsTask<ENTITY, TASK_ENTITY> {
+public abstract class AbsGroupTask<TASK_ENTITY extends AbsGroupTaskWrapper>
+    extends AbsTask<TASK_ENTITY> {
 
   @Override public String getKey() {
     return mTaskWrapper.getEntity().getKey();

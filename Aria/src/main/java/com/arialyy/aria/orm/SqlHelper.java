@@ -141,7 +141,7 @@ final class SqlHelper extends SQLiteOpenHelper {
   }
 
   /**
-   * 处理数据库升级，该段代码无法修改表字段
+   * 处理数据库升级
    *
    * @param modifyColumns 需要修改的表字段的映射，key为表名，
    * value{@code Map<String, String>}中的Map的key为老字段名称，value为该老字段对应的新字段名称
@@ -176,8 +176,9 @@ final class SqlHelper extends SQLiteOpenHelper {
           long count = cursor.getLong(0);
           cursor.close();
 
+          // 复制数据
           if (count > 0) {
-            // 获取所有表字段名称
+            // 获取旧表的所有字段名称
             Cursor columnC =
                 db.rawQuery(String.format("PRAGMA table_info(%s_temp)", tableName), null);
             StringBuilder params = new StringBuilder();
@@ -243,11 +244,17 @@ final class SqlHelper extends SQLiteOpenHelper {
         mDelegate.dropTable(db, taskTable);
       }
     }
+
     Map<String, Map<String, String>> columnMap = new HashMap<>();
-    Map<String, String> map = new HashMap<>();
-    map.put("groupName", "groupHash");
-    columnMap.put("DownloadEntity", map);
-    columnMap.put("DownloadGroupEntity", map);
+    // 处理DownloadEntity、DownloadGroupEntity的 groupName字段名的修改
+    Map<String, String> groupNameModify = new HashMap<>();
+    groupNameModify.put("groupName", "groupHash");
+    columnMap.put("DownloadEntity", groupNameModify);
+    columnMap.put("DownloadGroupEntity", groupNameModify);
+    // 处理TaskRecord的dGroupName字段名的修改
+    Map<String, String> dGroupNameModify = new HashMap<>();
+    dGroupNameModify.put("dGroupName", "dGroupHash");
+    columnMap.put("TaskRecord", dGroupNameModify);
     handleDbUpdate(db, columnMap, null);
   }
 
@@ -263,7 +270,7 @@ final class SqlHelper extends SQLiteOpenHelper {
       }
     }
 
-    //删除所有主键为null和逐渐重复的数据
+    //删除所有主键为null和主键重复的数据
     String[] tables = new String[] { "DownloadEntity", "DownloadGroupEntity" };
     String[] keys = new String[] { "downloadPath", "groupName" };
     int i = 0;

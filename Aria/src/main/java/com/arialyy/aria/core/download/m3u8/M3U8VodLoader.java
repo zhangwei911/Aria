@@ -19,6 +19,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import com.arialyy.aria.core.common.AbsThreadTask;
 import com.arialyy.aria.core.common.IThreadState;
 import com.arialyy.aria.core.common.SubThreadConfig;
 import com.arialyy.aria.core.common.TaskRecord;
@@ -200,6 +201,8 @@ public class M3U8VodLoader extends BaseM3U8Loader {
       switch (msg.what) {
         case STATE_STOP:
           mStopNum++;
+          ThreadTaskManager.getInstance().removeSingleTaskThread(mTaskWrapper.getKey(),
+              (AbsThreadTask) msg.obj);
           if (isStop()) {
             ALog.d(TAG, "任务停止");
             mListener.onStop(mProgress);
@@ -208,6 +211,8 @@ public class M3U8VodLoader extends BaseM3U8Loader {
           break;
         case STATE_CANCEL:
           mCancelNum++;
+          ThreadTaskManager.getInstance().removeSingleTaskThread(mTaskWrapper.getKey(),
+              (AbsThreadTask) msg.obj);
           if (isCancel()) {
             ALog.d(TAG, "任务取消");
             mListener.onCancel();
@@ -225,6 +230,8 @@ public class M3U8VodLoader extends BaseM3U8Loader {
           break;
         case STATE_COMPLETE:
           mCompleteNum++;
+          ThreadTaskManager.getInstance().removeSingleTaskThread(mTaskWrapper.getKey(),
+              (AbsThreadTask) msg.obj);
           handlerPercent();
           notifyLock();
           if (isComplete()) {

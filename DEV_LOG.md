@@ -3,6 +3,11 @@
     - fix bug https://github.com/AriaLyy/Aria/issues/403
     - 新增ftp上传拦截器 https://github.com/AriaLyy/Aria/issues/402
     - 重构线程任务模块
+    - 修复一个低版本数据库升级的问题 https://github.com/AriaLyy/Aria/issues/407
+    - 新增遵循m3u8协议的文件下载
+    - 修复拦截器可能出现的空指针问题
+    - 移除`DownloadGroupEntity`字段`groupHash`的主键约束，`DownloadEntity`字段`groupHash`的外键约束，`TaskRecord`字段`dGroupHash`的外键约束
+    - 优化关联查询的性能
   + v_3.6.4 (2019/5/16)
     - 优化任务接收器的代码结构
     - 修复`DbEntity.saveAll()`失败的问题

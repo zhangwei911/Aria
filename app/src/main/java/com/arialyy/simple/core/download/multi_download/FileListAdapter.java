@@ -73,6 +73,7 @@ final class FileListAdapter extends AbsRVAdapter<FileListEntity, FileListAdapter
                 .setSubFileName(Arrays.asList(item.names))
                 .setDirPath(item.downloadPath)
                 .setGroupAlias(item.name)
+                .unknownSize()
                 .start();
           } else {
             Aria.download(getContext())

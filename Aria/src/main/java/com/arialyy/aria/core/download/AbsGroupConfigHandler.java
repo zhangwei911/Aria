@@ -78,17 +78,15 @@ abstract class AbsGroupConfigHandler<TARGET extends AbsDGTarget> implements IGro
     ALog.d(TAG, String.format("修改新路径为：%s", newDirPath));
     List<DTaskWrapper> subTasks = mWrapper.getSubTaskWrapper();
     if (subTasks != null && !subTasks.isEmpty()) {
-      List<DownloadEntity> des = new ArrayList<>();
       for (DTaskWrapper dte : subTasks) {
         DownloadEntity de = dte.getEntity();
-        String oldPath = de.getDownloadPath();
+        String oldPath = de.getFilePath();
         String newPath = newDirPath + "/" + de.getFileName();
         File file = new File(oldPath);
         if (file.exists()) {
           file.renameTo(new File(newPath));
         }
-        de.setDownloadPath(newPath);
-        des.add(de);
+        de.setFilePath(newPath);
       }
     }
   }
@@ -103,12 +101,18 @@ abstract class AbsGroupConfigHandler<TARGET extends AbsDGTarget> implements IGro
       ALog.e(TAG, "文件夹路径不能为null");
       return false;
     } else if (!mDirPathTemp.startsWith("/")) {
-      ALog.e(TAG, "文件夹路径【" + mDirPathTemp + "】错误");
+      ALog.e(TAG, String.format("文件夹路径【%s】错误", mDirPathTemp));
       return false;
     }
     File file = new File(mDirPathTemp);
     if (file.isFile()) {
-      ALog.e(TAG, "路径【" + mDirPathTemp + "】是文件，请设置文件夹路径");
+      ALog.e(TAG, String.format("路径【%s】是文件，请设置文件夹路径", mDirPathTemp));
+      return false;
+    }
+
+    if ((getEntity().getDirPath() == null || !getEntity().getDirPath().equals(mDirPathTemp))
+        && DbEntity.checkDataExist(DownloadGroupEntity.class, "dirPath=?", mDirPathTemp)) {
+      ALog.e(TAG, String.format("文件夹路径【%s】已被其它任务占用，请重新设置文件夹路径", mDirPathTemp));
       return false;
     }
 

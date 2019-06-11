@@ -15,11 +15,11 @@
  */
 package com.arialyy.aria.orm;
 
-import android.annotation.TargetApi;
+import android.annotation.SuppressLint;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.os.Build;
 import android.text.TextUtils;
+import android.util.SparseArray;
 import com.arialyy.aria.orm.annotation.Many;
 import com.arialyy.aria.orm.annotation.One;
 import com.arialyy.aria.orm.annotation.Wrapper;
@@ -29,9 +29,8 @@ import com.arialyy.aria.util.CommonUtil;
 import java.lang.reflect.Field;
 import java.net.URLDecoder;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -127,11 +126,11 @@ class DelegateFind extends AbsDelegate {
    * @param page 当前页
    * @param num 一页的数量
    */
-  private <T extends AbsDbWrapper> List<T> exeRelationSql(SQLiteDatabase db, Class<T> clazz,
+  private <T extends AbsDbWrapper> List<T> exeRelationSql(SQLiteDatabase db, Class<T> wrapperClazz,
       int page, int num, String... expression) {
     db = checkDb(db);
-    if (SqlUtil.isWrapper(clazz)) {
-      Field[] om = getOneAndManyField(clazz);
+    if (SqlUtil.isWrapper(wrapperClazz)) {
+      Field[] om = getOneAndManyField(wrapperClazz);
       if (om == null) {
         return null;
       }
@@ -145,8 +144,6 @@ class DelegateFind extends AbsDelegate {
         final String cTableName = childClazz.getSimpleName();
         List<Field> pColumn = SqlUtil.getAllNotIgnoreField(parentClazz);
         List<Field> cColumn = SqlUtil.getAllNotIgnoreField(childClazz);
-        List<String> pColumnAlias = new ArrayList<>();
-        List<String> cColumnAlias = new ArrayList<>();
         StringBuilder pSb = new StringBuilder();
         StringBuilder cSb = new StringBuilder();
 
@@ -154,7 +151,6 @@ class DelegateFind extends AbsDelegate {
           pSb.append(pTableName.concat(".rowid AS ").concat(PARENT_COLUMN_ALIAS).concat("rowid,"));
           for (Field f : pColumn) {
             String temp = PARENT_COLUMN_ALIAS.concat(f.getName());
-            pColumnAlias.add(temp);
             pSb.append(pTableName.concat(".").concat(f.getName()))
                 .append(" AS ")
                 .append(temp)
@@ -166,7 +162,6 @@ class DelegateFind extends AbsDelegate {
           pSb.append(cTableName.concat(".rowid AS ").concat(CHILD_COLUMN_ALIAS).concat("rowid,"));
           for (Field f : cColumn) {
             String temp = CHILD_COLUMN_ALIAS.concat(f.getName());
-            cColumnAlias.add(temp);
             cSb.append(cTableName.concat(".").concat(f.getName()))
                 .append(" AS ")
                 .append(temp)
@@ -223,8 +218,7 @@ class DelegateFind extends AbsDelegate {
         }
         Cursor cursor = db.rawQuery(sql, null);
         List<T> data =
-            (List<T>) newInstanceEntity(clazz, parentClazz, childClazz, cursor, pColumn, cColumn,
-                pColumnAlias, cColumnAlias);
+            newInstanceEntity(wrapperClazz, parentClazz, childClazz, cursor, pColumn, cColumn);
         closeCursor(cursor);
         return data;
       } catch (ClassNotFoundException e) {
@@ -242,139 +236,84 @@ class DelegateFind extends AbsDelegate {
    *
    * @param pColumn 父表的所有字段
    * @param cColumn 字表的所有字段
-   * @param pColumnAlias 关联查询父表别名
-   * @param cColumnAlias 关联查询子表别名
    */
   private synchronized <T extends AbsDbWrapper, P extends DbEntity, C extends DbEntity> List<T> newInstanceEntity(
-      Class<T> clazz, Class<P> parent,
-      Class<C> child,
+      Class<T> wrapperClazz, Class<P> parentClazz,
+      Class<C> childClazz,
       Cursor cursor,
-      List<Field> pColumn, List<Field> cColumn,
-      List<String> pColumnAlias, List<String> cColumnAlias) {
+      List<Field> pColumn, List<Field> cColumn) {
+    List<T> wrappers = new ArrayList<>();
+    SparseArray<List<DbEntity>> childs = new SparseArray<>(); // 所有子表数据
+    SparseArray<DbEntity> parents = new SparseArray<>(); // 所有父表数据
+
     try {
-      String parentPrimary = ""; //父表主键别名
-      for (Field f : pColumn) {
-        if (SqlUtil.isPrimary(f)) {
-          parentPrimary = PARENT_COLUMN_ALIAS.concat(f.getName());
-          break;
-        }
-      }
-
-      List<T> wrappers = new ArrayList<>();
-      Map<Object, P> tempParent = new LinkedHashMap<>();  // 所有父表元素，key为父表主键的值
-      Map<Object, List<C>> tempChild = new LinkedHashMap<>(); // 所有的字表元素，key为父表主键的值
-
-      Object old = null;
       while (cursor.moveToNext()) {
-        //创建父实体
-        Object ppValue = setPPValue(parentPrimary, cursor);
-        if (old == null || ppValue != old) {  //当主键不同时，表示是不同的父表数据
-          old = ppValue;
-          if (tempParent.get(old) == null) {
-            P pEntity = parent.newInstance();
-            String pPrimaryName = "";
-            for (int i = 0, len = pColumnAlias.size(); i < len; i++) {
-              Field pField = pColumn.get(i);
-              pField.setAccessible(true);
-              Class<?> type = pField.getType();
-              int column = cursor.getColumnIndex(pColumnAlias.get(i));
-              if (column == -1) continue;
-              setFieldValue(type, pField, column, cursor, pEntity);
-
-              if (SqlUtil.isPrimary(pField) && (type == int.class || type == Integer.class)) {
-                pPrimaryName = pField.getName();
-              }
-            }
-
-            //当设置了主键，而且主键的类型为integer时，查询RowID等于主键
-            pEntity.rowID = cursor.getInt(
-                cursor.getColumnIndex(
-                    TextUtils.isEmpty(pPrimaryName) ? PARENT_COLUMN_ALIAS.concat("rowid")
-                        : pPrimaryName));
-
-            tempParent.put(ppValue, pEntity);
-          }
+        int pRowId = cursor.getInt(cursor.getColumnIndex(PARENT_COLUMN_ALIAS.concat("rowid")));
+        if (childs.get(pRowId) == null) {
+          childs.put(pRowId, new ArrayList<DbEntity>());
+          parents.put(pRowId, createParent(pRowId, parentClazz, pColumn, cursor));
         }
-
-        // 创建子实体
-        C cEntity = child.newInstance();
-        String cPrimaryName = "";
-        for (int i = 0, len = cColumnAlias.size(); i < len; i++) {
-          Field cField = cColumn.get(i);
-          cField.setAccessible(true);
-          Class<?> type = cField.getType();
-
-          int column = cursor.getColumnIndex(cColumnAlias.get(i));
-          if (column == -1) continue;
-          setFieldValue(type, cField, column, cursor, cEntity);
-
-          if (SqlUtil.isPrimary(cField) && (type == int.class || type == Integer.class)) {
-            cPrimaryName = cField.getName();
-          }
-        }
-        //当设置了主键，而且主键的类型为integer时，查询RowID等于主键
-        cEntity.rowID = cursor.getInt(
-            cursor.getColumnIndex(
-                TextUtils.isEmpty(cPrimaryName) ? CHILD_COLUMN_ALIAS.concat("rowid")
-                    : cPrimaryName));
-        if (tempChild.get(old) == null) {
-          tempChild.put(old, new ArrayList<C>());
-        }
-        tempChild.get(old).add(cEntity);
+        childs.get(pRowId).add(createChild(childClazz, cColumn, cursor));
       }
 
-      List<Field> wFields = SqlUtil.getAllNotIgnoreField(clazz);
-      if (wFields != null && !wFields.isEmpty()) {
-        Set<Object> pKeys = tempParent.keySet();
-        for (Object pk : pKeys) {
-          T wrapper = clazz.newInstance();
-          P p = tempParent.get(pk);
-          boolean isPSet = false, isCSet = false;
-          for (Field f : wFields) {
-            if (!isPSet && f.getAnnotation(One.class) != null) {
-              f.set(wrapper, p);
-              isPSet = true;
-            }
-            if (!isCSet && f.getAnnotation(Many.class) != null) {
-              f.set(wrapper, tempChild.get(pk));
-              isCSet = true;
-            }
-          }
-          wrapper.handleConvert();  //处理下转换
-          wrappers.add(wrapper);
-        }
+      List<Field> wFields = SqlUtil.getAllNotIgnoreField(wrapperClazz);
+      if (wFields == null || wFields.isEmpty()) {
+        return null;
       }
-      return wrappers;
-    } catch (InstantiationException e) {
-      e.printStackTrace();
-    } catch (IllegalAccessException e) {
+      for (int i = 0; i < parents.size(); i++) {
+        int pRowId = parents.keyAt(i);
+        T wrapper = wrapperClazz.newInstance();
+        boolean isPSet = false, isCSet = false; // 保证One 或 Many 只设置一次
+        for (Field f : wFields) {
+          if (!isPSet && f.getAnnotation(One.class) != null) {
+            f.set(wrapper, parents.get(pRowId));
+            isPSet = true;
+          }
+          if (!isCSet && f.getAnnotation(Many.class) != null) {
+            f.set(wrapper, childs.get(pRowId));
+            isCSet = true;
+          }
+        }
+        wrapper.handleConvert();  //处理下转换
+        wrappers.add(wrapper);
+      }
+    } catch (Exception e) {
       e.printStackTrace();
     }
-    return null;
+
+    return wrappers;
   }
 
   /**
-   * 获取父表主键数据
-   *
-   * @param parentPrimary 父表主键别名
+   * 创建子对象
    */
-  @TargetApi(Build.VERSION_CODES.HONEYCOMB) private Object setPPValue(String parentPrimary,
-      Cursor cursor) {
-    Object ppValue = null;
-    int ppColumn = cursor.getColumnIndex(parentPrimary);  //父表主键所在的列
-    int type = cursor.getType(ppColumn);
-    switch (type) {
-      case Cursor.FIELD_TYPE_INTEGER:
-        ppValue = cursor.getLong(ppColumn);
-        break;
-      case Cursor.FIELD_TYPE_FLOAT:
-        ppValue = cursor.getFloat(ppColumn);
-        break;
-      case Cursor.FIELD_TYPE_STRING:
-        ppValue = cursor.getString(ppColumn);
-        break;
+  private <T extends DbEntity> T createChild(Class<T> childClazz, List<Field> cColumn,
+      Cursor cursor)
+      throws InstantiationException, IllegalAccessException {
+    T child = childClazz.newInstance();
+    child.rowID = cursor.getInt(cursor.getColumnIndex(CHILD_COLUMN_ALIAS.concat("rowid")));
+    for (Field field : cColumn) {
+      field.setAccessible(true);
+      int columnIndex = cursor.getColumnIndex(CHILD_COLUMN_ALIAS.concat(field.getName()));
+      setFieldValue(field.getType(), field, columnIndex, cursor, child);
     }
-    return ppValue;
+    return child;
+  }
+
+  /**
+   * 创建父对象
+   */
+  private <T extends DbEntity> T createParent(int rowId, Class<T> parentClazz, List<Field> pColumn,
+      Cursor cursor)
+      throws InstantiationException, IllegalAccessException {
+    T parent = parentClazz.newInstance();
+    parent.rowID = rowId;
+    for (Field field : pColumn) {
+      field.setAccessible(true);
+      int columnIndex = cursor.getColumnIndex(PARENT_COLUMN_ALIAS.concat(field.getName()));
+      setFieldValue(field.getType(), field, columnIndex, cursor, parent);
+    }
+    return parent;
   }
 
   /**
@@ -467,9 +406,9 @@ class DelegateFind extends AbsDelegate {
       String sql, String[] selectionArgs) {
     String[] temp = new String[selectionArgs.length];
     int i = 0;
-    for (String arg : selectionArgs){
+    for (String arg : selectionArgs) {
       temp[i] = encodeStr(arg);
-      i ++;
+      i++;
     }
     Cursor cursor = db.rawQuery(sql, temp);
     List<T> data = cursor.getCount() > 0 ? newInstanceEntity(clazz, cursor) : null;
@@ -525,43 +464,44 @@ class DelegateFind extends AbsDelegate {
    *
    * @throws IllegalAccessException
    */
-  private void setFieldValue(Class type, Field field, int column, Cursor cursor, Object entity)
+  private void setFieldValue(Class type, Field field, int columnIndex, Cursor cursor,
+      DbEntity entity)
       throws IllegalAccessException {
     if (cursor == null || cursor.isClosed()) {
       ALog.e(TAG, "cursor没有初始化");
       return;
     }
     if (type == String.class) {
-      String temp = cursor.getString(column);
+      String temp = cursor.getString(columnIndex);
       if (!TextUtils.isEmpty(temp)) {
         field.set(entity, URLDecoder.decode(temp));
       }
     } else if (type == int.class || type == Integer.class) {
-      field.setInt(entity, cursor.getInt(column));
+      field.setInt(entity, cursor.getInt(columnIndex));
     } else if (type == float.class || type == Float.class) {
-      field.setFloat(entity, cursor.getFloat(column));
+      field.setFloat(entity, cursor.getFloat(columnIndex));
     } else if (type == double.class || type == Double.class) {
-      field.setDouble(entity, cursor.getDouble(column));
+      field.setDouble(entity, cursor.getDouble(columnIndex));
     } else if (type == long.class || type == Long.class) {
-      field.setLong(entity, cursor.getLong(column));
+      field.setLong(entity, cursor.getLong(columnIndex));
     } else if (type == boolean.class || type == Boolean.class) {
-      String temp = cursor.getString(column);
+      String temp = cursor.getString(columnIndex);
       if (TextUtils.isEmpty(temp)) {
         field.setBoolean(entity, false);
       } else {
         field.setBoolean(entity, !temp.equalsIgnoreCase("false"));
       }
     } else if (type == java.util.Date.class || type == java.sql.Date.class) {
-      field.set(entity, new Date(URLDecoder.decode(cursor.getString(column))));
+      field.set(entity, new Date(URLDecoder.decode(cursor.getString(columnIndex))));
     } else if (type == byte[].class) {
-      field.set(entity, cursor.getBlob(column));
+      field.set(entity, cursor.getBlob(columnIndex));
     } else if (type == Map.class) {
-      String temp = cursor.getString(column);
+      String temp = cursor.getString(columnIndex);
       if (!TextUtils.isEmpty(temp)) {
         field.set(entity, SqlUtil.str2Map(URLDecoder.decode(temp)));
       }
     } else if (type == List.class) {
-      String value = cursor.getString(column);
+      String value = cursor.getString(columnIndex);
       if (!TextUtils.isEmpty(value)) {
         field.set(entity, SqlUtil.str2List(URLDecoder.decode(value), field));
       }

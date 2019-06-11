@@ -18,8 +18,8 @@ package com.arialyy.aria.core.inf;
 /**
  * Created by lyy on 2017/6/3.
  */
-public abstract class AbsNormalTask<ENTITY extends AbsEntity, TASK_WRAPPER extends AbsTaskWrapper>
-    extends AbsTask<ENTITY, TASK_WRAPPER> {
+public abstract class AbsNormalTask<TASK_WRAPPER extends AbsTaskWrapper>
+    extends AbsTask<TASK_WRAPPER> {
 
   /**
    * 最高优先级命令，最高优先级命令有以下属性

@@ -33,6 +33,7 @@ import com.arialyy.aria.core.manager.ThreadTaskManager;
 import com.arialyy.aria.exception.BaseException;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.BufferedRandomAccessFile;
+import com.arialyy.aria.util.CommonUtil;
 import com.arialyy.aria.util.ErrorHelp;
 import com.arialyy.aria.util.NetUtils;
 import java.io.File;
@@ -197,6 +198,7 @@ public abstract class AbsThreadTask<ENTITY extends AbsNormalEntity, TASK_WRAPPER
   void sendState(int state, @Nullable Bundle bundle) {
     Message msg = mStateHandler.obtainMessage();
     msg.what = state;
+    msg.obj = this;
     if (bundle != null) {
       msg.setData(bundle);
     }
@@ -242,7 +244,7 @@ public abstract class AbsThreadTask<ENTITY extends AbsNormalEntity, TASK_WRAPPER
         blockFile.delete();
         ALog.i(TAG, String.format("删除分块【%s】成功", blockFile.getName()));
       }
-      retryThis(isBreak());
+      retryBlockTask(isBreak());
       return false;
     }
     return true;
@@ -316,7 +318,7 @@ public abstract class AbsThreadTask<ENTITY extends AbsNormalEntity, TASK_WRAPPER
    * @param subCurrentLocation 当前线程下载进度
    * @param ex 异常信息
    */
-  protected void fail(final long subCurrentLocation, BaseException ex) {
+  protected void fail(long subCurrentLocation, BaseException ex) {
     fail(subCurrentLocation, ex, true);
   }
 
@@ -331,10 +333,11 @@ public abstract class AbsThreadTask<ENTITY extends AbsNormalEntity, TASK_WRAPPER
     }
     if (mTaskWrapper.getRequestType() == ITaskWrapper.M3U8_VOD) {
       writeConfig(false, 0);
+      retryM3U8Peer(needRetry);
     } else {
       if (mTaskWrapper.isSupportBP()) {
         writeConfig(false, subCurrentLocation);
-        retryThis(needRetry && mConfig.startThreadNum != 1);
+        retryBlockTask(needRetry && mConfig.startThreadNum != 1);
       } else {
         ALog.e(TAG, String.format("任务【%s】执行失败", getFileName()));
         ErrorHelp.saveError(TAG, "", ALog.getExceptionString(ex));
@@ -344,30 +347,53 @@ public abstract class AbsThreadTask<ENTITY extends AbsNormalEntity, TASK_WRAPPER
   }
 
   /**
-   * 重试当前线程，如果其中一条线程已经下载失败，则任务该任务下载失败，并且停止该任务的所有线程
-   *
-   * @param needRetry 是否可以重试
+   * 重试ts分片
    */
-  private void retryThis(boolean needRetry) {
+  private void retryM3U8Peer(boolean needRetry) {
     if (!NetUtils.isConnected(AriaManager.APP) && !isNotNetRetry) {
       ALog.w(TAG, String.format("任务【%s】重试失败，网络未连接", getFileName()));
+      sendFailMsg(null);
+      return;
     }
     if (mFailTimes < RETRY_NUM && needRetry && (NetUtils.isConnected(AriaManager.APP)
         || isNotNetRetry) && !isBreak()) {
       ALog.w(TAG, String.format("任务【%s】正在重试", getFileName()));
       mFailTimes++;
-      handleRetryRecord();
-      ThreadTaskManager.getInstance().retryThread(AbsThreadTask.this);
+      mConfig.tempFile.delete();
+      CommonUtil.createFile(mConfig.tempFile.getPath());
+      ThreadTaskManager.getInstance().retryThread(this);
     } else {
       sendFailMsg(null);
     }
   }
 
   /**
-   * 处理线程重试的记录，只有多线程任务才会执行
+   * 重试分块线程，如果其中一条线程已经下载失败，则任务该任务下载失败，并且停止该任务的所有线程
+   *
+   * @param needRetry 是否可以重试
+   */
+  private void retryBlockTask(boolean needRetry) {
+    if (!NetUtils.isConnected(AriaManager.APP) && !isNotNetRetry) {
+      ALog.w(TAG, String.format("任务【%s】重试失败，网络未连接", getFileName()));
+      sendFailMsg(null);
+      return;
+    }
+    if (mFailTimes < RETRY_NUM && needRetry && (NetUtils.isConnected(AriaManager.APP)
+        || isNotNetRetry) && !isBreak()) {
+      ALog.w(TAG, String.format("任务【%s】正在重试", getFileName()));
+      mFailTimes++;
+      handleBlockRecord();
+      ThreadTaskManager.getInstance().retryThread(this);
+    } else {
+      sendFailMsg(null);
+    }
+  }
+
+  /**
+   * 处理线程重试的分块记录，只有多线程任务才会执行
    * 如果是以前版本{@link BufferedRandomAccessFile}创建的下载，那么 record.startLocation不用修改
    */
-  private void handleRetryRecord() {
+  private void handleBlockRecord() {
     if (mConfig.isBlock) {
       // 默认线程分块长度
       File temp = mConfig.tempFile;

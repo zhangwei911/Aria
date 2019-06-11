@@ -19,6 +19,7 @@ import com.arialyy.aria.core.common.BaseDelegate;
 import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.inf.AbsTarget;
 import com.arialyy.aria.core.inf.AbsTaskWrapper;
+import com.arialyy.aria.util.ALog;
 
 /**
  * m3u8直播参数设置
@@ -38,6 +39,20 @@ public class M3U8LiveDelegate<TARGET extends AbsTarget> extends BaseDelegate<TAR
    */
   public M3U8LiveDelegate setLiveTsUrlConvert(ILiveTsUrlConverter converter) {
     ((DTaskWrapper) mTarget.getTaskWrapper()).asM3U8().setLiveTsUrlConverter(converter);
+    return this;
+  }
+
+  /**
+   * 设置直播的m3u8文件更新间隔，默认10000微秒。
+   *
+   * @param interval 更新间隔，单位微秒
+   */
+  public M3U8LiveDelegate setM3U8FileUpdateInterval(long interval) {
+    if (interval <= 1) {
+      ALog.e(TAG, "间隔时间错误");
+      return this;
+    }
+    ((DTaskWrapper) mTarget.getTaskWrapper()).asM3U8().setLiveUpdateInterval(interval);
     return this;
   }
 }

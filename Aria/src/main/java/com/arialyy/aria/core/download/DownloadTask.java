@@ -32,7 +32,7 @@ import com.arialyy.aria.core.scheduler.ISchedulers;
  * Created by lyy on 2016/8/11.
  * 下载任务类
  */
-public class DownloadTask extends AbsNormalTask<DownloadEntity, DTaskWrapper> {
+public class DownloadTask extends AbsNormalTask<DTaskWrapper> {
   public static final String TAG = "DownloadTask";
 
   private DownloadTask(DTaskWrapper taskWrapper, Handler outHandler) {
@@ -40,7 +40,6 @@ public class DownloadTask extends AbsNormalTask<DownloadEntity, DTaskWrapper> {
     mOutHandler = outHandler;
     mContext = AriaManager.APP;
     mListener = new BaseDListener(this, mOutHandler);
-    mEntity = taskWrapper.getEntity();
   }
 
   /**
@@ -57,7 +56,7 @@ public class DownloadTask extends AbsNormalTask<DownloadEntity, DTaskWrapper> {
    * 获取文件保存路径
    */
   public String getFilePath() {
-    return mEntity.getFilePath();
+    return mTaskWrapper.getEntity().getFilePath();
   }
 
   public DownloadEntity getEntity() {
@@ -70,7 +69,7 @@ public class DownloadTask extends AbsNormalTask<DownloadEntity, DTaskWrapper> {
    * @see DownloadTask#getKey()
    */
   @Deprecated public String getDownloadUrl() {
-    return mEntity.getUrl();
+    return mTaskWrapper.getEntity().getUrl();
   }
 
   @Override public int getTaskType() {
@@ -78,15 +77,15 @@ public class DownloadTask extends AbsNormalTask<DownloadEntity, DTaskWrapper> {
   }
 
   @Override public String getKey() {
-    return mEntity.getUrl();
+    return mTaskWrapper.getEntity().getUrl();
   }
 
   public DownloadEntity getDownloadEntity() {
-    return mEntity;
+    return mTaskWrapper.getEntity();
   }
 
   @Override public String getTaskName() {
-    return mEntity.getFileName();
+    return mTaskWrapper.getEntity().getFileName();
   }
 
   @Override protected synchronized IUtil createUtil() {

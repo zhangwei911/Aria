@@ -22,10 +22,11 @@ import com.arialyy.aria.core.common.OnFileInfoCallback;
 import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.inf.AbsEntity;
 import com.arialyy.aria.core.inf.IDownloadListener;
-import com.arialyy.aria.core.manager.ThreadTaskManager;
 import com.arialyy.aria.exception.BaseException;
 import com.arialyy.aria.exception.M3U8Exception;
 import com.arialyy.aria.util.ALog;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -42,7 +43,6 @@ import java.util.concurrent.TimeUnit;
  */
 public class M3U8LiveDownloadUtil implements IUtil {
   private final String TAG = "M3U8LiveDownloadUtil";
-
   private DTaskWrapper mWrapper;
   private IDownloadListener mListener;
   private boolean isStop = false, isCancel = false;
@@ -50,6 +50,7 @@ public class M3U8LiveDownloadUtil implements IUtil {
   private M3U8InfoThread mInfoThread;
   private ScheduledThreadPoolExecutor mTimer;
   private ExecutorService mInfoPool = Executors.newCachedThreadPool();
+  private List<String> mPeerUrls = new ArrayList<>();
 
   public M3U8LiveDownloadUtil(DTaskWrapper wrapper, IDownloadListener listener) {
     mWrapper = wrapper;
@@ -86,6 +87,7 @@ public class M3U8LiveDownloadUtil implements IUtil {
    */
   @Override public void stop() {
     isStop = true;
+    mLoader.stop();
     handleComplete();
   }
 
@@ -122,7 +124,7 @@ public class M3U8LiveDownloadUtil implements IUtil {
         mInfoThread = (M3U8InfoThread) getLiveInfo();
         mInfoPool.execute(mInfoThread);
       }
-    }, 0, 1000, TimeUnit.MILLISECONDS);
+    }, 0, mWrapper.asM3U8().getLiveUpdateInterval(), TimeUnit.MILLISECONDS);
   }
 
   private void closeTimer() {
@@ -150,6 +152,10 @@ public class M3U8LiveDownloadUtil implements IUtil {
     });
     infoThread.setOnGetPeerCallback(new M3U8InfoThread.OnGetLivePeerCallback() {
       @Override public void onGetPeer(String url) {
+        if (mPeerUrls.contains(url)) {
+          return;
+        }
+        mPeerUrls.add(url);
         ILiveTsUrlConverter converter = mWrapper.asM3U8().getLiveTsUrlConverter();
         if (converter != null) {
           if (TextUtils.isEmpty(mWrapper.asM3U8().getBandWidthUrl())) {
@@ -162,7 +168,6 @@ public class M3U8LiveDownloadUtil implements IUtil {
           failDownload(new M3U8Exception(TAG, String.format("ts地址错误，url：%s", url)), false);
           return;
         }
-        //todo url 需要去重
         mLoader.offerPeer(url);
       }
     });
