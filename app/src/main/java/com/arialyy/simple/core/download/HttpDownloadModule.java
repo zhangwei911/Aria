@@ -34,9 +34,10 @@ public class HttpDownloadModule extends BaseViewModule {
 
   private final String defUrl =
       "http://hzdown.muzhiwan.com/2017/05/08/nl.noio.kingdom_59104935e56f0.apk";
+      //"http://202.98.201.103:7000/vrs/TPK/ZTC440402001Z.tpk";
   private final String defFilePath =
       Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getPath()
-          + "/test.apk";
+          + "/ZTC440402001Z.tpk";
 
   private MutableLiveData<DownloadEntity> liveData = new MutableLiveData<>();
   private DownloadEntity singDownloadInfo;

@@ -76,21 +76,21 @@ public class XMLReader extends DefaultHandler {
             ALog.w(TAG, "任务队列数不能小于 1");
             maxTaskNum = 2;
           }
-          setField("maxTaskNum", maxTaskNum, getAllTaskType());
+          setField("maxTaskNum", maxTaskNum, mType);
           break;
         case "reTryNum":  //任务重试次数
-          setField("reTryNum", checkInt(value) ? Integer.parseInt(value) : 0, getAllTaskType());
+          setField("reTryNum", checkInt(value) ? Integer.parseInt(value) : 0, mType);
           break;
         case "connectTimeOut": // 连接超时时间
           setField("connectTimeOut", checkInt(value) ? Integer.parseInt(value) : 5 * 1000,
-              getAllTaskType());
+              mType);
           break;
         case "iOTimeOut":   //io流超时时间
           int iOTimeOut = checkInt(value) ? Integer.parseInt(value) : 10 * 1000;
           if (iOTimeOut < 10 * 1000) {
             iOTimeOut = 10 * 1000;
           }
-          setField("iOTimeOut", iOTimeOut, getAllTaskType());
+          setField("iOTimeOut", iOTimeOut, mType);
           break;
         case "reTryInterval":   //失败重试间隔
           int reTryInterval = checkInt(value) ? Integer.parseInt(value) : 2 * 1000;
@@ -98,7 +98,7 @@ public class XMLReader extends DefaultHandler {
           if (reTryInterval < 2 * 1000) {
             reTryInterval = 2 * 1000;
           }
-          setField("reTryInterval", reTryInterval, getAllTaskType());
+          setField("reTryInterval", reTryInterval, mType);
           break;
         case "buffSize":    //缓冲大小
           int buffSize = checkInt(value) ? Integer.parseInt(value) : 8192;
@@ -107,21 +107,21 @@ public class XMLReader extends DefaultHandler {
             buffSize = 2048;
           }
 
-          setField("buffSize", buffSize, getAllTaskType());
+          setField("buffSize", buffSize, mType);
           break;
         case "ca":    // ca证书
           String caName = attributes.getValue("name");
           String caPath = attributes.getValue("path");
-          setField("caName", caName, getAllTaskType());
-          setField("caPath", caPath, getAllTaskType());
+          setField("caName", caName, mType);
+          setField("caPath", caPath, mType);
           break;
         case "convertSpeed": // 是否转换速度
           setField("isConvertSpeed", !checkBoolean(value) || Boolean.parseBoolean(value),
-              getAllTaskType());
+              mType);
           break;
         case "maxSpeed":  // 最大速度
           int maxSpeed = checkInt(value) ? Integer.parseInt(value) : 0;
-          setField("maxSpeed", maxSpeed, getAllTaskType());
+          setField("maxSpeed", maxSpeed, mType);
           break;
         case "queueMod":  // 队列类型
           String mod = "now";
@@ -129,11 +129,11 @@ public class XMLReader extends DefaultHandler {
               "wait"))) {
             mod = value;
           }
-          setField("queueMod", mod, getAllTaskType());
+          setField("queueMod", mod, mType);
           break;
         case "updateInterval":  // 进度更新时间
           setField("updateInterval", checkLong(value) ? Long.parseLong(value) : 1000,
-              getAllTaskType());
+              mType);
           break;
 
         case "useBlock":    // 是否使用分块任务
@@ -184,25 +184,15 @@ public class XMLReader extends DefaultHandler {
     }
   }
 
-  /**
-   * 获取任务类型集合，类型有 {@link ConfigType#DOWNLOAD}、{@link ConfigType#UPLOAD}、{@link ConfigType#D_GROUP}
-   */
-  private int[] getAllTaskType() {
-    return new int[] {ConfigType.DOWNLOAD, ConfigType.UPLOAD,
-        ConfigType.D_GROUP};
-  }
-
-  private void setField(String key, Object value, int... types) {
-    for (int type : types) {
-      if (type == ConfigType.DOWNLOAD) {
-        setField(DownloadConfig.class, mDownloadConfig, key, value);
-      } else if (type == ConfigType.UPLOAD) {
-        setField(UploadConfig.class, mUploadConfig, key, value);
-      } else if (type == ConfigType.APP) {
-        setField(AppConfig.class, mAppConfig, key, value);
-      } else if (type == ConfigType.D_GROUP) {
-        setField(DGroupConfig.class, mDGroupConfig, key, value);
-      }
+  private void setField(String key, Object value, int type) {
+    if (type == ConfigType.DOWNLOAD) {
+      setField(DownloadConfig.class, mDownloadConfig, key, value);
+    } else if (type == ConfigType.UPLOAD) {
+      setField(UploadConfig.class, mUploadConfig, key, value);
+    } else if (type == ConfigType.APP) {
+      setField(AppConfig.class, mAppConfig, key, value);
+    } else if (type == ConfigType.D_GROUP) {
+      setField(DGroupConfig.class, mDGroupConfig, key, value);
     }
   }
 

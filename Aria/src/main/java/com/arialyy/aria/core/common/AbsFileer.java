@@ -193,7 +193,7 @@ public abstract class AbsFileer<ENTITY extends AbsNormalEntity, TASK_WRAPPER ext
     return b;
   }
 
-  public synchronized void cancel() {
+  final public synchronized void cancel() {
     if (isCancel) {
       ALog.d(TAG, String.format("任务【%s】正在删除，删除任务失败", mTaskWrapper.getKey()));
       return;
@@ -208,13 +208,24 @@ public abstract class AbsFileer<ENTITY extends AbsNormalEntity, TASK_WRAPPER ext
       }
     }
     ThreadTaskManager.getInstance().removeTaskThread(mTaskWrapper.getKey());
+    onPostCancel();
   }
 
+  /**
+   * 删除线程任务前的操作
+   */
   protected void onCancel() {
 
   }
 
-  public synchronized void stop() {
+  /**
+   * 删除操作处理完成
+   */
+  protected void onPostCancel() {
+
+  }
+
+  final public synchronized void stop() {
     if (isStop) {
       return;
     }
@@ -229,9 +240,20 @@ public abstract class AbsFileer<ENTITY extends AbsNormalEntity, TASK_WRAPPER ext
       }
     }
     ThreadTaskManager.getInstance().removeTaskThread(mTaskWrapper.getKey());
+    onPostStop();
   }
 
+  /**
+   * 停止线程任务前的操作
+   */
   protected void onStop() {
+
+  }
+
+  /**
+   * 停止操作完成
+   */
+  protected void onPostStop() {
 
   }
 

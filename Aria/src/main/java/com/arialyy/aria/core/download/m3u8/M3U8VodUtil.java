@@ -36,7 +36,7 @@ import java.util.List;
  * 3、完成所有分片下载后，合并ts文件
  * 4、删除该隐藏文件夹
  */
-public class M3U8VodDownloadUtil implements IUtil {
+public class M3U8VodUtil implements IUtil {
   private final String TAG = "M3U8DownloadUtil";
 
   private DTaskWrapper mWrapper;
@@ -45,7 +45,7 @@ public class M3U8VodDownloadUtil implements IUtil {
   private List<String> mUrls = new ArrayList<>();
   private M3U8VodLoader mLoader;
 
-  public M3U8VodDownloadUtil(DTaskWrapper wrapper, IDownloadListener listener) {
+  public M3U8VodUtil(DTaskWrapper wrapper, IDownloadListener listener) {
     mWrapper = wrapper;
     mListener = listener;
     mLoader = new M3U8VodLoader(mListener, mWrapper);

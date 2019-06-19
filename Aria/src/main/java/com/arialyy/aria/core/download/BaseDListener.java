@@ -19,12 +19,14 @@ import android.os.Handler;
 
 import com.arialyy.aria.core.common.BaseListener;
 import com.arialyy.aria.core.common.RecordHandler;
+import com.arialyy.aria.core.inf.AbsTaskWrapper;
 import com.arialyy.aria.core.inf.IDownloadListener;
 import com.arialyy.aria.core.inf.IEntity;
 import com.arialyy.aria.core.inf.TaskSchedulerType;
 import com.arialyy.aria.core.scheduler.ISchedulers;
 import com.arialyy.aria.util.CommonUtil;
 import com.arialyy.aria.util.RecordUtil;
+import java.io.File;
 
 /**
  * 下载监听类

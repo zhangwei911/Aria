@@ -41,7 +41,7 @@ import java.util.concurrent.TimeUnit;
  * 4、对于直播来说是没有停止的，停止就代表完成
  * 5、不处理直播切片下载失败的状态
  */
-public class M3U8LiveDownloadUtil implements IUtil {
+public class M3U8LiveUtil implements IUtil {
   private final String TAG = "M3U8LiveDownloadUtil";
   private DTaskWrapper mWrapper;
   private IDownloadListener mListener;
@@ -52,7 +52,7 @@ public class M3U8LiveDownloadUtil implements IUtil {
   private ExecutorService mInfoPool = Executors.newCachedThreadPool();
   private List<String> mPeerUrls = new ArrayList<>();
 
-  public M3U8LiveDownloadUtil(DTaskWrapper wrapper, IDownloadListener listener) {
+  public M3U8LiveUtil(DTaskWrapper wrapper, IDownloadListener listener) {
     mWrapper = wrapper;
     mListener = listener;
     mLoader = new M3U8LiveLoader(mListener, mWrapper);

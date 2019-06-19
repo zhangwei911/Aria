@@ -37,9 +37,9 @@ class FtpFileInfoThread extends AbsFtpInfoThread<DownloadEntity, DTaskWrapper> {
 
   @Override protected void handleFile(String remotePath, FTPFile ftpFile) {
     super.handleFile(remotePath, ftpFile);
-    if (!CommonUtil.checkSDMemorySpace(mEntity.getDownloadPath(), ftpFile.getSize())) {
+    if (!CommonUtil.checkSDMemorySpace(mEntity.getFilePath(), ftpFile.getSize())) {
       mCallback.onFail(mEntity, new AriaIOException(TAG,
-              String.format("获取ftp文件信息失败，内存空间不足, filePath: %s", mEntity.getDownloadPath())),
+              String.format("获取ftp文件信息失败，内存空间不足, filePath: %s", mEntity.getFilePath())),
           false);
     }
   }

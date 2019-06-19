@@ -15,10 +15,13 @@
  */
 package com.arialyy.aria.core.download.m3u8;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 /**
  * m3u8加密密钥信息
  */
-public class M3U8KeyInfo {
+public class M3U8KeyInfo implements Parcelable {
 
   /**
    * 加密key保存地址
@@ -39,4 +42,36 @@ public class M3U8KeyInfo {
    * key的iv值
    */
   public String iv;
+
+  @Override public int describeContents() {
+    return 0;
+  }
+
+  @Override public void writeToParcel(Parcel dest, int flags) {
+    dest.writeString(this.keyPath);
+    dest.writeString(this.keyUrl);
+    dest.writeString(this.method);
+    dest.writeString(this.iv);
+  }
+
+  public M3U8KeyInfo() {
+  }
+
+  protected M3U8KeyInfo(Parcel in) {
+    this.keyPath = in.readString();
+    this.keyUrl = in.readString();
+    this.method = in.readString();
+    this.iv = in.readString();
+  }
+
+  public static final Parcelable.Creator<M3U8KeyInfo> CREATOR =
+      new Parcelable.Creator<M3U8KeyInfo>() {
+        @Override public M3U8KeyInfo createFromParcel(Parcel source) {
+          return new M3U8KeyInfo(source);
+        }
+
+        @Override public M3U8KeyInfo[] newArray(int size) {
+          return new M3U8KeyInfo[size];
+        }
+      };
 }

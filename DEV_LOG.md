@@ -8,6 +8,9 @@
     - 修复拦截器可能出现的空指针问题
     - 移除`DownloadGroupEntity`字段`groupHash`的主键约束，`DownloadEntity`字段`groupHash`的外键约束，`TaskRecord`字段`dGroupHash`的外键约束
     - 优化关联查询的性能
+    - 修复任务记录删除失败的问题
+    - 优化网络连接状态获取的逻辑
+    - 修复配置文件的某些配置失效的问题
   + v_3.6.4 (2019/5/16)
     - 优化任务接收器的代码结构
     - 修复`DbEntity.saveAll()`失败的问题

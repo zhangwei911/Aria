@@ -31,7 +31,9 @@ import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.download.DownloadTarget;
 import com.arialyy.aria.core.download.DownloadTask;
 import com.arialyy.aria.core.download.m3u8.IBandWidthUrlConverter;
+import com.arialyy.aria.core.download.m3u8.ITsMergeHandler;
 import com.arialyy.aria.core.download.m3u8.IVodTsUrlConverter;
+import com.arialyy.aria.core.download.m3u8.M3U8KeyInfo;
 import com.arialyy.aria.core.inf.IEntity;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
@@ -201,6 +203,8 @@ public class M3U8VodDownloadActivity extends BaseActivity<ActivityM3u8VodBinding
           Toast.LENGTH_SHORT)
           .show();
       getBinding().setStateStr(getString(R.string.start));
+      getBinding().setSpeed("");
+      Log.d(TAG, "fail");
     }
   }
 
@@ -259,6 +263,11 @@ public class M3U8VodDownloadActivity extends BaseActivity<ActivityM3u8VodBinding
             }
 
             return newUrls;
+          }
+        })
+        .setMergeHandler(new ITsMergeHandler() {
+          @Override public boolean merge(@Nullable M3U8KeyInfo keyInfo, List<String> tsPath) {
+            return false;
           }
         })
         .start();

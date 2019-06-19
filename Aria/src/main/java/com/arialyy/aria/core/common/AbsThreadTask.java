@@ -175,17 +175,15 @@ public abstract class AbsThreadTask<ENTITY extends AbsNormalEntity, TASK_WRAPPER
    * 中断任务
    */
   void breakTask() {
-    synchronized (AriaManager.LOCK) {
-      taskBreak = true;
-      if (mTaskWrapper.isSupportBP()) {
-        final long currentTemp = mChildCurrentLocation;
-        sendState(IThreadState.STATE_STOP, null);
-        ALog.d(TAG, String.format("任务【%s】thread__%s__中断【停止位置：%s】", getFileName(),
-            mRecord.threadId, currentTemp));
-        writeConfig(false, currentTemp);
-      } else {
-        ALog.i(TAG, String.format("任务【%s】已中断", getFileName()));
-      }
+    taskBreak = true;
+    if (mTaskWrapper.isSupportBP()) {
+      final long currentTemp = mChildCurrentLocation;
+      sendState(IThreadState.STATE_STOP, null);
+      ALog.d(TAG, String.format("任务【%s】thread__%s__中断【停止位置：%s】", getFileName(),
+          mRecord.threadId, currentTemp));
+      writeConfig(false, currentTemp);
+    } else {
+      ALog.i(TAG, String.format("任务【%s】已中断", getFileName()));
     }
   }
 
@@ -276,28 +274,26 @@ public abstract class AbsThreadTask<ENTITY extends AbsNormalEntity, TASK_WRAPPER
    * 执行中
    */
   protected void progress(long len) {
-    synchronized (AriaManager.LOCK) {
-      //if (getState().CURRENT_LOCATION > getEntity().getFileSize() && !getTaskWrapper().asHttp()
-      //    .isChunked()) {
-      //  String errorMsg =
-      //      String.format("下载失败，下载长度超出文件真实长度；currentLocation=%s, fileSize=%s",
-      //          getState().CURRENT_LOCATION,
-      //          getEntity().getFileSize());
-      //  taskBreak = true;
-      //  fail(mChildCurrentLocation, new FileException(TAG, errorMsg), false);
-      //  return;
-      //}
-      mChildCurrentLocation += len;
-      if (!mStateHandler.getLooper().getThread().isAlive()) {
-        return;
-      }
-      mStateHandler.obtainMessage(IThreadState.STATE_RUNNING, len).sendToTarget();
-      if (System.currentTimeMillis() - mLastSaveTime > 5000
-          && mChildCurrentLocation < mRecord.endLocation) {
-        mLastSaveTime = System.currentTimeMillis();
-        if (!mConfigThreadPool.isShutdown()) {
-          mConfigThreadPool.execute(mConfigThread);
-        }
+    //if (getState().CURRENT_LOCATION > getEntity().getFileSize() && !getTaskWrapper().asHttp()
+    //    .isChunked()) {
+    //  String errorMsg =
+    //      String.format("下载失败，下载长度超出文件真实长度；currentLocation=%s, fileSize=%s",
+    //          getState().CURRENT_LOCATION,
+    //          getEntity().getFileSize());
+    //  taskBreak = true;
+    //  fail(mChildCurrentLocation, new FileException(TAG, errorMsg), false);
+    //  return;
+    //}
+    mChildCurrentLocation += len;
+    if (!mStateHandler.getLooper().getThread().isAlive()) {
+      return;
+    }
+    mStateHandler.obtainMessage(IThreadState.STATE_RUNNING, len).sendToTarget();
+    if (System.currentTimeMillis() - mLastSaveTime > 5000
+        && mChildCurrentLocation < mRecord.endLocation) {
+      mLastSaveTime = System.currentTimeMillis();
+      if (!mConfigThreadPool.isShutdown()) {
+        mConfigThreadPool.execute(mConfigThread);
       }
     }
   }
@@ -350,14 +346,15 @@ public abstract class AbsThreadTask<ENTITY extends AbsNormalEntity, TASK_WRAPPER
    * 重试ts分片
    */
   private void retryM3U8Peer(boolean needRetry) {
-    if (!NetUtils.isConnected(AriaManager.APP) && !isNotNetRetry) {
-      ALog.w(TAG, String.format("任务【%s】重试失败，网络未连接", getFileName()));
+    boolean isConnected = NetUtils.isConnected(AriaManager.APP);
+    if (!isConnected && !isNotNetRetry) {
+      ALog.w(TAG, String.format("ts切片【%s】重试失败，网络未连接", getFileName()));
       sendFailMsg(null);
       return;
     }
     if (mFailTimes < RETRY_NUM && needRetry && (NetUtils.isConnected(AriaManager.APP)
         || isNotNetRetry) && !isBreak()) {
-      ALog.w(TAG, String.format("任务【%s】正在重试", getFileName()));
+      ALog.w(TAG, String.format("ts切片【%s】正在重试", getFileName()));
       mFailTimes++;
       mConfig.tempFile.delete();
       CommonUtil.createFile(mConfig.tempFile.getPath());
@@ -374,13 +371,13 @@ public abstract class AbsThreadTask<ENTITY extends AbsNormalEntity, TASK_WRAPPER
    */
   private void retryBlockTask(boolean needRetry) {
     if (!NetUtils.isConnected(AriaManager.APP) && !isNotNetRetry) {
-      ALog.w(TAG, String.format("任务【%s】重试失败，网络未连接", getFileName()));
+      ALog.w(TAG, String.format("分块【%s】重试失败，网络未连接", getFileName()));
       sendFailMsg(null);
       return;
     }
     if (mFailTimes < RETRY_NUM && needRetry && (NetUtils.isConnected(AriaManager.APP)
         || isNotNetRetry) && !isBreak()) {
-      ALog.w(TAG, String.format("任务【%s】正在重试", getFileName()));
+      ALog.w(TAG, String.format("分块【%s】正在重试", getFileName()));
       mFailTimes++;
       handleBlockRecord();
       ThreadTaskManager.getInstance().retryThread(this);

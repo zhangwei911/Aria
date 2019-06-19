@@ -182,6 +182,9 @@ public class RecordUtil {
     if (TextUtils.isEmpty(filePath)) {
       throw new NullPointerException("删除记录失败，文件路径为空");
     }
+    if (!filePath.startsWith("/")) {
+      throw new IllegalArgumentException(String.format("文件路径错误，filePath：%s", filePath));
+    }
     if (type != RecordHandler.TYPE_DOWNLOAD && type != RecordHandler.TYPE_UPLOAD) {
       throw new IllegalArgumentException("任务记录类型错误");
     }
@@ -210,7 +213,8 @@ public class RecordUtil {
       if (record.taskType == TaskRecord.TYPE_M3U8_VOD) { // 删除ts分片文件
         String cacheDir = null;
         if (!targetFile.isDirectory()) {
-          cacheDir = targetFile.getParent() + "/." + targetFile.getName();
+          cacheDir = String.format("%s/.%s_%s", targetFile.getParent(), targetFile.getName(),
+              record.bandWidth);
         }
         removeTsCache(record, cacheDir);
       } else if (record.isBlock) { // 删除分块文件
@@ -235,6 +239,7 @@ public class RecordUtil {
   }
 
   private static void removeRecord(String filePath) {
+    ALog.i(TAG, "删除任务记录");
     DbEntity.deleteData(ThreadRecord.class, "key=?", filePath);
     DbEntity.deleteData(TaskRecord.class, "filePath=?", filePath);
   }

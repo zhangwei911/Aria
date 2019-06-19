@@ -26,6 +26,7 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Toast;
 
@@ -308,6 +309,10 @@ public class SingleTaskActivity extends BaseActivity<ActivitySingleBinding> {
   protected void onStop() {
     super.onStop();
     //Aria.download(this).unRegister();
+  }
+
+  @Override public boolean dispatchTouchEvent(MotionEvent ev) {
+    return super.dispatchTouchEvent(ev);
   }
 
   @Override protected void dataCallback(int result, Object data) {

@@ -50,8 +50,8 @@ dependencies {
   implementation "org.jetbrains.kotlin:kotlin-stdlib:${rootProject.ext.kotlin_version}"
   api project(':Aria')
   kapt project(':AriaCompiler')
-//  api 'com.arialyy.aria:aria-core:3.6.5_dev_4'
-//  kapt 'com.arialyy.aria:aria-compiler:3.6.5_dev_4'
+//  api 'com.arialyy.aria:aria-core:3.6.4'
+//  kapt 'com.arialyy.aria:aria-compiler:3.6.4'
 
   //  compile 'com.arialyy.aria:aria-core:3.3.14'
   //  annotationProcessor 'com.arialyy.aria:aria-compiler:3.3.14'

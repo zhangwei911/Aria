@@ -21,8 +21,8 @@ import android.os.Looper;
 import com.arialyy.aria.core.AriaManager;
 import com.arialyy.aria.core.common.IUtil;
 import com.arialyy.aria.core.download.downloader.SimpleDownloadUtil;
-import com.arialyy.aria.core.download.m3u8.M3U8LiveDownloadUtil;
-import com.arialyy.aria.core.download.m3u8.M3U8VodDownloadUtil;
+import com.arialyy.aria.core.download.m3u8.M3U8LiveUtil;
+import com.arialyy.aria.core.download.m3u8.M3U8VodUtil;
 import com.arialyy.aria.core.inf.AbsNormalTask;
 import com.arialyy.aria.core.inf.IDownloadListener;
 import com.arialyy.aria.core.inf.ITaskWrapper;
@@ -90,9 +90,9 @@ public class DownloadTask extends AbsNormalTask<DTaskWrapper> {
 
   @Override protected synchronized IUtil createUtil() {
     if (mTaskWrapper.getRequestType() == ITaskWrapper.M3U8_VOD) {
-      return new M3U8VodDownloadUtil(mTaskWrapper, (IDownloadListener) mListener);
+      return new M3U8VodUtil(mTaskWrapper, (IDownloadListener) mListener);
     } else if (mTaskWrapper.getRequestType() == ITaskWrapper.M3U8_LIVE) {
-      return new M3U8LiveDownloadUtil(mTaskWrapper, (IDownloadListener) mListener);
+      return new M3U8LiveUtil(mTaskWrapper, (IDownloadListener) mListener);
     } else {
       return new SimpleDownloadUtil(mTaskWrapper, (IDownloadListener) mListener);
     }

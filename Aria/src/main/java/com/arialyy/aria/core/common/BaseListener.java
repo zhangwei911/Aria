@@ -156,13 +156,13 @@ public abstract class BaseListener<ENTITY extends AbsEntity, TASK_WRAPPER extend
     mEntity.setCurrentProgress(mEntity.getFileSize());
     mEntity.setPercent(100);
     handleSpeed(0);
-    ALog.i(TAG, String.format("任务【%s】完成，将删除线程任务记录", mEntity.getKey()));
+    ALog.i(TAG, String.format("任务【%s】完成，将删除任务任务记录", mEntity.getKey()));
     if (mEntity instanceof DownloadGroupEntity) {
       RecordUtil.delGroupTaskRecord((DownloadGroupEntity) mEntity, false, false);
     } else if (mEntity instanceof DownloadEntity) {
-      RecordUtil.delTaskRecord(mEntity.getKey(), RecordHandler.TYPE_DOWNLOAD, false, false);
+      RecordUtil.delTaskRecord(((DownloadEntity) mEntity).getFilePath(), RecordHandler.TYPE_DOWNLOAD, false, false);
     } else if (mEntity instanceof UploadEntity) {
-      RecordUtil.delTaskRecord(mEntity.getKey(), RecordHandler.TYPE_UPLOAD, false, false);
+      RecordUtil.delTaskRecord(((UploadEntity) mEntity).getFilePath(), RecordHandler.TYPE_UPLOAD, false, false);
     }
   }
 

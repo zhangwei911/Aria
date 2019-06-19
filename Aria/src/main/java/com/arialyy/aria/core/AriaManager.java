@@ -21,13 +21,20 @@ import android.app.Activity;
 import android.app.Application;
 import android.app.Dialog;
 import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.Network;
+import android.net.NetworkCapabilities;
+import android.net.NetworkInfo;
+import android.net.NetworkRequest;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.support.annotation.RequiresApi;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.widget.PopupWindow;
+import com.arialyy.aria.BuildConfig;
 import com.arialyy.aria.core.command.ICmd;
 import com.arialyy.aria.core.common.QueueMod;
 import com.arialyy.aria.core.common.RecordHandler;
@@ -71,6 +78,10 @@ import org.xml.sax.SAXException;
   public static final Object LOCK = new Object();
   public static final String DOWNLOAD_TEMP_DIR = "/Aria/temp/download/";
   public static final String UPLOAD_TEMP_DIR = "/Aria/temp/upload/";
+  /**
+   * 是否已经联网，true 已经联网
+   */
+  private static boolean isConnectedNet = true;
 
   @SuppressLint("StaticFieldLeak") private static volatile AriaManager INSTANCE = null;
   private Map<String, AbsReceiver> mReceivers = new ConcurrentHashMap<>();
@@ -85,7 +96,6 @@ import org.xml.sax.SAXException;
   private AppConfig mAConfig;
   private DGroupConfig mDGConfig;
   private Handler mAriaHandler;
-  private File[] files;
 
   private AriaManager(Context context) {
     APP = context.getApplicationContext();
@@ -94,6 +104,7 @@ import org.xml.sax.SAXException;
     initConfig();
     initAria();
     amendTaskState();
+    regNetCallBack(context);
   }
 
   public static AriaManager getInstance(Context context) {
@@ -109,6 +120,47 @@ import org.xml.sax.SAXException;
     return INSTANCE;
   }
 
+  /**
+   * 注册网络监听，只有配置了检查网络{@link AppConfig#isNetCheck()}才会注册事件
+   */
+  private void regNetCallBack(Context context) {
+    if (!getAppConfig().isNetCheck()) {
+      return;
+    }
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+      return;
+    }
+    ConnectivityManager cm =
+        (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+    if (cm == null) {
+      return;
+    }
+
+    NetworkRequest.Builder builder = new NetworkRequest.Builder();
+    NetworkRequest request = builder.addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+        .addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
+        .addTransportType(NetworkCapabilities.TRANSPORT_CELLULAR)
+        .build();
+
+    cm.registerNetworkCallback(request, new ConnectivityManager.NetworkCallback() {
+
+      @Override public void onLost(Network network) {
+        super.onLost(network);
+        isConnectedNet = false;
+        ALog.d(TAG, "onLost");
+      }
+
+      @Override public void onAvailable(Network network) {
+        super.onAvailable(network);
+        ALog.d(TAG, "onAvailable");
+        isConnectedNet = true;
+      }
+    });
+  }
+
+  /**
+   * 初始化数据库
+   */
   private void initDb(Context context) {
     // 这个地方错误了，获取数据库路径见：https://www.jianshu.com/p/815c9efc5449
     String oldDbName = "AriaLyyDb";
@@ -151,6 +203,10 @@ import org.xml.sax.SAXException;
       mAriaHandler = new Handler(Looper.getMainLooper());
     }
     return mAriaHandler;
+  }
+
+  public boolean isConnectedNet() {
+    return isConnectedNet;
   }
 
   public Map<String, AbsReceiver> getReceiver() {

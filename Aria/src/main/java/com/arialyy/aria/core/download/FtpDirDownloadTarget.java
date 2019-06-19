@@ -107,8 +107,4 @@ public class FtpDirDownloadTarget extends AbsDGTarget<FtpDirDownloadTarget>
   @Override public FtpDirDownloadTarget login(String userName, String password, String account) {
     return mFtpDelegate.login(userName, password, account);
   }
-
-  @Override public FtpDirDownloadTarget setProxy(Proxy proxy) {
-    return mFtpDelegate.setProxy(proxy);
-  }
 }

@@ -59,7 +59,7 @@ public class RecordHandler {
   public static final String SUB_PATH = "%s.%s.part";
 
   @Deprecated private File mConfigFile;
-  private TaskRecord mRecord;
+  private TaskRecord mTaskRecord;
   private AbsTaskWrapper mTaskWrapper;
   private AbsNormalEntity mEntity;
 
@@ -81,11 +81,11 @@ public class RecordHandler {
     if (mConfigFile.exists()) {
       convertDb();
     } else {
-      mRecord = DbDataHelper.getTaskRecord(getFilePath());
-      if (mRecord == null) {
+      mTaskRecord = DbDataHelper.getTaskRecord(getFilePath());
+      if (mTaskRecord == null) {
         initRecord(true);
       } else {
-        if (mRecord.threadRecords == null || mRecord.threadRecords.isEmpty()) {
+        if (mTaskRecord.threadRecords == null || mTaskRecord.threadRecords.isEmpty()) {
           initRecord(false);
         }
 
@@ -94,10 +94,12 @@ public class RecordHandler {
         } else if (mTaskWrapper.getRequestType() == ITaskWrapper.M3U8_LIVE) {
           ALog.i(TAG, "直播下载不处理历史记录");
         } else {
-          if (mRecord.isBlock) {
+          if (mTaskRecord.isBlock) {
             handleBlockRecord();
           } else if (!mTaskWrapper.isSupportBP()) {
             handleNoSupportBPRecord();
+          } else if (!mTaskRecord.isBlock && mTaskRecord.threadNum > 1) {
+            handleNoBlockMultiThreadRecord();
           } else {
             handleSingleThreadRecord();
           }
@@ -105,7 +107,7 @@ public class RecordHandler {
       }
     }
     saveRecord();
-    return mRecord;
+    return mTaskRecord;
   }
 
   /**
@@ -119,7 +121,7 @@ public class RecordHandler {
     String cacheDir = wrapper.asM3U8().getCacheDir();
     long currentProgress = 0;
     int completeNum = 0;
-    for (ThreadRecord record : mRecord.threadRecords) {
+    for (ThreadRecord record : mTaskRecord.threadRecords) {
       File temp = new File(BaseM3U8Loader.getTsFilePath(cacheDir, record.threadId));
       if (!record.isComplete) {
         if (temp.exists()) {
@@ -140,32 +142,45 @@ public class RecordHandler {
     }
     wrapper.asM3U8().setCompleteNum(completeNum);
     wrapper.getEntity().setCurrentProgress(currentProgress);
+    mTaskRecord.bandWidth = wrapper.asM3U8().getBandWidth();
   }
 
   /**
    * 处理不支持断点的记录
    */
   private void handleNoSupportBPRecord() {
-    ThreadRecord tr = mRecord.threadRecords.get(0);
+    ThreadRecord tr = mTaskRecord.threadRecords.get(0);
     tr.startLocation = 0;
     tr.endLocation = mEntity.getFileSize();
-    tr.key = mRecord.filePath;
+    tr.key = mTaskRecord.filePath;
     tr.blockLen = tr.endLocation;
     tr.isComplete = false;
+  }
+
+  /**
+   * 处理为不分块的多线程任务
+   */
+  private void handleNoBlockMultiThreadRecord() {
+    File file = new File(mTaskRecord.filePath);
+    if (!file.exists()) {
+      ALog.w(TAG, String.format("文件【%s】不存在，重新分配线程区间", mTaskRecord.filePath));
+      DbEntity.deleteData(ThreadRecord.class, "key=?", mTaskRecord.filePath);
+      initRecord(false);
+    }
   }
 
   /**
    * 处理单线程的任务的记录
    */
   private void handleSingleThreadRecord() {
-    File file = new File(mRecord.filePath);
-    ThreadRecord tr = mRecord.threadRecords.get(0);
+    File file = new File(mTaskRecord.filePath);
+    ThreadRecord tr = mTaskRecord.threadRecords.get(0);
     if (!file.exists()) {
       ALog.w(TAG, String.format("文件【%s】不存在，任务将重新开始", file.getPath()));
       tr.startLocation = 0;
       tr.isComplete = false;
       tr.endLocation = mEntity.getFileSize();
-    } else if (mRecord.isOpenDynamicFile) {
+    } else if (mTaskRecord.isOpenDynamicFile) {
       if (file.length() > mEntity.getFileSize()) {
         ALog.i(TAG, String.format("文件【%s】错误，任务重新开始", file.getPath()));
         file.delete();
@@ -190,11 +205,11 @@ public class RecordHandler {
    */
   private void handleBlockRecord() {
     // 默认线程分块长度
-    long normalRectLen = mEntity.getFileSize() / mRecord.threadRecords.size();
-    for (ThreadRecord tr : mRecord.threadRecords) {
+    long normalRectLen = mEntity.getFileSize() / mTaskRecord.threadRecords.size();
+    for (ThreadRecord tr : mTaskRecord.threadRecords) {
       long threadRect = tr.blockLen;
 
-      File temp = new File(String.format(SUB_PATH, mRecord.filePath, tr.threadId));
+      File temp = new File(String.format(SUB_PATH, mTaskRecord.filePath, tr.threadId));
       if (!temp.exists()) {
         ALog.i(TAG, String.format("分块文件【%s】不存在，该分块将重新开始", temp.getPath()));
         tr.isComplete = false;
@@ -269,13 +284,13 @@ public class RecordHandler {
         return;
       }
       mTaskWrapper.setNewTask(false);
-      mRecord = createTaskRecord(threadNum);
-      mRecord.isOpenDynamicFile = false;
-      mRecord.isBlock = false;
+      mTaskRecord = createTaskRecord(threadNum);
+      mTaskRecord.isOpenDynamicFile = false;
+      mTaskRecord.isBlock = false;
       File tempFile = new File(getFilePath());
       for (int i = 0; i < threadNum; i++) {
         ThreadRecord tRecord = new ThreadRecord();
-        tRecord.key = mRecord.filePath;
+        tRecord.key = mTaskRecord.filePath;
         Object state = pro.getProperty(tempFile.getName() + STATE + i);
         Object record = pro.getProperty(tempFile.getName() + RECORD + i);
         if (state != null && Integer.parseInt(String.valueOf(state)) == 1) {
@@ -288,7 +303,7 @@ public class RecordHandler {
         } else {
           tRecord.startLocation = 0;
         }
-        mRecord.threadRecords.add(tRecord);
+        mTaskRecord.threadRecords.add(tRecord);
       }
       mConfigFile.delete();
     }
@@ -301,20 +316,20 @@ public class RecordHandler {
    */
   private void initRecord(boolean newRecord) {
     if (newRecord) {
-      mRecord = createTaskRecord(getNewTaskThreadNum());
+      mTaskRecord = createTaskRecord(getNewTaskThreadNum());
     }
     mTaskWrapper.setNewTask(true);
     int requestType = mTaskWrapper.getRequestType();
     if (requestType == ITaskWrapper.M3U8_LIVE) {
       return;
     }
-    long blockSize = mEntity.getFileSize() / mRecord.threadNum;
+    long blockSize = mEntity.getFileSize() / mTaskRecord.threadNum;
     // 处理线程区间记录
-    for (int i = 0; i < mRecord.threadNum; i++) {
+    for (int i = 0; i < mTaskRecord.threadNum; i++) {
       long startL = i * blockSize, endL = (i + 1) * blockSize;
       ThreadRecord tr;
       tr = new ThreadRecord();
-      tr.key = mRecord.filePath;
+      tr.key = mTaskRecord.filePath;
       tr.threadId = i;
       tr.startLocation = startL;
       tr.isComplete = false;
@@ -325,13 +340,13 @@ public class RecordHandler {
       } else {
         tr.threadType = TaskRecord.TYPE_HTTP_FTP;
         //最后一个线程的结束位置即为文件的总长度
-        if (i == (mRecord.threadNum - 1)) {
+        if (i == (mTaskRecord.threadNum - 1)) {
           endL = mEntity.getFileSize();
         }
         tr.endLocation = endL;
-        tr.blockLen = RecordUtil.getBlockLen(mEntity.getFileSize(), i, mRecord.threadNum);
+        tr.blockLen = RecordUtil.getBlockLen(mEntity.getFileSize(), i, mTaskRecord.threadNum);
       }
-      mRecord.threadRecords.add(tr);
+      mTaskRecord.threadRecords.add(tr);
     }
   }
 
@@ -350,9 +365,11 @@ public class RecordHandler {
     if (requestType == ITaskWrapper.M3U8_VOD) {
       record.taskType = TaskRecord.TYPE_M3U8_VOD;
       record.isOpenDynamicFile = true;
+      record.bandWidth = ((DTaskWrapper)mTaskWrapper).asM3U8().getBandWidth();
     } else if (requestType == ITaskWrapper.M3U8_LIVE) {
       record.taskType = TaskRecord.TYPE_M3U8_LIVE;
       record.isOpenDynamicFile = true;
+      record.bandWidth = ((DTaskWrapper)mTaskWrapper).asM3U8().getBandWidth();
     } else {
       if (getRecordType() == TYPE_DOWNLOAD) {
         record.isBlock = threadNum > 1 && Configuration.getInstance().downloadCfg.isUseBlock();
@@ -377,12 +394,12 @@ public class RecordHandler {
    * 保存任务记录
    */
   private void saveRecord() {
-    mRecord.threadNum = mRecord.threadRecords.size();
-    mRecord.save();
-    if (mRecord.threadRecords != null && !mRecord.threadRecords.isEmpty()) {
-      DbEntity.saveAll(mRecord.threadRecords);
+    mTaskRecord.threadNum = mTaskRecord.threadRecords.size();
+    mTaskRecord.save();
+    if (mTaskRecord.threadRecords != null && !mTaskRecord.threadRecords.isEmpty()) {
+      DbEntity.saveAll(mTaskRecord.threadRecords);
     }
-    ALog.d(TAG, String.format("保存记录，线程记录数：%s", mRecord.threadRecords.size()));
+    ALog.d(TAG, String.format("保存记录，线程记录数：%s", mTaskRecord.threadRecords.size()));
   }
 
   /**

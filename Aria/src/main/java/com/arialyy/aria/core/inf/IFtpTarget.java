@@ -47,11 +47,11 @@ public interface IFtpTarget<TARGET extends ITargetHandler> {
   @CheckResult
   TARGET login(String userName, String password, String account);
 
-  /**
-   * 设置代理
-   *
-   * @param proxy {@link Proxy}
-   */
-  @CheckResult
-  TARGET setProxy(Proxy proxy);
+  ///**
+  // * 设置代理
+  // *
+  // * @param proxy {@link Proxy}
+  // */
+  //@CheckResult
+  //TARGET setProxy(Proxy proxy);
 }

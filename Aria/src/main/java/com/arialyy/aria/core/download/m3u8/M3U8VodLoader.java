@@ -104,16 +104,6 @@ public class M3U8VodLoader extends BaseM3U8Loader {
 
   }
 
-  @Override protected void onStop() {
-    super.onStop();
-    //notifyLock();
-  }
-
-  @Override protected void onCancel() {
-    super.onCancel();
-    //notifyLock();
-  }
-
   private void notifyLock() {
     try {
       LOCK.lock();
@@ -204,7 +194,7 @@ public class M3U8VodLoader extends BaseM3U8Loader {
           ThreadTaskManager.getInstance().removeSingleTaskThread(mTaskWrapper.getKey(),
               (AbsThreadTask) msg.obj);
           if (isStop()) {
-            ALog.d(TAG, "任务停止");
+            ALog.d(TAG, String.format("vod任务【%s】停止", mTempFile.getName()));
             mListener.onStop(mProgress);
             quitLooper();
           }
@@ -214,7 +204,7 @@ public class M3U8VodLoader extends BaseM3U8Loader {
           ThreadTaskManager.getInstance().removeSingleTaskThread(mTaskWrapper.getKey(),
               (AbsThreadTask) msg.obj);
           if (isCancel()) {
-            ALog.d(TAG, "任务取消");
+            ALog.d(TAG, String.format("vod任务【%s】取消", mTempFile.getName()));
             mListener.onCancel();
             quitLooper();
           }
@@ -222,6 +212,7 @@ public class M3U8VodLoader extends BaseM3U8Loader {
         case STATE_FAIL:
           mFailNum++;
           if (isFail()) {
+            ALog.d(TAG, String.format("vod任务【%s】失败", mTempFile.getName()));
             Bundle b = msg.getData();
             mListener.onFail(b.getBoolean(KEY_RETRY, true),
                 (BaseException) b.getSerializable(KEY_ERROR_INFO));
@@ -235,7 +226,6 @@ public class M3U8VodLoader extends BaseM3U8Loader {
           handlerPercent();
           notifyLock();
           if (isComplete()) {
-            ALog.d(TAG, "isComplete, completeNum = " + mCompleteNum);
             if (mTaskWrapper.asM3U8().isMergeFile()) {
               if (mergeFile()) {
                 mListener.onComplete();
@@ -274,7 +264,7 @@ public class M3U8VodLoader extends BaseM3U8Loader {
 
     @Override public boolean isFail() {
       printInfo("isFail");
-      return mStartThreadNum == mStopNum + mFailNum + mCompleteNum + mCancelNum;
+      return mFailNum == mFlagQueue.size();
     }
 
     @Override public boolean isComplete() {

@@ -92,10 +92,6 @@ public class FtpUploadTarget extends AbsUploadTarget<FtpUploadTarget>
     return mFtpDelegate.login(userName, password, account);
   }
 
-  @Override public FtpUploadTarget setProxy(Proxy proxy) {
-    return mFtpDelegate.setProxy(proxy);
-  }
-
   @Override protected boolean checkEntity() {
     return mConfigHandler.checkEntity();
   }

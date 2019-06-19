@@ -26,7 +26,7 @@ public interface ITsMergeHandler {
   /**
    * 合并ts文件
    *
-   * @param keyInfo ts文件加密信息，如果ts文件不是加密的，该字段为空
+   * @param keyInfo 密钥信息，如果ts文件不是加密的，该字段为空
    * @param tsPath ts文件列表
    * @return {@code true} 合并成功
    */

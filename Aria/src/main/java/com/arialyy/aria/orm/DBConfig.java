@@ -57,7 +57,7 @@ class DBConfig {
     mapping.put("DownloadGroupEntity", DownloadGroupEntity.class);
     mapping.put("DownloadEntity", DownloadEntity.class);
     mapping.put("UploadEntity", UploadEntity.class);
-    mapping.put("TaskRecord", TaskRecord.class);
     mapping.put("ThreadRecord", ThreadRecord.class);
+    mapping.put("TaskRecord", TaskRecord.class);
   }
 }

@@ -63,8 +63,8 @@ public class FtpDelegate<TARGET extends AbsTarget> implements IFtpTarget<TARGET>
     return mTarget;
   }
 
-  @Override public TARGET setProxy(Proxy proxy) {
-    mTarget.getTaskWrapper().asFtp().setProxy(proxy);
-    return mTarget;
-  }
+  //@Override public TARGET setProxy(Proxy proxy) {
+  //  mTarget.getTaskWrapper().asFtp().setProxy(proxy);
+  //  return mTarget;
+  //}
 }

@@ -15,9 +15,7 @@
  */
 package com.arialyy.aria.core.common;
 
-import com.arialyy.aria.orm.ActionPolicy;
 import com.arialyy.aria.orm.DbEntity;
-import com.arialyy.aria.orm.annotation.Foreign;
 
 /**
  * Created by laoyuyu on 2018/5/8.
@@ -25,7 +23,9 @@ import com.arialyy.aria.orm.annotation.Foreign;
  */
 public class ThreadRecord extends DbEntity {
 
-  @Foreign(parent = TaskRecord.class, column = "filePath", onUpdate = ActionPolicy.CASCADE, onDelete = ActionPolicy.CASCADE)
+  /**
+   * 任务的文件路径，不是当前线程记录的的分块文件路径
+   */
   public String key;
 
   /**

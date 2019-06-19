@@ -144,11 +144,6 @@ public class FtpDownloadTarget extends AbsDTarget<FtpDownloadTarget>
     return mFtpDelegate.login(userName, password, account);
   }
 
-  @CheckResult
-  @Override public FtpDownloadTarget setProxy(Proxy proxy) {
-    return mFtpDelegate.setProxy(proxy);
-  }
-
   @Override public FtpDownloadTarget updateUrl(String newUrl) {
     return mConfigHandler.updateUrl(newUrl);
   }

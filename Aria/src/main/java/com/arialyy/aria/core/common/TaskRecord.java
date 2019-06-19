@@ -89,4 +89,9 @@ public class TaskRecord extends DbEntity {
    * {@link #TYPE_HTTP_FTP}、{@link #TYPE_M3U8_VOD}
    */
   public int taskType = 0;
+
+  /**
+   * m3u8文件码率
+   */
+  public long bandWidth = 0;
 }

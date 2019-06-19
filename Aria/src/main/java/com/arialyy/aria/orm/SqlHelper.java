@@ -98,8 +98,8 @@ final class SqlHelper extends SQLiteOpenHelper {
         handle314AriaUpdate(db);
       } else if (oldVersion < 45) {
         handle360AriaUpdate(db);
-      } else if (oldVersion < 46) {
-        db.execSQL("UPDATE ThreadRecord SET threadId=0 WHERE threadId=-1");
+      } else if (oldVersion < 48) {
+        handle365Update(db);
       } else {
         handleDbUpdate(db, null, null);
       }
@@ -227,10 +227,35 @@ final class SqlHelper extends SQLiteOpenHelper {
       }
       db.setTransactionSuccessful();
     } catch (Exception e) {
-      ALog.e(TAG, e);
+      e.printStackTrace();
     } finally {
       db.endTransaction();
     }
+  }
+
+  /**
+   * 删除重复的repeat数据
+   */
+  private void delRepeatThreadRecord(SQLiteDatabase db) {
+    String repeatSql =
+        "DELETE FROM ThreadRecord WHERE (key, threadId, endLocation) "
+            + "IN (SELECT key, threadId, endLocation FROM ThreadRecord GROUP BY key, threadId, endLocation "
+            + "HAVING COUNT(*) > 1) AND rowid "
+            + "NOT IN (SELECT MIN(rowid) FROM ThreadRecord GROUP BY key, threadId, endLocation "
+            + "HAVING COUNT(*)> 1)";
+    ALog.d(TAG, repeatSql);
+    db.execSQL(repeatSql);
+  }
+
+  /**
+   * 处理365版本以下的升级
+   */
+  private void handle365Update(SQLiteDatabase db) {
+    db.execSQL("UPDATE ThreadRecord SET threadId=0 WHERE threadId=-1");
+
+    // 执行升级操作
+    handleDbUpdate(db, null, null);
+    delRepeatThreadRecord(db);
   }
 
   /**
@@ -255,7 +280,10 @@ final class SqlHelper extends SQLiteOpenHelper {
     Map<String, String> dGroupNameModify = new HashMap<>();
     dGroupNameModify.put("dGroupName", "dGroupHash");
     columnMap.put("TaskRecord", dGroupNameModify);
+
+    // 执行升级操作
     handleDbUpdate(db, columnMap, null);
+    delRepeatThreadRecord(db);
   }
 
   /**

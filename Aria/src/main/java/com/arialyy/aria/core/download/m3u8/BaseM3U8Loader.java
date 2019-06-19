@@ -26,6 +26,7 @@ public abstract class BaseM3U8Loader extends AbsFileer<DownloadEntity, DTaskWrap
 
   BaseM3U8Loader(IEventListener listener, DTaskWrapper wrapper) {
     super(listener, wrapper);
+    mTempFile = new File(wrapper.getEntity().getFilePath());
   }
 
   @Override protected long delayTimer() {
