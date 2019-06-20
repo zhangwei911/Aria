@@ -102,11 +102,6 @@ class FtpFileInfoThread extends AbsFtpInfoThread<UploadEntity, UTaskWrapper> {
     } catch (IOException e) {
       e.printStackTrace();
       return false;
-    } finally {
-      IFtpUploadInterceptor interceptor = mTaskWrapper.asFtp().getUploadInterceptor();
-      if (interceptor != null && interceptor.getClass().isAnonymousClass()) {
-        mTaskWrapper.asFtp().setUploadInterceptor(null);
-      }
     }
 
     return true;

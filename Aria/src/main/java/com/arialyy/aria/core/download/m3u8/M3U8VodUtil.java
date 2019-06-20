@@ -103,9 +103,6 @@ public class M3U8VodUtil implements IUtil {
             mUrls.addAll(
                 converter.convert(mWrapper.asM3U8().getBandWidthUrl(), (List<String>) info.obj));
           }
-          if (converter.getClass().isAnonymousClass()) {
-            mWrapper.asM3U8().setVodUrlConverter(null);
-          }
         } else {
           mUrls.addAll((Collection<? extends String>) info.obj);
         }

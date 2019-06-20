@@ -87,6 +87,19 @@ public class M3U8TaskConfig {
    */
   private long liveUpdateInterval = 10 * 1000;
 
+  /**
+   * 同时下载的分片数量
+   */
+  private int maxTsQueueNum = 4;
+
+  public int getMaxTsQueueNum() {
+    return maxTsQueueNum;
+  }
+
+  public void setMaxTsQueueNum(int maxTsQueueNum) {
+    this.maxTsQueueNum = maxTsQueueNum;
+  }
+
   public long getLiveUpdateInterval() {
     return liveUpdateInterval;
   }

@@ -98,7 +98,7 @@ final class SqlHelper extends SQLiteOpenHelper {
         handle314AriaUpdate(db);
       } else if (oldVersion < 45) {
         handle360AriaUpdate(db);
-      } else if (oldVersion < 48) {
+      } else if (oldVersion < 49) {
         handle365Update(db);
       } else {
         handleDbUpdate(db, null, null);

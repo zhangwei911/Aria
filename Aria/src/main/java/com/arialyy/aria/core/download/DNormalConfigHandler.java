@@ -118,7 +118,8 @@ class DNormalConfigHandler<TARGET extends AbsDTarget> implements IConfigHandler 
             wrapper.asM3U8().getBandWidth()));
     if (wrapper.getRequestType() == ITaskWrapper.M3U8_VOD) {
       if (mEntity.getFileSize() == 0) {
-        ALog.w(TAG, "由于m3u8协议的特殊性质，无法获取到正确到文件长度，因此你需要自行设置文件大小：asM3U8().setFileSize(xxx)");
+        ALog.w(TAG,
+            "由于m3u8协议的特殊性质，无法有效快速获取到正确到文件长度，如果你需要显示文件中长度，你需要自行设置文件长度：.asM3U8().asVod().setFileSize(xxx)");
       }
     } else if (wrapper.getRequestType() == ITaskWrapper.M3U8_LIVE) {
       if (file.exists()) {

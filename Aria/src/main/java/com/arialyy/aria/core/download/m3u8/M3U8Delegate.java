@@ -53,20 +53,6 @@ public class M3U8Delegate<TARGET extends AbsTarget> extends BaseDelegate<TARGET>
   }
 
   /**
-   * 由于m3u8协议的特殊性质，无法获取到正确到文件长度，因此你需要自行设置文件大小
-   *
-   * @param fileSize 文件长度
-   */
-  public M3U8Delegate setFileSize(long fileSize) {
-    if (fileSize <= 0) {
-      ALog.e(TAG, "文件长度错误");
-      return this;
-    }
-    mTaskWrapper.getEntity().setFileSize(fileSize);
-    return this;
-  }
-
-  /**
    * M3U8 ts 文件url转换器，对于某些服务器，返回的ts地址可以是相对地址，也可能是处理过的
    * 对于这种情况，你需要使用url转换器将地址转换为可正常访问的http地址
    *
@@ -96,6 +82,13 @@ public class M3U8Delegate<TARGET extends AbsTarget> extends BaseDelegate<TARGET>
   public M3U8Delegate setBandWidthUrlConverter(IBandWidthUrlConverter converter) {
     mTaskWrapper.asM3U8().setBandWidthUrlConverter(converter);
     return this;
+  }
+
+  /**
+   * 处理点播文件的下载参数
+   */
+  public M3U8VodDelegate<TARGET> asVod() {
+    return new M3U8VodDelegate<>(mTarget);
   }
 
   /**

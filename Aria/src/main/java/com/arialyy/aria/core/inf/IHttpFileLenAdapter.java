@@ -23,7 +23,7 @@ import java.util.Map;
 /**
  * Http文件长度适配器
  */
-public interface IHttpFileLenAdapter extends Serializable {
+public class IHttpFileLenAdapter implements Serializable {
   long serialVersionUID = 1L;
 
   /**
@@ -32,5 +32,7 @@ public interface IHttpFileLenAdapter extends Serializable {
    * @param headers header参数{@link URLConnection#getHeaderFields()}
    * @return 文件长度
    */
-  long handleFileLen(Map<String, List<String>> headers);
+  public long handleFileLen(Map<String, List<String>> headers) {
+    return 0;
+  }
 }

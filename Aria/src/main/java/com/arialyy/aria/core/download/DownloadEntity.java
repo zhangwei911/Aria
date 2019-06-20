@@ -19,9 +19,13 @@ package com.arialyy.aria.core.download;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.text.TextUtils;
+import com.arialyy.aria.core.download.m3u8.M3U8Entity;
 import com.arialyy.aria.core.inf.AbsNormalEntity;
 import com.arialyy.aria.core.inf.AbsTaskWrapper;
+import com.arialyy.aria.orm.DbEntity;
+import com.arialyy.aria.orm.annotation.Ignore;
 import com.arialyy.aria.orm.annotation.Unique;
+import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
 
 /**
@@ -51,6 +55,27 @@ public class DownloadEntity extends AbsNormalEntity implements Parcelable {
    * 从disposition获取到的文件名，如果可以获取到，则会赋值到这个字段
    */
   private String serverFileName;
+
+  @Ignore
+  private M3U8Entity m3U8Entity;
+
+  public M3U8Entity getM3U8Entity() {
+    if (TextUtils.isEmpty(downloadPath)) {
+      ALog.e("DownloadEntity", "文件保存路径为空，获取m3u8实体之前需要设置文件保存路径");
+      return null;
+    }
+    if (m3U8Entity == null) {
+      m3U8Entity = DbEntity.findFirst(M3U8Entity.class, "filePath=?", downloadPath);
+    }
+    if (m3U8Entity == null) {
+      m3U8Entity = new M3U8Entity();
+      m3U8Entity.setFilePath(downloadPath);
+      m3U8Entity.setPeerIndex(0);
+      m3U8Entity.insert();
+    }
+
+    return m3U8Entity;
+  }
 
   @Override public String getKey() {
     return getUrl();
@@ -124,19 +149,6 @@ public class DownloadEntity extends AbsNormalEntity implements Parcelable {
     return (DownloadEntity) super.clone();
   }
 
-  @Override public int describeContents() {
-    return 0;
-  }
-
-  @Override public void writeToParcel(Parcel dest, int flags) {
-    super.writeToParcel(dest, flags);
-    dest.writeString(this.downloadPath);
-    dest.writeString(this.groupHash);
-    dest.writeString(this.md5Code);
-    dest.writeString(this.disposition);
-    dest.writeString(this.serverFileName);
-  }
-
   @Override public String toString() {
     return "DownloadEntity{"
         + "downloadPath='"
@@ -160,6 +172,20 @@ public class DownloadEntity extends AbsNormalEntity implements Parcelable {
         + '}';
   }
 
+  @Override public int describeContents() {
+    return 0;
+  }
+
+  @Override public void writeToParcel(Parcel dest, int flags) {
+    super.writeToParcel(dest, flags);
+    dest.writeString(this.downloadPath);
+    dest.writeString(this.groupHash);
+    dest.writeString(this.md5Code);
+    dest.writeString(this.disposition);
+    dest.writeString(this.serverFileName);
+    dest.writeParcelable(this.m3U8Entity, flags);
+  }
+
   protected DownloadEntity(Parcel in) {
     super(in);
     this.downloadPath = in.readString();
@@ -167,6 +193,7 @@ public class DownloadEntity extends AbsNormalEntity implements Parcelable {
     this.md5Code = in.readString();
     this.disposition = in.readString();
     this.serverFileName = in.readString();
+    this.m3U8Entity = in.readParcelable(M3U8Entity.class.getClassLoader());
   }
 
   public static final Creator<DownloadEntity> CREATOR = new Creator<DownloadEntity>() {

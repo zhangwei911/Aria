@@ -21,7 +21,7 @@ import java.util.List;
 /**
  * Ts文件合并处理，如果你希望使用自行处理ts文件的合并，你可以实现该接口
  */
-public interface ITsMergeHandler {
+public class ITsMergeHandler {
 
   /**
    * 合并ts文件
@@ -30,5 +30,7 @@ public interface ITsMergeHandler {
    * @param tsPath ts文件列表
    * @return {@code true} 合并成功
    */
-  boolean merge(@Nullable M3U8KeyInfo keyInfo, List<String> tsPath);
+  public boolean merge(@Nullable M3U8KeyInfo keyInfo, List<String> tsPath) {
+    return false;
+  }
 }

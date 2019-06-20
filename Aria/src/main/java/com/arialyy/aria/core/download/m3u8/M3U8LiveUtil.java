@@ -101,10 +101,6 @@ public class M3U8LiveUtil implements IUtil {
         mListener.onFail(false, new M3U8Exception(TAG, "合并文件失败"));
       }
     }
-    ILiveTsUrlConverter converter = mWrapper.asM3U8().getLiveTsUrlConverter();
-    if (converter != null && converter.getClass().isAnonymousClass()) {
-      mWrapper.asM3U8().setLiveTsUrlConverter(null);
-    }
   }
 
   @Override public void start() {

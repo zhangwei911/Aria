@@ -25,6 +25,7 @@ import com.arialyy.aria.core.common.http.HttpTaskConfig;
 import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.download.downloader.ConnectionHelp;
+import com.arialyy.aria.core.inf.AbsTaskWrapper;
 import com.arialyy.aria.core.inf.ITaskWrapper;
 import com.arialyy.aria.exception.M3U8Exception;
 import com.arialyy.aria.exception.TaskException;
@@ -75,6 +76,7 @@ final class M3U8InfoThread implements Runnable {
         AriaManager.getInstance(AriaManager.APP).getDownloadConfig().getConnectTimeOut();
     onFileInfoCallback = callback;
     mTaskDelegate = taskWrapper.asHttp();
+    mEntity.getM3U8Entity().setLive(mTaskWrapper.getRequestType() == AbsTaskWrapper.M3U8_LIVE);
   }
 
   @Override public void run() {
@@ -109,7 +111,7 @@ final class M3U8InfoThread implements Runnable {
       List<String> extInf = new ArrayList<>();
       boolean isLive = mTaskWrapper.getRequestType() == ITaskWrapper.M3U8_LIVE;
       while ((line = reader.readLine()) != null) {
-        if (isStop){
+        if (isStop) {
           break;
         }
         if (line.startsWith("#EXT-X-ENDLIST")) {
@@ -144,6 +146,10 @@ final class M3U8InfoThread implements Runnable {
       if (!isLive && extInf.isEmpty()) {
         failDownload(String.format("获取M3U8下载地址列表失败，url: %s", mEntity.getUrl()), false);
         return;
+      }
+      if (!isLive && mEntity.getM3U8Entity().getPeerNum() != 0) {
+        mEntity.getM3U8Entity().setPeerNum(extInf.size());
+        mEntity.getM3U8Entity().update();
       }
       CompleteInfo info = new CompleteInfo();
       info.obj = extInf;
@@ -247,9 +253,6 @@ final class M3U8InfoThread implements Runnable {
     IBandWidthUrlConverter converter = mTaskWrapper.asM3U8().getBandWidthUrlConverter();
     if (converter != null) {
       bandWidthM3u8Url = converter.convert(bandWidthM3u8Url);
-      if (converter.getClass().isAnonymousClass()) {
-        mTaskWrapper.asM3U8().setBandWidthUrlConverter(null);
-      }
       if (!bandWidthM3u8Url.startsWith("http")) {
         failDownload(String.format("码率转换器转换后的url地址无效，转换后的url：%s", bandWidthM3u8Url), false);
         return;

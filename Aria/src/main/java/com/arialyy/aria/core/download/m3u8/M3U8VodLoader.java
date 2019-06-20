@@ -48,13 +48,14 @@ public class M3U8VodLoader extends BaseM3U8Loader {
    */
   private static final int EXEC_MAX_NUM = 4;
   private Handler mStateHandler;
-  private ArrayBlockingQueue<Long> mFlagQueue = new ArrayBlockingQueue<>(EXEC_MAX_NUM);
+  private ArrayBlockingQueue<Long> mFlagQueue;
   private VodStateManager mManager;
   private ReentrantLock LOCK = new ReentrantLock();
   private Condition mCondition = LOCK.newCondition();
 
   M3U8VodLoader(IEventListener listener, DTaskWrapper wrapper) {
     super(listener, wrapper);
+    mFlagQueue = new ArrayBlockingQueue<>(wrapper.asM3U8().getMaxTsQueueNum());
   }
 
   @Override protected IThreadState getStateManager(Looper looper) {
@@ -84,7 +85,8 @@ public class M3U8VodLoader extends BaseM3U8Loader {
 
               M3U8ThreadTask task = createThreadTask(cacheDir, tr);
               getTaskList().put(tr.threadId, task);
-              mFlagQueue.offer(startThreadTask(task));
+              mEntity.getM3U8Entity().setPeerIndex(index);
+              mFlagQueue.offer(startThreadTask(task, index));
             }
             if (mFlagQueue.size() > 0) {
               mCondition.await();
@@ -122,9 +124,9 @@ public class M3U8VodLoader extends BaseM3U8Loader {
    *
    * @return 线程唯一id标志
    */
-  private long startThreadTask(M3U8ThreadTask task) {
+  private long startThreadTask(M3U8ThreadTask task, int peerIndex) {
     ThreadTaskManager.getInstance().startThread(mTaskWrapper.getKey(), task);
-    return IdGenerator.getInstance().nextId();
+    return peerIndex;
   }
 
   /**
@@ -304,9 +306,6 @@ public class M3U8VodLoader extends BaseM3U8Loader {
       boolean isSuccess;
       if (mergeHandler != null) {
         isSuccess = mergeHandler.merge(mTaskWrapper.asM3U8().getKeyInfo(), partPath);
-        if (mergeHandler.getClass().isAnonymousClass()) {
-          mTaskWrapper.asM3U8().setMergeHandler(null);
-        }
       } else {
         isSuccess = FileUtil.mergeFile(mTaskRecord.filePath, partPath);
       }

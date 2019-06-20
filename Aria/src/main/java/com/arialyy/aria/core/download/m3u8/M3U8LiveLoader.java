@@ -173,9 +173,6 @@ public class M3U8LiveLoader extends BaseM3U8Loader {
     boolean isSuccess;
     if (mergeHandler != null) {
       isSuccess = mergeHandler.merge(mTaskWrapper.asM3U8().getKeyInfo(), partPath);
-      if (mergeHandler.getClass().isAnonymousClass()) {
-        mTaskWrapper.asM3U8().setMergeHandler(null);
-      }
     } else {
       isSuccess = FileUtil.mergeFile(mEntity.getFilePath(), partPath);
     }
