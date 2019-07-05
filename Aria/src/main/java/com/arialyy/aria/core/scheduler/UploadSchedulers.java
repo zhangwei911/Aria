@@ -15,7 +15,6 @@
  */
 package com.arialyy.aria.core.scheduler;
 
-import com.arialyy.aria.core.AriaManager;
 import com.arialyy.aria.core.queue.UploadTaskQueue;
 import com.arialyy.aria.core.upload.UTaskWrapper;
 import com.arialyy.aria.core.upload.UploadTask;
@@ -35,15 +34,11 @@ public class UploadSchedulers extends AbsSchedulers<UTaskWrapper, UploadTask, Up
 
   public static UploadSchedulers getInstance() {
     if (INSTANCE == null) {
-      synchronized (AriaManager.LOCK) {
+      synchronized (UploadSchedulers.class) {
         INSTANCE = new UploadSchedulers();
       }
     }
 
     return INSTANCE;
-  }
-
-  @Override String getProxySuffix() {
-    return "$$UploadListenerProxy";
   }
 }

@@ -13,21 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.arialyy.aria.core.command.group;
-
-import com.arialyy.aria.core.inf.AbsGroupTaskWrapper;
+package com.arialyy.aria.core.scheduler;
 
 /**
- * Created by AriaL on 2017/6/29. 任务组开始命令，该命令负责处理任务组子任务的开始\恢复等工作
+ * Created by Aria.Lao on 2019/6/26.
+ * m3u8切片事件回调类
  */
-class GroupStartCmd<T extends AbsGroupTaskWrapper> extends AbsGroupCmd<T> {
-  GroupStartCmd(T wrapper) {
-    super(wrapper);
+public class M3U8PeerTaskListener implements ISchedulerListener {
+
+  public void onPeerStart(final String m3u8Url, final String peerPath, final int peerIndex) {
   }
 
-  @Override public void executeCmd() {
-    if (checkTask()) {
-      tempTask.startSubTask(childUrl);
-    }
+  public void onPeerComplete(final String m3u8Url, final String peerPath, final int peerIndex) {
+  }
+
+  public void onPeerFail(final String m3u8Url, final String peerPath, final int peerIndex) {
+  }
+
+  @Override public void setListener(Object obj) {
+
   }
 }

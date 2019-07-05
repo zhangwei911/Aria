@@ -64,7 +64,7 @@ public final class BufferedRandomAccessFile extends RandomAccessFile {
      * c(f) the abstract contents of the file disk(f) the contents of f's
      * backing disk file closed(f) true iff the file is closed
      *
-     * "curr(f)" is an index in the closed interval [0, len(f)]. "c(f)" is a
+     * "curr(f)" is an peerIndex in the closed interval [0, len(f)]. "c(f)" is a
      * character sequence of length "len(f)". "c(f)" and "disk(f)" may differ if
      * "c(f)" contains unflushed writes not reflected in "disk(f)". The flush
      * operation has the effect of making "disk(f)" identical to "c(f)".

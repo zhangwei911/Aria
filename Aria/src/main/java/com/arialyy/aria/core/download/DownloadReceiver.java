@@ -18,16 +18,16 @@ package com.arialyy.aria.core.download;
 import android.support.annotation.CheckResult;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
-import com.arialyy.annotations.DownloadGroup;
+import com.arialyy.annotations.TaskEnum;
 import com.arialyy.aria.core.AriaManager;
+import com.arialyy.aria.core.command.CancelAllCmd;
 import com.arialyy.aria.core.command.ICmd;
-import com.arialyy.aria.core.command.normal.CancelAllCmd;
-import com.arialyy.aria.core.command.normal.NormalCmdFactory;
+import com.arialyy.aria.core.command.NormalCmdFactory;
 import com.arialyy.aria.core.common.ProxyHelper;
+import com.arialyy.aria.core.event.EventMsgUtil;
 import com.arialyy.aria.core.inf.AbsEntity;
 import com.arialyy.aria.core.inf.AbsReceiver;
 import com.arialyy.aria.core.inf.ReceiverType;
-import com.arialyy.aria.core.manager.TaskWrapperManager;
 import com.arialyy.aria.core.scheduler.DownloadGroupSchedulers;
 import com.arialyy.aria.core.scheduler.DownloadSchedulers;
 import com.arialyy.aria.orm.DbEntity;
@@ -173,9 +173,13 @@ public class DownloadReceiver extends AbsReceiver {
     if (set != null && !set.isEmpty()) {
       for (Integer type : set) {
         if (type == ProxyHelper.PROXY_TYPE_DOWNLOAD) {
-          DownloadSchedulers.getInstance().register(obj);
+          DownloadSchedulers.getInstance().register(obj, TaskEnum.DOWNLOAD);
         } else if (type == ProxyHelper.PROXY_TYPE_DOWNLOAD_GROUP) {
-          DownloadGroupSchedulers.getInstance().register(obj);
+          DownloadGroupSchedulers.getInstance().register(obj, TaskEnum.DOWNLOAD_GROUP);
+        } else if (type == ProxyHelper.PROXY_TYPE_M3U8_PEER) {
+          DownloadSchedulers.getInstance().register(obj, TaskEnum.M3U8_PEER);
+        } else if (type == ProxyHelper.PROXY_TYPE_DOWNLOAD_GROUP_SUB) {
+          DownloadGroupSchedulers.getInstance().register(obj, TaskEnum.DOWNLOAD_GROUP_SUB);
         }
       }
     } else {
@@ -417,11 +421,9 @@ public class DownloadReceiver extends AbsReceiver {
    * 停止所有正在下载的任务，并清空等待队列。
    */
   public void stopAllTask() {
-    AriaManager.getInstance(AriaManager.APP)
-        .setCmd(NormalCmdFactory.getInstance()
-            .createCmd(new DTaskWrapper(null), NormalCmdFactory.TASK_STOP_ALL,
-                ICmd.TASK_TYPE_DOWNLOAD))
-        .exe();
+    EventMsgUtil.getDefault().post(NormalCmdFactory.getInstance()
+        .createCmd(new DTaskWrapper(null), NormalCmdFactory.TASK_STOP_ALL,
+            ICmd.TASK_TYPE_DOWNLOAD));
   }
 
   /**
@@ -430,11 +432,9 @@ public class DownloadReceiver extends AbsReceiver {
    * 2.如果队列执行队列已经满了，则将所有任务添加到等待队列中
    */
   public void resumeAllTask() {
-    AriaManager.getInstance(AriaManager.APP)
-        .setCmd(NormalCmdFactory.getInstance()
-            .createCmd(new DTaskWrapper(null), NormalCmdFactory.TASK_RESUME_ALL,
-                ICmd.TASK_TYPE_DOWNLOAD))
-        .exe();
+    EventMsgUtil.getDefault().post(NormalCmdFactory.getInstance()
+        .createCmd(new DTaskWrapper(null), NormalCmdFactory.TASK_RESUME_ALL,
+            ICmd.TASK_TYPE_DOWNLOAD));
   }
 
   /**
@@ -449,7 +449,8 @@ public class DownloadReceiver extends AbsReceiver {
         (CancelAllCmd) CommonUtil.createNormalCmd(new DTaskWrapper(null),
             NormalCmdFactory.TASK_CANCEL_ALL, ICmd.TASK_TYPE_DOWNLOAD);
     cancelCmd.removeFile = removeFile;
-    ariaManager.setCmd(cancelCmd).exe();
+    EventMsgUtil.getDefault().post(cancelCmd);
+
     Set<String> keys = ariaManager.getReceiver().keySet();
     for (String key : keys) {
       ariaManager.getReceiver().remove(key);

@@ -1,4 +1,4 @@
-package com.arialyy.aria.core.command.normal;
+package com.arialyy.aria.core.command;
 
 import com.arialyy.aria.core.AriaManager;
 import com.arialyy.aria.core.download.DGTaskWrapper;

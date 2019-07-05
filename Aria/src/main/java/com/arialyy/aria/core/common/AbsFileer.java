@@ -49,6 +49,7 @@ public abstract class AbsFileer<ENTITY extends AbsNormalEntity, TASK_WRAPPER ext
   protected TaskRecord mRecord;
   private IThreadState mStateManager;
   private boolean isCancel = false, isStop = false;
+  private boolean isRuning = false;
 
   protected AbsFileer(IEventListener listener, TASK_WRAPPER wrapper) {
     mListener = listener;
@@ -63,11 +64,6 @@ public abstract class AbsFileer<ENTITY extends AbsNormalEntity, TASK_WRAPPER ext
    * 处理任务
    */
   protected abstract void handleTask();
-
-  /**
-   * 设置最大下载速度
-   */
-  protected abstract void setMaxSpeed(int maxSpeed);
 
   public String getKey() {
     return mTaskWrapper.getKey();
@@ -101,14 +97,15 @@ public abstract class AbsFileer<ENTITY extends AbsNormalEntity, TASK_WRAPPER ext
     if (isBreak()) {
       return;
     }
+    isRuning = true;
     resetState();
     mRecord = new RecordHandler(mTaskWrapper).getRecord();
     Looper.prepare();
     Looper looper = Looper.myLooper();
     mStateManager = getStateManager(looper);
     onPostPre();
-    startTimer();
     handleTask();
+    startTimer();
     Looper.loop();
   }
 
@@ -137,18 +134,24 @@ public abstract class AbsFileer<ENTITY extends AbsNormalEntity, TASK_WRAPPER ext
    * 启动进度获取定时器
    */
   private synchronized void startTimer() {
+    if (isBreak()) {
+      return;
+    }
     ALog.d(TAG, "启动定时器");
     mTimer = new ScheduledThreadPoolExecutor(1);
     mTimer.scheduleWithFixedDelay(new Runnable() {
       @Override public void run() {
         if (mStateManager.isComplete()
-            || mStateManager.isStop()
-            || mStateManager.isCancel()
             || mStateManager.isFail()
             || !isRunning()
             || isBreak()) {
+          ALog.d(TAG, "isComplete = " + mStateManager.isComplete()
+              + "; isFail = " + mStateManager.isFail()
+              + "; isRunning = " + isRunning()
+              + "; isBreak = " + isBreak());
           ThreadTaskManager.getInstance().removeTaskThread(mTaskWrapper.getKey());
           closeTimer();
+          onDestroy();
         } else if (mStateManager.getCurrentProgress() >= 0) {
           mListener.onProgress(mStateManager.getCurrentProgress());
         }
@@ -157,10 +160,14 @@ public abstract class AbsFileer<ENTITY extends AbsNormalEntity, TASK_WRAPPER ext
   }
 
   public synchronized void closeTimer() {
-    ALog.d(TAG, "关闭定时器");
+    ALog.i(TAG, "关闭定时器");
     if (mTimer != null && !mTimer.isShutdown()) {
       mTimer.shutdown();
     }
+  }
+
+  public void onDestroy() {
+    isRuning = false;
   }
 
   /**
@@ -184,13 +191,13 @@ public abstract class AbsFileer<ENTITY extends AbsNormalEntity, TASK_WRAPPER ext
    * 获取当前任务位置
    */
   public long getCurrentLocation() {
-    return mStateManager.getCurrentProgress();
+    return isRuning ? mStateManager.getCurrentProgress() : mEntity.getCurrentProgress();
   }
 
   public synchronized boolean isRunning() {
     boolean b = ThreadTaskManager.getInstance().taskIsRunning(mTaskWrapper.getKey());
     //ALog.d(TAG, "isRunning = " + b);
-    return b;
+    return b && isRuning;
   }
 
   final public synchronized void cancel() {
@@ -209,6 +216,8 @@ public abstract class AbsFileer<ENTITY extends AbsNormalEntity, TASK_WRAPPER ext
     }
     ThreadTaskManager.getInstance().removeTaskThread(mTaskWrapper.getKey());
     onPostCancel();
+    onDestroy();
+    mListener.onCancel();
   }
 
   /**
@@ -232,7 +241,6 @@ public abstract class AbsFileer<ENTITY extends AbsNormalEntity, TASK_WRAPPER ext
     closeTimer();
     isStop = true;
     onStop();
-    if (mStateManager.isComplete()) return;
     for (int i = 0; i < mTask.size(); i++) {
       AbsThreadTask task = mTask.valueAt(i);
       if (task != null && !task.isThreadComplete()) {
@@ -241,6 +249,8 @@ public abstract class AbsFileer<ENTITY extends AbsNormalEntity, TASK_WRAPPER ext
     }
     ThreadTaskManager.getInstance().removeTaskThread(mTaskWrapper.getKey());
     onPostStop();
+    onDestroy();
+    mListener.onStop(getCurrentLocation());
   }
 
   /**
@@ -283,7 +293,8 @@ public abstract class AbsFileer<ENTITY extends AbsNormalEntity, TASK_WRAPPER ext
    */
   public boolean isBreak() {
     if (isCancel || isStop) {
-      closeTimer();
+      //closeTimer();
+      ALog.d(TAG, "isCancel = " + isCancel + ", isStop = " + isStop);
       ALog.d(TAG, String.format("任务【%s】已停止或取消了", mEntity.getFileName()));
       return true;
     }

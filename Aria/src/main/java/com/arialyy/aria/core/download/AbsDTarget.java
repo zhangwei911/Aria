@@ -15,8 +15,8 @@
  */
 package com.arialyy.aria.core.download;
 
-import com.arialyy.aria.core.AriaManager;
-import com.arialyy.aria.core.command.normal.NormalCmdFactory;
+import com.arialyy.aria.core.command.NormalCmdFactory;
+import com.arialyy.aria.core.event.EventMsgUtil;
 import com.arialyy.aria.core.inf.AbsTarget;
 import com.arialyy.aria.util.CommonUtil;
 
@@ -43,11 +43,9 @@ abstract class AbsDTarget<TARGET extends AbsDTarget> extends AbsTarget<TARGET> {
    */
   public void setHighestPriority() {
     if (checkConfig()) {
-      AriaManager.getInstance(AriaManager.APP)
-          .setCmd(
-              CommonUtil.createNormalCmd(getTaskWrapper(), NormalCmdFactory.TASK_HIGHEST_PRIORITY,
-                  checkTaskType()))
-          .exe();
+      EventMsgUtil.getDefault()
+          .post(CommonUtil.createNormalCmd(getTaskWrapper(), NormalCmdFactory.TASK_HIGHEST_PRIORITY,
+              checkTaskType()));
     }
   }
 

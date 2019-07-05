@@ -17,6 +17,7 @@ package com.arialyy.compiler;
 
 import com.arialyy.annotations.Download;
 import com.arialyy.annotations.DownloadGroup;
+import com.arialyy.annotations.M3U8;
 import com.arialyy.annotations.Upload;
 import javax.lang.model.element.ExecutableElement;
 
@@ -25,6 +26,26 @@ import javax.lang.model.element.ExecutableElement;
  * 获取注解value工具
  */
 final class ValuesUtil {
+
+  /**
+   * 获取m3u8切片注解信息
+   */
+  static String[] getM3U8PeerValues(ExecutableElement method, int annotationType) {
+    String[] values = null;
+    switch (annotationType) {
+      case ProxyConstance.TASK_START:
+        values = method.getAnnotation(M3U8.onPeerStart.class).value();
+        break;
+      case ProxyConstance.TASK_COMPLETE:
+        values = method.getAnnotation(M3U8.onPeerComplete.class).value();
+        break;
+      case ProxyConstance.TASK_FAIL:
+        values = method.getAnnotation(M3U8.onPeerFail.class).value();
+        break;
+    }
+    return values;
+  }
+
   /**
    * 获取下载任务组子任务的的注解数据
    */

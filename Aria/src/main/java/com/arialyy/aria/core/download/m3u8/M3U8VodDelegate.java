@@ -17,8 +17,11 @@ package com.arialyy.aria.core.download.m3u8;
 
 import com.arialyy.aria.core.common.BaseDelegate;
 import com.arialyy.aria.core.download.DTaskWrapper;
+import com.arialyy.aria.core.event.EventMsgUtil;
+import com.arialyy.aria.core.event.PeerIndexEvent;
 import com.arialyy.aria.core.inf.AbsTarget;
 import com.arialyy.aria.core.inf.AbsTaskWrapper;
+import com.arialyy.aria.core.queue.DownloadTaskQueue;
 import com.arialyy.aria.util.ALog;
 
 /**
@@ -59,5 +62,49 @@ public class M3U8VodDelegate<TARGET extends AbsTarget> extends BaseDelegate<TARG
     }
     mTaskWrapper.asM3U8().setMaxTsQueueNum(num);
     return this;
+  }
+
+  /**
+   * 启动任务时初始化索引位置
+   *
+   * 优先下载指定索引后的切片
+   * 如果指定的切片索引大于切片总数，则此操作无效
+   * 如果指定的切片索引小于当前正在下载的切片索引，并且指定索引和当前索引区间内有未下载的切片，则优先下载该区间的切片；否则此操作无效
+   * 如果指定索引后的切片已经全部下载完成，但是索引前有未下载的切片，间会自动下载未下载的切片
+   *
+   * @param index 指定的切片位置
+   */
+  public M3U8VodDelegate setPeerIndex(int index) {
+    if (index < 1) {
+      ALog.e(TAG, "切片索引不能小于1");
+      return this;
+    }
+    mTaskWrapper.asM3U8().setJumpIndex(index);
+    return this;
+  }
+
+  /**
+   * 任务执行中，跳转索引位置
+   * 优先下载指定索引后的切片
+   * 如果指定的切片索引大于切片总数，则此操作无效
+   * 如果指定的切片索引小于当前正在下载的切片索引，并且指定索引和当前索引区间内有未下载的切片，则优先下载该区间的切片；否则此操作无效
+   * 如果指定索引后的切片已经全部下载完成，但是索引前有未下载的切片，间会自动下载未下载的切片
+   *
+   * @param index 指定的切片位置
+   */
+  public void jumPeerIndex(int index) {
+    if (index < 1) {
+      ALog.e(TAG, "切片索引不能小于1");
+      return;
+    }
+
+    if (!DownloadTaskQueue.getInstance().taskIsRunning(mTaskWrapper.getKey())) {
+      ALog.e(TAG,
+          String.format("任务【%s】没有运行，如果你希望在启动任务时初始化索引位置，请调用setPeerIndex(xxx）",
+              mTaskWrapper.getKey()));
+      return;
+    }
+
+    EventMsgUtil.getDefault().post(new PeerIndexEvent(index));
   }
 }

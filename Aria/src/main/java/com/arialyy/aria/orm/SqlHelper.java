@@ -98,7 +98,7 @@ final class SqlHelper extends SQLiteOpenHelper {
         handle314AriaUpdate(db);
       } else if (oldVersion < 45) {
         handle360AriaUpdate(db);
-      } else if (oldVersion < 49) {
+      } else if (oldVersion < 51) {
         handle365Update(db);
       } else {
         handleDbUpdate(db, null, null);
@@ -223,6 +223,8 @@ final class SqlHelper extends SQLiteOpenHelper {
           }
           //删除中介表
           mDelegate.dropTable(db, tableName + "_temp");
+        }else {
+          mDelegate.createTable(db, clazz);
         }
       }
       db.setTransactionSuccessful();

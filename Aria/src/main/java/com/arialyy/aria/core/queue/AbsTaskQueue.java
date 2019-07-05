@@ -23,14 +23,13 @@ import com.arialyy.aria.core.inf.AbsTaskWrapper;
 import com.arialyy.aria.core.inf.IEntity;
 import com.arialyy.aria.core.inf.TaskSchedulerType;
 import com.arialyy.aria.core.manager.TaskWrapperManager;
+import com.arialyy.aria.core.manager.ThreadTaskManager;
 import com.arialyy.aria.core.queue.pool.BaseCachePool;
 import com.arialyy.aria.core.queue.pool.BaseExecutePool;
 import com.arialyy.aria.core.queue.pool.DownloadSharePool;
 import com.arialyy.aria.core.queue.pool.UploadSharePool;
 import com.arialyy.aria.core.upload.UploadTask;
 import com.arialyy.aria.util.ALog;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * Created by lyy on 2017/2/23. 任务队列
@@ -62,7 +61,11 @@ public abstract class AbsTaskQueue<TASK extends AbsTask, TASK_WRAPPER extends Ab
   abstract int getQueueType();
 
   @Override public boolean taskIsRunning(String key) {
-    return mExecutePool.getTask(key) != null;
+    TASK task = mExecutePool.getTask(key);
+    if (task == null && ThreadTaskManager.getInstance().taskIsRunning(key)) {
+      ThreadTaskManager.getInstance().removeTaskThread(key);
+    }
+    return task != null && task.isRunning() && taskExists(key);
   }
 
   /**
@@ -71,7 +74,7 @@ public abstract class AbsTaskQueue<TASK extends AbsTask, TASK_WRAPPER extends Ab
    * @param task 需要恢复的任务
    */
   @Override public void resumeTask(TASK task) {
-    if (task == null){
+    if (task == null) {
       ALog.w(TAG, "resume task fail, task is null");
       return;
     }
@@ -107,18 +110,6 @@ public abstract class AbsTaskQueue<TASK extends AbsTask, TASK_WRAPPER extends Ab
     }
 
     mCachePool.clear();
-  }
-
-  /**
-   * 最大下载速度
-   */
-  public void setMaxSpeed(int maxSpeed) {
-    Map<String, TASK> tasks = mExecutePool.getAllTask();
-    Set<String> keys = tasks.keySet();
-    for (String key : keys) {
-      TASK task = tasks.get(key);
-      task.setMaxSpeed(maxSpeed);
-    }
   }
 
   /**
@@ -208,7 +199,7 @@ public abstract class AbsTaskQueue<TASK extends AbsTask, TASK_WRAPPER extends Ab
    * @param task {@link DownloadTask}、{@link UploadTask}、{@link DownloadGroupTask}
    */
   void addTask(TASK task) {
-    if (task == null){
+    if (task == null) {
       ALog.w(TAG, "add task fail, task is null");
       return;
     }
@@ -218,7 +209,7 @@ public abstract class AbsTaskQueue<TASK extends AbsTask, TASK_WRAPPER extends Ab
   }
 
   @Override public void startTask(TASK task) {
-    if (task == null){
+    if (task == null) {
       ALog.w(TAG, "start fail, task is null");
     }
     if (mExecutePool.taskExits(task.getKey())) {
@@ -253,6 +244,12 @@ public abstract class AbsTaskQueue<TASK extends AbsTask, TASK_WRAPPER extends Ab
       case IEntity.STATE_OTHER:
       case IEntity.STATE_FAIL:
         ALog.w(TAG, String.format("停止任务【%s】失败，原因：已停止", task.getTaskName()));
+        if (taskIsRunning(task.getKey())) {
+          removeTaskFormQueue(task.getKey());
+          if (ThreadTaskManager.getInstance().taskIsRunning(task.getKey())) {
+            ThreadTaskManager.getInstance().removeTaskThread(task.getKey());
+          }
+        }
         break;
       case IEntity.STATE_CANCEL:
         ALog.w(TAG, String.format("停止任务【%s】失败，原因：任务已删除", task.getTaskName()));

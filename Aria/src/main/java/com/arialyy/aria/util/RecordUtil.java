@@ -22,13 +22,11 @@ import com.arialyy.aria.core.common.TaskRecord;
 import com.arialyy.aria.core.common.ThreadRecord;
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.download.DownloadGroupEntity;
-import com.arialyy.aria.core.download.m3u8.BaseM3U8Loader;
 import com.arialyy.aria.core.inf.AbsEntity;
 import com.arialyy.aria.core.inf.AbsNormalEntity;
 import com.arialyy.aria.core.upload.UploadEntity;
 import com.arialyy.aria.orm.DbEntity;
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -154,7 +152,7 @@ public class RecordUtil {
         if (!targetFile.isDirectory()) {
           cacheDir = targetFile.getParent() + "/." + targetFile.getName();
         }
-        removeTsCache(record, cacheDir);
+        removeTsCache(cacheDir);
       } else if (record.isBlock) { // 删除分块文件
         removeBlockFile(record);
       }
@@ -216,7 +214,7 @@ public class RecordUtil {
           cacheDir = String.format("%s/.%s_%s", targetFile.getParent(), targetFile.getName(),
               record.bandWidth);
         }
-        removeTsCache(record, cacheDir);
+        removeTsCache(cacheDir);
       } else if (record.isBlock) { // 删除分块文件
         removeBlockFile(record);
       }
@@ -289,15 +287,12 @@ public class RecordUtil {
   /**
    * 删除ts文件
    */
-  private static void removeTsCache(TaskRecord record, String cacheDir) {
+  private static void removeTsCache(String cacheDir) {
 
     if (!TextUtils.isEmpty(cacheDir)) {
-      List<String> partPath = new ArrayList<>();
-      for (ThreadRecord tr : record.threadRecords) {
-        partPath.add(BaseM3U8Loader.getTsFilePath(cacheDir, tr.threadId));
-      }
-      for (String pp : partPath) {
-        File f = new File(pp);
+
+      File[] files = new File(cacheDir).listFiles();
+      for (File f : files) {
         if (f.exists()) {
           f.delete();
         }

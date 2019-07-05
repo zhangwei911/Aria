@@ -12,6 +12,7 @@
       android:allowBackup="true"
       android:icon="@mipmap/ic_launcher"
       android:label="@string/app_name"
+      android:networkSecurityConfig="@xml/network_security_config"
       android:supportsRtl="true"
       android:theme="@style/AppTheme.NoActionBar"
       tools:ignore="GoogleAppIndexingWarning">
@@ -47,8 +48,8 @@
         android:screenOrientation="landscape"
         android:theme="@style/FullScreen"
         android:windowSoftInputMode="stateHidden|adjustResize"/>
-    <activity android:name=".core.download.m3u8.M3U8VodDownloadActivity"/>
-    <activity android:name=".core.download.m3u8.M3U8LiveDownloadActivity"/>
+    <activity android:name=".core.download.m3u8.M3U8VodDLoadActivity"/>
+    <activity android:name=".core.download.m3u8.M3U8LiveDLoadActivity"/>
 
     <service android:name=".core.download.service_download.DownloadService"/>
 

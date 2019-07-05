@@ -14,20 +14,23 @@
  * limitations under the License.
  */
 
-package com.arialyy.aria.core.command.normal;
+package com.arialyy.aria.core.command;
 
 import com.arialyy.aria.core.inf.AbsTask;
 import com.arialyy.aria.core.inf.AbsTaskWrapper;
-import com.arialyy.aria.core.inf.IEntity;
-import com.arialyy.aria.util.ALog;
 
 /**
- * Created by lyy on 2016/8/22.
- * 添加任务的命令
+ * Created by lyy on 2016/9/20.
+ * 取消命令
  */
-class AddCmd<T extends AbsTaskWrapper> extends AbsNormalCmd<T> {
+final public class CancelCmd<T extends AbsTaskWrapper> extends AbsNormalCmd<T> {
+  /**
+   * removeFile {@code true} 删除已经下载完成的任务，不仅删除下载记录，还会删除已经下载完成的文件，{@code false}
+   * 如果文件已经下载完成，只删除下载记录
+   */
+  public boolean removeFile = false;
 
-  AddCmd(T entity, int taskType) {
+  CancelCmd(T entity, int taskType) {
     super(entity, taskType);
   }
 
@@ -35,11 +38,11 @@ class AddCmd<T extends AbsTaskWrapper> extends AbsNormalCmd<T> {
     if (!canExeCmd) return;
     AbsTask task = getTask();
     if (task == null) {
-      mTaskWrapper.getEntity().setState(IEntity.STATE_WAIT);
-      createTask();
-      sendWaitState();
-    } else {
-      ALog.w(TAG, "添加命令执行失败，【该任务已经存在】");
+      task = createTask();
+    }
+    if (task != null) {
+      mTaskWrapper.setRemoveFile(removeFile);
+      removeTask();
     }
   }
 }

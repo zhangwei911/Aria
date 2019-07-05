@@ -24,26 +24,23 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.Network;
 import android.net.NetworkCapabilities;
-import android.net.NetworkInfo;
 import android.net.NetworkRequest;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.support.annotation.RequiresApi;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.widget.PopupWindow;
-import com.arialyy.aria.BuildConfig;
-import com.arialyy.aria.core.command.ICmd;
+import com.arialyy.aria.core.command.CommandManager;
 import com.arialyy.aria.core.common.QueueMod;
 import com.arialyy.aria.core.common.RecordHandler;
 import com.arialyy.aria.core.config.AppConfig;
+import com.arialyy.aria.core.config.Configuration;
 import com.arialyy.aria.core.config.DGroupConfig;
 import com.arialyy.aria.core.config.DownloadConfig;
 import com.arialyy.aria.core.config.UploadConfig;
 import com.arialyy.aria.core.config.XMLReader;
-import com.arialyy.aria.core.config.Configuration;
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.download.DownloadGroupEntity;
 import com.arialyy.aria.core.download.DownloadReceiver;
@@ -75,7 +72,7 @@ import org.xml.sax.SAXException;
  */
 @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH) public class AriaManager {
   private static final String TAG = "AriaManager";
-  public static final Object LOCK = new Object();
+  private static final Object LOCK = new Object();
   public static final String DOWNLOAD_TEMP_DIR = "/Aria/temp/download/";
   public static final String UPLOAD_TEMP_DIR = "/Aria/temp/upload/";
   /**
@@ -90,7 +87,6 @@ import org.xml.sax.SAXException;
    */
   private Map<String, List<String>> mSubClass = new ConcurrentHashMap<>();
   public static Context APP;
-  private List<ICmd> mCommands = new ArrayList<>();
   private DownloadConfig mDConfig;
   private UploadConfig mUConfig;
   private AppConfig mAConfig;
@@ -110,7 +106,9 @@ import org.xml.sax.SAXException;
   public static AriaManager getInstance(Context context) {
     if (INSTANCE == null) {
       synchronized (LOCK) {
-        INSTANCE = new AriaManager(context);
+        if (INSTANCE == null) {
+          INSTANCE = new AriaManager(context);
+        }
       }
     }
     return INSTANCE;
@@ -182,6 +180,7 @@ import org.xml.sax.SAXException;
       Thread.setDefaultUncaughtExceptionHandler(new AriaCrashHandler());
     }
     mAConfig.setLogLevel(mAConfig.getLogLevel());
+    CommandManager.init();
   }
 
   /**
@@ -289,34 +288,6 @@ import org.xml.sax.SAXException;
    */
   public DGroupConfig getDGroupConfig() {
     return mDGConfig;
-  }
-
-  /**
-   * 设置命令
-   */
-  public AriaManager setCmd(ICmd command) {
-    mCommands.add(command);
-    return this;
-  }
-
-  /**
-   * 设置一组命令
-   */
-  public <T extends ICmd> AriaManager setCmds(List<T> commands) {
-    if (commands != null && commands.size() > 0) {
-      mCommands.addAll(commands);
-    }
-    return this;
-  }
-
-  /**
-   * 执行所有设置的命令
-   */
-  public synchronized void exe() {
-    for (ICmd command : mCommands) {
-      command.executeCmd();
-    }
-    mCommands.clear();
   }
 
   /**

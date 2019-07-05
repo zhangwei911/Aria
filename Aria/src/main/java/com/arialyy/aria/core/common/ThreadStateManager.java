@@ -16,7 +16,6 @@
 package com.arialyy.aria.core.common;
 
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import com.arialyy.aria.core.inf.IEventListener;
@@ -62,15 +61,12 @@ public class ThreadStateManager implements IThreadState {
       case STATE_STOP:
         mStopNum++;
         if (isStop()) {
-          mListener.onStop(mProgress);
           quitLooper();
         }
         break;
       case STATE_CANCEL:
         mCancelNum++;
         if (isCancel()) {
-          ALog.d(TAG, "icCancel");
-          mListener.onCancel();
           quitLooper();
         }
         break;
@@ -133,7 +129,6 @@ public class ThreadStateManager implements IThreadState {
   /**
    * 所有子线程是否都已经停止
    */
-  @Override
   public boolean isStop() {
     //ALog.d(TAG,
     //    String.format("isStop; stopNum: %s, cancelNum: %s, failNum: %s, completeNum: %s", mStopNum,
@@ -168,7 +163,6 @@ public class ThreadStateManager implements IThreadState {
   /**
    * 所有子线程是否都已经取消
    */
-  @Override
   public boolean isCancel() {
     //ALog.d(TAG, String.format("isCancel; stopNum: %s, cancelNum: %s, failNum: %s, completeNum: %s",
     //    mStopNum,

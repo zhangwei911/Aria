@@ -19,7 +19,6 @@ package com.arialyy.aria.core.scheduler;
 import android.os.Handler;
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.download.DownloadGroupEntity;
-import com.arialyy.aria.core.inf.AbsTask;
 import com.arialyy.aria.core.inf.ITask;
 import com.arialyy.aria.core.upload.UploadEntity;
 
@@ -64,9 +63,27 @@ public interface ISchedulers extends Handler.Callback {
   String TASK_PERCENT = "ARIA_TASK_PERCENT";
 
   /**
-   * 为组合任务任务
+   * M3U8地址
+   */
+  String DATA_M3U8_URL = "DATA_M3U8_URL";
+  /**
+   * 当前下载完成的切片地址
+   */
+  String DATA_M3U8_PEER_PATH = "DATA_M3U8_PEER_PATH";
+  /**
+   * 当前下载完成的切片索引
+   */
+  String DATA_M3U8_PEER_INDEX = "DATA_M3U8_PEER_INDEX";
+
+  /**
+   * 组合任务任务标志
    */
   int IS_SUB_TASK = 0xd1;
+
+  /**
+   * m3u8切片任务标志
+   */
+  int IS_M3U8_PEER = 0xd2;
 
   /**
    * 任务不支持断点
@@ -148,4 +165,17 @@ public interface ISchedulers extends Handler.Callback {
    * 组合任务子任务完成
    */
   int SUB_COMPLETE = 0xa7;
+
+  /**
+   * M3U8切片开始下载
+   */
+  int M3U8_PEER_START = 0xb1;
+  /**
+   * M3U8切片下载完成
+   */
+  int M3U8_PEER_COMPLETE = 0xb2;
+  /**
+   * M3U8切片下载失败
+   */
+  int M3U8_PEER_FAIL = 0xb3;
 }

@@ -19,60 +19,13 @@ import com.arialyy.aria.core.inf.AbsNormalEntity;
 import com.arialyy.aria.core.inf.ITask;
 
 /**
- * Created by Aria.Lao on 2017/6/7.
+ * Created by Aria.Lao on 2019/6/26.
+ * 子任务事件回调类
  */
-public class AbsSchedulerListener<TASK extends ITask, SUB_ENTITY extends AbsNormalEntity>
-    implements ISchedulerListener<TASK> {
-
-  @Override public void onWait(TASK task) {
-
-  }
-
-  @Override public void onPre(TASK task) {
-
-  }
-
-  @Override public void onTaskPre(TASK task) {
-
-  }
-
-  @Override public void onTaskResume(TASK task) {
-
-  }
-
-  @Override public void onTaskStart(TASK task) {
-
-  }
-
-  @Override public void onTaskStop(TASK task) {
-
-  }
-
-  @Override public void onTaskCancel(TASK task) {
-
-  }
-
-  @Override public void onTaskFail(TASK task) {
-
-  }
-
-  @Override public void onTaskFail(TASK task, Exception e) {
-
-  }
-
-  @Override public void onTaskComplete(TASK task) {
-
-  }
-
-  @Override public void onTaskRunning(TASK task) {
-
-  }
+public class SubTaskListener<TASK extends ITask, SUB_ENTITY extends AbsNormalEntity>
+    implements ISchedulerListener {
 
   public void onNoSupportBreakPoint(TASK task) {
-
-  }
-
-  public void setListener(Object obj) {
 
   }
 
@@ -106,6 +59,10 @@ public class AbsSchedulerListener<TASK extends ITask, SUB_ENTITY extends AbsNorm
   }
 
   public void onSubTaskRunning(TASK task, SUB_ENTITY subTask) {
+
+  }
+
+  @Override public void setListener(Object obj) {
 
   }
 }

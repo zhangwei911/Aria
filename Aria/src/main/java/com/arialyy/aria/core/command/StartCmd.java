@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.arialyy.aria.core.command.normal;
+package com.arialyy.aria.core.command;
 
 import com.arialyy.aria.core.AriaManager;
 import com.arialyy.aria.core.common.QueueMod;
@@ -41,7 +41,7 @@ import java.util.List;
 /**
  * Created by lyy on 2016/8/22. 开始命令 队列模型{@link QueueMod#NOW}、{@link QueueMod#WAIT}
  */
-class StartCmd<T extends AbsTaskWrapper> extends AbsNormalCmd<T> {
+final class StartCmd<T extends AbsTaskWrapper> extends AbsNormalCmd<T> {
 
   StartCmd(T entity, int taskType) {
     super(entity, taskType);
@@ -90,8 +90,7 @@ class StartCmd<T extends AbsTaskWrapper> extends AbsNormalCmd<T> {
       }
     } else {
       //任务没执行并且执行队列中没有该任务，才认为任务没有运行中
-      if (!task.isRunning() && !mQueue.taskIsRunning(task.getKey()) && !mQueue.taskExists(
-          task.getKey())) {
+      if (!mQueue.taskIsRunning(task.getKey())) {
         resumeTask();
       } else {
         ALog.w(TAG, String.format("任务【%s】已经在运行", task.getTaskName()));
@@ -166,7 +165,7 @@ class StartCmd<T extends AbsTaskWrapper> extends AbsNormalCmd<T> {
     private void handleTask(List<AbsTaskWrapper> waitList) {
       for (AbsTaskWrapper te : waitList) {
         if (te.getEntity() == null) continue;
-        AbsTask task = getTask(te.getEntity());
+        AbsTask task = getTask(te.getKey());
         if (task != null) continue;
         if (te instanceof DTaskWrapper) {
           if (te.getRequestType() == AbsTaskWrapper.D_FTP

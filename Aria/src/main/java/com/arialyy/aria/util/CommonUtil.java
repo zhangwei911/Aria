@@ -26,11 +26,11 @@ import android.text.TextUtils;
 import android.util.Base64;
 import com.arialyy.aria.core.AriaManager;
 import com.arialyy.aria.core.FtpUrlEntity;
+import com.arialyy.aria.core.command.AbsGroupCmd;
+import com.arialyy.aria.core.command.AbsNormalCmd;
+import com.arialyy.aria.core.command.GroupCmdFactory;
 import com.arialyy.aria.core.command.ICmd;
-import com.arialyy.aria.core.command.group.AbsGroupCmd;
-import com.arialyy.aria.core.command.group.GroupCmdFactory;
-import com.arialyy.aria.core.command.normal.AbsNormalCmd;
-import com.arialyy.aria.core.command.normal.NormalCmdFactory;
+import com.arialyy.aria.core.command.NormalCmdFactory;
 import com.arialyy.aria.core.inf.AbsGroupTaskWrapper;
 import com.arialyy.aria.core.inf.AbsTaskWrapper;
 import dalvik.system.DexFile;
@@ -70,6 +70,22 @@ import java.util.regex.Pattern;
 public class CommonUtil {
   private static final String TAG = "CommonUtil";
   public static final String SERVER_CHARSET = "ISO-8859-1";
+  private static long lastClickTime;
+
+  /**
+   * 是否是快速点击，500ms内快速点击无效
+   *
+   * @return true 快速点击
+   */
+  public static boolean isFastDoubleClick() {
+    long time = System.currentTimeMillis();
+    long timeD = time - lastClickTime;
+    if (0 < timeD && timeD < 500) {
+      return true;
+    }
+    lastClickTime = time;
+    return false;
+  }
 
   /**
    * 将字符串转换为Ftp服务器默认的ISO-8859-1编码
@@ -82,8 +98,6 @@ public class CommonUtil {
       throws UnsupportedEncodingException {
     return new String(str.getBytes(charSet), SERVER_CHARSET);
   }
-
-
 
   /**
    * 删除文件
@@ -968,7 +982,7 @@ public class CommonUtil {
     }
     try {
       if (file.createNewFile()) {
-        ALog.d(TAG, "创建文件成功:" + file.getAbsolutePath());
+        //ALog.d(TAG, "创建文件成功:" + file.getAbsolutePath());
         return true;
       }
     } catch (IOException e) {

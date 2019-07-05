@@ -41,7 +41,7 @@ import java.util.List;
  *
  * </pre>
  */
-public class IFtpUploadInterceptor {
+public interface IFtpUploadInterceptor {
 
   /**
    * 处理拦截事件
@@ -49,7 +49,5 @@ public class IFtpUploadInterceptor {
    * @param entity 上传信息实体
    * @param fileList ftp服务器端remotePath下的文件列表
    */
-  public FtpInterceptHandler onIntercept(UploadEntity entity, List<String> fileList) {
-    return null;
-  }
+  FtpInterceptHandler onIntercept(UploadEntity entity, List<String> fileList);
 }

@@ -15,8 +15,6 @@
  */
 package com.arialyy.aria.core.queue.pool;
 
-import com.arialyy.aria.core.AriaManager;
-
 /**
  * Created by Aria.Lao on 2017/7/17.
  * 下载任务池，该池子为简单任务和任务组共用
@@ -34,7 +32,7 @@ public class DownloadSharePool {
 
   public static DownloadSharePool getInstance() {
     if (INSTANCE == null) {
-      synchronized (AriaManager.LOCK) {
+      synchronized (DownloadSharePool.class) {
         INSTANCE = new DownloadSharePool();
       }
     }

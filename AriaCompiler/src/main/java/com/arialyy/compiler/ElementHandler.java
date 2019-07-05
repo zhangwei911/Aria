@@ -17,6 +17,8 @@ package com.arialyy.compiler;
 
 import com.arialyy.annotations.Download;
 import com.arialyy.annotations.DownloadGroup;
+import com.arialyy.annotations.M3U8;
+import com.arialyy.annotations.TaskEnum;
 import com.arialyy.annotations.Upload;
 import java.io.IOException;
 import javax.annotation.processing.Filer;
@@ -113,7 +115,7 @@ class ElementHandler {
   }
 
   /**
-   * 处理搜索到的上传注解F
+   * 处理搜索到的上传注解
    */
   void handleUpload(RoundEnvironment roundEnv) {
     mPbUtil.saveMethod(TaskEnum.UPLOAD, roundEnv, Upload.onWait.class, ProxyConstance.WAIT);
@@ -137,6 +139,18 @@ class ElementHandler {
   }
 
   /**
+   * 处理搜索到到m3u8切片注解
+   */
+  void handleM3U8(RoundEnvironment roundEnv) {
+    mPbUtil.saveMethod(TaskEnum.M3U8_PEER, roundEnv, M3U8.onPeerStart.class,
+        ProxyConstance.TASK_START);
+    mPbUtil.saveMethod(TaskEnum.M3U8_PEER, roundEnv, M3U8.onPeerComplete.class,
+        ProxyConstance.TASK_COMPLETE);
+    mPbUtil.saveMethod(TaskEnum.M3U8_PEER, roundEnv, M3U8.onPeerFail.class,
+        ProxyConstance.TASK_FAIL);
+  }
+
+  /**
    * 在build文件夹中生成代理文件
    */
   void createProxyFile() {
@@ -150,6 +164,5 @@ class ElementHandler {
 
   void clean() {
     mPbUtil.getMethodParams().clear();
-    mPbUtil.getListenerClass().clear();
   }
 }

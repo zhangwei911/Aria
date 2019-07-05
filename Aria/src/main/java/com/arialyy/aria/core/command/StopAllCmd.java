@@ -1,4 +1,4 @@
-package com.arialyy.aria.core.command.normal;
+package com.arialyy.aria.core.command;
 
 import com.arialyy.aria.core.inf.AbsTaskWrapper;
 

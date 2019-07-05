@@ -31,8 +31,6 @@ import java.lang.annotation.Target;
  *       }
  *   </code>
  * </pre>
- * {@literal @}Download.onPre("http://www.baidu.com")，如果你的注解中增加了url描述，
- * 则表示，所有下载任务中，只有下载地址为"http://www.baidu.com"的任务才能回调该注解的方法。
  */
 @Retention(RetentionPolicy.CLASS) @Target(ElementType.METHOD) public @interface Download {
 

@@ -15,6 +15,7 @@
  */
 package com.arialyy.compiler;
 
+import com.arialyy.annotations.TaskEnum;
 import java.lang.annotation.Annotation;
 import java.util.HashMap;
 import java.util.Map;
@@ -44,7 +45,7 @@ class ProxyClassParam {
   /**
    * 子任务泛型参数
    */
-  TaskEnum subTaskEnum = TaskEnum.NORMAL_ENTITY;
+  EntityInfo subTaskEnum = EntityInfo.NORMAL;
 
   Set<TaskEnum> taskEnums;
   Map<String, Set<String>> keyMappings = new HashMap<>();

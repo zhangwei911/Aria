@@ -21,6 +21,8 @@ import com.arialyy.aria.core.common.RecordHandler;
 import com.arialyy.aria.core.common.SubThreadConfig;
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.download.DTaskWrapper;
+import com.arialyy.aria.core.event.Event;
+import com.arialyy.aria.core.event.SpeedEvent;
 import com.arialyy.aria.core.inf.AbsTaskWrapper;
 import com.arialyy.aria.core.inf.IDownloadListener;
 import com.arialyy.aria.exception.BaseException;
@@ -93,6 +95,11 @@ public class Downloader extends NormalFileer<DownloadEntity, DTaskWrapper> {
         ALog.d(TAG, String.format("更新tempFile文件名%s", b ? "成功" : "失败"));
       }
     }
+  }
+
+  @Event
+  public void setMaxSpeed(SpeedEvent event) {
+    setMaxSpeed(event.speed);
   }
 
   @Override protected void onPostPre() {

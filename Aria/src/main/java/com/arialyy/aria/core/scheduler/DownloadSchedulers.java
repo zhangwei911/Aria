@@ -16,10 +16,9 @@
 
 package com.arialyy.aria.core.scheduler;
 
-import com.arialyy.aria.core.AriaManager;
 import com.arialyy.aria.core.download.DTaskWrapper;
-import com.arialyy.aria.core.queue.DownloadTaskQueue;
 import com.arialyy.aria.core.download.DownloadTask;
+import com.arialyy.aria.core.queue.DownloadTaskQueue;
 
 /**
  * Created by lyy on 2016/8/16.
@@ -38,14 +37,10 @@ public class DownloadSchedulers
 
   public static DownloadSchedulers getInstance() {
     if (INSTANCE == null) {
-      synchronized (AriaManager.LOCK) {
+      synchronized (DownloadSchedulers.class) {
         INSTANCE = new DownloadSchedulers();
       }
     }
     return INSTANCE;
-  }
-
-  @Override String getProxySuffix() {
-    return "$$DownloadListenerProxy";
   }
 }

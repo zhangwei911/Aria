@@ -13,13 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.arialyy.aria.core.command.group;
+package com.arialyy.aria.core.command;
 
-import com.arialyy.aria.core.command.AbsCmd;
 import com.arialyy.aria.core.download.DGTaskWrapper;
 import com.arialyy.aria.core.inf.AbsGroupTask;
-import com.arialyy.aria.core.inf.AbsTask;
 import com.arialyy.aria.core.inf.AbsGroupTaskWrapper;
+import com.arialyy.aria.core.inf.AbsTask;
 import com.arialyy.aria.core.queue.DownloadGroupTaskQueue;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;

@@ -17,8 +17,8 @@ package com.arialyy.aria.core.scheduler;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.CountDownTimer;
 import android.os.Message;
+import com.arialyy.annotations.TaskEnum;
 import com.arialyy.aria.core.AriaManager;
 import com.arialyy.aria.core.download.DownloadGroupTask;
 import com.arialyy.aria.core.download.DownloadTask;
@@ -51,14 +51,7 @@ abstract class AbsSchedulers<TASK_ENTITY extends AbsTaskWrapper, TASK extends IT
 
   protected QUEUE mQueue;
 
-  private Map<String, AbsSchedulerListener<TASK, AbsNormalEntity>> mObservers =
-      new ConcurrentHashMap<>();
-
-  /**
-   * 设置代理类后缀名
-   */
-  abstract String getProxySuffix();
-
+  private Map<String, Map<TaskEnum, ISchedulerListener>> mObservers = new ConcurrentHashMap<>();
   private AriaManager manager;
 
   AbsSchedulers() {
@@ -69,19 +62,37 @@ abstract class AbsSchedulers<TASK_ENTITY extends AbsTaskWrapper, TASK extends IT
    * 将当前类注册到Aria
    *
    * @param obj 观察者类
+   * @param taskEnum 任务类型 {@link TaskEnum}
    */
-  public void register(Object obj) {
+  public void register(Object obj, TaskEnum taskEnum) {
     String targetName = obj.getClass().getName();
-    AbsSchedulerListener<TASK, AbsNormalEntity> listener = mObservers.get(getKey(obj));
-    if (listener == null) {
-      listener = createListener(targetName);
+    Map<TaskEnum, ISchedulerListener> listeners = mObservers.get(getKey(obj));
+
+    if (listeners == null) {
+      listeners = new ConcurrentHashMap<>();
+      mObservers.put(getKey(obj), listeners);
+    }
+    String proxyClassName = targetName + taskEnum.proxySuffix;
+
+    if (!hasProxyListener(listeners, taskEnum)) {
+      ISchedulerListener listener = createListener(proxyClassName);
       if (listener != null) {
         listener.setListener(obj);
-        mObservers.put(getKey(obj), listener);
+        listeners.put(taskEnum, listener);
       } else {
-        ALog.e(TAG, "注册错误，没有【" + targetName + "】观察者");
+        ALog.e(TAG, "注册错误，没有【" + proxyClassName + "】观察者");
       }
     }
+  }
+
+  /**
+   * 检查当前类是否已经注册了对应的代理
+   *
+   * @param taskEnum 代理类类型
+   * @return true，已注册代理类，false，没有注册代理类
+   */
+  private boolean hasProxyListener(Map<TaskEnum, ISchedulerListener> listeners, TaskEnum taskEnum) {
+    return !listeners.isEmpty() && listeners.get(taskEnum) != null;
   }
 
   /**
@@ -93,9 +104,10 @@ abstract class AbsSchedulers<TASK_ENTITY extends AbsTaskWrapper, TASK extends IT
     if (!mObservers.containsKey(getKey(obj))) {
       return;
     }
-    for (Iterator<Map.Entry<String, AbsSchedulerListener<TASK, AbsNormalEntity>>> iter =
+    for (Iterator<Map.Entry<String, Map<TaskEnum, ISchedulerListener>>> iter =
         mObservers.entrySet().iterator(); iter.hasNext(); ) {
-      Map.Entry<String, AbsSchedulerListener<TASK, AbsNormalEntity>> entry = iter.next();
+      Map.Entry<String, Map<TaskEnum, ISchedulerListener>> entry = iter.next();
+
       if (entry.getKey().equals(getKey(obj))) {
         iter.remove();
       }
@@ -109,15 +121,15 @@ abstract class AbsSchedulers<TASK_ENTITY extends AbsTaskWrapper, TASK extends IT
   /**
    * 创建代理类
    *
-   * @param targetName 通过观察者创建对应的Aria事件代理
+   * @param proxyClassName 代理类类名
    */
-  private AbsSchedulerListener<TASK, AbsNormalEntity> createListener(String targetName) {
-    AbsSchedulerListener<TASK, AbsNormalEntity> listener = null;
+  private ISchedulerListener createListener(String proxyClassName) {
+    ISchedulerListener listener = null;
     try {
-      Class clazz = Class.forName(targetName + getProxySuffix());
-      listener = (AbsSchedulerListener<TASK, AbsNormalEntity>) clazz.newInstance();
+      Class clazz = Class.forName(proxyClassName);
+      listener = (ISchedulerListener) clazz.newInstance();
     } catch (ClassNotFoundException e) {
-      ALog.e(TAG, targetName + "，没有Aria的Download或Upload注解方法");
+      ALog.e(TAG, e.getMessage());
     } catch (InstantiationException e) {
       ALog.e(TAG, e.getMessage());
     } catch (IllegalAccessException e) {
@@ -131,12 +143,64 @@ abstract class AbsSchedulers<TASK_ENTITY extends AbsTaskWrapper, TASK extends IT
       return handleSubEvent(msg);
     }
 
+    if (msg.arg1 == IS_M3U8_PEER) {
+      return handlePeerEvent(msg);
+    }
+
     TASK task = (TASK) msg.obj;
     if (task == null) {
       ALog.e(TAG, "请传入下载任务");
       return true;
     }
     handleNormalEvent(task, msg.what);
+    return true;
+  }
+
+  /**
+   * 处理m3u8切片任务事件
+   */
+  private boolean handlePeerEvent(Message msg) {
+    Bundle data = msg.getData();
+    if (mObservers.size() > 0) {
+      Set<String> keys = mObservers.keySet();
+      for (String key : keys) {
+        Map<TaskEnum, ISchedulerListener> listeners = mObservers.get(key);
+        if (listeners == null || listeners.isEmpty()) {
+          continue;
+        }
+        M3U8PeerTaskListener listener =
+            (M3U8PeerTaskListener) listeners.get(TaskEnum.M3U8_PEER);
+        if (listener == null) {
+          continue;
+        }
+
+        switch (msg.what) {
+          case M3U8_PEER_START:
+            listener.onPeerStart(data.getString(DATA_M3U8_URL),
+                data.getString(DATA_M3U8_PEER_PATH),
+                data.getInt(DATA_M3U8_PEER_INDEX));
+            break;
+          case M3U8_PEER_COMPLETE:
+            listener.onPeerComplete(data.getString(DATA_M3U8_URL),
+                data.getString(DATA_M3U8_PEER_PATH),
+                data.getInt(DATA_M3U8_PEER_INDEX));
+            break;
+          case M3U8_PEER_FAIL:
+            listener.onPeerFail(data.getString(DATA_M3U8_URL),
+                data.getString(DATA_M3U8_PEER_PATH),
+                data.getInt(DATA_M3U8_PEER_INDEX));
+            break;
+        }
+      }
+    }
+
+    boolean canSend = manager.getAppConfig().isUseBroadcast();
+    if (canSend) {
+      Intent intent = new Intent(ISchedulers.ARIA_TASK_INFO_ACTION);
+      intent.putExtras(data);
+      AriaManager.APP.sendBroadcast(intent);
+    }
+
     return true;
   }
 
@@ -148,7 +212,15 @@ abstract class AbsSchedulers<TASK_ENTITY extends AbsTaskWrapper, TASK extends IT
     if (mObservers.size() > 0) {
       Set<String> keys = mObservers.keySet();
       for (String key : keys) {
-        AbsSchedulerListener<TASK, AbsNormalEntity> listener = mObservers.get(key);
+        Map<TaskEnum, ISchedulerListener> listeners = mObservers.get(key);
+        if (listeners == null || listeners.isEmpty()) {
+          continue;
+        }
+        SubTaskListener<TASK, AbsNormalEntity> listener =
+            (SubTaskListener<TASK, AbsNormalEntity>) listeners.get(TaskEnum.DOWNLOAD_GROUP_SUB);
+        if (listener == null) {
+          continue;
+        }
         switch (msg.what) {
           case SUB_PRE:
             listener.onSubTaskPre((TASK) params.groupTask, params.entity);
@@ -228,7 +300,7 @@ abstract class AbsSchedulers<TASK_ENTITY extends AbsTaskWrapper, TASK extends IT
       }
     }
     if (what != FAIL) {
-      callback(what, task);
+      normalTaskCallback(what, task);
     }
   }
 
@@ -237,18 +309,33 @@ abstract class AbsSchedulers<TASK_ENTITY extends AbsTaskWrapper, TASK extends IT
    *
    * @param state 状态
    */
-  private void callback(int state, TASK task) {
+  private void normalTaskCallback(int state, TASK task) {
     sendNormalBroadcast(state, task);
     if (mObservers.size() > 0) {
       Set<String> keys = mObservers.keySet();
       for (String key : keys) {
-        callback(state, task, mObservers.get(key));
+        Map<TaskEnum, ISchedulerListener> listeners = mObservers.get(key);
+        if (listeners == null || listeners.isEmpty()) {
+          continue;
+        }
+        NormalTaskListener<TASK> listener = null;
+        if (mObservers.get(key) != null) {
+          if (task instanceof DownloadTask) {
+            listener = (NormalTaskListener<TASK>) listeners.get(TaskEnum.DOWNLOAD);
+          } else if (task instanceof DownloadGroupTask) {
+            listener = (NormalTaskListener<TASK>) listeners.get(TaskEnum.DOWNLOAD_GROUP);
+          } else if (task instanceof UploadTask) {
+            listener = (NormalTaskListener<TASK>) listeners.get(TaskEnum.UPLOAD);
+          }
+        }
+        if (listener != null) {
+          normalTaskCallback(state, task, listener);
+        }
       }
     }
   }
 
-  private void callback(int state, TASK task,
-      AbsSchedulerListener<TASK, AbsNormalEntity> listener) {
+  private void normalTaskCallback(int state, TASK task, NormalTaskListener<TASK> listener) {
     if (listener != null) {
       if (task == null) {
         ALog.e(TAG, "TASK 为null，回调失败");
@@ -341,7 +428,7 @@ abstract class AbsSchedulers<TASK_ENTITY extends AbsTaskWrapper, TASK extends IT
     if (!task.isNeedRetry() || task.isStop() || task.isCancel()) {
       mQueue.removeTaskFormQueue(task.getKey());
       startNextTask(task);
-      callback(FAIL, task);
+      normalTaskCallback(FAIL, task);
       return;
     }
     long interval = task.getTaskWrapper().getConfig().getReTryInterval();
@@ -354,7 +441,7 @@ abstract class AbsSchedulers<TASK_ENTITY extends AbsTaskWrapper, TASK extends IT
       mQueue.removeTaskFormQueue(task.getKey());
       startNextTask(task);
       TaskWrapperManager.getInstance().removeTaskWrapper(task.getKey());
-      callback(FAIL, task);
+      normalTaskCallback(FAIL, task);
       return;
     }
 

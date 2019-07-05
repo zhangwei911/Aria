@@ -18,11 +18,13 @@ package com.arialyy.aria.core.upload;
 import android.support.annotation.CheckResult;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
+import com.arialyy.annotations.TaskEnum;
 import com.arialyy.aria.core.AriaManager;
+import com.arialyy.aria.core.command.CancelAllCmd;
 import com.arialyy.aria.core.command.ICmd;
-import com.arialyy.aria.core.command.normal.CancelAllCmd;
-import com.arialyy.aria.core.command.normal.NormalCmdFactory;
+import com.arialyy.aria.core.command.NormalCmdFactory;
 import com.arialyy.aria.core.common.ProxyHelper;
+import com.arialyy.aria.core.event.EventMsgUtil;
 import com.arialyy.aria.core.inf.AbsReceiver;
 import com.arialyy.aria.core.inf.ReceiverType;
 import com.arialyy.aria.core.scheduler.UploadSchedulers;
@@ -164,11 +166,9 @@ public class UploadReceiver extends AbsReceiver {
    * 停止所有正在下载的任务，并清空等待队列。
    */
   public void stopAllTask() {
-    AriaManager.getInstance(AriaManager.APP)
-        .setCmd(NormalCmdFactory.getInstance()
-            .createCmd(new UTaskWrapper(null), NormalCmdFactory.TASK_STOP_ALL,
-                ICmd.TASK_TYPE_UPLOAD))
-        .exe();
+    EventMsgUtil.getDefault().post(NormalCmdFactory.getInstance()
+        .createCmd(new UTaskWrapper(null), NormalCmdFactory.TASK_STOP_ALL,
+            ICmd.TASK_TYPE_UPLOAD));
   }
 
   /**
@@ -183,7 +183,8 @@ public class UploadReceiver extends AbsReceiver {
         (CancelAllCmd) CommonUtil.createNormalCmd(new UTaskWrapper(null),
             NormalCmdFactory.TASK_CANCEL_ALL, ICmd.TASK_TYPE_UPLOAD);
     cancelCmd.removeFile = removeFile;
-    am.setCmd(cancelCmd).exe();
+
+    EventMsgUtil.getDefault().post(cancelCmd);
     Set<String> keys = am.getReceiver().keySet();
     for (String key : keys) {
       am.getReceiver().remove(key);
@@ -207,7 +208,7 @@ public class UploadReceiver extends AbsReceiver {
     if (set != null && !set.isEmpty()) {
       for (Integer type : set) {
         if (type == ProxyHelper.PROXY_TYPE_UPLOAD) {
-          UploadSchedulers.getInstance().register(obj);
+          UploadSchedulers.getInstance().register(obj, TaskEnum.UPLOAD);
         }
       }
     } else {

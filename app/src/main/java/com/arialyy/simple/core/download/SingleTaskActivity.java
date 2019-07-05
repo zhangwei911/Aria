@@ -31,6 +31,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.arialyy.annotations.Download;
+import com.arialyy.annotations.M3U8;
 import com.arialyy.aria.core.Aria;
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.download.DownloadTarget;

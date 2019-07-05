@@ -104,7 +104,7 @@ final class FileListAdapter extends AbsRVAdapter<FileListEntity, FileListAdapter
     for (String key : keys) {
       if (key.equals(url)) {
         int index = mPositions.get(key);
-        //Log.d(TAG, "index ==> " + index);
+        //Log.d(TAG, "peerIndex ==> " + peerIndex);
         return index;
       }
     }

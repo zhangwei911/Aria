@@ -36,7 +36,7 @@ public class DownloadTaskQueue extends AbsTaskQueue<DownloadTask, DTaskWrapper> 
 
   public static DownloadTaskQueue getInstance() {
     if (INSTANCE == null) {
-      synchronized (AriaManager.LOCK) {
+      synchronized (DownloadTaskQueue.class) {
         INSTANCE = new DownloadTaskQueue();
       }
     }

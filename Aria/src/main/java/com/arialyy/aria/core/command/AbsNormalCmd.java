@@ -14,17 +14,13 @@
  * limitations under the License.
  */
 
-package com.arialyy.aria.core.command.normal;
+package com.arialyy.aria.core.command;
 
-import com.arialyy.aria.core.command.AbsCmd;
-import com.arialyy.aria.core.command.ICmd;
 import com.arialyy.aria.core.download.DGTaskWrapper;
 import com.arialyy.aria.core.download.DTaskWrapper;
-import com.arialyy.aria.core.inf.AbsEntity;
 import com.arialyy.aria.core.inf.AbsTask;
 import com.arialyy.aria.core.inf.AbsTaskWrapper;
 import com.arialyy.aria.core.inf.IEntity;
-import com.arialyy.aria.core.manager.TaskWrapperManager;
 import com.arialyy.aria.core.queue.DownloadGroupTaskQueue;
 import com.arialyy.aria.core.queue.DownloadTaskQueue;
 import com.arialyy.aria.core.queue.UploadTaskQueue;
@@ -130,10 +126,10 @@ public abstract class AbsNormalCmd<T extends AbsTaskWrapper> extends AbsCmd<T> {
   /**
    * 删除任务
    */
-  void removeTask(AbsTaskWrapper taskEntity) {
-    AbsTask tempTask = getTask(taskEntity.getEntity());
+  void removeTask(AbsTaskWrapper wrapper) {
+    AbsTask tempTask = getTask(wrapper.getKey());
     if (tempTask == null) {
-      tempTask = createTask(taskEntity);
+      tempTask = createTask(wrapper);
     }
     mQueue.cancelTask(tempTask);
   }
@@ -143,7 +139,7 @@ public abstract class AbsNormalCmd<T extends AbsTaskWrapper> extends AbsCmd<T> {
    */
   void startTask() {
     AbsTask task = getTask();
-    if (task == null){
+    if (task == null) {
       task = createTask();
     }
     mQueue.startTask(task);
@@ -154,7 +150,7 @@ public abstract class AbsNormalCmd<T extends AbsTaskWrapper> extends AbsCmd<T> {
    */
   void resumeTask() {
     AbsTask task = getTask();
-    if (task == null){
+    if (task == null) {
       task = createTask();
     }
     mQueue.resumeTask(task);
@@ -183,8 +179,8 @@ public abstract class AbsNormalCmd<T extends AbsTaskWrapper> extends AbsCmd<T> {
    *
    * @return 执行任务
    */
-  AbsTask getTask(AbsEntity entity) {
-    return mQueue.getTask(entity.getKey());
+  AbsTask getTask(String key) {
+    return mQueue.getTask(key);
   }
 
   /**
@@ -199,11 +195,11 @@ public abstract class AbsNormalCmd<T extends AbsTaskWrapper> extends AbsCmd<T> {
   /**
    * 创建指定实体的任务
    *
-   * @param taskEntity 特定的任务实体
+   * @param wrapper 特定的任务实体
    * @return 创建的任务
    */
-  AbsTask createTask(AbsTaskWrapper taskEntity) {
+  AbsTask createTask(AbsTaskWrapper wrapper) {
 
-    return mQueue.createTask(taskEntity);
+    return mQueue.createTask(wrapper);
   }
 }

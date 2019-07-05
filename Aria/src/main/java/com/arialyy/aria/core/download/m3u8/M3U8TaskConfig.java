@@ -15,6 +15,7 @@
  */
 package com.arialyy.aria.core.download.m3u8;
 
+import java.lang.ref.WeakReference;
 import java.util.List;
 
 /**
@@ -30,7 +31,7 @@ public class M3U8TaskConfig {
   /**
    * #EXTINF 标签信息处理器
    */
-  private IVodTsUrlConverter vodUrlConverter;
+  private WeakReference<IVodTsUrlConverter> vodUrlConverter;
 
   /**
    * 缓存目录
@@ -45,7 +46,7 @@ public class M3U8TaskConfig {
   /**
    * 合并处理器
    */
-  private ITsMergeHandler mergeHandler;
+  private WeakReference<ITsMergeHandler> mergeHandler;
 
   /**
    * 已完成的ts分片数量
@@ -65,7 +66,7 @@ public class M3U8TaskConfig {
   /**
    * 码率url转换器
    */
-  private IBandWidthUrlConverter bandWidthUrlConverter;
+  private WeakReference<IBandWidthUrlConverter> bandWidthUrlConverter;
 
   /**
    * 码率地址
@@ -80,7 +81,7 @@ public class M3U8TaskConfig {
   /**
    * 直播下载，ts url转换器
    */
-  private ILiveTsUrlConverter liveTsUrlConverter;
+  private WeakReference<ILiveTsUrlConverter> liveTsUrlConverter;
 
   /**
    * 直播的m3u8文件更新间隔
@@ -91,6 +92,19 @@ public class M3U8TaskConfig {
    * 同时下载的分片数量
    */
   private int maxTsQueueNum = 4;
+
+  /**
+   * 指定的索引位置
+   */
+  private int jumpIndex;
+
+  public int getJumpIndex() {
+    return jumpIndex;
+  }
+
+  public void setJumpIndex(int jumpIndex) {
+    this.jumpIndex = jumpIndex;
+  }
 
   public int getMaxTsQueueNum() {
     return maxTsQueueNum;
@@ -109,12 +123,11 @@ public class M3U8TaskConfig {
   }
 
   public ILiveTsUrlConverter getLiveTsUrlConverter() {
-    return liveTsUrlConverter;
+    return liveTsUrlConverter.get();
   }
 
-  public void setLiveTsUrlConverter(
-      ILiveTsUrlConverter liveTsUrlConverter) {
-    this.liveTsUrlConverter = liveTsUrlConverter;
+  public void setLiveTsUrlConverter(ILiveTsUrlConverter liveTsUrlConverter) {
+    this.liveTsUrlConverter = new WeakReference<>(liveTsUrlConverter);
   }
 
   public M3U8KeyInfo getKeyInfo() {
@@ -134,12 +147,11 @@ public class M3U8TaskConfig {
   }
 
   public IBandWidthUrlConverter getBandWidthUrlConverter() {
-    return bandWidthUrlConverter;
+    return bandWidthUrlConverter.get();
   }
 
-  public void setBandWidthUrlConverter(
-      IBandWidthUrlConverter bandWidthUrlConverter) {
-    this.bandWidthUrlConverter = bandWidthUrlConverter;
+  public void setBandWidthUrlConverter(IBandWidthUrlConverter bandWidthUrlConverter) {
+    this.bandWidthUrlConverter = new WeakReference<>(bandWidthUrlConverter);
   }
 
   public int getBandWidth() {
@@ -175,19 +187,19 @@ public class M3U8TaskConfig {
   }
 
   public ITsMergeHandler getMergeHandler() {
-    return mergeHandler;
+    return mergeHandler.get();
   }
 
   public void setMergeHandler(ITsMergeHandler mergeHandler) {
-    this.mergeHandler = mergeHandler;
+    this.mergeHandler = new WeakReference<>(mergeHandler);
   }
 
   public IVodTsUrlConverter getVodUrlConverter() {
-    return vodUrlConverter;
+    return vodUrlConverter.get();
   }
 
   public void setVodUrlConverter(IVodTsUrlConverter vodUrlConverter) {
-    this.vodUrlConverter = vodUrlConverter;
+    this.vodUrlConverter = new WeakReference<>(vodUrlConverter);
   }
 
   public List<String> getUrls() {

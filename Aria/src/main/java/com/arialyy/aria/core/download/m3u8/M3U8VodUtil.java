@@ -20,10 +20,11 @@ import com.arialyy.aria.core.common.CompleteInfo;
 import com.arialyy.aria.core.common.IUtil;
 import com.arialyy.aria.core.common.OnFileInfoCallback;
 import com.arialyy.aria.core.download.DTaskWrapper;
+import com.arialyy.aria.core.download.M3U8Listener;
 import com.arialyy.aria.core.inf.AbsEntity;
-import com.arialyy.aria.core.inf.IDownloadListener;
 import com.arialyy.aria.exception.BaseException;
 import com.arialyy.aria.exception.M3U8Exception;
+import com.arialyy.aria.util.ALog;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -40,12 +41,12 @@ public class M3U8VodUtil implements IUtil {
   private final String TAG = "M3U8DownloadUtil";
 
   private DTaskWrapper mWrapper;
-  private IDownloadListener mListener;
+  private M3U8Listener mListener;
   private boolean isStop = false, isCancel = false;
   private List<String> mUrls = new ArrayList<>();
   private M3U8VodLoader mLoader;
 
-  public M3U8VodUtil(DTaskWrapper wrapper, IDownloadListener listener) {
+  public M3U8VodUtil(DTaskWrapper wrapper, M3U8Listener listener) {
     mWrapper = wrapper;
     mListener = listener;
     mLoader = new M3U8VodLoader(mListener, mWrapper);
@@ -85,10 +86,6 @@ public class M3U8VodUtil implements IUtil {
     getVodInfo();
   }
 
-  @Override public void setMaxSpeed(int speed) {
-    mLoader.setMaxSpeed(speed);
-  }
-
   /**
    * 获取点播文件信息
    */
@@ -114,7 +111,13 @@ public class M3U8VodUtil implements IUtil {
           return;
         }
         mWrapper.asM3U8().setUrls(mUrls);
-        mLoader.start();
+        if (isStop) {
+          mListener.onStop(mWrapper.getEntity().getCurrentProgress());
+        } else if (isCancel) {
+          mListener.onCancel();
+        } else {
+          mLoader.start();
+        }
       }
 
       @Override public void onFail(AbsEntity entity, BaseException e, boolean needRetry) {
@@ -129,5 +132,6 @@ public class M3U8VodUtil implements IUtil {
       return;
     }
     mListener.onFail(needRetry, e);
+    mLoader.onDestroy();
   }
 }

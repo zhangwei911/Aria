@@ -129,10 +129,6 @@ public class M3U8LiveUtil implements IUtil {
     }
   }
 
-  @Override public void setMaxSpeed(int speed) {
-    mLoader.setMaxSpeed(speed);
-  }
-
   /**
    * 获取直播文件信息
    */

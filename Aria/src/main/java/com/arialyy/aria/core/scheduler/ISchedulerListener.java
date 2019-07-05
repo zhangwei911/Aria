@@ -15,69 +15,10 @@
  */
 package com.arialyy.aria.core.scheduler;
 
-import com.arialyy.aria.core.inf.ITask;
-
 /**
  * Target处理任务监听
  */
-public interface ISchedulerListener<TASK extends ITask> {
+public interface ISchedulerListener {
 
-  /**
-   * 队列已经满了，继续创建任务，将会回调该方法
-   */
-  void onWait(TASK task);
-
-  /**
-   * 预处理，有时有些地址链接比较慢，这时可以先在这个地方出来一些界面上的UI，如按钮的状态。
-   * 在这个回调中，任务是获取不到文件大小，下载速度等参数
-   */
-  void onPre(TASK task);
-
-  /**
-   * 任务预加载完成
-   */
-  void onTaskPre(TASK task);
-
-  /**
-   * 任务恢复下载
-   */
-  void onTaskResume(TASK task);
-
-  /**
-   * 任务开始
-   */
-  void onTaskStart(TASK task);
-
-  /**
-   * 任务停止
-   */
-  void onTaskStop(TASK task);
-
-  /**
-   * 任务取消
-   */
-  void onTaskCancel(TASK task);
-
-  /**
-   * 任务失败
-   *
-   * @deprecated {@link #onTaskFail(ITask, Exception)}
-   */
-  @Deprecated
-  void onTaskFail(TASK task);
-
-  /**
-   * 任务失败
-   */
-  void onTaskFail(TASK task, Exception e);
-
-  /**
-   * 任务完成
-   */
-  void onTaskComplete(TASK task);
-
-  /**
-   * 任务执行中
-   */
-  void onTaskRunning(TASK task);
+  void setListener(Object obj);
 }

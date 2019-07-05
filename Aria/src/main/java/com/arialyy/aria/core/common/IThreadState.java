@@ -31,13 +31,6 @@ public interface IThreadState extends Handler.Callback {
   String KEY_ERROR_INFO = "KEY_ERROR_INFO";
 
   /**
-   * 任务是否已经停止
-   *
-   * @return true 任务已停止
-   */
-  boolean isStop();
-
-  /**
    * 任务是否已经失败
    *
    * @return true 任务已失败
@@ -50,13 +43,6 @@ public interface IThreadState extends Handler.Callback {
    * @return true 任务已完成
    */
   boolean isComplete();
-
-  /**
-   * 任务是否已经取消
-   *
-   * @return true 任务已取消
-   */
-  boolean isCancel();
 
   /**
    * 获取当前任务进度

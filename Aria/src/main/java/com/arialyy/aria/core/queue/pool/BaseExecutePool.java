@@ -31,6 +31,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class BaseExecutePool<TASK extends AbsTask> implements IPool<TASK> {
   private final String TAG = "BaseExecutePool";
+  private static final Object LOCK = new Object();
   final long TIME_OUT = 1000;
   ArrayBlockingQueue<TASK> mExecuteQueue;
   Map<String, TASK> mExecuteMap;
@@ -59,7 +60,7 @@ public class BaseExecutePool<TASK extends AbsTask> implements IPool<TASK> {
   }
 
   @Override public boolean putTask(TASK task) {
-    synchronized (AriaManager.LOCK) {
+    synchronized (LOCK) {
       if (task == null) {
         ALog.e(TAG, "任务不能为空！！");
         return false;
@@ -86,7 +87,7 @@ public class BaseExecutePool<TASK extends AbsTask> implements IPool<TASK> {
    * @param maxNum 下载数
    */
   public void setMaxNum(int maxNum) {
-    synchronized (AriaManager.LOCK) {
+    synchronized (LOCK) {
       try {
         ArrayBlockingQueue<TASK> temp = new ArrayBlockingQueue<>(maxNum);
         TASK task;
@@ -107,7 +108,7 @@ public class BaseExecutePool<TASK extends AbsTask> implements IPool<TASK> {
    * @param newTask 新任务
    */
   boolean putNewTask(TASK newTask) {
-    synchronized (AriaManager.LOCK) {
+    synchronized (LOCK) {
       String url = newTask.getKey();
       boolean s = mExecuteQueue.offer(newTask);
       ALog.d(TAG, "任务【" + newTask.getTaskName() + "】进入执行队列" + (s ? "成功" : "失败"));
@@ -122,7 +123,7 @@ public class BaseExecutePool<TASK extends AbsTask> implements IPool<TASK> {
    * 队列满时，将移除下载队列中的第一个任务
    */
   boolean pollFirstTask() {
-    synchronized (AriaManager.LOCK) {
+    synchronized (LOCK) {
       try {
         TASK oldTask = mExecuteQueue.poll(TIME_OUT, TimeUnit.MICROSECONDS);
         if (oldTask == null) {
@@ -141,7 +142,7 @@ public class BaseExecutePool<TASK extends AbsTask> implements IPool<TASK> {
   }
 
   @Override public TASK pollTask() {
-    synchronized (AriaManager.LOCK) {
+    synchronized (LOCK) {
       try {
         TASK task;
         task = mExecuteQueue.poll(TIME_OUT, TimeUnit.MICROSECONDS);
@@ -158,7 +159,7 @@ public class BaseExecutePool<TASK extends AbsTask> implements IPool<TASK> {
   }
 
   @Override public TASK getTask(String key) {
-    synchronized (AriaManager.LOCK) {
+    synchronized (LOCK) {
       if (TextUtils.isEmpty(key)) {
         ALog.e(TAG, "key 为null");
         return null;
@@ -172,7 +173,7 @@ public class BaseExecutePool<TASK extends AbsTask> implements IPool<TASK> {
   }
 
   @Override public boolean removeTask(TASK task) {
-    synchronized (AriaManager.LOCK) {
+    synchronized (LOCK) {
       if (task == null) {
         ALog.e(TAG, "任务不能为空");
         return false;
@@ -183,7 +184,7 @@ public class BaseExecutePool<TASK extends AbsTask> implements IPool<TASK> {
   }
 
   @Override public boolean removeTask(String key) {
-    synchronized (AriaManager.LOCK) {
+    synchronized (LOCK) {
       if (TextUtils.isEmpty(key)) {
         ALog.e(TAG, "key 为null");
         return false;

@@ -97,15 +97,12 @@ public class SimpleDownloadUtil implements IUtil {
     new Thread(createInfoThread()).start();
   }
 
-  @Override public void setMaxSpeed(int speed) {
-    mDownloader.setMaxSpeed(speed);
-  }
-
   private void failDownload(BaseException e, boolean needRetry) {
     if (isStop || isCancel) {
       return;
     }
     mListener.onFail(needRetry, e);
+    mDownloader.onDestroy();
   }
 
   /**

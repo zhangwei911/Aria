@@ -19,12 +19,11 @@ import android.os.Handler;
 import android.os.Looper;
 import com.arialyy.aria.core.common.IUtil;
 import com.arialyy.aria.core.config.Configuration;
-import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.download.DGTaskWrapper;
+import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.inf.IEntity;
 import com.arialyy.aria.util.ALog;
 import java.util.Map;
-import java.util.Set;
 import java.util.WeakHashMap;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -218,16 +217,6 @@ public abstract class AbsGroupUtil implements IUtil, Runnable {
 
   protected void onStart() {
 
-  }
-
-  @Override public void setMaxSpeed(int speed) {
-    Set<String> keys = mSubQueue.getExec().keySet();
-    for (String key : keys) {
-      SubDownloadLoader dt = mSubQueue.getExec().get(key);
-      if (dt != null) {
-        dt.setMaxSpeed(speed);
-      }
-    }
   }
 
   synchronized void closeTimer() {

@@ -16,7 +16,6 @@
 
 package com.arialyy.aria.core.queue;
 
-import com.arialyy.aria.core.AriaManager;
 import com.arialyy.aria.core.download.DGTaskWrapper;
 import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.download.DownloadGroupTask;
@@ -43,7 +42,7 @@ class TaskFactory {
 
   public static TaskFactory getInstance() {
     if (INSTANCE == null) {
-      synchronized (AriaManager.LOCK) {
+      synchronized (TaskFactory.class) {
         INSTANCE = new TaskFactory();
       }
     }

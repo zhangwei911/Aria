@@ -17,6 +17,7 @@ package com.arialyy.compiler;
 
 import com.arialyy.annotations.Download;
 import com.arialyy.annotations.DownloadGroup;
+import com.arialyy.annotations.M3U8;
 import com.arialyy.annotations.Upload;
 import com.google.auto.service.AutoService;
 import java.util.LinkedHashSet;
@@ -85,6 +86,10 @@ import javax.lang.model.element.TypeElement;
     annotataions.add(Upload.onTaskRunning.class.getCanonicalName());
     annotataions.add(Upload.onTaskStart.class.getCanonicalName());
     annotataions.add(Upload.onTaskStop.class.getCanonicalName());
+    // M3U8切片事件
+    annotataions.add(M3U8.onPeerStart.class.getCanonicalName());
+    annotataions.add(M3U8.onPeerComplete.class.getCanonicalName());
+    annotataions.add(M3U8.onPeerFail.class.getCanonicalName());
     return annotataions;
   }
 
@@ -99,6 +104,7 @@ import javax.lang.model.element.TypeElement;
     mHandler.handleDownloadGroup(roundEnv);
     mHandler.handleDownloadGroupSub(roundEnv);
     mHandler.handleUpload(roundEnv);
+    mHandler.handleM3U8(roundEnv);
     mHandler.createProxyFile();
     return true;
   }

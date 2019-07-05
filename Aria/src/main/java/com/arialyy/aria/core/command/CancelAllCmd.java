@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.arialyy.aria.core.command.normal;
+package com.arialyy.aria.core.command;
 
 import com.arialyy.aria.core.download.DGTaskWrapper;
 import com.arialyy.aria.core.download.DTaskWrapper;
@@ -35,7 +35,7 @@ import java.util.List;
  * Created by AriaL on 2017/6/27.
  * 删除所有任务，并且删除所有回掉
  */
-public class CancelAllCmd<T extends AbsTaskWrapper> extends AbsNormalCmd<T> {
+final public class CancelAllCmd<T extends AbsTaskWrapper> extends AbsNormalCmd<T> {
   /**
    * removeFile {@code true} 删除已经下载完成的任务，不仅删除下载记录，还会删除已经下载完成的文件，{@code false}
    * 如果文件已经下载完成，只删除下载记录
@@ -64,7 +64,8 @@ public class CancelAllCmd<T extends AbsTaskWrapper> extends AbsNormalCmd<T> {
         DbEntity.findDatas(DownloadEntity.class, "isGroupChild=?", "false");
     if (entities != null && !entities.isEmpty()) {
       for (DownloadEntity entity : entities) {
-        remove(TaskWrapperManager.getInstance().getHttpTaskWrapper(DTaskWrapper.class, entity.getKey()));
+        remove(TaskWrapperManager.getInstance()
+            .getHttpTaskWrapper(DTaskWrapper.class, entity.getKey()));
       }
     }
   }
@@ -78,7 +79,8 @@ public class CancelAllCmd<T extends AbsTaskWrapper> extends AbsNormalCmd<T> {
     if (entities != null && !entities.isEmpty()) {
       for (DownloadGroupEntity entity : entities) {
         remove(
-            TaskWrapperManager.getInstance().getDGTaskWrapper(DGTaskWrapper.class, entity.getUrls()));
+            TaskWrapperManager.getInstance()
+                .getDGTaskWrapper(DGTaskWrapper.class, entity.getUrls()));
       }
     }
   }
@@ -91,13 +93,14 @@ public class CancelAllCmd<T extends AbsTaskWrapper> extends AbsNormalCmd<T> {
         DbEntity.findDatas(UploadEntity.class, "isGroupChild=?", "false");
     if (entities != null && !entities.isEmpty()) {
       for (UploadEntity entity : entities) {
-        remove(TaskWrapperManager.getInstance().getHttpTaskWrapper(UTaskWrapper.class, entity.getKey()));
+        remove(TaskWrapperManager.getInstance()
+            .getHttpTaskWrapper(UTaskWrapper.class, entity.getKey()));
       }
     }
   }
 
   private void remove(AbsTaskWrapper te) {
-    if (te == null){
+    if (te == null) {
       ALog.w(TAG, "取消任务失败，任务为空");
       return;
     }

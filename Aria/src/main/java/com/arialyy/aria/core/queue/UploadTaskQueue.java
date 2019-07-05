@@ -31,7 +31,7 @@ public class UploadTaskQueue extends AbsTaskQueue<UploadTask, UTaskWrapper> {
 
   public static UploadTaskQueue getInstance() {
     if (INSTANCE == null) {
-      synchronized (AriaManager.LOCK) {
+      synchronized (UploadTaskQueue.class) {
         INSTANCE = new UploadTaskQueue();
       }
     }

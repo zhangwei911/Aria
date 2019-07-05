@@ -34,7 +34,7 @@ class DownloadExecutePool<TASK extends AbsTask> extends BaseExecutePool<TASK> {
   }
 
   @Override public boolean putTask(TASK task) {
-    synchronized (AriaManager.LOCK) {
+    synchronized (DownloadExecutePool.class) {
       if (task == null) {
         ALog.e(TAG, "任务不能为空！！");
         return false;

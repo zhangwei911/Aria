@@ -23,8 +23,8 @@ import com.arialyy.aria.core.common.SubThreadConfig;
 import com.arialyy.aria.core.common.ftp.AbsFtpThreadTask;
 import com.arialyy.aria.core.common.ftp.FtpTaskConfig;
 import com.arialyy.aria.core.config.UploadConfig;
-import com.arialyy.aria.core.upload.UploadEntity;
 import com.arialyy.aria.core.upload.UTaskWrapper;
+import com.arialyy.aria.core.upload.UploadEntity;
 import com.arialyy.aria.exception.AriaIOException;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.BufferedRandomAccessFile;
@@ -107,6 +107,7 @@ class FtpThreadTask extends AbsFtpThreadTask<UploadEntity, UTaskWrapper> {
       } catch (IOException e) {
         e.printStackTrace();
       }
+      onThreadComplete();
     }
     return this;
   }

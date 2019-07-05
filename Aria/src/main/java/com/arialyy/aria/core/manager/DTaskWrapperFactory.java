@@ -70,9 +70,9 @@ class DTaskWrapperFactory implements INormalTEFactory<DownloadEntity, DTaskWrapp
       entity.setUrl(downloadUrl);
       entity.setGroupChild(false);
       entity.setGroupHash(null);
-      entity.setDownloadPath(UUID.randomUUID().toString().replace("-", ""));  //设置临时路径
+      entity.setFilePath(UUID.randomUUID().toString().replace("-", ""));  //设置临时路径
     }
-    File file = new File(entity.getDownloadPath());
+    File file = new File(entity.getFilePath());
 
     if (!entity.isComplete()) {
       TaskRecord record =
@@ -91,7 +91,7 @@ class DTaskWrapperFactory implements INormalTEFactory<DownloadEntity, DTaskWrapp
           if (count == record.threadNum) {
             resetEntity(entity);
           }
-        } else if (!file.exists()) { // 非分块文件需要判断文件是否存在
+        } else if (!file.exists() && record.taskType != TaskRecord.TYPE_M3U8_VOD) { // 非分块文件需要判断文件是否存在
           resetEntity(entity);
         }
       }

@@ -17,7 +17,6 @@
 package com.arialyy.aria.core.queue.pool;
 
 import android.text.TextUtils;
-import com.arialyy.aria.core.AriaManager;
 import com.arialyy.aria.core.inf.AbsTask;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
@@ -35,6 +34,7 @@ public class BaseCachePool<TASK extends AbsTask> implements IPool<TASK> {
   private static final String TAG = "BaseCachePool";
   private static final int MAX_NUM = Integer.MAX_VALUE;  //最大下载任务数
   private static final long TIME_OUT = 1000;
+  private static final Object LOCK = new Object();
   private Map<String, TASK> mCacheMap;
   private LinkedBlockingQueue<TASK> mCacheQueue;
 
@@ -82,7 +82,7 @@ public class BaseCachePool<TASK extends AbsTask> implements IPool<TASK> {
   }
 
   @Override public boolean putTask(TASK task) {
-    synchronized (AriaManager.LOCK) {
+    synchronized (LOCK) {
       if (task == null) {
         ALog.e(TAG, "任务不能为空！！");
         return false;
@@ -103,7 +103,7 @@ public class BaseCachePool<TASK extends AbsTask> implements IPool<TASK> {
   }
 
   @Override public TASK pollTask() {
-    synchronized (AriaManager.LOCK) {
+    synchronized (LOCK) {
       try {
         TASK task;
         task = mCacheQueue.poll(TIME_OUT, TimeUnit.MICROSECONDS);
@@ -120,7 +120,7 @@ public class BaseCachePool<TASK extends AbsTask> implements IPool<TASK> {
   }
 
   @Override public TASK getTask(String key) {
-    synchronized (AriaManager.LOCK) {
+    synchronized (LOCK) {
       if (TextUtils.isEmpty(key)) {
         ALog.e(TAG, "key 为null");
         return null;
@@ -134,7 +134,7 @@ public class BaseCachePool<TASK extends AbsTask> implements IPool<TASK> {
   }
 
   @Override public boolean removeTask(TASK task) {
-    synchronized (AriaManager.LOCK) {
+    synchronized (LOCK) {
       if (task == null) {
         ALog.e(TAG, "任务不能为空");
         return false;
@@ -147,7 +147,7 @@ public class BaseCachePool<TASK extends AbsTask> implements IPool<TASK> {
   }
 
   @Override public boolean removeTask(String key) {
-    synchronized (AriaManager.LOCK) {
+    synchronized (LOCK) {
       if (TextUtils.isEmpty(key)) {
         ALog.e(TAG, "请传入有效的下载链接");
         return false;

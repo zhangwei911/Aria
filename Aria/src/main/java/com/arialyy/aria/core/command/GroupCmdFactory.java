@@ -13,10 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.arialyy.aria.core.command.group;
+package com.arialyy.aria.core.command;
 
-import com.arialyy.aria.core.AriaManager;
-import com.arialyy.aria.core.download.DGTaskWrapper;
 import com.arialyy.aria.core.inf.AbsGroupTaskWrapper;
 
 /**
@@ -40,7 +38,7 @@ public class GroupCmdFactory {
 
   public static GroupCmdFactory getInstance() {
     if (INSTANCE == null) {
-      synchronized (AriaManager.LOCK) {
+      synchronized (GroupCmdFactory.class) {
         INSTANCE = new GroupCmdFactory();
       }
     }
@@ -58,10 +56,10 @@ public class GroupCmdFactory {
     AbsGroupCmd cmd = null;
     switch (type) {
       case SUB_TASK_START:
-        cmd = new GroupStartCmd<>(wrapper);
+        cmd = new DGSubStartCmd<>(wrapper);
         break;
       case SUB_TASK_STOP:
-        cmd = new GroupStopCmd<>(wrapper);
+        cmd = new DGSubStopCmd<>(wrapper);
         break;
     }
     if (cmd != null) {

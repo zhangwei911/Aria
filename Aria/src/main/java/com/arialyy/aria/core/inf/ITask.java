@@ -42,9 +42,13 @@ public interface ITask<TASK_WRAPPER extends AbsTaskWrapper> {
    */
   int DOWNLOAD_GROUP_SUB = 4;
   /**
+   * 切片任务
+   */
+  int M3U8_PEER = 5;
+  /**
    * 填充的
    */
-  int TEMP = 5;
+  int TEMP = 6;
   /**
    * 未知
    */

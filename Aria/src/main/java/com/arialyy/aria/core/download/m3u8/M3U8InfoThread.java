@@ -91,7 +91,7 @@ final class M3U8InfoThread implements Runnable {
       conn.connect();
       handleConnect(conn);
     } catch (IOException e) {
-      e.printStackTrace();
+      failDownload(e.getMessage(), false);
     } finally {
       if (conn != null) {
         conn.disconnect();
@@ -147,7 +147,7 @@ final class M3U8InfoThread implements Runnable {
         failDownload(String.format("获取M3U8下载地址列表失败，url: %s", mEntity.getUrl()), false);
         return;
       }
-      if (!isLive && mEntity.getM3U8Entity().getPeerNum() != 0) {
+      if (!isLive && mEntity.getM3U8Entity().getPeerNum() == 0) {
         mEntity.getM3U8Entity().setPeerNum(extInf.size());
         mEntity.getM3U8Entity().update();
       }
@@ -257,6 +257,8 @@ final class M3U8InfoThread implements Runnable {
         failDownload(String.format("码率转换器转换后的url地址无效，转换后的url：%s", bandWidthM3u8Url), false);
         return;
       }
+    } else {
+      ALog.d(TAG, "没有设置码率转换器");
     }
     mTaskWrapper.asM3U8().setBandWidthUrl(bandWidthM3u8Url);
     ALog.d(TAG, String.format("新码率url：%s", bandWidthM3u8Url));

@@ -101,17 +101,6 @@ public abstract class AbsTask<TASK_WRAPPER extends AbsTaskWrapper>
   }
 
   /**
-   * 设置最大下载/上传速度
-   *
-   * @param speed 单位为：kb
-   */
-  public void setMaxSpeed(int speed) {
-    if (getUtil() != null) {
-      getUtil().setMaxSpeed(speed);
-    }
-  }
-
-  /**
    * 任务是否完成
    *
    * @return {@code true} 已经完成，{@code false} 未完成
@@ -215,12 +204,7 @@ public abstract class AbsTask<TASK_WRAPPER extends AbsTaskWrapper>
   @Override public void stop(@TaskSchedulerType int type) {
     isStop = true;
     mSchedulerType = type;
-    if (getUtil().isRunning()) {
-      getUtil().stop();
-    } else {
-      ALog.d(TAG, "下载任务未执行");
-      mListener.onStop(mTaskWrapper.getEntity().getCurrentProgress());
-    }
+    getUtil().stop();
   }
 
   @Override public void cancel() {
@@ -230,11 +214,7 @@ public abstract class AbsTask<TASK_WRAPPER extends AbsTaskWrapper>
   @Override public void cancel(@TaskSchedulerType int type) {
     isCancel = true;
     mSchedulerType = type;
-    if (!getUtil().isRunning()) {
-      mListener.onCancel();
-    } else {
-      getUtil().cancel();
-    }
+    getUtil().cancel();
   }
 
   /**

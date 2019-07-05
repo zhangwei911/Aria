@@ -15,6 +15,8 @@
  */
 package com.arialyy.aria.core.config;
 
+import com.arialyy.aria.core.event.EventMsgUtil;
+import com.arialyy.aria.core.event.SpeedEvent;
 import com.arialyy.aria.core.queue.DownloadGroupTaskQueue;
 import java.io.Serializable;
 
@@ -50,7 +52,7 @@ public class DGroupConfig extends BaseTaskConfig implements Serializable {
 
   @Override public DGroupConfig setMaxSpeed(int maxSpeed) {
     super.setMaxSpeed(maxSpeed);
-    DownloadGroupTaskQueue.getInstance().setMaxSpeed(maxSpeed);
+    EventMsgUtil.getDefault().post(new SpeedEvent(maxSpeed));
     return this;
   }
 

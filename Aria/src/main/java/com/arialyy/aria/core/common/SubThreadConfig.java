@@ -36,4 +36,6 @@ public class SubThreadConfig<TASK_WRAPPER extends AbsTaskWrapper> {
   public Handler stateHandler;
   // 动态文件
   public boolean isOpenDynamicFile;
+  // m3u8切片索引
+  public int peerIndex;
 }

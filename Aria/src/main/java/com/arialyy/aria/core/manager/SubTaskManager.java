@@ -16,9 +16,9 @@
 package com.arialyy.aria.core.manager;
 
 import android.text.TextUtils;
-import com.arialyy.aria.core.AriaManager;
-import com.arialyy.aria.core.command.group.GroupCmdFactory;
+import com.arialyy.aria.core.command.GroupCmdFactory;
 import com.arialyy.aria.core.download.DGTaskWrapper;
+import com.arialyy.aria.core.event.EventMsgUtil;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
 import java.util.List;
@@ -44,10 +44,9 @@ public class SubTaskManager {
    */
   public void startSubTask(String url) {
     if (checkUrl(url)) {
-      AriaManager.getInstance(AriaManager.APP)
-          .setCmd(
-              CommonUtil.createGroupCmd(mTargetName, mEntity, GroupCmdFactory.SUB_TASK_START, url))
-          .exe();
+      EventMsgUtil.getDefault()
+          .post(
+              CommonUtil.createGroupCmd(mTargetName, mEntity, GroupCmdFactory.SUB_TASK_START, url));
     }
   }
 
@@ -58,10 +57,9 @@ public class SubTaskManager {
    */
   public void stopSubTask(String url) {
     if (checkUrl(url)) {
-      AriaManager.getInstance(AriaManager.APP)
-          .setCmd(
-              CommonUtil.createGroupCmd(mTargetName, mEntity, GroupCmdFactory.SUB_TASK_STOP, url))
-          .exe();
+      EventMsgUtil.getDefault()
+          .post(
+              CommonUtil.createGroupCmd(mTargetName, mEntity, GroupCmdFactory.SUB_TASK_STOP, url));
     }
   }
 

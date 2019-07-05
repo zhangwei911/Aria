@@ -18,6 +18,9 @@ package com.arialyy.aria.core.common;
 import android.os.Handler;
 import android.os.Looper;
 import com.arialyy.aria.core.download.BaseDListener;
+import com.arialyy.aria.core.event.Event;
+import com.arialyy.aria.core.event.EventMsgUtil;
+import com.arialyy.aria.core.event.SpeedEvent;
 import com.arialyy.aria.core.inf.AbsNormalEntity;
 import com.arialyy.aria.core.inf.AbsTaskWrapper;
 import com.arialyy.aria.core.inf.IEventListener;
@@ -34,6 +37,7 @@ public abstract class NormalFileer<ENTITY extends AbsNormalEntity, TASK_WRAPPER 
 
   protected NormalFileer(IEventListener listener, TASK_WRAPPER wrapper) {
     super(listener, wrapper);
+    EventMsgUtil.getDefault().register(this);
   }
 
   /**
@@ -53,14 +57,18 @@ public abstract class NormalFileer<ENTITY extends AbsNormalEntity, TASK_WRAPPER 
    *
    * @param maxSpeed 单位为：kb
    */
-  @Override
-  public void setMaxSpeed(int maxSpeed) {
+  protected void setMaxSpeed(int maxSpeed) {
     for (int i = 0; i < getTaskList().size(); i++) {
       AbsThreadTask task = getTaskList().valueAt(i);
       if (task != null && mStartThreadNum > 0) {
         task.setMaxSpeed(maxSpeed / mStartThreadNum);
       }
     }
+  }
+
+  @Override public void onDestroy() {
+    super.onDestroy();
+    EventMsgUtil.getDefault().unRegister(this);
   }
 
   @Override protected void onPostPre() {

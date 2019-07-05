@@ -24,6 +24,7 @@ import com.arialyy.aria.core.download.downloader.SimpleDownloadUtil;
 import com.arialyy.aria.core.download.m3u8.M3U8LiveUtil;
 import com.arialyy.aria.core.download.m3u8.M3U8VodUtil;
 import com.arialyy.aria.core.inf.AbsNormalTask;
+import com.arialyy.aria.core.inf.AbsTaskWrapper;
 import com.arialyy.aria.core.inf.IDownloadListener;
 import com.arialyy.aria.core.inf.ITaskWrapper;
 import com.arialyy.aria.core.scheduler.ISchedulers;
@@ -39,7 +40,12 @@ public class DownloadTask extends AbsNormalTask<DTaskWrapper> {
     mTaskWrapper = taskWrapper;
     mOutHandler = outHandler;
     mContext = AriaManager.APP;
-    mListener = new BaseDListener(this, mOutHandler);
+    if (taskWrapper.getRequestType() == AbsTaskWrapper.M3U8_VOD
+        || taskWrapper.getRequestType() == AbsTaskWrapper.M3U8_LIVE) {
+      mListener = new M3U8Listener(this, mOutHandler);
+    } else {
+      mListener = new BaseDListener(this, mOutHandler);
+    }
   }
 
   /**
@@ -90,9 +96,9 @@ public class DownloadTask extends AbsNormalTask<DTaskWrapper> {
 
   @Override protected synchronized IUtil createUtil() {
     if (mTaskWrapper.getRequestType() == ITaskWrapper.M3U8_VOD) {
-      return new M3U8VodUtil(mTaskWrapper, (IDownloadListener) mListener);
+      return new M3U8VodUtil(mTaskWrapper, (M3U8Listener) mListener);
     } else if (mTaskWrapper.getRequestType() == ITaskWrapper.M3U8_LIVE) {
-      return new M3U8LiveUtil(mTaskWrapper, (IDownloadListener) mListener);
+      return new M3U8LiveUtil(mTaskWrapper, (M3U8Listener) mListener);
     } else {
       return new SimpleDownloadUtil(mTaskWrapper, (IDownloadListener) mListener);
     }

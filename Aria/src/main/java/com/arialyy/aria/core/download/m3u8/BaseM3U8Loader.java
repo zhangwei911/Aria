@@ -30,7 +30,7 @@ public abstract class BaseM3U8Loader extends AbsFileer<DownloadEntity, DTaskWrap
   }
 
   @Override protected long delayTimer() {
-    return 2000;
+    return 1000;
   }
 
   /**

@@ -22,6 +22,7 @@ import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.download.DownloadGroupEntity;
 import com.arialyy.aria.core.download.DGTaskWrapper;
 import com.arialyy.aria.core.download.DTaskWrapper;
+import com.arialyy.aria.core.download.m3u8.M3U8Entity;
 import com.arialyy.aria.core.upload.UploadEntity;
 import com.arialyy.aria.core.upload.UTaskWrapper;
 import java.util.HashMap;
@@ -37,7 +38,7 @@ class DBConfig {
   static boolean DEBUG = false;
   static Map<String, Class> mapping = new LinkedHashMap<>();
   static String DB_NAME;
-  static int VERSION = 49;
+  static int VERSION = 51;
 
   /**
    * 是否将数据库保存在Sd卡，{@code true} 是
@@ -59,5 +60,6 @@ class DBConfig {
     mapping.put("UploadEntity", UploadEntity.class);
     mapping.put("ThreadRecord", ThreadRecord.class);
     mapping.put("TaskRecord", TaskRecord.class);
+    mapping.put("M3U8Entity", M3U8Entity.class);
   }
 }

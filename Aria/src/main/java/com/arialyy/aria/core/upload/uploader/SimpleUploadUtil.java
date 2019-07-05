@@ -65,7 +65,7 @@ public class SimpleUploadUtil implements IUtil, Runnable {
               }
 
               @Override public void onFail(AbsEntity entity, BaseException e, boolean needRetry) {
-                mListener.onFail(needRetry, e);
+                failUpload(e, needRetry);
               }
             });
         new Thread(infoThread).start();
@@ -74,6 +74,14 @@ public class SimpleUploadUtil implements IUtil, Runnable {
         mUploader.start();
         break;
     }
+  }
+
+  private void failUpload(BaseException e, boolean needRetry) {
+    if (isStop || isCancel) {
+      return;
+    }
+    mListener.onFail(needRetry, e);
+    mUploader.onDestroy();
   }
 
   @Override public String getKey() {
@@ -107,9 +115,5 @@ public class SimpleUploadUtil implements IUtil, Runnable {
       return;
     }
     new Thread(this).start();
-  }
-
-  @Override public void setMaxSpeed(int speed) {
-    mUploader.setMaxSpeed(speed);
   }
 }

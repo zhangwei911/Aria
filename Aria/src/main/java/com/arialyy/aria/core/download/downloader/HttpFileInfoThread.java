@@ -331,7 +331,7 @@ public class HttpFileInfoThread implements Runnable {
     }
   }
 
-  private static class FileLenAdapter extends IHttpFileLenAdapter {
+  private static class FileLenAdapter implements IHttpFileLenAdapter {
 
     @Override public long handleFileLen(Map<String, List<String>> headers) {
       List<String> sLength = headers.get("Content-Length");

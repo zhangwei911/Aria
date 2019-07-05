@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.arialyy.aria.core.command.normal;
+package com.arialyy.aria.core.command;
 
 import com.arialyy.aria.core.inf.AbsTask;
 import com.arialyy.aria.core.inf.AbsTaskWrapper;
@@ -25,7 +25,7 @@ import com.arialyy.aria.util.ALog;
  * Created by lyy on 2016/9/20.
  * 停止命令
  */
-class StopCmd<T extends AbsTaskWrapper> extends AbsNormalCmd<T> {
+final class StopCmd<T extends AbsTaskWrapper> extends AbsNormalCmd<T> {
 
   StopCmd(T entity, int taskType) {
     super(entity, taskType);
@@ -36,7 +36,6 @@ class StopCmd<T extends AbsTaskWrapper> extends AbsNormalCmd<T> {
     AbsTask task = getTask();
     if (task == null) {
       if (mTaskWrapper.getEntity().getState() == IEntity.STATE_RUNNING) {
-        createTask();
         stopTask();
       } else {
         ALog.w(TAG, "停止命令执行失败，【调度器中没有该任务】");

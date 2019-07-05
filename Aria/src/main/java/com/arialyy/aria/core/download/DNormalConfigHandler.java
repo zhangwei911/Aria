@@ -17,8 +17,8 @@ package com.arialyy.aria.core.download;
 
 import android.text.TextUtils;
 import com.arialyy.aria.core.common.RecordHandler;
-import com.arialyy.aria.core.inf.ITargetHandler;
 import com.arialyy.aria.core.inf.IConfigHandler;
+import com.arialyy.aria.core.inf.ITargetHandler;
 import com.arialyy.aria.core.inf.ITaskWrapper;
 import com.arialyy.aria.core.manager.TaskWrapperManager;
 import com.arialyy.aria.core.queue.DownloadTaskQueue;
@@ -93,8 +93,7 @@ class DNormalConfigHandler<TARGET extends AbsDTarget> implements IConfigHandler 
   }
 
   @Override public boolean isRunning() {
-    DownloadTask task = DownloadTaskQueue.getInstance().getTask(mEntity.getKey());
-    return task != null && task.isRunning();
+    return DownloadTaskQueue.getInstance().taskIsRunning(mEntity.getKey());
   }
 
   @Override public boolean checkEntity() {
@@ -113,9 +112,10 @@ class DNormalConfigHandler<TARGET extends AbsDTarget> implements IConfigHandler 
     File file = new File(mTempFilePath);
     DTaskWrapper wrapper = (DTaskWrapper) mTarget.getTaskWrapper();
     // 缓存文件夹格式：问文件夹/.文件名_码率
-    wrapper.asM3U8()
-        .setCacheDir(String.format("%s/.%s_%s", file.getParent(), file.getName(),
-            wrapper.asM3U8().getBandWidth()));
+    String cacheDir = String.format("%s/.%s_%s", file.getParent(), file.getName(),
+        wrapper.asM3U8().getBandWidth());
+    wrapper.asM3U8().setCacheDir(cacheDir);
+    mEntity.getM3U8Entity().setCacheDir(cacheDir);
     if (wrapper.getRequestType() == ITaskWrapper.M3U8_VOD) {
       if (mEntity.getFileSize() == 0) {
         ALog.w(TAG,

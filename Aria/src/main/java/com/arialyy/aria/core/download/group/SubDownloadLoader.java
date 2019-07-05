@@ -127,10 +127,4 @@ class SubDownloadLoader implements IUtil {
       ALog.w(TAG, String.format("不识别的类型，requestType：%s", mWrapper.getRequestType()));
     }
   }
-
-  @Override public void setMaxSpeed(int speed) {
-    if (mDownloader != null) {
-      mDownloader.setMaxSpeed(speed);
-    }
-  }
 }

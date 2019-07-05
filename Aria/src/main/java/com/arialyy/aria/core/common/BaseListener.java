@@ -160,9 +160,11 @@ public abstract class BaseListener<ENTITY extends AbsEntity, TASK_WRAPPER extend
     if (mEntity instanceof DownloadGroupEntity) {
       RecordUtil.delGroupTaskRecord((DownloadGroupEntity) mEntity, false, false);
     } else if (mEntity instanceof DownloadEntity) {
-      RecordUtil.delTaskRecord(((DownloadEntity) mEntity).getFilePath(), RecordHandler.TYPE_DOWNLOAD, false, false);
+      RecordUtil.delTaskRecord(((DownloadEntity) mEntity).getFilePath(),
+          RecordHandler.TYPE_DOWNLOAD, false, false);
     } else if (mEntity instanceof UploadEntity) {
-      RecordUtil.delTaskRecord(((UploadEntity) mEntity).getFilePath(), RecordHandler.TYPE_UPLOAD, false, false);
+      RecordUtil.delTaskRecord(((UploadEntity) mEntity).getFilePath(), RecordHandler.TYPE_UPLOAD,
+          false, false);
     }
   }
 

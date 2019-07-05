@@ -13,22 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.arialyy.aria.core.command.group;
+package com.arialyy.aria.core.event;
 
-import com.arialyy.aria.core.inf.AbsGroupTaskWrapper;
+public class PeerIndexEvent {
 
-/**
- * Created by AriaL on 2017/6/29.
- * 停止任务组的命令
- */
-class GroupStopCmd<T extends AbsGroupTaskWrapper> extends AbsGroupCmd<T> {
-  GroupStopCmd(T entity) {
-    super(entity);
-  }
+  public int peerIndex;
+  public long createTime;
 
-  @Override public void executeCmd() {
-    if (checkTask()) {
-      tempTask.stopSubTask(childUrl);
-    }
+  public PeerIndexEvent(int peerIndex) {
+    this.peerIndex = peerIndex;
+    createTime = System.currentTimeMillis();
   }
 }

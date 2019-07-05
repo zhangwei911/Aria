@@ -141,6 +141,8 @@ final class HttpThreadTask extends AbsThreadTask<DownloadEntity, DTaskWrapper> {
       } catch (IOException e) {
         e.printStackTrace();
       }
+
+      onThreadComplete();
     }
     return this;
   }

@@ -68,7 +68,7 @@ class KotlinDownloadActivity : BaseActivity<ActivitySingleBinding>() {
   }
 
   /**
-   * 注解方法不能添加internal修饰符，否则会出现e: [kapt] An exception occurred: java.lang.IllegalArgumentException: index 1 for '$a' not in range (received 0 arguments)错误
+   * 注解方法不能添加internal修饰符，否则会出现e: [kapt] An exception occurred: java.lang.IllegalArgumentException: peerIndex 1 for '$a' not in range (received 0 arguments)错误
    */
   @Download.onTaskRunning
   fun running(task: DownloadTask) {

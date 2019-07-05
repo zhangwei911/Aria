@@ -15,7 +15,6 @@
  */
 package com.arialyy.aria.core.scheduler;
 
-import com.arialyy.aria.core.AriaManager;
 import com.arialyy.aria.core.download.DGTaskWrapper;
 import com.arialyy.aria.core.download.DownloadGroupTask;
 import com.arialyy.aria.core.queue.DownloadGroupTaskQueue;
@@ -36,14 +35,10 @@ public class DownloadGroupSchedulers extends
 
   public static DownloadGroupSchedulers getInstance() {
     if (INSTANCE == null) {
-      synchronized (AriaManager.LOCK) {
+      synchronized (DownloadGroupSchedulers.class) {
         INSTANCE = new DownloadGroupSchedulers();
       }
     }
     return INSTANCE;
-  }
-
-  @Override String getProxySuffix() {
-    return "$$DownloadGroupListenerProxy";
   }
 }

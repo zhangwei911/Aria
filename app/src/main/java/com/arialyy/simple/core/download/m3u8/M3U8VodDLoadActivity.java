@@ -20,12 +20,14 @@ import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 import com.arialyy.annotations.Download;
+import com.arialyy.annotations.M3U8;
 import com.arialyy.aria.core.Aria;
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.download.DownloadTarget;
@@ -47,12 +49,13 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-public class M3U8VodDownloadActivity extends BaseActivity<ActivityM3u8VodBinding> {
+public class M3U8VodDLoadActivity extends BaseActivity<ActivityM3u8VodBinding> {
 
   private String mUrl;
   private String mFilePath;
   private M3U8VodModule mModule;
   private DownloadTarget mTarget;
+  private VideoPlayerFragment mVideoFragment;
 
   @Override
   protected void init(Bundle savedInstanceState) {
@@ -66,7 +69,7 @@ public class M3U8VodDownloadActivity extends BaseActivity<ActivityM3u8VodBinding
         if (entity == null) {
           return;
         }
-        mTarget = Aria.download(M3U8VodDownloadActivity.this).load(entity.getUrl());
+        mTarget = Aria.download(M3U8VodDLoadActivity.this).load(entity.getUrl());
         if (mTarget.getTaskState() == IEntity.STATE_STOP) {
           getBinding().setStateStr(getString(R.string.resume));
         } else if (mTarget.isRunning()) {
@@ -81,6 +84,10 @@ public class M3U8VodDownloadActivity extends BaseActivity<ActivityM3u8VodBinding
         getBinding().setFilePath(entity.getFilePath());
         mUrl = entity.getUrl();
         mFilePath = entity.getFilePath();
+        mVideoFragment = new VideoPlayerFragment(0, entity);
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        ft.add(R.id.video_content, mVideoFragment);
+        ft.commit();
       }
     });
     getBinding().setViewModel(this);
@@ -140,6 +147,22 @@ public class M3U8VodDownloadActivity extends BaseActivity<ActivityM3u8VodBinding
     return true;
   }
 
+  @M3U8.onPeerStart
+  void onPeerStart(String m3u8Url, String peerPath, int peerIndex) {
+    //ALog.d(TAG, "peer start, path: " + peerPath + ", index: " + peerIndex);
+  }
+
+  @M3U8.onPeerComplete
+  void onPeerComplete(String m3u8Url, String peerPath, int peerIndex) {
+    //ALog.d(TAG, "peer complete, path: " + peerPath + ", index: " + peerIndex);
+    mVideoFragment.addPlayer(peerIndex, peerPath);
+  }
+
+  @M3U8.onPeerFail
+  void onPeerFail(String m3u8Url, String peerPath, int peerIndex) {
+    //ALog.d(TAG, "peer fail, path: " + peerPath + ", index: " + peerIndex);
+  }
+
   @Download.onWait
   void onWait(DownloadTask task) {
     if (task.getKey().equals(mUrl)) {
@@ -165,7 +188,7 @@ public class M3U8VodDownloadActivity extends BaseActivity<ActivityM3u8VodBinding
   @Download.onTaskRunning
   protected void running(DownloadTask task) {
     if (task.getKey().equals(mUrl)) {
-      ALog.d(TAG, "isRunning");
+      //ALog.d(TAG, "isRunning");
       getBinding().setProgress(task.getPercent());
       getBinding().setSpeed(task.getConvertSpeed());
     }
@@ -199,7 +222,7 @@ public class M3U8VodDownloadActivity extends BaseActivity<ActivityM3u8VodBinding
   @Download.onTaskFail
   void taskFail(DownloadTask task, Exception e) {
     if (task.getKey().equals(mUrl)) {
-      Toast.makeText(M3U8VodDownloadActivity.this, getString(R.string.download_fail),
+      Toast.makeText(M3U8VodDLoadActivity.this, getString(R.string.download_fail),
           Toast.LENGTH_SHORT)
           .show();
       getBinding().setStateStr(getString(R.string.start));
@@ -212,7 +235,7 @@ public class M3U8VodDownloadActivity extends BaseActivity<ActivityM3u8VodBinding
   void taskComplete(DownloadTask task) {
     if (task.getKey().equals(mUrl)) {
       getBinding().setProgress(100);
-      Toast.makeText(M3U8VodDownloadActivity.this, getString(R.string.download_success),
+      Toast.makeText(M3U8VodDLoadActivity.this, getString(R.string.download_success),
           Toast.LENGTH_SHORT).show();
       getBinding().setStateStr(getString(R.string.re_start));
       getBinding().setSpeed("");
@@ -242,7 +265,7 @@ public class M3U8VodDownloadActivity extends BaseActivity<ActivityM3u8VodBinding
   }
 
   private void startD() {
-    Aria.download(M3U8VodDownloadActivity.this)
+    Aria.download(M3U8VodDLoadActivity.this)
         .load(mUrl)
         .useServerFileName(true)
         .setFilePath(mFilePath, true)
@@ -270,6 +293,7 @@ public class M3U8VodDownloadActivity extends BaseActivity<ActivityM3u8VodBinding
             return false;
           }
         })
+        //.asVod().setPeerIndex(50)
         .start();
   }
 
@@ -279,6 +303,8 @@ public class M3U8VodDownloadActivity extends BaseActivity<ActivityM3u8VodBinding
       mModule.uploadUrl(this, String.valueOf(data));
     } else if (result == ModifyPathDialog.MODIFY_PATH_RESULT) {
       mModule.updateFilePath(this, String.valueOf(data));
+    } else if (result == VideoPlayerFragment.SEEK_BAR_PROGRESS_KEY) {
+      Aria.download(this).load(mUrl).asM3U8().asVod().jumPeerIndex((Integer) data);
     }
   }
 }

@@ -19,6 +19,8 @@ import com.arialyy.aria.core.AriaManager;
 import com.arialyy.aria.core.common.AbsThreadTask;
 import com.arialyy.aria.core.common.NormalFileer;
 import com.arialyy.aria.core.common.SubThreadConfig;
+import com.arialyy.aria.core.event.Event;
+import com.arialyy.aria.core.event.SpeedEvent;
 import com.arialyy.aria.core.inf.AbsTaskWrapper;
 import com.arialyy.aria.core.inf.IUploadListener;
 import com.arialyy.aria.core.upload.UTaskWrapper;
@@ -50,5 +52,10 @@ class Uploader extends NormalFileer<UploadEntity, UTaskWrapper> {
         return new HttpThreadTask(config);
     }
     return null;
+  }
+
+  @Event
+  public void setMaxSpeed(SpeedEvent event) {
+    setMaxSpeed(event.speed);
   }
 }

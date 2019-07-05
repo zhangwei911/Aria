@@ -102,6 +102,8 @@ class HttpThreadTask extends AbsThreadTask<UploadEntity, UTaskWrapper> {
       fail(new TaskException(TAG,
           String.format("上传失败，filePath: %s, url: %s", getEntity().getFilePath(),
               getEntity().getUrl()), e));
+    } finally {
+      onThreadComplete();
     }
     return this;
   }

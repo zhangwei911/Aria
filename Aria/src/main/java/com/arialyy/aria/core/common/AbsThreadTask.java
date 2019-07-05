@@ -30,6 +30,7 @@ import com.arialyy.aria.core.inf.AbsNormalEntity;
 import com.arialyy.aria.core.inf.AbsTaskWrapper;
 import com.arialyy.aria.core.inf.ITaskWrapper;
 import com.arialyy.aria.core.manager.ThreadTaskManager;
+import com.arialyy.aria.core.scheduler.ISchedulers;
 import com.arialyy.aria.exception.BaseException;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.BufferedRandomAccessFile;
@@ -66,7 +67,7 @@ public abstract class AbsThreadTask<ENTITY extends AbsNormalEntity, TASK_WRAPPER
   private boolean taskBreak = false;  //任务跳出
   protected BandwidthLimiter mSpeedBandUtil; //速度限制工具
   protected AriaManager mAridManager;
-  private boolean isInterrupted = false;
+  private boolean isDestroy = false;
   protected boolean isCancel = false, isStop = false;
   protected ThreadRecord mRecord;
   private Handler mStateHandler;
@@ -103,17 +104,22 @@ public abstract class AbsThreadTask<ENTITY extends AbsNormalEntity, TASK_WRAPPER
     return mConfig.tempFile.getName();
   }
 
-  protected SubThreadConfig<TASK_WRAPPER> getConfig() {
+  public SubThreadConfig<TASK_WRAPPER> getConfig() {
     return mConfig;
   }
 
   /**
    * 设置线程是否中断
-   *
-   * @param isInterrupted {@code true} 中断
    */
-  public void setInterrupted(boolean isInterrupted) {
-    this.isInterrupted = isInterrupted;
+  public void destroy() {
+    this.isDestroy = true;
+  }
+
+  /**
+   * 线程执行完成
+   */
+  protected void onThreadComplete() {
+
   }
 
   /**
@@ -122,7 +128,7 @@ public abstract class AbsThreadTask<ENTITY extends AbsNormalEntity, TASK_WRAPPER
    * @return {@code true}存活
    */
   protected boolean isLive() {
-    return !Thread.currentThread().isInterrupted() && !isInterrupted;
+    return !Thread.currentThread().isInterrupted() && !isDestroy;
   }
 
   /**
@@ -165,6 +171,7 @@ public abstract class AbsThreadTask<ENTITY extends AbsNormalEntity, TASK_WRAPPER
    *
    * @param speed 单位为：kb
    */
+
   public void setMaxSpeed(int speed) {
     if (mSpeedBandUtil != null) {
       mSpeedBandUtil.setMaxRate(speed);
@@ -197,13 +204,28 @@ public abstract class AbsThreadTask<ENTITY extends AbsNormalEntity, TASK_WRAPPER
     Message msg = mStateHandler.obtainMessage();
     msg.what = state;
     msg.obj = this;
+
+    if ((state == IThreadState.STATE_COMPLETE || state == IThreadState.STATE_FAIL)
+        && (mTaskWrapper.getRequestType() == AbsTaskWrapper.M3U8_VOD
+        || mTaskWrapper.getRequestType() == AbsTaskWrapper.M3U8_LIVE)) {
+      if (bundle == null) {
+        bundle = new Bundle();
+      }
+      bundle.putString(ISchedulers.DATA_M3U8_URL, getConfig().url);
+      bundle.putString(ISchedulers.DATA_M3U8_PEER_PATH, getConfig().tempFile.getPath());
+      bundle.putInt(ISchedulers.DATA_M3U8_PEER_INDEX, getConfig().peerIndex);
+    }
     if (bundle != null) {
       msg.setData(bundle);
+    }
+    Thread loopThread = mStateHandler.getLooper().getThread();
+    if (!loopThread.isAlive() || loopThread.isInterrupted()) {
+      return;
     }
     msg.sendToTarget();
   }
 
-  public boolean isInterrupted() {
+  public boolean isDestroy() {
     return Thread.currentThread().isInterrupted();
   }
 
@@ -215,7 +237,10 @@ public abstract class AbsThreadTask<ENTITY extends AbsNormalEntity, TASK_WRAPPER
   }
 
   /**
-   * 任务是否中断，中断条件： 1、任务取消 2、任务停止 3、手动中断 {@link #taskBreak}
+   * 任务是否中断，中断条件：
+   * 1、任务取消
+   * 2、任务停止
+   * 3、手动中断 {@link #taskBreak}
    *
    * @return {@code true} 中断，{@code false} 不是中断
    */
@@ -285,7 +310,8 @@ public abstract class AbsThreadTask<ENTITY extends AbsNormalEntity, TASK_WRAPPER
     //  return;
     //}
     mChildCurrentLocation += len;
-    if (!mStateHandler.getLooper().getThread().isAlive()) {
+    Thread loopThread = mStateHandler.getLooper().getThread();
+    if (!loopThread.isAlive() || loopThread.isInterrupted()) {
       return;
     }
     mStateHandler.obtainMessage(IThreadState.STATE_RUNNING, len).sendToTarget();
@@ -471,7 +497,7 @@ public abstract class AbsThreadTask<ENTITY extends AbsNormalEntity, TASK_WRAPPER
   }
 
   @Override public AbsThreadTask call() throws Exception {
-    isInterrupted = false;
+    isDestroy = false;
     Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
     TrafficStats.setThreadStatsTag(UUID.randomUUID().toString().hashCode());
     return this;

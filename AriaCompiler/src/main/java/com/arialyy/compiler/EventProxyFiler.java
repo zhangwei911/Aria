@@ -17,9 +17,10 @@ package com.arialyy.compiler;
 
 import com.arialyy.annotations.Download;
 import com.arialyy.annotations.DownloadGroup;
+import com.arialyy.annotations.M3U8;
+import com.arialyy.annotations.TaskEnum;
 import com.arialyy.annotations.Upload;
 import com.squareup.javapoet.ClassName;
-import com.squareup.javapoet.CodeBlock;
 import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
@@ -28,8 +29,6 @@ import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeSpec;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import javax.annotation.processing.Filer;
@@ -87,18 +86,39 @@ final class EventProxyFiler {
   }
 
   /**
-   * 创建代理方法
+   * 创建M3u8切片的代理方法
+   *
+   * @param taskEnum 任务类型枚举{@link TaskEnum}
+   * @param annotation {@link Download}、{@link Upload}、{@link M3U8}
+   * @param methodInfo 被代理类注解的方法信息
+   */
+  private MethodSpec createM3U8PeerMethod(TaskEnum taskEnum, Class<? extends Annotation> annotation,
+      MethodInfo methodInfo) {
+
+    String sb = String.format("obj.%s(m3u8Url, peerPath, peerIndex);\n", methodInfo.methodName);
+
+    MethodSpec.Builder builder = MethodSpec.methodBuilder(annotation.getSimpleName())
+        .addModifiers(Modifier.PUBLIC)
+        .returns(void.class)
+        .addParameter(String.class, "m3u8Url", Modifier.FINAL)
+        .addParameter(String.class, "peerPath", Modifier.FINAL)
+        .addParameter(int.class, "peerIndex", Modifier.FINAL)
+        .addAnnotation(Override.class)
+        .addCode(sb);
+
+    return builder.build();
+  }
+
+  /**
+   * 创建任务的代理方法
    *
    * @param taskEnum 任务类型枚举{@link TaskEnum}
    * @param annotation {@link Download}、{@link Upload}
    * @param methodInfo 被代理类注解的方法信息
    */
-  private MethodSpec createProxyMethod(TaskEnum taskEnum, Class<? extends Annotation> annotation,
+  private MethodSpec createTaskMethod(TaskEnum taskEnum, Class<? extends Annotation> annotation,
       MethodInfo methodInfo) {
-    ClassName task = ClassName.get(taskEnum.getPkg(), taskEnum.getClassName());
-
-    ParameterSpec taskParam =
-        ParameterSpec.builder(task, "task").addModifiers(Modifier.FINAL).build();
+    ClassName task = ClassName.get(taskEnum.pkg, taskEnum.className);
 
     String callCode;
 
@@ -125,26 +145,23 @@ final class EventProxyFiler {
         callCode = "task";
       }
     }
-    StringBuilder sb = new StringBuilder();
-    sb.append("obj.")
-        .append(methodInfo.methodName)
-        .append("((")
-        .append(taskEnum.getClassName())
-        .append(")")
-        .append(callCode)
-        .append(");\n");
 
+    String sb = String.format("obj.%s((%s)%s);\n",
+        methodInfo.methodName, taskEnum.className, callCode);
+
+    ParameterSpec taskParam =
+        ParameterSpec.builder(task, "task").addModifiers(Modifier.FINAL).build();
     MethodSpec.Builder builder = MethodSpec.methodBuilder(annotation.getSimpleName())
         .addModifiers(Modifier.PUBLIC)
         .returns(void.class)
         .addParameter(taskParam)
         .addAnnotation(Override.class)
-        .addCode(sb.toString());
+        .addCode(sb);
 
     //任务组接口
     if (taskEnum == TaskEnum.DOWNLOAD_GROUP_SUB) {
       ClassName subTask =
-          ClassName.get(TaskEnum.DOWNLOAD_ENTITY.pkg, TaskEnum.DOWNLOAD_ENTITY.className);
+          ClassName.get(EntityInfo.DOWNLOAD.pkg, EntityInfo.DOWNLOAD.className);
       ParameterSpec subTaskParam =
           ParameterSpec.builder(subTask, "subEntity").addModifiers(Modifier.FINAL).build();
 
@@ -177,40 +194,21 @@ final class EventProxyFiler {
     //添加注解方法
     for (TaskEnum te : entity.methods.keySet()) {
       Map<Class<? extends Annotation>, MethodInfo> methodInfoMap = entity.methods.get(te);
-      //if (entity.proxyClassName.contains(TaskEnum.DOWNLOAD.proxySuffix)) {
-      //  type.add(1);
-      //} else if (entity.proxyClassName.contains(TaskEnum.DOWNLOAD_GROUP.proxySuffix)) {
-      //  type.add(2);
-      //} else if (entity.proxyClassName.contains(TaskEnum.UPLOAD.proxySuffix)) {
-      //  type.add(3);
-      //} else if (entity.proxyClassName.contains(TaskEnum.UPLOAD_GROUP.proxySuffix)) {
-      //  type.add(4);
-      //}
       if (methodInfoMap != null) {
         for (Class<? extends Annotation> annotation : methodInfoMap.keySet()) {
-          MethodSpec method = createProxyMethod(te, annotation, methodInfoMap.get(annotation));
-          builder.addMethod(method);
+          if (te == TaskEnum.DOWNLOAD
+              || te == TaskEnum.DOWNLOAD_GROUP
+              || te == TaskEnum.DOWNLOAD_GROUP_SUB
+              || te == TaskEnum.UPLOAD) {
+            MethodSpec method = createTaskMethod(te, annotation, methodInfoMap.get(annotation));
+            builder.addMethod(method);
+          } else if (te == TaskEnum.M3U8_PEER) {
+            MethodSpec method = createM3U8PeerMethod(te, annotation, methodInfoMap.get(annotation));
+            builder.addMethod(method);
+          }
         }
       }
     }
-
-    //注册当前类
-    //for (Integer i : type) {
-    //  String str = null;
-    //  switch (i) {
-    //    case 1:
-    //    case 2:
-    //      str = "$T.download(obj).register();\n";
-    //      break;
-    //    case 3:
-    //    case 4:
-    //      str = "$T.upload(obj).register();\n";
-    //      break;
-    //  }
-    //  if (str != null) {
-    //    cb.add(str, ClassName.get("com.arialyy.aria.core", "Aria"));
-    //  }
-    //}
 
     MethodSpec structure = MethodSpec.constructorBuilder().addModifiers(Modifier.PUBLIC).build();
     builder.addMethod(structure);
@@ -228,16 +226,29 @@ final class EventProxyFiler {
     builder.addJavadoc("该文件为Aria自动生成的代理文件，请不要修改该文件的任何代码！\n");
 
     //创建父类参数
-    ClassName superClass = ClassName.get("com.arialyy.aria.core.scheduler", "AbsSchedulerListener");
-    //主任务泛型参数
-    ClassName taskTypeVariable =
-        ClassName.get(entity.mainTaskEnum.pkg, entity.mainTaskEnum.className);
-    //子任务泛型参数
-    ClassName subTaskTypeVariable =
-        ClassName.get(entity.subTaskEnum.pkg, entity.subTaskEnum.className);
+    ClassName superClass =
+        ClassName.get("com.arialyy.aria.core.scheduler", entity.mainTaskEnum.proxySuperClass);
 
-    builder.superclass(
-        ParameterizedTypeName.get(superClass, taskTypeVariable, subTaskTypeVariable));
+    if (entity.mainTaskEnum == TaskEnum.DOWNLOAD
+        || entity.mainTaskEnum == TaskEnum.UPLOAD
+        || entity.mainTaskEnum == TaskEnum.DOWNLOAD_GROUP) {
+      ClassName taskTypeVariable =
+          ClassName.get(entity.mainTaskEnum.pkg, entity.mainTaskEnum.className);
+      builder.superclass(ParameterizedTypeName.get(superClass, taskTypeVariable));
+    } else if (entity.mainTaskEnum == TaskEnum.DOWNLOAD_GROUP_SUB) {
+
+      ClassName taskTypeVariable =
+          ClassName.get(entity.mainTaskEnum.pkg, entity.mainTaskEnum.className);
+      //子任务泛型参数
+      ClassName subTaskTypeVariable =
+          ClassName.get(entity.subTaskEnum.pkg, entity.subTaskEnum.className);
+
+      builder.superclass(
+          ParameterizedTypeName.get(superClass, taskTypeVariable, subTaskTypeVariable));
+    } else if (entity.mainTaskEnum == TaskEnum.M3U8_PEER) {
+      builder.superclass(superClass);
+    }
+
     builder.addMethod(listener);
     return builder.build();
   }

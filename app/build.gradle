@@ -16,10 +16,22 @@ android {
     multiDexEnabled true
     vectorDrawables.useSupportLibrary = true
   }
+
+  signingConfigs {
+    release {
+      storeFile file("lyy.keystore")
+      storePassword "123456"
+      keyAlias "key0"
+      keyPassword "123456"
+      v2SigningEnabled false
+    }
+  }
+
   buildTypes {
     release {
       minifyEnabled false
       proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+      signingConfig signingConfigs.release
     }
   }
 
@@ -50,8 +62,8 @@ dependencies {
   implementation "org.jetbrains.kotlin:kotlin-stdlib:${rootProject.ext.kotlin_version}"
   api project(':Aria')
   kapt project(':AriaCompiler')
-//  api 'com.arialyy.aria:aria-core:3.6.4'
-//  kapt 'com.arialyy.aria:aria-compiler:3.6.4'
+  //  api 'com.arialyy.aria:aria-core:3.6.4'
+  //  kapt 'com.arialyy.aria:aria-compiler:3.6.4'
 
   //  compile 'com.arialyy.aria:aria-core:3.3.14'
   //  annotationProcessor 'com.arialyy.aria:aria-compiler:3.3.14'

@@ -14,11 +14,8 @@
  * limitations under the License.
  */
 
-package com.arialyy.aria.core.command.normal;
+package com.arialyy.aria.core.command;
 
-import com.arialyy.aria.core.AriaManager;
-import com.arialyy.aria.core.command.AbsCmdFactory;
-import com.arialyy.aria.core.command.ICmd;
 import com.arialyy.aria.core.inf.AbsTaskWrapper;
 
 /**
@@ -75,7 +72,7 @@ public class NormalCmdFactory extends AbsCmdFactory<AbsTaskWrapper, AbsNormalCmd
 
   public static NormalCmdFactory getInstance() {
     if (INSTANCE == null) {
-      synchronized (AriaManager.LOCK) {
+      synchronized (NormalCmdFactory.class) {
         INSTANCE = new NormalCmdFactory();
       }
     }

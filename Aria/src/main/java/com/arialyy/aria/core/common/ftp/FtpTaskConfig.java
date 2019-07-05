@@ -17,6 +17,7 @@ package com.arialyy.aria.core.common.ftp;
 
 import com.arialyy.aria.core.FtpUrlEntity;
 import com.arialyy.aria.core.inf.ITaskConfig;
+import java.lang.ref.WeakReference;
 import java.net.Proxy;
 
 /**
@@ -39,7 +40,7 @@ public class FtpTaskConfig implements ITaskConfig {
   /**
    * 上传拦截器
    */
-  private IFtpUploadInterceptor uploadInterceptor;
+  private WeakReference<IFtpUploadInterceptor> uploadInterceptor;
 
   /**
    * 上传到服务器文件的新文件名{@link FtpInterceptHandler#getNewFileName()}
@@ -55,11 +56,11 @@ public class FtpTaskConfig implements ITaskConfig {
   }
 
   public IFtpUploadInterceptor getUploadInterceptor() {
-    return uploadInterceptor;
+    return uploadInterceptor.get();
   }
 
   public void setUploadInterceptor(IFtpUploadInterceptor uploadInterceptor) {
-    this.uploadInterceptor = uploadInterceptor;
+    this.uploadInterceptor = new WeakReference<>(uploadInterceptor);
   }
 
   public FtpUrlEntity getUrlEntity() {

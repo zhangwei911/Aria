@@ -99,10 +99,6 @@ public class M3U8LiveLoader extends BaseM3U8Loader {
     }).start();
   }
 
-  @Override protected void setMaxSpeed(int maxSpeed) {
-    // TODO: 2019-06-06 暂不支持
-  }
-
   private void notifyLock() {
     try {
       LOCK.lock();
@@ -227,16 +223,14 @@ public class M3U8LiveLoader extends BaseM3U8Loader {
     @Override public boolean handleMessage(Message msg) {
       switch (msg.what) {
         case STATE_STOP:
-          if (isStop()) {
+          if (isBreak()) {
             ALog.d(TAG, "任务停止");
-            mListener.onStop(mProgress);
             quitLooper();
           }
           break;
         case STATE_CANCEL:
-          if (isCancel()) {
+          if (isBreak()) {
             ALog.d(TAG, "任务取消");
-            mListener.onCancel();
             quitLooper();
           }
           break;
@@ -250,19 +244,11 @@ public class M3U8LiveLoader extends BaseM3U8Loader {
       return false;
     }
 
-    @Override public boolean isStop() {
-      return false;
-    }
-
     @Override public boolean isFail() {
       return false;
     }
 
     @Override public boolean isComplete() {
-      return false;
-    }
-
-    @Override public boolean isCancel() {
       return false;
     }
 

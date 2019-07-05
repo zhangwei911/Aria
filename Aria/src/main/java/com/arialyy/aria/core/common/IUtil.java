@@ -65,11 +65,4 @@ public interface IUtil {
    * 开始
    */
   void start();
-
-  /**
-   * 设置最大下载/上传速度
-   *
-   * @param speed 单位：kb
-   */
-  void setMaxSpeed(int speed);
 }

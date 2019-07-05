@@ -41,7 +41,7 @@ import com.arialyy.simple.common.ModifyUrlDialog;
 import com.arialyy.simple.databinding.ActivityM3u8LiveBinding;
 import java.io.File;
 
-public class M3U8LiveDownloadActivity extends BaseActivity<ActivityM3u8LiveBinding> {
+public class M3U8LiveDLoadActivity extends BaseActivity<ActivityM3u8LiveBinding> {
 
   private String mUrl;
   private String mFilePath;
@@ -60,7 +60,7 @@ public class M3U8LiveDownloadActivity extends BaseActivity<ActivityM3u8LiveBindi
         if (entity == null) {
           return;
         }
-        mTarget = Aria.download(M3U8LiveDownloadActivity.this).load(entity.getUrl());
+        mTarget = Aria.download(M3U8LiveDLoadActivity.this).load(entity.getUrl());
         getBinding().setStateStr(getString(R.string.start));
         getBinding().setUrl(entity.getUrl());
         getBinding().setFilePath(entity.getFilePath());
@@ -184,7 +184,7 @@ public class M3U8LiveDownloadActivity extends BaseActivity<ActivityM3u8LiveBindi
   @Download.onTaskFail
   void taskFail(DownloadTask task, Exception e) {
     if (task.getKey().equals(mUrl)) {
-      Toast.makeText(M3U8LiveDownloadActivity.this, getString(R.string.download_fail),
+      Toast.makeText(M3U8LiveDLoadActivity.this, getString(R.string.download_fail),
           Toast.LENGTH_SHORT)
           .show();
       getBinding().setStateStr(getString(R.string.start));
@@ -195,7 +195,7 @@ public class M3U8LiveDownloadActivity extends BaseActivity<ActivityM3u8LiveBindi
   void taskComplete(DownloadTask task) {
     if (task.getKey().equals(mUrl)) {
       getBinding().setProgress(100);
-      Toast.makeText(M3U8LiveDownloadActivity.this, getString(R.string.download_success),
+      Toast.makeText(M3U8LiveDLoadActivity.this, getString(R.string.download_success),
           Toast.LENGTH_SHORT).show();
       getBinding().setStateStr(getString(R.string.re_start));
       getBinding().setSpeed("");
@@ -225,15 +225,15 @@ public class M3U8LiveDownloadActivity extends BaseActivity<ActivityM3u8LiveBindi
   }
 
   private void startD() {
-    Aria.download(M3U8LiveDownloadActivity.this)
+    Aria.download(M3U8LiveDLoadActivity.this)
         .load(mUrl)
         .useServerFileName(true)
         .setFilePath(mFilePath, true)
         .asM3U8()
         //.setBandWidthUrlConverter(new IBandWidthUrlConverter() {
         //  @Override public String convert(String bandWidthUrl) {
-        //    int index = mUrl.lastIndexOf("/");
-        //    return mUrl.substring(0, index + 1) + bandWidthUrl;
+        //    int peerIndex = mUrl.lastIndexOf("/");
+        //    return mUrl.substring(0, peerIndex + 1) + bandWidthUrl;
         //  }
         //})
         .asLive()
@@ -246,8 +246,8 @@ public class M3U8LiveDownloadActivity extends BaseActivity<ActivityM3u8LiveBindi
         })
         //.setLiveTsUrlConvert(new IVodTsUrlConverter() {
         //  @Override public List<String> convert(String m3u8Url, List<String> tsUrls) {
-        //    int index = m3u8Url.lastIndexOf("/");
-        //    String parentUrl = m3u8Url.substring(0, index + 1);
+        //    int peerIndex = m3u8Url.lastIndexOf("/");
+        //    String parentUrl = m3u8Url.substring(0, peerIndex + 1);
         //    List<String> newUrls = new ArrayList<>();
         //    for (String url : tsUrls) {
         //      newUrls.add(parentUrl + url);

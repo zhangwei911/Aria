@@ -33,7 +33,7 @@ public class DownloadGroupTaskQueue
 
   public static DownloadGroupTaskQueue getInstance() {
     if (INSTANCE == null) {
-      synchronized (AriaManager.LOCK) {
+      synchronized (DownloadGroupTaskQueue.class) {
         INSTANCE = new DownloadGroupTaskQueue();
       }
     }

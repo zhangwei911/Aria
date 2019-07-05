@@ -13,17 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.arialyy.aria.core.scheduler;
+package com.arialyy.aria.core.command;
 
-import com.arialyy.aria.core.inf.ITask;
+import com.arialyy.aria.core.inf.AbsGroupTaskWrapper;
 
 /**
- * Created by lyy on 2017/4/5.
+ * Created by AriaL on 2017/6/29.
+ * 任务组开始命令，该命令负责处理任务组子任务的开始\恢复等工作
  */
-public interface IDownloadSchedulerListener<TASK extends ITask> extends ISchedulerListener<TASK> {
+final class DGSubStartCmd<T extends AbsGroupTaskWrapper> extends AbsGroupCmd<T> {
+  DGSubStartCmd(T wrapper) {
+    super(wrapper);
+  }
 
-  /**
-   * 支持断点的回调
-   */
-  public void onNoSupportBreakPoint(TASK task);
+  @Override public void executeCmd() {
+    if (checkTask()) {
+      tempTask.startSubTask(childUrl);
+    }
+  }
 }

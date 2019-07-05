@@ -26,7 +26,6 @@ import com.arialyy.aria.core.download.downloader.ConnectionHelp;
 import com.arialyy.aria.exception.AriaIOException;
 import com.arialyy.aria.exception.TaskException;
 import com.arialyy.aria.util.ALog;
-import com.arialyy.aria.util.BufferedRandomAccessFile;
 import java.io.BufferedInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -40,7 +39,6 @@ import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -48,7 +46,7 @@ import java.util.Set;
  * Created by lyy on 2017/1/18. 下载线程
  */
 final class M3U8ThreadTask extends AbsThreadTask<DownloadEntity, DTaskWrapper> {
-  private final String TAG = "HttpThreadTask";
+  private final String TAG = "M3U8ThreadTask";
 
   M3U8ThreadTask(SubThreadConfig<DTaskWrapper> config) {
     super(config);
@@ -75,9 +73,6 @@ final class M3U8ThreadTask extends AbsThreadTask<DownloadEntity, DTaskWrapper> {
         conn.setChunkedStreamingMode(0);
       }
       conn.connect();
-      //Map<String, List<String>> header = conn.getHeaderFields();
-      //int code = conn.getResponseCode();
-      //String msg = conn.getResponseMessage();
       // 传递参数
       if (taskDelegate.getRequestEnum() == RequestEnum.POST) {
         Map<String, String> params = taskDelegate.getParams();
@@ -125,6 +120,7 @@ final class M3U8ThreadTask extends AbsThreadTask<DownloadEntity, DTaskWrapper> {
       } catch (IOException e) {
         e.printStackTrace();
       }
+      onThreadComplete();
     }
     return this;
   }

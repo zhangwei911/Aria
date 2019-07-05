@@ -111,6 +111,8 @@ class FtpThreadTask extends AbsFtpThreadTask<DownloadEntity, DTaskWrapper> {
       } catch (IOException e) {
         e.printStackTrace();
       }
+
+      onThreadComplete();
     }
     return this;
   }

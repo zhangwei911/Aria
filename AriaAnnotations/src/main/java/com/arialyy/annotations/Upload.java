@@ -31,8 +31,6 @@ import java.lang.annotation.Target;
  *       }
  *   </code>
  * </pre>
- * {@literal @}Upload.onPre("/mnt/sdcard/test.zip")，如果你的注解中增加了path描述，
- * 则表示，所有上传任务中，只有上传路径为"/mnt/sdcard/test.zip"的任务才能回调该注解的方法。
  */
 @Retention(RetentionPolicy.CLASS) @Target(ElementType.METHOD) public @interface Upload {
 

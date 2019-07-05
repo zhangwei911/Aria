@@ -21,7 +21,6 @@ import com.arialyy.aria.core.inf.AbsTask;
 import com.arialyy.aria.core.inf.AbsTaskWrapper;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -112,7 +111,7 @@ public class ThreadTaskManager {
           if (container.future.isDone() || container.future.isCancelled()) {
             continue;
           }
-          container.threadTask.setInterrupted(true);
+          container.threadTask.destroy();
         }
         temp.clear();
       }
@@ -130,16 +129,16 @@ public class ThreadTaskManager {
    * @param key 任务的key
    * @param task 线程任务
    */
-  public void removeSingleTaskThread(String key, AbsThreadTask task) {
+  public boolean removeSingleTaskThread(String key, AbsThreadTask task) {
     try {
       LOCK.tryLock(2, TimeUnit.SECONDS);
       if (mExePool.isShutdown()) {
         ALog.e(TAG, "线程池已经关闭");
-        return;
+        return false;
       }
       if (task == null) {
         ALog.e(TAG, "线程任务为空");
-        return;
+        return false;
       }
       key = getKey(key);
       Set<FutureContainer> temp = mThreadTasks.get(key);
@@ -152,8 +151,9 @@ public class ThreadTaskManager {
           }
         }
         if (tempC != null) {
-          task.setInterrupted(true);
+          task.destroy();
           temp.remove(tempC);
+          return true;
         }
       }
     } catch (Exception e) {
@@ -161,6 +161,7 @@ public class ThreadTaskManager {
     } finally {
       LOCK.unlock();
     }
+    return false;
   }
 
   /**
@@ -176,7 +177,7 @@ public class ThreadTaskManager {
         return;
       }
       try {
-        if (task == null || task.isInterrupted()) {
+        if (task == null || task.isDestroy()) {
           ALog.e(TAG, "线程为空或线程已经中断");
           return;
         }

@@ -19,14 +19,13 @@ import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.CheckResult;
 import android.text.TextUtils;
-import com.arialyy.aria.core.AriaManager;
+import com.arialyy.aria.core.command.CancelCmd;
 import com.arialyy.aria.core.command.ICmd;
-import com.arialyy.aria.core.command.normal.CancelCmd;
-import com.arialyy.aria.core.command.normal.NormalCmdFactory;
-import com.arialyy.aria.core.command.normal.ReStartCmd;
+import com.arialyy.aria.core.command.NormalCmdFactory;
 import com.arialyy.aria.core.download.DGTaskWrapper;
-import com.arialyy.aria.core.download.DownloadGroupEntity;
 import com.arialyy.aria.core.download.DTaskWrapper;
+import com.arialyy.aria.core.download.DownloadGroupEntity;
+import com.arialyy.aria.core.event.EventMsgUtil;
 import com.arialyy.aria.core.manager.TaskWrapperManager;
 import com.arialyy.aria.core.scheduler.DownloadGroupSchedulers;
 import com.arialyy.aria.core.scheduler.DownloadSchedulers;
@@ -36,8 +35,6 @@ import com.arialyy.aria.core.upload.UTaskWrapper;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
 import com.arialyy.aria.util.RecordUtil;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by AriaL on 2017/7/3.
@@ -81,7 +78,8 @@ public abstract class AbsTarget<TARGET extends AbsTarget> implements ITargetHand
       if (mEntity instanceof AbsNormalEntity) {
         RecordUtil.delTaskRecord((AbsNormalEntity) mEntity, mTaskWrapper.isRemoveFile());
       } else if (mEntity instanceof DownloadGroupEntity) {
-        RecordUtil.delGroupTaskRecord(((DownloadGroupEntity) mEntity), mTaskWrapper.isRemoveFile(), true);
+        RecordUtil.delGroupTaskRecord(((DownloadGroupEntity) mEntity), mTaskWrapper.isRemoveFile(),
+            true);
       }
       TaskWrapperManager.getInstance().removeTaskWrapper(mEntity.getKey());
     }
@@ -272,10 +270,9 @@ public abstract class AbsTarget<TARGET extends AbsTarget> implements ITargetHand
    */
   @Override public void add() {
     if (checkConfig()) {
-      AriaManager.getInstance(AriaManager.APP)
-          .setCmd(CommonUtil.createNormalCmd(getTaskWrapper(), NormalCmdFactory.TASK_CREATE,
-              checkTaskType()))
-          .exe();
+      EventMsgUtil.getDefault()
+          .post(CommonUtil.createNormalCmd(mTaskWrapper, NormalCmdFactory.TASK_CREATE,
+              checkTaskType()));
     }
   }
 
@@ -284,11 +281,9 @@ public abstract class AbsTarget<TARGET extends AbsTarget> implements ITargetHand
    */
   @Override public void start() {
     if (checkConfig()) {
-      AriaManager.getInstance(AriaManager.APP)
-          .setCmd(
-              CommonUtil.createNormalCmd(mTaskWrapper, NormalCmdFactory.TASK_START,
-                  checkTaskType()))
-          .exe();
+      EventMsgUtil.getDefault()
+          .post(CommonUtil.createNormalCmd(mTaskWrapper, NormalCmdFactory.TASK_START,
+              checkTaskType()));
     }
   }
 
@@ -298,17 +293,14 @@ public abstract class AbsTarget<TARGET extends AbsTarget> implements ITargetHand
    * @see #stop()
    */
   @Deprecated public void pause() {
-    if (checkConfig()) {
-      stop();
-    }
+    stop();
   }
 
   @Override public void stop() {
     if (checkConfig()) {
-      AriaManager.getInstance(AriaManager.APP)
-          .setCmd(
-              CommonUtil.createNormalCmd(mTaskWrapper, NormalCmdFactory.TASK_STOP, checkTaskType()))
-          .exe();
+      EventMsgUtil.getDefault()
+          .post(CommonUtil.createNormalCmd(mTaskWrapper, NormalCmdFactory.TASK_STOP,
+              checkTaskType()));
     }
   }
 
@@ -317,11 +309,9 @@ public abstract class AbsTarget<TARGET extends AbsTarget> implements ITargetHand
    */
   @Override public void resume() {
     if (checkConfig()) {
-      AriaManager.getInstance(AriaManager.APP)
-          .setCmd(
-              CommonUtil.createNormalCmd(mTaskWrapper, NormalCmdFactory.TASK_START,
-                  checkTaskType()))
-          .exe();
+      EventMsgUtil.getDefault()
+          .post(CommonUtil.createNormalCmd(mTaskWrapper, NormalCmdFactory.TASK_START,
+              checkTaskType()));
     }
   }
 
@@ -330,10 +320,9 @@ public abstract class AbsTarget<TARGET extends AbsTarget> implements ITargetHand
    */
   @Override public void cancel() {
     if (checkConfig()) {
-      AriaManager.getInstance(AriaManager.APP)
-          .setCmd(CommonUtil.createNormalCmd(mTaskWrapper, NormalCmdFactory.TASK_CANCEL,
-              checkTaskType()))
-          .exe();
+      EventMsgUtil.getDefault()
+          .post(CommonUtil.createNormalCmd(mTaskWrapper, NormalCmdFactory.TASK_CANCEL,
+              checkTaskType()));
     }
   }
 
@@ -342,12 +331,11 @@ public abstract class AbsTarget<TARGET extends AbsTarget> implements ITargetHand
    */
   @Override public void reTry() {
     if (checkConfig()) {
-      List<ICmd> cmds = new ArrayList<>();
       int taskType = checkTaskType();
-      cmds.add(
-          CommonUtil.createNormalCmd(mTaskWrapper, NormalCmdFactory.TASK_STOP, taskType));
-      cmds.add(CommonUtil.createNormalCmd(mTaskWrapper, NormalCmdFactory.TASK_START, taskType));
-      AriaManager.getInstance(AriaManager.APP).setCmds(cmds).exe();
+      EventMsgUtil.getDefault()
+          .post(CommonUtil.createNormalCmd(mTaskWrapper, NormalCmdFactory.TASK_STOP, taskType));
+      EventMsgUtil.getDefault()
+          .post(CommonUtil.createNormalCmd(mTaskWrapper, NormalCmdFactory.TASK_START, taskType));
     }
   }
 
@@ -363,7 +351,7 @@ public abstract class AbsTarget<TARGET extends AbsTarget> implements ITargetHand
           (CancelCmd) CommonUtil.createNormalCmd(mTaskWrapper, NormalCmdFactory.TASK_CANCEL,
               checkTaskType());
       cancelCmd.removeFile = removeFile;
-      AriaManager.getInstance(AriaManager.APP).setCmd(cancelCmd).exe();
+      EventMsgUtil.getDefault().post(cancelCmd);
     }
   }
 
@@ -372,10 +360,9 @@ public abstract class AbsTarget<TARGET extends AbsTarget> implements ITargetHand
    */
   @Override public void reStart() {
     if (checkConfig()) {
-      ReStartCmd cmd =
-          (ReStartCmd) CommonUtil.createNormalCmd(mTaskWrapper, NormalCmdFactory.TASK_RESTART,
-              checkTaskType());
-      AriaManager.getInstance(AriaManager.APP).setCmd(cmd).exe();
+      EventMsgUtil.getDefault()
+          .post(CommonUtil.createNormalCmd(mTaskWrapper, NormalCmdFactory.TASK_RESTART,
+              checkTaskType()));
     }
   }
 

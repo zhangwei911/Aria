@@ -13,29 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.arialyy.aria.core.command.normal;
-
-import com.arialyy.aria.core.inf.AbsTask;
-import com.arialyy.aria.core.inf.AbsTaskWrapper;
-import com.arialyy.aria.core.inf.TaskSchedulerType;
+package com.arialyy.compiler;
 
 /**
- * 重新开始任务命令
+ * Created by lyy on 2019/6/25.
+ * 实体信息
  */
-public class ReStartCmd<T extends AbsTaskWrapper> extends AbsNormalCmd<T> {
+enum EntityInfo {
+  NORMAL("com.arialyy.aria.core.inf", "AbsNormalEntity"),
+  DOWNLOAD("com.arialyy.aria.core.download", "DownloadEntity"),
+  UPLOAD("com.arialyy.aria.core.upload", "UploadEntity");
+  String pkg, className;
 
-  ReStartCmd(T entity, int taskType) {
-    super(entity, taskType);
+  public String getClassName() {
+    return className;
   }
 
-  @Override public void executeCmd() {
-    AbsTask task = getTask();
-    if (task == null) {
-      task = createTask();
-    }
-    if (task != null) {
-      task.cancel(TaskSchedulerType.TYPE_CANCEL_AND_NOT_NOTIFY);
-      task.start(TaskSchedulerType.TYPE_START_AND_RESET_STATE);
-    }
+  public String getPkg() {
+    return pkg;
+  }
+
+  /**
+   * @param pkg 包名
+   * @param className 对应到任务类名
+   */
+  EntityInfo(String pkg, String className) {
+    this.pkg = pkg;
+    this.className = className;
   }
 }
