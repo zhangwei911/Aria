@@ -290,8 +290,11 @@ public class RecordUtil {
   private static void removeTsCache(String cacheDir) {
 
     if (!TextUtils.isEmpty(cacheDir)) {
-
-      File[] files = new File(cacheDir).listFiles();
+      File cacheDirF = new File(cacheDir);
+      if (!cacheDirF.exists()){
+        return;
+      }
+      File[] files = cacheDirF.listFiles();
       for (File f : files) {
         if (f.exists()) {
           f.delete();

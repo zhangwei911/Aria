@@ -130,6 +130,10 @@ public interface ISchedulers extends Handler.Callback {
    * 等待
    */
   int WAIT = 10;
+  /**
+   * 检查信息失败
+   */
+  int CHECK_FAIL = 11;
 
   /**
    * 组合任务子任务预处理

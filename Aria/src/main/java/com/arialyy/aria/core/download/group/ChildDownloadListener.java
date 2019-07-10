@@ -32,9 +32,9 @@ class ChildDownloadListener implements IDownloadListener {
   private long lastSaveTime;
   private long lastLen;
   private Handler schedulers;
-  private SubDownloadLoader loader;
+  private SubDLoadUtil loader;
 
-  ChildDownloadListener(Handler schedulers, SubDownloadLoader loader) {
+  ChildDownloadListener(Handler schedulers, SubDLoadUtil loader) {
     this.loader = loader;
     this.schedulers = schedulers;
     subEntity = loader.getEntity();
@@ -140,7 +140,7 @@ class ChildDownloadListener implements IDownloadListener {
    *
    * @param state {@link ISchedulers}
    */
-  private void sendToTarget(int state, SubDownloadLoader util) {
+  private void sendToTarget(int state, SubDLoadUtil util) {
     schedulers.obtainMessage(state, util).sendToTarget();
   }
 }

@@ -21,11 +21,11 @@ import android.text.TextUtils;
 import com.arialyy.annotations.TaskEnum;
 import com.arialyy.aria.core.AriaManager;
 import com.arialyy.aria.core.command.CancelAllCmd;
-import com.arialyy.aria.core.command.ICmd;
 import com.arialyy.aria.core.command.NormalCmdFactory;
 import com.arialyy.aria.core.common.ProxyHelper;
 import com.arialyy.aria.core.event.EventMsgUtil;
 import com.arialyy.aria.core.inf.AbsReceiver;
+import com.arialyy.aria.core.inf.ITask;
 import com.arialyy.aria.core.inf.ReceiverType;
 import com.arialyy.aria.core.scheduler.UploadSchedulers;
 import com.arialyy.aria.orm.DbEntity;
@@ -168,7 +168,7 @@ public class UploadReceiver extends AbsReceiver {
   public void stopAllTask() {
     EventMsgUtil.getDefault().post(NormalCmdFactory.getInstance()
         .createCmd(new UTaskWrapper(null), NormalCmdFactory.TASK_STOP_ALL,
-            ICmd.TASK_TYPE_UPLOAD));
+            ITask.UPLOAD));
   }
 
   /**
@@ -181,7 +181,7 @@ public class UploadReceiver extends AbsReceiver {
     final AriaManager am = AriaManager.getInstance(AriaManager.APP);
     CancelAllCmd cancelCmd =
         (CancelAllCmd) CommonUtil.createNormalCmd(new UTaskWrapper(null),
-            NormalCmdFactory.TASK_CANCEL_ALL, ICmd.TASK_TYPE_UPLOAD);
+            NormalCmdFactory.TASK_CANCEL_ALL, ITask.UPLOAD);
     cancelCmd.removeFile = removeFile;
 
     EventMsgUtil.getDefault().post(cancelCmd);

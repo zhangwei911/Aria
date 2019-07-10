@@ -16,7 +16,6 @@
 package com.arialyy.aria.core.download;
 
 import android.os.Handler;
-
 import com.arialyy.aria.core.common.BaseListener;
 import com.arialyy.aria.core.common.RecordHandler;
 import com.arialyy.aria.core.download.group.IDownloadGroupListener;
@@ -46,6 +45,7 @@ class DownloadGroupListener
 
   @Override
   public void onSubPre(DownloadEntity subEntity) {
+    saveSubState(IEntity.STATE_PRE, subEntity);
     sendInState2Target(ISchedulers.SUB_PRE, subEntity);
   }
 
@@ -56,23 +56,27 @@ class DownloadGroupListener
 
   @Override
   public void onSubStart(DownloadEntity subEntity) {
+    saveSubState(IEntity.STATE_RUNNING, subEntity);
     sendInState2Target(ISchedulers.SUB_START, subEntity);
   }
 
   @Override
   public void onSubStop(DownloadEntity subEntity) {
+    saveSubState(IEntity.STATE_STOP, subEntity);
     saveCurrentLocation();
     sendInState2Target(ISchedulers.SUB_STOP, subEntity);
   }
 
   @Override
   public void onSubComplete(DownloadEntity subEntity) {
+    saveSubState(IEntity.STATE_COMPLETE, subEntity);
     saveCurrentLocation();
     sendInState2Target(ISchedulers.SUB_COMPLETE, subEntity);
   }
 
   @Override
   public void onSubFail(DownloadEntity subEntity, BaseException e) {
+    saveSubState(IEntity.STATE_FAIL, subEntity);
     saveCurrentLocation();
     sendInState2Target(ISchedulers.SUB_FAIL, subEntity);
     if (e != null) {
@@ -83,12 +87,17 @@ class DownloadGroupListener
 
   @Override
   public void onSubCancel(DownloadEntity subEntity) {
+    saveSubState(IEntity.STATE_CANCEL, subEntity);
     saveCurrentLocation();
     sendInState2Target(ISchedulers.SUB_CANCEL, subEntity);
   }
 
   @Override
   public void onSubRunning(DownloadEntity subEntity) {
+    if (System.currentTimeMillis() - mLastSaveTime >= RUN_SAVE_INTERVAL) {
+      saveSubState(IEntity.STATE_RUNNING, subEntity);
+      mLastSaveTime = System.currentTimeMillis();
+    }
     sendInState2Target(ISchedulers.SUB_RUNNING, subEntity);
   }
 
@@ -102,7 +111,6 @@ class DownloadGroupListener
       mSeedEntity.entity = subEntity;
       outHandler.get().obtainMessage(state, ISchedulers.IS_SUB_TASK, 0, mSeedEntity).sendToTarget();
     }
-    saveSubState(state, subEntity);
   }
 
   private void saveSubState(int state, DownloadEntity subEntity) {
@@ -117,7 +125,7 @@ class DownloadGroupListener
       subEntity.setConvertSpeed("0kb/s");
       subEntity.setSpeed(0);
       ALog.i(TAG, String.format("任务【%s】完成，将删除线程任务记录", mEntity.getKey()));
-      RecordUtil.delTaskRecord(subEntity.getKey(), RecordHandler.TYPE_DOWNLOAD, false, false);
+      RecordUtil.delTaskRecord(subEntity.getFilePath(), RecordHandler.TYPE_DOWNLOAD, false, false);
     }
     subEntity.update();
   }

@@ -75,7 +75,7 @@ import java.util.List;
 
     findViewById(R.id.stop).setOnClickListener(this);
     findViewById(R.id.start).setOnClickListener(this);
-    findViewById(R.id.cancel).setOnClickListener(this);
+    //findViewById(R.id.cancel).setOnClickListener(this);
     mGroup.setText("任务组：" + mGroupHash);
     mSub.setText("子任务：" + mChildName);
     mPb.setProgress((int) (mChildEntity.getCurrentProgress() * 100 / mChildEntity.getFileSize()));

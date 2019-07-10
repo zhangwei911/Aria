@@ -29,9 +29,7 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Toast;
-
 import com.arialyy.annotations.Download;
-import com.arialyy.annotations.M3U8;
 import com.arialyy.aria.core.Aria;
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.download.DownloadTarget;
@@ -47,7 +45,6 @@ import com.arialyy.simple.base.BaseActivity;
 import com.arialyy.simple.common.ModifyPathDialog;
 import com.arialyy.simple.common.ModifyUrlDialog;
 import com.arialyy.simple.databinding.ActivitySingleBinding;
-
 import com.arialyy.simple.util.AppUtil;
 import java.io.File;
 import java.io.IOException;
@@ -243,9 +240,9 @@ public class SingleTaskActivity extends BaseActivity<ActivitySingleBinding> {
 
   @Download.onTaskFail
   void taskFail(DownloadTask task, Exception e) {
-    if (task.getKey().equals(mUrl)) {
-      Toast.makeText(SingleTaskActivity.this, getString(R.string.download_fail), Toast.LENGTH_SHORT)
-          .show();
+    Toast.makeText(SingleTaskActivity.this, getString(R.string.download_fail), Toast.LENGTH_SHORT)
+        .show();
+    if (task != null && task.getKey().equals(mUrl)) {
       getBinding().setStateStr(getString(R.string.start));
     }
   }

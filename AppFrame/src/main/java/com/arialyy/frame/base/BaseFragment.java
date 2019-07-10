@@ -9,6 +9,7 @@ import com.arialyy.frame.core.AbsFragment;
 public abstract class BaseFragment<VB extends ViewDataBinding> extends AbsFragment<VB> {
   public int color;
 
+
   @Override protected void dataCallback(int result, Object obj) {
 
   }

@@ -114,8 +114,8 @@ public class ThreadTaskManager {
           container.threadTask.destroy();
         }
         temp.clear();
+        mThreadTasks.remove(key);
       }
-      mThreadTasks.remove(key);
     } catch (Exception e) {
       e.printStackTrace();
     } finally {

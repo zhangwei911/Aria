@@ -12,7 +12,7 @@
     <SurfaceView
         android:id="@+id/surface_view"
         android:layout_width="match_parent"
-        android:layout_height="200dp"
+        android:layout_height="240dp"
         />
 
 
@@ -31,7 +31,8 @@
           android:layout_height="wrap_content"
           android:layout_centerVertical="true"
           android:clickable="true"
-          app:srcCompat="@drawable/ic_start"
+          android:visibility="visible"
+          app:srcCompat="@drawable/selector_start_stop_bt"
           />
 
       <SeekBar

@@ -20,7 +20,6 @@ import android.os.Looper;
 import android.support.annotation.CheckResult;
 import android.text.TextUtils;
 import com.arialyy.aria.core.command.CancelCmd;
-import com.arialyy.aria.core.command.ICmd;
 import com.arialyy.aria.core.command.NormalCmdFactory;
 import com.arialyy.aria.core.download.DGTaskWrapper;
 import com.arialyy.aria.core.download.DTaskWrapper;
@@ -193,11 +192,11 @@ public abstract class AbsTarget<TARGET extends AbsTarget> implements ITargetHand
   protected int checkTaskType() {
     int taskType = 0;
     if (mTaskWrapper instanceof DTaskWrapper) {
-      taskType = ICmd.TASK_TYPE_DOWNLOAD;
+      taskType = ITask.DOWNLOAD;
     } else if (mTaskWrapper instanceof DGTaskWrapper) {
-      taskType = ICmd.TASK_TYPE_DOWNLOAD_GROUP;
+      taskType = ITask.DOWNLOAD_GROUP;
     } else if (mTaskWrapper instanceof UTaskWrapper) {
-      taskType = ICmd.TASK_TYPE_UPLOAD;
+      taskType = ITask.UPLOAD;
     }
     return taskType;
   }
@@ -209,8 +208,9 @@ public abstract class AbsTarget<TARGET extends AbsTarget> implements ITargetHand
     boolean b = checkEntity();
     ISchedulers schedulers = getScheduler();
     if (!b && schedulers != null) {
-      new Handler(Looper.getMainLooper(), schedulers).obtainMessage(ISchedulers.FAIL,
-          new TempTask(mTaskWrapper, mEntity)).sendToTarget();
+
+      new Handler(Looper.getMainLooper(), schedulers).obtainMessage(ISchedulers.CHECK_FAIL,
+          checkTaskType(), -1, null).sendToTarget();
     }
 
     return b;
@@ -363,85 +363,6 @@ public abstract class AbsTarget<TARGET extends AbsTarget> implements ITargetHand
       EventMsgUtil.getDefault()
           .post(CommonUtil.createNormalCmd(mTaskWrapper, NormalCmdFactory.TASK_RESTART,
               checkTaskType()));
-    }
-  }
-
-  private static class TempTask implements ITask {
-
-    private AbsTaskWrapper wrapper;
-    private AbsEntity entity;
-
-    private TempTask(AbsTaskWrapper wrapper, AbsEntity entity) {
-      this.wrapper = wrapper;
-      this.entity = entity;
-    }
-
-    @Override public int getTaskType() {
-      return TEMP;
-    }
-
-    @Override public int getState() {
-      return entity.getState();
-    }
-
-    @Override public String getKey() {
-      return entity.getKey();
-    }
-
-    @Override public boolean isRunning() {
-      return false;
-    }
-
-    @Override public AbsTaskWrapper getTaskWrapper() {
-      return wrapper;
-    }
-
-    @Override public void start() {
-
-    }
-
-    @Override public void start(int type) {
-
-    }
-
-    @Override public void stop() {
-
-    }
-
-    @Override public void stop(int type) {
-
-    }
-
-    @Override public void cancel() {
-
-    }
-
-    @Override public void cancel(int type) {
-
-    }
-
-    @Override public Object getExpand(String key) {
-      return null;
-    }
-
-    @Override public boolean isStop() {
-      return false;
-    }
-
-    @Override public boolean isCancel() {
-      return false;
-    }
-
-    @Override public boolean isNeedRetry() {
-      return false;
-    }
-
-    @Override public String getTaskName() {
-      return "TempTask";
-    }
-
-    @Override public int getSchedulerType() {
-      return TaskSchedulerType.TYPE_DEFAULT;
     }
   }
 }

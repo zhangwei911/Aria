@@ -21,12 +21,12 @@ import android.text.TextUtils;
 import com.arialyy.annotations.TaskEnum;
 import com.arialyy.aria.core.AriaManager;
 import com.arialyy.aria.core.command.CancelAllCmd;
-import com.arialyy.aria.core.command.ICmd;
 import com.arialyy.aria.core.command.NormalCmdFactory;
 import com.arialyy.aria.core.common.ProxyHelper;
 import com.arialyy.aria.core.event.EventMsgUtil;
 import com.arialyy.aria.core.inf.AbsEntity;
 import com.arialyy.aria.core.inf.AbsReceiver;
+import com.arialyy.aria.core.inf.ITask;
 import com.arialyy.aria.core.inf.ReceiverType;
 import com.arialyy.aria.core.scheduler.DownloadGroupSchedulers;
 import com.arialyy.aria.core.scheduler.DownloadSchedulers;
@@ -423,7 +423,7 @@ public class DownloadReceiver extends AbsReceiver {
   public void stopAllTask() {
     EventMsgUtil.getDefault().post(NormalCmdFactory.getInstance()
         .createCmd(new DTaskWrapper(null), NormalCmdFactory.TASK_STOP_ALL,
-            ICmd.TASK_TYPE_DOWNLOAD));
+            ITask.DOWNLOAD));
   }
 
   /**
@@ -434,7 +434,7 @@ public class DownloadReceiver extends AbsReceiver {
   public void resumeAllTask() {
     EventMsgUtil.getDefault().post(NormalCmdFactory.getInstance()
         .createCmd(new DTaskWrapper(null), NormalCmdFactory.TASK_RESUME_ALL,
-            ICmd.TASK_TYPE_DOWNLOAD));
+            ITask.DOWNLOAD));
   }
 
   /**
@@ -447,7 +447,7 @@ public class DownloadReceiver extends AbsReceiver {
     final AriaManager ariaManager = AriaManager.getInstance(AriaManager.APP);
     CancelAllCmd cancelCmd =
         (CancelAllCmd) CommonUtil.createNormalCmd(new DTaskWrapper(null),
-            NormalCmdFactory.TASK_CANCEL_ALL, ICmd.TASK_TYPE_DOWNLOAD);
+            NormalCmdFactory.TASK_CANCEL_ALL, ITask.DOWNLOAD);
     cancelCmd.removeFile = removeFile;
     EventMsgUtil.getDefault().post(cancelCmd);
 

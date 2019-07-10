@@ -14,24 +14,29 @@ import android.view.View;
 import android.widget.SeekBar;
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.download.m3u8.M3U8Entity;
+import com.arialyy.aria.util.ALog;
 import com.arialyy.frame.base.BaseFragment;
 import com.arialyy.simple.R;
+import com.arialyy.simple.common.LoadingDialog;
 import com.arialyy.simple.databinding.FragmentVideoPlayerBinding;
+import com.arialyy.simple.to.PeerIndex;
 import java.io.IOException;
 import java.util.List;
+import org.greenrobot.eventbus.EventBus;
 
 @SuppressLint("ValidFragment")
 @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
 public class VideoPlayerFragment extends BaseFragment<FragmentVideoPlayerBinding> {
 
-  static final int SEEK_BAR_PROGRESS_KEY = 0xC1;
-
   private M3U8VodModule mModule;
   private DownloadEntity mEntity;
   private int mPeerIndex;
-  SparseArray<String> mPlayers = new SparseArray<>();
+  private SparseArray<String> mPlayers = new SparseArray<>();
   private SurfaceHolder mSurfaceHolder;
-  private NextMediaPlayer nexPlayer;
+  private NextMediaPlayer mNextPlayer;
+  private MediaPlayer mCurrentPlayer;
+  private LoadingDialog mLoadingDialog;
+  private int mJumpIndex = -1;
 
   VideoPlayerFragment(int peerIndex, DownloadEntity entity) {
     mEntity = entity;
@@ -46,13 +51,11 @@ public class VideoPlayerFragment extends BaseFragment<FragmentVideoPlayerBinding
 
   @Override protected void init(Bundle savedInstanceState) {
     mModule = ViewModelProviders.of(this).get(M3U8VodModule.class);
-    final MediaPlayer firstPlayer = new MediaPlayer();
-    firstPlayer.setScreenOnWhilePlaying(true);
 
     getBinding().surfaceView.getHolder().addCallback(new SurfaceHolder.Callback() {
       @Override public void surfaceCreated(SurfaceHolder holder) {
         mSurfaceHolder = holder;
-        firstPlayer.setSurface(holder.getSurface());
+        startNewPlayer(mPlayers.valueAt(0));
       }
 
       @Override
@@ -61,7 +64,12 @@ public class VideoPlayerFragment extends BaseFragment<FragmentVideoPlayerBinding
       }
 
       @Override public void surfaceDestroyed(SurfaceHolder holder) {
-
+        if (mCurrentPlayer != null) {
+          mCurrentPlayer.release();
+        }
+        if (mNextPlayer != null) {
+          mNextPlayer.getPlayer().release();
+        }
       }
     });
     getBinding().seekBar.setMax(mEntity.getM3U8Entity().getPeerNum());
@@ -75,35 +83,65 @@ public class VideoPlayerFragment extends BaseFragment<FragmentVideoPlayerBinding
       }
 
       @Override public void onStopTrackingTouch(SeekBar seekBar) {
-        dataCallback(SEEK_BAR_PROGRESS_KEY, seekBar.getProgress());
+        PeerIndex index = new PeerIndex();
+        index.index = seekBar.getProgress();
+        EventBus.getDefault().post(index);
+        if (mCurrentPlayer != null && mCurrentPlayer.isPlaying()) {
+          mCurrentPlayer.stop();
+          mCurrentPlayer.setDisplay(null);
+          mCurrentPlayer.release();
+        }
+        showLoadingDialog();
+        mJumpIndex = seekBar.getProgress();
       }
     });
+
     getBinding().controlBt.setOnClickListener(new View.OnClickListener() {
       @Override public void onClick(View v) {
-        try {
-          firstPlayer.setDataSource(mPlayers.valueAt(0));
-          firstPlayer.prepareAsync();
-        } catch (IOException e) {
-          e.printStackTrace();
+        if (mCurrentPlayer != null) {
+          if (mCurrentPlayer.isPlaying()) {
+            getBinding().controlBt.setSelected(true);
+            mCurrentPlayer.start();
+          } else {
+            getBinding().controlBt.setSelected(false);
+            mCurrentPlayer.stop();
+          }
         }
       }
     });
-
-    firstPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-      @Override public void onPrepared(MediaPlayer mp) {
-        mp.start();
-        setNextMediaPlayer(mp);
-      }
-    });
-
-    firstPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-      @Override public void onCompletion(MediaPlayer mp) {
-        mp.setDisplay(null);
-        nexPlayer.getPlayer().setSurface(mSurfaceHolder.getSurface());
-        nexPlayer.start();
-      }
-    });
   }
+
+  private void startNewPlayer(String source) {
+    if (TextUtils.isEmpty(source)) {
+      ALog.e(TAG, "资源路径为空");
+      return;
+    }
+    try {
+      mCurrentPlayer = new MediaPlayer();
+      mCurrentPlayer.setScreenOnWhilePlaying(true);
+      mCurrentPlayer.setSurface(mSurfaceHolder.getSurface());
+      mCurrentPlayer.setDataSource(source);
+      mCurrentPlayer.prepareAsync();
+      mCurrentPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+        @Override public void onPrepared(MediaPlayer mp) {
+          mp.start();
+          setNextMediaPlayer(mp);
+        }
+      });
+
+      mCurrentPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+        @Override public void onCompletion(MediaPlayer mp) {
+          mp.setDisplay(null);
+          mNextPlayer.getPlayer().setSurface(mSurfaceHolder.getSurface());
+          mNextPlayer.start();
+        }
+      });
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+  }
+
+
 
   /**
    * 设置下一个分片
@@ -112,24 +150,40 @@ public class VideoPlayerFragment extends BaseFragment<FragmentVideoPlayerBinding
     mPeerIndex++;
     String nextPeerPath = mPlayers.get(mPeerIndex);
     if (!TextUtils.isEmpty(nextPeerPath)) {
-      nexPlayer = new NextMediaPlayer(nextPeerPath);
-      nexPlayer.prepareAsync();
+      mNextPlayer = new NextMediaPlayer(nextPeerPath);
+      mNextPlayer.prepareAsync();
 
-      nexPlayer.setListener(new NextMediaPlayer.StateListener() {
+      mNextPlayer.setListener(new NextMediaPlayer.StateListener() {
         @Override public void onStart(MediaPlayer mp) {
+          mCurrentPlayer = mp;
           setNextMediaPlayer(mp);
         }
 
         @Override public void onCompletion(MediaPlayer mp) {
-          mp.setDisplay(null);
-          nexPlayer.getPlayer().setSurface(mSurfaceHolder.getSurface());
-          nexPlayer.start();
+          //mp.setDisplay(null);
+          //mNextPlayer.getPlayer().setSurface(mSurfaceHolder.getSurface());
+          mNextPlayer.start();
         }
 
         @Override public void onPrepared(MediaPlayer mp) {
-          lastPlayer.setNextMediaPlayer(nexPlayer.getPlayer());
+          lastPlayer.setNextMediaPlayer(mNextPlayer.getPlayer());
         }
       });
+    }
+  }
+
+  private void showLoadingDialog() {
+    if (mLoadingDialog == null) {
+      mLoadingDialog = new LoadingDialog(this);
+    }
+    if (!mLoadingDialog.isHidden()) {
+      mLoadingDialog.show(getChildFragmentManager(), "mLoadingDialog");
+    }
+  }
+
+  private void dismissDialog() {
+    if (mLoadingDialog != null) {
+      mLoadingDialog.dismiss();
     }
   }
 
@@ -139,6 +193,10 @@ public class VideoPlayerFragment extends BaseFragment<FragmentVideoPlayerBinding
 
   public void addPlayer(int peerIndex, String peerPath) {
     mPlayers.put(peerIndex, peerPath);
+    if (mJumpIndex != -1 && mJumpIndex == peerIndex) {
+      startNewPlayer(mPlayers.get(peerIndex));
+      dismissDialog();
+    }
   }
 
   private static class NextMediaPlayer implements MediaPlayer.OnPreparedListener,

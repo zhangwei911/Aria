@@ -23,6 +23,7 @@ import com.arialyy.annotations.DownloadGroup;
 import com.arialyy.aria.core.Aria;
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.download.DownloadGroupEntity;
+import com.arialyy.aria.core.download.DownloadGroupTarget;
 import com.arialyy.aria.core.download.DownloadGroupTask;
 import com.arialyy.aria.core.inf.IHttpFileLenAdapter;
 import com.arialyy.aria.util.ALog;
@@ -40,18 +41,23 @@ import java.util.Map;
  */
 public class DownloadGroupActivity extends BaseActivity<ActivityDownloadGroupBinding> {
 
-  SubStateLinearLayout mChildList;
-  List<String> mUrls;
+  private SubStateLinearLayout mChildList;
+  private List<String> mUrls;
+  private DownloadGroupTarget mTarget;
 
   @Override protected void init(Bundle savedInstanceState) {
     super.init(savedInstanceState);
     Aria.download(this).register();
     setTitle("任务组");
+
     mChildList = getBinding().childList;
     mUrls = getModule(GroupModule.class).getUrls();
     DownloadGroupEntity entity = Aria.download(this).getDownloadGroupEntity(mUrls);
     if (entity != null) {
+      mTarget = Aria.download(this).loadGroup(entity);
       mChildList.addData(entity.getSubEntities());
+      getBinding().setStateStr(
+          mTarget.isRunning() ? getString(R.string.stop) : getString(R.string.resume));
       getBinding().setFileSize(entity.getConvertFileSize());
       if (entity.getFileSize() == 0) {
         getBinding().setProgress(0);
@@ -59,7 +65,8 @@ public class DownloadGroupActivity extends BaseActivity<ActivityDownloadGroupBin
         getBinding().setProgress(entity.isComplete() ? 100
             : (int) (entity.getCurrentProgress() * 100 / entity.getFileSize()));
       }
-      ALog.d(TAG, "size = " + entity.getSubEntities().size() + "; len = " + entity.getConvertFileSize());
+      ALog.d(TAG,
+          "size = " + entity.getSubEntities().size() + "; len = " + entity.getConvertFileSize());
     }
 
     mChildList.setOnItemClickListener(new SubStateLinearLayout.OnItemClickListener() {
@@ -82,33 +89,36 @@ public class DownloadGroupActivity extends BaseActivity<ActivityDownloadGroupBin
   public void onClick(View view) {
     switch (view.getId()) {
       case R.id.start:
-        Aria.download(this)
-            .loadGroup(mUrls)
-            .setDirPath(
-                //Environment.getExternalStorageDirectory().getPath() + "/Download/group_test_5")
-                Environment.getExternalStorageDirectory().getPath() + "/Download/group_test_2")
-            .setGroupAlias("任务组测试")
-            //.setSubFileName(getModule(GroupModule.class).getSubName2())
-            .setSubFileName(getModule(GroupModule.class).getSubName())
-            .unknownSize()
-            .setFileLenAdapter(new IHttpFileLenAdapter() {
-              @Override public long handleFileLen(Map<String, List<String>> headers) {
+        if (mTarget == null || !mTarget.isRunning()) {
+          Aria.download(this)
+              .loadGroup(mUrls)
+              .setDirPath(
+                  //Environment.getExternalStorageDirectory().getPath() + "/Download/group_test_5")
+                  Environment.getExternalStorageDirectory().getPath() + "/Download/group_test_2")
+              .setGroupAlias("任务组测试")
+              //.setSubFileName(getModule(GroupModule.class).getSubName2())
+              .setSubFileName(getModule(GroupModule.class).getSubName())
+              .unknownSize()
+              .setFileLenAdapter(new IHttpFileLenAdapter() {
+                @Override public long handleFileLen(Map<String, List<String>> headers) {
 
-                List<String> sLength = headers.get("Content-Length");
-                if (sLength == null || sLength.isEmpty()) {
-                  return -1;
+                  List<String> sLength = headers.get("Content-Length");
+                  if (sLength == null || sLength.isEmpty()) {
+                    return -1;
+                  }
+                  String temp = sLength.get(0);
+
+                  return Long.parseLong(temp);
                 }
-                String temp = sLength.get(0);
-
-                return Long.parseLong(temp);
-              }
-            })
-            //.setFileSize(114981416)
-            //.updateUrls(temp)
-            .start();
-        break;
-      case R.id.stop:
-        Aria.download(this).loadGroup(mUrls).stop();
+              })
+              //.setFileSize(114981416)
+              //.updateUrls(temp)
+              .start();
+          getBinding().setStateStr(getString(R.string.stop));
+        } else {
+          Aria.download(this).loadGroup(mUrls).stop();
+          getBinding().setStateStr(getString(R.string.resume));
+        }
         break;
       case R.id.cancel:
         Aria.download(this).loadGroup(mUrls).cancel(true);
@@ -166,10 +176,12 @@ public class DownloadGroupActivity extends BaseActivity<ActivityDownloadGroupBin
     L.d(TAG, "group task cancel");
     getBinding().setSpeed("");
     getBinding().setProgress(0);
+    getBinding().setStateStr(getString(R.string.start));
   }
 
   @DownloadGroup.onTaskFail() void taskFail(DownloadGroupTask task) {
     L.d(TAG, "group task fail");
+    getBinding().setStateStr(getString(R.string.resume));
   }
 
   @DownloadGroup.onTaskComplete() void taskComplete(DownloadGroupTask task) {
@@ -178,6 +190,7 @@ public class DownloadGroupActivity extends BaseActivity<ActivityDownloadGroupBin
     mChildList.updateChildProgress(task.getEntity().getSubEntities());
     T.showShort(this, "任务组下载完成");
     L.d(TAG, "任务组下载完成");
+    getBinding().setStateStr(getString(R.string.start));
   }
 
   @DownloadGroup.onSubTaskRunning void onSubTaskRunning(DownloadGroupTask groupTask,

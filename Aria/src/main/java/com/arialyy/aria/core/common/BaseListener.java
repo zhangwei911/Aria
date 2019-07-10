@@ -38,12 +38,12 @@ public abstract class BaseListener<ENTITY extends AbsEntity, TASK_WRAPPER extend
     TASK extends AbsTask<TASK_WRAPPER>>
     implements IEventListener {
   protected static String TAG;
-  private static final int RUN_SAVE_INTERVAL = 5 * 1000;  //5s保存一次下载中的进度
+  protected static final int RUN_SAVE_INTERVAL = 5 * 1000;  //5s保存一次下载中的进度
   protected WeakReference<Handler> outHandler;
   private long mLastLen;   //上一次发送长度
   private boolean isFirst = true;
   private TASK mTask;
-  private long mLastSaveTime;
+  protected long mLastSaveTime;
   protected ENTITY mEntity;
   protected TASK_WRAPPER mTaskWrapper;
   private boolean isConvertSpeed;

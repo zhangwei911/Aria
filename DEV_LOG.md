@@ -1,6 +1,8 @@
 ## 开发日志
   + v_3.6.5
     - fix bug https://github.com/AriaLyy/Aria/issues/403
+    - fix bug https://github.com/AriaLyy/Aria/issues/414
+    - fix bug https://github.com/AriaLyy/Aria/issues/406
     - 新增ftp上传拦截器 https://github.com/AriaLyy/Aria/issues/402
     - 重构线程任务模块
     - 修复一个低版本数据库升级的问题 https://github.com/AriaLyy/Aria/issues/407

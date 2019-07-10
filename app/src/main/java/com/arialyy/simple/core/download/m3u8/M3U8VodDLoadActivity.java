@@ -45,9 +45,13 @@ import com.arialyy.simple.base.BaseActivity;
 import com.arialyy.simple.common.ModifyPathDialog;
 import com.arialyy.simple.common.ModifyUrlDialog;
 import com.arialyy.simple.databinding.ActivityM3u8VodBinding;
+import com.arialyy.simple.to.PeerIndex;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 public class M3U8VodDLoadActivity extends BaseActivity<ActivityM3u8VodBinding> {
 
@@ -103,6 +107,21 @@ public class M3U8VodDLoadActivity extends BaseActivity<ActivityM3u8VodBinding> {
     ModifyPathDialog dialog =
         new ModifyPathDialog(this, getString(R.string.modify_file_path), mFilePath);
     dialog.show(getSupportFragmentManager(), "ModifyPathDialog");
+  }
+
+  @Override protected void onStart() {
+    super.onStart();
+    EventBus.getDefault().register(this);
+  }
+
+  @Override protected void onStop() {
+    super.onStop();
+    EventBus.getDefault().unregister(this);
+  }
+
+  @Subscribe(threadMode = ThreadMode.MAIN)
+  public void jumpIndex(PeerIndex index) {
+    Aria.download(this).load(mUrl).asM3U8().asVod().jumPeerIndex(index.index);
   }
 
   @Override
@@ -303,8 +322,6 @@ public class M3U8VodDLoadActivity extends BaseActivity<ActivityM3u8VodBinding> {
       mModule.uploadUrl(this, String.valueOf(data));
     } else if (result == ModifyPathDialog.MODIFY_PATH_RESULT) {
       mModule.updateFilePath(this, String.valueOf(data));
-    } else if (result == VideoPlayerFragment.SEEK_BAR_PROGRESS_KEY) {
-      Aria.download(this).load(mUrl).asM3U8().asVod().jumPeerIndex((Integer) data);
     }
   }
 }

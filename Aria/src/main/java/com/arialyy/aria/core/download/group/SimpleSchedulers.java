@@ -20,6 +20,7 @@ import android.os.Message;
 import com.arialyy.aria.core.AriaManager;
 import com.arialyy.aria.core.config.Configuration;
 import com.arialyy.aria.core.inf.AbsEntity;
+import com.arialyy.aria.core.manager.ThreadTaskManager;
 import com.arialyy.aria.core.scheduler.ISchedulers;
 import com.arialyy.aria.exception.TaskException;
 import com.arialyy.aria.util.ALog;
@@ -47,7 +48,7 @@ class SimpleSchedulers implements ISchedulers {
   }
 
   @Override public boolean handleMessage(Message msg) {
-    SubDownloadLoader loader = (SubDownloadLoader) msg.obj;
+    SubDLoadUtil loader = (SubDLoadUtil) msg.obj;
     switch (msg.what) {
       case RUNNING:
         mGState.listener.onSubRunning(loader.getEntity());
@@ -78,7 +79,7 @@ class SimpleSchedulers implements ISchedulers {
    * 2、stopNum + failNum + completeNum + cacheNum == subSize，则认为组合任务停止
    * 3、failNum == subSize，只有全部的子任务都失败了，才能任务组合任务失败
    */
-  private synchronized void handleFail(final SubDownloadLoader loader) {
+  private synchronized void handleFail(final SubDLoadUtil loader) {
     Configuration config = Configuration.getInstance();
 
     long interval = config.dGroupCfg.getSubReTryInterval();
@@ -125,7 +126,7 @@ class SimpleSchedulers implements ISchedulers {
    * 1、所有的子任务已经停止，则认为组合任务停止
    * 2、completeNum + failNum + stopNum = subSize，则认为组合任务停止
    */
-  private synchronized void handleStop(SubDownloadLoader loader) {
+  private synchronized void handleStop(SubDLoadUtil loader) {
     mGState.listener.onSubStop(loader.getEntity());
     mGState.countStopNum(loader.getKey());
     if (mGState.getStopNum() == mGState.getSubSize()
@@ -150,8 +151,9 @@ class SimpleSchedulers implements ISchedulers {
    * GroupRunState#getFailNum()}不为0，则认为组合任务被停止
    * 3、只有有缓存的子任务，则任务组合任务没有完成
    */
-  private synchronized void handleComplete(SubDownloadLoader loader) {
+  private synchronized void handleComplete(SubDLoadUtil loader) {
     ALog.d(TAG, String.format("子任务【%s】完成", loader.getEntity().getFileName()));
+    ThreadTaskManager.getInstance().removeTaskThread(loader.getKey());
     mGState.listener.onSubComplete(loader.getEntity());
     mQueue.removeTaskFromExecQ(loader);
     mGState.updateCompleteNum();
@@ -177,7 +179,7 @@ class SimpleSchedulers implements ISchedulers {
     if (mQueue.isStopAll()) {
       return;
     }
-    SubDownloadLoader next = mQueue.getNextTask();
+    SubDLoadUtil next = mQueue.getNextTask();
     if (next != null) {
       ALog.d(TAG, String.format("启动任务：%s", next.getEntity().getFileName()));
       mQueue.startTask(next);

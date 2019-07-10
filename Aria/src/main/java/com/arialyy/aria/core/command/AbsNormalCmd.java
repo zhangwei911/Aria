@@ -21,6 +21,7 @@ import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.inf.AbsTask;
 import com.arialyy.aria.core.inf.AbsTaskWrapper;
 import com.arialyy.aria.core.inf.IEntity;
+import com.arialyy.aria.core.inf.ITask;
 import com.arialyy.aria.core.queue.DownloadGroupTaskQueue;
 import com.arialyy.aria.core.queue.DownloadTaskQueue;
 import com.arialyy.aria.core.queue.UploadTaskQueue;
@@ -41,26 +42,26 @@ public abstract class AbsNormalCmd<T extends AbsTaskWrapper> extends AbsCmd<T> {
   int taskType;
 
   /**
-   * @param taskType 下载任务类型{@link ICmd#TASK_TYPE_DOWNLOAD}、{@link ICmd#TASK_TYPE_DOWNLOAD_GROUP}、{@link
-   * ICmd#TASK_TYPE_UPLOAD}
+   * @param taskType 下载任务类型{@link ITask#DOWNLOAD}、{@link ITask#DOWNLOAD_GROUP}、{@link
+   * ITask#UPLOAD}
    */
   AbsNormalCmd(T entity, int taskType) {
     this.taskType = taskType;
     mTaskWrapper = entity;
     TAG = CommonUtil.getClassName(this);
-    if (taskType == ICmd.TASK_TYPE_DOWNLOAD) {
+    if (taskType == ITask.DOWNLOAD) {
       if (!(entity instanceof DTaskWrapper)) {
         ALog.e(TAG, "任务类型错误，任务类型应该为ICM.TASK_TYPE_DOWNLOAD");
         return;
       }
       mQueue = DownloadTaskQueue.getInstance();
-    } else if (taskType == ICmd.TASK_TYPE_DOWNLOAD_GROUP) {
+    } else if (taskType == ITask.DOWNLOAD_GROUP) {
       if (!(entity instanceof DGTaskWrapper)) {
         ALog.e(TAG, "任务类型错误，任务类型应该为ICM.TASK_TYPE_DOWNLOAD_GROUP");
         return;
       }
       mQueue = DownloadGroupTaskQueue.getInstance();
-    } else if (taskType == ICmd.TASK_TYPE_UPLOAD) {
+    } else if (taskType == ITask.UPLOAD) {
       if (!(entity instanceof UTaskWrapper)) {
         ALog.e(TAG, "任务类型错误，任务类型应该为ICM.TASK_TYPE_UPLOAD");
         return;
@@ -70,7 +71,7 @@ public abstract class AbsNormalCmd<T extends AbsTaskWrapper> extends AbsCmd<T> {
       ALog.e(TAG, "任务类型错误，任务类型应该为ICM.TASK_TYPE_DOWNLOAD、TASK_TYPE_DOWNLOAD_GROUP、TASK_TYPE_UPLOAD");
       return;
     }
-    isDownloadCmd = taskType < ICmd.TASK_TYPE_UPLOAD;
+    isDownloadCmd = taskType == ITask.DOWNLOAD || taskType == ITask.DOWNLOAD_GROUP;
   }
 
   /**

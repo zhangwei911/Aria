@@ -50,7 +50,7 @@ public abstract class AbsGroupUtil implements IUtil, Runnable {
   private boolean isStop = false, isCancel = false;
   private Handler mScheduler;
   private SimpleSubQueue mSubQueue = SimpleSubQueue.newInstance();
-  private Map<String, SubDownloadLoader> mExeLoader = new WeakHashMap<>();
+  private Map<String, SubDLoadUtil> mExeLoader = new WeakHashMap<>();
   private Map<String, DTaskWrapper> mCache = new WeakHashMap<>();
   DGTaskWrapper mGTWrapper;
   GroupRunState mState;
@@ -102,7 +102,7 @@ public abstract class AbsGroupUtil implements IUtil, Runnable {
     if (!mState.isRunning) {
       startTimer();
     }
-    SubDownloadLoader d = getDownloader(url);
+    SubDLoadUtil d = getDownloader(url);
     if (d != null && !d.isRunning()) {
       mSubQueue.startTask(d);
     }
@@ -115,7 +115,7 @@ public abstract class AbsGroupUtil implements IUtil, Runnable {
    */
   public void stopSubTask(String url) {
     if (!checkSubTask(url, "停止")) return;
-    SubDownloadLoader d = getDownloader(url);
+    SubDLoadUtil d = getDownloader(url);
     if (d != null && d.isRunning()) {
       mSubQueue.stopTask(d);
     }
@@ -147,8 +147,8 @@ public abstract class AbsGroupUtil implements IUtil, Runnable {
    *
    * @param url 子任务下载地址
    */
-  private SubDownloadLoader getDownloader(String url) {
-    SubDownloadLoader d = mExeLoader.get(url);
+  private SubDLoadUtil getDownloader(String url) {
+    SubDLoadUtil d = mExeLoader.get(url);
     if (d == null) {
       return createAndStartSubLoader(mCache.get(url));
     }
@@ -266,7 +266,7 @@ public abstract class AbsGroupUtil implements IUtil, Runnable {
   /**
    * 创建并启动子任务下载器
    */
-  SubDownloadLoader createAndStartSubLoader(DTaskWrapper taskWrapper) {
+  SubDLoadUtil createAndStartSubLoader(DTaskWrapper taskWrapper) {
     return createAndStartSubLoader(taskWrapper, true);
   }
 
@@ -275,8 +275,8 @@ public abstract class AbsGroupUtil implements IUtil, Runnable {
    *
    * @param needGetFileInfo {@code true} 需要获取文件信息。{@code false} 不需要获取文件信息
    */
-  SubDownloadLoader createAndStartSubLoader(DTaskWrapper taskWrapper, boolean needGetFileInfo) {
-    SubDownloadLoader loader = new SubDownloadLoader(mScheduler, taskWrapper, needGetFileInfo);
+  SubDLoadUtil createAndStartSubLoader(DTaskWrapper taskWrapper, boolean needGetFileInfo) {
+    SubDLoadUtil loader = new SubDLoadUtil(mScheduler, taskWrapper, needGetFileInfo);
     mExeLoader.put(loader.getKey(), loader);
     mSubQueue.startTask(loader);
     return loader;

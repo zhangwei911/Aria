@@ -15,6 +15,11 @@
         name="progress"
         type="int"
         />
+    <variable
+        name="stateStr"
+        type="String"
+        />
+
   </data>
 
   <RelativeLayout
@@ -26,7 +31,7 @@
     <include layout="@layout/layout_bar"/>
 
     <include
-        layout="@layout/content_single"
+        layout="@layout/layout_content_single"
         android:id="@+id/content"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -34,6 +39,7 @@
         bind:fileSize="@{fileSize}"
         bind:progress="@{progress}"
         bind:speed="@{speed}"
+        bind:stateStr="@{stateStr}"
         />
 
     <com.arialyy.simple.widget.SubStateLinearLayout

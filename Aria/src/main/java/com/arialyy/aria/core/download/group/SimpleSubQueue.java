@@ -28,16 +28,16 @@ import java.util.Set;
 /**
  * 组合任务队列，该队列生命周期和{@link AbsGroupUtil}生命周期一致
  */
-class SimpleSubQueue implements ISubQueue<SubDownloadLoader> {
+class SimpleSubQueue implements ISubQueue<SubDLoadUtil> {
   private static final String TAG = "SimpleSubQueue";
   /**
    * 缓存下载器
    */
-  private Map<String, SubDownloadLoader> mCache = new LinkedHashMap<>();
+  private Map<String, SubDLoadUtil> mCache = new LinkedHashMap<>();
   /**
    * 执行中的下载器
    */
-  private Map<String, SubDownloadLoader> mExec = new LinkedHashMap<>();
+  private Map<String, SubDLoadUtil> mExec = new LinkedHashMap<>();
 
   /**
    * 最大执行任务数
@@ -57,7 +57,7 @@ class SimpleSubQueue implements ISubQueue<SubDownloadLoader> {
     return new SimpleSubQueue();
   }
 
-  Map<String, SubDownloadLoader> getExec() {
+  Map<String, SubDLoadUtil> getExec() {
     return mExec;
   }
 
@@ -72,11 +72,11 @@ class SimpleSubQueue implements ISubQueue<SubDownloadLoader> {
     return isStopAll;
   }
 
-  @Override public void addTask(SubDownloadLoader fileer) {
+  @Override public void addTask(SubDLoadUtil fileer) {
     mCache.put(fileer.getKey(), fileer);
   }
 
-  @Override public void startTask(SubDownloadLoader fileer) {
+  @Override public void startTask(SubDLoadUtil fileer) {
     if (mExec.size() < mExecSize) {
       mCache.remove(fileer.getKey());
       mExec.put(fileer.getKey(), fileer);
@@ -88,7 +88,7 @@ class SimpleSubQueue implements ISubQueue<SubDownloadLoader> {
     }
   }
 
-  @Override public void stopTask(SubDownloadLoader fileer) {
+  @Override public void stopTask(SubDLoadUtil fileer) {
     fileer.stop();
     mExec.remove(fileer.getKey());
   }
@@ -98,7 +98,7 @@ class SimpleSubQueue implements ISubQueue<SubDownloadLoader> {
     ALog.d(TAG, "停止组合任务");
     Set<String> keys = mExec.keySet();
     for (String key : keys) {
-      SubDownloadLoader loader = mExec.get(key);
+      SubDLoadUtil loader = mExec.get(key);
       if (loader != null) {
         ALog.d(TAG, String.format("停止子任务：%s", loader.getEntity().getFileName()));
         loader.stop();
@@ -122,7 +122,7 @@ class SimpleSubQueue implements ISubQueue<SubDownloadLoader> {
     if (oldSize < num) { // 处理队列变小的情况，该情况下将停止队尾任务，并将这些任务添加到缓存队列中
       if (mExec.size() > num) {
         Set<String> keys = mExec.keySet();
-        List<SubDownloadLoader> caches = new ArrayList<>();
+        List<SubDLoadUtil> caches = new ArrayList<>();
         int i = 0;
         for (String key : keys) {
           if (i > num) {
@@ -130,20 +130,19 @@ class SimpleSubQueue implements ISubQueue<SubDownloadLoader> {
           }
           i++;
         }
-        Collection<SubDownloadLoader> temp = mCache.values();
+        Collection<SubDLoadUtil> temp = mCache.values();
         mCache.clear();
-        ALog.d(TAG, String.format("测试, cacheSize: %s", mCache.size()));
-        for (SubDownloadLoader cache : caches) {
+        for (SubDLoadUtil cache : caches) {
           addTask(cache);
         }
-        for (SubDownloadLoader t : temp) {
+        for (SubDLoadUtil t : temp) {
           addTask(t);
         }
       }
     } else { // 处理队列变大的情况，该情况下将增加任务
       if (mExec.size() < num) {
         for (int i = 0; i < diff; i++) {
-          SubDownloadLoader next = getNextTask();
+          SubDLoadUtil next = getNextTask();
           if (next != null) {
             startTask(next);
           } else {
@@ -154,7 +153,7 @@ class SimpleSubQueue implements ISubQueue<SubDownloadLoader> {
     }
   }
 
-  @Override public void removeTaskFromExecQ(SubDownloadLoader fileer) {
+  @Override public void removeTaskFromExecQ(SubDLoadUtil fileer) {
     if (mExec.containsKey(fileer.getKey())) {
       if (fileer.isRunning()) {
         fileer.stop();
@@ -163,7 +162,7 @@ class SimpleSubQueue implements ISubQueue<SubDownloadLoader> {
     }
   }
 
-  @Override public void removeTask(SubDownloadLoader fileer) {
+  @Override public void removeTask(SubDLoadUtil fileer) {
     removeTaskFromExecQ(fileer);
     mCache.remove(fileer.getKey());
   }
@@ -172,7 +171,7 @@ class SimpleSubQueue implements ISubQueue<SubDownloadLoader> {
     ALog.d(TAG, "删除组合任务");
     Set<String> keys = mExec.keySet();
     for (String key : keys) {
-      SubDownloadLoader loader = mExec.get(key);
+      SubDLoadUtil loader = mExec.get(key);
       if (loader != null) {
         ALog.d(TAG, String.format("停止子任务：%s", loader.getEntity().getFileName()));
         loader.cancel();
@@ -180,7 +179,7 @@ class SimpleSubQueue implements ISubQueue<SubDownloadLoader> {
     }
   }
 
-  @Override public SubDownloadLoader getNextTask() {
+  @Override public SubDLoadUtil getNextTask() {
     Iterator<String> keys = mCache.keySet().iterator();
     if (keys.hasNext()) {
       return mCache.get(keys.next());

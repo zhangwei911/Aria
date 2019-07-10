@@ -148,11 +148,11 @@ abstract class AbsSchedulers<TASK_ENTITY extends AbsTaskWrapper, TASK extends IT
     }
 
     TASK task = (TASK) msg.obj;
-    if (task == null) {
+    if (task == null && msg.what != ISchedulers.CHECK_FAIL) {
       ALog.e(TAG, "请传入下载任务");
       return true;
     }
-    handleNormalEvent(task, msg.what);
+    handleNormalEvent(task, msg.what, msg.arg1);
     return true;
   }
 
@@ -260,7 +260,7 @@ abstract class AbsSchedulers<TASK_ENTITY extends AbsTaskWrapper, TASK extends IT
   /**
    * 处理普通任务和任务组的事件
    */
-  private void handleNormalEvent(TASK task, int what) {
+  private void handleNormalEvent(TASK task, int what, int arg1) {
     switch (what) {
       case STOP:
         if (task.getState() == IEntity.STATE_WAIT) {
@@ -269,7 +269,7 @@ abstract class AbsSchedulers<TASK_ENTITY extends AbsTaskWrapper, TASK extends IT
         mQueue.removeTaskFormQueue(task.getKey());
         if (mQueue.getCurrentExePoolNum() < mQueue.getMaxTaskNum()) {
           ALog.d(TAG, String.format("停止任务【%s】成功，尝试开始下一任务", task.getTaskName()));
-          startNextTask(task);
+          startNextTask(task.getSchedulerType());
         } else {
           ALog.d(TAG, String.format("停止任务【%s】成功", task.getTaskName()));
         }
@@ -278,7 +278,7 @@ abstract class AbsSchedulers<TASK_ENTITY extends AbsTaskWrapper, TASK extends IT
         mQueue.removeTaskFormQueue(task.getKey());
         if (mQueue.getCurrentExePoolNum() < mQueue.getMaxTaskNum()) {
           ALog.d(TAG, String.format("删除任务【%s】成功，尝试开始下一任务", task.getTaskName()));
-          startNextTask(task);
+          startNextTask(task.getSchedulerType());
         } else {
           ALog.d(TAG, String.format("删除任务【%s】成功", task.getTaskName()));
         }
@@ -286,12 +286,20 @@ abstract class AbsSchedulers<TASK_ENTITY extends AbsTaskWrapper, TASK extends IT
       case COMPLETE:
         mQueue.removeTaskFormQueue(task.getKey());
         ALog.d(TAG, String.format("任务【%s】处理完成", task.getTaskName()));
-        startNextTask(task);
+        startNextTask(task.getSchedulerType());
         break;
       case FAIL:
         handleFailTask(task);
         break;
+      case CHECK_FAIL:
+        handlePreFailTask(arg1);
+        break;
     }
+
+    if (what == FAIL || what == CHECK_FAIL) {
+      return;
+    }
+
     if (what == CANCEL || what == COMPLETE) {
       TaskWrapperManager.getInstance().removeTaskWrapper(task.getKey());
     } else {
@@ -299,8 +307,44 @@ abstract class AbsSchedulers<TASK_ENTITY extends AbsTaskWrapper, TASK extends IT
         TaskWrapperManager.getInstance().putTaskWrapper(task.getKey(), task.getTaskWrapper());
       }
     }
-    if (what != FAIL) {
-      normalTaskCallback(what, task);
+    normalTaskCallback(what, task);
+  }
+
+  private void handlePreFailTask(int taskType) {
+    startNextTask(TaskSchedulerType.TYPE_DEFAULT);
+
+    // 发送广播
+    boolean canSend = manager.getAppConfig().isUseBroadcast();
+    if (canSend) {
+      Intent intent = new Intent(ISchedulers.ARIA_TASK_INFO_ACTION);
+      Bundle b = new Bundle();
+      b.putInt(ISchedulers.TASK_TYPE, taskType);
+      b.putInt(ISchedulers.TASK_STATE, ISchedulers.FAIL);
+      AriaManager.APP.sendBroadcast(intent);
+    }
+
+    // 处理回调
+    if (mObservers.size() > 0) {
+      Set<String> keys = mObservers.keySet();
+      for (String key : keys) {
+        Map<TaskEnum, ISchedulerListener> listeners = mObservers.get(key);
+        if (listeners == null || listeners.isEmpty()) {
+          continue;
+        }
+        NormalTaskListener<TASK> listener = null;
+        if (mObservers.get(key) != null) {
+          if (taskType == ITask.DOWNLOAD) {
+            listener = (NormalTaskListener<TASK>) listeners.get(TaskEnum.DOWNLOAD);
+          } else if (taskType == ITask.DOWNLOAD_GROUP) {
+            listener = (NormalTaskListener<TASK>) listeners.get(TaskEnum.DOWNLOAD_GROUP);
+          } else if (taskType == ITask.DOWNLOAD_GROUP) {
+            listener = (NormalTaskListener<TASK>) listeners.get(TaskEnum.UPLOAD);
+          }
+        }
+        if (listener != null) {
+          normalTaskCallback(ISchedulers.CHECK_FAIL, null, listener);
+        }
+      }
     }
   }
 
@@ -337,7 +381,7 @@ abstract class AbsSchedulers<TASK_ENTITY extends AbsTaskWrapper, TASK extends IT
 
   private void normalTaskCallback(int state, TASK task, NormalTaskListener<TASK> listener) {
     if (listener != null) {
-      if (task == null) {
+      if (task == null && state != ISchedulers.CHECK_FAIL) {
         ALog.e(TAG, "TASK 为null，回调失败");
         return;
       }
@@ -372,6 +416,9 @@ abstract class AbsSchedulers<TASK_ENTITY extends AbsTaskWrapper, TASK extends IT
         case FAIL:
           listener.onTaskFail(task.getTaskType() == ITask.TEMP ? null : task,
               (Exception) task.getExpand(AbsTask.ERROR_INFO_KEY));
+          break;
+        case CHECK_FAIL:
+          listener.onTaskFail(null, null);
           break;
         case NO_SUPPORT_BREAK_POINT:
           listener.onNoSupportBreakPoint(task);
@@ -427,7 +474,7 @@ abstract class AbsSchedulers<TASK_ENTITY extends AbsTaskWrapper, TASK extends IT
   private void handleFailTask(final TASK task) {
     if (!task.isNeedRetry() || task.isStop() || task.isCancel()) {
       mQueue.removeTaskFormQueue(task.getKey());
-      startNextTask(task);
+      startNextTask(task.getSchedulerType());
       normalTaskCallback(FAIL, task);
       return;
     }
@@ -439,7 +486,7 @@ abstract class AbsSchedulers<TASK_ENTITY extends AbsTaskWrapper, TASK extends IT
     if ((!NetUtils.isConnected(AriaManager.APP) && !isNotNetRetry)
         || task.getTaskWrapper().getEntity().getFailNum() > reTryNum) {
       mQueue.removeTaskFormQueue(task.getKey());
-      startNextTask(task);
+      startNextTask(task.getSchedulerType());
       TaskWrapperManager.getInstance().removeTaskWrapper(task.getKey());
       normalTaskCallback(FAIL, task);
       return;
@@ -456,7 +503,7 @@ abstract class AbsSchedulers<TASK_ENTITY extends AbsTaskWrapper, TASK extends IT
           mQueue.reTryStart(task);
         } else {
           mQueue.removeTaskFormQueue(task.getKey());
-          startNextTask(task);
+          startNextTask(task.getSchedulerType());
           TaskWrapperManager.getInstance().removeTaskWrapper(task.getKey());
         }
       }
@@ -466,8 +513,8 @@ abstract class AbsSchedulers<TASK_ENTITY extends AbsTaskWrapper, TASK extends IT
   /**
    * 启动下一个任务，条件：任务停止，取消下载，任务完成
    */
-  private void startNextTask(TASK oldTask) {
-    if (oldTask.getSchedulerType() == TaskSchedulerType.TYPE_STOP_NOT_NEXT) {
+  private void startNextTask(int schedulerType) {
+    if (schedulerType == TaskSchedulerType.TYPE_STOP_NOT_NEXT) {
       return;
     }
     TASK newTask = mQueue.getNextTask();

@@ -86,7 +86,7 @@ public class HttpTaskConfig implements ITaskConfig {
   private WeakReference<IHttpFileLenAdapter> fileLenAdapter;
 
   public IHttpFileLenAdapter getFileLenAdapter() {
-    return fileLenAdapter.get();
+    return fileLenAdapter == null ? null : fileLenAdapter.get();
   }
 
   /**
