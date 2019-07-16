@@ -173,9 +173,10 @@ public abstract class AbsThreadTask<ENTITY extends AbsNormalEntity, TASK_WRAPPER
    */
 
   public void setMaxSpeed(int speed) {
-    if (mSpeedBandUtil != null) {
-      mSpeedBandUtil.setMaxRate(speed);
+    if (mSpeedBandUtil == null) {
+      mSpeedBandUtil = new BandwidthLimiter(getMaxSpeed(), getConfig().startThreadNum);
     }
+    mSpeedBandUtil.setMaxRate(speed);
   }
 
   /**

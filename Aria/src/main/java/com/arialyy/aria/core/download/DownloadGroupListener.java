@@ -18,7 +18,7 @@ package com.arialyy.aria.core.download;
 import android.os.Handler;
 import com.arialyy.aria.core.common.BaseListener;
 import com.arialyy.aria.core.common.RecordHandler;
-import com.arialyy.aria.core.download.group.IDownloadGroupListener;
+import com.arialyy.aria.core.download.group.IDGroupListener;
 import com.arialyy.aria.core.inf.GroupSendParams;
 import com.arialyy.aria.core.inf.IEntity;
 import com.arialyy.aria.core.inf.TaskSchedulerType;
@@ -34,7 +34,7 @@ import com.arialyy.aria.util.RecordUtil;
  */
 class DownloadGroupListener
     extends BaseListener<DownloadGroupEntity, DGTaskWrapper, DownloadGroupTask>
-    implements IDownloadGroupListener {
+    implements IDGroupListener {
   private GroupSendParams<DownloadGroupTask, DownloadEntity> mSeedEntity;
 
   DownloadGroupListener(DownloadGroupTask task, Handler outHandler) {

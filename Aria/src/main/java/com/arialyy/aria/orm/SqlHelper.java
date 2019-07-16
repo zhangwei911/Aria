@@ -95,7 +95,7 @@ final class SqlHelper extends SQLiteOpenHelper {
   @Override public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
     if (oldVersion < newVersion) {
       if (oldVersion < 31) {
-        handle314AriaUpdate(db);
+        handleLowAriaUpdate(db);
       } else if (oldVersion < 45) {
         handle360AriaUpdate(db);
       } else if (oldVersion < 51) {
@@ -203,7 +203,6 @@ final class SqlHelper extends SQLiteOpenHelper {
             String newParamStr = oldParamStr;
             // 处理字段名称改变
             if (modifyColumns != null) {
-              //newParamStr = params.toString();
               Map<String, String> columnMap = modifyColumns.get(tableName);
               if (columnMap != null && !columnMap.isEmpty()) {
                 Set<String> keys = columnMap.keySet();
@@ -223,7 +222,7 @@ final class SqlHelper extends SQLiteOpenHelper {
           }
           //删除中介表
           mDelegate.dropTable(db, tableName + "_temp");
-        }else {
+        } else {
           mDelegate.createTable(db, clazz);
         }
       }
@@ -289,9 +288,9 @@ final class SqlHelper extends SQLiteOpenHelper {
   }
 
   /**
-   * 处理3.4版本之前数据库迁移，主要是修改子表外键字段对应的值
+   * 处理低版本的数据库迁移，主要是修改子表外键字段对应的值
    */
-  private void handle314AriaUpdate(SQLiteDatabase db) {
+  private void handleLowAriaUpdate(SQLiteDatabase db) {
     String[] taskTables =
         new String[] { "UploadTaskEntity", "DownloadTaskEntity", "DownloadGroupTaskEntity" };
     for (String taskTable : taskTables) {
@@ -305,6 +304,9 @@ final class SqlHelper extends SQLiteOpenHelper {
     String[] keys = new String[] { "downloadPath", "groupName" };
     int i = 0;
     for (String tableName : tables) {
+      if (!mDelegate.tableExists(db, tableName)) {
+        continue;
+      }
       String pColumn = keys[i];
       String nullSql =
           String.format("DELETE FROM %s WHERE %s='' OR %s IS NULL", tableName, pColumn, pColumn);
@@ -323,10 +325,16 @@ final class SqlHelper extends SQLiteOpenHelper {
     }
 
     Map<String, Map<String, String>> modifyColumnMap = new HashMap<>();
-    Map<String, String> map = new HashMap<>();
-    map.put("groupName", "groupHash");
-    modifyColumnMap.put("DownloadEntity", map);
-    modifyColumnMap.put("DownloadGroupEntity", map);
+    Map<String, String> dMap = new HashMap<>();
+    dMap.put("groupName", "groupHash");
+    // 处理数据库版本小于3的字段改变
+    dMap.put("downloadUrl", "url");
+    dMap.put("isDownloadComplete", "isComplete");
+    modifyColumnMap.put("DownloadEntity", dMap);
+
+    Map<String, String> dGMap = new HashMap<>();
+    dGMap.put("groupName", "groupHash");
+    modifyColumnMap.put("DownloadGroupEntity", dGMap);
 
     Map<String, List<String>> delColumnMap = new HashMap<>();
     List<String> dEntityDel = new ArrayList<>();

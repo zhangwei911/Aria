@@ -97,8 +97,8 @@ public class DownloadGroupActivity extends BaseActivity<ActivityDownloadGroupBin
                   Environment.getExternalStorageDirectory().getPath() + "/Download/group_test_2")
               .setGroupAlias("任务组测试")
               //.setSubFileName(getModule(GroupModule.class).getSubName2())
-              .setSubFileName(getModule(GroupModule.class).getSubName())
-              .unknownSize()
+              //.setSubFileName(getModule(GroupModule.class).getSubName())
+              //.unknownSize()
               .setFileLenAdapter(new IHttpFileLenAdapter() {
                 @Override public long handleFileLen(Map<String, List<String>> headers) {
 
@@ -111,7 +111,7 @@ public class DownloadGroupActivity extends BaseActivity<ActivityDownloadGroupBin
                   return Long.parseLong(temp);
                 }
               })
-              //.setFileSize(114981416)
+              .setFileSize(114981416)
               //.updateUrls(temp)
               .start();
           getBinding().setStateStr(getString(R.string.stop));
@@ -170,6 +170,7 @@ public class DownloadGroupActivity extends BaseActivity<ActivityDownloadGroupBin
   @DownloadGroup.onTaskStop() void taskStop(DownloadGroupTask task) {
     L.d(TAG, "group task stop");
     getBinding().setSpeed("");
+    getBinding().setStateStr(getString(R.string.start));
   }
 
   @DownloadGroup.onTaskCancel() void taskCancel(DownloadGroupTask task) {
@@ -182,6 +183,7 @@ public class DownloadGroupActivity extends BaseActivity<ActivityDownloadGroupBin
   @DownloadGroup.onTaskFail() void taskFail(DownloadGroupTask task) {
     L.d(TAG, "group task fail");
     getBinding().setStateStr(getString(R.string.resume));
+    getBinding().setSpeed("");
   }
 
   @DownloadGroup.onTaskComplete() void taskComplete(DownloadGroupTask task) {
@@ -236,6 +238,7 @@ public class DownloadGroupActivity extends BaseActivity<ActivityDownloadGroupBin
 
   @DownloadGroup.onSubTaskComplete void onSubTaskComplete(DownloadGroupTask groupTask,
       DownloadEntity subEntity) {
+    mChildList.updateChildState(subEntity);
   }
 
   @DownloadGroup.onSubTaskFail void onSubTaskFail(DownloadGroupTask groupTask,

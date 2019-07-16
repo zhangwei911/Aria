@@ -25,11 +25,12 @@ import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.download.downloader.HttpFileInfoThread;
 import com.arialyy.aria.core.inf.AbsEntity;
 import com.arialyy.aria.core.inf.IEntity;
-import com.arialyy.aria.core.inf.IHttpFileLenAdapter;
 import com.arialyy.aria.exception.AriaIOException;
 import com.arialyy.aria.exception.BaseException;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -37,13 +38,14 @@ import java.util.concurrent.Executors;
  * Created by AriaL on 2017/6/30.
  * 任务组下载工具
  */
-public class DownloadGroupUtil extends AbsGroupUtil implements IUtil {
+public class DGroupUtil extends AbsGroupUtil implements IUtil {
   private static final String TAG = "DownloadGroupUtil";
   private final Object LOCK = new Object();
   private ExecutorService mPool = null;
   private boolean getLenComplete = false;
+  private List<DTaskWrapper> mTempWrapper = new ArrayList<>();
 
-  public DownloadGroupUtil(IDownloadGroupListener listener, DGTaskWrapper taskWrapper) {
+  public DGroupUtil(IDGroupListener listener, DGTaskWrapper taskWrapper) {
     super(listener, taskWrapper);
   }
 
@@ -101,18 +103,18 @@ public class DownloadGroupUtil extends AbsGroupUtil implements IUtil {
       int failCount;
 
       @Override public void run() {
-        try {
-          Thread.sleep(2000);
-        } catch (InterruptedException e) {
-          e.printStackTrace();
-        }
         for (DTaskWrapper dTaskWrapper : mGTWrapper.getSubTaskWrapper()) {
           cloneHeader(dTaskWrapper);
           mPool.submit(new HttpFileInfoThread(dTaskWrapper, new OnFileInfoCallback() {
             @Override public void onComplete(String url, CompleteInfo info) {
-              createAndStartSubLoader((DTaskWrapper) info.wrapper, false);
+              if (!mGTWrapper.isUnknownSize()) {
+                createAndStartSubLoader((DTaskWrapper) info.wrapper, false);
+              } else {
+                mTempWrapper.add((DTaskWrapper) info.wrapper);
+              }
               count++;
               checkGetSizeComplete(count, failCount);
+              ALog.d(TAG, "获取子任务信息完成");
             }
 
             @Override public void onFail(AbsEntity entity, BaseException e, boolean needRetry) {
@@ -122,6 +124,7 @@ public class DownloadGroupUtil extends AbsGroupUtil implements IUtil {
               mListener.onSubFail((DownloadEntity) entity, new AriaIOException(TAG,
                   String.format("子任务获取文件长度失败，url：%s", ((DownloadEntity) entity).getUrl())));
               checkGetSizeComplete(count, failCount);
+              mState.countFailNum(entity.getKey());
             }
           }));
         }
@@ -133,6 +136,11 @@ public class DownloadGroupUtil extends AbsGroupUtil implements IUtil {
    * 检查组合任务大小是否获取完成，获取完成后取消阻塞，并设置组合任务大小
    */
   private void checkGetSizeComplete(int count, int failCount) {
+    if (failCount == mGTWrapper.getSubTaskWrapper().size()) {
+      mListener.onFail(false, new AriaIOException(TAG, "获取子任务长度失败"));
+      notifyLock();
+      return;
+    }
     if (count == mGTWrapper.getSubTaskWrapper().size()) {
       long size = 0;
       for (DTaskWrapper wrapper : mGTWrapper.getSubTaskWrapper()) {
@@ -142,14 +150,18 @@ public class DownloadGroupUtil extends AbsGroupUtil implements IUtil {
       mGTWrapper.getEntity().setFileSize(size);
       mGTWrapper.getEntity().update();
       getLenComplete = true;
-      ALog.d(TAG, String.format("获取组合任务长度完成，len：%s", size));
-    } else if (failCount == mGTWrapper.getSubTaskWrapper().size()) {
-      mListener.onFail(true, new AriaIOException(TAG, "获取子任务长度失败"));
+      ALog.d(TAG, String.format("获取组合任务长度完成，组合任务总长度：%s，失败的只任务数：%s", size, failCount));
+      // 未知大小的组合任务，延迟下载
+      if (mGTWrapper.isUnknownSize()) {
+        for (DTaskWrapper wrapper : mTempWrapper) {
+          createAndStartSubLoader(wrapper, false);
+        }
+      }
+      notifyLock();
     }
-    IHttpFileLenAdapter lenAdapter = mGTWrapper.asHttp().getFileLenAdapter();
-    if (lenAdapter != null && lenAdapter.getClass().isAnonymousClass()) {
-      mGTWrapper.asHttp().setFileLenAdapter(null);
-    }
+  }
+
+  private void notifyLock() {
     synchronized (LOCK) {
       LOCK.notifyAll();
     }

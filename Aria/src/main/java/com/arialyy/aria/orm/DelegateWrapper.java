@@ -40,12 +40,15 @@ public class DelegateWrapper {
     mDManager = DelegateManager.getInstance();
   }
 
-  public static void init(Context context) {
-    synchronized (DelegateWrapper.class) {
-      if (INSTANCE == null) {
-        INSTANCE = new DelegateWrapper(context);
+  public static DelegateWrapper init(Context context) {
+    if (INSTANCE == null) {
+      synchronized (DelegateWrapper.class) {
+        if (INSTANCE == null) {
+          INSTANCE = new DelegateWrapper(context);
+        }
       }
     }
+    return INSTANCE;
   }
 
   static DelegateWrapper getInstance() {
@@ -117,7 +120,7 @@ public class DelegateWrapper {
   /**
    * 更新多条数据
    */
-  <T extends  DbEntity> void updateManyData(List<T> dbEntitys) {
+  <T extends DbEntity> void updateManyData(List<T> dbEntitys) {
     mDManager.getDelegate(DelegateUpdate.class).updateManyData(mDb, dbEntitys);
   }
 
@@ -182,14 +185,14 @@ public class DelegateWrapper {
   /**
    * 插入多条数据
    */
-  <T extends  DbEntity> void insertManyData(List<T> dbEntitys) {
+  <T extends DbEntity> void insertManyData(List<T> dbEntitys) {
     mDManager.getDelegate(DelegateUpdate.class).insertManyData(mDb, dbEntitys);
   }
 
   /**
    * 查找某张表是否存在
    */
-  boolean tableExists(Class clazz) {
+  public boolean tableExists(Class clazz) {
     return mDManager.getDelegate(DelegateCommon.class).tableExists(mDb, clazz);
   }
 

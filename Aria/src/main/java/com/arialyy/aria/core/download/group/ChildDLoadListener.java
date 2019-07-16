@@ -26,7 +26,7 @@ import com.arialyy.aria.util.CommonUtil;
 /**
  * 子任务事件监听
  */
-class ChildDownloadListener implements IDownloadListener {
+class ChildDLoadListener implements IDownloadListener {
   private DownloadEntity subEntity;
   private int RUN_SAVE_INTERVAL = 5 * 1000;  //5s保存一次下载中的进度
   private long lastSaveTime;
@@ -34,7 +34,7 @@ class ChildDownloadListener implements IDownloadListener {
   private Handler schedulers;
   private SubDLoadUtil loader;
 
-  ChildDownloadListener(Handler schedulers, SubDLoadUtil loader) {
+  ChildDLoadListener(Handler schedulers, SubDLoadUtil loader) {
     this.loader = loader;
     this.schedulers = schedulers;
     subEntity = loader.getEntity();

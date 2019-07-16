@@ -92,6 +92,7 @@ import org.xml.sax.SAXException;
   private AppConfig mAConfig;
   private DGroupConfig mDGConfig;
   private Handler mAriaHandler;
+  private DelegateWrapper mDbWrapper;
 
   private AriaManager(Context context) {
     APP = context.getApplicationContext();
@@ -172,7 +173,7 @@ import org.xml.sax.SAXException;
         dbConfig.delete();
       }
     }
-    DelegateWrapper.init(context.getApplicationContext());
+    mDbWrapper = DelegateWrapper.init(context.getApplicationContext());
   }
 
   private void initAria() {
@@ -192,6 +193,9 @@ import org.xml.sax.SAXException;
     };
     String sql = "UPDATE %s SET state=2 WHERE state IN (3,4,5,6)";
     for (Class clazz : clazzs) {
+      if (!mDbWrapper.tableExists(clazz)) {
+        continue;
+      }
       String temp = String.format(sql, clazz.getSimpleName());
       DbEntity.exeSql(temp);
     }

@@ -18,8 +18,10 @@ package com.arialyy.aria.core.inf;
 import android.os.Parcel;
 import android.os.Parcelable;
 import com.arialyy.aria.orm.DbEntity;
+import com.arialyy.aria.orm.annotation.Default;
 import com.arialyy.aria.orm.annotation.Ignore;
 import java.io.Serializable;
+
 /**
  * Created by AriaL on 2017/6/29.
  */
@@ -53,6 +55,7 @@ public abstract class AbsEntity extends DbEntity implements IEntity, Parcelable,
   /**
    * 任务状态{@link IEntity}
    */
+  @Default("3")
   private int state = STATE_WAIT;
   /**
    * 当前下载进度
@@ -68,6 +71,7 @@ public abstract class AbsEntity extends DbEntity implements IEntity, Parcelable,
    */
   private int percent;
 
+  @Default("false")
   private boolean isComplete = false;
 
   /**

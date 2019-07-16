@@ -17,6 +17,8 @@ Aria有以下特点：
    - 在配置文件中很容易就可以设置CA证书的信息
  + 支持[多线程分块下载](https://aria.laoyuyu.me/aria_doc/start/config.html)，能更有效的发挥机器IO性能
  + 支持300、301、302重定向下载链接下载
+ + 支持m3u8协议的文件下载[m3u8下载](https://aria.laoyuyu.me/aria_doc/download/m3u8.html)
+ + 支持m3u8边下边看的下载支持，[点击查看详情](https://aria.laoyuyu.me/aria_doc/download/m3u8_vod.html)
  + 下载支持文件长度动态增加，文件下载初始化时将不再占用过多的内存空间，见[动态长度配置](https://aria.laoyuyu.me/aria_doc/start/config.html#%E4%B8%8B%E8%BD%BD%E5%8A%A8%E6%80%81%E6%96%87%E4%BB%B6%E8%AF%B4%E6%98%8E)
 
 [怎样使用Aria?](#使用)
@@ -36,14 +38,17 @@ Aria有以下特点：
 
 <img src="https://github.com/AriaLyy/DownloadUtil/blob/master/img/group_task.gif" width="360" height="640"/>
 
+* m3u8下载
+
+![m3u8点播文件边下边看](https://github.com/AriaLyy/Aria/blob/master/img/m3u8VodDownload.gif)
 
 ## 引入库
 [![Core](https://api.bintray.com/packages/arialyy/maven/AriaApi/images/download.svg)](https://bintray.com/arialyy/maven/AriaApi/_latestVersion)
 [![Compiler](https://api.bintray.com/packages/arialyy/maven/AriaCompiler/images/download.svg)](https://bintray.com/arialyy/maven/AriaCompiler/_latestVersion)
 
 ```java
-compile 'com.arialyy.aria:aria-core:3.6.4'
-annotationProcessor 'com.arialyy.aria:aria-compiler:3.6.4'
+compile 'com.arialyy.aria:aria-core:3.6.5'
+annotationProcessor 'com.arialyy.aria:aria-compiler:3.6.5'
 ```
 如果出现android support依赖错误，请将 `compile 'com.arialyy.aria:aria-core:<last-version>'`替换为
 ```
@@ -113,36 +118,25 @@ protected void onCreate(Bundle savedInstanceState) {
 
 
 ### 版本日志
- + v_3.6.4 (2019/5/16)
-    - 优化任务接收器的代码结构
-    - 修复`DbEntity.saveAll()`失败的问题
-    - 修复分块任务重命名失败的问题
-    - fix bug https://github.com/AriaLyy/Aria/issues/379
-    - 移除`getDownloadTask(String url)`、`getGroupTask(List<String> urls)`、`getFtpDirTask(String path)`
-      等获取任务的api，如果你希望获取对应状态，请使用实体的状态判断，如：`getDownloadEntity()`、`getDownloadGroupEntity()`
-      `getFtpDirEntity()`
-    - fix bug https://github.com/AriaLyy/Aria/issues/388
-    - 修复使用`Content-Disposition`的文件名时，第一次下载无法重命名文件的问题
-    - 修复使用`Content-Disposition`的文件名时，多次重命名文件的问题
-    - 组合任务新增`unknownSize()`，用于处理组合任务大小ø未知的情况，https://github.com/AriaLyy/Aria/issues/380
-    - 优化`AbsThreadTask`代码
-    - 新增文件长度处理功能 https://github.com/AriaLyy/Aria/issues/393
-      ```java
-      .setFileLenAdapter(new IHttpFileLenAdapter() {
-        @Override public long handleFileLen(Map<String, List<String>> headers) {
-          ...
-          // 处理header中的文件长度
-
-          return fileLen;
-        }
-       })
-      ```
-    - 修复组合任务多次回调`onStop`注解的问题
-    - 优化`isRunning()`的逻辑，任务是否在执行的判断将更加准确
-    - 修复多次重复快速点击`暂停、开始`时，任务有可能重复下载的问题
-    - 修复组合任务中没有等待中的只任务实体保存失败的问题
-    - 新增组合任务url重复检查 https://github.com/AriaLyy/Aria/issues/395
-    - 初始化任务时，如果url、path有错误将会回调`@Download.onTaskFail`、`@Upload.onTaskFail`、`@DownGroup.onTaskFail`
+  + v_3.6.5
+    - fix bug https://github.com/AriaLyy/Aria/issues/403
+    - fix bug https://github.com/AriaLyy/Aria/issues/414
+    - fix bug https://github.com/AriaLyy/Aria/issues/406
+    - fix bug https://github.com/AriaLyy/Aria/issues/407
+    - fix bug https://github.com/AriaLyy/Aria/issues/416
+    - fix bug https://github.com/AriaLyy/Aria/issues/420
+    - fix bug https://github.com/AriaLyy/Aria/issues/422
+    - 新增ftp上传拦截器 https://github.com/AriaLyy/Aria/issues/402
+    - 重构线程任务模块
+    - 新增m3u8协议的文件下载
+    - 修复拦截器可能出现的空指针问题
+    - 移除`DownloadGroupEntity`字段`groupHash`的主键约束，`DownloadEntity`字段`groupHash`的外键约束，`TaskRecord`字段`dGroupHash`的外键约束
+    - 优化关联查询的性能
+    - 修复任务记录删除失败的问题
+    - 优化网络连接状态获取的逻辑
+    - 修复配置文件的某些配置失效的问题
+    - 新增m3u8切片状态注解`@M3U8.onPeerStart`，`@M3U8.onPeerComplete`，`@M3U8.onPeerFail`
+    - 新增动态指定m3u8协议视频的下载功能（边下边播下载支持）,[详情](https://aria.laoyuyu.me/aria_doc/download/m3u8_vod.html)
 
 [更多版本记录](https://github.com/AriaLyy/Aria/blob/master/DEV_LOG.md)
 

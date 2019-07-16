@@ -18,7 +18,6 @@ package com.arialyy.simple.widget;
 import android.content.Context;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -36,6 +35,7 @@ import java.util.WeakHashMap;
  */
 public class SubStateLinearLayout extends LinearLayout implements View.OnClickListener {
   private final String TAG = "SubStateLinearLayout";
+
   interface OnShowCallback {
     void onShow(boolean visibility);
   }
@@ -100,7 +100,7 @@ public class SubStateLinearLayout extends LinearLayout implements View.OnClickLi
 
   public void updateChildProgress(List<DownloadEntity> entities) {
     for (DownloadEntity entity : entities) {
-      Integer i = mPosition.get(entity.getDownloadPath());
+      Integer i = mPosition.get(entity.getFilePath());
       if (i == null) return;
       int position = i;
       if (position != -1) {
@@ -109,6 +109,22 @@ public class SubStateLinearLayout extends LinearLayout implements View.OnClickLi
         child.setText(entity.getFileName() + ": " + p + "%" + "   | " + entity.getConvertSpeed());
         child.invalidate();
       }
+    }
+  }
+
+  public void updateChildState(DownloadEntity entity) {
+    Integer i = mPosition.get(entity.getFilePath());
+    if (i == null) return;
+    int position = i;
+    if (position != -1) {
+      TextView child = ((TextView) getChildAt(position));
+      if (entity.isComplete()) {
+        child.setText(entity.getFileName() + " | " + getResources().getText(R.string.complete));
+      } else {
+        int p = getPercent(entity);
+        child.setText(entity.getFileName() + ": " + p + "%" + "   | " + entity.getConvertSpeed());
+      }
+      child.invalidate();
     }
   }
 

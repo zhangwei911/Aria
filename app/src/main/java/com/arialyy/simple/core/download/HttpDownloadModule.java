@@ -34,7 +34,8 @@ public class HttpDownloadModule extends BaseViewModule {
 
   private final String defUrl =
       "http://hzdown.muzhiwan.com/2017/05/08/nl.noio.kingdom_59104935e56f0.apk";
-      //"http://202.98.201.103:7000/vrs/TPK/ZTC440402001Z.tpk";
+  //"http://9.9.9.205:5000/download/Cyberduck-6.9.4.30164.zip";
+  //"http://202.98.201.103:7000/vrs/TPK/ZTC440402001Z.tpk";
   private final String defFilePath =
       Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getPath()
           + "/ZTC440402001Z.tpk";

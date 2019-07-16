@@ -44,7 +44,7 @@ public abstract class AbsGroupUtil implements IUtil, Runnable {
   int HTTP_GROUP = 0xa2;
 
   private long mCurrentLocation = 0;
-  protected IDownloadGroupListener mListener;
+  protected IDGroupListener mListener;
   private ScheduledThreadPoolExecutor mTimer;
   private long mUpdateInterval;
   private boolean isStop = false, isCancel = false;
@@ -55,7 +55,7 @@ public abstract class AbsGroupUtil implements IUtil, Runnable {
   DGTaskWrapper mGTWrapper;
   GroupRunState mState;
 
-  AbsGroupUtil(IDownloadGroupListener listener, DGTaskWrapper groupWrapper) {
+  AbsGroupUtil(IDGroupListener listener, DGTaskWrapper groupWrapper) {
     mListener = listener;
     mGTWrapper = groupWrapper;
     mUpdateInterval = Configuration.getInstance().downloadCfg.getUpdateInterval();
@@ -195,7 +195,7 @@ public abstract class AbsGroupUtil implements IUtil, Runnable {
   /**
    * onStop前的操作
    *
-   * @return 返回{@code true}，直接回调{@link IDownloadGroupListener#onStop(long)}
+   * @return 返回{@code true}，直接回调{@link IDGroupListener#onStop(long)}
    */
   protected boolean onPreStop() {
 

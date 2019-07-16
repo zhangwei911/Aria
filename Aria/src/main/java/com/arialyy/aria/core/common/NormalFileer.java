@@ -18,9 +18,7 @@ package com.arialyy.aria.core.common;
 import android.os.Handler;
 import android.os.Looper;
 import com.arialyy.aria.core.download.BaseDListener;
-import com.arialyy.aria.core.event.Event;
 import com.arialyy.aria.core.event.EventMsgUtil;
-import com.arialyy.aria.core.event.SpeedEvent;
 import com.arialyy.aria.core.inf.AbsNormalEntity;
 import com.arialyy.aria.core.inf.AbsTaskWrapper;
 import com.arialyy.aria.core.inf.IEventListener;
@@ -190,6 +188,7 @@ public abstract class NormalFileer<ENTITY extends AbsNormalEntity, TASK_WRAPPER 
     if (mListener instanceof BaseDListener) {
       ((BaseDListener) mListener).supportBreakpoint(false);
     }
+    mStartThreadNum = 1;
 
     AbsThreadTask task = createSingThreadTask(mRecord.threadRecords.get(0), 1);
     if (task == null) return;

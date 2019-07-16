@@ -12,6 +12,7 @@
   <string name="start">开始</string>
   <string name="resume">恢复</string>
   <string name="delete">删除</string>
+  <string name="complete">完成</string>
   <string name="code_simple">代码示例：</string>
   <string name="download_success">下载完成</string>
   <string name="download_fail">下载失败</string>
@@ -125,7 +126,7 @@
 
   <string-array name="group_urls_1">
     <item>http://hzdown.muzhiwan.com/2017/05/08/nl.noio.kingdom_59104935e56f0.apk</item>
-    <!--<item>https://atom-installer.github.com/v1.13.0/AtomSetup.exe</item>-->
+    <item>https://atom-installer.github.com/v1.13.0/AtomSetup.exe1</item>
     <item>http://hzdown.muzhiwan.com/2017/09/05/com.mir.iphone.empire83jie.mzw_59ae6d5a3638d.apk</item>
   </string-array>
 

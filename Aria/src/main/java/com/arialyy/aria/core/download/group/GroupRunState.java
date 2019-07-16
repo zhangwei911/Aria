@@ -51,7 +51,7 @@ class GroupRunState {
   /**
    * 组合任务监听
    */
-  IDownloadGroupListener listener;
+  IDGroupListener listener;
 
   /**
    * 子任务队列
@@ -71,7 +71,7 @@ class GroupRunState {
 
   private String mGroupHash;
 
-  GroupRunState(String groupHash, IDownloadGroupListener listener, int subSize,
+  GroupRunState(String groupHash, IDGroupListener listener, int subSize,
       SimpleSubQueue queue) {
     this.listener = listener;
     this.queue = queue;

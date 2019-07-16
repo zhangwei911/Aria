@@ -23,7 +23,7 @@ import com.arialyy.aria.exception.BaseException;
  * Created by Aria.Lao on 2017/7/20.
  * 下载任务组事件
  */
-public interface IDownloadGroupListener extends IDownloadListener {
+public interface IDGroupListener extends IDownloadListener {
 
   /**
    * 子任务预处理

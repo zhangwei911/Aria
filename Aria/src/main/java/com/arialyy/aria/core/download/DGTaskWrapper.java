@@ -46,9 +46,6 @@ public class DGTaskWrapper extends AbsGroupTaskWrapper<DownloadGroupEntity, DTas
     this.unknownSize = unknownSize;
   }
 
-  /**
-   * 组名
-   */
   @Override public String getKey() {
     return getEntity().getKey();
   }

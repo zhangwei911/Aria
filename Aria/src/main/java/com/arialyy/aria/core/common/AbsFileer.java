@@ -160,7 +160,6 @@ public abstract class AbsFileer<ENTITY extends AbsNormalEntity, TASK_WRAPPER ext
   }
 
   public synchronized void closeTimer() {
-    ALog.i(TAG, "关闭定时器");
     if (mTimer != null && !mTimer.isShutdown()) {
       mTimer.shutdown();
     }

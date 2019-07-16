@@ -79,7 +79,7 @@ class SimpleSchedulers implements ISchedulers {
    * 2、stopNum + failNum + completeNum + cacheNum == subSize，则认为组合任务停止
    * 3、failNum == subSize，只有全部的子任务都失败了，才能任务组合任务失败
    */
-  private synchronized void handleFail(final SubDLoadUtil loader) {
+  private synchronized void handleFail(final SubDLoadUtil loaderUtil) {
     Configuration config = Configuration.getInstance();
 
     long interval = config.dGroupCfg.getSubReTryInterval();
@@ -88,32 +88,34 @@ class SimpleSchedulers implements ISchedulers {
 
     final int reTryNum = num;
     if ((!NetUtils.isConnected(AriaManager.APP) && !isNotNetRetry)
-        || loader.getEntity().getFailNum() > reTryNum) {
-      mQueue.removeTaskFromExecQ(loader);
-      mGState.listener.onSubFail(loader.getEntity(), new TaskException(TAG,
-          String.format("任务组子任务【%s】下载失败，下载地址【%s】", loader.getEntity().getFileName(),
-              loader.getEntity().getUrl())));
-      mGState.countFailNum(loader.getKey());
+        || loaderUtil.getDownloader() == null // 如果获取不到文件信息，loader为空
+        || loaderUtil.getEntity().getFailNum() > reTryNum) {
+      mQueue.removeTaskFromExecQ(loaderUtil);
+      mGState.listener.onSubFail(loaderUtil.getEntity(), new TaskException(TAG,
+          String.format("任务组子任务【%s】下载失败，下载地址【%s】", loaderUtil.getEntity().getFileName(),
+              loaderUtil.getEntity().getUrl())));
+      mGState.countFailNum(loaderUtil.getKey());
       if (mGState.getFailNum() == mGState.getSubSize()
           || mGState.getStopNum() + mGState.getFailNum() + mGState.getCompleteNum()
           == mGState.getSubSize()) {
         mQueue.clear();
         mGState.isRunning = false;
-        mGState.listener.onFail(true, new TaskException(TAG,
+        mGState.listener.onFail(false, new TaskException(TAG,
             String.format("任务组【%s】下载失败", mGState.getGroupHash())));
       } else {
         startNext();
       }
       return;
     }
-    final ScheduledThreadPoolExecutor timer = new ScheduledThreadPoolExecutor(1);
 
+    // 如果获取不到文件信息，loader为空
+    final ScheduledThreadPoolExecutor timer = new ScheduledThreadPoolExecutor(1);
     timer.schedule(new Runnable() {
       @Override public void run() {
-        AbsEntity entity = loader.getEntity();
+        AbsEntity entity = loaderUtil.getEntity();
         if (entity.getFailNum() <= reTryNum) {
-          ALog.d(TAG, String.format("任务【%s】开始重试", loader.getEntity().getFileName()));
-          loader.reStart();
+          ALog.d(TAG, String.format("任务【%s】开始重试", loaderUtil.getEntity().getFileName()));
+          loaderUtil.reStart();
         } else {
           startNext();
         }
@@ -159,7 +161,8 @@ class SimpleSchedulers implements ISchedulers {
     mGState.updateCompleteNum();
     ALog.d(TAG, String.format("总任务数：%s，完成的任务数：%s，失败的任务数：%s，停止的任务数：%s", mGState.getSubSize(),
         mGState.getCompleteNum(), mGState.getFailNum(), mGState.getStopNum()));
-    if (mGState.getCompleteNum() == mGState.getSubSize()) {
+    if (mGState.getCompleteNum() + mGState.getFailNum() + mGState.getStopNum()
+        == mGState.getSubSize()) {
       if (mGState.getStopNum() == 0 && mGState.getFailNum() == 0) {
         mGState.listener.onComplete();
       } else {

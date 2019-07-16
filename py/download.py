@@ -1,4 +1,5 @@
 # coding=utf-8
+#!/usr/bin/python3
 
 import os
 from flask import Flask, send_from_directory, request
@@ -12,8 +13,8 @@ def downloader(filename):
     不支持断点的下载
     """
     data = request.values.get('key')
-    print data
-    dirpath = 'D:/test'
+    print(data)
+    dirpath = '/Users/aria/dev/ftp'
     return send_from_directory(dirpath, filename, as_attachment=True)  # as_attachment=True 一定要写，不然会变成打开，而不是下载
 
 
@@ -24,7 +25,7 @@ def downloader1():
     """
     filename = request.values.get('filename')
     data = request.values.get('key')
-    print data
+    print(data)
     dirpath = 'D:/test'
     return send_from_directory(dirpath, filename, as_attachment=True)  # as_attachment=True 一定要写，不然会变成打开，而不是下载
 

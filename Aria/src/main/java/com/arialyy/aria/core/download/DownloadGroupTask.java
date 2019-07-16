@@ -20,9 +20,9 @@ import android.os.Looper;
 import android.text.TextUtils;
 import com.arialyy.aria.core.AriaManager;
 import com.arialyy.aria.core.common.IUtil;
-import com.arialyy.aria.core.download.group.DownloadGroupUtil;
+import com.arialyy.aria.core.download.group.DGroupUtil;
 import com.arialyy.aria.core.download.group.FtpDirDownloadUtil;
-import com.arialyy.aria.core.download.group.IDownloadGroupListener;
+import com.arialyy.aria.core.download.group.IDGroupListener;
 import com.arialyy.aria.core.inf.AbsGroupTask;
 import com.arialyy.aria.core.inf.AbsTaskWrapper;
 import com.arialyy.aria.core.scheduler.ISchedulers;
@@ -57,9 +57,9 @@ public class DownloadGroupTask extends AbsGroupTask<DGTaskWrapper> {
   @Override protected synchronized IUtil createUtil() {
     switch (mTaskWrapper.getRequestType()) {
       case AbsTaskWrapper.D_HTTP:
-        return new DownloadGroupUtil((IDownloadGroupListener) mListener, mTaskWrapper);
+        return new DGroupUtil((IDGroupListener) mListener, mTaskWrapper);
       case AbsTaskWrapper.D_FTP_DIR:
-        return new FtpDirDownloadUtil((IDownloadGroupListener) mListener, mTaskWrapper);
+        return new FtpDirDownloadUtil((IDGroupListener) mListener, mTaskWrapper);
     }
     return null;
   }

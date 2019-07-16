@@ -30,7 +30,7 @@ import com.arialyy.aria.exception.BaseException;
 public class FtpDirDownloadUtil extends AbsGroupUtil {
   private String TAG = "FtpDirDownloadUtil";
 
-  public FtpDirDownloadUtil(IDownloadGroupListener listener, DGTaskWrapper taskEntity) {
+  public FtpDirDownloadUtil(IDGroupListener listener, DGTaskWrapper taskEntity) {
     super(listener, taskEntity);
   }
 

@@ -38,7 +38,7 @@ class SubDLoadUtil implements IUtil {
   private Downloader mDownloader;
   private DTaskWrapper mWrapper;
   private Handler mSchedulers;
-  private ChildDownloadListener mListener;
+  private ChildDLoadListener mListener;
   private boolean needGetInfo;
 
   /**
@@ -49,7 +49,7 @@ class SubDLoadUtil implements IUtil {
     mWrapper = taskWrapper;
     mSchedulers = schedulers;
     this.needGetInfo = needGetInfo;
-    mListener = new ChildDownloadListener(mSchedulers, SubDLoadUtil.this);
+    mListener = new ChildDLoadListener(mSchedulers, SubDLoadUtil.this);
   }
 
   @Override public String getKey() {
@@ -71,6 +71,10 @@ class SubDLoadUtil implements IUtil {
     if (mDownloader != null) {
       mDownloader.retryTask();
     }
+  }
+
+  public Downloader getDownloader() {
+    return mDownloader;
   }
 
   @Override public long getFileSize() {
@@ -112,7 +116,7 @@ class SubDLoadUtil implements IUtil {
           }
 
           @Override public void onFail(AbsEntity entity, BaseException e, boolean needRetry) {
-            mSchedulers.obtainMessage(ISchedulers.FAIL, SubDLoadUtil.this);
+            mSchedulers.obtainMessage(ISchedulers.FAIL, SubDLoadUtil.this).sendToTarget();
           }
         })).start();
       } else {
