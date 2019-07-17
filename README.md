@@ -58,7 +58,7 @@ api('com.arialyy.aria:aria-core:<last-version>'){
 ```
 如果你使用的是kotlin，请使用kotlin官方提供的方法配置apt，[kotlin kapt官方配置传送门](https://www.kotlincn.net/docs/reference/kapt.html)
 
-__注意：3.5.4以下版本升级时，需要更新[配置文件]！！(https://aria.laoyuyu.me/aria_doc/start/config.html)__
+__⚠️注意：3.5.4以下版本升级时，需要更新[配置文件](https://aria.laoyuyu.me/aria_doc/start/config.html)！！__
 
 ***
 ## 使用
