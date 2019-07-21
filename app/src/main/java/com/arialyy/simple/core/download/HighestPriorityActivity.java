@@ -27,15 +27,15 @@ import android.widget.TextView;
 import com.arialyy.annotations.Download;
 import com.arialyy.aria.core.Aria;
 import com.arialyy.aria.core.download.DownloadEntity;
-import com.arialyy.aria.core.download.DownloadTarget;
 import com.arialyy.aria.core.download.DownloadTask;
 import com.arialyy.aria.core.inf.AbsEntity;
 import com.arialyy.aria.core.inf.IEntity;
 import com.arialyy.frame.util.show.L;
 import com.arialyy.simple.R;
 import com.arialyy.simple.base.BaseActivity;
-import com.arialyy.simple.databinding.ActivityHighestPriorityBinding;
 import com.arialyy.simple.core.download.multi_download.DownloadAdapter;
+import com.arialyy.simple.databinding.ActivityHighestPriorityBinding;
+import com.arialyy.simple.util.AppUtil;
 import com.arialyy.simple.widget.HorizontalProgressBarWithNumber;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -54,6 +54,7 @@ public class HighestPriorityActivity extends BaseActivity<ActivityHighestPriorit
   private TextView mSize;
   private TextView mSpeed;
   private RecyclerView mList;
+  private DownloadEntity mEntity;
 
   private String mTaskName = "光明大陆";
   private static final String DOWNLOAD_URL =
@@ -83,16 +84,20 @@ public class HighestPriorityActivity extends BaseActivity<ActivityHighestPriorit
   }
 
   private void initWidget() {
-    DownloadTarget target = Aria.download(this).load(DOWNLOAD_URL);
-    mPb.setProgress(target.getPercent());
-    if (target.getTaskState() == IEntity.STATE_STOP) {
-      mStart.setText("恢复");
-      mStart.setTextColor(getResources().getColor(android.R.color.holo_blue_light));
-      setBtState(true);
-    } else if (target.isRunning()) {
-      setBtState(false);
+    mEntity = Aria.download(this).getFirstDownloadEntity(DOWNLOAD_URL);
+
+    if (mEntity != null) {
+      mPb.setProgress(mEntity.getPercent());
+      if (mEntity.getState() == IEntity.STATE_STOP) {
+        mStart.setText("恢复");
+        mStart.setTextColor(getResources().getColor(android.R.color.holo_blue_light));
+        setBtState(true);
+      } else if (mEntity.getState() == IEntity.STATE_RUNNING) {
+        setBtState(false);
+      }
+      mSize.setText(mEntity.getConvertFileSize());
     }
-    mSize.setText(target.getConvertFileSize());
+
     List<DownloadEntity> temp = Aria.download(this).getTaskList();
     if (temp != null && !temp.isEmpty()) {
       for (DownloadEntity entity : temp) {
@@ -143,8 +148,7 @@ public class HighestPriorityActivity extends BaseActivity<ActivityHighestPriorit
   public void onClick(View view) {
     switch (view.getId()) {
       case R.id.start:
-        String text = ((TextView) view).getText().toString();
-        if (text.equals("重新开始？") || text.equals("开始")) {
+        if (AppUtil.chekEntityValid(mEntity)) {
           Aria.download(this)
               .load(DOWNLOAD_URL)
               .setFilePath(Environment.getExternalStorageDirectory().getPath()
@@ -152,15 +156,21 @@ public class HighestPriorityActivity extends BaseActivity<ActivityHighestPriorit
                   + mTaskName
                   + ".apk")
               .setHighestPriority();
-        } else if (text.equals("恢复")) {
-          Aria.download(this).load(DOWNLOAD_URL).resume();
+        } else {
+          Aria.download(this).load(mEntity.getId()).resume();
         }
+        ((TextView) view).setText(getString(R.string.stop));
         break;
       case R.id.stop:
-        Aria.download(this).load(DOWNLOAD_URL).pause();
+        if (AppUtil.chekEntityValid(mEntity)) {
+          Aria.download(this).load(mEntity.getId()).stop();
+        }
+        ((TextView) view).setText(getString(R.string.resume));
         break;
       case R.id.cancel:
-        Aria.download(this).load(DOWNLOAD_URL).cancel();
+        if (AppUtil.chekEntityValid(mEntity)) {
+          Aria.download(this).load(mEntity.getId()).cancel();
+        }
         break;
     }
   }

@@ -47,7 +47,7 @@ public class M3U8LiveModule extends BaseViewModule {
     String url = AppUtil.getConfigValue(context, M3U8_LIVE_URL_KEY, defUrl);
     String filePath = AppUtil.getConfigValue(context, M3U8_LIVE_PATH_KEY, this.filePath);
 
-    singDownloadInfo = Aria.download(context).getDownloadEntity(url);
+    singDownloadInfo = Aria.download(context).getFirstDownloadEntity(url);
     if (singDownloadInfo == null) {
       singDownloadInfo = new DownloadEntity();
       singDownloadInfo.setUrl(url);

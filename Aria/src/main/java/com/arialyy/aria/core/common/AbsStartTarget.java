@@ -13,24 +13,46 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.arialyy.aria.core.download;
+package com.arialyy.aria.core.common;
 
-import com.arialyy.aria.core.command.NormalCmdFactory;
-import com.arialyy.aria.core.event.EventMsgUtil;
+import com.arialyy.aria.core.common.controller.IStartFeature;
+import com.arialyy.aria.core.common.controller.StartController;
 import com.arialyy.aria.core.inf.AbsTarget;
-import com.arialyy.aria.util.CommonUtil;
 
 /**
- * Created by lyy on 2017/2/28.
+ * 处理第一次下载
  */
-abstract class AbsDTarget<TARGET extends AbsDTarget> extends AbsTarget<TARGET> {
+public abstract class AbsStartTarget<TARGET extends AbsStartTarget> extends AbsTarget<TARGET>
+    implements IStartFeature {
+
+  private StartController mStartController;
+
+  private synchronized StartController getController() {
+    if (mStartController == null) {
+      mStartController = new StartController(getTaskWrapper());
+    }
+    return mStartController;
+  }
 
   /**
-   * 更新下载url
+   * 添加任务
    *
-   * @param newUrl 新的下载url
+   * @return 正常添加，返回任务id，否则返回-1
    */
-  public abstract TARGET updateUrl(String newUrl);
+  @Override
+  public long add() {
+    return getController().add();
+  }
+
+  /**
+   * 开始任务
+   *
+   * @return 正常启动，返回任务id，否则返回-1
+   */
+  @Override
+  public long start() {
+    return getController().start();
+  }
 
   /**
    * 将任务设置为最高优先级任务，最高优先级任务有以下特点：
@@ -41,15 +63,8 @@ abstract class AbsDTarget<TARGET extends AbsDTarget> extends AbsTarget<TARGET> {
    * 5、如果下载队列中已经满了，则会停止队尾的任务，当高优先级任务完成后，该队尾任务将自动执行
    * 6、把任务设置为最高优先级任务后，将自动执行任务，不需要重新调用start()启动任务
    */
-  public void setHighestPriority() {
-    if (checkConfig()) {
-      EventMsgUtil.getDefault()
-          .post(CommonUtil.createNormalCmd(getTaskWrapper(), NormalCmdFactory.TASK_HIGHEST_PRIORITY,
-              checkTaskType()));
-    }
-  }
-
-  @Override public DownloadEntity getEntity() {
-    return (DownloadEntity) super.getEntity();
+  @Override
+  public long setHighestPriority() {
+    return getController().setHighestPriority();
   }
 }

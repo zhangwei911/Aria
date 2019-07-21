@@ -39,7 +39,7 @@ public class UploadModule extends BaseViewModule {
     String filePath = AppUtil.getConfigValue(context, FTP_PATH_KEY,
         Environment.getExternalStorageDirectory().getPath() + "/AriaPrj.rar");
 
-    UploadEntity entity = Aria.upload(context).getUploadEntity(filePath);
+    UploadEntity entity = Aria.upload(context).getFirstUploadEntity(filePath);
     if (entity != null) {
       uploadInfo = entity;
       AppUtil.setConfigValue(context, FTP_URL_KEY, uploadInfo.getUrl());

@@ -13,46 +13,48 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.arialyy.aria.core.inf;
+package com.arialyy.aria.core.common.controller;
 
 /**
- * Created by lyy on 2019/4/5.
- * 组合任务配置处理
+ * 恢复、停止、删除、等功能控制器
  */
-public interface IGroupConfigHandler {
+public interface INormalFeature {
 
   /**
-   * 获取实体
+   * 停止任务
    */
-  AbsEntity getEntity();
+  void stop();
 
   /**
-   * 任务是否存在
+   * 恢复任务
+   */
+  void resume();
+
+  /**
+   * 删除任务
+   */
+  void cancel();
+
+  /**
+   * 任务重试
+   */
+  void reTry();
+
+  /**
+   * 删除任务
    *
-   * @return {@code true}任务存在，{@code false} 任务不存在
+   * @param removeFile {@code true} 不仅删除任务数据库记录，还会删除已经删除完成的文件
+   * {@code false}如果任务已经完成，只删除任务数据库记录，
    */
-  boolean taskExists();
+  void cancel(boolean removeFile);
 
   /**
-   * 任务是否在执行
-   *
-   * @return {@code true} 任务正在执行，{@code false} 任务没有执行
+   * 重新下载
    */
-  boolean isRunning();
+  void reStart();
 
   /**
-   * 检查实体是否合法
-   *
-   * @return {@code true}合法
+   * 保存数据
    */
-  boolean checkEntity();
-
-  /**
-   * 检查文件夹路径
-   * 1、文件夹路径不能为空
-   * 2、文件夹路径不能是文件
-   *
-   * @return {@code true} 合法
-   */
-  boolean checkDirPath();
+  void save();
 }

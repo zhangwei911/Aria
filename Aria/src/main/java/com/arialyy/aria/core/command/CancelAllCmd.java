@@ -65,7 +65,7 @@ final public class CancelAllCmd<T extends AbsTaskWrapper> extends AbsNormalCmd<T
     if (entities != null && !entities.isEmpty()) {
       for (DownloadEntity entity : entities) {
         remove(TaskWrapperManager.getInstance()
-            .getHttpTaskWrapper(DTaskWrapper.class, entity.getKey()));
+            .getNormalTaskWrapper(DTaskWrapper.class, entity.getId()));
       }
     }
   }
@@ -78,9 +78,8 @@ final public class CancelAllCmd<T extends AbsTaskWrapper> extends AbsNormalCmd<T
         DbEntity.findDatas(DownloadGroupEntity.class, "state!=?", "-1");
     if (entities != null && !entities.isEmpty()) {
       for (DownloadGroupEntity entity : entities) {
-        remove(
-            TaskWrapperManager.getInstance()
-                .getDGTaskWrapper(DGTaskWrapper.class, entity.getUrls()));
+        remove(TaskWrapperManager.getInstance()
+            .getGroupWrapper(DGTaskWrapper.class, entity.getId()));
       }
     }
   }
@@ -94,7 +93,7 @@ final public class CancelAllCmd<T extends AbsTaskWrapper> extends AbsNormalCmd<T
     if (entities != null && !entities.isEmpty()) {
       for (UploadEntity entity : entities) {
         remove(TaskWrapperManager.getInstance()
-            .getHttpTaskWrapper(UTaskWrapper.class, entity.getKey()));
+            .getNormalTaskWrapper(UTaskWrapper.class, entity.getId()));
       }
     }
   }

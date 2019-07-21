@@ -13,18 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.arialyy.aria.core.common.http;
+package com.arialyy.aria.core.manager;
 
-import com.arialyy.aria.core.common.RequestEnum;
-import com.arialyy.aria.core.inf.AbsTarget;
+import com.arialyy.aria.core.inf.AbsEntity;
+import com.arialyy.aria.core.inf.AbsTaskWrapper;
 
 /**
- * get处理委托类
+ * 任务组通过组创建任务
+ * Created by Aria.Lao on 2017/11/1.
  */
-public class GetDelegate<TARGET extends AbsTarget> extends HttpDelegate<TARGET> {
+interface IGroupWrapperFactory<ENTITY extends AbsEntity, TASK_ENTITY extends AbsTaskWrapper<ENTITY>> {
 
-  public GetDelegate(TARGET target) {
-    super(target);
-    mTarget.getTaskWrapper().asHttp().setRequestEnum(RequestEnum.GET);
-  }
+  /**
+   * 获取任务组的任务实体，
+   * 1、创建实体和任务实体之间的关联
+   * 2、如果在数据库中查找不到对应的数据，则新创建任务实体
+   *
+   * @param taskId 组合任务任务Id
+   */
+  TASK_ENTITY getGroupWrapper(long taskId);
 }

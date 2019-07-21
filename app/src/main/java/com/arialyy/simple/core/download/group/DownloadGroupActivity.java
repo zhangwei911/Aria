@@ -23,8 +23,8 @@ import com.arialyy.annotations.DownloadGroup;
 import com.arialyy.aria.core.Aria;
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.download.DownloadGroupEntity;
-import com.arialyy.aria.core.download.DownloadGroupTarget;
 import com.arialyy.aria.core.download.DownloadGroupTask;
+import com.arialyy.aria.core.inf.IEntity;
 import com.arialyy.aria.core.inf.IHttpFileLenAdapter;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.frame.util.show.L;
@@ -32,6 +32,7 @@ import com.arialyy.frame.util.show.T;
 import com.arialyy.simple.R;
 import com.arialyy.simple.base.BaseActivity;
 import com.arialyy.simple.databinding.ActivityDownloadGroupBinding;
+import com.arialyy.simple.util.AppUtil;
 import com.arialyy.simple.widget.SubStateLinearLayout;
 import java.util.List;
 import java.util.Map;
@@ -43,7 +44,7 @@ public class DownloadGroupActivity extends BaseActivity<ActivityDownloadGroupBin
 
   private SubStateLinearLayout mChildList;
   private List<String> mUrls;
-  private DownloadGroupTarget mTarget;
+  private DownloadGroupEntity mEntity;
 
   @Override protected void init(Bundle savedInstanceState) {
     super.init(savedInstanceState);
@@ -52,21 +53,21 @@ public class DownloadGroupActivity extends BaseActivity<ActivityDownloadGroupBin
 
     mChildList = getBinding().childList;
     mUrls = getModule(GroupModule.class).getUrls();
-    DownloadGroupEntity entity = Aria.download(this).getDownloadGroupEntity(mUrls);
-    if (entity != null) {
-      mTarget = Aria.download(this).loadGroup(entity);
-      mChildList.addData(entity.getSubEntities());
+    mEntity = Aria.download(this).getGroupEntity(mUrls);
+    if (mEntity != null) {
+      mChildList.addData(mEntity.getSubEntities());
       getBinding().setStateStr(
-          mTarget.isRunning() ? getString(R.string.stop) : getString(R.string.resume));
-      getBinding().setFileSize(entity.getConvertFileSize());
-      if (entity.getFileSize() == 0) {
+          mEntity.getState() == IEntity.STATE_RUNNING ? getString(R.string.stop)
+              : getString(R.string.resume));
+      getBinding().setFileSize(mEntity.getConvertFileSize());
+      if (mEntity.getFileSize() == 0) {
         getBinding().setProgress(0);
       } else {
-        getBinding().setProgress(entity.isComplete() ? 100
-            : (int) (entity.getCurrentProgress() * 100 / entity.getFileSize()));
+        getBinding().setProgress(mEntity.isComplete() ? 100
+            : (int) (mEntity.getCurrentProgress() * 100 / mEntity.getFileSize()));
       }
       ALog.d(TAG,
-          "size = " + entity.getSubEntities().size() + "; len = " + entity.getConvertFileSize());
+          "size = " + mEntity.getSubEntities().size() + "; len = " + mEntity.getConvertFileSize());
     }
 
     mChildList.setOnItemClickListener(new SubStateLinearLayout.OnItemClickListener() {
@@ -89,16 +90,15 @@ public class DownloadGroupActivity extends BaseActivity<ActivityDownloadGroupBin
   public void onClick(View view) {
     switch (view.getId()) {
       case R.id.start:
-        if (mTarget == null || !mTarget.isRunning()) {
+        if (!AppUtil.chekEntityValid(mEntity)) {
           Aria.download(this)
               .loadGroup(mUrls)
               .setDirPath(
-                  //Environment.getExternalStorageDirectory().getPath() + "/Download/group_test_5")
                   Environment.getExternalStorageDirectory().getPath() + "/Download/group_test_2")
               .setGroupAlias("任务组测试")
               //.setSubFileName(getModule(GroupModule.class).getSubName2())
-              //.setSubFileName(getModule(GroupModule.class).getSubName())
-              //.unknownSize()
+              .setSubFileName(getModule(GroupModule.class).getSubName())
+              .unknownSize()
               .setFileLenAdapter(new IHttpFileLenAdapter() {
                 @Override public long handleFileLen(Map<String, List<String>> headers) {
 
@@ -115,13 +115,19 @@ public class DownloadGroupActivity extends BaseActivity<ActivityDownloadGroupBin
               //.updateUrls(temp)
               .start();
           getBinding().setStateStr(getString(R.string.stop));
+          break;
+        }
+        if (Aria.download(this).loadGroup(mEntity.getId()).isRunning()) {
+          Aria.download(this).loadGroup(mEntity.getId()).stop();
         } else {
-          Aria.download(this).loadGroup(mUrls).stop();
-          getBinding().setStateStr(getString(R.string.resume));
+          Aria.download(this).loadGroup(mEntity.getId()).resume();
         }
         break;
       case R.id.cancel:
-        Aria.download(this).loadGroup(mUrls).cancel(true);
+        if (AppUtil.chekEntityValid(mEntity)) {
+
+          Aria.download(this).loadGroup(mEntity.getId()).cancel(true);
+        }
         break;
     }
   }
@@ -200,7 +206,7 @@ public class DownloadGroupActivity extends BaseActivity<ActivityDownloadGroupBin
     //Log.e(TAG, "gHash = "
     //    + groupTask.getEntity().getSubEntities().get(0).hashCode()
     //    + "; subHash = "
-    //    + groupTask.getHttpTaskWrapper().getSubTaskEntities().get(0).getEntity().hashCode() +
+    //    + groupTask.getNormalTaskWrapper().getSubTaskEntities().get(0).getEntity().hashCode() +
     //    "; subHash = " + subEntity.hashCode());
     //int percent = subEntity.getPercent();
     ////如果你打开了速度单位转换配置，将可以通过以下方法获取带单位的下载速度，如：1 mb/s

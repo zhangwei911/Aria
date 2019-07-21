@@ -20,14 +20,15 @@ import android.os.Environment;
 import android.view.View;
 import com.arialyy.annotations.DownloadGroup;
 import com.arialyy.aria.core.Aria;
+import com.arialyy.aria.core.common.controller.ControllerType;
 import com.arialyy.aria.core.download.DownloadGroupEntity;
 import com.arialyy.aria.core.download.DownloadGroupTask;
-import com.arialyy.aria.core.download.DGTaskWrapper;
 import com.arialyy.frame.util.show.L;
 import com.arialyy.frame.util.show.T;
 import com.arialyy.simple.R;
 import com.arialyy.simple.base.BaseActivity;
 import com.arialyy.simple.databinding.ActivityDownloadGroupBinding;
+import com.arialyy.simple.util.AppUtil;
 import com.arialyy.simple.widget.SubStateLinearLayout;
 
 /**
@@ -36,22 +37,23 @@ import com.arialyy.simple.widget.SubStateLinearLayout;
 public class FTPDirDownloadActivity extends BaseActivity<ActivityDownloadGroupBinding> {
   private static final String dir = "ftp://9.9.9.50:21/upload/测试";
 
-  SubStateLinearLayout mChildList;
+  private SubStateLinearLayout mChildList;
+  private DownloadGroupEntity mEntity;
 
   @Override protected void init(Bundle savedInstanceState) {
     super.init(savedInstanceState);
     Aria.download(this).register();
     setTitle("FTP文件夹下载");
     mChildList = findViewById(R.id.child_list);
-    DownloadGroupEntity entity = Aria.download(this).getFtpDirEntity(dir);
-    if (entity != null) {
-      mChildList.addData(entity.getSubEntities());
-      getBinding().setFileSize(entity.getConvertFileSize());
-      if (entity.getFileSize() == 0) {
+    mEntity = Aria.download(this).getFtpDirEntity(dir);
+    if (mEntity != null) {
+      mChildList.addData(mEntity.getSubEntities());
+      getBinding().setFileSize(mEntity.getConvertFileSize());
+      if (mEntity.getFileSize() == 0) {
         getBinding().setProgress(0);
       } else {
-        getBinding().setProgress(entity.isComplete() ? 100
-            : (int) (entity.getCurrentProgress() * 100 / entity.getFileSize()));
+        getBinding().setProgress(mEntity.isComplete() ? 100
+            : (int) (mEntity.getCurrentProgress() * 100 / mEntity.getFileSize()));
       }
     }
   }
@@ -63,20 +65,28 @@ public class FTPDirDownloadActivity extends BaseActivity<ActivityDownloadGroupBi
   public void onClick(View view) {
     switch (view.getId()) {
       case R.id.start:
-        Aria.download(this)
-            .loadFtpDir(dir)
-            .setDirPath(
-                Environment.getExternalStorageDirectory().getPath() + "/Download/ftp_dir")
-            .setGroupAlias("ftp文件夹下载")
-            //.setSubTaskFileName(getModule(GroupModule.class).getSubName())
-            .login("lao", "123456")
-            .start();
-        break;
-      case R.id.stop:
-        Aria.download(this).loadFtpDir(dir).stop();
+        if (!AppUtil.chekEntityValid(mEntity)) {
+          Aria.download(this)
+              .loadFtpDir(dir)
+              .setDirPath(
+                  Environment.getExternalStorageDirectory().getPath() + "/Download/ftp_dir")
+              .setGroupAlias("ftp文件夹下载")
+              .option()
+              .login("lao", "123456")
+              .controller(ControllerType.START_CONTROLLER)
+              .start();
+          break;
+        }
+        if (Aria.download(this).loadFtpDir(mEntity.getId()).isRunning()) {
+          Aria.download(this).loadFtpDir(mEntity.getId()).stop();
+        } else {
+          Aria.download(this).loadFtpDir(mEntity.getId()).resume();
+        }
         break;
       case R.id.cancel:
-        Aria.download(this).loadFtpDir(dir).cancel();
+        if (AppUtil.chekEntityValid(mEntity)) {
+          Aria.download(this).loadFtpDir(mEntity.getId()).cancel();
+        }
         break;
     }
   }

@@ -15,15 +15,13 @@
  */
 package com.arialyy.aria.core.upload;
 
-import android.text.TextUtils;
-import com.arialyy.aria.core.inf.AbsEntity;
 import com.arialyy.aria.core.common.ftp.IFtpUploadInterceptor;
+import com.arialyy.aria.core.inf.AbsEntity;
+import com.arialyy.aria.core.inf.AbsTarget;
 import com.arialyy.aria.core.inf.IConfigHandler;
 import com.arialyy.aria.core.manager.TaskWrapperManager;
 import com.arialyy.aria.core.queue.UploadTaskQueue;
 import com.arialyy.aria.orm.DbEntity;
-import com.arialyy.aria.util.ALog;
-import com.arialyy.aria.util.CheckUtil;
 import com.arialyy.aria.util.CommonUtil;
 import java.io.File;
 
@@ -31,42 +29,36 @@ import java.io.File;
  * Created by Aria.Lao on 2019/4/5.
  * 普通上传任务通用功能处理
  */
-class UNormalConfigHandler<TARGET extends AbsUploadTarget> implements IConfigHandler {
+class UNormalConfigHandler<TARGET extends AbsTarget> implements IConfigHandler {
   private String TAG = "UNormalDelegate";
   private UploadEntity mEntity;
   private TARGET mTarget;
-  /**
-   * 上传路径
-   */
-  private String mTempUrl;
+  private UTaskWrapper mWrapper;
 
-  UNormalConfigHandler(TARGET target, String filePath, String targetName) {
+  UNormalConfigHandler(TARGET target, long taskId, String targetName) {
     mTarget = target;
-    initTarget(filePath, targetName);
+    initTarget(taskId, targetName);
   }
 
-  private void initTarget(String filePath, String targetName) {
-    UTaskWrapper taskWrapper =
-        TaskWrapperManager.getInstance().getHttpTaskWrapper(UTaskWrapper.class, filePath);
-    mEntity = taskWrapper.getEntity();
+  private void initTarget(long taskId, String targetName) {
+    mWrapper = TaskWrapperManager.getInstance().getNormalTaskWrapper(UTaskWrapper.class, taskId);
+    mEntity = mWrapper.getEntity();
+    mTarget.setTargetName(targetName);
+    mTarget.setTaskWrapper(mWrapper);
+    getTaskWrapper().setTempUrl(mEntity.getUrl());
+  }
+
+  void setFilePath(String filePath) {
     File file = new File(filePath);
     mEntity.setFileName(file.getName());
     mEntity.setFileSize(file.length());
-    mTarget.setTargetName(targetName);
-    mTarget.setTaskWrapper(taskWrapper);
-    mTempUrl = mEntity.getUrl();
-  }
-
-  TARGET updateUrl(String newUrl) {
-    mTempUrl = newUrl;
-    return mTarget;
   }
 
   TARGET setUploadInterceptor(IFtpUploadInterceptor uploadInterceptor) {
     if (uploadInterceptor == null) {
       throw new NullPointerException("ftp拦截器为空");
     }
-    mTarget.getTaskWrapper().asFtp().setUploadInterceptor(uploadInterceptor);
+    getTaskWrapper().asFtp().setUploadInterceptor(uploadInterceptor);
     return mTarget;
   }
 
@@ -83,73 +75,12 @@ class UNormalConfigHandler<TARGET extends AbsUploadTarget> implements IConfigHan
     return task != null && task.isRunning();
   }
 
-  @Override public boolean checkEntity() {
-    boolean b = checkUrl() && checkFilePath();
-    if (b) {
-      mEntity.save();
-    }
-    if (mTarget.getTaskWrapper().asFtp().getUrlEntity() != null && mTarget.getTaskWrapper()
-        .asFtp()
-        .getUrlEntity().isFtps) {
-      if (TextUtils.isEmpty(mTarget.getTaskWrapper().asFtp().getUrlEntity().storePath)) {
-        ALog.e(TAG, "证书路径为空");
-        return false;
-      }
-      if (TextUtils.isEmpty(mTarget.getTaskWrapper().asFtp().getUrlEntity().keyAlias)) {
-        ALog.e(TAG, "证书别名为空");
-        return false;
-      }
-    }
-    return b;
-  }
-
-  @Override public boolean checkFilePath() {
-    String filePath = mEntity.getFilePath();
-    if (TextUtils.isEmpty(filePath)) {
-      ALog.e(TAG, "上传失败，文件路径为null");
-      return false;
-    } else if (!filePath.startsWith("/")) {
-      ALog.e(TAG, "上传失败，文件路径【" + filePath + "】不合法");
-      return false;
-    }
-
-    File file = new File(mEntity.getFilePath());
-    if (!file.exists()) {
-      ALog.e(TAG, "上传失败，文件【" + filePath + "】不存在");
-      return false;
-    }
-    if (file.isDirectory()) {
-      ALog.e(TAG, "上传失败，文件【" + filePath + "】不能是文件夹");
-      return false;
-    }
-    return true;
-  }
-
-  @Override public boolean checkUrl() {
-
-    final String url = mTempUrl;
-    if (TextUtils.isEmpty(url)) {
-      ALog.e(TAG, "上传失败，url为null");
-      return false;
-    } else if (!CheckUtil.checkUrlNotThrow(url)) {
-      ALog.e(TAG, "上传失败，url【" + url + "】错误");
-      return false;
-    }
-    int index = url.indexOf("://");
-    if (index == -1) {
-      ALog.e(TAG, "上传失败，url【" + url + "】不合法");
-      return false;
-    }
-    mEntity.setUrl(url);
-    return true;
-  }
-
   void setTempUrl(String tempUrl) {
-    this.mTempUrl = tempUrl;
-    mTarget.getTaskWrapper().asFtp().setUrlEntity(CommonUtil.getFtpUrlInfo(tempUrl));
+    getTaskWrapper().setTempUrl(tempUrl);
+    getTaskWrapper().asFtp().setUrlEntity(CommonUtil.getFtpUrlInfo(tempUrl));
   }
 
-  public String getTempUrl() {
-    return mTempUrl;
+  private UTaskWrapper getTaskWrapper() {
+    return mWrapper;
   }
 }

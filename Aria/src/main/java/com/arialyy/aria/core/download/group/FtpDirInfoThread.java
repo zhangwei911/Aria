@@ -21,9 +21,9 @@ import com.arialyy.aria.core.common.CompleteInfo;
 import com.arialyy.aria.core.common.OnFileInfoCallback;
 import com.arialyy.aria.core.common.ftp.AbsFtpInfoThread;
 import com.arialyy.aria.core.download.DGTaskWrapper;
+import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.download.DownloadGroupEntity;
-import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.inf.AbsTaskWrapper;
 import com.arialyy.aria.util.CommonUtil;
 import java.nio.charset.Charset;
@@ -61,7 +61,7 @@ class FtpDirInfoThread extends AbsFtpInfoThread<DownloadGroupEntity, DGTaskWrapp
     DownloadEntity entity = new DownloadEntity();
     entity.setUrl(
         urlEntity.scheme + "://" + urlEntity.hostName + ":" + urlEntity.port + "/" + remotePath);
-    entity.setDownloadPath(mEntity.getDirPath() + "/" + remotePath);
+    entity.setFilePath(mEntity.getDirPath() + "/" + remotePath);
     int lastIndex = remotePath.lastIndexOf("/");
     String fileName = lastIndex < 0 ? CommonUtil.keyToHashKey(remotePath)
         : remotePath.substring(lastIndex + 1);
@@ -73,18 +73,25 @@ class FtpDirInfoThread extends AbsFtpInfoThread<DownloadGroupEntity, DGTaskWrapp
     entity.setFileSize(ftpFile.getSize());
     entity.insert();
 
-    DTaskWrapper taskWrapper = new DTaskWrapper(entity);
-    taskWrapper.setGroupTask(true);
-    taskWrapper.setGroupHash(mEntity.getGroupHash());
-    taskWrapper.setRequestType(AbsTaskWrapper.D_FTP);
+    DTaskWrapper subWrapper = new DTaskWrapper(entity);
+    subWrapper.setGroupTask(true);
+    subWrapper.setGroupHash(mEntity.getGroupHash());
+    subWrapper.setRequestType(AbsTaskWrapper.D_FTP);
     urlEntity.url = entity.getUrl();
     urlEntity.remotePath = remotePath;
-    taskWrapper.asFtp().setUrlEntity(urlEntity);
+
+    cloneInfo(subWrapper, urlEntity);
 
     if (mEntity.getUrls() == null) {
       mEntity.setUrls(new ArrayList<String>());
     }
     mEntity.getSubEntities().add(entity);
-    mTaskWrapper.getSubTaskWrapper().add(taskWrapper);
+    mTaskWrapper.getSubTaskWrapper().add(subWrapper);
+  }
+
+  private void cloneInfo(DTaskWrapper subWrapper, FtpUrlEntity urlEntity) {
+    subWrapper.asFtp().setUrlEntity(urlEntity);
+    subWrapper.asFtp().setCharSet(mTaskWrapper.asFtp().getCharSet());
+    subWrapper.asFtp().setProxy(mTaskWrapper.asFtp().getProxy());
   }
 }

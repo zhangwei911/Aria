@@ -39,28 +39,4 @@ public interface IConfigHandler {
    * @return {@code true} 任务正在执行，{@code false} 任务没有执行
    */
   boolean isRunning();
-
-  /**
-   * 检查下载实体，判断实体是否合法 合法标准为：
-   * 1、下载路径不为null，并且下载路径是正常的http或ftp路径
-   * 2、保存路径不为null，并且保存路径是android文件系统路径
-   * 3、保存路径不能重复
-   *
-   * @return {@code true}合法
-   */
-  boolean checkEntity();
-
-  /**
-   * 检查并设置普通任务的文件保存路径
-   *
-   * @return {@code true}保存路径合法
-   */
-  boolean checkFilePath();
-
-  /**
-   * 检查普通任务的下载地址
-   *
-   * @return {@code true}地址合法
-   */
-  boolean checkUrl();
 }

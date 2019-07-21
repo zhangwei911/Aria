@@ -21,7 +21,7 @@ import android.widget.Button
 import android.widget.Toast
 import com.arialyy.annotations.Download
 import com.arialyy.aria.core.Aria
-import com.arialyy.aria.core.download.DownloadTarget
+import com.arialyy.aria.core.download.HttpNormalTarget
 import com.arialyy.aria.core.download.DownloadTask
 import com.arialyy.aria.core.inf.IEntity
 import com.arialyy.simple.R
@@ -39,7 +39,7 @@ class KotlinDownloadActivity : BaseActivity<ActivitySingleBinding>() {
   private lateinit var mStart: Button
   private lateinit var mStop: Button
   private lateinit var mCancel: Button
-  private lateinit var target: DownloadTarget
+  private lateinit var target: HttpNormalTarget
 
   override fun setLayoutId(): Int {
     return R.layout.activity_single

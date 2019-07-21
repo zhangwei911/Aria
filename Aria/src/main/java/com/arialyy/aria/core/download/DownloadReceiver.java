@@ -22,6 +22,7 @@ import com.arialyy.annotations.TaskEnum;
 import com.arialyy.aria.core.AriaManager;
 import com.arialyy.aria.core.command.CancelAllCmd;
 import com.arialyy.aria.core.command.NormalCmdFactory;
+import com.arialyy.aria.core.common.AbsStartTarget;
 import com.arialyy.aria.core.common.ProxyHelper;
 import com.arialyy.aria.core.event.EventMsgUtil;
 import com.arialyy.aria.core.inf.AbsEntity;
@@ -59,101 +60,91 @@ public class DownloadReceiver extends AbsReceiver {
   }
 
   /**
-   * 使用下载实体执行下载操作
-   *
-   * @param entity 下载实体
-   */
-  @CheckResult
-  public DownloadTarget load(DownloadEntity entity) {
-    CheckUtil.checkUrlInvalidThrow(entity.getUrl());
-    return new DownloadTarget(entity, targetName);
-  }
-
-  /**
-   * 加载Http、https单任务下载地址
+   * 加载Http、https单任务下载地址，用于任务第一次下载，如果需要控制任务停止或删除等操作，请使用{@link #load(long)}
    *
    * @param url 下载地址
    */
   @CheckResult
-  public DownloadTarget load(@NonNull String url) {
+  public HttpStartTarget load(@NonNull String url) {
     CheckUtil.checkUrlInvalidThrow(url);
-    return new DownloadTarget(url, targetName);
+    return new HttpStartTarget(url, targetName);
   }
 
   /**
-   * 加载下载地址，如果任务组的中的下载地址改变了，则任务从新的一个任务组
+   * 用于任务停止、删除等操作
    *
-   * @param urls 任务组子任务下载地址列表
-   * @deprecated {@link #loadGroup(DownloadGroupEntity)}
+   * @param taskId 任务id，可从{@link AbsStartTarget#start()}、{@link AbsStartTarget#add()}、{@link
+   * AbsEntity#getId()}读取任务id
    */
-  @Deprecated
   @CheckResult
-  public DownloadGroupTarget load(List<String> urls) {
-    return loadGroup(urls);
+  public HttpNormalTarget load(long taskId) {
+    CheckUtil.checkTaskId(taskId);
+    return new HttpNormalTarget(taskId, targetName);
   }
 
   /**
-   * 加载下载地址，如果任务组的中的下载地址改变了，则任务从新的一个任务组
+   * 加载组合任务，用于任务第一次下载，如果需要控制任务停止或删除等操作，请使用{@link #loadGroup(long)}
+   *
+   * @param urls 组合任务只任务列被，如果任务组的中的下载地址改变了，则任务从新的一个任务组
    */
   @CheckResult
-  public DownloadGroupTarget loadGroup(List<String> urls) {
+  public GroupStartTarget loadGroup(List<String> urls) {
     CheckUtil.checkDownloadUrls(urls);
-    return new DownloadGroupTarget(urls, targetName);
+    return new GroupStartTarget(urls, targetName);
   }
 
   /**
-   * 使用下载实体执行FTP下载操作
+   * 加载组合任务，用于任务停止、删除等操作
    *
-   * @param entity 下载实体
+   * @param taskId 任务id，可从{@link AbsStartTarget#start()}、{@link AbsStartTarget#add()}、{@link
+   * * AbsEntity#getId()}读取任务id
    */
   @CheckResult
-  public FtpDownloadTarget loadFtp(DownloadEntity entity) {
-    CheckUtil.checkUrlInvalidThrow(entity.getUrl());
-    return new FtpDownloadTarget(entity, targetName);
+  public GroupNormalTarget loadGroup(long taskId) {
+    CheckUtil.checkTaskId(taskId);
+    return new GroupNormalTarget(taskId, targetName);
   }
 
   /**
-   * 加载ftp单任务下载地址
+   * 加载ftp单任务下载地址，用于任务第一次下载，如果需要控制任务停止或删除等操作，请使用{@link #loadFtp(long)}
    */
   @CheckResult
-  public FtpDownloadTarget loadFtp(@NonNull String url) {
+  public FtpStartTarget loadFtp(@NonNull String url) {
     CheckUtil.checkUrlInvalidThrow(url);
-    return new FtpDownloadTarget(url, targetName);
+    return new FtpStartTarget(url, targetName);
   }
 
   /**
-   * 使用任务组实体执行任务组的实体执行任务组的下载操作，后续版本会删除该api
+   * 用于任务停止、删除等操作
    *
-   * @param groupEntity 如果加载的任务实体没有子项的下载地址，
-   * 那么你需要使用{@link DownloadGroupTarget#setGroupUrl(List)}设置子项的下载地址
-   * @deprecated 请使用 {@link #loadGroup(DownloadGroupEntity)}
+   * @param taskId 任务id，可从{@link AbsStartTarget#start()}、{@link AbsStartTarget#add()}、{@link
+   * AbsEntity#getId()}读取任务id
    */
-  @Deprecated
   @CheckResult
-  public DownloadGroupTarget load(DownloadGroupEntity groupEntity) {
-    CheckUtil.checkDownloadUrls(groupEntity.getUrls());
-    return loadGroup(groupEntity);
+  public FtpNormalTarget loadFtp(long taskId) {
+    CheckUtil.checkTaskId(taskId);
+    return new FtpNormalTarget(taskId, targetName);
   }
 
   /**
-   * 使用任务组实体执行任务组的实体执行任务组的下载操作
-   *
-   * @param groupEntity 如果加载的任务实体没有子项的下载地址，
-   * 那么你需要使用{@link DownloadGroupTarget#setGroupUrl(List)}设置子项的下载地址
+   * 加载ftp文件夹下载地址，用于任务第一次下载，如果需要控制任务停止或删除等操作，请使用{@link #loadFtpDir(long)}
    */
   @CheckResult
-  public DownloadGroupTarget loadGroup(DownloadGroupEntity groupEntity) {
-    CheckUtil.checkDownloadUrls(groupEntity.getUrls());
-    return new DownloadGroupTarget(groupEntity, targetName);
-  }
-
-  /**
-   * 加载ftp文件夹下载地址
-   */
-  @CheckResult
-  public FtpDirDownloadTarget loadFtpDir(@NonNull String dirUrl) {
+  public FtpDirStartTarget loadFtpDir(@NonNull String dirUrl) {
     CheckUtil.checkUrlInvalidThrow(dirUrl);
-    return new FtpDirDownloadTarget(dirUrl, targetName);
+    return new FtpDirStartTarget(dirUrl, targetName);
+  }
+
+  /**
+   * 加载ftp文件夹下载地址，用于任务停止、删除等操作
+   *
+   * @param taskId 任务id，可从{@link AbsStartTarget#start()}、{@link AbsStartTarget#add()}、{@link
+   * AbsEntity#getId()}读取任务id
+   */
+  @CheckResult
+  public FtpDirNormalTarget loadFtpDir(long taskId) {
+    CheckUtil.checkTaskId(taskId);
+    return new FtpDirNormalTarget(taskId, targetName);
   }
 
   /**
@@ -232,13 +223,45 @@ public class DownloadReceiver extends AbsReceiver {
   }
 
   /**
+   * 获取任务实体
+   *
+   * @param taskId 任务实体唯一id
+   */
+  public DownloadEntity getDownloadEntity(long taskId) {
+    CheckUtil.checkTaskId(taskId);
+    return DbEntity.findFirst(DownloadEntity.class, "rowid=?", String.valueOf(taskId));
+  }
+
+  /**
+   * 获取第一个匹配url的下载实体，如果你有多个任务的下载地址都相同，请使用{@link #getDownloadEntity(long)}
+   * 或{@link #getDownloadEntity(String)}
+   *
+   * @return 如果url错误或查找不到数据，则返回null
+   */
+  public DownloadEntity getFirstDownloadEntity(String downloadUrl) {
+    CheckUtil.checkUrl(downloadUrl);
+    return DbEntity.findFirst(DownloadEntity.class, "url=? and isGroupChild='false'", downloadUrl);
+  }
+
+  /**
    * 通过下载链接获取下载实体
    *
    * @return 如果url错误或查找不到数据，则返回null
    */
-  public DownloadEntity getDownloadEntity(String downloadUrl) {
+  public List<DownloadEntity> getDownloadEntity(String downloadUrl) {
     CheckUtil.checkUrl(downloadUrl);
-    return DbEntity.findFirst(DownloadEntity.class, "url=? and isGroupChild='false'", downloadUrl);
+    return DbEntity.findDatas(DownloadEntity.class, "url=? and isGroupChild='false'", downloadUrl);
+  }
+
+  /**
+   * 获取组合任务实在实体
+   *
+   * @param taskId 组合任务实体id
+   * @return 如果实体不存在，返回null
+   */
+  public DownloadGroupEntity getGroupEntity(long taskId) {
+    CheckUtil.checkTaskId(taskId);
+    return DbDataHelper.getDGEntity(taskId);
   }
 
   /**
@@ -247,22 +270,9 @@ public class DownloadReceiver extends AbsReceiver {
    * @param urls 组合任务的url
    * @return 如果实体不存在，返回null
    */
-  public DownloadGroupEntity getDownloadGroupEntity(List<String> urls) {
+  public DownloadGroupEntity getGroupEntity(List<String> urls) {
     CheckUtil.checkDownloadUrls(urls);
     return DbDataHelper.getDGEntity(CommonUtil.getMd5Code(urls));
-  }
-
-  /**
-   * 获取组合任务实在实体
-   *
-   * @param key 组合任务的key，{@link DownloadGroupEntity#getKey()}
-   * @return 如果实体不存在，返回null
-   */
-  public DownloadGroupEntity getDownloadGroupEntity(String key) {
-    if (TextUtils.isEmpty(key)) {
-      throw new IllegalArgumentException("key为空");
-    }
-    return DbDataHelper.getDGEntity(key);
   }
 
   /**

@@ -20,9 +20,12 @@ import android.os.Environment;
 import android.util.Log;
 import com.arialyy.annotations.Download;
 import com.arialyy.aria.core.Aria;
+import com.arialyy.aria.core.common.controller.ControllerType;
+import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.download.DownloadTask;
 import com.arialyy.aria.util.CommonUtil;
 import com.arialyy.frame.util.show.L;
+import com.arialyy.simple.util.AppUtil;
 import java.io.File;
 
 /**
@@ -33,6 +36,7 @@ public class AnyRunnModule {
   String TAG = "AnyRunnModule";
   private Context mContext;
   private String mUrl;
+  private DownloadEntity mEntity;
 
   public AnyRunnModule(Context context) {
     Aria.download(this).register();
@@ -78,33 +82,54 @@ public class AnyRunnModule {
 
   public void start(String url) {
     mUrl = url;
-    String path = Environment.getExternalStorageDirectory().getPath() + "/mmm2.mp4";
-    Aria.download(this)
-        .load(url)
-        .setFilePath(path)
-        .resetState()
-        .start();
+    if (mEntity == null) {
+      mEntity = Aria.download(this).getFirstDownloadEntity(url);
+    }
+    if (!AppUtil.chekEntityValid(mEntity)) {
+
+      String path = Environment.getExternalStorageDirectory().getPath() + "/mmm2.mp4";
+      Aria.download(this)
+          .load(url)
+          .setFilePath(path)
+          .resetState()
+          .start();
+    } else {
+      Aria.download(this).load(mEntity.getId()).resume();
+    }
   }
 
   public void startFtp(String url) {
     mUrl = url;
-    Aria.download(this)
-        .loadFtp(url)
-        .login("lao", "123456")
-        .setFilePath(Environment.getExternalStorageDirectory().getPath() + "/Download/")
-        .asFtps()
-        .setStorePath("/mnt/sdcard/Download/server.crt")
-        .setAlias("www.laoyuyu.me")
-        .setStorePass("123456")
-        .start();
+
+    if (mEntity == null) {
+      mEntity = Aria.download(this).getFirstDownloadEntity(url);
+    }
+    if (!AppUtil.chekEntityValid(mEntity)) {
+      Aria.download(this)
+          .loadFtp(url)
+          .setFilePath(Environment.getExternalStorageDirectory().getPath() + "/Download/")
+          .option()
+          .asFtps()
+          .setStorePath("/mnt/sdcard/Download/server.crt")
+          .setAlias("www.laoyuyu.me")
+          .setStorePass("123456")
+          .controller(ControllerType.START_CONTROLLER)
+          .start();
+    } else {
+      Aria.download(this).load(mEntity.getId()).resume();
+    }
   }
 
   public void stop(String url) {
-    Aria.download(this).load(url).stop();
+    if (AppUtil.chekEntityValid(mEntity)) {
+      Aria.download(this).load(mEntity.getId()).stop();
+    }
   }
 
   public void cancel(String url) {
-    Aria.download(this).load(url).cancel();
+    if (AppUtil.chekEntityValid(mEntity)) {
+      Aria.download(this).load(mEntity.getId()).cancel();
+    }
   }
 
   public void unRegister() {

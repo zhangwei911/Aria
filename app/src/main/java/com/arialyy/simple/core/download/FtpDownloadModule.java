@@ -48,7 +48,7 @@ public class FtpDownloadModule extends BaseViewModule {
     String url = AppUtil.getConfigValue(context, FTP_URL_KEY, ftpDefUrl);
     String filePath = AppUtil.getConfigValue(context, FTP_PATH_KEY, ftpDefPath);
 
-    singDownloadInfo = Aria.download(context).getDownloadEntity(url);
+    singDownloadInfo = Aria.download(context).getFirstDownloadEntity(url);
     if (singDownloadInfo == null) {
       singDownloadInfo = new DownloadEntity();
       singDownloadInfo.setUrl(url);

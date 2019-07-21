@@ -28,18 +28,19 @@ import com.arialyy.aria.core.download.DownloadTask;
 import com.arialyy.aria.util.CommonUtil;
 import com.arialyy.frame.core.AbsDialog;
 import com.arialyy.simple.R;
+import com.arialyy.simple.util.AppUtil;
 import com.arialyy.simple.widget.HorizontalProgressBarWithNumber;
 
 /**
  * Created by AriaL on 2017/1/2.
  */
-public class DownloadDialog extends AbsDialog implements View.OnClickListener{
+public class DownloadDialog extends AbsDialog implements View.OnClickListener {
   private HorizontalProgressBarWithNumber mPb;
   private Button mStart;
-  private Button mStop;
   private Button mCancel;
   private TextView mSize;
   private TextView mSpeed;
+  private DownloadEntity mEntity;
 
   private static final String DOWNLOAD_URL =
       "http://static.gaoshouyou.com/d/4b/d7/e04b308d9cd7f0ad4cac18d1a514544c.apk";
@@ -57,22 +58,20 @@ public class DownloadDialog extends AbsDialog implements View.OnClickListener{
     Aria.download(this).register();
     mPb = findViewById(R.id.progressBar);
     mStart = findViewById(R.id.start);
-    mStop = findViewById(R.id.stop);
     mCancel = findViewById(R.id.cancel);
     mSize = findViewById(R.id.size);
     mSpeed = findViewById(R.id.speed);
-    DownloadEntity entity = Aria.download(this).getDownloadEntity(DOWNLOAD_URL);
-    if (entity != null) {
-      mSize.setText(CommonUtil.formatFileSize(entity.getFileSize()));
-      int p = (int) (entity.getCurrentProgress() * 100 / entity.getFileSize());
+    mEntity = Aria.download(this).getFirstDownloadEntity(DOWNLOAD_URL);
+    if (mEntity != null) {
+      mSize.setText(CommonUtil.formatFileSize(mEntity.getFileSize()));
+      int p = (int) (mEntity.getCurrentProgress() * 100 / mEntity.getFileSize());
       mPb.setProgress(p);
-      int state = entity.getState();
+      int state = mEntity.getState();
       setBtState(state != DownloadEntity.STATE_RUNNING);
     } else {
       setBtState(true);
     }
     mStart.setOnClickListener(this);
-    mStop.setOnClickListener(this);
     mCancel.setOnClickListener(this);
   }
 
@@ -80,16 +79,28 @@ public class DownloadDialog extends AbsDialog implements View.OnClickListener{
   public void onClick(View view) {
     switch (view.getId()) {
       case R.id.start:
-        Aria.download(this)
-            .load(DOWNLOAD_URL)
-            .setFilePath(Environment.getExternalStorageDirectory().getPath() + "/飞机大战.apk")
-            .start();
+        if (!AppUtil.chekEntityValid(mEntity)) {
+          Aria.download(this)
+              .load(DOWNLOAD_URL)
+              .setFilePath(Environment.getExternalStorageDirectory().getPath() + "/飞机大战.apk")
+              .start();
+          mStart.setText(getContext().getString(R.string.stop));
+          break;
+        }
+        if (Aria.download(this).load(mEntity.getId()).isRunning()) {
+          Aria.download(this).load(mEntity.getId()).stop();
+          mStart.setText(getContext().getString(R.string.resume));
+        } else {
+          Aria.download(this).load(mEntity.getId()).resume();
+          mStart.setText(getContext().getString(R.string.stop));
+        }
         break;
-      case R.id.stop:
-        Aria.download(this).load(DOWNLOAD_URL).stop();
-        break;
+
       case R.id.cancel:
-        Aria.download(this).load(DOWNLOAD_URL).cancel();
+        if (AppUtil.chekEntityValid(mEntity)) {
+          Aria.download(this).load(mEntity.getId()).cancel();
+          mStart.setText(getContext().getString(R.string.start));
+        }
         break;
     }
   }
@@ -124,6 +135,5 @@ public class DownloadDialog extends AbsDialog implements View.OnClickListener{
   private void setBtState(boolean startEnable) {
     mStart.setEnabled(startEnable);
     mCancel.setEnabled(!startEnable);
-    mStop.setEnabled(!startEnable);
   }
 }

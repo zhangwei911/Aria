@@ -33,6 +33,7 @@ import com.arialyy.aria.util.CommonUtil;
 import com.arialyy.simple.R;
 import com.arialyy.simple.base.adapter.AbsHolder;
 import com.arialyy.simple.base.adapter.AbsRVAdapter;
+import com.arialyy.simple.util.AppUtil;
 import com.arialyy.simple.widget.HorizontalProgressBarWithNumber;
 import com.arialyy.simple.widget.SubStateLinearLayout;
 import java.util.List;
@@ -269,20 +270,23 @@ public class DownloadAdapter extends AbsRVAdapter<AbsEntity, DownloadAdapter.Sim
   }
 
   private void cancel(AbsEntity entity) {
+    if (!AppUtil.chekEntityValid(entity)) {
+      return;
+    }
     switch (entity.getTaskType()) {
       case AbsTaskWrapper.D_FTP:
         Aria.download(getContext())
-            .loadFtp((DownloadEntity) entity)
+            .loadFtp(entity.getId())
             //.login("lao", "123456")
             .cancel(true);
         break;
       case AbsTaskWrapper.D_FTP_DIR:
         break;
       case AbsTaskWrapper.D_HTTP:
-        Aria.download(getContext()).load((DownloadEntity) entity).cancel(true);
+        Aria.download(getContext()).load(entity.getId()).cancel(true);
         break;
       case AbsTaskWrapper.DG_HTTP:
-        Aria.download(getContext()).load((DownloadGroupEntity) entity).cancel(true);
+        Aria.download(getContext()).load(entity.getId()).cancel(true);
         break;
     }
   }
@@ -291,32 +295,35 @@ public class DownloadAdapter extends AbsRVAdapter<AbsEntity, DownloadAdapter.Sim
     switch (entity.getTaskType()) {
       case AbsTaskWrapper.D_FTP:
         //Aria.download(getContext()).loadFtp((DownloadEntity) entity).login("lao", "123456").start();
-        Aria.download(getContext()).loadFtp((DownloadEntity) entity).charSet("GBK").start();
+        Aria.download(getContext()).loadFtp(entity.getKey()).start();
         break;
       case AbsTaskWrapper.D_FTP_DIR:
         break;
       case AbsTaskWrapper.D_HTTP:
-        Aria.download(getContext()).load((DownloadEntity) entity).start();
+        Aria.download(getContext()).load(entity.getKey()).start();
         break;
       case AbsTaskWrapper.DG_HTTP:
-        Aria.download(getContext()).loadGroup((DownloadGroupEntity) entity).start();
+        Aria.download(getContext()).loadGroup(((DownloadGroupEntity) entity).getUrls()).start();
         break;
     }
   }
 
   private void stop(AbsEntity entity) {
+    if (!AppUtil.chekEntityValid(entity)) {
+      return;
+    }
+
     switch (entity.getTaskType()) {
       case AbsTaskWrapper.D_FTP:
-        //Aria.download(getContext()).loadFtp((DownloadEntity) entity).login("lao", "123456").stop();
-        Aria.download(getContext()).loadFtp((DownloadEntity) entity).charSet("GBK").stop();
+        Aria.download(getContext()).loadFtp(entity.getId()).stop();
         break;
       case AbsTaskWrapper.D_FTP_DIR:
         break;
       case AbsTaskWrapper.D_HTTP:
-        Aria.download(getContext()).load((DownloadEntity) entity).stop();
+        Aria.download(getContext()).load(entity.getId()).stop();
         break;
       case AbsTaskWrapper.DG_HTTP:
-        Aria.download(getContext()).loadGroup((DownloadGroupEntity) entity).stop();
+        Aria.download(getContext()).loadGroup(entity.getId()).stop();
         break;
     }
   }

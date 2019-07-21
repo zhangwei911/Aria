@@ -71,11 +71,6 @@ public class HttpTaskConfig implements ITaskConfig {
    * 文件上传需要的key
    */
   private String attachment;
-  /**
-   * 上传的文件类型
-   */
-  private String contentType = "multipart/form-data";
-  private String userAgent = "Mozilla/5.0 (Windows; U; Windows NT 6.1; zh-CN; rv:1.9.2.6)";
 
   private Proxy proxy;
   /**
@@ -110,22 +105,6 @@ public class HttpTaskConfig implements ITaskConfig {
 
   public void setAttachment(String attachment) {
     this.attachment = attachment;
-  }
-
-  public String getContentType() {
-    return contentType;
-  }
-
-  public void setContentType(String contentType) {
-    this.contentType = contentType;
-  }
-
-  public String getUserAgent() {
-    return userAgent;
-  }
-
-  public void setUserAgent(String userAgent) {
-    this.userAgent = userAgent;
   }
 
   public boolean isChunked() {

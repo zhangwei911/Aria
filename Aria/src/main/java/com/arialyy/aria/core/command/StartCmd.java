@@ -127,11 +127,7 @@ final class StartCmd<T extends AbsTaskWrapper> extends AbsNormalCmd<T> {
             "isGroupChild=? and state=?", "false", "3");
         if (dEntities != null && !dEntities.isEmpty()) {
           for (DownloadEntity e : dEntities) {
-            if (e.getTaskType() == AbsTaskWrapper.D_FTP) {
-              waitList.add(tManager.getFtpTaskWrapper(DTaskWrapper.class, e.getKey()));
-            } else if (e.getTaskType() == AbsTaskWrapper.D_HTTP) {
-              waitList.add(tManager.getHttpTaskWrapper(DTaskWrapper.class, e.getKey()));
-            }
+            waitList.add(tManager.getNormalTaskWrapper(DTaskWrapper.class, e.getId()));
           }
         }
       } else if (type == 2) { // 组合任务
@@ -140,9 +136,9 @@ final class StartCmd<T extends AbsTaskWrapper> extends AbsNormalCmd<T> {
         if (dEntities != null && !dEntities.isEmpty()) {
           for (DownloadGroupEntity e : dEntities) {
             if (e.getTaskType() == AbsTaskWrapper.DG_HTTP) {
-              waitList.add(tManager.getDGTaskWrapper(DGTaskWrapper.class, e.getUrls()));
+              waitList.add(tManager.getGroupWrapper(DGTaskWrapper.class, e.getId()));
             } else if (e.getTaskType() == AbsTaskWrapper.D_FTP_DIR) {
-              waitList.add(tManager.getFtpTaskWrapper(DGTaskWrapper.class, e.getKey()));
+              waitList.add(tManager.getGroupWrapper(DGTaskWrapper.class, e.getId()));
             }
           }
         }
@@ -151,11 +147,7 @@ final class StartCmd<T extends AbsTaskWrapper> extends AbsNormalCmd<T> {
 
         if (dEntities != null && !dEntities.isEmpty()) {
           for (UploadEntity e : dEntities) {
-            if (e.getTaskType() == AbsTaskWrapper.D_FTP) {
-              waitList.add(tManager.getFtpTaskWrapper(UTaskWrapper.class, e.getKey()));
-            } else if (e.getTaskType() == AbsTaskWrapper.D_HTTP) {
-              waitList.add(tManager.getHttpTaskWrapper(UTaskWrapper.class, e.getKey()));
-            }
+            waitList.add(tManager.getNormalTaskWrapper(UTaskWrapper.class, e.getId()));
           }
         }
       }

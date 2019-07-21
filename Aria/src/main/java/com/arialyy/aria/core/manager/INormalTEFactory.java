@@ -26,5 +26,5 @@ interface INormalTEFactory<ENTITY extends AbsEntity, TASK_ENTITY extends AbsTask
   /**
    * 通过key创建任务，只适应于单任务
    */
-  TASK_ENTITY create(String key);
+  TASK_ENTITY create(long taskId);
 }

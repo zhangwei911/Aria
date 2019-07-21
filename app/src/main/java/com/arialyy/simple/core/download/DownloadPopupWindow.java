@@ -26,11 +26,12 @@ import android.widget.TextView;
 import com.arialyy.annotations.Download;
 import com.arialyy.aria.core.Aria;
 import com.arialyy.aria.core.download.DownloadEntity;
-import com.arialyy.aria.core.download.DownloadTarget;
 import com.arialyy.aria.core.download.DownloadTask;
+import com.arialyy.aria.core.inf.IEntity;
 import com.arialyy.aria.util.CommonUtil;
 import com.arialyy.frame.core.AbsPopupWindow;
 import com.arialyy.simple.R;
+import com.arialyy.simple.util.AppUtil;
 import com.arialyy.simple.widget.HorizontalProgressBarWithNumber;
 
 /**
@@ -39,10 +40,10 @@ import com.arialyy.simple.widget.HorizontalProgressBarWithNumber;
 public class DownloadPopupWindow extends AbsPopupWindow implements View.OnClickListener {
   private HorizontalProgressBarWithNumber mPb;
   private Button mStart;
-  private Button mStop;
   private Button mCancel;
   private TextView mSize;
   private TextView mSpeed;
+  private DownloadEntity mEntity;
 
   private static final String DOWNLOAD_URL =
       "http://static.gaoshouyou.com/d/25/57/2e25bd9d4557ba31e9beebacfaf9e804.apk";
@@ -59,44 +60,54 @@ public class DownloadPopupWindow extends AbsPopupWindow implements View.OnClickL
   private void initWidget() {
     mPb = mView.findViewById(R.id.progressBar);
     mStart = mView.findViewById(R.id.start);
-    mStop = mView.findViewById(R.id.stop);
     mCancel = mView.findViewById(R.id.cancel);
     mSize = mView.findViewById(R.id.size);
     mSpeed = mView.findViewById(R.id.speed);
 
     mStart.setOnClickListener(this);
-    mStop.setOnClickListener(this);
     mCancel.setOnClickListener(this);
-    if (Aria.download(this).taskExists(DOWNLOAD_URL)) {
-      DownloadTarget target = Aria.download(this).load(DOWNLOAD_URL);
-      int p = (int) (target.getCurrentProgress() * 100 / target.getFileSize());
-      mPb.setProgress(p);
+
+    mEntity = Aria.download(this).getFirstDownloadEntity(DOWNLOAD_URL);
+    if (mEntity != null) {
+      mPb.setProgress(mEntity.getPercent());
+      mSize.setText(CommonUtil.formatFileSize(mEntity.getFileSize()));
+      if (mEntity.getState() == IEntity.STATE_RUNNING) {
+        mStart.setText(getContext().getString(R.string.stop));
+      } else {
+        mStart.setText(getContext().getString(R.string.resume));
+      }
+    } else {
+      mStart.setText(getContext().getString(R.string.start));
     }
     Aria.download(this).register();
-    DownloadEntity entity = Aria.download(this).getDownloadEntity(DOWNLOAD_URL);
-    if (entity != null) {
-      mSize.setText(CommonUtil.formatFileSize(entity.getFileSize()));
-      int state = entity.getState();
-      setBtState(state != DownloadEntity.STATE_RUNNING);
-    } else {
-      setBtState(true);
-    }
   }
 
   @Override
   public void onClick(View view) {
     switch (view.getId()) {
       case R.id.start:
-        Aria.download(this)
-            .load(DOWNLOAD_URL)
-            .setFilePath(Environment.getExternalStorageDirectory().getPath() + "/消消乐.apk")
-            .start();
+        if (!AppUtil.chekEntityValid(mEntity)) {
+          Aria.download(this)
+              .load(DOWNLOAD_URL)
+              .setFilePath(Environment.getExternalStorageDirectory().getPath() + "/消消乐.apk")
+              .start();
+          mStart.setText(getContext().getString(R.string.stop));
+          break;
+        }
+        if (Aria.download(this).load(mEntity.getId()).isRunning()) {
+          Aria.download(this).load(mEntity.getId()).stop();
+          mStart.setText(getContext().getString(R.string.resume));
+        } else {
+          Aria.download(this).load(mEntity.getId()).resume();
+          mStart.setText(getContext().getString(R.string.stop));
+        }
         break;
-      case R.id.stop:
-        Aria.download(this).load(DOWNLOAD_URL).stop();
-        break;
+
       case R.id.cancel:
-        Aria.download(this).load(DOWNLOAD_URL).cancel();
+        if (AppUtil.chekEntityValid(mEntity)) {
+
+          Aria.download(this).load(mEntity.getId()).cancel();
+        }
         break;
     }
   }
@@ -105,24 +116,16 @@ public class DownloadPopupWindow extends AbsPopupWindow implements View.OnClickL
 
   }
 
-  private void setBtState(boolean startEnable) {
-    mStart.setEnabled(startEnable);
-    mCancel.setEnabled(!startEnable);
-    mStop.setEnabled(!startEnable);
-  }
-
   @Download.onTaskPre public void onTaskPre(DownloadTask task) {
     mSize.setText(CommonUtil.formatFileSize(task.getFileSize()));
-    setBtState(false);
   }
 
   @Download.onTaskStop public void onTaskStop(DownloadTask task) {
-    setBtState(true);
     mSpeed.setText("0.0kb/s");
+    mStart.setText(getContext().getString(R.string.resume));
   }
 
   @Download.onTaskCancel public void onTaskCancel(DownloadTask task) {
-    setBtState(true);
     mPb.setProgress(0);
     mSpeed.setText("0.0kb/s");
   }

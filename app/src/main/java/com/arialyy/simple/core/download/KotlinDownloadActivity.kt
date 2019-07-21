@@ -27,14 +27,11 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
-
 import com.arialyy.annotations.Download
 import com.arialyy.aria.core.Aria
 import com.arialyy.aria.core.download.DownloadEntity
-import com.arialyy.aria.core.download.DownloadTarget
 import com.arialyy.aria.core.download.DownloadTask
 import com.arialyy.aria.core.inf.IEntity
-import com.arialyy.aria.core.inf.IHttpFileLenAdapter
 import com.arialyy.aria.core.scheduler.ISchedulers
 import com.arialyy.aria.util.ALog
 import com.arialyy.aria.util.CommonUtil
@@ -46,7 +43,6 @@ import com.arialyy.simple.common.ModifyUrlDialog
 import com.arialyy.simple.databinding.ActivitySingleKotlinBinding
 import com.arialyy.simple.util.AppUtil
 import com.pddstudio.highlightjs.models.Language
-
 import java.io.IOException
 
 class KotlinDownloadActivity : BaseActivity<ActivitySingleKotlinBinding>() {
@@ -54,7 +50,7 @@ class KotlinDownloadActivity : BaseActivity<ActivitySingleKotlinBinding>() {
   private var mUrl: String? = null
   private var mFilePath: String? = null
   private var mModule: HttpDownloadModule? = null
-  private var mTarget: DownloadTarget? = null
+  private val mTaskId: Long = -1
 
   internal var receiver: BroadcastReceiver = object : BroadcastReceiver() {
     override fun onReceive(
@@ -99,11 +95,11 @@ class KotlinDownloadActivity : BaseActivity<ActivitySingleKotlinBinding>() {
           if (entity == null) {
             return@Observer
           }
-          mTarget = Aria.download(this)
-              .load(entity.url)
-          if (mTarget!!.taskState == IEntity.STATE_STOP) {
+          if (entity.state == IEntity.STATE_STOP) {
             binding.stateStr = getString(R.string.resume)
-          } else if (mTarget!!.isRunning) {
+          }
+
+          if (Aria.download(this).load(entity.id).isRunning) {
             binding.stateStr = getString(R.string.stop)
           }
 
@@ -265,15 +261,15 @@ class KotlinDownloadActivity : BaseActivity<ActivitySingleKotlinBinding>() {
 
   fun onClick(view: View) {
     when (view.id) {
-      R.id.start -> if (mTarget!!.isRunning) {
+      R.id.start -> if (Aria.download(this).load(mTaskId).isRunning) {
         Aria.download(this)
-            .load(mUrl!!)
+            .load(mTaskId)
             .stop()
       } else {
         startD()
       }
-      R.id.stop -> Aria.download(this).load(mUrl!!).stop()
-      R.id.cancel -> Aria.download(this).load(mUrl!!).cancel(true)
+      R.id.stop -> Aria.download(this).load(mTaskId).stop()
+      R.id.cancel -> Aria.download(this).load(mTaskId).cancel(true)
     }
   }
 

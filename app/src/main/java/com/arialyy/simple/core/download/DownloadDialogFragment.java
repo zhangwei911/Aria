@@ -9,17 +9,20 @@ import com.arialyy.annotations.Download;
 import com.arialyy.aria.core.Aria;
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.download.DownloadTask;
+import com.arialyy.aria.core.inf.IEntity;
 import com.arialyy.aria.util.CommonUtil;
-import com.arialyy.frame.util.show.T;
 import com.arialyy.simple.R;
 import com.arialyy.simple.base.BaseDialog;
 import com.arialyy.simple.databinding.DialogFragmentDownloadBinding;
+import com.arialyy.simple.util.AppUtil;
 
 /**
  * Created by lyy on 2017/8/8.
  */
 @SuppressLint("ValidFragment") public class DownloadDialogFragment
-    extends BaseDialog<DialogFragmentDownloadBinding> implements View.OnClickListener{
+    extends BaseDialog<DialogFragmentDownloadBinding> implements View.OnClickListener {
+
+  private DownloadEntity mEntity;
 
   private static final String DOWNLOAD_URL =
       "http://res3.d.cn/android/new/game/2/78702/fzjh_1499390260312.apk?f=web_1";
@@ -31,10 +34,16 @@ import com.arialyy.simple.databinding.DialogFragmentDownloadBinding;
   @Override protected void init(Bundle savedInstanceState) {
     super.init(savedInstanceState);
     Aria.download(getContext()).register();
-    DownloadEntity entity = Aria.download(getContext()).getDownloadEntity(DOWNLOAD_URL);
-    if (entity != null) {
-      getBinding().setFileSize(CommonUtil.formatFileSize(entity.getFileSize()));
-      getBinding().setProgress((int) (entity.getCurrentProgress() * 100 / entity.getFileSize()));
+    mEntity = Aria.download(getContext()).getFirstDownloadEntity(DOWNLOAD_URL);
+    if (mEntity != null) {
+      if (mEntity.getState() == IEntity.STATE_RUNNING) {
+        getBinding().setStateStr(getString(R.string.stop));
+      } else {
+        getBinding().setStateStr(getString(R.string.resume));
+      }
+
+      getBinding().setFileSize(CommonUtil.formatFileSize(mEntity.getFileSize()));
+      getBinding().setProgress((int) (mEntity.getCurrentProgress() * 100 / mEntity.getFileSize()));
     }
     mRootView.findViewById(R.id.start).setOnClickListener(this);
     mRootView.findViewById(R.id.stop).setOnClickListener(this);
@@ -90,24 +99,30 @@ import com.arialyy.simple.databinding.DialogFragmentDownloadBinding;
     getBinding().setSpeed("");
   }
 
-  @Download.onNoSupportBreakPoint(DOWNLOAD_URL)
-  public void onNoSupportBreakPoint(DownloadTask task) {
-    T.showShort(getContext(), "该下载链接不支持断点");
-  }
-
   public void onClick(View view) {
     switch (view.getId()) {
       case R.id.start:
-        Aria.download(getContext())
-            .load(DOWNLOAD_URL)
-            .setFilePath(Environment.getExternalStorageDirectory().getPath() + "/放置江湖.apk")
-            .start();
+        if (!AppUtil.chekEntityValid(mEntity)) {
+          Aria.download(getContext())
+              .load(DOWNLOAD_URL)
+              .setFilePath(Environment.getExternalStorageDirectory().getPath() + "/放置江湖.apk")
+              .start();
+          getBinding().setStateStr(getString(R.string.stop));
+          break;
+        }
+        if (Aria.download(this).load(mEntity.getId()).isRunning()) {
+          Aria.download(this).load(mEntity.getId()).stop();
+          getBinding().setStateStr(getString(R.string.resume));
+        } else {
+          Aria.download(this).load(mEntity.getId()).resume();
+          getBinding().setStateStr(getString(R.string.stop));
+        }
         break;
-      case R.id.stop:
-        Aria.download(getContext()).load(DOWNLOAD_URL).stop();
-        break;
+
       case R.id.cancel:
-        Aria.download(getContext()).load(DOWNLOAD_URL).cancel();
+        if (AppUtil.chekEntityValid(mEntity)) {
+          Aria.download(getContext()).load(mEntity.getId()).cancel();
+        }
         break;
     }
   }

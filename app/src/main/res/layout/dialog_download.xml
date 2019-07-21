@@ -55,15 +55,6 @@
         style="?buttonBarButtonStyle"
         />
 
-    <Button
-        android:id="@+id/stop"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:onClick="onClick"
-        android:text="暂停"
-        style="?buttonBarButtonStyle"
-        />
 
     <Button
         android:id="@+id/cancel"

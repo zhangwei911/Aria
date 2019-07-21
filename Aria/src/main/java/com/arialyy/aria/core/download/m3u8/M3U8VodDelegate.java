@@ -15,7 +15,9 @@
  */
 package com.arialyy.aria.core.download.m3u8;
 
+import android.support.annotation.CheckResult;
 import com.arialyy.aria.core.common.BaseDelegate;
+import com.arialyy.aria.core.common.Suggest;
 import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.event.EventMsgUtil;
 import com.arialyy.aria.core.event.PeerIndexEvent;
@@ -30,9 +32,9 @@ import com.arialyy.aria.util.ALog;
 public class M3U8VodDelegate<TARGET extends AbsTarget> extends BaseDelegate<TARGET> {
   private DTaskWrapper mTaskWrapper;
 
-  M3U8VodDelegate(TARGET target) {
-    super(target);
-    mTaskWrapper = (DTaskWrapper) mTarget.getTaskWrapper();
+  M3U8VodDelegate(TARGET target, AbsTaskWrapper wrapper) {
+    super(target, wrapper);
+    mTaskWrapper = (DTaskWrapper) getTaskWrapper();
     mTaskWrapper.setRequestType(AbsTaskWrapper.M3U8_VOD);
   }
 
@@ -41,7 +43,8 @@ public class M3U8VodDelegate<TARGET extends AbsTarget> extends BaseDelegate<TARG
    *
    * @param fileSize 文件长度
    */
-  public M3U8VodDelegate setFileSize(long fileSize) {
+  @CheckResult(suggest = Suggest.TO_CONTROLLER)
+  public M3U8VodDelegate<TARGET> setFileSize(long fileSize) {
     if (fileSize <= 0) {
       ALog.e(TAG, "文件长度错误");
       return this;
@@ -55,7 +58,8 @@ public class M3U8VodDelegate<TARGET extends AbsTarget> extends BaseDelegate<TARG
    *
    * @param num 同时下载的ts分片数量
    */
-  public M3U8VodDelegate setMaxTsQueueNum(int num) {
+  @CheckResult(suggest = Suggest.TO_CONTROLLER)
+  public M3U8VodDelegate<TARGET> setMaxTsQueueNum(int num) {
     if (num < 1) {
       ALog.e(TAG, "同时下载的分片数量不能小于1");
       return this;
@@ -74,7 +78,8 @@ public class M3U8VodDelegate<TARGET extends AbsTarget> extends BaseDelegate<TARG
    *
    * @param index 指定的切片位置
    */
-  public M3U8VodDelegate setPeerIndex(int index) {
+  @CheckResult(suggest = Suggest.TO_CONTROLLER)
+  public M3U8VodDelegate<TARGET> setPeerIndex(int index) {
     if (index < 1) {
       ALog.e(TAG, "切片索引不能小于1");
       return this;

@@ -15,12 +15,14 @@
  */
 package com.arialyy.aria.core.common.ftp;
 
+import android.support.annotation.CheckResult;
 import android.text.TextUtils;
 import com.arialyy.aria.core.FtpUrlEntity;
 import com.arialyy.aria.core.common.BaseDelegate;
 import com.arialyy.aria.core.common.ProtocolType;
+import com.arialyy.aria.core.common.Suggest;
 import com.arialyy.aria.core.inf.AbsTarget;
-import com.arialyy.aria.core.inf.ITargetHandler;
+import com.arialyy.aria.core.inf.AbsTaskWrapper;
 
 /**
  * D_FTP SSL/TSL 参数委托
@@ -29,9 +31,9 @@ public class FTPSDelegate<TARGET extends AbsTarget> extends BaseDelegate<TARGET>
 
   private FtpUrlEntity mUrlEntity;
 
-  public FTPSDelegate(TARGET target) {
-    super(target);
-    mUrlEntity = mTarget.getTaskWrapper().asFtp().getUrlEntity();
+  public FTPSDelegate(TARGET target, AbsTaskWrapper wrapper) {
+    super(target, wrapper);
+    mUrlEntity = getTaskWrapper().asFtp().getUrlEntity();
   }
 
   /**
@@ -39,7 +41,8 @@ public class FTPSDelegate<TARGET extends AbsTarget> extends BaseDelegate<TARGET>
    *
    * @param protocol {@link ProtocolType}
    */
-  public FTPSDelegate setProtocol(@ProtocolType String protocol) {
+  @CheckResult(suggest = Suggest.TO_CONTROLLER)
+  public FTPSDelegate<TARGET> setProtocol(@ProtocolType String protocol) {
     if (TextUtils.isEmpty(protocol)) {
       throw new NullPointerException("协议为空");
     }
@@ -52,7 +55,8 @@ public class FTPSDelegate<TARGET extends AbsTarget> extends BaseDelegate<TARGET>
    *
    * @param keyAlias 别名
    */
-  public FTPSDelegate setAlias(String keyAlias) {
+  @CheckResult(suggest = Suggest.TO_CONTROLLER)
+  public FTPSDelegate<TARGET> setAlias(String keyAlias) {
     if (TextUtils.isEmpty(keyAlias)) {
       throw new NullPointerException("别名为空");
     }
@@ -65,7 +69,8 @@ public class FTPSDelegate<TARGET extends AbsTarget> extends BaseDelegate<TARGET>
    *
    * @param storePass 私钥密码
    */
-  public FTPSDelegate setStorePass(String storePass) {
+  @CheckResult(suggest = Suggest.TO_CONTROLLER)
+  public FTPSDelegate<TARGET> setStorePass(String storePass) {
     if (TextUtils.isEmpty(storePass)) {
       throw new NullPointerException("证书密码为空");
     }
@@ -78,47 +83,12 @@ public class FTPSDelegate<TARGET extends AbsTarget> extends BaseDelegate<TARGET>
    *
    * @param storePath 证书路径
    */
-  public FTPSDelegate setStorePath(String storePath) {
+  @CheckResult(suggest = Suggest.TO_CONTROLLER)
+  public FTPSDelegate<TARGET> setStorePath(String storePath) {
     if (TextUtils.isEmpty(storePath)) {
       throw new NullPointerException("证书路径为空");
     }
     mUrlEntity.storePath = storePath;
     return this;
-  }
-
-  @Override public void add() {
-    mTarget.add();
-  }
-
-  @Override public void start() {
-    mTarget.start();
-  }
-
-  @Override public void stop() {
-    mTarget.stop();
-  }
-
-  @Override public void resume() {
-    mTarget.resume();
-  }
-
-  @Override public void cancel() {
-    mTarget.cancel();
-  }
-
-  @Override public void save() {
-    mTarget.save();
-  }
-
-  @Override public void cancel(boolean removeFile) {
-    mTarget.cancel(removeFile);
-  }
-
-  @Override public void reTry() {
-    mTarget.reTry();
-  }
-
-  @Override public void reStart() {
-    mTarget.reStart();
   }
 }

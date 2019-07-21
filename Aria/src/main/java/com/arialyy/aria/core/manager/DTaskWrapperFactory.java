@@ -21,13 +21,12 @@ import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.inf.IEntity;
 import java.io.File;
-import java.util.UUID;
 
 /**
  * 创建下载任务wrapper Created by Aria.Lao on 2017/11/1.
  */
 class DTaskWrapperFactory implements INormalTEFactory<DownloadEntity, DTaskWrapper> {
-  private static final String TAG = "DTaskWrapperFactory";
+  private final String TAG = "DTaskWrapperFactory";
   private static volatile DTaskWrapperFactory INSTANCE = null;
 
   private DTaskWrapperFactory() {
@@ -43,34 +42,27 @@ class DTaskWrapperFactory implements INormalTEFactory<DownloadEntity, DTaskWrapp
   }
 
   /**
-   * 通过下载实体创建任务实体
-   */
-  private DTaskWrapper create(DownloadEntity entity) {
-    return new DTaskWrapper(entity);
-  }
-
-  /**
    * 通过下载地址创建任务实体
    */
-  @Override public DTaskWrapper create(String downloadUrl) {
-    return create(getEntity(downloadUrl));
+  @Override public DTaskWrapper create(long taskId) {
+    if (taskId == -1) {
+      return new DTaskWrapper(new DownloadEntity());
+    }
+
+    return new DTaskWrapper(getEntity(taskId));
   }
 
   /**
    * 如果任务存在，但是下载实体不存在，则通过下载地址获取下载实体
-   *
-   * @param downloadUrl 下载地址
    */
-  private DownloadEntity getEntity(String downloadUrl) {
+  private DownloadEntity getEntity(long taskId) {
     DownloadEntity entity =
-        DownloadEntity.findFirst(DownloadEntity.class, "url=? and isGroupChild='false'",
-            downloadUrl);
+        DownloadEntity.findFirst(DownloadEntity.class, "rowid=? and isGroupChild='false'",
+            String.valueOf(taskId));
+
     if (entity == null) {
       entity = new DownloadEntity();
-      entity.setUrl(downloadUrl);
-      entity.setGroupChild(false);
-      entity.setGroupHash(null);
-      entity.setFilePath(UUID.randomUUID().toString().replace("-", ""));  //设置临时路径
+      return entity;
     }
     File file = new File(entity.getFilePath());
 
@@ -91,7 +83,8 @@ class DTaskWrapperFactory implements INormalTEFactory<DownloadEntity, DTaskWrapp
           if (count == record.threadNum) {
             resetEntity(entity);
           }
-        } else if (!file.exists() && record.taskType != TaskRecord.TYPE_M3U8_VOD) { // 非分块文件需要判断文件是否存在
+        } else if (!file.exists()
+            && record.taskType != TaskRecord.TYPE_M3U8_VOD) { // 非分块文件需要判断文件是否存在
           resetEntity(entity);
         }
       }

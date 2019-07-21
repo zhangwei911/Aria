@@ -29,8 +29,9 @@ import android.widget.Toast;
 import com.arialyy.annotations.Download;
 import com.arialyy.annotations.M3U8;
 import com.arialyy.aria.core.Aria;
+import com.arialyy.aria.core.common.controller.ControllerType;
+import com.arialyy.aria.core.common.controller.StartController;
 import com.arialyy.aria.core.download.DownloadEntity;
-import com.arialyy.aria.core.download.DownloadTarget;
 import com.arialyy.aria.core.download.DownloadTask;
 import com.arialyy.aria.core.download.m3u8.IBandWidthUrlConverter;
 import com.arialyy.aria.core.download.m3u8.ITsMergeHandler;
@@ -46,6 +47,7 @@ import com.arialyy.simple.common.ModifyPathDialog;
 import com.arialyy.simple.common.ModifyUrlDialog;
 import com.arialyy.simple.databinding.ActivityM3u8VodBinding;
 import com.arialyy.simple.to.PeerIndex;
+import com.arialyy.simple.util.AppUtil;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -58,8 +60,8 @@ public class M3U8VodDLoadActivity extends BaseActivity<ActivityM3u8VodBinding> {
   private String mUrl;
   private String mFilePath;
   private M3U8VodModule mModule;
-  private DownloadTarget mTarget;
   private VideoPlayerFragment mVideoFragment;
+  private DownloadEntity mEntity;
 
   @Override
   protected void init(Bundle savedInstanceState) {
@@ -73,10 +75,10 @@ public class M3U8VodDLoadActivity extends BaseActivity<ActivityM3u8VodBinding> {
         if (entity == null) {
           return;
         }
-        mTarget = Aria.download(M3U8VodDLoadActivity.this).load(entity.getUrl());
-        if (mTarget.getTaskState() == IEntity.STATE_STOP) {
+        mEntity = entity;
+        if (mEntity.getState() == IEntity.STATE_STOP) {
           getBinding().setStateStr(getString(R.string.resume));
-        } else if (mTarget.isRunning()) {
+        } else if (mEntity.getState() == IEntity.STATE_RUNNING) {
           getBinding().setStateStr(getString(R.string.stop));
         }
 
@@ -270,15 +272,20 @@ public class M3U8VodDLoadActivity extends BaseActivity<ActivityM3u8VodBinding> {
   public void onClick(View view) {
     switch (view.getId()) {
       case R.id.start:
-        ALog.d(TAG, "isRunning = " + mTarget.isRunning());
-        if (mTarget.isRunning()) {
-          Aria.download(this).load(mUrl).stop();
-        } else {
+        if (!AppUtil.chekEntityValid(mEntity)) {
           startD();
+          break;
+        }
+        if (Aria.download(this).load(mEntity.getId()).isRunning()) {
+          Aria.download(this).load(mEntity.getId()).stop();
+        } else {
+          Aria.download(this).load(mEntity.getId()).resume();
         }
         break;
       case R.id.cancel:
-        Aria.download(this).load(mUrl).cancel(true);
+        if (AppUtil.chekEntityValid(mEntity)) {
+          Aria.download(this).load(mEntity.getId()).cancel(true);
+        }
         break;
     }
   }
@@ -312,9 +319,14 @@ public class M3U8VodDLoadActivity extends BaseActivity<ActivityM3u8VodBinding> {
             return false;
           }
         })
-        //.asVod().setPeerIndex(50)
+        .controller(ControllerType.START_CONTROLLER)
         .start();
+    //.start();
+    //.asVod().setPeerIndex(50)
+    //.start();
   }
+
+  private Class<StartController> c = StartController.class;
 
   @Override protected void dataCallback(int result, Object data) {
     super.dataCallback(result, data);

@@ -17,45 +17,56 @@ package com.arialyy.aria.core.download;
 
 import android.support.annotation.CheckResult;
 import android.text.TextUtils;
-import com.arialyy.aria.core.inf.IGroupConfigHandler;
+import com.arialyy.aria.core.inf.AbsTarget;
+import com.arialyy.aria.core.inf.IConfigHandler;
+import com.arialyy.aria.core.manager.SubTaskManager;
+import com.arialyy.aria.core.manager.TaskWrapperManager;
 import com.arialyy.aria.core.queue.DownloadGroupTaskQueue;
 import com.arialyy.aria.orm.DbEntity;
-import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by lyy on 2019/4/9.
  * 下载组合任务功能
  */
-abstract class AbsGroupConfigHandler<TARGET extends AbsDGTarget> implements IGroupConfigHandler {
+abstract class AbsGroupConfigHandler<TARGET extends AbsTarget> implements IConfigHandler {
   protected String TAG;
   private TARGET mTarget;
   private DGTaskWrapper mWrapper;
-  /**
-   * 组任务名
-   */
-  private String mGroupHash;
-  /**
-   * 文件夹临时路径
-   */
-  private String mDirPathTemp;
-  /**
-   * 是否需要修改路径
-   */
-  private boolean needModifyPath = false;
 
-  AbsGroupConfigHandler(TARGET target, DGTaskWrapper wrapper) {
+  private SubTaskManager mSubTaskManager;
+
+  AbsGroupConfigHandler(TARGET target, long taskId) {
     TAG = CommonUtil.getClassName(getClass());
     mTarget = target;
-    mWrapper = wrapper;
-    setGroupHash(wrapper.getKey());
-    mTarget.setTaskWrapper(wrapper);
+    mWrapper = TaskWrapperManager.getInstance().getGroupWrapper(DGTaskWrapper.class, taskId);
+    mTarget.setTaskWrapper(mWrapper);
     if (getEntity() != null) {
-      mDirPathTemp = getEntity().getDirPath();
+      getTaskWrapper().setDirPathTemp(getEntity().getDirPath());
     }
+  }
+
+  /**
+   * 获取子任务管理器
+   *
+   * @return 子任务管理器
+   */
+  @CheckResult
+  SubTaskManager getSubTaskManager() {
+    if (mSubTaskManager == null) {
+      mSubTaskManager = new SubTaskManager(mTarget.getTargetName(), getTaskWrapper());
+    }
+    return mSubTaskManager;
+  }
+
+  /**
+   * 设置任务组别名
+   */
+  void setGroupAlias(String alias) {
+    if (TextUtils.isEmpty(alias)) {
+      return;
+    }
+    getEntity().setAlias(alias);
   }
 
   @Override public boolean isRunning() {
@@ -65,67 +76,8 @@ abstract class AbsGroupConfigHandler<TARGET extends AbsDGTarget> implements IGro
 
   @CheckResult
   TARGET setDirPath(String dirPath) {
-    mDirPathTemp = dirPath;
+    mWrapper.setDirPathTemp(dirPath);
     return mTarget;
-  }
-
-  /**
-   * 改变任务组文件夹路径，修改文件夹路径会将子任务所有路径更换
-   *
-   * @param newDirPath 新的文件夹路径
-   */
-  void reChangeDirPath(String newDirPath) {
-    ALog.d(TAG, String.format("修改新路径为：%s", newDirPath));
-    List<DTaskWrapper> subTasks = mWrapper.getSubTaskWrapper();
-    if (subTasks != null && !subTasks.isEmpty()) {
-      for (DTaskWrapper dte : subTasks) {
-        DownloadEntity de = dte.getEntity();
-        String oldPath = de.getFilePath();
-        String newPath = newDirPath + "/" + de.getFileName();
-        File file = new File(oldPath);
-        if (file.exists()) {
-          file.renameTo(new File(newPath));
-        }
-        de.setFilePath(newPath);
-      }
-    }
-  }
-
-  /**
-   * 检查并设置文件夹路径
-   *
-   * @return {@code true} 合法
-   */
-  @Override public boolean checkDirPath() {
-    if (TextUtils.isEmpty(mDirPathTemp)) {
-      ALog.e(TAG, "文件夹路径不能为null");
-      return false;
-    } else if (!mDirPathTemp.startsWith("/")) {
-      ALog.e(TAG, String.format("文件夹路径【%s】错误", mDirPathTemp));
-      return false;
-    }
-    File file = new File(mDirPathTemp);
-    if (file.isFile()) {
-      ALog.e(TAG, String.format("路径【%s】是文件，请设置文件夹路径", mDirPathTemp));
-      return false;
-    }
-
-    if ((getEntity().getDirPath() == null || !getEntity().getDirPath().equals(mDirPathTemp))
-        && DbEntity.checkDataExist(DownloadGroupEntity.class, "dirPath=?", mDirPathTemp)) {
-      ALog.e(TAG, String.format("文件夹路径【%s】已被其它任务占用，请重新设置文件夹路径", mDirPathTemp));
-      return false;
-    }
-
-    if (TextUtils.isEmpty(getEntity().getDirPath()) || !getEntity().getDirPath()
-        .equals(mDirPathTemp)) {
-      if (!file.exists()) {
-        file.mkdirs();
-      }
-      needModifyPath = true;
-      getEntity().setDirPath(mDirPathTemp);
-      ALog.i(TAG, String.format("文件夹路径改变，将更新文件夹路径为：%s", mDirPathTemp));
-    }
-    return true;
   }
 
   @Override public DownloadGroupEntity getEntity() {
@@ -133,30 +85,15 @@ abstract class AbsGroupConfigHandler<TARGET extends AbsDGTarget> implements IGro
   }
 
   @Override public boolean taskExists() {
-    return DbEntity.checkDataExist(DownloadGroupEntity.class, "groupHash=?", mWrapper.getKey());
+    return getEntity().getId() != -1 && DbEntity.checkDataExist(DownloadGroupEntity.class,
+        "rowid=?", String.valueOf(getEntity().getId()));
   }
 
   DGTaskWrapper getTaskWrapper() {
     return mWrapper;
   }
 
-  boolean isNeedModifyPath() {
-    return needModifyPath;
-  }
-
-  String getDirPathTemp() {
-    return mDirPathTemp;
-  }
-
   TARGET getTarget() {
     return mTarget;
-  }
-
-  public String getGroupHash() {
-    return mGroupHash;
-  }
-
-  public void setGroupHash(String groupHash) {
-    this.mGroupHash = groupHash;
   }
 }

@@ -15,52 +15,65 @@
  */
 package com.arialyy.aria.core.common.ftp;
 
+import android.support.annotation.CheckResult;
 import android.text.TextUtils;
 import com.arialyy.aria.core.FtpUrlEntity;
+import com.arialyy.aria.core.common.BaseDelegate;
+import com.arialyy.aria.core.common.Suggest;
 import com.arialyy.aria.core.inf.AbsTarget;
-import com.arialyy.aria.core.inf.IFtpTarget;
+import com.arialyy.aria.core.inf.AbsTaskWrapper;
 import com.arialyy.aria.util.ALog;
-import java.net.Proxy;
 
 /**
  * Created by laoyuyu on 2018/3/9.
- * ftp 委托
  */
-public class FtpDelegate<TARGET extends AbsTarget> implements IFtpTarget<TARGET> {
+public class FtpDelegate<TARGET extends AbsTarget> extends BaseDelegate<TARGET> {
   private static final String TAG = "FtpDelegate";
-  private TARGET mTarget;
 
-  public FtpDelegate(TARGET target) {
-    mTarget = target;
+  public FtpDelegate(TARGET target, AbsTaskWrapper wrapper) {
+    super(target, wrapper);
   }
 
-  @Override public TARGET charSet(String charSet) {
+  @CheckResult(suggest = Suggest.TO_CONTROLLER)
+  public FtpDelegate<TARGET> charSet(String charSet) {
     if (TextUtils.isEmpty(charSet)) {
       throw new NullPointerException("字符编码为空");
     }
-    mTarget.getTaskWrapper().asFtp().setCharSet(charSet);
-    return mTarget;
+    getTaskWrapper().asFtp().setCharSet(charSet);
+    return this;
   }
 
-  @Override public TARGET login(String userName, String password) {
+  @CheckResult(suggest = Suggest.TO_CONTROLLER)
+  public FtpDelegate<TARGET> login(String userName, String password) {
     return login(userName, password, null);
   }
 
-  @Override public TARGET login(String userName, String password, String account) {
+  @CheckResult(suggest = Suggest.TO_CONTROLLER)
+  public FtpDelegate<TARGET> login(String userName, String password, String account) {
     if (TextUtils.isEmpty(userName)) {
       ALog.e(TAG, "用户名不能为null");
-      return mTarget;
+      return this;
     } else if (TextUtils.isEmpty(password)) {
       ALog.e(TAG, "密码不能为null");
-      return mTarget;
+      return this;
     }
     // urlEntity 不能在构造函数中获取，因为ftp上传时url是后于构造函数的
-    FtpUrlEntity urlEntity = mTarget.getTaskWrapper().asFtp().getUrlEntity();
+    FtpUrlEntity urlEntity = getTaskWrapper().asFtp().getUrlEntity();
     urlEntity.needLogin = true;
     urlEntity.user = userName;
     urlEntity.password = password;
     urlEntity.account = account;
-    return mTarget;
+    return this;
+  }
+
+  /**
+   * 是否是FTPS协议
+   * 如果是FTPS协议，需要使用{@link FTPSDelegate#setStorePath(String)} 、{@link FTPSDelegate#setAlias(String)}
+   * 设置证书信息
+   */
+  @CheckResult(suggest = Suggest.TO_CONTROLLER)
+  public FTPSDelegate<TARGET> asFtps() {
+    return new FTPSDelegate<>(mTarget, mWrapper);
   }
 
   //@Override public TARGET setProxy(Proxy proxy) {

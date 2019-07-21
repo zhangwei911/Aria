@@ -37,6 +37,20 @@ public class DTaskWrapper extends AbsTaskWrapper<DownloadEntity> {
 
   private M3U8TaskConfig m3u8TaskConfig;
 
+  /**
+   * 文件下载url的临时保存变量
+   */
+  private String mTempUrl;
+  /**
+   * 文件保存路径的临时变量
+   */
+  private String mTempFilePath;
+
+  /**
+   * {@code true}强制下载，不考虑文件路径是否被占用
+   */
+  private boolean forceDownload = false;
+
   public DTaskWrapper(DownloadEntity entity) {
     super(entity);
   }
@@ -77,5 +91,29 @@ public class DTaskWrapper extends AbsTaskWrapper<DownloadEntity> {
 
   public void setGroupTask(boolean groupTask) {
     isGroupTask = groupTask;
+  }
+
+  public String getmTempUrl() {
+    return mTempUrl;
+  }
+
+  public void setmTempUrl(String mTempUrl) {
+    this.mTempUrl = mTempUrl;
+  }
+
+  public String getmTempFilePath() {
+    return mTempFilePath;
+  }
+
+  public void setmTempFilePath(String mTempFilePath) {
+    this.mTempFilePath = mTempFilePath;
+  }
+
+  public boolean isForceDownload() {
+    return forceDownload;
+  }
+
+  public void setForceDownload(boolean forceDownload) {
+    this.forceDownload = forceDownload;
   }
 }

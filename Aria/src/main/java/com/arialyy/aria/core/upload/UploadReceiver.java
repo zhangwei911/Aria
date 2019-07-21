@@ -22,8 +22,10 @@ import com.arialyy.annotations.TaskEnum;
 import com.arialyy.aria.core.AriaManager;
 import com.arialyy.aria.core.command.CancelAllCmd;
 import com.arialyy.aria.core.command.NormalCmdFactory;
+import com.arialyy.aria.core.common.AbsStartTarget;
 import com.arialyy.aria.core.common.ProxyHelper;
 import com.arialyy.aria.core.event.EventMsgUtil;
+import com.arialyy.aria.core.inf.AbsEntity;
 import com.arialyy.aria.core.inf.AbsReceiver;
 import com.arialyy.aria.core.inf.ITask;
 import com.arialyy.aria.core.inf.ReceiverType;
@@ -55,36 +57,82 @@ public class UploadReceiver extends AbsReceiver {
   }
 
   /**
-   * 加载HTTP单文件上传任务
+   * 加载HTTP单文件上传任务，用于任务第一次上传，如果需要控制任务停止或删除等操作，请使用{@link #load(long)}
    *
    * @param filePath 文件路径
    */
   @CheckResult
-  public UploadTarget load(@NonNull String filePath) {
+  public HttpStartTarget load(@NonNull String filePath) {
     CheckUtil.checkUploadPath(filePath);
-    return new UploadTarget(filePath, targetName);
+    return new HttpStartTarget(filePath, targetName);
   }
 
   /**
-   * 加载FTP单文件上传任务
+   * 用于任务停止、删除等操作
+   *
+   * @param taskId 任务id，可从{@link AbsStartTarget#start()}、{@link AbsStartTarget#add()}、{@link
+   * AbsEntity#getId()}读取任务id
+   */
+  @CheckResult
+  public HttpNormalTarget load(long taskId) {
+    CheckUtil.checkTaskId(taskId);
+    return new HttpNormalTarget(taskId, targetName);
+  }
+
+  /**
+   * 加载FTP单文件上传任务，用于任务第一次上传，如果需要控制任务停止或删除等操作，请使用{@link #load(long)}
    *
    * @param filePath 文件路径
    */
   @CheckResult
-  public FtpUploadTarget loadFtp(@NonNull String filePath) {
+  public FtpStartTarget loadFtp(@NonNull String filePath) {
     CheckUtil.checkUploadPath(filePath);
-    return new FtpUploadTarget(filePath, targetName);
+    return new FtpStartTarget(filePath, targetName);
+  }
+
+  /**
+   * 加载FTP单文件上传任务，用于任务第一次上传，如果需要控制任务停止或删除等操作，请使用{@link #load(long)}
+   *
+   * @param taskId 任务id，可从{@link AbsStartTarget#start()}、{@link AbsStartTarget#add()}、{@link
+   * AbsEntity#getId()}读取任务id
+   */
+  @CheckResult
+  public FtpNormalTarget loadFtp(long taskId) {
+    CheckUtil.checkTaskId(taskId);
+    return new FtpNormalTarget(taskId, targetName);
   }
 
   /**
    * 通过上传路径获取上传实体
    * 如果任务不存在，方便null
    */
-  public UploadEntity getUploadEntity(String filePath) {
+  public UploadEntity getUploadEntity(long taskId) {
+    if (taskId == -1) {
+      return null;
+    }
+    return DbEntity.findFirst(UploadEntity.class, "rowid=?", String.valueOf(taskId));
+  }
+
+  /**
+   * 获取第一个匹配url的下载实体，如果你有多个任务的下载地址都相同，请使用{@link #getUploadEntity(long)}
+   * 或{@link #getUploadEntity(String)}
+   */
+  public UploadEntity getFirstUploadEntity(String filePath) {
     if (TextUtils.isEmpty(filePath)) {
       return null;
     }
     return DbEntity.findFirst(UploadEntity.class, "filePath=?", filePath);
+  }
+
+  /**
+   * 通过上传路径获取上传实体
+   * 如果任务不存在，方便null
+   */
+  public List<UploadEntity> getUploadEntity(String filePath) {
+    if (TextUtils.isEmpty(filePath)) {
+      return null;
+    }
+    return DbEntity.findDatas(UploadEntity.class, "filePath=?", filePath);
   }
 
   /**

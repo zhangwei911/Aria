@@ -21,14 +21,15 @@ import android.os.Environment;
 import android.view.View;
 import android.widget.Button;
 import com.arialyy.annotations.Download;
-import com.arialyy.aria.core.download.DownloadTarget;
 import com.arialyy.aria.core.Aria;
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.download.DownloadTask;
+import com.arialyy.aria.core.inf.IEntity;
 import com.arialyy.aria.util.CommonUtil;
 import com.arialyy.frame.core.AbsFragment;
 import com.arialyy.simple.R;
 import com.arialyy.simple.databinding.FragmentDownloadBinding;
+import com.arialyy.simple.util.AppUtil;
 
 /**
  * Created by lyy on 2017/1/4.
@@ -36,31 +37,30 @@ import com.arialyy.simple.databinding.FragmentDownloadBinding;
 public class DownloadFragment extends AbsFragment<FragmentDownloadBinding>
     implements View.OnClickListener {
   Button mStart;
-  Button mStop;
   Button mCancel;
+  private DownloadEntity mEntity;
 
   private static final String DOWNLOAD_URL =
       "https://res5.d.cn/2137e42d610b3488d9420c6421529386eee5bdbfd9be1fafe0a05d6dabaec8c156ddbd00581055bbaeac03904fb63310e80010680235d16bd4c040b50096a0c20dd1c4b0854529a1.apk";
 
   @Override protected void init(Bundle savedInstanceState) {
     mStart = mRootView.findViewById(R.id.start);
-    mStop = mRootView.findViewById(R.id.stop);
     mCancel = mRootView.findViewById(R.id.cancel);
     mStart.setOnClickListener(this);
-    mStop.setOnClickListener(this);
     mCancel.setOnClickListener(this);
 
-    if (Aria.download(this).taskExists(DOWNLOAD_URL)) {
-      DownloadTarget target = Aria.download(this).load(DOWNLOAD_URL);
-      getBinding().setProgress(target.getPercent());
-    }
-    DownloadEntity entity = Aria.download(this).getDownloadEntity(DOWNLOAD_URL);
-    if (entity != null) {
-      getBinding().setFileSize(CommonUtil.formatFileSize(entity.getFileSize()));
-      int state = entity.getState();
-      setBtState(state != DownloadEntity.STATE_RUNNING);
+    mEntity = Aria.download(this).getFirstDownloadEntity(DOWNLOAD_URL);
+    if (mEntity != null) {
+      getBinding().setFileSize(CommonUtil.formatFileSize(mEntity.getFileSize()));
+      int state = mEntity.getState();
+      getBinding().setProgress(mEntity.getPercent());
+      if (mEntity.getState() == IEntity.STATE_RUNNING) {
+        getBinding().setStateStr(getString(R.string.stop));
+      } else {
+        getBinding().setStateStr(getString(R.string.resume));
+      }
     } else {
-      setBtState(true);
+      getBinding().setStateStr(getString(R.string.start));
     }
     Aria.download(this).register();
   }
@@ -68,34 +68,44 @@ public class DownloadFragment extends AbsFragment<FragmentDownloadBinding>
   public void onClick(View view) {
     switch (view.getId()) {
       case R.id.start:
-        Aria.download(this)
-            .load(DOWNLOAD_URL)
-            .setFilePath(Environment.getExternalStorageDirectory().getPath() + "/王者军团.apk")
-            .start();
+        if (!AppUtil.chekEntityValid(mEntity)) {
+          Aria.download(this)
+              .load(DOWNLOAD_URL)
+              .setFilePath(Environment.getExternalStorageDirectory().getPath() + "/王者军团.apk")
+              .start();
+          getBinding().setStateStr(getString(R.string.stop));
+          break;
+        }
+        if (Aria.download(this).load(mEntity.getId()).isRunning()) {
+          Aria.download(this).load(mEntity.getId()).stop();
+          getBinding().setStateStr(getString(R.string.resume));
+        } else {
+          Aria.download(this).load(mEntity.getId()).resume();
+          getBinding().setStateStr(getString(R.string.stop));
+        }
         break;
-      case R.id.stop:
-        Aria.download(this).load(DOWNLOAD_URL).pause();
-        break;
+
       case R.id.cancel:
-        Aria.download(this).load(DOWNLOAD_URL).cancel();
+        if (AppUtil.chekEntityValid(mEntity)) {
+          Aria.download(this).load(mEntity.getId()).cancel();
+        }
         break;
     }
   }
 
   @Download.onTaskPre public void onTaskPre(DownloadTask task) {
     getBinding().setFileSize(task.getConvertFileSize());
-    setBtState(false);
   }
 
   @Download.onTaskStop public void onTaskStop(DownloadTask task) {
-    setBtState(true);
     getBinding().setSpeed("");
+    getBinding().setStateStr(getString(R.string.resume));
   }
 
   @Download.onTaskCancel public void onTaskCancel(DownloadTask task) {
-    setBtState(true);
     getBinding().setProgress(0);
     getBinding().setSpeed("");
+    getBinding().setStateStr(getString(R.string.cancel));
   }
 
   @Download.onTaskRunning public void onTaskRunning(DownloadTask task) {
@@ -118,11 +128,5 @@ public class DownloadFragment extends AbsFragment<FragmentDownloadBinding>
 
   @Override protected void dataCallback(int result, Object obj) {
 
-  }
-
-  private void setBtState(boolean startEnable) {
-    mStart.setEnabled(startEnable);
-    mCancel.setEnabled(!startEnable);
-    mStop.setEnabled(!startEnable);
   }
 }

@@ -16,6 +16,7 @@
 package com.arialyy.simple.core.upload;
 
 import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -24,8 +25,10 @@ import android.util.Log;
 import android.view.View;
 import com.arialyy.annotations.Upload;
 import com.arialyy.aria.core.Aria;
+import com.arialyy.aria.core.common.controller.ControllerType;
 import com.arialyy.aria.core.common.ftp.FtpInterceptHandler;
 import com.arialyy.aria.core.common.ftp.IFtpUploadInterceptor;
+import com.arialyy.aria.core.inf.IEntity;
 import com.arialyy.aria.core.upload.UploadEntity;
 import com.arialyy.aria.core.upload.UploadTask;
 import com.arialyy.aria.util.ALog;
@@ -40,7 +43,6 @@ import com.arialyy.simple.util.AppUtil;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-import android.arch.lifecycle.ViewModelProviders;
 
 /**
  * Created by lyy on 2017/7/28. Ftp 文件上传demo
@@ -50,6 +52,7 @@ public class FtpUploadActivity extends BaseActivity<ActivityFtpUploadBinding> {
   private String mFilePath;
   private String mUrl;
   private UploadModule mModule;
+  private UploadEntity mEntity;
 
   @Override protected void init(Bundle savedInstanceState) {
     setTile("D_FTP 文件上传");
@@ -64,6 +67,7 @@ public class FtpUploadActivity extends BaseActivity<ActivityFtpUploadBinding> {
     mModule = ViewModelProviders.of(this).get(UploadModule.class);
     mModule.getFtpInfo(this).observe(this, new Observer<UploadEntity>() {
       @Override public void onChanged(@Nullable UploadEntity entity) {
+        mEntity = entity;
         if (entity != null) {
           if (entity.getFileSize() != 0) {
             getBinding().setFileSize(CommonUtil.formatFileSize(entity.getFileSize()));
@@ -74,6 +78,10 @@ public class FtpUploadActivity extends BaseActivity<ActivityFtpUploadBinding> {
           getBinding().setFilePath(entity.getFilePath());
           mUrl = entity.getUrl();
           mFilePath = entity.getFilePath();
+          getBinding().setStateStr(getString(
+              entity.getState() == IEntity.STATE_RUNNING ? R.string.stop : R.string.resume));
+        } else {
+          getBinding().setStateStr(getString(R.string.resume));
         }
       }
     });
@@ -105,11 +113,7 @@ public class FtpUploadActivity extends BaseActivity<ActivityFtpUploadBinding> {
   public void onClick(View view) {
     switch (view.getId()) {
       case R.id.start:
-        if (Aria.upload(this).load(mFilePath).isRunning()) {
-          Aria.upload(this).loadFtp(mFilePath).stop();
-          getBinding().setStateStr(getString(R.string.resume));
-        } else {
-          getBinding().setStateStr(getString(R.string.stop));
+        if (!AppUtil.chekEntityValid(mEntity)) {
           Aria.upload(this).loadFtp(mFilePath).setUploadUrl(mUrl).setUploadInterceptor(
               new IFtpUploadInterceptor() {
 
@@ -121,13 +125,26 @@ public class FtpUploadActivity extends BaseActivity<ActivityFtpUploadBinding> {
                   return builder.build();
                 }
               })
-              //.login("lao", "123456")
+              .option()
               .login("N0rI", "0qcK")
+              .controller(ControllerType.START_CONTROLLER)
               .start();
+          getBinding().setStateStr(getString(R.string.stop));
+          break;
         }
+        if (Aria.download(this).loadFtp(mEntity.getId()).isRunning()) {
+          Aria.download(this).loadFtp(mEntity.getId()).stop();
+          getBinding().setStateStr(getString(R.string.resume));
+        } else {
+          Aria.download(this).loadFtp(mEntity.getId()).resume();
+          getBinding().setStateStr(getString(R.string.stop));
+        }
+
         break;
       case R.id.cancel:
-        Aria.upload(this).loadFtp(mFilePath).cancel();
+        if (AppUtil.chekEntityValid(mEntity)) {
+          Aria.upload(this).loadFtp(mEntity.getId()).cancel();
+        }
         break;
     }
   }

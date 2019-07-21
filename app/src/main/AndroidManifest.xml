@@ -36,7 +36,6 @@
     <activity android:name=".core.download.fragment_download.FragmentActivity"/>
     <activity android:name=".core.download.multi_download.MultiDownloadActivity"/>
     <activity android:name=".core.download.HighestPriorityActivity"/>
-    <activity android:name="com.arialyy.simple.core.test.TestMutilTaskSysDownload"/>
     <activity android:name=".core.download.group.DownloadGroupActivity"/>
     <activity android:name=".core.download.FtpDownloadActivity"/>
     <activity android:name=".core.download.group.FTPDirDownloadActivity"/>

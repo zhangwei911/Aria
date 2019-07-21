@@ -301,10 +301,10 @@ abstract class AbsSchedulers<TASK_ENTITY extends AbsTaskWrapper, TASK extends IT
     }
 
     if (what == CANCEL || what == COMPLETE) {
-      TaskWrapperManager.getInstance().removeTaskWrapper(task.getKey());
+      TaskWrapperManager.getInstance().removeTaskWrapper(task.getTaskWrapper());
     } else {
       if (what != RUNNING) {
-        TaskWrapperManager.getInstance().putTaskWrapper(task.getKey(), task.getTaskWrapper());
+        TaskWrapperManager.getInstance().putTaskWrapper(task.getTaskWrapper());
       }
     }
     normalTaskCallback(what, task);
@@ -487,7 +487,7 @@ abstract class AbsSchedulers<TASK_ENTITY extends AbsTaskWrapper, TASK extends IT
         || task.getTaskWrapper().getEntity().getFailNum() > reTryNum) {
       mQueue.removeTaskFormQueue(task.getKey());
       startNextTask(task.getSchedulerType());
-      TaskWrapperManager.getInstance().removeTaskWrapper(task.getKey());
+      TaskWrapperManager.getInstance().removeTaskWrapper(task.getTaskWrapper());
       normalTaskCallback(FAIL, task);
       return;
     }
@@ -504,7 +504,7 @@ abstract class AbsSchedulers<TASK_ENTITY extends AbsTaskWrapper, TASK extends IT
         } else {
           mQueue.removeTaskFormQueue(task.getKey());
           startNextTask(task.getSchedulerType());
-          TaskWrapperManager.getInstance().removeTaskWrapper(task.getKey());
+          TaskWrapperManager.getInstance().removeTaskWrapper(task.getTaskWrapper());
         }
       }
     }, interval, TimeUnit.MILLISECONDS);

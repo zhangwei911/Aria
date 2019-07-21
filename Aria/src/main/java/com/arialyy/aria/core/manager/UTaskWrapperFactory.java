@@ -17,8 +17,6 @@ package com.arialyy.aria.core.manager;
 
 import com.arialyy.aria.core.upload.UTaskWrapper;
 import com.arialyy.aria.core.upload.UploadEntity;
-import com.arialyy.aria.util.Regular;
-import java.util.regex.Pattern;
 
 /**
  * Created by Aria.Lao on 2017/11/1. 任务实体工厂
@@ -39,29 +37,21 @@ class UTaskWrapperFactory implements INormalTEFactory<UploadEntity, UTaskWrapper
     return INSTANCE;
   }
 
-  private UTaskWrapper create(UploadEntity entity) {
-    return new UTaskWrapper(entity);
-  }
-
-  @Override public UTaskWrapper create(String key) {
-    return create(getUploadEntity(key));
+  @Override public UTaskWrapper create(long taskId) {
+    if (taskId == -1) {
+      return new UTaskWrapper(new UploadEntity());
+    }
+    return new UTaskWrapper(getUploadEntity(taskId));
   }
 
   /**
    * 从数据中读取上传实体，如果数据库查不到，则新创建一个上传实体
-   *
-   * @param filePath 上传文件的文件路径
    */
-  private UploadEntity getUploadEntity(String filePath) {
-    UploadEntity entity = UploadEntity.findFirst(UploadEntity.class, "filePath=?", filePath);
+  private UploadEntity getUploadEntity(long taskId) {
+    UploadEntity entity =
+        UploadEntity.findFirst(UploadEntity.class, "rowid=?", String.valueOf(taskId));
     if (entity == null) {
       entity = new UploadEntity();
-      String regex = Regular.REG_FILE_NAME;
-      Pattern p = Pattern.compile(regex);
-      String[] strs = p.split(filePath);
-      String fileName = strs[strs.length - 1];
-      entity.setFileName(fileName);
-      entity.setFilePath(filePath);
     }
     return entity;
   }

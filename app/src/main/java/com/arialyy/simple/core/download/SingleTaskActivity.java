@@ -32,7 +32,6 @@ import android.widget.Toast;
 import com.arialyy.annotations.Download;
 import com.arialyy.aria.core.Aria;
 import com.arialyy.aria.core.download.DownloadEntity;
-import com.arialyy.aria.core.download.DownloadTarget;
 import com.arialyy.aria.core.download.DownloadTask;
 import com.arialyy.aria.core.inf.IEntity;
 import com.arialyy.aria.core.inf.IHttpFileLenAdapter;
@@ -56,7 +55,7 @@ public class SingleTaskActivity extends BaseActivity<ActivitySingleBinding> {
   private String mUrl;
   private String mFilePath;
   private HttpDownloadModule mModule;
-  private DownloadTarget mTarget;
+  private DownloadEntity mEntity;
 
   BroadcastReceiver receiver = new BroadcastReceiver() {
     @Override
@@ -96,10 +95,11 @@ public class SingleTaskActivity extends BaseActivity<ActivitySingleBinding> {
         if (entity == null) {
           return;
         }
-        mTarget = Aria.download(SingleTaskActivity.this).load(entity.getUrl());
-        if (mTarget.getTaskState() == IEntity.STATE_STOP) {
+        mEntity = entity;
+
+        if (mEntity.getState() == IEntity.STATE_STOP) {
           getBinding().setStateStr(getString(R.string.resume));
-        } else if (mTarget.isRunning()) {
+        } else if (mEntity.getState() == IEntity.STATE_RUNNING) {
           getBinding().setStateStr(getString(R.string.stop));
         }
 
@@ -267,14 +267,19 @@ public class SingleTaskActivity extends BaseActivity<ActivitySingleBinding> {
   public void onClick(View view) {
     switch (view.getId()) {
       case R.id.start:
-        if (mTarget.isRunning()) {
-          Aria.download(this).load(mUrl).stop();
-        } else {
+        if (!AppUtil.chekEntityValid(mEntity)) {
           startD();
+        }
+        if (Aria.download(this).load(mEntity.getId()).isRunning()) {
+          Aria.download(this).load(mEntity.getId()).stop();
+        } else {
+          Aria.download(this).load(mEntity.getId()).resume();
         }
         break;
       case R.id.cancel:
-        Aria.download(this).load(mUrl).cancel(true);
+        if (AppUtil.chekEntityValid(mEntity)) {
+          Aria.download(this).load(mEntity.getId()).cancel(true);
+        }
         break;
     }
   }
@@ -282,10 +287,6 @@ public class SingleTaskActivity extends BaseActivity<ActivitySingleBinding> {
   private void startD() {
     Aria.download(SingleTaskActivity.this)
         .load(mUrl)
-        //.addHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3")
-        //.addHeader("Accept-Encoding", "gzip, deflate")
-        //.addHeader("DNT", "1")
-        //.addHeader("Cookie", "BAIDUID=648E5FF020CC69E8DD6F492D1068AAA9:FG=1; BIDUPSID=648E5FF020CC69E8DD6F492D1068AAA9; PSTM=1519099573; BD_UPN=12314753; locale=zh; BDSVRTM=0")
         .useServerFileName(true)
         .setFilePath(mFilePath, true)
         .setFileLenAdapter(new IHttpFileLenAdapter() {

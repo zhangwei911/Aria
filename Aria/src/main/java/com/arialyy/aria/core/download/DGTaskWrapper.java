@@ -18,6 +18,7 @@ package com.arialyy.aria.core.download;
 import com.arialyy.aria.core.config.Configuration;
 import com.arialyy.aria.core.config.DGroupConfig;
 import com.arialyy.aria.core.inf.AbsGroupTaskWrapper;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -29,8 +30,34 @@ public class DGTaskWrapper extends AbsGroupTaskWrapper<DownloadGroupEntity, DTas
 
   private boolean unknownSize = false;
 
+  /**
+   * 保存临时设置的文件夹路径
+   */
+  private String dirPathTemp;
+
+  /**
+   * 子任务文件名
+   */
+  private List<String> subNameTemp = new ArrayList<>();
+
   public DGTaskWrapper(DownloadGroupEntity entity) {
     super(entity);
+  }
+
+  public List<String> getSubNameTemp() {
+    return subNameTemp;
+  }
+
+  public void setSubNameTemp(List<String> subNameTemp) {
+    this.subNameTemp = subNameTemp;
+  }
+
+  public String getDirPathTemp() {
+    return dirPathTemp;
+  }
+
+  public void setDirPathTemp(String mDirPathTemp) {
+    this.dirPathTemp = mDirPathTemp;
   }
 
   @Override

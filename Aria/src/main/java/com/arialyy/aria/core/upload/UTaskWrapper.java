@@ -24,8 +24,21 @@ import com.arialyy.aria.core.inf.AbsTaskWrapper;
  */
 public class UTaskWrapper extends AbsTaskWrapper<UploadEntity> {
 
+  /**
+   * 保存临时设置的上传路径
+   */
+  private String tempUrl;
+
   public UTaskWrapper(UploadEntity entity) {
     super(entity);
+  }
+
+  public String getTempUrl() {
+    return tempUrl;
+  }
+
+  public void setTempUrl(String tempUrl) {
+    this.tempUrl = tempUrl;
   }
 
   /**

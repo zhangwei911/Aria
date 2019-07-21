@@ -15,52 +15,37 @@
  */
 package com.arialyy.aria.core.common;
 
+import android.support.annotation.CheckResult;
+import com.arialyy.aria.core.common.controller.ControllerType;
+import com.arialyy.aria.core.common.controller.FeatureController;
 import com.arialyy.aria.core.inf.AbsTarget;
-import com.arialyy.aria.core.inf.ITargetHandler;
+import com.arialyy.aria.core.inf.AbsTaskWrapper;
 import com.arialyy.aria.util.CommonUtil;
 
-public abstract class BaseDelegate<TARGET extends AbsTarget> implements ITargetHandler {
-  protected TARGET mTarget;
+public abstract class BaseDelegate<TARGET extends AbsTarget> {
   protected final String TAG;
+  protected TARGET mTarget;
+  protected AbsTaskWrapper mWrapper;
 
-  public BaseDelegate(TARGET target) {
-    mTarget = target;
+  public BaseDelegate(TARGET target, AbsTaskWrapper wrapper) {
     TAG = CommonUtil.getClassName(getClass());
+    mTarget = target;
+    mWrapper = wrapper;
   }
 
-  @Override public void add() {
-    mTarget.add();
+  protected AbsTaskWrapper getTaskWrapper() {
+    return mWrapper;
   }
 
-  @Override public void start() {
-    mTarget.start();
-  }
-
-  @Override public void stop() {
-    mTarget.stop();
-  }
-
-  @Override public void resume() {
-    mTarget.resume();
-  }
-
-  @Override public void cancel() {
-    mTarget.cancel();
-  }
-
-  @Override public void save() {
-    mTarget.save();
-  }
-
-  @Override public void cancel(boolean removeFile) {
-    mTarget.cancel(removeFile);
-  }
-
-  @Override public void reTry() {
-    mTarget.reTry();
-  }
-
-  @Override public void reStart() {
-    mTarget.reStart();
+  /**
+   * 使用对应等控制器，注意：
+   * 1、对于不存在的任务（第一次下载），只能使用{@link ControllerType#START_CONTROLLER}
+   * 2、对于已存在的任务，只能使用{@link ControllerType#NORMAL_CONTROLLER}
+   *
+   * @param clazz {@link ControllerType#START_CONTROLLER}、{@link ControllerType#NORMAL_CONTROLLER}
+   */
+  @CheckResult(suggest = Suggest.TASK_CONTROLLER)
+  public <T extends FeatureController> T controller(@ControllerType Class<T> clazz) {
+    return FeatureController.newInstance(clazz, getTaskWrapper());
   }
 }

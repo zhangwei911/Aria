@@ -24,6 +24,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.support.v4.content.FileProvider;
 import android.text.TextUtils;
+import com.arialyy.aria.core.inf.AbsEntity;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
 import com.arialyy.simple.BuildConfig;
@@ -33,6 +34,15 @@ import java.io.IOException;
 public class AppUtil {
   private static final String TAG = "AppUtil";
   private static final String ARIA_SHARE_PRE_KEY = "ARIA_SHARE_PRE_KEY";
+
+  /**
+   * 检查实体是否有效
+   *
+   * @return true 实体有效
+   */
+  public static boolean chekEntityValid(AbsEntity entity) {
+    return entity != null && entity.getId() != -1;
+  }
 
   /**
    * http下载示例代码

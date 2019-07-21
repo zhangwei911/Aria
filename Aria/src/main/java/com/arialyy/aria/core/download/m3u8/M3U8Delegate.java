@@ -15,11 +15,12 @@
  */
 package com.arialyy.aria.core.download.m3u8;
 
+import android.support.annotation.CheckResult;
 import com.arialyy.aria.core.common.BaseDelegate;
+import com.arialyy.aria.core.common.Suggest;
 import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.inf.AbsTarget;
 import com.arialyy.aria.core.inf.AbsTaskWrapper;
-import com.arialyy.aria.util.ALog;
 
 /**
  * m3u8 委托
@@ -27,9 +28,9 @@ import com.arialyy.aria.util.ALog;
 public class M3U8Delegate<TARGET extends AbsTarget> extends BaseDelegate<TARGET> {
   private DTaskWrapper mTaskWrapper;
 
-  public M3U8Delegate(TARGET target) {
-    super(target);
-    mTaskWrapper = (DTaskWrapper) mTarget.getTaskWrapper();
+  public M3U8Delegate(TARGET target, AbsTaskWrapper wrapper) {
+    super(target, wrapper);
+    mTaskWrapper = (DTaskWrapper) getTaskWrapper();
     mTaskWrapper.setRequestType(AbsTaskWrapper.M3U8_VOD);
   }
 
@@ -38,7 +39,8 @@ public class M3U8Delegate<TARGET extends AbsTarget> extends BaseDelegate<TARGET>
    *
    * @param merge {@code true}合并所有ts文件为一个
    */
-  public M3U8Delegate merge(boolean merge) {
+  @CheckResult(suggest = Suggest.TO_CONTROLLER)
+  public M3U8Delegate<TARGET> merge(boolean merge) {
     mTaskWrapper.asM3U8().setMergeFile(merge);
     return this;
   }
@@ -47,7 +49,8 @@ public class M3U8Delegate<TARGET extends AbsTarget> extends BaseDelegate<TARGET>
    * 如果你希望使用自行处理ts文件的合并，可以使用{@link ITsMergeHandler}处理ts文件的合并
    * 需要注意的是：只有{@link #merge(boolean)}设置合并ts文件，该方法才会生效
    */
-  public M3U8Delegate setMergeHandler(ITsMergeHandler handler) {
+  @CheckResult(suggest = Suggest.TO_CONTROLLER)
+  public M3U8Delegate<TARGET> setMergeHandler(ITsMergeHandler handler) {
     mTaskWrapper.asM3U8().setMergeHandler(handler);
     return this;
   }
@@ -58,7 +61,8 @@ public class M3U8Delegate<TARGET extends AbsTarget> extends BaseDelegate<TARGET>
    *
    * @param converter {@link IVodTsUrlConverter}
    */
-  public M3U8Delegate setTsUrlConvert(IVodTsUrlConverter converter) {
+  @CheckResult(suggest = Suggest.TO_CONTROLLER)
+  public M3U8Delegate<TARGET> setTsUrlConvert(IVodTsUrlConverter converter) {
     mTaskWrapper.asM3U8().setVodUrlConverter(converter);
     return this;
   }
@@ -68,7 +72,8 @@ public class M3U8Delegate<TARGET extends AbsTarget> extends BaseDelegate<TARGET>
    *
    * @param bandWidth 指定的码率
    */
-  public M3U8Delegate setBandWidth(int bandWidth) {
+  @CheckResult(suggest = Suggest.TO_CONTROLLER)
+  public M3U8Delegate<TARGET> setBandWidth(int bandWidth) {
     mTaskWrapper.asM3U8().setBandWidth(bandWidth);
     return this;
   }
@@ -79,7 +84,8 @@ public class M3U8Delegate<TARGET extends AbsTarget> extends BaseDelegate<TARGET>
    *
    * @param converter {@link IBandWidthUrlConverter}
    */
-  public M3U8Delegate setBandWidthUrlConverter(IBandWidthUrlConverter converter) {
+  @CheckResult(suggest = Suggest.TO_CONTROLLER)
+  public M3U8Delegate<TARGET> setBandWidthUrlConverter(IBandWidthUrlConverter converter) {
     mTaskWrapper.asM3U8().setBandWidthUrlConverter(converter);
     return this;
   }
@@ -87,14 +93,16 @@ public class M3U8Delegate<TARGET extends AbsTarget> extends BaseDelegate<TARGET>
   /**
    * 处理点播文件的下载参数
    */
+  @CheckResult(suggest = Suggest.TO_CONTROLLER)
   public M3U8VodDelegate<TARGET> asVod() {
-    return new M3U8VodDelegate<>(mTarget);
+    return new M3U8VodDelegate<>(mTarget, mTaskWrapper);
   }
 
   /**
    * 处理直播类的下载
    */
+  @CheckResult(suggest = Suggest.TO_CONTROLLER)
   public M3U8LiveDelegate<TARGET> asLive() {
-    return new M3U8LiveDelegate<>(mTarget);
+    return new M3U8LiveDelegate<>(mTarget, mTaskWrapper);
   }
 }

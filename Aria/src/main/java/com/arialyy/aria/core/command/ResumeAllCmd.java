@@ -62,7 +62,7 @@ final class ResumeAllCmd<T extends AbsTaskWrapper> extends AbsNormalCmd<T> {
       if (entities != null && !entities.isEmpty()) {
         for (DownloadEntity entity : entities) {
           addResumeEntity(TaskWrapperManager.getInstance()
-              .getHttpTaskWrapper(DTaskWrapper.class, entity.getKey()));
+              .getNormalTaskWrapper(DTaskWrapper.class, entity.getId()));
         }
       }
     } else if (type == 2) {
@@ -72,7 +72,7 @@ final class ResumeAllCmd<T extends AbsTaskWrapper> extends AbsNormalCmd<T> {
         for (DownloadGroupEntity entity : entities) {
           addResumeEntity(
               TaskWrapperManager.getInstance()
-                  .getDGTaskWrapper(DGTaskWrapper.class, entity.getUrls()));
+                  .getGroupWrapper(DGTaskWrapper.class, entity.getId()));
         }
       }
     } else if (type == 3) {
@@ -81,7 +81,7 @@ final class ResumeAllCmd<T extends AbsTaskWrapper> extends AbsNormalCmd<T> {
       if (entities != null && !entities.isEmpty()) {
         for (UploadEntity entity : entities) {
           addResumeEntity(TaskWrapperManager.getInstance()
-              .getHttpTaskWrapper(UTaskWrapper.class, entity.getKey()));
+              .getNormalTaskWrapper(UTaskWrapper.class, entity.getId()));
         }
       }
     }
@@ -91,7 +91,9 @@ final class ResumeAllCmd<T extends AbsTaskWrapper> extends AbsNormalCmd<T> {
    * 添加恢复实体
    */
   private void addResumeEntity(AbsTaskWrapper te) {
-    if (te == null || te.getEntity() == null) return;
+    if (te == null || te.getEntity() == null) {
+      return;
+    }
     if (!mQueue.taskExists(te.getKey())) {
       mWaitList.add(te);
     }

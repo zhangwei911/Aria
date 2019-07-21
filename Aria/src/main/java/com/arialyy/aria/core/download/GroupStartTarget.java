@@ -16,72 +16,33 @@
 package com.arialyy.aria.core.download;
 
 import android.support.annotation.CheckResult;
-import android.support.annotation.NonNull;
-import com.arialyy.aria.core.common.http.GetDelegate;
+import com.arialyy.aria.core.common.AbsStartTarget;
+import com.arialyy.aria.core.common.Suggest;
 import com.arialyy.aria.core.common.http.HttpDelegate;
-import com.arialyy.aria.core.common.http.PostDelegate;
 import com.arialyy.aria.core.inf.IHttpFileLenAdapter;
-import com.arialyy.aria.core.manager.TaskWrapperManager;
-import com.arialyy.aria.exception.ParamException;
+import com.arialyy.aria.core.manager.SubTaskManager;
 import com.arialyy.aria.util.ALog;
-import java.net.Proxy;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by AriaL on 2017/6/29.
  * 下载任务组
  */
-public class DownloadGroupTarget extends AbsDGTarget<DownloadGroupTarget> {
-  private HttpDelegate<DownloadGroupTarget> mHttpDelegate;
-  private HttpGroupConfigHandler mConfigHandler;
+public class GroupStartTarget extends AbsStartTarget<GroupStartTarget> {
+  private HttpGroupConfigHandler<GroupStartTarget> mConfigHandler;
 
-  DownloadGroupTarget(DownloadGroupEntity groupEntity, String targetName) {
+  GroupStartTarget(List<String> urls, String targetName) {
     setTargetName(targetName);
-    if (groupEntity.getUrls() != null && !groupEntity.getUrls().isEmpty()) {
-      init(groupEntity.getUrls());
-    } else {
-      throw new ParamException("组合任务只任务下载地址为空");
-    }
-  }
-
-  DownloadGroupTarget(List<String> urls, String targetName) {
-    setTargetName(targetName);
-    init(urls);
-  }
-
-  private void init(List<String> urls) {
-    mConfigHandler = new HttpGroupConfigHandler(this,
-        TaskWrapperManager.getInstance().getDGTaskWrapper(DGTaskWrapper.class, urls));
-    mHttpDelegate = new HttpDelegate<>(this);
+    mConfigHandler = new HttpGroupConfigHandler<>(this, -1);
+    mConfigHandler.setGroupUrl(urls);
   }
 
   /**
-   * Post处理
+   * 设置http请求参数，header等信息
    */
-  @CheckResult
-  public PostDelegate asPost() {
-    mHttpDelegate = new PostDelegate<>(this);
-    return (PostDelegate) mHttpDelegate;
-  }
-
-  /**
-   * get处理
-   */
-  @CheckResult
-  public GetDelegate asGet() {
-    mHttpDelegate = new GetDelegate<>(this);
-    return (GetDelegate) mHttpDelegate;
-  }
-
-  /**
-   * 更新组合任务下载地址
-   *
-   * @param urls 新的组合任务下载地址列表
-   */
-  @CheckResult
-  public DownloadGroupTarget updateUrls(List<String> urls) {
-    return mConfigHandler.updateUrls(urls);
+  @CheckResult(suggest = Suggest.TASK_CONTROLLER)
+  public HttpDelegate<GroupStartTarget> option() {
+    return new HttpDelegate<>(this, getTaskWrapper());
   }
 
   /**
@@ -92,8 +53,8 @@ public class DownloadGroupTarget extends AbsDGTarget<DownloadGroupTarget> {
    *
    * @param fileSize 任务组总大小
    */
-  @CheckResult
-  public DownloadGroupTarget setFileSize(long fileSize) {
+  @CheckResult(suggest = Suggest.TASK_CONTROLLER)
+  public GroupStartTarget setFileSize(long fileSize) {
     if (fileSize <= 0) {
       ALog.e(TAG, "文件大小不能小于 0");
       return this;
@@ -111,18 +72,20 @@ public class DownloadGroupTarget extends AbsDGTarget<DownloadGroupTarget> {
    * 2、如果你的知道组合任务的总长度，请使用{@link #setFileSize(long)}设置组合任务的长度。
    * 3、由于网络或其它原因的存在，这种方式获取的组合任务大小有可能是不准确的。
    */
-  @CheckResult
-  public DownloadGroupTarget unknownSize() {
-    getTaskWrapper().setUnknownSize(true);
+  @CheckResult(suggest = Suggest.TASK_CONTROLLER)
+  public GroupStartTarget unknownSize() {
+    ((DGTaskWrapper) getTaskWrapper()).setUnknownSize(true);
     return this;
   }
 
   /**
-   * 如果你是使用{@link DownloadReceiver#load(DownloadGroupEntity)}进行下载操作，那么你需要设置任务组的下载地址
+   * 获取子任务管理器
+   *
+   * @return 子任务管理器
    */
-  @CheckResult
-  public DownloadGroupTarget setGroupUrl(List<String> urls) {
-    return mConfigHandler.setGroupUrl(urls);
+  @CheckResult(suggest = Suggest.TASK_CONTROLLER)
+  public SubTaskManager getSubTaskManager() {
+    return mConfigHandler.getSubTaskManager();
   }
 
   /**
@@ -130,9 +93,18 @@ public class DownloadGroupTarget extends AbsDGTarget<DownloadGroupTarget> {
    *
    * @deprecated {@link #setSubFileName(List)} 请使用该api
    */
-  @CheckResult
-  @Deprecated public DownloadGroupTarget setSubTaskFileName(List<String> subTaskFileName) {
+  @CheckResult(suggest = Suggest.TASK_CONTROLLER)
+  @Deprecated public GroupStartTarget setSubTaskFileName(List<String> subTaskFileName) {
     return setSubFileName(subTaskFileName);
+  }
+
+  /**
+   * 设置任务组别名
+   */
+  @CheckResult(suggest = Suggest.TASK_CONTROLLER)
+  public GroupStartTarget setGroupAlias(String alias) {
+    mConfigHandler.setGroupAlias(alias);
+    return this;
   }
 
   /**
@@ -154,54 +126,29 @@ public class DownloadGroupTarget extends AbsDGTarget<DownloadGroupTarget> {
    *
    * @param dirPath 任务组保存文件夹路径
    */
-  @CheckResult
-  public DownloadGroupTarget setDirPath(String dirPath) {
+  @CheckResult(suggest = Suggest.TASK_CONTROLLER)
+  public GroupStartTarget setDirPath(String dirPath) {
     return mConfigHandler.setDirPath(dirPath);
   }
 
   /**
    * 设置子任务文件名，该方法必须在{@link #setDirPath(String)}之后调用，否则不生效
    */
-  @CheckResult
-  public DownloadGroupTarget setSubFileName(List<String> subTaskFileName) {
+  @CheckResult(suggest = Suggest.TASK_CONTROLLER)
+  public GroupStartTarget setSubFileName(List<String> subTaskFileName) {
     return mConfigHandler.setSubFileName(subTaskFileName);
   }
 
   /**
    * 如果你需要使用header中特定的key来设置文件长度，或有定制文件长度的需要，那么你可以通过该方法自行处理文件长度
    */
-  public DownloadGroupTarget setFileLenAdapter(IHttpFileLenAdapter adapter) {
-    return mHttpDelegate.setFileLenAdapter(adapter);
-  }
+  @CheckResult(suggest = Suggest.TASK_CONTROLLER)
+  public GroupStartTarget setFileLenAdapter(IHttpFileLenAdapter adapter) {
 
-  @Override public int getTargetType() {
-    return GROUP_HTTP;
-  }
-
-  @Override protected boolean checkEntity() {
-    return mConfigHandler.checkEntity();
-  }
-
-  @Override public boolean isRunning() {
-    return mConfigHandler.isRunning();
-  }
-
-  @Override public boolean taskExists() {
-    return mConfigHandler.taskExists();
-  }
-
-  @CheckResult
-  public DownloadGroupTarget addHeader(@NonNull String key, @NonNull String value) {
-    return mHttpDelegate.addHeader(key, value);
-  }
-
-  @CheckResult
-  public DownloadGroupTarget addHeaders(Map<String, String> headers) {
-    return mHttpDelegate.addHeaders(headers);
-  }
-
-  @CheckResult
-  public DownloadGroupTarget setUrlProxy(Proxy proxy) {
-    return mHttpDelegate.setUrlProxy(proxy);
+    if (adapter == null) {
+      throw new IllegalArgumentException("adapter为空");
+    }
+    getTaskWrapper().asHttp().setFileLenAdapter(adapter);
+    return this;
   }
 }

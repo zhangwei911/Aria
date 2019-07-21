@@ -17,19 +17,16 @@ package com.arialyy.simple.core.download;
 
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
-import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.View;
 import com.arialyy.annotations.Download;
 import com.arialyy.aria.core.Aria;
+import com.arialyy.aria.core.common.controller.ControllerType;
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.download.DownloadTask;
-import com.arialyy.aria.core.download.FtpDownloadTarget;
 import com.arialyy.aria.core.inf.IEntity;
-import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
 import com.arialyy.frame.util.show.L;
 import com.arialyy.frame.util.show.T;
@@ -49,7 +46,7 @@ import java.io.IOException;
 public class FtpDownloadActivity extends BaseActivity<ActivityFtpDownloadBinding> {
   private String mUrl, mFilePath;
   private FtpDownloadModule mModule;
-  private FtpDownloadTarget mTarget;
+  private DownloadEntity mEntity;
 
   @Override protected void init(Bundle savedInstanceState) {
     super.init(savedInstanceState);
@@ -63,10 +60,10 @@ public class FtpDownloadActivity extends BaseActivity<ActivityFtpDownloadBinding
         if (entity == null) {
           return;
         }
-        mTarget = Aria.download(FtpDownloadActivity.this).loadFtp(entity.getUrl());
-        if (mTarget.getTaskState() == IEntity.STATE_STOP) {
+        mEntity = entity;
+        if (mEntity.getState() == IEntity.STATE_STOP) {
           getBinding().setStateStr(getString(R.string.resume));
-        } else if (mTarget.isRunning()) {
+        } else if (mEntity.getState() == IEntity.STATE_RUNNING) {
           getBinding().setStateStr(getString(R.string.stop));
         }
 
@@ -92,18 +89,30 @@ public class FtpDownloadActivity extends BaseActivity<ActivityFtpDownloadBinding
   public void onClick(View view) {
     switch (view.getId()) {
       case R.id.start:
-        if (mTarget.isRunning()) {
-          getBinding().setStateStr(getString(R.string.resume));
-          Aria.download(this).loadFtp(mUrl).stop();
-        } else {
-          getBinding().setStateStr(getString(R.string.stop));
-          Aria.download(this).loadFtp(mUrl).login("N0rI", "0qcK")
+
+        if (!AppUtil.chekEntityValid(mEntity)) {
+
+          Aria.download(this).loadFtp(mUrl)
               .setFilePath(mFilePath, true)
+              .option().login("N0rI", "0qcK")
+              .controller(ControllerType.START_CONTROLLER)
               .start();
+          getBinding().setStateStr(getString(R.string.stop));
+          break;
+        }
+        if (Aria.download(this).load(mEntity.getId()).isRunning()) {
+          getBinding().setStateStr(getString(R.string.resume));
+          Aria.download(this).loadFtp(mEntity.getId()).stop();
+        } else {
+          Aria.download(this).loadFtp(mEntity.getId()).resume();
+          getBinding().setStateStr(getString(R.string.stop));
         }
         break;
+
       case R.id.cancel:
-        Aria.download(this).loadFtp(mUrl).cancel();
+        if (AppUtil.chekEntityValid(mEntity)) {
+          Aria.download(this).loadFtp(mEntity.getId()).cancel();
+        }
         break;
     }
   }
@@ -170,9 +179,8 @@ public class FtpDownloadActivity extends BaseActivity<ActivityFtpDownloadBinding
     super.dataCallback(result, data);
     if (result == ModifyUrlDialog.MODIFY_URL_DIALOG_RESULT) {
       mModule.uploadUrl(this, String.valueOf(data));
-    }else if (result == DirChooseDialog.DIR_CHOOSE_DIALOG_RESULT) {
+    } else if (result == DirChooseDialog.DIR_CHOOSE_DIALOG_RESULT) {
       mModule.updateFilePath(this, String.valueOf(data));
     }
   }
-
 }

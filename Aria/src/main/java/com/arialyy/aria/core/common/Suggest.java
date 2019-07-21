@@ -13,18 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.arialyy.aria.core.common.http;
+package com.arialyy.aria.core.common;
 
-import com.arialyy.aria.core.common.RequestEnum;
-import com.arialyy.aria.core.inf.AbsTarget;
+public interface Suggest {
 
-/**
- * post处理委托类
- */
-public class PostDelegate<TARGET extends AbsTarget> extends HttpDelegate<TARGET> {
+  String TASK_CONTROLLER = "after use #add()、#start()、#stop()、#cancel()、#resume()、#save()?";
 
-  public PostDelegate(TARGET target) {
-    super(target);
-    mTarget.getTaskWrapper().asHttp().setRequestEnum(RequestEnum.POST);
-  }
+  String TO_CONTROLLER = "after use #controller()?";
 }

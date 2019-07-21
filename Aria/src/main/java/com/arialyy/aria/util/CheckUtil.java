@@ -115,6 +115,15 @@ public class CheckUtil {
   /**
    * 检测url是否合法，如果url不合法，将抛异常
    */
+  public static void checkTaskId(long taskId) {
+    if (taskId < 0) {
+      throw new IllegalArgumentException("任务id不能小于0");
+    }
+  }
+
+  /**
+   * 检测url是否合法，如果url不合法，将抛异常
+   */
   public static void checkUrlInvalidThrow(String url) {
     if (TextUtils.isEmpty(url)) {
       throw new IllegalArgumentException("url不能为null");

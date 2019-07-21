@@ -15,6 +15,11 @@
         name="progress"
         type="int"
         />
+
+    <variable
+        name="stateStr"
+        type="String"
+        />
   </data>
   <LinearLayout
       android:layout_width="match_parent"
@@ -23,10 +28,11 @@
       >
 
     <include
-        layout="@layout/content_single"
+        layout="@layout/layout_content_single"
         bind:fileSize="@{fileSize}"
         bind:progress="@{progress}"
         bind:speed="@{speed}"
+        bind:stateStr="@{stateStr}"
         />
 
   </LinearLayout>

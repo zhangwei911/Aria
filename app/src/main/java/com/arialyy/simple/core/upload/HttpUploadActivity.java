@@ -20,12 +20,14 @@ import android.os.Bundle;
 import android.view.View;
 import com.arialyy.annotations.Upload;
 import com.arialyy.aria.core.Aria;
+import com.arialyy.aria.core.upload.UploadEntity;
 import com.arialyy.aria.core.upload.UploadTask;
 import com.arialyy.frame.util.FileUtil;
 import com.arialyy.frame.util.show.L;
 import com.arialyy.simple.R;
 import com.arialyy.simple.base.BaseActivity;
 import com.arialyy.simple.databinding.ActivityUploadBinding;
+import com.arialyy.simple.util.AppUtil;
 import com.arialyy.simple.widget.HorizontalProgressBarWithNumber;
 import java.io.File;
 
@@ -36,7 +38,8 @@ public class HttpUploadActivity extends BaseActivity<ActivityUploadBinding> {
   private static final String TAG = "HttpUploadActivity";
   HorizontalProgressBarWithNumber mPb;
 
-  private static final String FILE_PATH = "/mnt/sdcard/test.apk";
+  private final String FILE_PATH = "/mnt/sdcard/test.apk";
+  private UploadEntity mEntity;
 
   @Override protected int setLayoutId() {
     return R.layout.activity_upload;
@@ -45,6 +48,9 @@ public class HttpUploadActivity extends BaseActivity<ActivityUploadBinding> {
   @Override protected void init(Bundle savedInstanceState) {
     setTile("D_HTTP 上传");
     super.init(savedInstanceState);
+
+    mEntity = Aria.upload(this).getFirstUploadEntity(FILE_PATH);
+
     Aria.upload(this).register();
     getBinding().upload.setOnClickListener(new View.OnClickListener() {
       @Override public void onClick(View v) {
@@ -70,16 +76,19 @@ public class HttpUploadActivity extends BaseActivity<ActivityUploadBinding> {
             "http://lib-test.xzxyun.com:8042/Api/upload?data={\"type\":\"1\",\"fileType\":\".apk\"}")
         //.setTempUrl("http://192.168.1.6:8080/upload/sign_file/").setAttachment("file")
         //.addHeader("iplanetdirectorypro", "11a09102fb934ad0bc206f9c611d7933")
-        .asPost()
         .start();
   }
 
   void stop() {
-    Aria.upload(this).load(FILE_PATH).cancel();
+    if (AppUtil.chekEntityValid(mEntity)) {
+      Aria.upload(this).load(mEntity.getId()).stop();
+    }
   }
 
   void remove() {
-    Aria.upload(this).load(FILE_PATH).cancel();
+    if (AppUtil.chekEntityValid(mEntity)) {
+      Aria.upload(this).load(mEntity.getId()).cancel();
+    }
   }
 
   @Upload.onPre public void onPre(UploadTask task) {

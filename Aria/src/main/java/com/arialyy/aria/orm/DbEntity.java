@@ -30,6 +30,10 @@ public abstract class DbEntity {
 
   }
 
+  protected long getRowID() {
+    return rowID;
+  }
+
   /**
    * 查询关联数据
    * <code>

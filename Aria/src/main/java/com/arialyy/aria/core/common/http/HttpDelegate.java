@@ -15,16 +15,14 @@
  */
 package com.arialyy.aria.core.common.http;
 
+import android.support.annotation.CheckResult;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import com.arialyy.aria.core.common.BaseDelegate;
-import com.arialyy.aria.core.download.DGTaskWrapper;
-import com.arialyy.aria.core.download.DTaskWrapper;
-import com.arialyy.aria.core.download.DownloadGroupTarget;
+import com.arialyy.aria.core.common.RequestEnum;
+import com.arialyy.aria.core.common.Suggest;
 import com.arialyy.aria.core.inf.AbsTarget;
 import com.arialyy.aria.core.inf.AbsTaskWrapper;
-import com.arialyy.aria.core.inf.IHttpFileLenAdapter;
-import com.arialyy.aria.core.inf.IHttpHeaderDelegate;
 import com.arialyy.aria.util.ALog;
 import java.net.Proxy;
 import java.util.Collection;
@@ -35,39 +33,48 @@ import java.util.Set;
 /**
  * HTTP协议处理
  */
-public class HttpDelegate<TARGET extends AbsTarget> extends BaseDelegate<TARGET>
-    implements IHttpHeaderDelegate<TARGET> {
-  public HttpDelegate(TARGET target) {
-    super(target);
+public class HttpDelegate<TARGET extends AbsTarget> extends BaseDelegate<TARGET> {
+
+  public HttpDelegate(TARGET target, AbsTaskWrapper wrapper) {
+    super(target, wrapper);
   }
 
-  public TARGET setParams(Map<String, String> params) {
-    mTarget.getTaskWrapper().asHttp().setParams(params);
-    if (mTarget instanceof DownloadGroupTarget) {
-      for (DTaskWrapper subTask : ((DGTaskWrapper) mTarget.getTaskWrapper()).getSubTaskWrapper()) {
-        subTask.asHttp().setParams(params);
-      }
-    }
-    return mTarget;
+  /**
+   * 设置请求类型
+   *
+   * @param requestEnum {@link RequestEnum}
+   */
+  @CheckResult(suggest = Suggest.TO_CONTROLLER)
+  public HttpDelegate<TARGET> setRequestType(RequestEnum requestEnum) {
+    getTaskWrapper().asHttp().setRequestEnum(requestEnum);
+    return this;
   }
 
-  public TARGET setParam(String key, String value) {
+  /**
+   * 设置http请求参数
+   */
+  @CheckResult(suggest = Suggest.TO_CONTROLLER)
+  public HttpDelegate<TARGET> setParams(Map<String, String> params) {
+    getTaskWrapper().asHttp().setParams(params);
+    return this;
+  }
+
+  /**
+   * 设置http请求参数
+   */
+  @CheckResult(suggest = Suggest.TO_CONTROLLER)
+  public HttpDelegate<TARGET> setParam(String key, String value) {
     if (TextUtils.isEmpty(key) || TextUtils.isEmpty(value)) {
       ALog.d(TAG, "key 或value 为空");
-      return mTarget;
+      return this;
     }
-    Map<String, String> params = mTarget.getTaskWrapper().asHttp().getParams();
+    Map<String, String> params = getTaskWrapper().asHttp().getParams();
     if (params == null) {
       params = new HashMap<>();
-      mTarget.getTaskWrapper().asHttp().setParams(params);
+      getTaskWrapper().asHttp().setParams(params);
     }
     params.put(key, value);
-    if (mTarget instanceof DownloadGroupTarget) {
-      for (DTaskWrapper subTask : ((DGTaskWrapper) mTarget.getTaskWrapper()).getSubTaskWrapper()) {
-        subTask.asHttp().setParams(params);
-      }
-    }
-    return mTarget;
+    return this;
   }
 
   /**
@@ -77,17 +84,17 @@ public class HttpDelegate<TARGET extends AbsTarget> extends BaseDelegate<TARGET>
    * @param key header对应的key
    * @param value header对应的value
    */
-  @Override
-  public TARGET addHeader(@NonNull String key, @NonNull String value) {
+  @CheckResult(suggest = Suggest.TO_CONTROLLER)
+  public HttpDelegate<TARGET> addHeader(@NonNull String key, @NonNull String value) {
     if (TextUtils.isEmpty(key)) {
       ALog.w(TAG, "设置header失败，header对应的key不能为null");
-      return mTarget;
+      return this;
     } else if (TextUtils.isEmpty(value)) {
       ALog.w(TAG, "设置header失败，header对应的value不能为null");
-      return mTarget;
+      return this;
     }
-    addHeader(mTarget.getTaskWrapper(), key, value);
-    return mTarget;
+    addHeader(getTaskWrapper(), key, value);
+    return this;
   }
 
   /**
@@ -96,27 +103,23 @@ public class HttpDelegate<TARGET extends AbsTarget> extends BaseDelegate<TARGET>
    *
    * @param headers 一组http header数据
    */
-  @Override
-  public TARGET addHeaders(@NonNull Map<String, String> headers) {
+  @CheckResult(suggest = Suggest.TO_CONTROLLER)
+  public HttpDelegate<TARGET> addHeaders(@NonNull Map<String, String> headers) {
     if (headers.size() == 0) {
       ALog.w(TAG, "设置header失败，map没有header数据");
-      return mTarget;
+      return this;
     }
-    addHeaders(mTarget.getTaskWrapper(), headers);
-    return mTarget;
+    addHeaders(getTaskWrapper(), headers);
+    return this;
   }
 
-  @Override public TARGET setUrlProxy(Proxy proxy) {
-    mTarget.getTaskWrapper().asHttp().setProxy(proxy);
-    return mTarget;
-  }
-
-  public TARGET setFileLenAdapter(IHttpFileLenAdapter adapter) {
-    if (adapter == null) {
-      throw new IllegalArgumentException("adapter为空");
-    }
-    mTarget.getTaskWrapper().asHttp().setFileLenAdapter(adapter);
-    return mTarget;
+  /**
+   * 设置代理
+   */
+  @CheckResult(suggest = Suggest.TO_CONTROLLER)
+  public HttpDelegate<TARGET> setUrlProxy(Proxy proxy) {
+    getTaskWrapper().asHttp().setProxy(proxy);
+    return this;
   }
 
   private void addHeader(AbsTaskWrapper taskWrapper, String key, String value) {

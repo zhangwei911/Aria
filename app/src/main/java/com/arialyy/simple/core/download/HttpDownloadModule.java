@@ -50,13 +50,13 @@ public class HttpDownloadModule extends BaseViewModule {
     String url = AppUtil.getConfigValue(context, HTTP_URL_KEY, defUrl);
     String filePath = AppUtil.getConfigValue(context, HTTP_PATH_KEY, defFilePath);
 
-    singDownloadInfo = Aria.download(context).getDownloadEntity(url);
+    singDownloadInfo = Aria.download(context).getFirstDownloadEntity(url);
     if (singDownloadInfo == null) {
       singDownloadInfo = new DownloadEntity();
       singDownloadInfo.setUrl(url);
-      File temp = new File(defFilePath);
-      singDownloadInfo.setDownloadPath(filePath);
-      singDownloadInfo.setFileName(temp.getName());
+      File file = new File(defFilePath);
+      singDownloadInfo.setFilePath(filePath);
+      singDownloadInfo.setFileName(file.getName());
     } else {
       AppUtil.setConfigValue(context, HTTP_PATH_KEY, singDownloadInfo.getDownloadPath());
       AppUtil.setConfigValue(context, HTTP_URL_KEY, singDownloadInfo.getUrl());
@@ -79,7 +79,7 @@ public class HttpDownloadModule extends BaseViewModule {
     File temp = new File(filePath);
     AppUtil.setConfigValue(context, HTTP_PATH_KEY, filePath);
     singDownloadInfo.setFileName(temp.getName());
-    singDownloadInfo.setDownloadPath(filePath);
+    singDownloadInfo.setFilePath(filePath);
     liveData.postValue(singDownloadInfo);
   }
 

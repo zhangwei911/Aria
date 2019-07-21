@@ -17,8 +17,8 @@ package com.arialyy.aria.util;
 
 import com.arialyy.aria.core.common.RecordWrapper;
 import com.arialyy.aria.core.common.TaskRecord;
-import com.arialyy.aria.core.common.ThreadRecord;
 import com.arialyy.aria.core.download.DGEntityWrapper;
+import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.download.DownloadGroupEntity;
 import com.arialyy.aria.orm.DbEntity;
@@ -61,42 +61,29 @@ public class DbDataHelper {
   }
 
   /**
-   * 获取组合任务实体 如果数据库不存在该实体，则新创建一个新的任务组实体
+   * 获取组合任务实体、ftpDir任务实体
    *
-   * @param groupHash 组合任务Hash
-   * @param urls 子任务url列表
+   * @param taskId 组合任务id
+   * @return 实体不存在，返回null
    */
-  public static DownloadGroupEntity getOrCreateHttpDGEntity(String groupHash, List<String> urls) {
+  public static DownloadGroupEntity getDGEntity(long taskId) {
     List<DGEntityWrapper> wrapper =
-        DbEntity.findRelationData(DGEntityWrapper.class, "DownloadGroupEntity.groupHash=?",
-            groupHash);
+        DbEntity.findRelationData(DGEntityWrapper.class, "DownloadGroupEntity.rowid=?",
+            String.valueOf(taskId));
 
-    DownloadGroupEntity groupEntity;
-    if (wrapper != null && !wrapper.isEmpty()) {
-      groupEntity = wrapper.get(0).groupEntity;
-      if (groupEntity == null) {
-        groupEntity = new DownloadGroupEntity();
-        groupEntity.setSubEntities(createHttpSubTask(groupHash, urls));
-      }
-    } else {
-      groupEntity = new DownloadGroupEntity();
-      groupEntity.setSubEntities(createHttpSubTask(groupHash, urls));
-    }
-    groupEntity.setGroupHash(groupHash);
-    groupEntity.setUrls(urls);
-    return groupEntity;
+    return wrapper == null || wrapper.size() == 0 ? null : wrapper.get(0).groupEntity;
   }
 
   /**
    * 创建HTTP子任务实体
    */
-  private static List<DownloadEntity> createHttpSubTask(String groupHash, List<String> urls) {
+  public static List<DownloadEntity> createHttpSubTask(String groupHash, List<String> urls) {
     List<DownloadEntity> list = new ArrayList<>();
     for (int i = 0, len = urls.size(); i < len; i++) {
       String url = urls.get(i);
       DownloadEntity entity = new DownloadEntity();
       entity.setUrl(url);
-      entity.setDownloadPath(groupHash + "_" + i);
+      entity.setFilePath(groupHash + "_" + i);
       int lastIndex = url.lastIndexOf(File.separator);
       entity.setFileName(url.substring(lastIndex + 1));
       entity.setGroupHash(groupHash);
@@ -126,5 +113,19 @@ public class DbDataHelper {
     }
     groupEntity.setGroupHash(ftpUrl);
     return groupEntity;
+  }
+
+  /**
+   * 创建任务组子任务的任务实体
+   */
+  public static List<DTaskWrapper> createDGSubTaskWrapper(DownloadGroupEntity dge) {
+    List<DTaskWrapper> list = new ArrayList<>();
+    for (DownloadEntity entity : dge.getSubEntities()) {
+      DTaskWrapper taskEntity = new DTaskWrapper(entity);
+      taskEntity.setGroupHash(dge.getKey());
+      taskEntity.setGroupTask(true);
+      list.add(taskEntity);
+    }
+    return list;
   }
 }

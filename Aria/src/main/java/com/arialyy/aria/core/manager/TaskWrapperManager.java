@@ -22,7 +22,6 @@ import com.arialyy.aria.core.inf.AbsTaskWrapper;
 import com.arialyy.aria.core.upload.UTaskWrapper;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
-import java.util.List;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -48,7 +47,7 @@ public class TaskWrapperManager {
     lock = new ReentrantLock();
   }
 
-  private IGTEFactory chooseGroupFactory(Class clazz) {
+  private IGroupWrapperFactory chooseGroupFactory(Class clazz) {
     if (clazz == DGTaskWrapper.class) {
       return DGTaskWrapperFactory.getInstance();
     }
@@ -65,52 +64,26 @@ public class TaskWrapperManager {
   }
 
   /**
-   * 从缓存中获取单任务实体，如果任务实体不存在，则创建任务实体
+   * 获取普通任务的Wrapper
    *
-   * @param key 下载任务，key为下载地址；上传任务，key为本地文件路径
    * @return 创建失败，返回null；成功返回{@link DTaskWrapper}或者{@link UTaskWrapper}
    */
-  public <TE extends AbsTaskWrapper> TE getHttpTaskWrapper(Class<TE> clazz, String key) {
+  public <TW extends AbsTaskWrapper> TW getNormalTaskWrapper(Class<TW> clazz, long taskId) {
     final Lock lock = this.lock;
     lock.lock();
     try {
-      AbsTaskWrapper wrapper = cache.get(convertKey(key));
+
+      AbsTaskWrapper wrapper = cache.get(convertKey(clazz, taskId));
       if (wrapper == null || wrapper.getClass() != clazz) {
         INormalTEFactory factory = chooseNormalFactory(clazz);
         if (factory == null) {
           ALog.e(TAG, "任务实体创建失败");
           return null;
         }
-        wrapper = factory.create(key);
-        cache.put(convertKey(key), wrapper);
+        wrapper = factory.create(taskId);
+        cache.put(convertKey(clazz, taskId), wrapper);
       }
-      return (TE) wrapper;
-    } finally {
-      lock.unlock();
-    }
-  }
-
-  /**
-   * 从缓存中获取FTP文件夹任务实体，如果任务实体不存在，则创建任务实体
-   *
-   * @param key 下载任务，key为下载地址；上传任务，key为本地文件路径
-   * @return 创建失败，返回null；成功返回{@link DTaskWrapper}，
-   */
-  public <TE extends AbsTaskWrapper> TE getFtpTaskWrapper(Class<TE> clazz, String key) {
-    final Lock lock = this.lock;
-    lock.lock();
-    try {
-      AbsTaskWrapper tEntity = cache.get(convertKey(key));
-      if (tEntity == null || tEntity.getClass() != clazz) {
-        IGTEFactory factory = chooseGroupFactory(clazz);
-        if (factory == null) {
-          ALog.e(TAG, "任务实体创建失败");
-          return null;
-        }
-        tEntity = factory.getFTE(key);
-        cache.put(convertKey(key), tEntity);
-      }
-      return (TE) tEntity;
+      return (TW) wrapper;
     } finally {
       lock.unlock();
     }
@@ -119,29 +92,24 @@ public class TaskWrapperManager {
   /**
    * 从缓存中获取HTTP任务组的任务实体，如果任务实体不存在，则创建任务实体 获取{}
    *
-   * @param urls HTTP任务组的子任务下载地址列表
+   * @param taskId 任务ID
    * @return 地址列表为null或创建实体失败，返回null；成功返回{@link DGTaskWrapper}
    */
-  public <TE extends AbsTaskWrapper> TE getDGTaskWrapper(Class<TE> clazz, List<String> urls) {
-    if (urls == null || urls.isEmpty()) {
-      ALog.e(TAG, "获取HTTP任务组实体失败：任务组的子任务下载地址列表为null");
-      return null;
-    }
+  public <TW extends AbsTaskWrapper> TW getGroupWrapper(Class<TW> clazz, long taskId) {
     final Lock lock = this.lock;
     lock.lock();
     try {
-      String groupHash = CommonUtil.getMd5Code(urls);
-      AbsTaskWrapper tWrapper = cache.get(convertKey(groupHash));
+      AbsTaskWrapper tWrapper = cache.get(convertKey(clazz, taskId));
       if (tWrapper == null || tWrapper.getClass() != clazz) {
-        IGTEFactory factory = chooseGroupFactory(clazz);
+        IGroupWrapperFactory factory = chooseGroupFactory(clazz);
         if (factory == null) {
           ALog.e(TAG, "任务实体创建失败");
           return null;
         }
-        tWrapper = factory.getGTE(groupHash, urls);
-        cache.put(convertKey(groupHash), tWrapper);
+        tWrapper = factory.getGroupWrapper(taskId);
+        cache.put(convertKey(clazz, taskId), tWrapper);
       }
-      return (TE) tWrapper;
+      return (TW) tWrapper;
     } finally {
       lock.unlock();
     }
@@ -150,11 +118,11 @@ public class TaskWrapperManager {
   /**
    * 更新任务Wrapper
    */
-  public void putTaskWrapper(String key, AbsTaskWrapper tEntity) {
+  public void putTaskWrapper(AbsTaskWrapper wrapper) {
     final Lock lock = this.lock;
     lock.lock();
     try {
-      cache.put(convertKey(key), tEntity);
+      cache.put(convertKey(wrapper.getClass(), wrapper.getEntity().getId()), wrapper);
     } finally {
       lock.unlock();
     }
@@ -165,15 +133,16 @@ public class TaskWrapperManager {
    *
    * @return {@code false} 实体为null，添加失败
    */
-  public boolean addTaskWrapper(AbsTaskWrapper te) {
-    if (te == null) {
+  public boolean addTaskWrapper(AbsTaskWrapper wrapper) {
+    if (wrapper == null) {
       ALog.e(TAG, "任务实体添加失败");
       return false;
     }
     final Lock lock = this.lock;
     lock.lock();
     try {
-      return cache.put(convertKey(te.getKey()), te) != null;
+      return cache.put(convertKey(wrapper.getClass(), wrapper.getEntity().getId()), wrapper)
+          != null;
     } finally {
       lock.unlock();
     }
@@ -182,24 +151,17 @@ public class TaskWrapperManager {
   /**
    * 通过key删除任务实体 当任务complete或删除记录时将删除缓存
    */
-  public AbsTaskWrapper removeTaskWrapper(String key) {
+  public AbsTaskWrapper removeTaskWrapper(AbsTaskWrapper wrapper) {
     final Lock lock = this.lock;
     lock.lock();
     try {
-      return cache.remove(convertKey(key));
+      return cache.remove(convertKey(wrapper.getClass(), wrapper.getEntity().getId()));
     } finally {
       lock.unlock();
     }
   }
 
-  private String convertKey(String key) {
-    key = key.trim();
-    final Lock lock = this.lock;
-    lock.lock();
-    try {
-      return CommonUtil.keyToHashKey(key);
-    } finally {
-      lock.unlock();
-    }
+  private String convertKey(Class clazz, long taskId) {
+    return CommonUtil.keyToHashKey(clazz.getName() + taskId);
   }
 }

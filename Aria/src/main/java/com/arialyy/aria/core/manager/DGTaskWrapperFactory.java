@@ -15,19 +15,17 @@
  */
 package com.arialyy.aria.core.manager;
 
+import com.arialyy.aria.core.download.DGEntityWrapper;
 import com.arialyy.aria.core.download.DGTaskWrapper;
-import com.arialyy.aria.core.download.DTaskWrapper;
-import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.download.DownloadGroupEntity;
-import com.arialyy.aria.util.CommonUtil;
+import com.arialyy.aria.orm.DbEntity;
 import com.arialyy.aria.util.DbDataHelper;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created by Aria.Lao on 2017/11/1. 组合任务wrapper
  */
-class DGTaskWrapperFactory implements IGTEFactory<DownloadGroupEntity, DGTaskWrapper> {
+class DGTaskWrapperFactory implements IGroupWrapperFactory<DownloadGroupEntity, DGTaskWrapper> {
   private static final String TAG = "DTaskWrapperFactory";
   private static volatile DGTaskWrapperFactory INSTANCE = null;
 
@@ -43,40 +41,49 @@ class DGTaskWrapperFactory implements IGTEFactory<DownloadGroupEntity, DGTaskWra
     return INSTANCE;
   }
 
-  @Override public DGTaskWrapper getGTE(String groupHash, List<String> urls) {
-    DownloadGroupEntity entity = DbDataHelper.getOrCreateHttpDGEntity(groupHash, urls);
+  @Override public DGTaskWrapper getGroupWrapper(long taskId) {
+    if (taskId == -1) {
+      return new DGTaskWrapper(new DownloadGroupEntity());
+    }
+    DownloadGroupEntity entity = getOrCreateHttpDGEntity(taskId);
     DGTaskWrapper wrapper = new DGTaskWrapper(entity);
-    wrapper.setSubTaskWrapper(createDGSubTaskWrapper(entity));
+    if (entity.getSubEntities() != null && !entity.getSubEntities().isEmpty()) {
+      wrapper.setSubTaskWrapper(DbDataHelper.createDGSubTaskWrapper(entity));
+    }
     return wrapper;
   }
 
-  @Override public DGTaskWrapper getFTE(String ftpUrl) {
-    DownloadGroupEntity entity = DbDataHelper.getOrCreateFtpDGEntity(ftpUrl);
-    DGTaskWrapper fte = new DGTaskWrapper(entity);
-    fte.asFtp().setUrlEntity(CommonUtil.getFtpUrlInfo(ftpUrl));
-
-    if (fte.getEntity().getSubEntities() == null) {
-      fte.getEntity().setSubEntities(new ArrayList<DownloadEntity>());
-    }
-    if (fte.getSubTaskWrapper() == null) {
-      fte.setSubTaskWrapper(new ArrayList<DTaskWrapper>());
-    }
-    return fte;
-  }
+  //@Override public DGTaskWrapper getFtpDirWrapper(long taskId) {
+  //  DownloadGroupEntity entity = DbDataHelper.getOrCreateFtpDGEntity(ftpUrl);
+  //  DGTaskWrapper fte = new DGTaskWrapper(entity);
+  //  fte.asFtp().setUrlEntity(CommonUtil.getFtpUrlInfo(ftpUrl));
+  //
+  //  if (fte.getEntity().getSubEntities() == null) {
+  //    fte.getEntity().setSubEntities(new ArrayList<DownloadEntity>());
+  //  }
+  //  if (fte.getSubTaskWrapper() == null) {
+  //    fte.setSubTaskWrapper(new ArrayList<DTaskWrapper>());
+  //  }
+  //  return fte;
+  //}
 
   /**
-   * 创建任务组子任务的任务实体
+   * 获取组合任务实体 如果数据库不存在该实体，则新创建一个新的任务组实体
    */
-  private List<DTaskWrapper> createDGSubTaskWrapper(DownloadGroupEntity dge) {
-    List<DTaskWrapper> list = new ArrayList<>();
-    for (DownloadEntity entity : dge.getSubEntities()) {
-      DTaskWrapper taskEntity = new DTaskWrapper(entity);
-      taskEntity.setGroupHash(dge.getKey());
-      taskEntity.setGroupTask(true);
-      list.add(taskEntity);
+  private DownloadGroupEntity getOrCreateHttpDGEntity(long taskId) {
+    List<DGEntityWrapper> wrapper =
+        DbEntity.findRelationData(DGEntityWrapper.class, "DownloadGroupEntity.rowid=?",
+            String.valueOf(taskId));
+
+    DownloadGroupEntity groupEntity;
+    if (wrapper != null && !wrapper.isEmpty()) {
+      groupEntity = wrapper.get(0).groupEntity;
+      if (groupEntity == null) {
+        groupEntity = new DownloadGroupEntity();
+      }
+    } else {
+      groupEntity = new DownloadGroupEntity();
     }
-    return list;
+    return groupEntity;
   }
-
-
 }

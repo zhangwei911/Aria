@@ -175,6 +175,10 @@ public abstract class AbsEntity extends DbEntity implements IEntity, Parcelable,
     this.stopTime = stopTime;
   }
 
+  public long getId() {
+    return getRowID();
+  }
+
   /**
    * 实体唯一标识符
    * 下载实体：下载url

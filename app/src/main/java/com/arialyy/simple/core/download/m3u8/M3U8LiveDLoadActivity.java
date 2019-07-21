@@ -27,8 +27,8 @@ import android.view.View;
 import android.widget.Toast;
 import com.arialyy.annotations.Download;
 import com.arialyy.aria.core.Aria;
+import com.arialyy.aria.core.common.controller.ControllerType;
 import com.arialyy.aria.core.download.DownloadEntity;
-import com.arialyy.aria.core.download.DownloadTarget;
 import com.arialyy.aria.core.download.DownloadTask;
 import com.arialyy.aria.core.download.m3u8.ILiveTsUrlConverter;
 import com.arialyy.aria.util.ALog;
@@ -39,6 +39,7 @@ import com.arialyy.simple.base.BaseActivity;
 import com.arialyy.simple.common.ModifyPathDialog;
 import com.arialyy.simple.common.ModifyUrlDialog;
 import com.arialyy.simple.databinding.ActivityM3u8LiveBinding;
+import com.arialyy.simple.util.AppUtil;
 import java.io.File;
 
 public class M3U8LiveDLoadActivity extends BaseActivity<ActivityM3u8LiveBinding> {
@@ -46,7 +47,7 @@ public class M3U8LiveDLoadActivity extends BaseActivity<ActivityM3u8LiveBinding>
   private String mUrl;
   private String mFilePath;
   private M3U8LiveModule mModule;
-  private DownloadTarget mTarget;
+  private DownloadEntity mEntity;
 
   @Override
   protected void init(Bundle savedInstanceState) {
@@ -60,7 +61,7 @@ public class M3U8LiveDLoadActivity extends BaseActivity<ActivityM3u8LiveBinding>
         if (entity == null) {
           return;
         }
-        mTarget = Aria.download(M3U8LiveDLoadActivity.this).load(entity.getUrl());
+        mEntity = entity;
         getBinding().setStateStr(getString(R.string.start));
         getBinding().setUrl(entity.getUrl());
         getBinding().setFilePath(entity.getFilePath());
@@ -211,15 +212,20 @@ public class M3U8LiveDLoadActivity extends BaseActivity<ActivityM3u8LiveBinding>
   public void onClick(View view) {
     switch (view.getId()) {
       case R.id.start:
-        ALog.d(TAG, "isRunning = " + mTarget.isRunning());
-        if (mTarget.isRunning()) {
-          Aria.download(this).load(mUrl).stop();
-        } else {
+        if (!AppUtil.chekEntityValid(mEntity)) {
           startD();
+          break;
+        }
+        if (Aria.download(this).load(mEntity.getId()).isRunning()) {
+          Aria.download(this).load(mEntity.getId()).stop();
+        } else {
+          Aria.download(this).load(mEntity.getId()).resume();
         }
         break;
       case R.id.cancel:
-        Aria.download(this).load(mUrl).cancel(true);
+        if (AppUtil.chekEntityValid(mEntity)) {
+          Aria.download(this).load(mEntity.getId()).cancel(true);
+        }
         break;
     }
   }
@@ -244,6 +250,7 @@ public class M3U8LiveDLoadActivity extends BaseActivity<ActivityM3u8LiveBinding>
             return parentUrl + tsUrl;
           }
         })
+        .controller(ControllerType.START_CONTROLLER)
         //.setLiveTsUrlConvert(new IVodTsUrlConverter() {
         //  @Override public List<String> convert(String m3u8Url, List<String> tsUrls) {
         //    int peerIndex = m3u8Url.lastIndexOf("/");

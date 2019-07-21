@@ -15,6 +15,7 @@
  */
 package com.arialyy.aria.core.upload.uploader;
 
+import android.text.TextUtils;
 import com.arialyy.aria.core.common.AbsThreadTask;
 import com.arialyy.aria.core.common.SubThreadConfig;
 import com.arialyy.aria.core.common.http.HttpTaskConfig;
@@ -73,8 +74,8 @@ class HttpThreadTask extends AbsThreadTask<UploadEntity, UTaskWrapper> {
       mHttpConn.setDoInput(true);
       mHttpConn.setRequestProperty("Connection", "Keep-Alive");
       mHttpConn.setRequestProperty("Content-Type",
-          taskDelegate.getContentType() + "; boundary=" + BOUNDARY);
-      mHttpConn.setRequestProperty("User-Agent", taskDelegate.getUserAgent());
+          getContentType() + "; boundary=" + BOUNDARY);
+      mHttpConn.setRequestProperty("User-Agent", getUserAgent());
       mHttpConn.setConnectTimeout(getTaskConfig().getConnectTimeOut());
       mHttpConn.setReadTimeout(getTaskConfig().getIOTimeOut());
       //mHttpConn.setRequestProperty("Range", "bytes=" + 0 + "-" + "100");
@@ -117,6 +118,23 @@ class HttpThreadTask extends AbsThreadTask<UploadEntity, UTaskWrapper> {
     } catch (IOException e) {
       e.printStackTrace();
     }
+  }
+
+  private String getContentType() {
+    HttpTaskConfig config = getTaskWrapper().asHttp();
+    return
+        (config.getHeaders() == null || TextUtils.isEmpty(config.getHeaders().get("Content-Type")))
+            ?
+            "multipart/form-data" : config.getHeaders().get("Content-Type");
+  }
+
+  private String getUserAgent() {
+    HttpTaskConfig config = getTaskWrapper().asHttp();
+    return
+        (config.getHeaders() == null || TextUtils.isEmpty(config.getHeaders().get("User-Agent")))
+            ?
+            "Mozilla/5.0 (Windows; U; Windows NT 6.1; zh-CN; rv:1.9.2.6)"
+            : config.getHeaders().get("User-Agent");
   }
 
   /**
