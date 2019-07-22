@@ -127,7 +127,7 @@ public class M3U8LiveLoader extends BaseM3U8Loader {
    */
   private M3U8ThreadTask createThreadTask(String cacheDir, int indexId, String tsUrl) {
     ThreadRecord record = new ThreadRecord();
-    record.key = mRecord.filePath;
+    record.taskKey = mRecord.filePath;
     record.isComplete = false;
     record.tsUrl = tsUrl;
     record.threadType = TaskRecord.TYPE_M3U8_LIVE;

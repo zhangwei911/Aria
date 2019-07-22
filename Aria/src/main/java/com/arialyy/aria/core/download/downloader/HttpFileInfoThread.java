@@ -22,9 +22,9 @@ import com.arialyy.aria.core.AriaManager;
 import com.arialyy.aria.core.common.CompleteInfo;
 import com.arialyy.aria.core.common.OnFileInfoCallback;
 import com.arialyy.aria.core.common.RequestEnum;
+import com.arialyy.aria.core.common.http.HttpTaskConfig;
 import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.download.DownloadEntity;
-import com.arialyy.aria.core.common.http.HttpTaskConfig;
 import com.arialyy.aria.core.inf.IHttpFileLenAdapter;
 import com.arialyy.aria.exception.AriaIOException;
 import com.arialyy.aria.exception.BaseException;
@@ -54,7 +54,7 @@ import java.util.UUID;
  * 下载文件信息获取
  */
 public class HttpFileInfoThread implements Runnable {
-  private final String TAG = "HttpFileInfoThread";
+  private static final String TAG = "HttpFileInfoThread";
   private DownloadEntity mEntity;
   private DTaskWrapper mTaskWrapper;
   private int mConnectTimeOut;
@@ -119,7 +119,7 @@ public class HttpFileInfoThread implements Runnable {
     }
     long len = lenAdapter.handleFileLen(conn.getHeaderFields());
 
-    if (!CommonUtil.checkSDMemorySpace(mEntity.getDownloadPath(), len)) {
+    if (!CommonUtil.checkSDMemorySpace(mEntity.getFilePath(), len)) {
       failDownload(new TaskException(TAG,
           String.format("下载失败，内存空间不足；filePath: %s, url: %s", mEntity.getDownloadPath(),
               mEntity.getUrl())), false);
@@ -334,6 +334,10 @@ public class HttpFileInfoThread implements Runnable {
   private static class FileLenAdapter implements IHttpFileLenAdapter {
 
     @Override public long handleFileLen(Map<String, List<String>> headers) {
+      if (headers == null || headers.isEmpty()) {
+        ALog.e(TAG, "header为空，获取文件长度失败");
+        return -1;
+      }
       List<String> sLength = headers.get("Content-Length");
       if (sLength == null || sLength.isEmpty()) {
         return -1;

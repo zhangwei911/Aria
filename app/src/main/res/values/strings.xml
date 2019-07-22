@@ -64,26 +64,16 @@
 
 
   <string-array name="test_apk_download_url">
-    <item>http://static.gaoshouyou.com/d/22/94/822260b849944492caadd2983f9bb624.apk</item>  <!--300M的文件-->
-    <item>http://static.gaoshouyou.com/d/21/e8/61218d78d0e8b79df68dbc18dd484c97.apk</item>
-    <item>http://static.gaoshouyou.com/d/12/0d/7f120f50c80d2e7b8c4ba24ece4f9cdd.apk</item>
     <item>http://static.gaoshouyou.com/d/d4/4f/d6d48db3794fb9ecf47e83c346570881.apk</item>
-    <!--<item>http://static.gaoshouyou.com/d/18/cf/ba18113bc6cf56c1c5863e761e717003.apk</item>-->
-    <!--<item>http://static.gaoshouyou.com/d/60/17/2460921367173ea7145f11194a6f2587.apk</item>-->
-    <!--<item>http://static.gaoshouyou.com/d/32/e0/1a32123ecbe0ee010d35479df248f90f.apk</item>-->
-    <!--<item>http://static.gaoshouyou.com/d/22/94/822260b849944492caadd2983f9bb624.apk</item>-->
-    <!--<item>http://static.gaoshouyou.com/d/e6/f5/4de6329f9cf5dc3a1d1e6bbcca0d003c.apk</item>-->
-    <!--<item>http://static.gaoshouyou.com/d/6e/e5/ff6ecaaf45e532e6d07747af82357472.apk</item>-->
-    <!--<item>http://static.gaoshouyou.com/d/36/69/2d3699acfa69e9632262442c46516ad8.apk</item>-->
   </string-array>
 
   <string-array name="file_nams">
-    <item>阴阳师</item>
-    <item>奇迹暖暖</item>
-    <item>幻影纹章</item>
-    <item>史上最坑爹的游戏10</item>
-    <item>鲜果消消乐</item>
-    <item>航海奇迹</item>
+    <item>王者荣耀</item>
+    <item>植物大战僵尸</item>
+    <item>部落冲突</item>
+    <item>瘟疫公司</item>
+    <item>水上公园大战</item>
+    <item>死亡之雨</item>
 
     <item>test_1</item>
     <item>test_2</item>
@@ -91,13 +81,12 @@
 
   </string-array>
   <string-array name="download_url">
-    <item>https://g37.gdl.netease.com/onmyoji_netease_10_1.0.20.apk</item>
-    <item>http://static.gaoshouyou.com/d/eb/f2/dfeba30541f209ab8a50d847fc1661ce.apk</item>
-    <item>http://rs.0.gaoshouyou.com/d/51/46/58514d126c46b8a3f27fc8c7db3b09ec.apk</item>
-    <item>http://rs.0.gaoshouyou.com/d/23/69/07238f952669727878d7a0e180534c8b.apk</item>
-    <item>http://rs.0.gaoshouyou.com/d/e7/3d/73e716d3353de5b479fcf7da8d36a5ef.apk</item>
-    <item>http://static.gaoshouyou.com/d/22/94/822260b849944492caadd2983f9bb624.apk</item>
-
+    <item>https://downs.muzhiwan.com/2019/06/28/com.tencent.tmgp.sgame5d15f9df3bb4d.gpk</item>
+    <item>https://downs.muzhiwan.com/2017/03/15/com.ea.game.pvz2_row58c8bfc00eea8.gpk</item>
+    <item>https://downs.muzhiwan.com/2019/07/04/com.supercell.clashofclans.ewan.mzw_5d1da09397884.apk</item>
+    <item>https://downs.muzhiwan.com/2019/02/28/com.miniclip.plagueinc_5c77596c79179.apk</item>
+    <item>https://downs.muzhiwan.com/2019/06/03/com.aqua.slide_5cf4b69e90e6a.apk</item>
+    <item>https://downs.muzhiwan.com/2019/05/07/com.tinydevbox.deadrain2_g_5cd14a8aedb2f.apk</item>
     <item>http://dby-resource-android.duobeiyun.com/jz22a8508b4265466b9fb4bb29082eaa2d.zip</item>
     <item>http://dby-resource-android.duobeiyun.com/jz05fa8faf068145fcb25c93c8091297ad.zip</item>
     <item>http://dby-resource-android.duobeiyun.com/jz684e1b4c2f6b4576979e60fd95edebad.zip</item>

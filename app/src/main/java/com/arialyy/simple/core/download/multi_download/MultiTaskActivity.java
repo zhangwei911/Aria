@@ -26,6 +26,7 @@ import android.view.View;
 import com.arialyy.annotations.Download;
 import com.arialyy.annotations.DownloadGroup;
 import com.arialyy.aria.core.Aria;
+import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.download.DownloadGroupTask;
 import com.arialyy.aria.core.download.DownloadTask;
 import com.arialyy.aria.util.ALog;
@@ -71,8 +72,13 @@ public class MultiTaskActivity extends BaseActivity<ActivityMultiBinding> {
         dialog.show(getSupportFragmentManager(), "download_num");
         break;
       case R.id.stop_all:
-        Aria.download(this).stopAllTask();
-        //Aria.download(this).removeAllTask(false);
+        List<DownloadEntity> entities = Aria.download(this).getTaskList();
+        for (DownloadEntity entity: entities){
+          Aria.download(this).load(entity.getUrl()).cancel(true);
+          ALog.d(TAG, "exist ==" + Aria.download(this).load(entity.getUrl()).taskExists());
+        }
+        //Aria.download(this).stopAllTask();
+        //Aria.download(this).removeAllTask(true);
         break;
       case R.id.turn:
         startActivity(new Intent(this, MultiDownloadActivity.class));

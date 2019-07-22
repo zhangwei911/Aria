@@ -152,7 +152,7 @@ public class RecordHandler {
     ThreadRecord tr = mTaskRecord.threadRecords.get(0);
     tr.startLocation = 0;
     tr.endLocation = mEntity.getFileSize();
-    tr.key = mTaskRecord.filePath;
+    tr.taskKey = mTaskRecord.filePath;
     tr.blockLen = tr.endLocation;
     tr.isComplete = false;
   }
@@ -164,7 +164,7 @@ public class RecordHandler {
     File file = new File(mTaskRecord.filePath);
     if (!file.exists()) {
       ALog.w(TAG, String.format("文件【%s】不存在，重新分配线程区间", mTaskRecord.filePath));
-      DbEntity.deleteData(ThreadRecord.class, "key=?", mTaskRecord.filePath);
+      DbEntity.deleteData(ThreadRecord.class, "taskKey=?", mTaskRecord.filePath);
       initRecord(false);
     }
   }
@@ -290,7 +290,7 @@ public class RecordHandler {
       File tempFile = new File(getFilePath());
       for (int i = 0; i < threadNum; i++) {
         ThreadRecord tRecord = new ThreadRecord();
-        tRecord.key = mTaskRecord.filePath;
+        tRecord.taskKey = mTaskRecord.filePath;
         Object state = pro.getProperty(tempFile.getName() + STATE + i);
         Object record = pro.getProperty(tempFile.getName() + RECORD + i);
         if (state != null && Integer.parseInt(String.valueOf(state)) == 1) {
@@ -329,7 +329,7 @@ public class RecordHandler {
       long startL = i * blockSize, endL = (i + 1) * blockSize;
       ThreadRecord tr;
       tr = new ThreadRecord();
-      tr.key = mTaskRecord.filePath;
+      tr.taskKey = mTaskRecord.filePath;
       tr.threadId = i;
       tr.startLocation = startL;
       tr.isComplete = false;

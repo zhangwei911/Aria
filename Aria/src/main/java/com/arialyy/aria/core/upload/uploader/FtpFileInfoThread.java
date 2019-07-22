@@ -144,7 +144,7 @@ class FtpFileInfoThread extends AbsFtpInfoThread<UploadEntity, UTaskWrapper> {
         ThreadRecord threadRecord;
         if (record.threadRecords == null || record.threadRecords.isEmpty()) {
           threadRecord = new ThreadRecord();
-          threadRecord.key = record.filePath;
+          threadRecord.taskKey = record.filePath;
         } else {
           threadRecord = record.threadRecords.get(0);
         }

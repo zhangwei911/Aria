@@ -26,7 +26,7 @@ public class ThreadRecord extends DbEntity {
   /**
    * 任务的文件路径，不是当前线程记录的的分块文件路径
    */
-  public String key;
+  public String taskKey;
 
   /**
    * 开始位置

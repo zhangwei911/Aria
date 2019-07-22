@@ -309,9 +309,11 @@ public class M3U8VodDLoadActivity extends BaseActivity<ActivityM3u8VodBinding> {
         })
         .setMergeHandler(new ITsMergeHandler() {
           @Override public boolean merge(@Nullable M3U8KeyInfo keyInfo, List<String> tsPath) {
+            ALog.d(TAG, "合并TS....");
             return false;
           }
         })
+        .merge(true)
         //.asVod().setPeerIndex(50)
         .start();
   }

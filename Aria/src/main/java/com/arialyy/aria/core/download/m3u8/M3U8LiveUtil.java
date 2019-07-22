@@ -95,10 +95,14 @@ public class M3U8LiveUtil implements IUtil {
     if (mInfoThread != null) {
       mInfoThread.setStop(true);
       closeTimer();
-      if (mLoader.mergeFile()) {
-        mListener.onComplete();
+      if (mWrapper.asM3U8().isMergeFile()) {
+        if (mLoader.mergeFile()) {
+          mListener.onComplete();
+        } else {
+          mListener.onFail(false, new M3U8Exception(TAG, "合并文件失败"));
+        }
       } else {
-        mListener.onFail(false, new M3U8Exception(TAG, "合并文件失败"));
+        mListener.onComplete();
       }
     }
   }

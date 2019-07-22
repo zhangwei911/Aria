@@ -32,7 +32,7 @@ public class RecordWrapper extends AbsDbWrapper {
   @One
   public TaskRecord taskRecord;
 
-  @Many(parentColumn = "filePath", entityColumn = "key")
+  @Many(parentColumn = "filePath", entityColumn = "taskKey")
   public List<ThreadRecord> threadRecords;
 
   @Override protected void handleConvert() {
