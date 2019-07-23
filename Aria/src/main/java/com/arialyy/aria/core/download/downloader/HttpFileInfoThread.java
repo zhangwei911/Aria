@@ -16,6 +16,7 @@
 package com.arialyy.aria.core.download.downloader;
 
 import android.net.TrafficStats;
+import android.net.Uri;
 import android.os.Process;
 import android.text.TextUtils;
 import com.arialyy.aria.core.AriaManager;
@@ -284,13 +285,17 @@ public class HttpFileInfoThread implements Runnable {
    */
   private void handleUrlReTurn(HttpURLConnection conn, String newUrl) throws IOException {
     ALog.d(TAG, "30x跳转，新url为【" + newUrl + "】");
-    if (TextUtils.isEmpty(newUrl) || newUrl.equalsIgnoreCase("null") || !newUrl.startsWith(
-        "http")) {
+    if (TextUtils.isEmpty(newUrl) || newUrl.equalsIgnoreCase("null")) {
       if (onFileInfoCallback != null) {
         onFileInfoCallback.onFail(mEntity, new TaskException(TAG, "获取重定向链接失败"), false);
       }
       return;
     }
+    if (newUrl.startsWith("/")) {
+      Uri uri = Uri.parse(mEntity.getUrl());
+      newUrl = uri.getHost() + newUrl;
+    }
+
     if (!CheckUtil.checkUrlNotThrow(newUrl)) {
       failDownload(new TaskException(TAG, "下载失败，重定向url错误"), false);
       return;
