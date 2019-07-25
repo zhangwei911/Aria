@@ -43,7 +43,7 @@ public class CommandManager {
 
   @Event
   public void add(AddCmd cmd) {
-    if (CommonUtil.isFastDoubleClick()){
+    if (CommonUtil.isFastDoubleClick()) {
       return;
     }
     cmd.executeCmd();
@@ -51,7 +51,7 @@ public class CommandManager {
 
   @Event
   public void start(StartCmd cmd) {
-    if (CommonUtil.isFastDoubleClick()){
+    if (CommonUtil.isFastDoubleClick()) {
       return;
     }
     cmd.executeCmd();
@@ -59,23 +59,17 @@ public class CommandManager {
 
   @Event
   public void stop(StopCmd cmd) {
-    if (CommonUtil.isFastDoubleClick()){
-      return;
-    }
     cmd.executeCmd();
   }
 
   @Event
   public void cancel(CancelCmd cmd) {
-    if (CommonUtil.isFastDoubleClick()){
-      return;
-    }
     cmd.executeCmd();
   }
 
   @Event
   public void stopAll(StopAllCmd cmd) {
-    if (CommonUtil.isFastDoubleClick()){
+    if (CommonUtil.isFastDoubleClick()) {
       return;
     }
     cmd.executeCmd();
@@ -83,7 +77,7 @@ public class CommandManager {
 
   @Event
   public void cancelAll(CancelAllCmd cmd) {
-    if (CommonUtil.isFastDoubleClick()){
+    if (CommonUtil.isFastDoubleClick()) {
       return;
     }
     cmd.executeCmd();
@@ -91,7 +85,7 @@ public class CommandManager {
 
   @Event
   public void reStart(ReStartCmd cmd) {
-    if (CommonUtil.isFastDoubleClick()){
+    if (CommonUtil.isFastDoubleClick()) {
       return;
     }
     cmd.executeCmd();
@@ -99,7 +93,7 @@ public class CommandManager {
 
   @Event
   public void highestPriority(HighestPriorityCmd cmd) {
-    if (CommonUtil.isFastDoubleClick()){
+    if (CommonUtil.isFastDoubleClick()) {
       return;
     }
     cmd.executeCmd();
@@ -107,7 +101,7 @@ public class CommandManager {
 
   @Event
   public void resumeAll(ResumeAllCmd cmd) {
-    if (CommonUtil.isFastDoubleClick()){
+    if (CommonUtil.isFastDoubleClick()) {
       return;
     }
     cmd.executeCmd();
@@ -115,7 +109,7 @@ public class CommandManager {
 
   @Event
   public void subStart(DGSubStartCmd cmd) {
-    if (CommonUtil.isFastDoubleClick()){
+    if (CommonUtil.isFastDoubleClick()) {
       return;
     }
     cmd.executeCmd();
@@ -123,9 +117,6 @@ public class CommandManager {
 
   @Event
   public void subStop(DGSubStopCmd cmd) {
-    if (CommonUtil.isFastDoubleClick()){
-      return;
-    }
     cmd.executeCmd();
   }
 }

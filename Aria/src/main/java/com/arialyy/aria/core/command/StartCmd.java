@@ -25,6 +25,7 @@ import com.arialyy.aria.core.download.DownloadGroupEntity;
 import com.arialyy.aria.core.inf.AbsTask;
 import com.arialyy.aria.core.inf.AbsTaskWrapper;
 import com.arialyy.aria.core.inf.IEntity;
+import com.arialyy.aria.core.inf.ITaskWrapper;
 import com.arialyy.aria.core.manager.TaskWrapperManager;
 import com.arialyy.aria.core.queue.DownloadGroupTaskQueue;
 import com.arialyy.aria.core.queue.DownloadTaskQueue;
@@ -135,9 +136,9 @@ final class StartCmd<T extends AbsTaskWrapper> extends AbsNormalCmd<T> {
             DbEntity.findDatas(DownloadGroupEntity.class, "state=?", "3");
         if (dEntities != null && !dEntities.isEmpty()) {
           for (DownloadGroupEntity e : dEntities) {
-            if (e.getTaskType() == AbsTaskWrapper.DG_HTTP) {
+            if (e.getTaskType() == ITaskWrapper.DG_HTTP) {
               waitList.add(tManager.getGroupWrapper(DGTaskWrapper.class, e.getId()));
-            } else if (e.getTaskType() == AbsTaskWrapper.D_FTP_DIR) {
+            } else if (e.getTaskType() == ITaskWrapper.D_FTP_DIR) {
               waitList.add(tManager.getGroupWrapper(DGTaskWrapper.class, e.getId()));
             }
           }
@@ -160,8 +161,8 @@ final class StartCmd<T extends AbsTaskWrapper> extends AbsNormalCmd<T> {
         AbsTask task = getTask(te.getKey());
         if (task != null) continue;
         if (te instanceof DTaskWrapper) {
-          if (te.getRequestType() == AbsTaskWrapper.D_FTP
-              || te.getRequestType() == AbsTaskWrapper.U_FTP) {
+          if (te.getRequestType() == ITaskWrapper.D_FTP
+              || te.getRequestType() == ITaskWrapper.U_FTP) {
             te.asFtp().setUrlEntity(CommonUtil.getFtpUrlInfo(te.getEntity().getKey()));
           }
           mQueue = DownloadTaskQueue.getInstance();

@@ -191,8 +191,8 @@ public abstract class AbsEntity extends DbEntity implements IEntity, Parcelable,
   /**
    * 实体驱动的下载任务类型
    *
-   * @return {@link AbsTaskWrapper#D_FTP}、{@link AbsTaskWrapper#D_FTP_DIR}、{@link
-   * AbsTaskWrapper#U_HTTP}...
+   * @return {@link ITaskWrapper#D_FTP}、{@link ITaskWrapper#D_FTP_DIR}、{@link
+   * ITaskWrapper#U_HTTP}...
    */
   public abstract int getTaskType();
 

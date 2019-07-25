@@ -32,7 +32,6 @@ import com.arialyy.frame.util.show.T;
 import com.arialyy.simple.R;
 import com.arialyy.simple.base.BaseActivity;
 import com.arialyy.simple.databinding.ActivityDownloadGroupBinding;
-import com.arialyy.simple.util.AppUtil;
 import com.arialyy.simple.widget.SubStateLinearLayout;
 import java.util.List;
 import java.util.Map;
@@ -44,7 +43,7 @@ public class DownloadGroupActivity extends BaseActivity<ActivityDownloadGroupBin
 
   private SubStateLinearLayout mChildList;
   private List<String> mUrls;
-  private DownloadGroupEntity mEntity;
+  private long mTaskId = -1;
 
   @Override protected void init(Bundle savedInstanceState) {
     super.init(savedInstanceState);
@@ -53,21 +52,22 @@ public class DownloadGroupActivity extends BaseActivity<ActivityDownloadGroupBin
 
     mChildList = getBinding().childList;
     mUrls = getModule(GroupModule.class).getUrls();
-    mEntity = Aria.download(this).getGroupEntity(mUrls);
-    if (mEntity != null) {
-      mChildList.addData(mEntity.getSubEntities());
+    DownloadGroupEntity entity = Aria.download(this).getGroupEntity(mUrls);
+    if (entity != null) {
+      mTaskId = entity.getId();
+      mChildList.addData(entity.getSubEntities());
       getBinding().setStateStr(
-          mEntity.getState() == IEntity.STATE_RUNNING ? getString(R.string.stop)
+          entity.getState() == IEntity.STATE_RUNNING ? getString(R.string.stop)
               : getString(R.string.resume));
-      getBinding().setFileSize(mEntity.getConvertFileSize());
-      if (mEntity.getFileSize() == 0) {
+      getBinding().setFileSize(entity.getConvertFileSize());
+      if (entity.getFileSize() == 0) {
         getBinding().setProgress(0);
       } else {
-        getBinding().setProgress(mEntity.isComplete() ? 100
-            : (int) (mEntity.getCurrentProgress() * 100 / mEntity.getFileSize()));
+        getBinding().setProgress(entity.isComplete() ? 100
+            : (int) (entity.getCurrentProgress() * 100 / entity.getFileSize()));
       }
       ALog.d(TAG,
-          "size = " + mEntity.getSubEntities().size() + "; len = " + mEntity.getConvertFileSize());
+          "size = " + entity.getSubEntities().size() + "; len = " + entity.getConvertFileSize());
     }
 
     mChildList.setOnItemClickListener(new SubStateLinearLayout.OnItemClickListener() {
@@ -90,8 +90,8 @@ public class DownloadGroupActivity extends BaseActivity<ActivityDownloadGroupBin
   public void onClick(View view) {
     switch (view.getId()) {
       case R.id.start:
-        if (!AppUtil.chekEntityValid(mEntity)) {
-          Aria.download(this)
+        if (mTaskId == -1) {
+          mTaskId = Aria.download(this)
               .loadGroup(mUrls)
               .setDirPath(
                   Environment.getExternalStorageDirectory().getPath() + "/Download/group_test_2")
@@ -117,17 +117,17 @@ public class DownloadGroupActivity extends BaseActivity<ActivityDownloadGroupBin
           getBinding().setStateStr(getString(R.string.stop));
           break;
         }
-        if (Aria.download(this).loadGroup(mEntity.getId()).isRunning()) {
-          Aria.download(this).loadGroup(mEntity.getId()).stop();
+        if (Aria.download(this).loadGroup(mTaskId).isRunning()) {
+          Aria.download(this).loadGroup(mTaskId).stop();
+          getBinding().setStateStr(getString(R.string.resume));
         } else {
-          Aria.download(this).loadGroup(mEntity.getId()).resume();
+          Aria.download(this).loadGroup(mTaskId).resume();
+          getBinding().setStateStr(getString(R.string.stop));
         }
         break;
       case R.id.cancel:
-        if (AppUtil.chekEntityValid(mEntity)) {
-
-          Aria.download(this).loadGroup(mEntity.getId()).cancel(true);
-        }
+        Aria.download(this).loadGroup(mTaskId).cancel(true);
+        mTaskId = -1;
         break;
     }
   }
@@ -141,9 +141,6 @@ public class DownloadGroupActivity extends BaseActivity<ActivityDownloadGroupBin
   }
 
   @DownloadGroup.onTaskPre() protected void onTaskPre(DownloadGroupTask task) {
-    if (mChildList.getSubData().size() <= 0) {
-      mChildList.addData(task.getEntity().getSubEntities());
-    }
     L.d(TAG, "group task pre");
     getBinding().setFileSize(task.getConvertFileSize());
     if (mChildList.getSubData().size() <= 0) {

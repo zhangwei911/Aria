@@ -24,7 +24,7 @@ import com.arialyy.aria.core.download.group.DGroupUtil;
 import com.arialyy.aria.core.download.group.FtpDirDownloadUtil;
 import com.arialyy.aria.core.download.group.IDGroupListener;
 import com.arialyy.aria.core.inf.AbsGroupTask;
-import com.arialyy.aria.core.inf.AbsTaskWrapper;
+import com.arialyy.aria.core.inf.ITaskWrapper;
 import com.arialyy.aria.core.scheduler.ISchedulers;
 import com.arialyy.aria.util.CheckUtil;
 
@@ -55,13 +55,14 @@ public class DownloadGroupTask extends AbsGroupTask<DGTaskWrapper> {
   }
 
   @Override protected synchronized IUtil createUtil() {
-    switch (mTaskWrapper.getRequestType()) {
-      case AbsTaskWrapper.D_HTTP:
-        return new DGroupUtil((IDGroupListener) mListener, mTaskWrapper);
-      case AbsTaskWrapper.D_FTP_DIR:
-        return new FtpDirDownloadUtil((IDGroupListener) mListener, mTaskWrapper);
+    int taskType = mTaskWrapper.getRequestType();
+    if (taskType == ITaskWrapper.DG_HTTP) {
+      return new DGroupUtil((IDGroupListener) mListener, mTaskWrapper);
+    } else if (taskType == ITaskWrapper.D_FTP_DIR) {
+      return new FtpDirDownloadUtil((IDGroupListener) mListener, mTaskWrapper);
+    } else {
+      throw new IllegalArgumentException(String.format("不识别的任务, 任务类型：%s", taskType));
     }
-    return null;
   }
 
   public static class Builder {

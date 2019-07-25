@@ -25,7 +25,9 @@ import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.download.DownloadGroupEntity;
 import com.arialyy.aria.core.inf.AbsTaskWrapper;
+import com.arialyy.aria.exception.BaseException;
 import com.arialyy.aria.util.CommonUtil;
+import com.arialyy.aria.util.RecordUtil;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 
@@ -93,5 +95,10 @@ class FtpDirInfoThread extends AbsFtpInfoThread<DownloadGroupEntity, DGTaskWrapp
     subWrapper.asFtp().setUrlEntity(urlEntity);
     subWrapper.asFtp().setCharSet(mTaskWrapper.asFtp().getCharSet());
     subWrapper.asFtp().setProxy(mTaskWrapper.asFtp().getProxy());
+  }
+
+  @Override protected void failDownload(BaseException e, boolean needRetry) {
+    super.failDownload(e, needRetry);
+    RecordUtil.delGroupTaskRecord(mTaskWrapper.getEntity(), true, true);
   }
 }

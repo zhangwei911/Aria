@@ -22,6 +22,7 @@ import com.arialyy.aria.core.common.Suggest;
 import com.arialyy.aria.core.common.http.HttpDelegate;
 import com.arialyy.aria.core.download.m3u8.M3U8Delegate;
 import com.arialyy.aria.core.inf.IHttpFileLenAdapter;
+import com.arialyy.aria.core.inf.ITaskWrapper;
 
 public class HttpStartTarget extends AbsStartTarget<HttpStartTarget> {
 
@@ -29,6 +30,7 @@ public class HttpStartTarget extends AbsStartTarget<HttpStartTarget> {
 
   HttpStartTarget(String url, String targetName) {
     mConfigHandler = new DNormalConfigHandler<>(this, -1, targetName);
+    getTaskWrapper().setRequestType(ITaskWrapper.D_HTTP);
     mConfigHandler.setUrl(url);
   }
 

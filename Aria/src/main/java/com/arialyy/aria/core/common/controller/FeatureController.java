@@ -24,12 +24,16 @@ import com.arialyy.aria.core.download.DGTaskWrapper;
 import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.inf.AbsEntity;
 import com.arialyy.aria.core.inf.AbsTaskWrapper;
+import com.arialyy.aria.core.inf.ICheckEntityUtil;
 import com.arialyy.aria.core.inf.ITask;
+import com.arialyy.aria.core.inf.ITaskWrapper;
+import com.arialyy.aria.core.scheduler.DownloadGroupSchedulers;
 import com.arialyy.aria.core.scheduler.DownloadSchedulers;
 import com.arialyy.aria.core.scheduler.ISchedulers;
 import com.arialyy.aria.core.scheduler.UploadSchedulers;
 import com.arialyy.aria.core.upload.CheckUEntityUtil;
 import com.arialyy.aria.core.upload.UTaskWrapper;
+import com.arialyy.aria.util.ALog;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
@@ -57,7 +61,8 @@ public abstract class FeatureController {
       throw new IllegalArgumentException("对于不存在的任务（第一次下载），只能使用\"ControllerType.START_CONTROLLER\"");
     }
     if (wrapper.getEntity().getId() != -1 && clazz != ControllerType.NORMAL_CONTROLLER) {
-      throw new IllegalArgumentException("对于已存在的任务，只能使用\" ControllerType.NORMAL_CONTROLLER\"");
+      throw new IllegalArgumentException(
+          "对于已存在的任务，只能使用\" ControllerType.NORMAL_CONTROLLER\"，请检查是否重复调用#start()方法");
     }
 
     Class[] paramTypes = { AbsTaskWrapper.class };
@@ -119,27 +124,24 @@ public abstract class FeatureController {
       return UploadSchedulers.getInstance();
     }
     if (mTaskWrapper instanceof DGTaskWrapper) {
-      return DownloadSchedulers.getInstance();
+      return DownloadGroupSchedulers.getInstance();
     }
     return null;
   }
 
   private boolean checkEntity() {
+    ICheckEntityUtil checkUtil = null;
     if (mTaskWrapper instanceof DTaskWrapper) {
-      return CheckDEntityUtil.newInstance((DTaskWrapper) mTaskWrapper).checkEntity();
-    }
-    if (mTaskWrapper instanceof DGTaskWrapper) {
-      if (mTaskWrapper.getRequestType() == AbsTaskWrapper.D_FTP_DIR) {
-        return CheckFtpDirEntityUtil.newInstance((DGTaskWrapper) mTaskWrapper).checkEntity();
+      checkUtil = CheckDEntityUtil.newInstance((DTaskWrapper) mTaskWrapper);
+    } else if (mTaskWrapper instanceof DGTaskWrapper) {
+      if (mTaskWrapper.getRequestType() == ITaskWrapper.D_FTP_DIR) {
+        checkUtil = CheckFtpDirEntityUtil.newInstance((DGTaskWrapper) mTaskWrapper);
+      } else if (mTaskWrapper.getRequestType() == ITaskWrapper.DG_HTTP) {
+        checkUtil = CheckDGEntityUtil.newInstance((DGTaskWrapper) mTaskWrapper);
       }
-
-      if (mTaskWrapper.getRequestType() == AbsTaskWrapper.DG_HTTP) {
-        return CheckDGEntityUtil.newInstance((DGTaskWrapper) mTaskWrapper).checkEntity();
-      }
+    } else if (mTaskWrapper instanceof UTaskWrapper) {
+      checkUtil = CheckUEntityUtil.newInstance((UTaskWrapper) mTaskWrapper);
     }
-    if (mTaskWrapper instanceof UTaskWrapper) {
-      return CheckUEntityUtil.newInstance((UTaskWrapper) mTaskWrapper).checkEntity();
-    }
-    return false;
+    return checkUtil != null && checkUtil.checkEntity();
   }
 }

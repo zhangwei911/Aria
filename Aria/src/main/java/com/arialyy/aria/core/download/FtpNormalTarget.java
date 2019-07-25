@@ -20,7 +20,7 @@ import android.support.annotation.NonNull;
 import com.arialyy.aria.core.common.AbsNormalTarget;
 import com.arialyy.aria.core.common.Suggest;
 import com.arialyy.aria.core.common.ftp.FtpDelegate;
-import com.arialyy.aria.core.inf.AbsTaskWrapper;
+import com.arialyy.aria.core.inf.ITaskWrapper;
 import com.arialyy.aria.util.CommonUtil;
 
 /**
@@ -32,8 +32,8 @@ public class FtpNormalTarget extends AbsNormalTarget<FtpNormalTarget> {
 
   FtpNormalTarget(long taskId, String targetName) {
     mConfigHandler = new DNormalConfigHandler<>(this, taskId, targetName);
-    getTaskWrapper().asFtp().setUrlEntity(CommonUtil.getFtpUrlInfo(mConfigHandler.getUrl()));
-    getTaskWrapper().setRequestType(AbsTaskWrapper.D_FTP);
+    getTaskWrapper().asFtp().setUrlEntity(CommonUtil.getFtpUrlInfo(getEntity().getUrl()));
+    getTaskWrapper().setRequestType(ITaskWrapper.D_FTP);
   }
 
   /**

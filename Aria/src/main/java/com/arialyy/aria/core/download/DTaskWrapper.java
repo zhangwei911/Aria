@@ -93,19 +93,19 @@ public class DTaskWrapper extends AbsTaskWrapper<DownloadEntity> {
     isGroupTask = groupTask;
   }
 
-  public String getmTempUrl() {
+  public String getTempUrl() {
     return mTempUrl;
   }
 
-  public void setmTempUrl(String mTempUrl) {
+  public void setTempUrl(String mTempUrl) {
     this.mTempUrl = mTempUrl;
   }
 
-  public String getmTempFilePath() {
+  public String getTempFilePath() {
     return mTempFilePath;
   }
 
-  public void setmTempFilePath(String mTempFilePath) {
+  public void setTempFilePath(String mTempFilePath) {
     this.mTempFilePath = mTempFilePath;
   }
 

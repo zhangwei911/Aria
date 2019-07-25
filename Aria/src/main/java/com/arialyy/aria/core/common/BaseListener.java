@@ -16,8 +16,6 @@
 package com.arialyy.aria.core.common;
 
 import android.os.Handler;
-import com.arialyy.aria.core.download.DownloadEntity;
-import com.arialyy.aria.core.download.DownloadGroupEntity;
 import com.arialyy.aria.core.inf.AbsEntity;
 import com.arialyy.aria.core.inf.AbsTask;
 import com.arialyy.aria.core.inf.AbsTaskWrapper;
@@ -26,12 +24,10 @@ import com.arialyy.aria.core.inf.IEventListener;
 import com.arialyy.aria.core.inf.ITaskWrapper;
 import com.arialyy.aria.core.inf.TaskSchedulerType;
 import com.arialyy.aria.core.scheduler.ISchedulers;
-import com.arialyy.aria.core.upload.UploadEntity;
 import com.arialyy.aria.exception.BaseException;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
 import com.arialyy.aria.util.ErrorHelp;
-import com.arialyy.aria.util.RecordUtil;
 import java.lang.ref.WeakReference;
 
 public abstract class BaseListener<ENTITY extends AbsEntity, TASK_WRAPPER extends AbsTaskWrapper<ENTITY>,
@@ -156,16 +152,6 @@ public abstract class BaseListener<ENTITY extends AbsEntity, TASK_WRAPPER extend
     mEntity.setCurrentProgress(mEntity.getFileSize());
     mEntity.setPercent(100);
     handleSpeed(0);
-    ALog.i(TAG, String.format("任务【%s】完成，将删除任务任务记录", mEntity.getKey()));
-    if (mEntity instanceof DownloadGroupEntity) {
-      RecordUtil.delGroupTaskRecord((DownloadGroupEntity) mEntity, false, false);
-    } else if (mEntity instanceof DownloadEntity) {
-      RecordUtil.delTaskRecord(((DownloadEntity) mEntity).getFilePath(),
-          RecordHandler.TYPE_DOWNLOAD, false, false);
-    } else if (mEntity instanceof UploadEntity) {
-      RecordUtil.delTaskRecord(((UploadEntity) mEntity).getFilePath(), RecordHandler.TYPE_UPLOAD,
-          false, false);
-    }
   }
 
   /**

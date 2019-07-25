@@ -16,7 +16,6 @@
 package com.arialyy.simple.core.download;
 
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
@@ -149,15 +148,11 @@ public class HighestPriorityActivity extends BaseActivity<ActivityHighestPriorit
     switch (view.getId()) {
       case R.id.start:
         if (AppUtil.chekEntityValid(mEntity)) {
-          Aria.download(this)
-              .load(DOWNLOAD_URL)
-              .setFilePath(Environment.getExternalStorageDirectory().getPath()
-                  + "/Download/"
-                  + mTaskName
-                  + ".apk")
-              .setHighestPriority();
-        } else {
-          Aria.download(this).load(mEntity.getId()).resume();
+          String text = ((TextView) view).getText().toString();
+          if (text.equals("重新开始？") || text.equals("开始")) {
+          } else {
+            Aria.download(this).load(mEntity.getId()).resume();
+          }
         }
         ((TextView) view).setText(getString(R.string.stop));
         break;

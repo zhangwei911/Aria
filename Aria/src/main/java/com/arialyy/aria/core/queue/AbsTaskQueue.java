@@ -177,7 +177,7 @@ public abstract class AbsTaskQueue<TASK extends AbsTask, TASK_WRAPPER extends Ab
   }
 
   @Override public TASK createTask(TASK_WRAPPER wrapper) {
-    TaskWrapperManager.getInstance().addTaskWrapper(wrapper);
+    TaskWrapperManager.getInstance().putTaskWrapper(wrapper);
     return null;
   }
 

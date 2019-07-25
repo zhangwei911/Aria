@@ -20,6 +20,7 @@ import com.arialyy.aria.core.common.AbsStartTarget;
 import com.arialyy.aria.core.common.Suggest;
 import com.arialyy.aria.core.common.http.HttpDelegate;
 import com.arialyy.aria.core.inf.IHttpFileLenAdapter;
+import com.arialyy.aria.core.inf.ITaskWrapper;
 import com.arialyy.aria.core.manager.SubTaskManager;
 import com.arialyy.aria.util.ALog;
 import java.util.List;
@@ -34,6 +35,7 @@ public class GroupStartTarget extends AbsStartTarget<GroupStartTarget> {
   GroupStartTarget(List<String> urls, String targetName) {
     setTargetName(targetName);
     mConfigHandler = new HttpGroupConfigHandler<>(this, -1);
+    getTaskWrapper().setRequestType(ITaskWrapper.DG_HTTP);
     mConfigHandler.setGroupUrl(urls);
   }
 

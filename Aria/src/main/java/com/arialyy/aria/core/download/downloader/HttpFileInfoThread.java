@@ -16,15 +16,16 @@
 package com.arialyy.aria.core.download.downloader;
 
 import android.net.TrafficStats;
+import android.net.Uri;
 import android.os.Process;
 import android.text.TextUtils;
 import com.arialyy.aria.core.AriaManager;
 import com.arialyy.aria.core.common.CompleteInfo;
 import com.arialyy.aria.core.common.OnFileInfoCallback;
 import com.arialyy.aria.core.common.RequestEnum;
+import com.arialyy.aria.core.common.http.HttpTaskConfig;
 import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.download.DownloadEntity;
-import com.arialyy.aria.core.common.http.HttpTaskConfig;
 import com.arialyy.aria.core.inf.IHttpFileLenAdapter;
 import com.arialyy.aria.exception.AriaIOException;
 import com.arialyy.aria.exception.BaseException;
@@ -54,7 +55,7 @@ import java.util.UUID;
  * 下载文件信息获取
  */
 public class HttpFileInfoThread implements Runnable {
-  private final String TAG = "HttpFileInfoThread";
+  private static final String TAG = "HttpFileInfoThread";
   private DownloadEntity mEntity;
   private DTaskWrapper mTaskWrapper;
   private int mConnectTimeOut;
@@ -83,6 +84,7 @@ public class HttpFileInfoThread implements Runnable {
       conn.connect();
       handleConnect(conn);
     } catch (IOException e) {
+      e.printStackTrace();
       failDownload(new AriaIOException(TAG,
               String.format("下载失败，filePath: %s, url: %s", mEntity.getDownloadPath(), mEntity.getUrl())),
           true);
@@ -119,7 +121,7 @@ public class HttpFileInfoThread implements Runnable {
     }
     long len = lenAdapter.handleFileLen(conn.getHeaderFields());
 
-    if (!CommonUtil.checkSDMemorySpace(mEntity.getDownloadPath(), len)) {
+    if (!CommonUtil.checkSDMemorySpace(mEntity.getFilePath(), len)) {
       failDownload(new TaskException(TAG,
           String.format("下载失败，内存空间不足；filePath: %s, url: %s", mEntity.getDownloadPath(),
               mEntity.getUrl())), false);
@@ -284,13 +286,17 @@ public class HttpFileInfoThread implements Runnable {
    */
   private void handleUrlReTurn(HttpURLConnection conn, String newUrl) throws IOException {
     ALog.d(TAG, "30x跳转，新url为【" + newUrl + "】");
-    if (TextUtils.isEmpty(newUrl) || newUrl.equalsIgnoreCase("null") || !newUrl.startsWith(
-        "http")) {
+    if (TextUtils.isEmpty(newUrl) || newUrl.equalsIgnoreCase("null")) {
       if (onFileInfoCallback != null) {
         onFileInfoCallback.onFail(mEntity, new TaskException(TAG, "获取重定向链接失败"), false);
       }
       return;
     }
+    if (newUrl.startsWith("/")) {
+      Uri uri = Uri.parse(mEntity.getUrl());
+      newUrl = uri.getHost() + newUrl;
+    }
+
     if (!CheckUtil.checkUrlNotThrow(newUrl)) {
       failDownload(new TaskException(TAG, "下载失败，重定向url错误"), false);
       return;
@@ -334,6 +340,10 @@ public class HttpFileInfoThread implements Runnable {
   private static class FileLenAdapter implements IHttpFileLenAdapter {
 
     @Override public long handleFileLen(Map<String, List<String>> headers) {
+      if (headers == null || headers.isEmpty()) {
+        ALog.e(TAG, "header为空，获取文件长度失败");
+        return -1;
+      }
       List<String> sLength = headers.get("Content-Length");
       if (sLength == null || sLength.isEmpty()) {
         return -1;

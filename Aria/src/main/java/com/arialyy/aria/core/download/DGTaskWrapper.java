@@ -26,7 +26,7 @@ import java.util.List;
  */
 public class DGTaskWrapper extends AbsGroupTaskWrapper<DownloadGroupEntity, DTaskWrapper> {
 
-  private List<DTaskWrapper> subTaskEntities;
+  private List<DTaskWrapper> subWrappers;
 
   private boolean unknownSize = false;
 
@@ -62,7 +62,7 @@ public class DGTaskWrapper extends AbsGroupTaskWrapper<DownloadGroupEntity, DTas
 
   @Override
   public void setSubTaskWrapper(List<DTaskWrapper> subTaskEntities) {
-    this.subTaskEntities = subTaskEntities;
+    this.subWrappers = subTaskEntities;
   }
 
   public boolean isUnknownSize() {
@@ -82,6 +82,9 @@ public class DGTaskWrapper extends AbsGroupTaskWrapper<DownloadGroupEntity, DTas
   }
 
   @Override public List<DTaskWrapper> getSubTaskWrapper() {
-    return subTaskEntities;
+    if (subWrappers == null) {
+      subWrappers = new ArrayList<>();
+    }
+    return subWrappers;
   }
 }

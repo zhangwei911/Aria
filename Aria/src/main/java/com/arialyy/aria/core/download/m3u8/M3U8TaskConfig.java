@@ -46,7 +46,7 @@ public class M3U8TaskConfig {
   /**
    * 合并处理器
    */
-  private WeakReference<ITsMergeHandler> mergeHandler;
+  private ITsMergeHandler mergeHandler;
 
   /**
    * 已完成的ts分片数量
@@ -147,7 +147,7 @@ public class M3U8TaskConfig {
   }
 
   public IBandWidthUrlConverter getBandWidthUrlConverter() {
-    return bandWidthUrlConverter.get();
+    return bandWidthUrlConverter == null ? null : bandWidthUrlConverter.get();
   }
 
   public void setBandWidthUrlConverter(IBandWidthUrlConverter bandWidthUrlConverter) {
@@ -187,11 +187,11 @@ public class M3U8TaskConfig {
   }
 
   public ITsMergeHandler getMergeHandler() {
-    return mergeHandler.get();
+    return mergeHandler;
   }
 
   public void setMergeHandler(ITsMergeHandler mergeHandler) {
-    this.mergeHandler = new WeakReference<>(mergeHandler);
+    this.mergeHandler = mergeHandler;
   }
 
   public IVodTsUrlConverter getVodUrlConverter() {

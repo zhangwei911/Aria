@@ -40,7 +40,7 @@ public class FtpDownload extends BaseActivity<ActivityTestBinding> {
   }
 
   @Download.onTaskStart void taskStart(DownloadTask task) {
-    Log.d(TAG, "onStart");
+    Log.d(TAG, "onPreStart");
   }
 
   @Download.onTaskRunning protected void running(DownloadTask task) {

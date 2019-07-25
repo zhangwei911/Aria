@@ -53,20 +53,6 @@ class DGTaskWrapperFactory implements IGroupWrapperFactory<DownloadGroupEntity, 
     return wrapper;
   }
 
-  //@Override public DGTaskWrapper getFtpDirWrapper(long taskId) {
-  //  DownloadGroupEntity entity = DbDataHelper.getOrCreateFtpDGEntity(ftpUrl);
-  //  DGTaskWrapper fte = new DGTaskWrapper(entity);
-  //  fte.asFtp().setUrlEntity(CommonUtil.getFtpUrlInfo(ftpUrl));
-  //
-  //  if (fte.getEntity().getSubEntities() == null) {
-  //    fte.getEntity().setSubEntities(new ArrayList<DownloadEntity>());
-  //  }
-  //  if (fte.getSubTaskWrapper() == null) {
-  //    fte.setSubTaskWrapper(new ArrayList<DTaskWrapper>());
-  //  }
-  //  return fte;
-  //}
-
   /**
    * 获取组合任务实体 如果数据库不存在该实体，则新创建一个新的任务组实体
    */

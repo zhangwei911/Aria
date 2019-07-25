@@ -161,7 +161,7 @@ public class BaseExecutePool<TASK extends AbsTask> implements IPool<TASK> {
   @Override public TASK getTask(String key) {
     synchronized (LOCK) {
       if (TextUtils.isEmpty(key)) {
-        ALog.e(TAG, "key 为null");
+        ALog.e(TAG, "key为null");
         return null;
       }
       return mExecuteMap.get(CommonUtil.keyToHashKey(key));

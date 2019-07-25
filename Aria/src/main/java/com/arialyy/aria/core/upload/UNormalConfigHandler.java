@@ -16,6 +16,7 @@
 package com.arialyy.aria.core.upload;
 
 import com.arialyy.aria.core.common.ftp.IFtpUploadInterceptor;
+import com.arialyy.aria.core.event.ErrorEvent;
 import com.arialyy.aria.core.inf.AbsEntity;
 import com.arialyy.aria.core.inf.AbsTarget;
 import com.arialyy.aria.core.inf.IConfigHandler;
@@ -42,6 +43,9 @@ class UNormalConfigHandler<TARGET extends AbsTarget> implements IConfigHandler {
 
   private void initTarget(long taskId, String targetName) {
     mWrapper = TaskWrapperManager.getInstance().getNormalTaskWrapper(UTaskWrapper.class, taskId);
+    if (taskId != -1 && mWrapper.getEntity().getId() == -1) {
+      mWrapper.setErrorEvent(new ErrorEvent(taskId, String.format("没有id为%s的任务", taskId)));
+    }
     mEntity = mWrapper.getEntity();
     mTarget.setTargetName(targetName);
     mTarget.setTaskWrapper(mWrapper);
@@ -50,6 +54,7 @@ class UNormalConfigHandler<TARGET extends AbsTarget> implements IConfigHandler {
 
   void setFilePath(String filePath) {
     File file = new File(filePath);
+    mEntity.setFilePath(filePath);
     mEntity.setFileName(file.getName());
     mEntity.setFileSize(file.length());
   }

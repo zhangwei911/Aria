@@ -83,7 +83,7 @@ public class RecordUtil {
             }
           }
         }
-        DbEntity.deleteData(ThreadRecord.class, "key=?", record.taskRecord.filePath);
+        DbEntity.deleteData(ThreadRecord.class, "taskKey=?", record.taskRecord.filePath);
         record.taskRecord.deleteData();
       }
     }
@@ -148,15 +148,14 @@ public class RecordUtil {
      */
     if (!entity.isComplete()) {
       if (record.taskType == TaskRecord.TYPE_M3U8_VOD) { // 删除ts分片文件
-        String cacheDir = null;
-        if (!targetFile.isDirectory()) {
-          cacheDir = targetFile.getParent() + "/." + targetFile.getName();
-        }
-        removeTsCache(cacheDir);
+        removeTsCache(targetFile, record.bandWidth);
       } else if (record.isBlock) { // 删除分块文件
         removeBlockFile(record);
       }
     } else if (removeFile) { // 处理任务完成情况
+      if (record.taskType == TaskRecord.TYPE_M3U8_VOD) {
+        removeTsCache(targetFile, record.bandWidth);
+      }
       removeTargetFile(targetFile);
     }
 
@@ -209,16 +208,14 @@ public class RecordUtil {
      */
     if (!entity.isComplete()) {
       if (record.taskType == TaskRecord.TYPE_M3U8_VOD) { // 删除ts分片文件
-        String cacheDir = null;
-        if (!targetFile.isDirectory()) {
-          cacheDir = String.format("%s/.%s_%s", targetFile.getParent(), targetFile.getName(),
-              record.bandWidth);
-        }
-        removeTsCache(cacheDir);
+        removeTsCache(targetFile, record.bandWidth);
       } else if (record.isBlock) { // 删除分块文件
         removeBlockFile(record);
       }
     } else if (removeFile) { // 处理任务完成情况
+      if (record.taskType == TaskRecord.TYPE_M3U8_VOD) {
+        removeTsCache(targetFile, record.bandWidth);
+      }
       removeTargetFile(targetFile);
     }
 
@@ -238,7 +235,7 @@ public class RecordUtil {
 
   private static void removeRecord(String filePath) {
     ALog.i(TAG, "删除任务记录");
-    DbEntity.deleteData(ThreadRecord.class, "key=?", filePath);
+    DbEntity.deleteData(ThreadRecord.class, "taskKey=?", filePath);
     DbEntity.deleteData(TaskRecord.class, "filePath=?", filePath);
   }
 
@@ -287,11 +284,17 @@ public class RecordUtil {
   /**
    * 删除ts文件
    */
-  private static void removeTsCache(String cacheDir) {
+  private static void removeTsCache(File targetFile, long bandWidth) {
+
+    String cacheDir = null;
+    if (!targetFile.isDirectory()) {
+      cacheDir =
+          String.format("%s/.%s_%s", targetFile.getParent(), targetFile.getName(), bandWidth);
+    }
 
     if (!TextUtils.isEmpty(cacheDir)) {
       File cacheDirF = new File(cacheDir);
-      if (!cacheDirF.exists()){
+      if (!cacheDirF.exists()) {
         return;
       }
       File[] files = cacheDirF.listFiles();
@@ -348,7 +351,7 @@ public class RecordUtil {
     // 修改线程记录
     if (record.threadRecords != null && !record.threadRecords.isEmpty()) {
       for (ThreadRecord tr : record.threadRecords) {
-        tr.key = newPath;
+        tr.taskKey = newPath;
         File blockFile = new File(String.format(RecordHandler.SUB_PATH, oldPath, tr.threadId));
         if (blockFile.exists()) {
           blockFile.renameTo(new File(String.format(RecordHandler.SUB_PATH, newPath, tr.threadId)));

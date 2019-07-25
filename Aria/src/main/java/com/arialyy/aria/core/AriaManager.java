@@ -161,13 +161,11 @@ import org.xml.sax.SAXException;
    * 初始化数据库
    */
   private void initDb(Context context) {
-    // 这个地方错误了，获取数据库路径见：https://www.jianshu.com/p/815c9efc5449
     String oldDbName = "AriaLyyDb";
-    String oldDbPath = context.getDatabasePath(oldDbName).getPath();
-    File db = new File(oldDbPath);
-    File dbConfig = new File(String.format("%s/%s", db.getParent(), "AriaLyyDb-journal"));
-    if (db.exists()) {
-      db.renameTo(new File(String.format("%s/%s", db.getParent(), "AndroidAria.db")));
+    File oldDbFile = context.getDatabasePath(oldDbName);
+    if (oldDbFile != null && oldDbFile.exists()) {
+      File dbConfig = new File(String.format("%s/%s", oldDbFile.getParent(), "AriaLyyDb-journal"));
+      oldDbFile.renameTo(new File(String.format("%s/%s", oldDbFile.getParent(), "AndroidAria.db")));
       // 如果数据库是在/data/data/{packagename}/databases/下面，journal文件因权限问题将无法删除和重命名
       if (dbConfig.exists()) {
         dbConfig.delete();

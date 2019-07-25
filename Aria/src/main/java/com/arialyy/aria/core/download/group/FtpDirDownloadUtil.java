@@ -15,6 +15,9 @@
  */
 package com.arialyy.aria.core.download.group;
 
+import android.net.Uri;
+import android.text.TextUtils;
+import com.arialyy.aria.core.FtpUrlEntity;
 import com.arialyy.aria.core.common.CompleteInfo;
 import com.arialyy.aria.core.common.OnFileInfoCallback;
 import com.arialyy.aria.core.download.DGTaskWrapper;
@@ -22,6 +25,8 @@ import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.inf.AbsEntity;
 import com.arialyy.aria.core.inf.IEntity;
 import com.arialyy.aria.exception.BaseException;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Created by Aria.Lao on 2017/7/27.
@@ -29,6 +34,8 @@ import com.arialyy.aria.exception.BaseException;
  */
 public class FtpDirDownloadUtil extends AbsGroupUtil {
   private String TAG = "FtpDirDownloadUtil";
+  private ReentrantLock LOCK = new ReentrantLock();
+  private Condition condition = LOCK.newCondition();
 
   public FtpDirDownloadUtil(IDGroupListener listener, DGTaskWrapper taskEntity) {
     super(listener, taskEntity);
@@ -38,16 +45,15 @@ public class FtpDirDownloadUtil extends AbsGroupUtil {
     return FTP_DIR;
   }
 
-  @Override protected void onStart() {
-    super.onStart();
+  @Override protected void onPreStart() {
+    super.onPreStart();
     if (mGTWrapper.getEntity().getFileSize() > 1) {
-      startDownload();
+      startDownload(true);
     } else {
-
       FtpDirInfoThread infoThread = new FtpDirInfoThread(mGTWrapper, new OnFileInfoCallback() {
         @Override public void onComplete(String url, CompleteInfo info) {
           if (info.code >= 200 && info.code < 300) {
-            startDownload();
+            startDownload(false);
           }
         }
 
@@ -56,14 +62,46 @@ public class FtpDirDownloadUtil extends AbsGroupUtil {
         }
       });
       new Thread(infoThread).start();
+      try {
+        LOCK.lock();
+        condition.await();
+      } catch (InterruptedException e) {
+        e.printStackTrace();
+      } finally {
+        LOCK.unlock();
+      }
     }
   }
 
-  private void startDownload() {
+  /**
+   * @param needCloneInfo 第一次下载，信息已经在{@link FtpDirInfoThread}中clone了
+   */
+  private void startDownload(boolean needCloneInfo) {
+    try {
+      LOCK.lock();
+      condition.signalAll();
+    } finally {
+      LOCK.unlock();
+    }
+    initState();
     for (DTaskWrapper wrapper : mGTWrapper.getSubTaskWrapper()) {
+      if (needCloneInfo) {
+        cloneInfo(wrapper);
+      }
       if (wrapper.getState() != IEntity.STATE_COMPLETE) {
         createAndStartSubLoader(wrapper);
       }
     }
+  }
+
+  private void cloneInfo(DTaskWrapper subWrapper) {
+    FtpUrlEntity urlEntity = mGTWrapper.asFtp().getUrlEntity().clone();
+    Uri uri = Uri.parse(subWrapper.getEntity().getUrl());
+    String remotePath = uri.getPath();
+    urlEntity.remotePath = TextUtils.isEmpty(remotePath) ? "/" : remotePath;
+
+    subWrapper.asFtp().setUrlEntity(urlEntity);
+    subWrapper.asFtp().setCharSet(mGTWrapper.asFtp().getCharSet());
+    subWrapper.asFtp().setProxy(mGTWrapper.asFtp().getProxy());
   }
 }

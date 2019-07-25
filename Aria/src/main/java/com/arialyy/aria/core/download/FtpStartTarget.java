@@ -21,6 +21,7 @@ import com.arialyy.aria.core.common.AbsStartTarget;
 import com.arialyy.aria.core.common.Suggest;
 import com.arialyy.aria.core.common.ftp.FtpDelegate;
 import com.arialyy.aria.core.inf.AbsTaskWrapper;
+import com.arialyy.aria.core.inf.ITaskWrapper;
 import com.arialyy.aria.util.CommonUtil;
 
 /**
@@ -33,7 +34,7 @@ public class FtpStartTarget extends AbsStartTarget<FtpStartTarget> {
     mConfigHandler = new DNormalConfigHandler<>(this, -1, targetName);
     mConfigHandler.setUrl(url);
     getTaskWrapper().asFtp().setUrlEntity(CommonUtil.getFtpUrlInfo(url));
-    getTaskWrapper().setRequestType(AbsTaskWrapper.D_FTP);
+    getTaskWrapper().setRequestType(ITaskWrapper.D_FTP);
   }
 
   /**

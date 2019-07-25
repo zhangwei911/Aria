@@ -21,7 +21,7 @@ import android.os.Parcelable;
 import android.text.TextUtils;
 import com.arialyy.aria.core.download.m3u8.M3U8Entity;
 import com.arialyy.aria.core.inf.AbsNormalEntity;
-import com.arialyy.aria.core.inf.AbsTaskWrapper;
+import com.arialyy.aria.core.inf.ITaskWrapper;
 import com.arialyy.aria.orm.DbEntity;
 import com.arialyy.aria.orm.annotation.Ignore;
 import com.arialyy.aria.orm.annotation.Unique;
@@ -67,13 +67,6 @@ public class DownloadEntity extends AbsNormalEntity implements Parcelable {
     if (m3U8Entity == null) {
       m3U8Entity = DbEntity.findFirst(M3U8Entity.class, "filePath=?", downloadPath);
     }
-    if (m3U8Entity == null) {
-      m3U8Entity = new M3U8Entity();
-      m3U8Entity.setFilePath(downloadPath);
-      m3U8Entity.setPeerIndex(0);
-      m3U8Entity.insert();
-    }
-
     return m3U8Entity;
   }
 
@@ -82,7 +75,18 @@ public class DownloadEntity extends AbsNormalEntity implements Parcelable {
   }
 
   @Override public int getTaskType() {
-    return getUrl().startsWith("ftp") ? AbsTaskWrapper.D_FTP : AbsTaskWrapper.D_HTTP;
+    int type;
+    if (getUrl().startsWith("ftp")) {
+      type = ITaskWrapper.D_FTP;
+    } else {
+      M3U8Entity temp = getM3U8Entity();
+      if (temp == null) {
+        type = ITaskWrapper.D_HTTP;
+      } else {
+        type = temp.isLive() ? ITaskWrapper.M3U8_LIVE : ITaskWrapper.M3U8_VOD;
+      }
+    }
+    return type;
   }
 
   public DownloadEntity() {

@@ -68,8 +68,9 @@ public class DGroupUtil extends AbsGroupUtil implements IUtil {
     return false;
   }
 
-  @Override protected void onStart() {
-    super.onStart();
+  @Override protected void onPreStart() {
+    super.onPreStart();
+    initState();
     if (mState.getCompleteNum() == mState.getSubSize()) {
       mListener.onComplete();
     } else {

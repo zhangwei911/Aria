@@ -17,6 +17,8 @@ package com.arialyy.aria.core.download;
 
 import android.text.TextUtils;
 import com.arialyy.aria.core.common.RecordHandler;
+import com.arialyy.aria.core.download.m3u8.M3U8Entity;
+import com.arialyy.aria.core.inf.ICheckEntityUtil;
 import com.arialyy.aria.core.inf.ITargetHandler;
 import com.arialyy.aria.core.inf.ITaskWrapper;
 import com.arialyy.aria.orm.DbEntity;
@@ -28,7 +30,7 @@ import java.io.File;
 /**
  * 检查下载任务实体
  */
-public class CheckDEntityUtil {
+public class CheckDEntityUtil implements ICheckEntityUtil {
   private final String TAG = "CheckDLoadEntity";
   private DTaskWrapper mWrapper;
   private DownloadEntity mEntity;
@@ -42,7 +44,13 @@ public class CheckDEntityUtil {
     mEntity = mWrapper.getEntity();
   }
 
+  @Override
   public boolean checkEntity() {
+    if (mWrapper.getErrorEvent() != null) {
+      ALog.e(TAG, mWrapper.getErrorEvent().errorMsg);
+      return false;
+    }
+
     boolean b = checkFtps() && checkUrl() && checkFilePath();
     if (b) {
       mEntity.save();
@@ -55,12 +63,19 @@ public class CheckDEntityUtil {
   }
 
   private void handleM3U8() {
-    File file = new File(mWrapper.getmTempFilePath());
+    File file = new File(mWrapper.getTempFilePath());
     // 缓存文件夹格式：问文件夹/.文件名_码率
     String cacheDir = String.format("%s/.%s_%s", file.getParent(), file.getName(),
         mWrapper.asM3U8().getBandWidth());
     mWrapper.asM3U8().setCacheDir(cacheDir);
-    mEntity.getM3U8Entity().setCacheDir(cacheDir);
+    M3U8Entity m3U8Entity = mEntity.getM3U8Entity();
+    if (m3U8Entity == null) {
+      m3U8Entity = new M3U8Entity();
+      m3U8Entity.setFilePath(mEntity.getFilePath());
+      m3U8Entity.setPeerIndex(0);
+      m3U8Entity.setCacheDir(cacheDir);
+      m3U8Entity.insert();
+    }
     if (mWrapper.getRequestType() == ITaskWrapper.M3U8_VOD) {
       if (mEntity.getFileSize() == 0) {
         ALog.w(TAG,
@@ -80,7 +95,7 @@ public class CheckDEntityUtil {
   }
 
   private boolean checkFilePath() {
-    String filePath = mWrapper.getmTempFilePath();
+    String filePath = mWrapper.getTempFilePath();
     if (TextUtils.isEmpty(filePath)) {
       ALog.e(TAG, "下载失败，文件保存路径为null");
       return false;
@@ -124,7 +139,7 @@ public class CheckDEntityUtil {
           RecordUtil.delTaskRecord(filePath, RecordHandler.TYPE_DOWNLOAD);
         }
       }
-      File oldFile = new File(mEntity.getFilePath());
+
       File newFile = new File(filePath);
       mEntity.setFilePath(filePath);
       mEntity.setFileName(newFile.getName());
@@ -134,14 +149,17 @@ public class CheckDEntityUtil {
           || mWrapper.getRequestType() == ITaskWrapper.M3U8_LIVE) {
         return true;
       }
-      if (oldFile.exists()) {
-        // 处理普通任务的重命名
-        RecordUtil.modifyTaskRecord(oldFile.getPath(), newFile.getPath());
-        ALog.i(TAG, String.format("将任务重命名为：%s", newFile.getName()));
-      } else if (RecordUtil.blockTaskExists(oldFile.getPath())) {
-        // 处理分块任务的重命名
-        RecordUtil.modifyTaskRecord(oldFile.getPath(), newFile.getPath());
-        ALog.i(TAG, String.format("将分块任务重命名为：%s", newFile.getName()));
+      if (!TextUtils.isEmpty(mEntity.getFilePath())) {
+        File oldFile = new File(mEntity.getFilePath());
+        if (oldFile.exists()) {
+          // 处理普通任务的重命名
+          RecordUtil.modifyTaskRecord(oldFile.getPath(), newFile.getPath());
+          ALog.i(TAG, String.format("将任务重命名为：%s", newFile.getName()));
+        } else if (RecordUtil.blockTaskExists(oldFile.getPath())) {
+          // 处理分块任务的重命名
+          RecordUtil.modifyTaskRecord(oldFile.getPath(), newFile.getPath());
+          ALog.i(TAG, String.format("将分块任务重命名为：%s", newFile.getName()));
+        }
       }
     }
     return true;
@@ -161,14 +179,15 @@ public class CheckDEntityUtil {
       ALog.e(TAG, "下载失败，url【" + url + "】不合法");
       return false;
     }
-    if (!TextUtils.isEmpty(mWrapper.getmTempUrl())) {
-      mEntity.setUrl(mWrapper.getmTempUrl());
+    if (!TextUtils.isEmpty(mWrapper.getTempUrl())) {
+      mEntity.setUrl(mWrapper.getTempUrl());
     }
     return true;
   }
 
   private boolean checkFtps() {
-    if (mWrapper.asFtp().getUrlEntity().isFtps) {
+    if (mWrapper.getRequestType() == ITaskWrapper.D_FTP && mWrapper.asFtp()
+        .getUrlEntity().isFtps) {
       if (TextUtils.isEmpty(mWrapper.asFtp().getUrlEntity().storePath)) {
         ALog.e(TAG, "证书路径为空");
         return false;

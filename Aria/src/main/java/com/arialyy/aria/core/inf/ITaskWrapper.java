@@ -22,6 +22,8 @@ import com.arialyy.aria.core.download.DownloadGroupEntity;
  */
 public interface ITaskWrapper<ENTITY extends AbsEntity> {
 
+  int DEFAULT = 0;
+
   /**
    * HTTP单任务载
    */

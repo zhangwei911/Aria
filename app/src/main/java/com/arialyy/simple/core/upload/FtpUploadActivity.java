@@ -52,7 +52,7 @@ public class FtpUploadActivity extends BaseActivity<ActivityFtpUploadBinding> {
   private String mFilePath;
   private String mUrl;
   private UploadModule mModule;
-  private UploadEntity mEntity;
+  private long mTaskId = -1;
 
   @Override protected void init(Bundle savedInstanceState) {
     setTile("D_FTP 文件上传");
@@ -67,8 +67,8 @@ public class FtpUploadActivity extends BaseActivity<ActivityFtpUploadBinding> {
     mModule = ViewModelProviders.of(this).get(UploadModule.class);
     mModule.getFtpInfo(this).observe(this, new Observer<UploadEntity>() {
       @Override public void onChanged(@Nullable UploadEntity entity) {
-        mEntity = entity;
         if (entity != null) {
+          mTaskId = entity.getId();
           if (entity.getFileSize() != 0) {
             getBinding().setFileSize(CommonUtil.formatFileSize(entity.getFileSize()));
             getBinding().setProgress(entity.isComplete() ? 100
@@ -79,7 +79,7 @@ public class FtpUploadActivity extends BaseActivity<ActivityFtpUploadBinding> {
           mUrl = entity.getUrl();
           mFilePath = entity.getFilePath();
           getBinding().setStateStr(getString(
-              entity.getState() == IEntity.STATE_RUNNING ? R.string.stop : R.string.resume));
+              entity.getState() == IEntity.STATE_RUNNING ? R.string.stop : R.string.start));
         } else {
           getBinding().setStateStr(getString(R.string.resume));
         }
@@ -113,38 +113,47 @@ public class FtpUploadActivity extends BaseActivity<ActivityFtpUploadBinding> {
   public void onClick(View view) {
     switch (view.getId()) {
       case R.id.start:
-        if (!AppUtil.chekEntityValid(mEntity)) {
-          Aria.upload(this).loadFtp(mFilePath).setUploadUrl(mUrl).setUploadInterceptor(
-              new IFtpUploadInterceptor() {
+        if (mTaskId == -1) {
+          mTaskId = Aria.upload(this)
+              .loadFtp(mFilePath)
+              .setUploadUrl(mUrl)
+              .setUploadInterceptor(
+                  new IFtpUploadInterceptor() {
 
-                @Override
-                public FtpInterceptHandler onIntercept(UploadEntity entity, List<String> fileList) {
-                  FtpInterceptHandler.Builder builder = new FtpInterceptHandler.Builder();
-                  //builder.coverServerFile();
-                  builder.resetFileName("test.zip");
-                  return builder.build();
-                }
-              })
+                    @Override
+                    public FtpInterceptHandler onIntercept(UploadEntity entity,
+                        List<String> fileList) {
+                      FtpInterceptHandler.Builder builder = new FtpInterceptHandler.Builder();
+                      //builder.coverServerFile();
+                      builder.resetFileName("test.zip");
+                      return builder.build();
+                    }
+                  })
               .option()
-              .login("N0rI", "0qcK")
+              .login("8L8e", "8guD")
               .controller(ControllerType.START_CONTROLLER)
               .start();
           getBinding().setStateStr(getString(R.string.stop));
           break;
         }
-        if (Aria.download(this).loadFtp(mEntity.getId()).isRunning()) {
-          Aria.download(this).loadFtp(mEntity.getId()).stop();
+        if (Aria.upload(this).loadFtp(mTaskId).isRunning()) {
+          Aria.upload(this).loadFtp(mTaskId).stop();
           getBinding().setStateStr(getString(R.string.resume));
         } else {
-          Aria.download(this).loadFtp(mEntity.getId()).resume();
+          Aria.upload(this)
+              .loadFtp(mTaskId)
+              .option()
+              .login("8L8e", "8guD")
+              .controller(ControllerType.NORMAL_CONTROLLER)
+              .resume();
           getBinding().setStateStr(getString(R.string.stop));
         }
 
         break;
       case R.id.cancel:
-        if (AppUtil.chekEntityValid(mEntity)) {
-          Aria.upload(this).loadFtp(mEntity.getId()).cancel();
-        }
+        Aria.upload(this).loadFtp(mTaskId).cancel();
+        mTaskId = -1;
+        getBinding().setStateStr(getString(R.string.start));
         break;
     }
   }
@@ -179,6 +188,7 @@ public class FtpUploadActivity extends BaseActivity<ActivityFtpUploadBinding> {
 
   @Upload.onTaskFail public void taskFail(UploadTask task) {
     Log.d(TAG, "上传失败");
+    getBinding().setStateStr(getString(R.string.resume));
   }
 
   @Upload.onTaskRunning public void taskRunning(UploadTask task) {
@@ -191,6 +201,7 @@ public class FtpUploadActivity extends BaseActivity<ActivityFtpUploadBinding> {
     getBinding().setProgress(100);
     getBinding().setSpeed("");
     T.showShort(this, "文件：" + task.getEntity().getFileName() + "，上传完成");
+    getBinding().setStateStr(getString(R.string.re_start));
   }
 
   @Override protected void dataCallback(int result, Object data) {

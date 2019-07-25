@@ -32,8 +32,8 @@ import com.arialyy.aria.util.ALog;
 import com.arialyy.frame.util.FileUtil;
 import com.arialyy.simple.R;
 import com.arialyy.simple.base.BaseActivity;
-import com.arialyy.simple.databinding.ActivityMultiBinding;
 import com.arialyy.simple.core.download.DownloadModule;
+import com.arialyy.simple.databinding.ActivityMultiBinding;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -136,7 +136,7 @@ public class MultiTaskActivity extends BaseActivity<ActivityMultiBinding> {
   }
 
   @DownloadGroup.onTaskFail void groupTaskFail(DownloadGroupTask task) {
-    if (task == null){
+    if (task == null) {
       return;
     }
     mAdapter.updateBtState(task.getKey(), true);

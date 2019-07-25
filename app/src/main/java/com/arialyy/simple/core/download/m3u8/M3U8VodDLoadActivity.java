@@ -47,7 +47,6 @@ import com.arialyy.simple.common.ModifyPathDialog;
 import com.arialyy.simple.common.ModifyUrlDialog;
 import com.arialyy.simple.databinding.ActivityM3u8VodBinding;
 import com.arialyy.simple.to.PeerIndex;
-import com.arialyy.simple.util.AppUtil;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -61,7 +60,7 @@ public class M3U8VodDLoadActivity extends BaseActivity<ActivityM3u8VodBinding> {
   private String mFilePath;
   private M3U8VodModule mModule;
   private VideoPlayerFragment mVideoFragment;
-  private DownloadEntity mEntity;
+  private long mTaskId;
 
   @Override
   protected void init(Bundle savedInstanceState) {
@@ -75,10 +74,10 @@ public class M3U8VodDLoadActivity extends BaseActivity<ActivityM3u8VodBinding> {
         if (entity == null) {
           return;
         }
-        mEntity = entity;
-        if (mEntity.getState() == IEntity.STATE_STOP) {
+        mTaskId = entity.getId();
+        if (entity.getState() == IEntity.STATE_STOP) {
           getBinding().setStateStr(getString(R.string.resume));
-        } else if (mEntity.getState() == IEntity.STATE_RUNNING) {
+        } else if (entity.getState() == IEntity.STATE_RUNNING) {
           getBinding().setStateStr(getString(R.string.stop));
         }
 
@@ -272,26 +271,47 @@ public class M3U8VodDLoadActivity extends BaseActivity<ActivityM3u8VodBinding> {
   public void onClick(View view) {
     switch (view.getId()) {
       case R.id.start:
-        if (!AppUtil.chekEntityValid(mEntity)) {
+        if (mTaskId == -1) {
           startD();
           break;
         }
-        if (Aria.download(this).load(mEntity.getId()).isRunning()) {
-          Aria.download(this).load(mEntity.getId()).stop();
+        if (Aria.download(this).load(mTaskId).isRunning()) {
+          Aria.download(this).load(mTaskId).stop();
         } else {
-          Aria.download(this).load(mEntity.getId()).resume();
+          Aria.download(this)
+              .load(mTaskId)
+              .asM3U8()
+              .setBandWidthUrlConverter(new IBandWidthUrlConverter() {
+                @Override public String convert(String bandWidthUrl) {
+                  int index = mUrl.lastIndexOf("/");
+                  return mUrl.substring(0, index + 1) + bandWidthUrl;
+                }
+              })
+              .setTsUrlConvert(new IVodTsUrlConverter() {
+                @Override public List<String> convert(String m3u8Url, List<String> tsUrls) {
+                  int index = m3u8Url.lastIndexOf("/");
+                  String parentUrl = m3u8Url.substring(0, index + 1);
+                  List<String> newUrls = new ArrayList<>();
+                  for (String url : tsUrls) {
+                    newUrls.add(parentUrl + url);
+                  }
+
+                  return newUrls;
+                }
+              })
+              .controller(ControllerType.NORMAL_CONTROLLER)
+              .resume();
         }
         break;
       case R.id.cancel:
-        if (AppUtil.chekEntityValid(mEntity)) {
-          Aria.download(this).load(mEntity.getId()).cancel(true);
-        }
+        Aria.download(this).load(mTaskId).cancel(true);
+        mTaskId = -1;
         break;
     }
   }
 
   private void startD() {
-    Aria.download(M3U8VodDLoadActivity.this)
+    mTaskId = Aria.download(M3U8VodDLoadActivity.this)
         .load(mUrl)
         .useServerFileName(true)
         .setFilePath(mFilePath, true)
@@ -315,15 +335,13 @@ public class M3U8VodDLoadActivity extends BaseActivity<ActivityM3u8VodBinding> {
           }
         })
         .setMergeHandler(new ITsMergeHandler() {
-          @Override public boolean merge(@Nullable M3U8KeyInfo keyInfo, List<String> tsPath) {
+          public boolean merge(@Nullable M3U8KeyInfo keyInfo, List<String> tsPath) {
+            ALog.d(TAG, "合并TS....");
             return false;
           }
         })
         .controller(ControllerType.START_CONTROLLER)
         .start();
-    //.start();
-    //.asVod().setPeerIndex(50)
-    //.start();
   }
 
   private Class<StartController> c = StartController.class;

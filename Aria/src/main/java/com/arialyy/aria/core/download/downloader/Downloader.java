@@ -19,12 +19,12 @@ import com.arialyy.aria.core.common.AbsThreadTask;
 import com.arialyy.aria.core.common.NormalFileer;
 import com.arialyy.aria.core.common.RecordHandler;
 import com.arialyy.aria.core.common.SubThreadConfig;
-import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.download.DTaskWrapper;
+import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.event.Event;
 import com.arialyy.aria.core.event.SpeedEvent;
-import com.arialyy.aria.core.inf.AbsTaskWrapper;
 import com.arialyy.aria.core.inf.IDownloadListener;
+import com.arialyy.aria.core.inf.ITaskWrapper;
 import com.arialyy.aria.exception.BaseException;
 import com.arialyy.aria.exception.TaskException;
 import com.arialyy.aria.util.ALog;
@@ -113,10 +113,10 @@ public class Downloader extends NormalFileer<DownloadEntity, DTaskWrapper> {
 
   @Override protected AbsThreadTask selectThreadTask(SubThreadConfig<DTaskWrapper> config) {
     switch (mTaskWrapper.getRequestType()) {
-      case AbsTaskWrapper.D_FTP:
-      case AbsTaskWrapper.D_FTP_DIR:
+      case ITaskWrapper.D_FTP:
+      case ITaskWrapper.D_FTP_DIR:
         return new FtpThreadTask(config);
-      case AbsTaskWrapper.D_HTTP:
+      case ITaskWrapper.D_HTTP:
         return new HttpThreadTask(config);
     }
     return null;

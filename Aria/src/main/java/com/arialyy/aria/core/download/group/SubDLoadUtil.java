@@ -24,7 +24,7 @@ import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.download.downloader.Downloader;
 import com.arialyy.aria.core.download.downloader.HttpFileInfoThread;
 import com.arialyy.aria.core.inf.AbsEntity;
-import com.arialyy.aria.core.inf.AbsTaskWrapper;
+import com.arialyy.aria.core.inf.ITaskWrapper;
 import com.arialyy.aria.core.scheduler.ISchedulers;
 import com.arialyy.aria.exception.BaseException;
 import com.arialyy.aria.util.ALog;
@@ -106,7 +106,7 @@ class SubDLoadUtil implements IUtil {
   }
 
   @Override public void start() {
-    if (mWrapper.getRequestType() == AbsTaskWrapper.D_HTTP) {
+    if (mWrapper.getRequestType() == ITaskWrapper.D_HTTP) {
       if (needGetInfo) {
         new Thread(new HttpFileInfoThread(mWrapper, new OnFileInfoCallback() {
 
@@ -123,7 +123,7 @@ class SubDLoadUtil implements IUtil {
         mDownloader = new Downloader(mListener, mWrapper);
         mDownloader.start();
       }
-    } else if (mWrapper.getRequestType() == AbsTaskWrapper.D_FTP) {
+    } else if (mWrapper.getRequestType() == ITaskWrapper.D_FTP) {
       mDownloader = new Downloader(mListener, mWrapper);
       mDownloader.start();
     } else {

@@ -17,6 +17,7 @@ package com.arialyy.aria.core.download;
 
 import android.support.annotation.CheckResult;
 import com.arialyy.aria.core.inf.AbsTarget;
+import com.arialyy.aria.orm.DbEntity;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
 import com.arialyy.aria.util.DbDataHelper;
@@ -53,7 +54,14 @@ class HttpGroupConfigHandler<TARGET extends AbsTarget> extends AbsGroupConfigHan
     mUrls.addAll(urls);
     String groupHash = CommonUtil.getMd5Code(urls);
     getEntity().setGroupHash(groupHash);
-    getEntity().setSubEntities(DbDataHelper.createHttpSubTask(groupHash, mUrls));
+    List<DownloadEntity> subEntities = DbDataHelper.createHttpSubTask(groupHash, mUrls);
+    List<DTaskWrapper> wrappers = new ArrayList<>();
+    for (DownloadEntity subEntity : subEntities) {
+      wrappers.add(new DTaskWrapper(subEntity));
+    }
+    getEntity().setUrls(urls);
+    getEntity().setSubEntities(subEntities);
+    getTaskWrapper().setSubTaskWrapper(wrappers);
   }
 
   /**
@@ -91,13 +99,17 @@ class HttpGroupConfigHandler<TARGET extends AbsTarget> extends AbsGroupConfigHan
     mUrls.clear();
     mUrls.addAll(urls);
     String newHash = CommonUtil.getMd5Code(urls);
+    getEntity().setUrls(mUrls);
     getEntity().setGroupHash(newHash);
     getEntity().update();
     if (getEntity().getSubEntities() != null && !getEntity().getSubEntities().isEmpty()) {
+      int i = 0;
       for (DownloadEntity de : getEntity().getSubEntities()) {
+        de.setUrl(mUrls.get(i));
         de.setGroupHash(newHash);
-        de.update();
+        i++;
       }
+      DbEntity.updateManyData(getEntity().getSubEntities());
     }
     return getTarget();
   }

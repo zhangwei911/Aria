@@ -17,6 +17,8 @@ package com.arialyy.aria.core.download;
 
 import com.arialyy.aria.core.inf.AbsTarget;
 import com.arialyy.aria.core.inf.AbsTaskWrapper;
+import com.arialyy.aria.core.inf.ITaskWrapper;
+import java.util.List;
 
 /**
  * Created by lyy on 2017/4/9.
@@ -26,6 +28,16 @@ class FtpDirConfigHandler<TARGET extends AbsTarget> extends AbsGroupConfigHandle
 
   FtpDirConfigHandler(TARGET target, long taskId) {
     super(target, taskId);
+    init();
+  }
+
+  private void init() {
     getTaskWrapper().setRequestType(AbsTaskWrapper.D_FTP_DIR);
+    List<DTaskWrapper> wrappers = getTaskWrapper().getSubTaskWrapper();
+    if (!wrappers.isEmpty()) {
+      for (DTaskWrapper subWrapper : wrappers) {
+        subWrapper.setRequestType(ITaskWrapper.D_FTP);
+      }
+    }
   }
 }

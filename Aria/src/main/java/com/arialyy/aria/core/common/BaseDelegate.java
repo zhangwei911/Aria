@@ -45,7 +45,7 @@ public abstract class BaseDelegate<TARGET extends AbsTarget> {
    * @param clazz {@link ControllerType#START_CONTROLLER}、{@link ControllerType#NORMAL_CONTROLLER}
    */
   @CheckResult(suggest = Suggest.TASK_CONTROLLER)
-  public <T extends FeatureController> T controller(@ControllerType Class<T> clazz) {
+  public synchronized <T extends FeatureController> T controller(@ControllerType Class<T> clazz) {
     return FeatureController.newInstance(clazz, getTaskWrapper());
   }
 }

@@ -30,6 +30,7 @@ public class HttpNormalTarget extends AbsNormalTarget<HttpNormalTarget> {
 
   HttpNormalTarget(long taskId, String targetName) {
     mConfigHandler = new DNormalConfigHandler<>(this, taskId, targetName);
+    getTaskWrapper().setRequestType(getTaskWrapper().getEntity().getTaskType());
   }
 
   @CheckResult(suggest = Suggest.TASK_CONTROLLER)

@@ -13,12 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.arialyy.aria.exception;
+package com.arialyy.aria.core.inf;
 
-public class ParamException extends RuntimeException {
-  private static final String ARIA_NET_EXCEPTION = "Aria Params Exception:";
+public interface ICheckEntityUtil {
 
-  public ParamException(String message) {
-    super(String.format("%s%s", ARIA_NET_EXCEPTION, message));
-  }
+  /**
+   * 检查实体对象
+   *
+   * @return true 成功；false 失败
+   */
+  boolean checkEntity();
 }

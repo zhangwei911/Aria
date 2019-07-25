@@ -15,7 +15,6 @@
  */
 package com.arialyy.aria.orm;
 
-import android.annotation.SuppressLint;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.text.TextUtils;
@@ -30,10 +29,8 @@ import java.lang.reflect.Field;
 import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Created by laoyuyu on 2018/3/22.

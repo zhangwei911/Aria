@@ -23,6 +23,7 @@ import com.arialyy.aria.core.config.DownloadConfig;
 import com.arialyy.aria.core.config.UploadConfig;
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.download.DownloadGroupEntity;
+import com.arialyy.aria.core.event.ErrorEvent;
 import com.arialyy.aria.core.upload.UploadEntity;
 
 /**
@@ -45,8 +46,8 @@ public abstract class AbsTaskWrapper<ENTITY extends AbsEntity>
   private boolean isNewTask = false;
 
   /**
-   * 请求类型 {@link AbsTaskWrapper#D_HTTP}、{@link AbsTaskWrapper#D_FTP}、{@link
-   * AbsTaskWrapper#D_FTP_DIR}。。。
+   * 请求类型 {@link ITaskWrapper#D_HTTP}、{@link ITaskWrapper#D_FTP}、{@link
+   * ITaskWrapper#D_FTP_DIR}。。。
    */
   private int requestType = D_HTTP;
 
@@ -71,8 +72,21 @@ public abstract class AbsTaskWrapper<ENTITY extends AbsEntity>
    */
   private ENTITY entity;
 
+  /**
+   * 错误信息
+   */
+  private ErrorEvent errorEvent;
+
   public AbsTaskWrapper(ENTITY entity) {
     this.entity = entity;
+  }
+
+  public ErrorEvent getErrorEvent() {
+    return errorEvent;
+  }
+
+  public void setErrorEvent(ErrorEvent errorEvent) {
+    this.errorEvent = errorEvent;
   }
 
   /**

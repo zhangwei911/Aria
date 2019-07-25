@@ -16,11 +16,13 @@
 package com.arialyy.aria.core.upload;
 
 import android.text.TextUtils;
+import com.arialyy.aria.core.inf.ICheckEntityUtil;
+import com.arialyy.aria.core.inf.ITaskWrapper;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CheckUtil;
 import java.io.File;
 
-public class CheckUEntityUtil {
+public class CheckUEntityUtil implements ICheckEntityUtil {
   private final String TAG = "CheckUEntityUtil";
   private UTaskWrapper mWrapper;
   private UploadEntity mEntity;
@@ -34,7 +36,13 @@ public class CheckUEntityUtil {
     mEntity = mWrapper.getEntity();
   }
 
+  @Override
   public boolean checkEntity() {
+    if (mWrapper.getErrorEvent() != null) {
+      ALog.e(TAG, mWrapper.getErrorEvent().errorMsg);
+      return false;
+    }
+
     boolean b = checkFtps() && checkUrl() && checkFilePath();
     if (b) {
       mEntity.save();
@@ -94,7 +102,8 @@ public class CheckUEntityUtil {
   }
 
   private boolean checkFtps() {
-    if (mWrapper.asFtp().getUrlEntity().isFtps) {
+    if (mWrapper.getRequestType() == ITaskWrapper.U_FTP && mWrapper.asFtp()
+        .getUrlEntity().isFtps) {
       if (TextUtils.isEmpty(mWrapper.asFtp().getUrlEntity().storePath)) {
         ALog.e(TAG, "证书路径为空");
         return false;

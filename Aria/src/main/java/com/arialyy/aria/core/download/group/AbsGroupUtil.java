@@ -32,7 +32,7 @@ import java.util.concurrent.TimeUnit;
  * Created by AriaL on 2017/6/30.
  * 任务组核心逻辑
  */
-public abstract class AbsGroupUtil implements IUtil, Runnable {
+public abstract class AbsGroupUtil implements IUtil {
   private final String TAG = "AbsGroupUtil";
   /**
    * FTP文件夹
@@ -59,16 +59,16 @@ public abstract class AbsGroupUtil implements IUtil, Runnable {
     mListener = listener;
     mGTWrapper = groupWrapper;
     mUpdateInterval = Configuration.getInstance().downloadCfg.getUpdateInterval();
-    mState = new GroupRunState(groupWrapper.getKey(), mListener,
-        groupWrapper.getSubTaskWrapper().size(), mSubQueue);
-    mScheduler = new Handler(Looper.getMainLooper(), SimpleSchedulers.newInstance(mState));
-    initState();
   }
 
   /**
    * 初始化组合任务状态
    */
-  private void initState() {
+  void initState() {
+    mState =
+        new GroupRunState(mGTWrapper.getKey(), mListener, mGTWrapper.getSubTaskWrapper().size(),
+            mSubQueue);
+    mScheduler = new Handler(Looper.getMainLooper(), SimpleSchedulers.newInstance(mState));
     for (DTaskWrapper wrapper : mGTWrapper.getSubTaskWrapper()) {
       if (wrapper.getEntity().getState() == IEntity.STATE_COMPLETE) {
         mState.updateCompleteNum();
@@ -164,7 +164,7 @@ public abstract class AbsGroupUtil implements IUtil, Runnable {
   }
 
   @Override public boolean isRunning() {
-    return mState.isRunning;
+    return mState != null && mState.isRunning;
   }
 
   @Override public void cancel() {
@@ -203,19 +203,15 @@ public abstract class AbsGroupUtil implements IUtil, Runnable {
   }
 
   @Override public void start() {
-    new Thread(this).start();
-  }
-
-  @Override public void run() {
     if (isStop || isCancel) {
       closeTimer();
       return;
     }
-    onStart();
+    onPreStart();
     startRunningFlow();
   }
 
-  protected void onStart() {
+  protected void onPreStart() {
 
   }
 

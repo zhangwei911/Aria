@@ -95,12 +95,15 @@ public class DownloadTask extends AbsNormalTask<DTaskWrapper> {
   }
 
   @Override protected synchronized IUtil createUtil() {
-    if (mTaskWrapper.getRequestType() == ITaskWrapper.M3U8_VOD) {
+    int taskType = mTaskWrapper.getRequestType();
+    if (taskType == ITaskWrapper.M3U8_VOD) {
       return new M3U8VodUtil(mTaskWrapper, (M3U8Listener) mListener);
-    } else if (mTaskWrapper.getRequestType() == ITaskWrapper.M3U8_LIVE) {
+    } else if (taskType == ITaskWrapper.M3U8_LIVE) {
       return new M3U8LiveUtil(mTaskWrapper, (M3U8Listener) mListener);
-    } else {
+    } else if (taskType == ITaskWrapper.D_HTTP || taskType == ITaskWrapper.D_FTP) {
       return new SimpleDownloadUtil(mTaskWrapper, (IDownloadListener) mListener);
+    } else {
+      throw new IllegalArgumentException(String.format("不识别的任务, 任务类型：%s", taskType));
     }
   }
 

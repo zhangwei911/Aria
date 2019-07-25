@@ -17,6 +17,7 @@ package com.arialyy.aria.core.download;
 
 import android.support.annotation.CheckResult;
 import android.text.TextUtils;
+import com.arialyy.aria.core.event.ErrorEvent;
 import com.arialyy.aria.core.inf.AbsTarget;
 import com.arialyy.aria.core.inf.IConfigHandler;
 import com.arialyy.aria.core.manager.SubTaskManager;
@@ -40,6 +41,9 @@ abstract class AbsGroupConfigHandler<TARGET extends AbsTarget> implements IConfi
     TAG = CommonUtil.getClassName(getClass());
     mTarget = target;
     mWrapper = TaskWrapperManager.getInstance().getGroupWrapper(DGTaskWrapper.class, taskId);
+    if (taskId != -1 && mWrapper.getEntity().getId() == -1) {
+      mWrapper.setErrorEvent(new ErrorEvent(taskId, String.format("没有id为%s的任务", taskId)));
+    }
     mTarget.setTaskWrapper(mWrapper);
     if (getEntity() != null) {
       getTaskWrapper().setDirPathTemp(getEntity().getDirPath());

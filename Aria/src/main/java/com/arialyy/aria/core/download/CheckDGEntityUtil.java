@@ -17,6 +17,7 @@ package com.arialyy.aria.core.download;
 
 import android.text.TextUtils;
 import com.arialyy.aria.core.common.RequestEnum;
+import com.arialyy.aria.core.inf.ICheckEntityUtil;
 import com.arialyy.aria.orm.DbEntity;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
@@ -28,7 +29,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class CheckDGEntityUtil {
+public class CheckDGEntityUtil implements ICheckEntityUtil {
 
   private final String TAG = "CheckDGEntityUtil";
   private DGTaskWrapper mWrapper;
@@ -108,7 +109,13 @@ public class CheckDGEntityUtil {
     }
   }
 
+  @Override
   public boolean checkEntity() {
+    if (mWrapper.getErrorEvent() != null) {
+      ALog.e(TAG, mWrapper.getErrorEvent().errorMsg);
+      return false;
+    }
+
     if (!checkDirPath()) {
       return false;
     }
@@ -183,7 +190,6 @@ public class CheckDGEntityUtil {
    */
   private boolean checkUrls() {
     if (mEntity.getUrls().isEmpty()) {
-
       ALog.e(TAG, "下载失败，子任务下载列表为null");
       return false;
     }

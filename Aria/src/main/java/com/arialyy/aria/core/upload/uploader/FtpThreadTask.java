@@ -176,7 +176,7 @@ class FtpThreadTask extends AbsFtpThreadTask<UploadEntity, UTaskWrapper> {
         fail(mChildCurrentLocation,
             new AriaIOException(TAG,
                 String.format("文件上传错误，错误码为：%s, msg：%s, filePath: %s", reply,
-                    client.getReplyString(), getEntity().getFilePath())));
+                    client.getReplyString(), getEntity().getFilePath())), false);
       }
       if (client.isConnected()) {
         client.disconnect();

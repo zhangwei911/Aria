@@ -46,7 +46,7 @@ import java.io.IOException;
 public class FtpDownloadActivity extends BaseActivity<ActivityFtpDownloadBinding> {
   private String mUrl, mFilePath;
   private FtpDownloadModule mModule;
-  private DownloadEntity mEntity;
+  private long mTaskId;
 
   @Override protected void init(Bundle savedInstanceState) {
     super.init(savedInstanceState);
@@ -60,10 +60,10 @@ public class FtpDownloadActivity extends BaseActivity<ActivityFtpDownloadBinding
         if (entity == null) {
           return;
         }
-        mEntity = entity;
-        if (mEntity.getState() == IEntity.STATE_STOP) {
+        mTaskId = entity.getId();
+        if (entity.getState() == IEntity.STATE_STOP) {
           getBinding().setStateStr(getString(R.string.resume));
-        } else if (mEntity.getState() == IEntity.STATE_RUNNING) {
+        } else if (entity.getState() == IEntity.STATE_RUNNING) {
           getBinding().setStateStr(getString(R.string.stop));
         }
 
@@ -90,29 +90,34 @@ public class FtpDownloadActivity extends BaseActivity<ActivityFtpDownloadBinding
     switch (view.getId()) {
       case R.id.start:
 
-        if (!AppUtil.chekEntityValid(mEntity)) {
-
-          Aria.download(this).loadFtp(mUrl)
+        if (mTaskId == -1) {
+          mTaskId = Aria.download(this).loadFtp(mUrl)
               .setFilePath(mFilePath, true)
-              .option().login("N0rI", "0qcK")
+              .option()
+              .login("8L8e", "8guD")
               .controller(ControllerType.START_CONTROLLER)
               .start();
           getBinding().setStateStr(getString(R.string.stop));
           break;
         }
-        if (Aria.download(this).load(mEntity.getId()).isRunning()) {
+        if (Aria.download(this).load(mTaskId).isRunning()) {
           getBinding().setStateStr(getString(R.string.resume));
-          Aria.download(this).loadFtp(mEntity.getId()).stop();
+          Aria.download(this).loadFtp(mTaskId).stop();
         } else {
-          Aria.download(this).loadFtp(mEntity.getId()).resume();
+          Aria.download(this)
+              .loadFtp(mTaskId)
+              .option()
+              .login("8L8e", "8guD")
+              .controller(ControllerType.NORMAL_CONTROLLER)
+              .resume();
           getBinding().setStateStr(getString(R.string.stop));
         }
         break;
 
       case R.id.cancel:
-        if (AppUtil.chekEntityValid(mEntity)) {
-          Aria.download(this).loadFtp(mEntity.getId()).cancel();
-        }
+        Aria.download(this).loadFtp(mTaskId).cancel();
+        getBinding().setStateStr(getString(R.string.start));
+        mTaskId = -1;
         break;
     }
   }
@@ -162,12 +167,13 @@ public class FtpDownloadActivity extends BaseActivity<ActivityFtpDownloadBinding
 
   @Download.onTaskFail() void taskFail(DownloadTask task) {
     L.d(TAG, "ftp task fail");
+    getBinding().setStateStr(getString(R.string.resume));
   }
 
   @Download.onTaskComplete() void taskComplete(DownloadTask task) {
     getBinding().setSpeed("");
     getBinding().setProgress(100);
-    Log.d(TAG, "md5 ==> " + CommonUtil.getFileMD5(new File(task.getDownloadPath())));
+    Log.d(TAG, "md5 ==> " + CommonUtil.getFileMD5(new File(task.getFilePath())));
     T.showShort(this, "文件：" + task.getEntity().getFileName() + "，下载完成");
   }
 

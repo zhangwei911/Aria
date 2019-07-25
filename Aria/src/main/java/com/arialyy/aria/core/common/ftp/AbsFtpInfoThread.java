@@ -384,7 +384,7 @@ public abstract class AbsFtpInfoThread<ENTITY extends AbsEntity, TASK_WRAPPER ex
   protected void handleFile(String remotePath, FTPFile ftpFile) {
   }
 
-  private void failDownload(BaseException e, boolean needRetry) {
+  protected void failDownload(BaseException e, boolean needRetry) {
     if (mCallback != null) {
       mCallback.onFail(mEntity, e, needRetry);
     }

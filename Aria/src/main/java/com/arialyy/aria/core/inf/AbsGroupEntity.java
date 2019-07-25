@@ -26,7 +26,8 @@ import java.util.List;
  */
 public abstract class AbsGroupEntity extends AbsEntity implements Parcelable {
   /**
-   * 为子任务地址相加的url的Md5
+   * 组合任务等hash为： 为子任务地址相加的url的Md5
+   * ftpdir为：ftpdir下载地址
    */
   @Unique protected String groupHash;
 

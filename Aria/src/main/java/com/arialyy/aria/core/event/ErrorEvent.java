@@ -13,12 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.arialyy.aria.exception;
+package com.arialyy.aria.core.event;
 
-public class ParamException extends RuntimeException {
-  private static final String ARIA_NET_EXCEPTION = "Aria Params Exception:";
+public class ErrorEvent {
+  public long taskId;
+  public String errorMsg;
 
-  public ParamException(String message) {
-    super(String.format("%s%s", ARIA_NET_EXCEPTION, message));
+  public ErrorEvent(long taskId, String errorMsg) {
+    this.taskId = taskId;
+    this.errorMsg = errorMsg;
   }
 }

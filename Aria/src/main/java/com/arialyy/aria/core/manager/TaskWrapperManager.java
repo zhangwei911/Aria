@@ -29,7 +29,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * Created by Aria.Lao on 2017/11/1. 任务实体管理器
  */
 public class TaskWrapperManager {
-  private static final String TAG = "TaskManager";
+  private static final String TAG = "TaskWrapperManager";
   private static volatile TaskWrapperManager INSTANCE = null;
   private LruCache<String, AbsTaskWrapper> cache = new LruCache<>(1024);
   private Lock lock;
@@ -37,7 +37,9 @@ public class TaskWrapperManager {
   public static TaskWrapperManager getInstance() {
     if (INSTANCE == null) {
       synchronized (TaskWrapperManager.class) {
-        INSTANCE = new TaskWrapperManager();
+        if (INSTANCE == null) {
+          INSTANCE = new TaskWrapperManager();
+        }
       }
     }
     return INSTANCE;
@@ -81,7 +83,7 @@ public class TaskWrapperManager {
           return null;
         }
         wrapper = factory.create(taskId);
-        cache.put(convertKey(clazz, taskId), wrapper);
+        putTaskWrapper(wrapper);
       }
       return (TW) wrapper;
     } finally {
@@ -107,7 +109,7 @@ public class TaskWrapperManager {
           return null;
         }
         tWrapper = factory.getGroupWrapper(taskId);
-        cache.put(convertKey(clazz, taskId), tWrapper);
+        putTaskWrapper(tWrapper);
       }
       return (TW) tWrapper;
     } finally {
@@ -119,6 +121,13 @@ public class TaskWrapperManager {
    * 更新任务Wrapper
    */
   public void putTaskWrapper(AbsTaskWrapper wrapper) {
+    if (wrapper == null) {
+      ALog.e(TAG, "任务实体添加失败");
+      return;
+    }
+    if (wrapper.getEntity() == null || wrapper.getEntity().getId() == -1) {
+      return;
+    }
     final Lock lock = this.lock;
     lock.lock();
     try {
@@ -129,33 +138,13 @@ public class TaskWrapperManager {
   }
 
   /**
-   * 向管理器中增加任务实体
-   *
-   * @return {@code false} 实体为null，添加失败
-   */
-  public boolean addTaskWrapper(AbsTaskWrapper wrapper) {
-    if (wrapper == null) {
-      ALog.e(TAG, "任务实体添加失败");
-      return false;
-    }
-    final Lock lock = this.lock;
-    lock.lock();
-    try {
-      return cache.put(convertKey(wrapper.getClass(), wrapper.getEntity().getId()), wrapper)
-          != null;
-    } finally {
-      lock.unlock();
-    }
-  }
-
-  /**
    * 通过key删除任务实体 当任务complete或删除记录时将删除缓存
    */
-  public AbsTaskWrapper removeTaskWrapper(AbsTaskWrapper wrapper) {
+  public void removeTaskWrapper(AbsTaskWrapper wrapper) {
     final Lock lock = this.lock;
     lock.lock();
     try {
-      return cache.remove(convertKey(wrapper.getClass(), wrapper.getEntity().getId()));
+      cache.remove(convertKey(wrapper.getClass(), wrapper.getEntity().getId()));
     } finally {
       lock.unlock();
     }

@@ -19,6 +19,7 @@ import android.os.Parcel;
 import com.arialyy.aria.core.inf.AbsGroupEntity;
 import com.arialyy.aria.core.inf.AbsTaskWrapper;
 import com.arialyy.aria.orm.annotation.Ignore;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -32,6 +33,9 @@ public class DownloadGroupEntity extends AbsGroupEntity {
    * 子任务实体列表
    */
   public List<DownloadEntity> getSubEntities() {
+    if (subEntities == null) {
+      subEntities = new ArrayList<>();
+    }
     return subEntities;
   }
 

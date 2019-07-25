@@ -22,7 +22,6 @@ import com.arialyy.aria.core.inf.AbsEntity;
 import com.arialyy.aria.core.inf.AbsTaskWrapper;
 import com.arialyy.aria.core.inf.IUploadListener;
 import com.arialyy.aria.core.upload.UTaskWrapper;
-import com.arialyy.aria.core.upload.UploadEntity;
 import com.arialyy.aria.exception.BaseException;
 import com.arialyy.aria.util.CheckUtil;
 
@@ -33,7 +32,6 @@ import com.arialyy.aria.util.CheckUtil;
 public class SimpleUploadUtil implements IUtil, Runnable {
   private static final String TAG = "SimpleUploadUtil";
 
-  private UploadEntity mUploadEntity;
   private UTaskWrapper mTaskWrapper;
   private IUploadListener mListener;
   private Uploader mUploader;
@@ -42,7 +40,6 @@ public class SimpleUploadUtil implements IUtil, Runnable {
   public SimpleUploadUtil(UTaskWrapper taskWrapper, IUploadListener listener) {
     mTaskWrapper = taskWrapper;
     CheckUtil.checkTaskEntity(taskWrapper);
-    mUploadEntity = taskWrapper.getEntity();
     if (listener == null) {
       throw new IllegalArgumentException("上传监听不能为空");
     }

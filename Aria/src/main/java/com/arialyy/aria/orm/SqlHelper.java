@@ -100,6 +100,8 @@ final class SqlHelper extends SQLiteOpenHelper {
         handle360AriaUpdate(db);
       } else if (oldVersion < 51) {
         handle365Update(db);
+      } else if (oldVersion < 52) {
+        handle366Update(db);
       } else {
         handleDbUpdate(db, null, null);
       }
@@ -239,13 +241,27 @@ final class SqlHelper extends SQLiteOpenHelper {
    */
   private void delRepeatThreadRecord(SQLiteDatabase db) {
     String repeatSql =
-        "DELETE FROM ThreadRecord WHERE (key, threadId, endLocation) "
-            + "IN (SELECT key, threadId, endLocation FROM ThreadRecord GROUP BY key, threadId, endLocation "
+        "DELETE FROM ThreadRecord WHERE (taskKey, threadId, endLocation) "
+            + "IN (SELECT taskKey, threadId, endLocation FROM ThreadRecord GROUP BY taskKey, threadId, endLocation "
             + "HAVING COUNT(*) > 1) AND rowid "
-            + "NOT IN (SELECT MIN(rowid) FROM ThreadRecord GROUP BY key, threadId, endLocation "
+            + "NOT IN (SELECT MIN(rowid) FROM ThreadRecord GROUP BY taskKey, threadId, endLocation "
             + "HAVING COUNT(*)> 1)";
     ALog.d(TAG, repeatSql);
     db.execSQL(repeatSql);
+  }
+
+  /**
+   * 处理366版本以下的升级
+   */
+  private void handle366Update(SQLiteDatabase db) {
+    Map<String, Map<String, String>> modifyMap = new HashMap<>();
+    // 处理ThreadRecord的key字段名修改
+    Map<String, String> threadRecordModify = new HashMap<>();
+    threadRecordModify.put("key", "taskKey");
+    modifyMap.put("ThreadRecord", threadRecordModify);
+
+    // 执行升级操作
+    handleDbUpdate(db, modifyMap, null);
   }
 
   /**
@@ -254,8 +270,14 @@ final class SqlHelper extends SQLiteOpenHelper {
   private void handle365Update(SQLiteDatabase db) {
     db.execSQL("UPDATE ThreadRecord SET threadId=0 WHERE threadId=-1");
 
+    Map<String, Map<String, String>> modifyMap = new HashMap<>();
+    // 处理ThreadRecord的key字段名修改
+    Map<String, String> threadRecordModify = new HashMap<>();
+    threadRecordModify.put("key", "taskKey");
+    modifyMap.put("ThreadRecord", threadRecordModify);
+
     // 执行升级操作
-    handleDbUpdate(db, null, null);
+    handleDbUpdate(db, modifyMap, null);
     delRepeatThreadRecord(db);
   }
 
@@ -271,19 +293,25 @@ final class SqlHelper extends SQLiteOpenHelper {
       }
     }
 
-    Map<String, Map<String, String>> columnMap = new HashMap<>();
+    Map<String, Map<String, String>> modifyMap = new HashMap<>();
     // 处理DownloadEntity、DownloadGroupEntity的 groupName字段名的修改
-    Map<String, String> groupNameModify = new HashMap<>();
-    groupNameModify.put("groupName", "groupHash");
-    columnMap.put("DownloadEntity", groupNameModify);
-    columnMap.put("DownloadGroupEntity", groupNameModify);
+    Map<String, String> entityModify = new HashMap<>();
+    entityModify.put("groupName", "groupHash");
+    modifyMap.put("DownloadEntity", entityModify);
+    modifyMap.put("DownloadGroupEntity", entityModify);
+
     // 处理TaskRecord的dGroupName字段名的修改
-    Map<String, String> dGroupNameModify = new HashMap<>();
-    dGroupNameModify.put("dGroupName", "dGroupHash");
-    columnMap.put("TaskRecord", dGroupNameModify);
+    Map<String, String> taskRecordModify = new HashMap<>();
+    taskRecordModify.put("dGroupName", "dGroupHash");
+    modifyMap.put("TaskRecord", taskRecordModify);
+
+    // 处理ThreadRecord的key字段名修改
+    Map<String, String> threadRecordModify = new HashMap<>();
+    threadRecordModify.put("key", "taskKey");
+    modifyMap.put("ThreadRecord", threadRecordModify);
 
     // 执行升级操作
-    handleDbUpdate(db, columnMap, null);
+    handleDbUpdate(db, modifyMap, null);
     delRepeatThreadRecord(db);
   }
 
@@ -324,18 +352,19 @@ final class SqlHelper extends SQLiteOpenHelper {
       i++;
     }
 
-    Map<String, Map<String, String>> modifyColumnMap = new HashMap<>();
-    Map<String, String> dMap = new HashMap<>();
-    dMap.put("groupName", "groupHash");
     // 处理数据库版本小于3的字段改变
-    dMap.put("downloadUrl", "url");
-    dMap.put("isDownloadComplete", "isComplete");
-    modifyColumnMap.put("DownloadEntity", dMap);
+    Map<String, Map<String, String>> modifyMap = new HashMap<>();
+    Map<String, String> dEntityModifyMap = new HashMap<>();
+    dEntityModifyMap.put("groupName", "groupHash");
+    dEntityModifyMap.put("downloadUrl", "url");
+    dEntityModifyMap.put("isDownloadComplete", "isComplete");
+    modifyMap.put("DownloadEntity", dEntityModifyMap);
 
-    Map<String, String> dGMap = new HashMap<>();
-    dGMap.put("groupName", "groupHash");
-    modifyColumnMap.put("DownloadGroupEntity", dGMap);
+    Map<String, String> dGEntityModifyMap = new HashMap<>();
+    dGEntityModifyMap.put("groupName", "groupHash");
+    modifyMap.put("DownloadGroupEntity", dGEntityModifyMap);
 
+    // 删除字段
     Map<String, List<String>> delColumnMap = new HashMap<>();
     List<String> dEntityDel = new ArrayList<>();
     dEntityDel.add("taskKey");
@@ -344,6 +373,6 @@ final class SqlHelper extends SQLiteOpenHelper {
     dgEntityDel.add("subtask");
     delColumnMap.put("DownloadGroupEntity", dgEntityDel);
 
-    handleDbUpdate(db, modifyColumnMap, delColumnMap);
+    handleDbUpdate(db, modifyMap, delColumnMap);
   }
 }

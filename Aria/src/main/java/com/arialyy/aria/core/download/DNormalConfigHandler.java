@@ -16,6 +16,7 @@
 package com.arialyy.aria.core.download;
 
 import android.text.TextUtils;
+import com.arialyy.aria.core.event.ErrorEvent;
 import com.arialyy.aria.core.inf.AbsTarget;
 import com.arialyy.aria.core.inf.IConfigHandler;
 import com.arialyy.aria.core.manager.TaskWrapperManager;
@@ -49,12 +50,15 @@ class DNormalConfigHandler<TARGET extends AbsTarget> implements IConfigHandler {
 
   private void initTarget(long taskId, String targetName) {
     mWrapper = TaskWrapperManager.getInstance().getNormalTaskWrapper(DTaskWrapper.class, taskId);
+    if (taskId != -1 && mWrapper.getEntity().getId() == -1) {
+      mWrapper.setErrorEvent(new ErrorEvent(taskId, String.format("没有id为%s的任务", taskId)));
+    }
     mEntity = mWrapper.getEntity();
 
     mTarget.setTargetName(targetName);
     mTarget.setTaskWrapper(mWrapper);
     if (mEntity != null) {
-      getWrapper().setmTempFilePath(mEntity.getFilePath());
+      getWrapper().setTempFilePath(mEntity.getFilePath());
     }
   }
 
@@ -68,7 +72,7 @@ class DNormalConfigHandler<TARGET extends AbsTarget> implements IConfigHandler {
       return mTarget;
     }
     getWrapper().setRefreshInfo(true);
-    getWrapper().setmTempUrl(newUrl);
+    getWrapper().setTempUrl(newUrl);
     return mTarget;
   }
 
@@ -98,7 +102,7 @@ class DNormalConfigHandler<TARGET extends AbsTarget> implements IConfigHandler {
   }
 
   void setTempFilePath(String tempFilePath) {
-    getWrapper().setmTempFilePath(tempFilePath);
+    getWrapper().setTempFilePath(tempFilePath);
   }
 
   private DTaskWrapper getWrapper() {

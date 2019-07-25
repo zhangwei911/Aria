@@ -1,4 +1,7 @@
 ## 开发日志
+  + v_3.7
+    - 适配androidX
+    - 修复组合任务，恢复下载，会出现进度显示为0的问题
   + v_3.6.5
     - fix bug https://github.com/AriaLyy/Aria/issues/403
     - fix bug https://github.com/AriaLyy/Aria/issues/414

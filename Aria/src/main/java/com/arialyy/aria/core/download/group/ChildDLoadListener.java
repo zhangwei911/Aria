@@ -21,6 +21,7 @@ import com.arialyy.aria.core.inf.IDownloadListener;
 import com.arialyy.aria.core.inf.IEntity;
 import com.arialyy.aria.core.scheduler.ISchedulers;
 import com.arialyy.aria.exception.BaseException;
+import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
 
 /**
@@ -48,25 +49,25 @@ class ChildDLoadListener implements IDownloadListener {
   }
 
   @Override public void onPre() {
-    saveData(IEntity.STATE_PRE, -1);
+    saveData(IEntity.STATE_PRE, subEntity.getCurrentProgress());
   }
 
   @Override public void onPostPre(long fileSize) {
     subEntity.setFileSize(fileSize);
     subEntity.setConvertFileSize(CommonUtil.formatFileSize(fileSize));
-    saveData(IEntity.STATE_POST_PRE, -1);
+    saveData(IEntity.STATE_POST_PRE, subEntity.getCurrentProgress());
     sendToTarget(ISchedulers.POST_PRE, loader);
   }
 
   @Override public void onResume(long resumeLocation) {
     lastLen = resumeLocation;
-    saveData(IEntity.STATE_POST_PRE, IEntity.STATE_RUNNING);
+    saveData(IEntity.STATE_POST_PRE, subEntity.getCurrentProgress());
     sendToTarget(ISchedulers.START, loader);
   }
 
   @Override public void onStart(long startLocation) {
     lastLen = startLocation;
-    saveData(IEntity.STATE_POST_PRE, IEntity.STATE_RUNNING);
+    saveData(IEntity.STATE_POST_PRE, subEntity.getCurrentProgress());
     sendToTarget(ISchedulers.START, loader);
   }
 
@@ -106,7 +107,7 @@ class ChildDLoadListener implements IDownloadListener {
 
   @Override public void onFail(boolean needRetry, BaseException e) {
     subEntity.setFailNum(subEntity.getFailNum() + 1);
-    saveData(IEntity.STATE_FAIL, lastLen);
+    saveData(IEntity.STATE_FAIL, subEntity.getCurrentProgress());
     handleSpeed(0);
     sendToTarget(ISchedulers.FAIL, loader);
   }

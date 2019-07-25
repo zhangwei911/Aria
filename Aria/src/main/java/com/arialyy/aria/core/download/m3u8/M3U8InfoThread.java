@@ -53,7 +53,7 @@ import java.util.regex.Pattern;
  * https://blog.csdn.net/Guofengpu/article/details/54922865
  */
 final class M3U8InfoThread implements Runnable {
-  private final String TAG = "M3U8FileInfoThread";
+  private final String TAG = "M3U8InfoThread";
   private DownloadEntity mEntity;
   private DTaskWrapper mTaskWrapper;
   private int mConnectTimeOut;

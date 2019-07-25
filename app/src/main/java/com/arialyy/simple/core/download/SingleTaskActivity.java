@@ -55,7 +55,7 @@ public class SingleTaskActivity extends BaseActivity<ActivitySingleBinding> {
   private String mUrl;
   private String mFilePath;
   private HttpDownloadModule mModule;
-  private DownloadEntity mEntity;
+  private long mTaskId = -1;
 
   BroadcastReceiver receiver = new BroadcastReceiver() {
     @Override
@@ -95,11 +95,10 @@ public class SingleTaskActivity extends BaseActivity<ActivitySingleBinding> {
         if (entity == null) {
           return;
         }
-        mEntity = entity;
-
-        if (mEntity.getState() == IEntity.STATE_STOP) {
+        mTaskId = entity.getId();
+        if (entity.getState() == IEntity.STATE_STOP) {
           getBinding().setStateStr(getString(R.string.resume));
-        } else if (mEntity.getState() == IEntity.STATE_RUNNING) {
+        } else if (entity.getState() == IEntity.STATE_RUNNING) {
           getBinding().setStateStr(getString(R.string.stop));
         }
 
@@ -231,6 +230,7 @@ public class SingleTaskActivity extends BaseActivity<ActivitySingleBinding> {
   @Download.onTaskCancel
   void taskCancel(DownloadTask task) {
     if (task.getKey().equals(mUrl)) {
+      mTaskId = -1;
       getBinding().setProgress(0);
       getBinding().setStateStr(getString(R.string.start));
       getBinding().setSpeed("");
@@ -267,25 +267,24 @@ public class SingleTaskActivity extends BaseActivity<ActivitySingleBinding> {
   public void onClick(View view) {
     switch (view.getId()) {
       case R.id.start:
-        if (!AppUtil.chekEntityValid(mEntity)) {
+        if (mTaskId == -1) {
           startD();
+          break;
         }
-        if (Aria.download(this).load(mEntity.getId()).isRunning()) {
-          Aria.download(this).load(mEntity.getId()).stop();
+        if (Aria.download(this).load(mTaskId).isRunning()) {
+          Aria.download(this).load(mTaskId).stop();
         } else {
-          Aria.download(this).load(mEntity.getId()).resume();
+          Aria.download(this).load(mTaskId).resume();
         }
         break;
       case R.id.cancel:
-        if (AppUtil.chekEntityValid(mEntity)) {
-          Aria.download(this).load(mEntity.getId()).cancel(true);
-        }
+        Aria.download(this).load(mTaskId).cancel(true);
         break;
     }
   }
 
   private void startD() {
-    Aria.download(SingleTaskActivity.this)
+    mTaskId = Aria.download(SingleTaskActivity.this)
         .load(mUrl)
         .useServerFileName(true)
         .setFilePath(mFilePath, true)

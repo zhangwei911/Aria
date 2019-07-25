@@ -19,6 +19,7 @@ import android.support.annotation.CheckResult;
 import com.arialyy.aria.core.common.AbsNormalTarget;
 import com.arialyy.aria.core.common.Suggest;
 import com.arialyy.aria.core.common.http.HttpDelegate;
+import com.arialyy.aria.core.inf.ITaskWrapper;
 import com.arialyy.aria.core.manager.SubTaskManager;
 import java.util.List;
 
@@ -32,6 +33,7 @@ public class GroupNormalTarget extends AbsNormalTarget<GroupNormalTarget> {
   GroupNormalTarget(long taskId, String targetName) {
     setTargetName(targetName);
     mConfigHandler = new HttpGroupConfigHandler<>(this, taskId);
+    getTaskWrapper().setRequestType(ITaskWrapper.DG_HTTP);
   }
 
   /**

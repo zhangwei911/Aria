@@ -21,8 +21,8 @@ import com.arialyy.aria.core.common.IUtil;
 import com.arialyy.aria.core.common.OnFileInfoCallback;
 import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.inf.AbsEntity;
-import com.arialyy.aria.core.inf.AbsTaskWrapper;
 import com.arialyy.aria.core.inf.IDownloadListener;
+import com.arialyy.aria.core.inf.ITaskWrapper;
 import com.arialyy.aria.exception.BaseException;
 
 /**
@@ -110,7 +110,7 @@ public class SimpleDownloadUtil implements IUtil {
    */
   private Runnable createInfoThread() {
     switch (mTaskWrapper.getRequestType()) {
-      case AbsTaskWrapper.D_FTP:
+      case ITaskWrapper.D_FTP:
         return new FtpFileInfoThread(mTaskWrapper, new OnFileInfoCallback() {
           @Override public void onComplete(String url, CompleteInfo info) {
             mDownloader.updateTempFile();
@@ -122,7 +122,7 @@ public class SimpleDownloadUtil implements IUtil {
             mDownloader.closeTimer();
           }
         });
-      case AbsTaskWrapper.D_HTTP:
+      case ITaskWrapper.D_HTTP:
         return new HttpFileInfoThread(mTaskWrapper, new OnFileInfoCallback() {
           @Override public void onComplete(String url, CompleteInfo info) {
             mDownloader.updateTempFile();
