@@ -100,7 +100,7 @@ final class SqlHelper extends SQLiteOpenHelper {
         handle360AriaUpdate(db);
       } else if (oldVersion < 51) {
         handle365Update(db);
-      } else if (oldVersion < 52) {
+      } else if (oldVersion < 53) {
         handle366Update(db);
       } else {
         handleDbUpdate(db, null, null);
@@ -240,12 +240,9 @@ final class SqlHelper extends SQLiteOpenHelper {
    * 删除重复的repeat数据
    */
   private void delRepeatThreadRecord(SQLiteDatabase db) {
-    String repeatSql =
-        "DELETE FROM ThreadRecord WHERE (taskKey, threadId, endLocation) "
-            + "IN (SELECT taskKey, threadId, endLocation FROM ThreadRecord GROUP BY taskKey, threadId, endLocation "
-            + "HAVING COUNT(*) > 1) AND rowid "
-            + "NOT IN (SELECT MIN(rowid) FROM ThreadRecord GROUP BY taskKey, threadId, endLocation "
-            + "HAVING COUNT(*)> 1)";
+    String repeatSql = "DELETE FROM ThreadRecord WHERE (rowid) "
+        + "IN (SELECT rowid FROM ThreadRecord GROUP BY taskKey, threadId, endLocation HAVING COUNT(*) > 1) "
+        + "AND rowid NOT IN (SELECT MIN(rowid) FROM ThreadRecord GROUP BY taskKey, threadId, endLocation HAVING COUNT(*)> 1)";
     ALog.d(TAG, repeatSql);
     db.execSQL(repeatSql);
   }
@@ -262,6 +259,7 @@ final class SqlHelper extends SQLiteOpenHelper {
 
     // 执行升级操作
     handleDbUpdate(db, modifyMap, null);
+    delRepeatThreadRecord(db);
   }
 
   /**
