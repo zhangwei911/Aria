@@ -35,6 +35,15 @@ public class M3U8Delegate<TARGET extends AbsTarget> extends BaseDelegate<TARGET>
   }
 
   /**
+   * 生成m3u8索引文件，只有{@link #merge(boolean)}设置为false才会有效
+   */
+  @CheckResult(suggest = Suggest.TO_CONTROLLER)
+  public M3U8Delegate<TARGET> genetateIndexFile() {
+    mTaskWrapper.asM3U8().setGenerateIndexFile(true);
+    return this;
+  }
+
+  /**
    * 是否合并ts文件，默认合并ts
    *
    * @param merge {@code true}合并所有ts文件为一个

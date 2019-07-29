@@ -98,6 +98,19 @@ public class M3U8TaskConfig {
    */
   private int jumpIndex;
 
+  /**
+   * 生成索引
+   */
+  private boolean generateIndexFile;
+
+  public boolean isGenerateIndexFile() {
+    return generateIndexFile;
+  }
+
+  public void setGenerateIndexFile(boolean generateIndexFile) {
+    this.generateIndexFile = generateIndexFile;
+  }
+
   public int getJumpIndex() {
     return jumpIndex;
   }

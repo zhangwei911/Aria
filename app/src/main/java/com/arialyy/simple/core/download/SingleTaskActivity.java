@@ -274,7 +274,9 @@ public class SingleTaskActivity extends BaseActivity<ActivitySingleBinding> {
         if (Aria.download(this).load(mTaskId).isRunning()) {
           Aria.download(this).load(mTaskId).stop();
         } else {
-          Aria.download(this).load(mTaskId).resume();
+          Aria.download(this).load(mTaskId)
+              //.updateUrl("http://sdkdown.muzhiwan.com/openfile/2019/07/11/com.netease.syfz.mzw_5d26f8d9cee27.apk")
+              .resume();
         }
         break;
       case R.id.cancel:

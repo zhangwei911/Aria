@@ -36,11 +36,6 @@ class DNormalConfigHandler<TARGET extends AbsTarget> implements IConfigHandler {
   private DTaskWrapper mWrapper;
 
   /**
-   * 资源地址
-   */
-  private String mUrl;
-
-  /**
    * @param taskId 第一次下载，taskId为-1
    */
   DNormalConfigHandler(TARGET target, long taskId, String targetName) {
@@ -67,12 +62,13 @@ class DNormalConfigHandler<TARGET extends AbsTarget> implements IConfigHandler {
       ALog.e(TAG, "url更新失败，newUrl为null");
       return mTarget;
     }
-    if (mUrl.equals(newUrl)) {
+    if (mEntity.getUrl().equals(newUrl)) {
       ALog.e(TAG, "url更新失败，新的下载url和旧的url一致");
       return mTarget;
     }
     getWrapper().setRefreshInfo(true);
     getWrapper().setTempUrl(newUrl);
+    ALog.d(TAG, "更新url成功");
     return mTarget;
   }
 
@@ -81,7 +77,8 @@ class DNormalConfigHandler<TARGET extends AbsTarget> implements IConfigHandler {
   }
 
   @Override public boolean taskExists() {
-    return DbEntity.checkDataExist(DownloadEntity.class, "url=?", mUrl);
+    return DbEntity.checkDataExist(DownloadEntity.class, "rowid=?",
+        String.valueOf(mEntity.getId()));
   }
 
   @Override public boolean isRunning() {
@@ -93,7 +90,6 @@ class DNormalConfigHandler<TARGET extends AbsTarget> implements IConfigHandler {
   }
 
   void setUrl(String url) {
-    this.mUrl = url;
     mEntity.setUrl(url);
   }
 

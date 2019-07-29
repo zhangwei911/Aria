@@ -47,7 +47,8 @@ public class HttpDownloadModule extends BaseViewModule {
    * 单任务下载的信息
    */
   LiveData<DownloadEntity> getHttpDownloadInfo(Context context) {
-    String url = AppUtil.getConfigValue(context, HTTP_URL_KEY, defUrl);
+    //String url = AppUtil.getConfigValue(context, HTTP_URL_KEY, defUrl);
+    String url = "http://sdkdown.muzhiwan.com/openfile/2019/05/21/com.netease.tom.mzw_5ce3ef8754d05.apk";
     String filePath = AppUtil.getConfigValue(context, HTTP_PATH_KEY, defFilePath);
 
     singDownloadInfo = Aria.download(context).getFirstDownloadEntity(url);
