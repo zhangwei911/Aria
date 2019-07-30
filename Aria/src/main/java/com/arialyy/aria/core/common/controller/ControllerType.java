@@ -19,6 +19,12 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 @Retention(RetentionPolicy.SOURCE) public @interface ControllerType {
+  /**
+   * 仅用于第一次创建任务，后续可调用`#start()、#add()、#setHighestPriority()`方法。
+   */
   Class<StartController> START_CONTROLLER = StartController.class;
+  /**
+   * 用于后续的任务控制，后续可调用`#stop()、#resume()、#cancel()、#cancel(boolean)、#retry()、#restart()`方法。
+   */
   Class<NormalController> NORMAL_CONTROLLER = NormalController.class;
 }

@@ -19,6 +19,7 @@ import android.support.annotation.CheckResult;
 import com.arialyy.aria.core.common.AbsStartTarget;
 import com.arialyy.aria.core.common.Suggest;
 import com.arialyy.aria.core.common.ftp.FtpDelegate;
+import com.arialyy.aria.core.manager.SubTaskManager;
 import com.arialyy.aria.util.CommonUtil;
 
 /**
@@ -78,5 +79,15 @@ public class FtpDirStartTarget extends AbsStartTarget<FtpDirStartTarget> {
 
   @Override public DownloadGroupEntity getEntity() {
     return (DownloadGroupEntity) super.getEntity();
+  }
+
+  /**
+   * 获取子任务管理器
+   *
+   * @return 子任务管理器
+   */
+  @CheckResult(suggest = Suggest.TASK_CONTROLLER)
+  public SubTaskManager getSubTaskManager() {
+    return mConfigHandler.getSubTaskManager();
   }
 }

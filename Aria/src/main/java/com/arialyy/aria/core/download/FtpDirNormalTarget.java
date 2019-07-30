@@ -19,6 +19,7 @@ import android.support.annotation.CheckResult;
 import com.arialyy.aria.core.common.AbsNormalTarget;
 import com.arialyy.aria.core.common.Suggest;
 import com.arialyy.aria.core.common.ftp.FtpDelegate;
+import com.arialyy.aria.core.manager.SubTaskManager;
 import com.arialyy.aria.util.CommonUtil;
 
 /**
@@ -76,5 +77,15 @@ public class FtpDirNormalTarget extends AbsNormalTarget<FtpDirNormalTarget> {
 
   @Override public DownloadGroupEntity getEntity() {
     return (DownloadGroupEntity) super.getEntity();
+  }
+
+  /**
+   * 获取子任务管理器
+   *
+   * @return 子任务管理器
+   */
+  @CheckResult(suggest = Suggest.TASK_CONTROLLER)
+  public SubTaskManager getSubTaskManager() {
+    return mConfigHandler.getSubTaskManager();
   }
 }

@@ -31,6 +31,8 @@ import android.view.View;
 import android.widget.Toast;
 import com.arialyy.annotations.Download;
 import com.arialyy.aria.core.Aria;
+import com.arialyy.aria.core.common.RequestEnum;
+import com.arialyy.aria.core.common.controller.ControllerType;
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.download.DownloadTask;
 import com.arialyy.aria.core.inf.IEntity;
@@ -302,6 +304,9 @@ public class SingleTaskActivity extends BaseActivity<ActivitySingleBinding> {
             return Long.parseLong(temp);
           }
         })
+        .option()
+        .addHeader("1", "@")
+        .controller(ControllerType.START_CONTROLLER)
         .start();
   }
 

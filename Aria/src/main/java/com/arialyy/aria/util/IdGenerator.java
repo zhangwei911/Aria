@@ -51,7 +51,8 @@ public class IdGenerator {
   public synchronized long nextId() {
     long ts = timeGen();
     if (ts < lastTs) {// 刚刚生成的时间戳比上次的时间戳还小，出错
-      throw new RuntimeException("时间戳顺序错误");
+      //throw new RuntimeException("时间戳顺序错误");
+      ts = nextTs(lastTs);
     }
     if (ts == lastTs) {// 刚刚生成的时间戳跟上次的时间戳一样，则需要生成一个sequence序列号
       // sequence循环自增
