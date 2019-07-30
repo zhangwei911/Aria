@@ -1,6 +1,6 @@
 package com.arialyy.frame.base;
 
-import android.arch.lifecycle.ViewModel;
+import androidx.lifecycle.ViewModel;
 import com.arialyy.frame.base.net.NetManager;
 import com.arialyy.frame.util.StringUtil;
 

@@ -4,11 +4,9 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.os.Build;
 import android.provider.Settings;
-import android.support.v4.app.Fragment;
 import android.util.SparseArray;
 
-import com.arialyy.frame.util.show.L;
-
+import androidx.fragment.app.Fragment;
 import java.util.Arrays;
 import java.util.List;
 

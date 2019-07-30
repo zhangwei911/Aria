@@ -15,33 +15,31 @@
  */
 package com.arialyy.simple.base.adapter;
 
-import android.support.annotation.IdRes;
-import android.support.v7.widget.RecyclerView;
 import android.util.SparseArray;
 import android.view.View;
-
+import androidx.annotation.IdRes;
+import androidx.recyclerview.widget.RecyclerView;
 
 /**
  * Created by lyy on 2015/12/3.
  * 通用Holder
  */
 public class AbsHolder extends RecyclerView.ViewHolder {
-    private View mView;
-    private SparseArray<View> mViews = new SparseArray<>();
+  private View mView;
+  private SparseArray<View> mViews = new SparseArray<>();
 
-    public AbsHolder(View itemView) {
-        super(itemView);
-        mView = itemView;
+  public AbsHolder(View itemView) {
+    super(itemView);
+    mView = itemView;
+  }
+
+  @SuppressWarnings("unchecked")
+  public <T extends View> T findViewById(@IdRes int id) {
+    View view = mViews.get(id);
+    if (view == null) {
+      view = mView.findViewById(id);
+      mViews.put(id, view);
     }
-
-    @SuppressWarnings("unchecked")
-    public <T extends View> T findViewById(@IdRes int id) {
-        View view = mViews.get(id);
-        if (view == null) {
-            view = mView.findViewById(id);
-            mViews.put(id, view);
-        }
-        return (T) view;
-    }
-
+    return (T) view;
+  }
 }

@@ -18,7 +18,7 @@ package com.arialyy.simple.core.download.service_download;
 
 import android.app.NotificationManager;
 import android.content.Context;
-import android.support.v4.app.NotificationCompat;
+import androidx.core.app.NotificationCompat;
 import com.arialyy.simple.R;
 
 /**

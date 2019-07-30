@@ -10,7 +10,7 @@ android {
     versionCode 1
     versionName "1.0"
 
-    testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
   }
   buildTypes {
     release {
@@ -25,11 +25,11 @@ android {
 
 dependencies {
   compile fileTree(dir: 'libs', include: ['*.jar'])
-  androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+  androidTestCompile('androidx.test.espresso:espresso-core:3.1.0', {
     exclude group: 'com.android.support', module: 'support-annotations'
   })
   testCompile 'junit:junit:4.12'
-  api "com.android.support:appcompat-v7:${rootProject.ext.supportLibVersion}"
+  api 'androidx.appcompat:appcompat:1.0.2'
   api 'com.google.code.gson:gson:2.8.2'
   api 'io.reactivex:rxandroid:1.2.0'
   api 'io.reactivex:rxjava:1.1.5'
@@ -39,10 +39,10 @@ dependencies {
   implementation 'com.squareup.retrofit2:converter-gson:2.1.0'
   implementation 'com.squareup.okhttp3:logging-interceptor:3.2.0'
   implementation 'com.github.franmontiel:PersistentCookieJar:v1.0.1'
-  implementation 'com.android.support:multidex:1.0.3'
+  implementation 'androidx.multidex:multidex:2.0.1'
 
-  api "android.arch.lifecycle:runtime:${rootProject.ext.lifecycleVersion}"
-  api "android.arch.lifecycle:extensions:${rootProject.ext.lifecycleVersion}"
-  annotationProcessor "android.arch.lifecycle:compiler:${rootProject.ext.lifecycleVersion}"
+  api 'androidx.lifecycle:lifecycle-runtime:2.0.0'
+  api 'androidx.lifecycle:lifecycle-extensions:2.0.0'
+  annotationProcessor 'androidx.lifecycle:lifecycle-compiler:2.0.0'
 
 }

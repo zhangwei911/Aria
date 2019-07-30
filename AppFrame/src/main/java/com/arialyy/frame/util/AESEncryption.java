@@ -1,11 +1,9 @@
 package com.arialyy.frame.util;
 
 import android.annotation.SuppressLint;
-import android.support.annotation.NonNull;
-
+import androidx.annotation.NonNull;
 import java.io.File;
 import java.security.SecureRandom;
-
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;

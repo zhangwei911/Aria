@@ -15,7 +15,7 @@
  */
 package com.arialyy.aria.core.download.m3u8;
 
-import android.support.annotation.CheckResult;
+import androidx.annotation.CheckResult;
 import com.arialyy.aria.core.common.BaseDelegate;
 import com.arialyy.aria.core.common.Suggest;
 import com.arialyy.aria.core.download.DTaskWrapper;

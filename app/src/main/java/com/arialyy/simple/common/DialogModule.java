@@ -16,9 +16,9 @@
 
 package com.arialyy.simple.common;
 
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.MutableLiveData;
 import android.text.TextUtils;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.frame.base.BaseViewModule;
 import java.io.File;

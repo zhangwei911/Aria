@@ -15,9 +15,9 @@
  */
 package com.arialyy.aria.core.common.http;
 
-import android.support.annotation.CheckResult;
-import android.support.annotation.NonNull;
 import android.text.TextUtils;
+import androidx.annotation.CheckResult;
+import androidx.annotation.NonNull;
 import com.arialyy.aria.core.common.BaseDelegate;
 import com.arialyy.aria.core.common.RequestEnum;
 import com.arialyy.aria.core.common.Suggest;

@@ -16,24 +16,24 @@
 
 package com.arialyy.simple.core.download;
 
-import android.arch.lifecycle.Observer;
-import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v7.widget.AppCompatImageView;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.TextView;
+import androidx.annotation.Nullable;
+import androidx.appcompat.widget.AppCompatImageView;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import com.arialyy.simple.MainActivity;
 import com.arialyy.simple.R;
 import com.arialyy.simple.base.BaseActivity;
 import com.arialyy.simple.base.adapter.AbsHolder;
 import com.arialyy.simple.base.adapter.AbsRVAdapter;
 import com.arialyy.simple.base.adapter.RvItemClickSupport;
-import com.arialyy.simple.databinding.ActivityDownloadMeanBinding;
 import com.arialyy.simple.core.download.multi_download.MultiTaskActivity;
+import com.arialyy.simple.databinding.ActivityDownloadMeanBinding;
 import com.arialyy.simple.modlue.CommonModule;
 import com.arialyy.simple.to.NormalTo;
 import java.util.ArrayList;

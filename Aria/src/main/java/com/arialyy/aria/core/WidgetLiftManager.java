@@ -20,8 +20,8 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Build;
 import android.os.Message;
-import android.support.v4.app.DialogFragment;
 import android.widget.PopupWindow;
+import androidx.fragment.app.DialogFragment;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
 import java.lang.reflect.Field;
@@ -46,7 +46,7 @@ final class WidgetLiftManager {
   /**
    * 处理DialogFragment事件
    *
-   * @param dialogFragment {@link android.support.v4.app.DialogFragment}
+   * @param dialogFragment {@link DialogFragment}
    */
   @TargetApi(Build.VERSION_CODES.HONEYCOMB) boolean handleDialogFragmentLift(
       DialogFragment dialogFragment) {

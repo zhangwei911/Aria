@@ -17,10 +17,7 @@ package com.arialyy.simple.widget;
 
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.databinding.BindingAdapter;
 import android.graphics.drawable.Drawable;
-import android.support.annotation.DrawableRes;
-import android.support.v7.widget.AppCompatImageView;
 import android.text.Html;
 import android.text.TextUtils;
 import android.util.AttributeSet;
@@ -28,6 +25,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import androidx.annotation.DrawableRes;
+import androidx.appcompat.widget.AppCompatImageView;
+import androidx.databinding.BindingAdapter;
 import com.arialyy.simple.R;
 
 public class SvgTextView extends RelativeLayout {
@@ -64,16 +64,14 @@ public class SvgTextView extends RelativeLayout {
     attributes.recycle();
   }
 
-  public void setIconClickListener(View.OnClickListener listener){
+  public void setIconClickListener(View.OnClickListener listener) {
     icon.setOnClickListener(listener);
   }
 
-
-  @BindingAdapter(value = {"svg_text_view_icon"})
+  @BindingAdapter(value = { "svg_text_view_icon" })
   public static void bindAttr(SvgTextView svgTextView, @DrawableRes int drawable) {
     svgTextView.icon.setImageResource(drawable);
   }
-
 
   public void setIcon(@DrawableRes int drawable) {
     icon.setImageResource(drawable);

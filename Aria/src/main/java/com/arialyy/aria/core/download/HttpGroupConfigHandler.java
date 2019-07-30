@@ -15,7 +15,7 @@
  */
 package com.arialyy.aria.core.download;
 
-import android.support.annotation.CheckResult;
+import androidx.annotation.CheckResult;
 import com.arialyy.aria.core.inf.AbsTarget;
 import com.arialyy.aria.orm.DbEntity;
 import com.arialyy.aria.util.ALog;

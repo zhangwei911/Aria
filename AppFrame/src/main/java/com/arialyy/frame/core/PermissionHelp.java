@@ -4,8 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.provider.Settings;
-import android.support.annotation.NonNull;
-
+import androidx.annotation.NonNull;
 import com.arialyy.frame.permission.OnPermissionCallback;
 import com.arialyy.frame.permission.PermissionManager;
 import com.arialyy.frame.util.AndroidVersionUtil;

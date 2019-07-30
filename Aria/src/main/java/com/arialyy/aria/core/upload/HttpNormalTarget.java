@@ -15,7 +15,7 @@
  */
 package com.arialyy.aria.core.upload;
 
-import android.support.annotation.CheckResult;
+import androidx.annotation.CheckResult;
 import com.arialyy.aria.core.common.AbsNormalTarget;
 import com.arialyy.aria.core.common.Suggest;
 import com.arialyy.aria.core.common.http.HttpDelegate;

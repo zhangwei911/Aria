@@ -15,10 +15,10 @@
  */
 package com.arialyy.simple.base.adapter;
 
-import android.support.v7.widget.RecyclerView;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
+import androidx.recyclerview.widget.RecyclerView;
 import com.arialyy.simple.R;
 
 /*

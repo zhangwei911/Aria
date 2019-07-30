@@ -1,14 +1,13 @@
 package com.arialyy.frame.core;
 
 import android.content.Intent;
-import android.databinding.DataBindingUtil;
-import android.databinding.ViewDataBinding;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.annotation.NonNull;
-import android.support.v7.app.AppCompatActivity;
 import android.view.View;
-
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.databinding.DataBindingUtil;
+import androidx.databinding.ViewDataBinding;
 import com.arialyy.frame.module.AbsModule;
 import com.arialyy.frame.module.IOCProxy;
 import com.arialyy.frame.temp.AbsTempView;

@@ -17,11 +17,11 @@
 package com.arialyy.simple.core.download.multi_download;
 
 import android.os.Bundle;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import com.arialyy.annotations.Download;
 import com.arialyy.annotations.DownloadGroup;
 import com.arialyy.aria.core.Aria;
@@ -76,7 +76,7 @@ public class MultiDownloadActivity extends BaseActivity<ActivityMultiDownloadBin
     Log.d(TAG, task.getTaskName() + ", " + task.getState());
   }
 
-  @Download.onWait void onWait(DownloadTask task){
+  @Download.onWait void onWait(DownloadTask task) {
     mAdapter.updateState(task.getEntity());
   }
 

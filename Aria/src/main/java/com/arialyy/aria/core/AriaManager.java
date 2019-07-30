@@ -29,9 +29,9 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.support.v4.app.DialogFragment;
-import android.support.v4.app.Fragment;
 import android.widget.PopupWindow;
+import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.Fragment;
 import com.arialyy.aria.core.command.CommandManager;
 import com.arialyy.aria.core.common.QueueMod;
 import com.arialyy.aria.core.common.RecordHandler;
@@ -385,7 +385,7 @@ import org.xml.sax.SAXException;
       relateSubClass(type, obj, ((DialogFragment) obj).getActivity());
     } else if (obj instanceof android.app.DialogFragment) {
       relateSubClass(type, obj, ((android.app.DialogFragment) obj).getActivity());
-    } else if (obj instanceof android.support.v4.app.Fragment) {
+    } else if (obj instanceof Fragment) {
       relateSubClass(type, obj, ((Fragment) obj).getActivity());
     } else if (obj instanceof android.app.Fragment) {
       relateSubClass(type, obj, ((android.app.Fragment) obj).getActivity());

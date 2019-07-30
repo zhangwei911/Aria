@@ -16,11 +16,11 @@
 
 package com.arialyy.simple.core.download;
 
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.MutableLiveData;
 import android.content.Context;
 import android.os.Environment;
 import android.text.TextUtils;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 import com.arialyy.aria.core.Aria;
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.util.ALog;
@@ -47,8 +47,9 @@ public class HttpDownloadModule extends BaseViewModule {
    * 单任务下载的信息
    */
   LiveData<DownloadEntity> getHttpDownloadInfo(Context context) {
-    //String url = AppUtil.getConfigValue(context, HTTP_URL_KEY, defUrl);
-    String url = "http://sdkdown.muzhiwan.com/openfile/2019/05/21/com.netease.tom.mzw_5ce3ef8754d05.apk";
+    String url = AppUtil.getConfigValue(context, HTTP_URL_KEY, defUrl);
+    //String url =
+    //    "http://sdkdown.muzhiwan.com/openfile/2019/05/21/com.netease.tom.mzw_5ce3ef8754d05.apk";
     String filePath = AppUtil.getConfigValue(context, HTTP_PATH_KEY, defFilePath);
 
     singDownloadInfo = Aria.download(context).getFirstDownloadEntity(url);
@@ -59,7 +60,7 @@ public class HttpDownloadModule extends BaseViewModule {
       singDownloadInfo.setFilePath(filePath);
       singDownloadInfo.setFileName(file.getName());
     } else {
-      AppUtil.setConfigValue(context, HTTP_PATH_KEY, singDownloadInfo.getDownloadPath());
+      AppUtil.setConfigValue(context, HTTP_PATH_KEY, singDownloadInfo.getFilePath());
       AppUtil.setConfigValue(context, HTTP_URL_KEY, singDownloadInfo.getUrl());
     }
     liveData.postValue(singDownloadInfo);

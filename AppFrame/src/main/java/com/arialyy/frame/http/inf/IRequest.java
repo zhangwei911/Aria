@@ -1,6 +1,6 @@
 package com.arialyy.frame.http.inf;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 /**
  * 网络请求类

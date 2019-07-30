@@ -1,6 +1,6 @@
 package com.arialyy.frame.base;
 
-import android.databinding.ViewDataBinding;
+import androidx.databinding.ViewDataBinding;
 import com.arialyy.frame.core.AbsFragment;
 
 /**

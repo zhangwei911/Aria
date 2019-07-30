@@ -2,12 +2,10 @@ package com.arialyy.frame.cache;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.support.annotation.NonNull;
-
+import androidx.annotation.NonNull;
 import com.arialyy.frame.util.DrawableUtil;
 import com.arialyy.frame.util.show.L;
 import com.google.gson.Gson;
-
 import java.io.UnsupportedEncodingException;
 
 /**

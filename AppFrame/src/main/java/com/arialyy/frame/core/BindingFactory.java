@@ -1,6 +1,6 @@
 package com.arialyy.frame.core;
 
-import android.databinding.ViewDataBinding;
+import androidx.databinding.ViewDataBinding;
 
 import java.util.HashMap;
 import java.util.Map;

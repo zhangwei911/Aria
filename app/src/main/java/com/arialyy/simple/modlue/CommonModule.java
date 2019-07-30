@@ -15,10 +15,10 @@
  */
 package com.arialyy.simple.modlue;
 
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.MutableLiveData;
 import android.content.Context;
 import android.content.Intent;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 import com.arialyy.frame.base.BaseViewModule;
 import com.arialyy.simple.MainActivity;
 import com.arialyy.simple.R;

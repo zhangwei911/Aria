@@ -15,12 +15,11 @@
  */
 package com.arialyy.aria.core.download;
 
-import android.support.annotation.CheckResult;
-import android.support.annotation.NonNull;
+import androidx.annotation.CheckResult;
+import androidx.annotation.NonNull;
 import com.arialyy.aria.core.common.AbsStartTarget;
 import com.arialyy.aria.core.common.Suggest;
 import com.arialyy.aria.core.common.ftp.FtpDelegate;
-import com.arialyy.aria.core.inf.AbsTaskWrapper;
 import com.arialyy.aria.core.inf.ITaskWrapper;
 import com.arialyy.aria.util.CommonUtil;
 

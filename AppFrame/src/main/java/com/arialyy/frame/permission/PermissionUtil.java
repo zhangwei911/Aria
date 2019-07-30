@@ -7,13 +7,11 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.provider.Settings;
-import android.support.v4.app.Fragment;
 import android.text.TextUtils;
-
+import androidx.fragment.app.Fragment;
 import com.arialyy.frame.util.AndroidVersionUtil;
 import com.arialyy.frame.util.show.L;
 import com.arialyy.frame.util.show.T;
-
 import java.util.ArrayList;
 import java.util.List;
 

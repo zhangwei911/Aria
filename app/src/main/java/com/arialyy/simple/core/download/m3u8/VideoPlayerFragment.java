@@ -1,17 +1,17 @@
 package com.arialyy.simple.core.download.m3u8;
 
 import android.annotation.SuppressLint;
-import android.arch.lifecycle.ViewModelProviders;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.RequiresApi;
 import android.text.TextUtils;
 import android.util.SparseArray;
 import android.view.SurfaceHolder;
 import android.view.View;
 import android.widget.SeekBar;
+import androidx.annotation.RequiresApi;
+import androidx.lifecycle.ViewModelProviders;
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.download.m3u8.M3U8Entity;
 import com.arialyy.aria.util.ALog;

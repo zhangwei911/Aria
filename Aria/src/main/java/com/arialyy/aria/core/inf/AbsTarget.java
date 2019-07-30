@@ -15,8 +15,8 @@
  */
 package com.arialyy.aria.core.inf;
 
-import android.support.annotation.CheckResult;
 import android.text.TextUtils;
+import androidx.annotation.CheckResult;
 import com.arialyy.aria.core.common.Suggest;
 import com.arialyy.aria.core.common.controller.NormalController;
 import com.arialyy.aria.core.common.controller.StartController;

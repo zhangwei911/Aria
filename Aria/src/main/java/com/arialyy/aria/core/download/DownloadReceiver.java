@@ -15,9 +15,9 @@
  */
 package com.arialyy.aria.core.download;
 
-import android.support.annotation.CheckResult;
-import android.support.annotation.NonNull;
 import android.text.TextUtils;
+import androidx.annotation.CheckResult;
+import androidx.annotation.NonNull;
 import com.arialyy.annotations.TaskEnum;
 import com.arialyy.aria.core.AriaManager;
 import com.arialyy.aria.core.command.CancelAllCmd;

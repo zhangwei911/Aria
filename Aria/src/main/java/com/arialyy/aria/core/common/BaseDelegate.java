@@ -15,7 +15,7 @@
  */
 package com.arialyy.aria.core.common;
 
-import android.support.annotation.CheckResult;
+import androidx.annotation.CheckResult;
 import com.arialyy.aria.core.common.controller.ControllerType;
 import com.arialyy.aria.core.common.controller.FeatureController;
 import com.arialyy.aria.core.inf.AbsTarget;

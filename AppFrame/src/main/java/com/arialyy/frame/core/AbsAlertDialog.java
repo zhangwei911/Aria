@@ -3,9 +3,8 @@ package com.arialyy.frame.core;
 import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v4.app.DialogFragment;
-
+import androidx.annotation.NonNull;
+import androidx.fragment.app.DialogFragment;
 import com.arialyy.frame.module.AbsModule;
 import com.arialyy.frame.module.IOCProxy;
 import com.arialyy.frame.util.StringUtil;

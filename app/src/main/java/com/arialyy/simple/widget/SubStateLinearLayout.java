@@ -16,13 +16,13 @@
 package com.arialyy.simple.widget;
 
 import android.content.Context;
-import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import androidx.annotation.Nullable;
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.simple.R;
 import java.util.LinkedList;

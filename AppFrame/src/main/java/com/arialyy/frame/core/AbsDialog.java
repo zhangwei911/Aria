@@ -2,9 +2,8 @@ package com.arialyy.frame.core;
 
 import android.app.Dialog;
 import android.content.Context;
-import android.support.annotation.NonNull;
 import android.view.Window;
-
+import androidx.annotation.NonNull;
 import com.arialyy.frame.module.AbsModule;
 import com.arialyy.frame.module.IOCProxy;
 import com.arialyy.frame.util.StringUtil;

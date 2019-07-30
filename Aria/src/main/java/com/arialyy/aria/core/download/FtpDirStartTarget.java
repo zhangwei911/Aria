@@ -15,7 +15,7 @@
  */
 package com.arialyy.aria.core.download;
 
-import android.support.annotation.CheckResult;
+import androidx.annotation.CheckResult;
 import com.arialyy.aria.core.common.AbsStartTarget;
 import com.arialyy.aria.core.common.Suggest;
 import com.arialyy.aria.core.common.ftp.FtpDelegate;

@@ -2,22 +2,21 @@ package com.arialyy.frame.core;
 
 import android.content.Context;
 import android.content.Intent;
-import android.databinding.DataBindingUtil;
-import android.databinding.ViewDataBinding;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentContainer;
-import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
-
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.databinding.DataBindingUtil;
+import androidx.databinding.ViewDataBinding;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentContainer;
+import androidx.viewpager.widget.ViewPager;
 import com.arialyy.frame.module.AbsModule;
 import com.arialyy.frame.module.IOCProxy;
 import com.arialyy.frame.temp.AbsTempView;
@@ -26,7 +25,6 @@ import com.arialyy.frame.temp.TempView;
 import com.arialyy.frame.util.ReflectionUtil;
 import com.arialyy.frame.util.StringUtil;
 import com.arialyy.frame.util.show.L;
-
 import java.lang.reflect.Field;
 
 /**

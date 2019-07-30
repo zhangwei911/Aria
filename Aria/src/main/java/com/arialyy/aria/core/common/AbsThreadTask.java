@@ -20,7 +20,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.os.Process;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 import com.arialyy.aria.core.AriaManager;
 import com.arialyy.aria.core.config.BaseTaskConfig;
 import com.arialyy.aria.core.config.DGroupConfig;

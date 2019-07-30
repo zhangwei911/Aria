@@ -16,10 +16,10 @@
 
 package com.arialyy.simple.base;
 
-import android.databinding.ViewDataBinding;
 import android.os.Bundle;
-import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
+import androidx.appcompat.widget.Toolbar;
+import androidx.databinding.ViewDataBinding;
 import com.arialyy.frame.core.AbsActivity;
 import com.arialyy.frame.util.AndroidVersionUtil;
 import com.arialyy.simple.R;

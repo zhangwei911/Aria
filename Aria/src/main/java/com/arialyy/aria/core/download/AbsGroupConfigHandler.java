@@ -15,7 +15,7 @@
  */
 package com.arialyy.aria.core.download;
 
-import android.support.annotation.CheckResult;
+import androidx.annotation.CheckResult;
 import android.text.TextUtils;
 import com.arialyy.aria.core.event.ErrorEvent;
 import com.arialyy.aria.core.inf.AbsTarget;

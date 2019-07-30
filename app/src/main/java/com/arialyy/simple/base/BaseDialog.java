@@ -16,7 +16,7 @@
 
 package com.arialyy.simple.base;
 
-import android.databinding.ViewDataBinding;
+import androidx.databinding.ViewDataBinding;
 import android.os.Bundle;
 import com.arialyy.frame.core.AbsDialogFragment;
 

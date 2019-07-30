@@ -1,22 +1,13 @@
 package com.arialyy.frame.module;
 
 import android.content.Context;
-import android.databinding.ViewDataBinding;
-import android.text.TextUtils;
-import android.util.SparseIntArray;
-import android.view.View;
+import androidx.databinding.ViewDataBinding;
 
 import com.arialyy.frame.core.AbsActivity;
 import com.arialyy.frame.core.BindingFactory;
 import com.arialyy.frame.module.inf.ModuleListener;
-import com.arialyy.frame.util.ObjUtil;
 import com.arialyy.frame.util.StringUtil;
 import com.arialyy.frame.util.show.L;
-
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * Created by AriaLyy on 2015/2/3.

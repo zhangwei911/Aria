@@ -1,18 +1,15 @@
 package com.arialyy.frame.cache;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
-import android.support.v4.util.LruCache;
 import android.text.TextUtils;
-
+import androidx.annotation.NonNull;
+import androidx.collection.LruCache;
 import com.arialyy.frame.util.AndroidUtils;
 import com.arialyy.frame.util.AppUtils;
-import com.arialyy.frame.util.FileUtil;
 import com.arialyy.frame.util.StreamUtil;
 import com.arialyy.frame.util.StringUtil;
 import com.arialyy.frame.util.show.FL;
 import com.arialyy.frame.util.show.L;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;

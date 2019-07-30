@@ -16,8 +16,6 @@
 
 package com.arialyy.simple.core.download
 
-import android.arch.lifecycle.Observer
-import android.arch.lifecycle.ViewModelProviders
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -27,6 +25,8 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
 import com.arialyy.annotations.Download
 import com.arialyy.aria.core.Aria
 import com.arialyy.aria.core.download.DownloadEntity
@@ -37,6 +37,7 @@ import com.arialyy.aria.util.ALog
 import com.arialyy.aria.util.CommonUtil
 import com.arialyy.frame.util.show.T
 import com.arialyy.simple.R
+import com.arialyy.simple.R.string
 import com.arialyy.simple.base.BaseActivity
 import com.arialyy.simple.common.ModifyPathDialog
 import com.arialyy.simple.common.ModifyUrlDialog
@@ -96,11 +97,11 @@ class KotlinDownloadActivity : BaseActivity<ActivitySingleKotlinBinding>() {
             return@Observer
           }
           if (entity.state == IEntity.STATE_STOP) {
-            binding.stateStr = getString(R.string.resume)
+            binding.stateStr = getString(string.resume)
           }
 
           if (Aria.download(this).load(entity.id).isRunning) {
-            binding.stateStr = getString(R.string.stop)
+            binding.stateStr = getString(string.stop)
           }
 
           if (entity.fileSize != 0L) {

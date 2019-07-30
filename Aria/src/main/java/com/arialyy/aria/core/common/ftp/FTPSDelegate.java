@@ -15,8 +15,8 @@
  */
 package com.arialyy.aria.core.common.ftp;
 
-import android.support.annotation.CheckResult;
 import android.text.TextUtils;
+import androidx.annotation.CheckResult;
 import com.arialyy.aria.core.FtpUrlEntity;
 import com.arialyy.aria.core.common.BaseDelegate;
 import com.arialyy.aria.core.common.ProtocolType;

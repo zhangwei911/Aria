@@ -15,7 +15,7 @@
  */
 package com.arialyy.aria.core.download.m3u8;
 
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 import java.util.List;
 
 /**

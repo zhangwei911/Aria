@@ -15,7 +15,7 @@
  */
 package com.arialyy.aria.core.manager;
 
-import android.support.v4.util.LruCache;
+import androidx.collection.LruCache;
 import com.arialyy.aria.core.download.DGTaskWrapper;
 import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.inf.AbsTaskWrapper;

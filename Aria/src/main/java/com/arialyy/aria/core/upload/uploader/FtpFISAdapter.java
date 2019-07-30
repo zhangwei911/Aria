@@ -15,7 +15,7 @@
  */
 package com.arialyy.aria.core.upload.uploader;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import com.arialyy.aria.util.BufferedRandomAccessFile;
 import java.io.IOException;
 import java.io.InputStream;

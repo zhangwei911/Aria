@@ -23,9 +23,9 @@ import android.app.Dialog;
 import android.app.Service;
 import android.content.Context;
 import android.os.Build;
-import android.support.v4.app.DialogFragment;
-import android.support.v4.app.Fragment;
 import android.widget.PopupWindow;
+import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.Fragment;
 import com.arialyy.aria.core.download.DownloadReceiver;
 import com.arialyy.aria.core.upload.UploadReceiver;
 import com.arialyy.aria.util.ALog;
@@ -86,8 +86,8 @@ import com.arialyy.aria.util.ALog;
    * @param obj 观察者对象，为本类对象，使用{@code this}
    */
   public static DownloadReceiver download(Object obj) {
-    if (AriaManager.getInstance() != null){
-     return AriaManager.getInstance().download(obj);
+    if (AriaManager.getInstance() != null) {
+      return AriaManager.getInstance().download(obj);
     }
     return get(convertContext(obj)).download(obj);
   }
@@ -100,7 +100,7 @@ import com.arialyy.aria.util.ALog;
    * @param obj 观察者对象，为本类对象，使用{@code this}
    */
   public static UploadReceiver upload(Object obj) {
-    if (AriaManager.getInstance() != null){
+    if (AriaManager.getInstance() != null) {
       return AriaManager.getInstance().upload(obj);
     }
     return get(convertContext(obj)).upload(obj);
@@ -111,9 +111,10 @@ import com.arialyy.aria.util.ALog;
    */
   public static AriaManager get(Context context) {
     if (context == null) {
-      throw new NullPointerException("context 无效，在非【Activity、Service、Application、DialogFragment、Fragment、PopupWindow、Dialog】，"
-          + "请参考【https://aria.laoyuyu.me/aria_doc/start/any_java.html】，参数请使用 download(this) 或 upload(this);"
-          + "不要使用 download(getContext()) 或 upload(getContext())");
+      throw new NullPointerException(
+          "context 无效，在非【Activity、Service、Application、DialogFragment、Fragment、PopupWindow、Dialog】，"
+              + "请参考【https://aria.laoyuyu.me/aria_doc/start/any_java.html】，参数请使用 download(this) 或 upload(this);"
+              + "不要使用 download(getContext()) 或 upload(getContext())");
     }
     return AriaManager.getInstance(context);
   }
@@ -139,7 +140,7 @@ import com.arialyy.aria.util.ALog;
       return ((DialogFragment) obj).getContext();
     } else if (obj instanceof android.app.DialogFragment) {
       return ((android.app.DialogFragment) obj).getActivity();
-    } else if (obj instanceof android.support.v4.app.Fragment) {
+    } else if (obj instanceof Fragment) {
       return ((Fragment) obj).getContext();
     } else if (obj instanceof android.app.Fragment) {
       return ((android.app.Fragment) obj).getActivity();
