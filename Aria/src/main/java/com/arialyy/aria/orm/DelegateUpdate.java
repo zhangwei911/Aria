@@ -34,13 +34,15 @@ class DelegateUpdate extends AbsDelegate {
   private DelegateUpdate() {
   }
 
-    /**
+  /**
    * 删除某条数据
    */
   synchronized <T extends DbEntity> void delData(SQLiteDatabase db, Class<T> clazz,
       String... expression) {
     db = checkDb(db);
-    CheckUtil.checkSqlExpression(expression);
+    if (!CheckUtil.checkSqlExpression(expression)) {
+      return;
+    }
 
     String sql = "DELETE FROM " + CommonUtil.getClassName(clazz) + " WHERE " + expression[0] + " ";
     sql = sql.replace("?", "%s");
@@ -60,7 +62,7 @@ class DelegateUpdate extends AbsDelegate {
     ContentValues values = createValues(dbEntity);
     if (values != null) {
       db.update(CommonUtil.getClassName(dbEntity), values, "rowid=?",
-          new String[] {String.valueOf(dbEntity.rowID)});
+          new String[] { String.valueOf(dbEntity.rowID) });
     } else {
       ALog.e(TAG, "更新记录失败，记录没有属性字段");
     }
@@ -69,7 +71,7 @@ class DelegateUpdate extends AbsDelegate {
   /**
    * 更新多条记录
    */
-  synchronized <T extends  DbEntity> void updateManyData(SQLiteDatabase db, List<T> dbEntities) {
+  synchronized <T extends DbEntity> void updateManyData(SQLiteDatabase db, List<T> dbEntities) {
     db = checkDb(db);
     db.beginTransaction();
     try {
@@ -84,7 +86,7 @@ class DelegateUpdate extends AbsDelegate {
         if (value == null) {
           ALog.e(TAG, "更新记录失败，记录没有属性字段");
         } else {
-          db.update(table, value, "rowid=?", new String[] {String.valueOf(entity.rowID)});
+          db.update(table, value, "rowid=?", new String[] { String.valueOf(entity.rowID) });
         }
       }
       db.setTransactionSuccessful();

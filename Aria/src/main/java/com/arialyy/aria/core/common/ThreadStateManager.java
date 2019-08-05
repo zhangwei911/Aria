@@ -96,12 +96,14 @@ public class ThreadStateManager implements IThreadState {
         }
         break;
       case STATE_RUNNING:
-        mProgress += (long) msg.obj;
+        if (msg.obj instanceof Long) {
+          mProgress += (long) msg.obj;
+        }
         break;
       case STATE_UPDATE_PROGRESS:
         if (msg.obj == null) {
           mProgress = updateBlockProgress();
-        } else {
+        } else if (msg.obj instanceof Long) {
           mProgress = (long) msg.obj;
         }
         break;

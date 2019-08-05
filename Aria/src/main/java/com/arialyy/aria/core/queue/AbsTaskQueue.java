@@ -26,7 +26,8 @@ import com.arialyy.aria.core.manager.TaskWrapperManager;
 import com.arialyy.aria.core.manager.ThreadTaskManager;
 import com.arialyy.aria.core.queue.pool.BaseCachePool;
 import com.arialyy.aria.core.queue.pool.BaseExecutePool;
-import com.arialyy.aria.core.queue.pool.DownloadSharePool;
+import com.arialyy.aria.core.queue.pool.DGLoadSharePool;
+import com.arialyy.aria.core.queue.pool.DLoadSharePool;
 import com.arialyy.aria.core.queue.pool.UploadSharePool;
 import com.arialyy.aria.core.upload.UploadTask;
 import com.arialyy.aria.util.ALog;
@@ -47,9 +48,12 @@ public abstract class AbsTaskQueue<TASK extends AbsTask, TASK_WRAPPER extends Ab
   AbsTaskQueue() {
     switch (getQueueType()) {
       case TYPE_D_QUEUE:
+        mCachePool = DLoadSharePool.getInstance().cachePool;
+        mExecutePool = DLoadSharePool.getInstance().executePool;
+        break;
       case TYPE_DG_QUEUE:
-        mCachePool = DownloadSharePool.getInstance().cachePool;
-        mExecutePool = DownloadSharePool.getInstance().executePool;
+        mCachePool = DGLoadSharePool.getInstance().cachePool;
+        mExecutePool = DGLoadSharePool.getInstance().executePool;
         break;
       case TYPE_U_QUEUE:
         mCachePool = UploadSharePool.getInstance().cachePool;

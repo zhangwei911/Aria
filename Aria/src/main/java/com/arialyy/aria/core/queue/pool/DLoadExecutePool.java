@@ -26,7 +26,7 @@ import java.util.concurrent.TimeUnit;
  * Created by AriaL on 2017/6/29.
  * 单个下载任务的执行池
  */
-class DownloadExecutePool<TASK extends AbsTask> extends BaseExecutePool<TASK> {
+class DLoadExecutePool<TASK extends AbsTask> extends BaseExecutePool<TASK> {
   private final String TAG = "DownloadExecutePool";
 
   @Override protected int getMaxSize() {
@@ -34,7 +34,7 @@ class DownloadExecutePool<TASK extends AbsTask> extends BaseExecutePool<TASK> {
   }
 
   @Override public boolean putTask(TASK task) {
-    synchronized (DownloadExecutePool.class) {
+    synchronized (DLoadExecutePool.class) {
       if (task == null) {
         ALog.e(TAG, "任务不能为空！！");
         return false;

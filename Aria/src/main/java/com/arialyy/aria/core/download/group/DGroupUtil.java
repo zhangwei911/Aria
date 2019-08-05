@@ -68,8 +68,7 @@ public class DGroupUtil extends AbsGroupUtil implements IUtil {
     return false;
   }
 
-  @Override protected void onStart() {
-    super.onStart();
+  @Override protected boolean onStart() {
     if (mState.getCompleteNum() == mState.getSubSize()) {
       mListener.onComplete();
     } else {
@@ -84,6 +83,7 @@ public class DGroupUtil extends AbsGroupUtil implements IUtil {
         } catch (InterruptedException e) {
           e.printStackTrace();
         }
+        return getLenComplete;
       } else {
         for (DTaskWrapper wrapper : mGTWrapper.getSubTaskWrapper()) {
           if (wrapper.getState() != IEntity.STATE_COMPLETE) {
@@ -92,6 +92,7 @@ public class DGroupUtil extends AbsGroupUtil implements IUtil {
         }
       }
     }
+    return true;
   }
 
   /**
@@ -137,6 +138,7 @@ public class DGroupUtil extends AbsGroupUtil implements IUtil {
    */
   private void checkGetSizeComplete(int count, int failCount) {
     if (failCount == mGTWrapper.getSubTaskWrapper().size()) {
+      mState.isRunning = false;
       mListener.onFail(false, new AriaIOException(TAG, "获取子任务长度失败"));
       notifyLock();
       return;

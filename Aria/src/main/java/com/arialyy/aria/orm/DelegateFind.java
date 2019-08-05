@@ -15,7 +15,6 @@
  */
 package com.arialyy.aria.orm;
 
-import android.annotation.SuppressLint;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.text.TextUtils;
@@ -30,10 +29,8 @@ import java.lang.reflect.Field;
 import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Created by laoyuyu on 2018/3/22.
@@ -201,7 +198,9 @@ class DelegateFind extends AbsDelegate {
             .append(cTableName.concat(".").concat(m.entityColumn()));
         String sql;
         if (expression != null && expression.length > 0) {
-          CheckUtil.checkSqlExpression(expression);
+          if (!CheckUtil.checkSqlExpression(expression)) {
+            return null;
+          }
           sb.append(" WHERE ").append(expression[0]).append(" ");
           sql = sb.toString();
           sql = sql.replace("?", "%s");
@@ -321,7 +320,9 @@ class DelegateFind extends AbsDelegate {
    */
   <T extends DbEntity> List<T> findData(SQLiteDatabase db, Class<T> clazz, String... expression) {
     db = checkDb(db);
-    CheckUtil.checkSqlExpression(expression);
+    if (!CheckUtil.checkSqlExpression(expression)) {
+      return null;
+    }
     String sql = String.format("SELECT rowid, * FROM %s WHERE %s", CommonUtil.getClassName(clazz),
         expression[0]);
     String[] params = new String[expression.length - 1];
@@ -339,7 +340,9 @@ class DelegateFind extends AbsDelegate {
       return null;
     }
     db = checkDb(db);
-    CheckUtil.checkSqlExpression(expression);
+    if (!CheckUtil.checkSqlExpression(expression)) {
+      return null;
+    }
     String sql = String.format("SELECT rowid, * FROM %s WHERE %s LIMIT %s,%s",
         CommonUtil.getClassName(clazz),
         expression[0], (page - 1) * num, num);

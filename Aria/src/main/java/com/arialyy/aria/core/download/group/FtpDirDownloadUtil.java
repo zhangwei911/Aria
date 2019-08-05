@@ -38,8 +38,7 @@ public class FtpDirDownloadUtil extends AbsGroupUtil {
     return FTP_DIR;
   }
 
-  @Override protected void onStart() {
-    super.onStart();
+  @Override protected boolean onStart() {
     if (mGTWrapper.getEntity().getFileSize() > 1) {
       startDownload();
     } else {
@@ -57,6 +56,7 @@ public class FtpDirDownloadUtil extends AbsGroupUtil {
       });
       new Thread(infoThread).start();
     }
+    return true;
   }
 
   private void startDownload() {

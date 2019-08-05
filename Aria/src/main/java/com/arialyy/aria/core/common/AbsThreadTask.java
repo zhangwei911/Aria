@@ -201,10 +201,12 @@ public abstract class AbsThreadTask<ENTITY extends AbsNormalEntity, TASK_WRAPPER
    * @param state {@link IThreadState#STATE_STOP}..
    * @param bundle 而外数据
    */
-  void sendState(int state, @Nullable Bundle bundle) {
+  synchronized void sendState(int state, @Nullable Bundle bundle) {
     Message msg = mStateHandler.obtainMessage();
     msg.what = state;
-    msg.obj = this;
+    if (state != IThreadState.STATE_UPDATE_PROGRESS) {
+      msg.obj = this;
+    }
 
     if ((state == IThreadState.STATE_COMPLETE || state == IThreadState.STATE_FAIL)
         && (mTaskWrapper.getRequestType() == AbsTaskWrapper.M3U8_VOD
