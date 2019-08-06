@@ -113,7 +113,7 @@ public class DownloadGroupActivity extends BaseActivity<ActivityDownloadGroupBin
               })
               .setFileSize(114981416)
               //.updateUrls(temp)
-              .start();
+              .create();
           getBinding().setStateStr(getString(R.string.stop));
           break;
         }
@@ -150,7 +150,7 @@ public class DownloadGroupActivity extends BaseActivity<ActivityDownloadGroupBin
 
   @DownloadGroup.onTaskStart() void taskStart(DownloadGroupTask task) {
     getBinding().setFileSize(task.getConvertFileSize());
-    L.d(TAG, "group task start");
+    L.d(TAG, "group task create");
   }
 
   @DownloadGroup.onTaskRunning() protected void running(DownloadGroupTask task) {

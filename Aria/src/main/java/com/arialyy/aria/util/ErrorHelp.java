@@ -77,8 +77,8 @@ public class ErrorHelp {
     PrintWriter writer = null;
     try {
       File file = new File(getLogPath());
-      if(!file.exists()){
-        CommonUtil.createFile(file.getPath());
+      if (!file.exists()) {
+        FileUtil.createFile(file.getPath());
       }
       writer = new PrintWriter(new FileWriter(file.getPath(), true));
       writer.append(stringBuffer);

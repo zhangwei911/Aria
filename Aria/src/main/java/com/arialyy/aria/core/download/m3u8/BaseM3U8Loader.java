@@ -19,7 +19,7 @@ import com.arialyy.aria.core.common.AbsFileer;
 import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.inf.IEventListener;
-import com.arialyy.aria.util.CommonUtil;
+import com.arialyy.aria.util.FileUtil;
 import java.io.File;
 
 public abstract class BaseM3U8Loader extends AbsFileer<DownloadEntity, DTaskWrapper> {
@@ -46,7 +46,7 @@ public abstract class BaseM3U8Loader extends AbsFileer<DownloadEntity, DTaskWrap
   String getCacheDir() {
     String cacheDir = mTaskWrapper.asM3U8().getCacheDir();
     if (!new File(cacheDir).exists()) {
-      CommonUtil.createDir(cacheDir);
+      FileUtil.createDir(cacheDir);
     }
     return cacheDir;
   }

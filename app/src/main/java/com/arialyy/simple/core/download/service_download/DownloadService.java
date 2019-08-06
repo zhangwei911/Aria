@@ -49,7 +49,7 @@ public class DownloadService extends Service {
     Aria.download(this)
         .load(DOWNLOAD_URL)
         .setFilePath(Environment.getExternalStorageDirectory().getPath() + "/service_task.apk")
-        .start();
+        .create();
   }
 
   @Override public void onDestroy() {

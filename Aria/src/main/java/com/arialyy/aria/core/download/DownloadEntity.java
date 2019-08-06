@@ -59,6 +59,11 @@ public class DownloadEntity extends AbsNormalEntity implements Parcelable {
   @Ignore
   private M3U8Entity m3U8Entity;
 
+  /**
+   * 获取m3u8数据信息
+   *
+   * @return 如果m3u8信息为空，则返回null
+   */
   public M3U8Entity getM3U8Entity() {
     if (TextUtils.isEmpty(downloadPath)) {
       ALog.e("DownloadEntity", "文件保存路径为空，获取m3u8实体之前需要设置文件保存路径");

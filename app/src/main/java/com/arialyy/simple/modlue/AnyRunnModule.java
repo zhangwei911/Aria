@@ -92,7 +92,7 @@ public class AnyRunnModule {
           .load(url)
           .setFilePath(path)
           .resetState()
-          .start();
+          .create();
     } else {
       Aria.download(this).load(mEntity.getId()).resume();
     }
@@ -114,7 +114,7 @@ public class AnyRunnModule {
           .setAlias("www.laoyuyu.me")
           .setStorePass("123456")
           .controller(ControllerType.START_CONTROLLER)
-          .start();
+          .create();
     } else {
       Aria.download(this).load(mEntity.getId()).resume();
     }

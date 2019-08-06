@@ -106,7 +106,7 @@ import com.arialyy.simple.util.AppUtil;
           Aria.download(getContext())
               .load(DOWNLOAD_URL)
               .setFilePath(Environment.getExternalStorageDirectory().getPath() + "/放置江湖.apk")
-              .start();
+              .create();
           getBinding().setStateStr(getString(R.string.stop));
           break;
         }

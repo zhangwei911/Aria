@@ -58,6 +58,71 @@ public class M3U8Entity extends DbEntity implements Parcelable {
    */
   private String cacheDir;
 
+  /**
+   * 生成索引
+   */
+  private boolean generateIndexFile;
+
+  /**
+   * 加密key保存地址
+   */
+  public String keyPath;
+
+  /**
+   * 加密key的下载地址
+   */
+  public String keyUrl;
+
+  /**
+   * 加密算法
+   */
+  public String method;
+
+  /**
+   * key的iv值
+   */
+  public String iv;
+
+  public String getKeyPath() {
+    return keyPath;
+  }
+
+  public void setKeyPath(String keyPath) {
+    this.keyPath = keyPath;
+  }
+
+  public String getKeyUrl() {
+    return keyUrl;
+  }
+
+  public void setKeyUrl(String keyUrl) {
+    this.keyUrl = keyUrl;
+  }
+
+  public String getMethod() {
+    return method;
+  }
+
+  public void setMethod(String method) {
+    this.method = method;
+  }
+
+  public String getIv() {
+    return iv;
+  }
+
+  public void setIv(String iv) {
+    this.iv = iv;
+  }
+
+  public boolean isGenerateIndexFile() {
+    return generateIndexFile;
+  }
+
+  public void setGenerateIndexFile(boolean generateIndexFile) {
+    this.generateIndexFile = generateIndexFile;
+  }
+
   public boolean isLive() {
     return isLive;
   }
@@ -163,6 +228,16 @@ public class M3U8Entity extends DbEntity implements Parcelable {
   public M3U8Entity() {
   }
 
+  public static class PeerInfo {
+    public PeerInfo(int peerId, String peerPath) {
+      this.peerId = peerId;
+      this.peerPath = peerPath;
+    }
+
+    public int peerId;
+    public String peerPath;
+  }
+
   @Override public int describeContents() {
     return 0;
   }
@@ -173,6 +248,11 @@ public class M3U8Entity extends DbEntity implements Parcelable {
     dest.writeInt(this.peerNum);
     dest.writeByte(this.isLive ? (byte) 1 : (byte) 0);
     dest.writeString(this.cacheDir);
+    dest.writeByte(this.generateIndexFile ? (byte) 1 : (byte) 0);
+    dest.writeString(this.keyPath);
+    dest.writeString(this.keyUrl);
+    dest.writeString(this.method);
+    dest.writeString(this.iv);
   }
 
   protected M3U8Entity(Parcel in) {
@@ -181,6 +261,11 @@ public class M3U8Entity extends DbEntity implements Parcelable {
     this.peerNum = in.readInt();
     this.isLive = in.readByte() != 0;
     this.cacheDir = in.readString();
+    this.generateIndexFile = in.readByte() != 0;
+    this.keyPath = in.readString();
+    this.keyUrl = in.readString();
+    this.method = in.readString();
+    this.iv = in.readString();
   }
 
   public static final Creator<M3U8Entity> CREATOR = new Creator<M3U8Entity>() {
@@ -192,14 +277,4 @@ public class M3U8Entity extends DbEntity implements Parcelable {
       return new M3U8Entity[size];
     }
   };
-
-  public static class PeerInfo {
-    public PeerInfo(int peerId, String peerPath) {
-      this.peerId = peerId;
-      this.peerPath = peerPath;
-    }
-
-    public int peerId;
-    public String peerPath;
-  }
 }

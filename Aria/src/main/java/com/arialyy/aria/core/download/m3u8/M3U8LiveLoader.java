@@ -26,7 +26,6 @@ import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.inf.IEventListener;
 import com.arialyy.aria.core.manager.ThreadTaskManager;
 import com.arialyy.aria.util.ALog;
-import com.arialyy.aria.util.CommonUtil;
 import com.arialyy.aria.util.FileUtil;
 import com.arialyy.aria.util.IdGenerator;
 import java.io.File;
@@ -143,7 +142,7 @@ public class M3U8LiveLoader extends BaseM3U8Loader {
     config.stateHandler = mStateHandler;
 
     if (!config.tempFile.exists()) {
-      CommonUtil.createFile(config.tempFile.getPath());
+      FileUtil.createFile(config.tempFile.getPath());
     }
     return new M3U8ThreadTask(config);
   }
@@ -168,7 +167,7 @@ public class M3U8LiveLoader extends BaseM3U8Loader {
 
     boolean isSuccess;
     if (mergeHandler != null) {
-      isSuccess = mergeHandler.merge(mTaskWrapper.asM3U8().getKeyInfo(), partPath);
+      isSuccess = mergeHandler.merge(getEntity().getM3U8Entity(), partPath);
     } else {
       isSuccess = FileUtil.mergeFile(mEntity.getFilePath(), partPath);
     }

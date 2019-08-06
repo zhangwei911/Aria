@@ -306,7 +306,7 @@ public class SingleTaskActivity extends BaseActivity<ActivitySingleBinding> {
         .option()
         .addHeader("1", "@")
         .controller(ControllerType.START_CONTROLLER)
-        .start();
+        .create();
   }
 
   @Override

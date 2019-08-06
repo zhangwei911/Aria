@@ -73,7 +73,7 @@ public class DownloadReceiver extends AbsReceiver {
   /**
    * 用于任务停止、删除等操作
    *
-   * @param taskId 任务id，可从{@link AbsStartTarget#start()}、{@link AbsStartTarget#add()}、{@link
+   * @param taskId 任务id，可从{@link AbsStartTarget#create()}、{@link AbsStartTarget#add()}、{@link
    * AbsEntity#getId()}读取任务id
    */
   @CheckResult
@@ -96,7 +96,7 @@ public class DownloadReceiver extends AbsReceiver {
   /**
    * 加载组合任务，用于任务停止、删除等操作
    *
-   * @param taskId 任务id，可从{@link AbsStartTarget#start()}、{@link AbsStartTarget#add()}、{@link
+   * @param taskId 任务id，可从{@link AbsStartTarget#create()}、{@link AbsStartTarget#add()}、{@link
    * * AbsEntity#getId()}读取任务id
    */
   @CheckResult
@@ -117,7 +117,7 @@ public class DownloadReceiver extends AbsReceiver {
   /**
    * 用于任务停止、删除等操作
    *
-   * @param taskId 任务id，可从{@link AbsStartTarget#start()}、{@link AbsStartTarget#add()}、{@link
+   * @param taskId 任务id，可从{@link AbsStartTarget#create()}、{@link AbsStartTarget#add()}、{@link
    * AbsEntity#getId()}读取任务id
    */
   @CheckResult
@@ -138,7 +138,7 @@ public class DownloadReceiver extends AbsReceiver {
   /**
    * 加载ftp文件夹下载地址，用于任务停止、删除等操作
    *
-   * @param taskId 任务id，可从{@link AbsStartTarget#start()}、{@link AbsStartTarget#add()}、{@link
+   * @param taskId 任务id，可从{@link AbsStartTarget#create()}、{@link AbsStartTarget#add()}、{@link
    * AbsEntity#getId()}读取任务id
    */
   @CheckResult

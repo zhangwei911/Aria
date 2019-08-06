@@ -16,6 +16,7 @@
 package com.arialyy.aria.core.download.m3u8;
 
 import android.net.TrafficStats;
+import android.net.Uri;
 import android.os.Process;
 import android.text.TextUtils;
 import com.arialyy.aria.core.AriaManager;
@@ -32,15 +33,18 @@ import com.arialyy.aria.exception.TaskException;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CheckUtil;
 import com.arialyy.aria.util.CommonUtil;
+import com.arialyy.aria.util.FileUtil;
 import com.arialyy.aria.util.Regular;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -53,6 +57,7 @@ import java.util.regex.Pattern;
  * https://blog.csdn.net/Guofengpu/article/details/54922865
  */
 final class M3U8InfoThread implements Runnable {
+  public static final String M3U8_INDEX_FORMAT = "%s.index";
   private final String TAG = "M3U8InfoThread";
   private DownloadEntity mEntity;
   private DTaskWrapper mTaskWrapper;
@@ -64,6 +69,10 @@ final class M3U8InfoThread implements Runnable {
    * 是否停止获取切片信息，{@code true}停止获取切片信息
    */
   private boolean isStop = false;
+  /**
+   * m3u8文件信息
+   */
+  private List<String> mInfos = new ArrayList<>();
 
   interface OnGetLivePeerCallback {
     void onGetPeer(String url);
@@ -110,16 +119,24 @@ final class M3U8InfoThread implements Runnable {
       }
       List<String> extInf = new ArrayList<>();
       boolean isLive = mTaskWrapper.getRequestType() == ITaskWrapper.M3U8_LIVE;
+      boolean isGenerateIndexFile = mTaskWrapper.getEntity().getM3U8Entity().isGenerateIndexFile();
+      if (isGenerateIndexFile) {
+        mInfos.add(line);
+      }
       while ((line = reader.readLine()) != null) {
         if (isStop) {
           break;
         }
+        if (isGenerateIndexFile) {
+          mInfos.add(line);
+        }
         if (line.startsWith("#EXT-X-ENDLIST")) {
           break;
         }
-        ALog.d(TAG, line);
+        //ALog.d(TAG, line);
         if (line.startsWith("#EXTINF")) {
           String info = reader.readLine();
+          mInfos.add(info);
           if (isLive) {
             if (onGetPeerCallback != null) {
               onGetPeerCallback.onGetPeer(info);
@@ -130,6 +147,10 @@ final class M3U8InfoThread implements Runnable {
         } else if (line.startsWith("#EXT-X-STREAM-INF")) {
           int setBand = mTaskWrapper.asM3U8().getBandWidth();
           int bandWidth = getBandWidth(line);
+          // 多码率的m3u8配置文件，清空信息
+          if (isGenerateIndexFile && mInfos != null) {
+            mInfos.clear();
+          }
           if (setBand == 0) {
             handleBandWidth(conn, reader.readLine());
           } else if (bandWidth == setBand) {
@@ -153,6 +174,7 @@ final class M3U8InfoThread implements Runnable {
       }
       CompleteInfo info = new CompleteInfo();
       info.obj = extInf;
+      generateIndexFile();
       onFileInfoCallback.onComplete(mEntity.getKey(), info);
     } else if (code == HttpURLConnection.HTTP_MOVED_TEMP
         || code == HttpURLConnection.HTTP_MOVED_PERM
@@ -164,6 +186,43 @@ final class M3U8InfoThread implements Runnable {
       failDownload("404错误", false);
     } else {
       failDownload(String.format("不支持的响应，code: %s", code), true);
+    }
+  }
+
+  /**
+   * 创建索引文件
+   */
+  private void generateIndexFile() {
+    if (mTaskWrapper.getEntity().getM3U8Entity().isGenerateIndexFile()) {
+
+      String indexPath = String.format(M3U8_INDEX_FORMAT, mEntity.getFilePath());
+      File indexFile = new File(indexPath);
+      if (indexFile.exists()) {
+        FileUtil.deleteFile(indexPath);
+      }
+      FileUtil.createFile(indexPath);
+
+      FileOutputStream fos = null;
+      try {
+        fos = new FileOutputStream(indexFile);
+        for (String str : mInfos) {
+          byte[] by = str.concat("\r\n").getBytes(Charset.forName("UTF-8"));
+          fos.write(by, 0, by.length);
+        }
+        fos.flush();
+      } catch (FileNotFoundException e) {
+        e.printStackTrace();
+      } catch (IOException e) {
+        e.printStackTrace();
+      } finally {
+        if (fos != null) {
+          try {
+            fos.close();
+          } catch (IOException e) {
+            e.printStackTrace();
+          }
+        }
+      }
     }
   }
 
@@ -187,20 +246,19 @@ final class M3U8InfoThread implements Runnable {
   private void getKeyInfo(String line) {
     String temp = line.substring(line.indexOf(":") + 1);
     String[] params = temp.split(",");
-    M3U8KeyInfo keyInfo = new M3U8KeyInfo();
+    M3U8Entity m3U8Entity = mEntity.getM3U8Entity();
     for (String param : params) {
       if (param.startsWith("METHOD")) {
-        keyInfo.method = param.split("=")[1];
+        m3U8Entity.method = param.split("=")[1];
       } else if (param.startsWith("URI")) {
-        keyInfo.keyUrl = param.split("=")[1].replaceAll("\"", "");
-        keyInfo.keyPath = new File(mEntity.getFilePath()).getParent() + "/" + CommonUtil.getStrMd5(
-            keyInfo.keyUrl) + ".key";
+        m3U8Entity.keyUrl = param.split("=")[1].replaceAll("\"", "");
+        m3U8Entity.keyPath = new File(mEntity.getFilePath()).getParent() + "/" + CommonUtil.getStrMd5(
+            m3U8Entity.keyUrl) + ".key";
       } else if (param.startsWith("IV")) {
-        keyInfo.iv = param.split("=")[1];
+        m3U8Entity.iv = param.split("=")[1];
       }
     }
-    mTaskWrapper.asM3U8().setKeyInfo(keyInfo);
-    DownloadKey(keyInfo);
+    downloadKey(m3U8Entity);
   }
 
   /**
@@ -220,13 +278,18 @@ final class M3U8InfoThread implements Runnable {
    */
   private void handleUrlReTurn(HttpURLConnection conn, String newUrl) throws IOException {
     ALog.d(TAG, "30x跳转，新url为【" + newUrl + "】");
-    if (TextUtils.isEmpty(newUrl) || newUrl.equalsIgnoreCase("null") || !newUrl.startsWith(
-        "http")) {
+    if (TextUtils.isEmpty(newUrl) || newUrl.equalsIgnoreCase("null")) {
       if (onFileInfoCallback != null) {
         onFileInfoCallback.onFail(mEntity, new TaskException(TAG, "获取重定向链接失败"), false);
       }
       return;
     }
+
+    if (newUrl.startsWith("/")) {
+      Uri uri = Uri.parse(mEntity.getUrl());
+      newUrl = uri.getHost() + newUrl;
+    }
+
     if (!CheckUtil.checkUrlNotThrow(newUrl)) {
       failDownload("下载失败，重定向url错误", false);
       return;
@@ -281,14 +344,14 @@ final class M3U8InfoThread implements Runnable {
   /**
    * 密钥不存在，下载密钥
    */
-  private void DownloadKey(M3U8KeyInfo info) {
+  private void downloadKey(M3U8Entity info) {
     HttpURLConnection conn = null;
     FileOutputStream fos = null;
     try {
       File keyF = new File(info.keyPath);
       if (!keyF.exists()) {
         ALog.d(TAG, "密钥不存在，下载密钥");
-        CommonUtil.createFile(keyF.getPath());
+        FileUtil.createFile(keyF.getPath());
       } else {
         return;
       }

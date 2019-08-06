@@ -43,7 +43,7 @@ import com.arialyy.aria.util.ALog;
  *       .load(URL)     //下载地址，必填
  *       //文件保存路径，必填
  *       .setDownloadPath(Environment.getExternalStorageDirectory().getPath() + "/test.apk")
- *       .start();
+ *       .create();
  *   </code>
  *   <code>
  *    //上传
@@ -51,7 +51,7 @@ import com.arialyy.aria.util.ALog;
  *        .load(filePath)     //文件路径，必填
  *        .setTempUrl(uploadUrl)  //上传路径，必填
  *        .setAttachment(fileKey)   //服务器读取文件的key，必填
- *        .start();
+ *        .create();
  *   </code>
  * </pre>
  *
@@ -67,7 +67,7 @@ import com.arialyy.aria.util.ALog;
  *       .load(URL)     //下载地址，必填
  *       //文件保存路径，必填
  *       .setDownloadPath(Environment.getExternalStorageDirectory().getPath() + "/test.apk")
- *       .start();
+ *       .create();
  *
  *   </code>
  *
@@ -113,7 +113,7 @@ import com.arialyy.aria.util.ALog;
     if (context == null) {
       throw new NullPointerException(
           "context 无效，在非【Activity、Service、Application、DialogFragment、Fragment、PopupWindow、Dialog】，"
-              + "请参考【https://aria.laoyuyu.me/aria_doc/start/any_java.html】，参数请使用 download(this) 或 upload(this);"
+              + "请参考【https://aria.laoyuyu.me/aria_doc/create/any_java.html】，参数请使用 download(this) 或 upload(this);"
               + "不要使用 download(getContext()) 或 upload(getContext())");
     }
     return AriaManager.getInstance(context);

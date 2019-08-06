@@ -208,7 +208,7 @@ public final class BufferedRandomAccessFile extends RandomAccessFile {
     if (pos >= this.hi_ || pos < this.lo_) {
       // seeking outside of current buffer -- flush and read
       this.flushBuffer();
-      this.lo_ = pos & BuffMask_; // start at BuffSz boundary
+      this.lo_ = pos & BuffMask_; // create at BuffSz boundary
       this.maxHi_ = this.lo_ + (long) this.buff_.length;
       if (this.diskPos_ != this.lo_) {
         super.seek(this.lo_);

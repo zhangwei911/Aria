@@ -28,11 +28,11 @@ public interface IStartFeature {
   long add();
 
   /**
-   * 开始任务
+   * 创建并开始任务
    *
    * @return 正常启动，返回任务id，否则返回-1
    */
-  long start();
+  long create();
 
   /**
    * 将任务设置为最高优先级任务，最高优先级任务有以下特点：

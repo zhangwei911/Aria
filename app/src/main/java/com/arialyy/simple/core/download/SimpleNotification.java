@@ -54,11 +54,11 @@
 //    Aria.download(this).register();
 //  }
 //
-//  public void start() {
+//  public void create() {
 //    Aria.download(this)
 //        .load(DOWNLOAD_URL)
 //        .setFilePath(Environment.getExternalStorageDirectory() + "/Download/消灭星星.apk")
-//        .start();
+//        .create();
 //  }
 //
 //  public void stop() {

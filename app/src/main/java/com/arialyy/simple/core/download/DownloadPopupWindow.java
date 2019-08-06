@@ -31,7 +31,6 @@ import com.arialyy.aria.core.inf.IEntity;
 import com.arialyy.aria.util.CommonUtil;
 import com.arialyy.frame.core.AbsPopupWindow;
 import com.arialyy.simple.R;
-import com.arialyy.simple.util.AppUtil;
 import com.arialyy.simple.widget.HorizontalProgressBarWithNumber;
 
 /**
@@ -43,7 +42,7 @@ public class DownloadPopupWindow extends AbsPopupWindow implements View.OnClickL
   private Button mCancel;
   private TextView mSize;
   private TextView mSpeed;
-  private DownloadEntity mEntity;
+  private long mTaskId = -1;
 
   private static final String DOWNLOAD_URL =
       "http://static.gaoshouyou.com/d/25/57/2e25bd9d4557ba31e9beebacfaf9e804.apk";
@@ -67,15 +66,16 @@ public class DownloadPopupWindow extends AbsPopupWindow implements View.OnClickL
     mStart.setOnClickListener(this);
     mCancel.setOnClickListener(this);
 
-    mEntity = Aria.download(this).getFirstDownloadEntity(DOWNLOAD_URL);
-    if (mEntity != null) {
-      mPb.setProgress(mEntity.getPercent());
-      mSize.setText(CommonUtil.formatFileSize(mEntity.getFileSize()));
-      if (mEntity.getState() == IEntity.STATE_RUNNING) {
+    DownloadEntity entity = Aria.download(this).getFirstDownloadEntity(DOWNLOAD_URL);
+    if (entity != null) {
+      mPb.setProgress(entity.getPercent());
+      mSize.setText(CommonUtil.formatFileSize(entity.getFileSize()));
+      if (entity.getState() == IEntity.STATE_RUNNING) {
         mStart.setText(getContext().getString(R.string.stop));
       } else {
         mStart.setText(getContext().getString(R.string.resume));
       }
+      mTaskId = entity.getId();
     } else {
       mStart.setText(getContext().getString(R.string.start));
     }
@@ -86,28 +86,28 @@ public class DownloadPopupWindow extends AbsPopupWindow implements View.OnClickL
   public void onClick(View view) {
     switch (view.getId()) {
       case R.id.start:
-        if (!AppUtil.chekEntityValid(mEntity)) {
+        if (mTaskId != -1) {
           Aria.download(this)
               .load(DOWNLOAD_URL)
               .setFilePath(Environment.getExternalStorageDirectory().getPath() + "/消消乐.apk")
-              .start();
+              .create();
           mStart.setText(getContext().getString(R.string.stop));
           break;
         }
-        if (Aria.download(this).load(mEntity.getId()).isRunning()) {
-          Aria.download(this).load(mEntity.getId()).stop();
+        if (Aria.download(this).load(mTaskId).isRunning()) {
+          Aria.download(this).load(mTaskId).stop();
           mStart.setText(getContext().getString(R.string.resume));
         } else {
-          Aria.download(this).load(mEntity.getId()).resume();
+          Aria.download(this).load(mTaskId).resume();
           mStart.setText(getContext().getString(R.string.stop));
         }
         break;
 
       case R.id.cancel:
-        if (AppUtil.chekEntityValid(mEntity)) {
 
-          Aria.download(this).load(mEntity.getId()).cancel();
-        }
+        Aria.download(this).load(mTaskId).cancel();
+        mStart.setText(getContext().getResources().getString(R.string.start));
+        mTaskId = -1;
         break;
     }
   }

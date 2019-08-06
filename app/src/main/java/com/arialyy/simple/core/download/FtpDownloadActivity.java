@@ -96,7 +96,7 @@ public class FtpDownloadActivity extends BaseActivity<ActivityFtpDownloadBinding
               .option()
               .login("8L8e", "8guD")
               .controller(ControllerType.START_CONTROLLER)
-              .start();
+              .create();
           getBinding().setStateStr(getString(R.string.stop));
           break;
         }
@@ -143,7 +143,7 @@ public class FtpDownloadActivity extends BaseActivity<ActivityFtpDownloadBinding
   }
 
   @Download.onTaskStart() void taskStart(DownloadTask task) {
-    L.d(TAG, "ftp task start");
+    L.d(TAG, "ftp task create");
   }
 
   @Download.onTaskRunning() protected void running(DownloadTask task) {

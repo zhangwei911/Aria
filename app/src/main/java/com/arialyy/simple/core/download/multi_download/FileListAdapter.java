@@ -74,12 +74,12 @@ final class FileListAdapter extends AbsRVAdapter<FileListEntity, FileListAdapter
                 .setDirPath(item.downloadPath)
                 .setGroupAlias(item.name)
                 .unknownSize()
-                .start();
+                .create();
           } else {
             Aria.download(getContext())
                 .load(item.key)
                 .setFilePath(item.downloadPath)
-                .start();
+                .create();
           }
         }
       });

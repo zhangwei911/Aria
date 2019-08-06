@@ -34,8 +34,8 @@ import com.arialyy.aria.core.scheduler.ISchedulers;
 import com.arialyy.aria.exception.BaseException;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.BufferedRandomAccessFile;
-import com.arialyy.aria.util.CommonUtil;
 import com.arialyy.aria.util.ErrorHelp;
+import com.arialyy.aria.util.FileUtil;
 import com.arialyy.aria.util.NetUtils;
 import java.io.File;
 import java.util.UUID;
@@ -201,10 +201,12 @@ public abstract class AbsThreadTask<ENTITY extends AbsNormalEntity, TASK_WRAPPER
    * @param state {@link IThreadState#STATE_STOP}..
    * @param bundle 而外数据
    */
-  void sendState(int state, @Nullable Bundle bundle) {
+  synchronized void sendState(int state, @Nullable Bundle bundle) {
     Message msg = mStateHandler.obtainMessage();
     msg.what = state;
-    msg.obj = this;
+    if (state != IThreadState.STATE_UPDATE_PROGRESS) {
+      msg.obj = this;
+    }
 
     if ((state == IThreadState.STATE_COMPLETE || state == IThreadState.STATE_FAIL)
         && (mTaskWrapper.getRequestType() == AbsTaskWrapper.M3U8_VOD
@@ -384,7 +386,7 @@ public abstract class AbsThreadTask<ENTITY extends AbsNormalEntity, TASK_WRAPPER
       ALog.w(TAG, String.format("ts切片【%s】正在重试", getFileName()));
       mFailTimes++;
       mConfig.tempFile.delete();
-      CommonUtil.createFile(mConfig.tempFile.getPath());
+      FileUtil.createFile(mConfig.tempFile.getPath());
       ThreadTaskManager.getInstance().retryThread(this);
     } else {
       sendFailMsg(null);

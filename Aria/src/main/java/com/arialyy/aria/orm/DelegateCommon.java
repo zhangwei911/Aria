@@ -106,7 +106,9 @@ class DelegateCommon extends AbsDelegate {
    */
   boolean checkDataExist(SQLiteDatabase db, Class clazz, String... expression) {
     db = checkDb(db);
-    CheckUtil.checkSqlExpression(expression);
+    if (!CheckUtil.checkSqlExpression(expression)) {
+      return false;
+    }
     String sql = String.format("SELECT rowid, * FROM %s WHERE %s ", CommonUtil.getClassName(clazz),
         expression[0]);
     sql = sql.replace("?", "%s");

@@ -35,11 +35,12 @@ public class M3U8Delegate<TARGET extends AbsTarget> extends BaseDelegate<TARGET>
   }
 
   /**
-   * 生成m3u8索引文件，只有{@link #merge(boolean)}设置为false才会有效
+   * 生成m3u8索引文件
+   * 注意：创建索引文件，{@link #merge(boolean)}方法设置与否都不再合并文件
    */
   @CheckResult(suggest = Suggest.TO_CONTROLLER)
-  public M3U8Delegate<TARGET> genetateIndexFile() {
-    mTaskWrapper.asM3U8().setGenerateIndexFile(true);
+  public M3U8Delegate<TARGET> generateIndexFile() {
+    mTaskWrapper.asM3U8().setGenerateIndexFileTemp(true);
     return this;
   }
 

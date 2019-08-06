@@ -29,7 +29,6 @@ import com.arialyy.aria.util.CommonUtil;
 import com.arialyy.frame.core.AbsFragment;
 import com.arialyy.simple.R;
 import com.arialyy.simple.databinding.FragmentDownloadBinding;
-import com.arialyy.simple.util.AppUtil;
 
 /**
  * Created by lyy on 2017/1/4.
@@ -38,7 +37,7 @@ public class DownloadFragment extends AbsFragment<FragmentDownloadBinding>
     implements View.OnClickListener {
   Button mStart;
   Button mCancel;
-  private DownloadEntity mEntity;
+  private long mTaskId = -1;
 
   private static final String DOWNLOAD_URL =
       "https://res5.d.cn/2137e42d610b3488d9420c6421529386eee5bdbfd9be1fafe0a05d6dabaec8c156ddbd00581055bbaeac03904fb63310e80010680235d16bd4c040b50096a0c20dd1c4b0854529a1.apk";
@@ -49,16 +48,17 @@ public class DownloadFragment extends AbsFragment<FragmentDownloadBinding>
     mStart.setOnClickListener(this);
     mCancel.setOnClickListener(this);
 
-    mEntity = Aria.download(this).getFirstDownloadEntity(DOWNLOAD_URL);
-    if (mEntity != null) {
-      getBinding().setFileSize(CommonUtil.formatFileSize(mEntity.getFileSize()));
-      int state = mEntity.getState();
-      getBinding().setProgress(mEntity.getPercent());
-      if (mEntity.getState() == IEntity.STATE_RUNNING) {
+    DownloadEntity entity = Aria.download(this).getFirstDownloadEntity(DOWNLOAD_URL);
+    if (entity != null) {
+      getBinding().setFileSize(CommonUtil.formatFileSize(entity.getFileSize()));
+      int state = entity.getState();
+      getBinding().setProgress(entity.getPercent());
+      if (entity.getState() == IEntity.STATE_RUNNING) {
         getBinding().setStateStr(getString(R.string.stop));
       } else {
         getBinding().setStateStr(getString(R.string.resume));
       }
+      mTaskId = entity.getId();
     } else {
       getBinding().setStateStr(getString(R.string.start));
     }
@@ -68,27 +68,27 @@ public class DownloadFragment extends AbsFragment<FragmentDownloadBinding>
   public void onClick(View view) {
     switch (view.getId()) {
       case R.id.start:
-        if (!AppUtil.chekEntityValid(mEntity)) {
-          Aria.download(this)
+        if (mTaskId == -1) {
+          mTaskId = Aria.download(this)
               .load(DOWNLOAD_URL)
               .setFilePath(Environment.getExternalStorageDirectory().getPath() + "/王者军团.apk")
-              .start();
+              .create();
           getBinding().setStateStr(getString(R.string.stop));
           break;
         }
-        if (Aria.download(this).load(mEntity.getId()).isRunning()) {
-          Aria.download(this).load(mEntity.getId()).stop();
+        if (Aria.download(this).load(mTaskId).isRunning()) {
+          Aria.download(this).load(mTaskId).stop();
           getBinding().setStateStr(getString(R.string.resume));
         } else {
-          Aria.download(this).load(mEntity.getId()).resume();
+          Aria.download(this).load(mTaskId).resume();
           getBinding().setStateStr(getString(R.string.stop));
         }
         break;
 
       case R.id.cancel:
-        if (AppUtil.chekEntityValid(mEntity)) {
-          Aria.download(this).load(mEntity.getId()).cancel();
-        }
+        Aria.download(this).load(mTaskId).cancel();
+        getBinding().setStateStr(getString(R.string.start));
+        mTaskId = -1;
         break;
     }
   }

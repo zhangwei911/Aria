@@ -16,7 +16,7 @@
 package com.arialyy.aria.core.config;
 
 import com.arialyy.aria.core.AriaManager;
-import com.arialyy.aria.util.CommonUtil;
+import com.arialyy.aria.util.FileUtil;
 import java.io.File;
 
 /**
@@ -45,28 +45,28 @@ public final class Configuration {
     File dgCfg = new File(String.format("%s%s", basePath, DGROUP_CONFIG_FILE));
     // 加载下载配置
     if (newDCfg.exists()) {
-      downloadCfg = (DownloadConfig) CommonUtil.readObjFromFile(newDCfg.getPath());
+      downloadCfg = (DownloadConfig) FileUtil.readObjFromFile(newDCfg.getPath());
     }
     if (downloadCfg == null) {
       downloadCfg = new DownloadConfig();
     }
     // 加载上传配置
     if (newUCfg.exists()) {
-      uploadCfg = (UploadConfig) CommonUtil.readObjFromFile(newUCfg.getPath());
+      uploadCfg = (UploadConfig) FileUtil.readObjFromFile(newUCfg.getPath());
     }
     if (uploadCfg == null) {
       uploadCfg = new UploadConfig();
     }
     // 加载app配置
     if (newACfg.exists()) {
-      appCfg = (AppConfig) CommonUtil.readObjFromFile(newACfg.getPath());
+      appCfg = (AppConfig) FileUtil.readObjFromFile(newACfg.getPath());
     }
     if (appCfg == null) {
       appCfg = new AppConfig();
     }
     // 加载下载类型组合任务的配置
     if (dgCfg.exists()) {
-      dGroupCfg = (DGroupConfig) CommonUtil.readObjFromFile(dgCfg.getPath());
+      dGroupCfg = (DGroupConfig) FileUtil.readObjFromFile(dgCfg.getPath());
     }
     if (dGroupCfg == null) {
       dGroupCfg = new DGroupConfig();

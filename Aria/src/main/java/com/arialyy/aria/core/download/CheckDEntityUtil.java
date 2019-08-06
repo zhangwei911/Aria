@@ -74,7 +74,11 @@ public class CheckDEntityUtil implements ICheckEntityUtil {
       m3U8Entity.setFilePath(mEntity.getFilePath());
       m3U8Entity.setPeerIndex(0);
       m3U8Entity.setCacheDir(cacheDir);
+      m3U8Entity.setGenerateIndexFile(mWrapper.asM3U8().isGenerateIndexFileTemp());
       m3U8Entity.insert();
+    } else {
+      m3U8Entity.setGenerateIndexFile(mWrapper.asM3U8().isGenerateIndexFileTemp());
+      m3U8Entity.update();
     }
     if (mWrapper.getRequestType() == ITaskWrapper.M3U8_VOD) {
       if (mEntity.getFileSize() == 0) {

@@ -70,7 +70,7 @@ public class UploadReceiver extends AbsReceiver {
   /**
    * 用于任务停止、删除等操作
    *
-   * @param taskId 任务id，可从{@link AbsStartTarget#start()}、{@link AbsStartTarget#add()}、{@link
+   * @param taskId 任务id，可从{@link AbsStartTarget#create()}、{@link AbsStartTarget#add()}、{@link
    * AbsEntity#getId()}读取任务id
    */
   @CheckResult
@@ -93,7 +93,7 @@ public class UploadReceiver extends AbsReceiver {
   /**
    * 加载FTP单文件上传任务，用于任务第一次上传，如果需要控制任务停止或删除等操作，请使用{@link #load(long)}
    *
-   * @param taskId 任务id，可从{@link AbsStartTarget#start()}、{@link AbsStartTarget#add()}、{@link
+   * @param taskId 任务id，可从{@link AbsStartTarget#create()}、{@link AbsStartTarget#add()}、{@link
    * AbsEntity#getId()}读取任务id
    */
   @CheckResult

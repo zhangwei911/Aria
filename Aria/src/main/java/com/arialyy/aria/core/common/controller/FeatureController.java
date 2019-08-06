@@ -62,7 +62,7 @@ public abstract class FeatureController {
     }
     if (wrapper.getEntity().getId() != -1 && clazz != ControllerType.NORMAL_CONTROLLER) {
       throw new IllegalArgumentException(
-          "对于已存在的任务，只能使用\" ControllerType.NORMAL_CONTROLLER\"，请检查是否重复调用#start()方法");
+          "对于已存在的任务，只能使用\" ControllerType.NORMAL_CONTROLLER\"，请检查是否重复调用#create()方法");
     }
 
     Class[] paramTypes = { AbsTaskWrapper.class };

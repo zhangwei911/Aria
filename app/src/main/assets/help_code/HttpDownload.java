@@ -22,16 +22,11 @@ import android.util.Log;
 import android.view.View;
 import com.arialyy.annotations.Download;
 import com.arialyy.aria.core.Aria;
-import com.arialyy.aria.core.common.ftp.FtpInterceptHandler;
-import com.arialyy.aria.core.common.ftp.IFtpUploadInterceptor;
 import com.arialyy.aria.core.download.DownloadEntity;
-import com.arialyy.aria.core.upload.UploadEntity;
-import com.arialyy.aria.core.upload.UploadTask;
 import com.arialyy.frame.util.FileUtil;
 import com.arialyy.frame.util.show.T;
 import com.arialyy.simple.R;
 import java.io.File;
-import java.util.List;
 
 /**
  * Created by lyy on 2017/7/28. HTTP 文件下载demo
@@ -64,7 +59,7 @@ public class FtpUpload extends Activity {
               //.addHeader(key, value) // 添加头
               //.asPost() //或 asGet()
               //.setParam() // 设置参数
-              .start();
+              .create();
         }
         break;
       case R.id.cancel:

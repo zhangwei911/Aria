@@ -13,23 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.arialyy.aria.core.download.m3u8;
+package com.arialyy.aria.core.queue.pool;
 
-import androidx.annotation.Nullable;
-import java.util.List;
+import com.arialyy.aria.core.AriaManager;
+import com.arialyy.aria.core.inf.AbsTask;
 
 /**
- * Ts文件合并处理，如果你希望使用自行处理ts文件的合并，你可以实现该接口
+ * Created by AriaL on 2017/6/29.
+ * 单个下载任务的执行池
  */
-public interface ITsMergeHandler {
+class DGLoadExecutePool<TASK extends AbsTask> extends DLoadExecutePool<TASK> {
+  private final String TAG = "DGLoadExecutePool";
 
-  /**
-   * 合并ts文件
-   *
-   * @param m3U8Entity m3u8信息，可通过{@link M3U8Entity#keyPath}、{@link M3U8Entity#keyUrl}、
-   * {@link M3U8Entity#iv}、{@link M3U8Entity#method} 获取相应的加密信息
-   * @param tsPath ts文件列表
-   * @return {@code true} 合并成功
-   */
-  boolean merge(@Nullable M3U8Entity m3U8Entity, List<String> tsPath);
+  @Override protected int getMaxSize() {
+    return AriaManager.getInstance(AriaManager.APP).getDGroupConfig().getMaxTaskNum();
+  }
 }

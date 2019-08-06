@@ -2,7 +2,16 @@
   + v_3.7
     - 适配androidX
     - 修复组合任务，恢复下载，会出现进度显示为0的问题
-  + v_3.6.5
+  + v_3.6.6
+    - fix bug https://github.com/AriaLyy/Aria/issues/426
+    - fix bug https://github.com/AriaLyy/Aria/issues/429
+    - fix bug https://github.com/AriaLyy/Aria/issues/428
+    - fix bug https://github.com/AriaLyy/Aria/issues/427
+    - fix bug https://github.com/AriaLyy/Aria/issues/431
+    - fix bug https://github.com/AriaLyy/Aria/issues/441
+    - 修复普通下载任务、组合任务共享执行队列、缓存池的问题
+    - 修复组合任务启动失败时，`DownloadGroupEntity`的状态变为执行中的问题
+  + v_3.6.5 (2019/7/17)
     - fix bug https://github.com/AriaLyy/Aria/issues/403
     - fix bug https://github.com/AriaLyy/Aria/issues/414
     - fix bug https://github.com/AriaLyy/Aria/issues/406

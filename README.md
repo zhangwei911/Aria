@@ -72,12 +72,21 @@ __⚠️注意：3.5.4以下版本升级时，需要更新[配置文件](https:/
 
 ## 使用Aria
 ### 基本使用
-例子为单任务下载，只需要很简单的代码，便可以实现下载功能
+例子为单任务下载，只需要很简单的代码，便可以实现下载功能。
+* 创建任务
   ```java
-  Aria.download(this)
+  long taskId = Aria.download(this)
       .load(DOWNLOAD_URL)     //读取下载地址
       .setFilePath(DOWNLOAD_PATH) //设置文件保存的完整路径
-      .start();   //启动下载
+      .create();   //创建并启动下载
+  ```
+* 停止\恢复任务
+  ```java
+  Aria.download(this)
+      .load(taskId)     //读取任务id
+      .stop();       // 停止任务
+      //.resume();    // 恢复任务
+
   ```
 
 ### 任务状态的获取

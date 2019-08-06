@@ -22,6 +22,7 @@ import com.arialyy.aria.core.common.TaskRecord;
 import com.arialyy.aria.core.common.ThreadRecord;
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.download.DownloadGroupEntity;
+import com.arialyy.aria.core.download.m3u8.M3U8Entity;
 import com.arialyy.aria.core.inf.AbsEntity;
 import com.arialyy.aria.core.inf.AbsNormalEntity;
 import com.arialyy.aria.core.upload.UploadEntity;
@@ -237,6 +238,8 @@ public class RecordUtil {
     ALog.i(TAG, "删除任务记录");
     DbEntity.deleteData(ThreadRecord.class, "taskKey=?", filePath);
     DbEntity.deleteData(TaskRecord.class, "filePath=?", filePath);
+    // 处理m3u8实体的删除
+    DbEntity.deleteData(M3U8Entity.class, "filePath=?", filePath);
   }
 
   /**

@@ -24,7 +24,7 @@ import com.arialyy.aria.core.download.M3U8Listener;
 import com.arialyy.aria.core.inf.AbsEntity;
 import com.arialyy.aria.exception.BaseException;
 import com.arialyy.aria.exception.M3U8Exception;
-import com.arialyy.aria.util.ALog;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -83,7 +83,15 @@ public class M3U8VodUtil implements IUtil {
       return;
     }
     mListener.onPre();
-    getVodInfo();
+    // peer数量小于0，
+    M3U8Entity m3U8Entity = mWrapper.getEntity().getM3U8Entity();
+    if (m3U8Entity.getPeerNum() <= 0 || (m3U8Entity.isGenerateIndexFile() && !new File(
+        String.format(M3U8InfoThread.M3U8_INDEX_FORMAT,
+            mWrapper.getEntity().getFilePath())).exists())) {
+      getVodInfo();
+    } else {
+      mLoader.start();
+    }
   }
 
   /**

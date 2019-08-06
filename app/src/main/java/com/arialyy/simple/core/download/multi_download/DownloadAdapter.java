@@ -294,16 +294,16 @@ public class DownloadAdapter extends AbsRVAdapter<AbsEntity, DownloadAdapter.Sim
   private void start(AbsEntity entity) {
     switch (entity.getTaskType()) {
       case AbsTaskWrapper.D_FTP:
-        //Aria.download(getContext()).loadFtp((DownloadEntity) entity).login("lao", "123456").start();
-        Aria.download(getContext()).loadFtp(entity.getKey()).start();
+        //Aria.download(getContext()).loadFtp((DownloadEntity) entity).login("lao", "123456").create();
+        Aria.download(getContext()).loadFtp(entity.getKey()).create();
         break;
       case AbsTaskWrapper.D_FTP_DIR:
         break;
       case AbsTaskWrapper.D_HTTP:
-        Aria.download(getContext()).load(entity.getKey()).start();
+        Aria.download(getContext()).load(entity.getKey()).create();
         break;
       case AbsTaskWrapper.DG_HTTP:
-        Aria.download(getContext()).loadGroup(((DownloadGroupEntity) entity).getUrls()).start();
+        Aria.download(getContext()).loadGroup(((DownloadGroupEntity) entity).getUrls()).create();
         break;
     }
   }

@@ -76,7 +76,7 @@ public class HttpUploadActivity extends BaseActivity<ActivityUploadBinding> {
             "http://lib-test.xzxyun.com:8042/Api/upload?data={\"type\":\"1\",\"fileType\":\".apk\"}")
         //.setTempUrl("http://192.168.1.6:8080/upload/sign_file/").setAttachment("file")
         //.addHeader("iplanetdirectorypro", "11a09102fb934ad0bc206f9c611d7933")
-        .start();
+        .create();
   }
 
   void stop() {
@@ -95,7 +95,7 @@ public class HttpUploadActivity extends BaseActivity<ActivityUploadBinding> {
   }
 
   @Upload.onTaskStart public void taskStart(UploadTask task) {
-    L.d(TAG, "upload start，md5：" + FileUtil.getFileMD5(new File(task.getEntity().getFilePath())));
+    L.d(TAG, "upload create，md5：" + FileUtil.getFileMD5(new File(task.getEntity().getFilePath())));
     getBinding().setFileSize(task.getConvertFileSize());
   }
 

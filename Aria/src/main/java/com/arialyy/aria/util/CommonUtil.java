@@ -29,10 +29,10 @@ import com.arialyy.aria.core.FtpUrlEntity;
 import com.arialyy.aria.core.command.AbsGroupCmd;
 import com.arialyy.aria.core.command.AbsNormalCmd;
 import com.arialyy.aria.core.command.GroupCmdFactory;
-import com.arialyy.aria.core.command.ICmd;
 import com.arialyy.aria.core.command.NormalCmdFactory;
 import com.arialyy.aria.core.inf.AbsGroupTaskWrapper;
 import com.arialyy.aria.core.inf.AbsTaskWrapper;
+import com.arialyy.aria.core.inf.ITask;
 import dalvik.system.DexFile;
 import java.io.File;
 import java.io.FileFilter;
@@ -41,9 +41,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
@@ -59,7 +56,6 @@ import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -97,102 +93,6 @@ public class CommonUtil {
   public static String convertFtpChar(String charSet, String str)
       throws UnsupportedEncodingException {
     return new String(str.getBytes(charSet), SERVER_CHARSET);
-  }
-
-  /**
-   * 删除文件
-   *
-   * @param path 文件路径
-   * @return {@code true}删除成功、{@code false}删除失败
-   */
-  public static boolean deleteFile(String path) {
-    if (TextUtils.isEmpty(path)) {
-      ALog.e(TAG, "删除文件失败，路径为空");
-      return false;
-    }
-    File file = new File(path);
-    if (file.exists()) {
-      final File to = new File(file.getAbsolutePath() + System.currentTimeMillis());
-      if (file.renameTo(to)) {
-        return to.delete();
-      } else {
-        return file.delete();
-      }
-    }
-    return false;
-  }
-
-  /**
-   * 将对象写入文件
-   *
-   * @param filePath 文件路径
-   * @param data data数据必须实现{@link Serializable}接口
-   */
-  public static void writeObjToFile(String filePath, Object data) {
-    if (!(data instanceof Serializable)) {
-      ALog.e(TAG, "对象写入文件失败，data数据必须实现Serializable接口");
-      return;
-    }
-    FileOutputStream ops = null;
-    try {
-      if (!createFile(filePath)) {
-        return;
-      }
-      ops = new FileOutputStream(filePath);
-      ObjectOutputStream oops = new ObjectOutputStream(ops);
-      oops.writeObject(data);
-    } catch (FileNotFoundException e) {
-      e.printStackTrace();
-    } catch (IOException e) {
-      e.printStackTrace();
-    } finally {
-      if (ops != null) {
-        try {
-          ops.close();
-        } catch (IOException e) {
-          e.printStackTrace();
-        }
-      }
-    }
-  }
-
-  /**
-   * 从文件中读取对象
-   *
-   * @param filePath 文件路径
-   * @return 如果读取成功，返回相应的Obj对象，读取失败，返回null
-   */
-  public static Object readObjFromFile(String filePath) {
-    if (TextUtils.isEmpty(filePath)) {
-      ALog.e(TAG, "文件路径为空");
-      return null;
-    }
-    File file = new File(filePath);
-    if (!file.exists()) {
-      ALog.e(TAG, String.format("文件【%s】不存在", filePath));
-      return null;
-    }
-    FileInputStream fis = null;
-    try {
-      fis = new FileInputStream(filePath);
-      ObjectInputStream oois = new ObjectInputStream(fis);
-      return oois.readObject();
-    } catch (FileNotFoundException e) {
-      e.printStackTrace();
-    } catch (IOException e) {
-      e.printStackTrace();
-    } catch (ClassNotFoundException e) {
-      e.printStackTrace();
-    } finally {
-      if (fis != null) {
-        try {
-          fis.close();
-        } catch (IOException e) {
-          e.printStackTrace();
-        }
-      }
-    }
-    return null;
   }
 
   /**
@@ -407,32 +307,6 @@ public class CommonUtil {
       return (Class) pt.getActualTypeArguments()[0]; //得到泛型里的class类型对象。
     }
     return null;
-  }
-
-  /**
-   * 创建文件名，如果url链接有后缀名，则使用url中的后缀名
-   *
-   * @return url 的 hashKey
-   */
-  public static String createFileName(String url) {
-    int end = url.indexOf("?");
-    String tempUrl, fileName = "";
-    if (end > 0) {
-      tempUrl = url.substring(0, end);
-      int tempEnd = tempUrl.lastIndexOf("/");
-      if (tempEnd > 0) {
-        fileName = tempUrl.substring(tempEnd + 1);
-      }
-    } else {
-      int tempEnd = url.lastIndexOf("/");
-      if (tempEnd > 0) {
-        fileName = url.substring(tempEnd + 1);
-      }
-    }
-    if (TextUtils.isEmpty(fileName)) {
-      fileName = CommonUtil.keyToHashKey(url);
-    }
-    return fileName;
   }
 
   /**
@@ -720,8 +594,7 @@ public class CommonUtil {
   /**
    * 创建任务命令
    *
-   * @param taskType {@link ICmd#TASK_TYPE_DOWNLOAD}、{@link ICmd#TASK_TYPE_DOWNLOAD_GROUP}、{@link
-   * ICmd#TASK_TYPE_UPLOAD}
+   * @param taskType {@link ITask#DOWNLOAD}、{@link ITask#DOWNLOAD_GROUP}、{@link ITask#UPLOAD}
    */
   public static <T extends AbsTaskWrapper> AbsNormalCmd createNormalCmd(T entity, int cmd,
       int taskType) {
@@ -940,59 +813,6 @@ public class CommonUtil {
   }
 
   /**
-   * 创建目录 当目录不存在的时候创建文件，否则返回false
-   */
-  public static boolean createDir(String path) {
-    File file = new File(path);
-    if (!file.exists()) {
-      if (!file.mkdirs()) {
-        ALog.d(TAG, "创建失败，请检查路径和是否配置文件权限！");
-        return false;
-      }
-      return true;
-    }
-    return false;
-  }
-
-  /**
-   * 创建文件 当文件不存在的时候就创建一个文件。 如果文件存在，先删除原文件，然后重新创建一个新文件
-   *
-   * @return {@code true} 创建成功、{@code false} 创建失败
-   */
-  public static boolean createFile(String path) {
-    if (TextUtils.isEmpty(path)) {
-      ALog.e(TAG, "文件路径不能为null");
-      return false;
-    }
-    File file = new File(path);
-    if (file.getParentFile() == null || !file.getParentFile().exists()) {
-      ALog.d(TAG, "目标文件所在路径不存在，准备创建……");
-      if (!createDir(file.getParent())) {
-        ALog.d(TAG, "创建目录文件所在的目录失败！文件路径【" + path + "】");
-      }
-    }
-    // 创建目标文件
-    if (file.exists()) {
-      final File to = new File(file.getAbsolutePath() + System.currentTimeMillis());
-      if (file.renameTo(to)) {
-        to.delete();
-      } else {
-        file.delete();
-      }
-    }
-    try {
-      if (file.createNewFile()) {
-        //ALog.d(TAG, "创建文件成功:" + file.getAbsolutePath());
-        return true;
-      }
-    } catch (IOException e) {
-      e.printStackTrace();
-      return false;
-    }
-    return false;
-  }
-
-  /**
    * 通过文件名获取下载配置文件路径
    *
    * @param fileName 文件名
@@ -1000,53 +820,5 @@ public class CommonUtil {
   public static String getFileConfigPath(boolean isDownload, String fileName) {
     return AriaManager.APP.getFilesDir().getPath() + (isDownload ? AriaManager.DOWNLOAD_TEMP_DIR
         : AriaManager.UPLOAD_TEMP_DIR) + fileName + ".properties";
-  }
-
-  /**
-   * 读取下载配置文件
-   */
-  public static Properties loadConfig(File file) {
-    Properties properties = new Properties();
-    FileInputStream fis = null;
-    if (!file.exists()) {
-      createFile(file.getPath());
-    }
-    try {
-      fis = new FileInputStream(file);
-      properties.load(fis);
-    } catch (Exception e) {
-      e.printStackTrace();
-    } finally {
-      try {
-        if (fis != null) {
-          fis.close();
-        }
-      } catch (IOException e) {
-        e.printStackTrace();
-      }
-    }
-    return properties;
-  }
-
-  /**
-   * 保存配置文件
-   */
-  public static void saveConfig(File file, Properties properties) {
-    FileOutputStream fos = null;
-    try {
-      fos = new FileOutputStream(file, false);
-      properties.store(fos, null);
-    } catch (Exception e) {
-      e.printStackTrace();
-    } finally {
-      try {
-        if (fos != null) {
-          fos.flush();
-          fos.close();
-        }
-      } catch (IOException e) {
-        e.printStackTrace();
-      }
-    }
   }
 }

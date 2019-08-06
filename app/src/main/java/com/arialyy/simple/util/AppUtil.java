@@ -22,11 +22,12 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Build;
-import androidx.core.content.FileProvider;
 import android.text.TextUtils;
+import androidx.core.content.FileProvider;
 import com.arialyy.aria.core.inf.AbsEntity;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
+import com.arialyy.aria.util.FileUtil;
 import com.arialyy.simple.BuildConfig;
 import java.io.File;
 import java.io.IOException;
@@ -51,7 +52,7 @@ public class AppUtil {
     String path = String.format("%s/code/%s", context.getFilesDir().getPath(), fileName);
     File ftpCode = new File(path);
     if (!ftpCode.exists()) {
-      CommonUtil.createFile(path);
+      FileUtil.createFile(path);
       CommonUtil.createFileFormInputStream(context.getAssets()
               .open(String.format("help_code/%s", fileName)),
           path);

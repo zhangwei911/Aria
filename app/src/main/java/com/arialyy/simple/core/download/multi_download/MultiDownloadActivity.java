@@ -139,8 +139,10 @@ public class MultiDownloadActivity extends BaseActivity<ActivityMultiDownloadBin
   }
 
   @DownloadGroup.onTaskFail void groupTaskFail(DownloadGroupTask task) {
-    ALog.d(TAG, String.format("group【%s】fail", task.getTaskName()));
-    mAdapter.updateState(task.getEntity());
+    if (task != null) {
+      ALog.d(TAG, String.format("group【%s】fail", task.getTaskName()));
+      mAdapter.updateState(task.getEntity());
+    }
   }
 
   @DownloadGroup.onTaskComplete void groupTaskComplete(DownloadGroupTask task) {

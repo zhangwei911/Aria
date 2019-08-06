@@ -36,7 +36,7 @@ import com.arialyy.aria.core.download.DownloadTask;
 import com.arialyy.aria.core.download.m3u8.IBandWidthUrlConverter;
 import com.arialyy.aria.core.download.m3u8.ITsMergeHandler;
 import com.arialyy.aria.core.download.m3u8.IVodTsUrlConverter;
-import com.arialyy.aria.core.download.m3u8.M3U8KeyInfo;
+import com.arialyy.aria.core.download.m3u8.M3U8Entity;
 import com.arialyy.aria.core.inf.IEntity;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
@@ -169,7 +169,7 @@ public class M3U8VodDLoadActivity extends BaseActivity<ActivityM3u8VodBinding> {
 
   @M3U8.onPeerStart
   void onPeerStart(String m3u8Url, String peerPath, int peerIndex) {
-    //ALog.d(TAG, "peer start, path: " + peerPath + ", index: " + peerIndex);
+    //ALog.d(TAG, "peer create, path: " + peerPath + ", index: " + peerIndex);
   }
 
   @M3U8.onPeerComplete
@@ -335,13 +335,14 @@ public class M3U8VodDLoadActivity extends BaseActivity<ActivityM3u8VodBinding> {
           }
         })
         .setMergeHandler(new ITsMergeHandler() {
-          public boolean merge(@Nullable M3U8KeyInfo keyInfo, List<String> tsPath) {
+          public boolean merge(@Nullable M3U8Entity m3U8Entity, List<String> tsPath) {
             ALog.d(TAG, "合并TS....");
             return false;
           }
         })
+        .generateIndexFile()
         .controller(ControllerType.START_CONTROLLER)
-        .start();
+        .create();
   }
 
   private Class<StartController> c = StartController.class;

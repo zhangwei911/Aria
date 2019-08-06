@@ -74,11 +74,6 @@ public class M3U8TaskConfig {
   private String bandWidthUrl;
 
   /**
-   * ts密钥信息
-   */
-  private M3U8KeyInfo keyInfo;
-
-  /**
    * 直播下载，ts url转换器
    */
   private WeakReference<ILiveTsUrlConverter> liveTsUrlConverter;
@@ -99,16 +94,16 @@ public class M3U8TaskConfig {
   private int jumpIndex;
 
   /**
-   * 生成索引
+   * 生成索引占位字段
    */
-  private boolean generateIndexFile;
+  private boolean generateIndexFileTemp;
 
-  public boolean isGenerateIndexFile() {
-    return generateIndexFile;
+  public boolean isGenerateIndexFileTemp() {
+    return generateIndexFileTemp;
   }
 
-  public void setGenerateIndexFile(boolean generateIndexFile) {
-    this.generateIndexFile = generateIndexFile;
+  public void setGenerateIndexFileTemp(boolean generateIndexFileTemp) {
+    this.generateIndexFileTemp = generateIndexFileTemp;
   }
 
   public int getJumpIndex() {
@@ -141,14 +136,6 @@ public class M3U8TaskConfig {
 
   public void setLiveTsUrlConverter(ILiveTsUrlConverter liveTsUrlConverter) {
     this.liveTsUrlConverter = new WeakReference<>(liveTsUrlConverter);
-  }
-
-  public M3U8KeyInfo getKeyInfo() {
-    return keyInfo;
-  }
-
-  public void setKeyInfo(M3U8KeyInfo keyInfo) {
-    this.keyInfo = keyInfo;
   }
 
   public String getBandWidthUrl() {

@@ -19,21 +19,21 @@ package com.arialyy.aria.core.queue.pool;
  * Created by Aria.Lao on 2017/7/17.
  * 下载任务池，该池子为简单任务和任务组共用
  */
-public class DownloadSharePool {
-  private static volatile DownloadSharePool INSTANCE;
+public class DLoadSharePool {
+  private static volatile DLoadSharePool INSTANCE;
 
-  public DownloadExecutePool executePool;
+  public DLoadExecutePool executePool;
   public BaseCachePool cachePool;
 
-  private DownloadSharePool() {
-    executePool = new DownloadExecutePool<>();
+  private DLoadSharePool() {
+    executePool = new DLoadExecutePool<>();
     cachePool = new BaseCachePool<>();
   }
 
-  public static DownloadSharePool getInstance() {
+  public static DLoadSharePool getInstance() {
     if (INSTANCE == null) {
-      synchronized (DownloadSharePool.class) {
-        INSTANCE = new DownloadSharePool();
+      synchronized (DLoadSharePool.class) {
+        INSTANCE = new DLoadSharePool();
       }
     }
     return INSTANCE;

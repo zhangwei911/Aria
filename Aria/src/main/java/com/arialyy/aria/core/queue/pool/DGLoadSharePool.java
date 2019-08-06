@@ -13,23 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.arialyy.aria.core.download.m3u8;
-
-import androidx.annotation.Nullable;
-import java.util.List;
+package com.arialyy.aria.core.queue.pool;
 
 /**
- * Ts文件合并处理，如果你希望使用自行处理ts文件的合并，你可以实现该接口
+ * Created by Aria.Lao on 2017/7/17.
+ * 下载任务池，该池子为简单任务和任务组共用
  */
-public interface ITsMergeHandler {
+public class DGLoadSharePool {
+  private static volatile DGLoadSharePool INSTANCE;
 
-  /**
-   * 合并ts文件
-   *
-   * @param m3U8Entity m3u8信息，可通过{@link M3U8Entity#keyPath}、{@link M3U8Entity#keyUrl}、
-   * {@link M3U8Entity#iv}、{@link M3U8Entity#method} 获取相应的加密信息
-   * @param tsPath ts文件列表
-   * @return {@code true} 合并成功
-   */
-  boolean merge(@Nullable M3U8Entity m3U8Entity, List<String> tsPath);
+  public DGLoadExecutePool executePool;
+  public BaseCachePool cachePool;
+
+  private DGLoadSharePool() {
+    executePool = new DGLoadExecutePool<>();
+    cachePool = new BaseCachePool<>();
+  }
+
+  public static DGLoadSharePool getInstance() {
+    if (INSTANCE == null) {
+      synchronized (DGLoadSharePool.class) {
+        INSTANCE = new DGLoadSharePool();
+      }
+    }
+    return INSTANCE;
+  }
 }

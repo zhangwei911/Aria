@@ -50,8 +50,8 @@ public abstract class AbsStartTarget<TARGET extends AbsStartTarget> extends AbsT
    * @return 正常启动，返回任务id，否则返回-1
    */
   @Override
-  public long start() {
-    return getController().start();
+  public long create() {
+    return getController().create();
   }
 
   /**

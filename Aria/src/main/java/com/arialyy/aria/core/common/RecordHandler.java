@@ -27,6 +27,7 @@ import com.arialyy.aria.orm.DbEntity;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
 import com.arialyy.aria.util.DbDataHelper;
+import com.arialyy.aria.util.FileUtil;
 import com.arialyy.aria.util.RecordUtil;
 import java.io.File;
 import java.util.ArrayList;
@@ -261,7 +262,7 @@ public class RecordHandler {
         DbEntity.findRelationData(RecordWrapper.class, "TaskRecord.filePath=?",
             getFilePath());
     if (records == null || records.size() == 0) {
-      Properties pro = CommonUtil.loadConfig(mConfigFile);
+      Properties pro = FileUtil.loadConfig(mConfigFile);
       if (pro.isEmpty()) {
         ALog.d(TAG, "老版本的线程记录为空，任务为新任务");
         initRecord(true);

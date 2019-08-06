@@ -263,7 +263,7 @@ public class M3U8LiveDLoadActivity extends BaseActivity<ActivityM3u8LiveBinding>
         //    return newUrls;
         //  }
         //})
-        .start();
+        .create();
   }
 
   @Override protected void dataCallback(int result, Object data) {

@@ -49,7 +49,7 @@ public final class StartController extends FeatureController implements IStartFe
    *
    * @return 正常启动，返回任务id，否则返回-1
    */
-  public long start() {
+  public long create() {
     if (checkConfig()) {
       EventMsgUtil.getDefault()
           .post(CommonUtil.createNormalCmd(getTaskWrapper(), NormalCmdFactory.TASK_START,

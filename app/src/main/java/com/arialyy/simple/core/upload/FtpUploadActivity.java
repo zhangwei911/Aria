@@ -132,7 +132,7 @@ public class FtpUploadActivity extends BaseActivity<ActivityFtpUploadBinding> {
               .option()
               .login("8L8e", "8guD")
               .controller(ControllerType.START_CONTROLLER)
-              .start();
+              .create();
           getBinding().setStateStr(getString(R.string.stop));
           break;
         }

@@ -198,7 +198,9 @@ class DelegateFind extends AbsDelegate {
             .append(cTableName.concat(".").concat(m.entityColumn()));
         String sql;
         if (expression != null && expression.length > 0) {
-          CheckUtil.checkSqlExpression(expression);
+          if (!CheckUtil.checkSqlExpression(expression)) {
+            return null;
+          }
           sb.append(" WHERE ").append(expression[0]).append(" ");
           sql = sb.toString();
           sql = sql.replace("?", "%s");
@@ -318,7 +320,9 @@ class DelegateFind extends AbsDelegate {
    */
   <T extends DbEntity> List<T> findData(SQLiteDatabase db, Class<T> clazz, String... expression) {
     db = checkDb(db);
-    CheckUtil.checkSqlExpression(expression);
+    if (!CheckUtil.checkSqlExpression(expression)) {
+      return null;
+    }
     String sql = String.format("SELECT rowid, * FROM %s WHERE %s", CommonUtil.getClassName(clazz),
         expression[0]);
     String[] params = new String[expression.length - 1];
@@ -336,7 +340,9 @@ class DelegateFind extends AbsDelegate {
       return null;
     }
     db = checkDb(db);
-    CheckUtil.checkSqlExpression(expression);
+    if (!CheckUtil.checkSqlExpression(expression)) {
+      return null;
+    }
     String sql = String.format("SELECT rowid, * FROM %s WHERE %s LIMIT %s,%s",
         CommonUtil.getClassName(clazz),
         expression[0], (page - 1) * num, num);

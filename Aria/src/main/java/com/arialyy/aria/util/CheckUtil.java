@@ -24,6 +24,7 @@ import com.arialyy.aria.core.upload.UTaskWrapper;
 import com.arialyy.aria.core.upload.UploadEntity;
 import com.arialyy.aria.exception.ParamException;
 import java.io.File;
+import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -68,17 +69,22 @@ public class CheckUtil {
 
   /**
    * 检查sql的expression是否合法
+   *
+   * @return false 不合法
    */
-  public static void checkSqlExpression(String... expression) {
+  public static boolean checkSqlExpression(String... expression) {
     if (expression.length == 0) {
-      throw new IllegalArgumentException("sql语句表达式不能为null");
+      ALog.e(TAG, "sql语句表达式不能为null");
+      return false;
     }
     if (expression.length == 1) {
-      throw new IllegalArgumentException("表达式需要写入参数");
+      ALog.e(TAG, String.format("表达式需要写入参数，参数信息：%s", Arrays.toString(expression)));
+      return false;
     }
     String where = expression[0];
     if (!where.contains("?")) {
-      throw new IllegalArgumentException("请在where语句的'='后编写?");
+      ALog.e(TAG, String.format("请在where语句的'='后编写?，参数信息：%s", Arrays.toString(expression)));
+      return false;
     }
     Pattern pattern = Pattern.compile("\\?");
     Matcher matcher = pattern.matcher(where);
@@ -87,11 +93,14 @@ public class CheckUtil {
       count++;
     }
     if (count < expression.length - 1) {
-      throw new IllegalArgumentException("条件语句的?个数不能小于参数个数");
+      ALog.e(TAG, String.format("条件语句的?个数不能小于参数个数，参数信息：%s", Arrays.toString(expression)));
+      return false;
     }
     if (count > expression.length - 1) {
-      throw new IllegalArgumentException("条件语句的?个数不能大于参数个数");
+      ALog.e(TAG, String.format("条件语句的?个数不能大于参数个数， 参数信息：%s", Arrays.toString(expression)));
+      return false;
     }
+    return true;
   }
 
   /**

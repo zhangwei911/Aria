@@ -207,12 +207,18 @@ public abstract class AbsGroupUtil implements IUtil {
       closeTimer();
       return;
     }
-    onPreStart();
-    startRunningFlow();
+    if (onPreStart()) {
+      startRunningFlow();
+    }
   }
 
-  protected void onPreStart() {
-
+  /**
+   * 处理启动前的检查：获取组合任务大小
+   *
+   * @return {@code false} 将不再走后续流程，任务介绍
+   */
+  protected boolean onPreStart() {
+    return false;
   }
 
   synchronized void closeTimer() {

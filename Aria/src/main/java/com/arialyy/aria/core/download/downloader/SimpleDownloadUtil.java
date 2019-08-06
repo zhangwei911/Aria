@@ -90,9 +90,9 @@ public class SimpleDownloadUtil implements IUtil {
     //    || mTaskWrapper.isRefreshInfo()
     //    || mTaskWrapper.getRequestType() == AbsTaskWrapper.D_FTP
     //    || mTaskWrapper.getState() == IEntity.STATE_FAIL) {
-    //  new Thread(createInfoThread()).start();
+    //  new Thread(createInfoThread()).create();
     //} else {
-    //  mDownloader.start();
+    //  mDownloader.create();
     //}
     new Thread(createInfoThread()).start();
   }

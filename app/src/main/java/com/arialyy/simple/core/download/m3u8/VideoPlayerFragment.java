@@ -41,7 +41,11 @@ public class VideoPlayerFragment extends BaseFragment<FragmentVideoPlayerBinding
   VideoPlayerFragment(int peerIndex, DownloadEntity entity) {
     mEntity = entity;
     mPeerIndex = peerIndex;
-    List<M3U8Entity.PeerInfo> peerInfos = entity.getM3U8Entity().getCompletedPeer();
+    M3U8Entity m3U8Entity = entity.getM3U8Entity();
+    if (m3U8Entity == null) {
+      return;
+    }
+    List<M3U8Entity.PeerInfo> peerInfos = m3U8Entity.getCompletedPeer();
     if (peerInfos != null) {
       for (M3U8Entity.PeerInfo info : peerInfos) {
         mPlayers.put(info.peerId, info.peerPath);
@@ -72,7 +76,9 @@ public class VideoPlayerFragment extends BaseFragment<FragmentVideoPlayerBinding
         }
       }
     });
-    getBinding().seekBar.setMax(mEntity.getM3U8Entity().getPeerNum());
+    if (mEntity.getM3U8Entity() != null) {
+      getBinding().seekBar.setMax(mEntity.getM3U8Entity().getPeerNum());
+    }
     getBinding().seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
       @Override public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
 
@@ -140,8 +146,6 @@ public class VideoPlayerFragment extends BaseFragment<FragmentVideoPlayerBinding
       e.printStackTrace();
     }
   }
-
-
 
   /**
    * 设置下一个分片

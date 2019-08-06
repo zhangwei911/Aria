@@ -30,7 +30,10 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.SequenceInputStream;
+import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
@@ -43,6 +46,7 @@ import java.util.Enumeration;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Properties;
 import java.util.Scanner;
 import java.util.regex.Pattern;
 
@@ -54,6 +58,181 @@ public class FileUtil {
   private static final Pattern DIR_SEPORATOR = Pattern.compile("/");
   private static final String EXTERNAL_STORAGE_PATH =
       Environment.getExternalStorageDirectory().getPath();
+
+  /**
+   * 创建目录 当目录不存在的时候创建文件，否则返回false
+   */
+  public static boolean createDir(String path) {
+    File file = new File(path);
+    if (!file.exists()) {
+      if (!file.mkdirs()) {
+        ALog.d(TAG, "创建失败，请检查路径和是否配置文件权限！");
+        return false;
+      }
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * 创建文件 当文件不存在的时候就创建一个文件。 如果文件存在，先删除原文件，然后重新创建一个新文件
+   *
+   * @return {@code true} 创建成功、{@code false} 创建失败
+   */
+  public static boolean createFile(String path) {
+    if (TextUtils.isEmpty(path)) {
+      ALog.e(TAG, "文件路径不能为null");
+      return false;
+    }
+    File file = new File(path);
+    if (file.getParentFile() == null || !file.getParentFile().exists()) {
+      ALog.d(TAG, "目标文件所在路径不存在，准备创建……");
+      if (!createDir(file.getParent())) {
+        ALog.d(TAG, "创建目录文件所在的目录失败！文件路径【" + path + "】");
+      }
+    }
+    // 创建目标文件
+    if (file.exists()) {
+      final File to = new File(file.getAbsolutePath() + System.currentTimeMillis());
+      if (file.renameTo(to)) {
+        to.delete();
+      } else {
+        file.delete();
+      }
+    }
+    try {
+      if (file.createNewFile()) {
+        //ALog.d(TAG, "创建文件成功:" + file.getAbsolutePath());
+        return true;
+      }
+    } catch (IOException e) {
+      e.printStackTrace();
+      return false;
+    }
+    return false;
+  }
+
+  /**
+   * 创建文件名，如果url链接有后缀名，则使用url中的后缀名
+   *
+   * @return url 的 hashKey
+   */
+  public static String createFileName(String url) {
+    int end = url.indexOf("?");
+    String tempUrl, fileName = "";
+    if (end > 0) {
+      tempUrl = url.substring(0, end);
+      int tempEnd = tempUrl.lastIndexOf("/");
+      if (tempEnd > 0) {
+        fileName = tempUrl.substring(tempEnd + 1);
+      }
+    } else {
+      int tempEnd = url.lastIndexOf("/");
+      if (tempEnd > 0) {
+        fileName = url.substring(tempEnd + 1);
+      }
+    }
+    if (TextUtils.isEmpty(fileName)) {
+      fileName = CommonUtil.keyToHashKey(url);
+    }
+    return fileName;
+  }
+
+  /**
+   * 删除文件
+   *
+   * @param path 文件路径
+   * @return {@code true}删除成功、{@code false}删除失败
+   */
+  public static boolean deleteFile(String path) {
+    if (TextUtils.isEmpty(path)) {
+      ALog.e(TAG, "删除文件失败，路径为空");
+      return false;
+    }
+    File file = new File(path);
+    if (file.exists()) {
+      final File to = new File(file.getAbsolutePath() + System.currentTimeMillis());
+      if (file.renameTo(to)) {
+        return to.delete();
+      } else {
+        return file.delete();
+      }
+    }
+    return false;
+  }
+
+  /**
+   * 将对象写入文件
+   *
+   * @param filePath 文件路径
+   * @param data data数据必须实现{@link Serializable}接口
+   */
+  public static void writeObjToFile(String filePath, Object data) {
+    if (!(data instanceof Serializable)) {
+      ALog.e(TAG, "对象写入文件失败，data数据必须实现Serializable接口");
+      return;
+    }
+    FileOutputStream ops = null;
+    try {
+      if (!createFile(filePath)) {
+        return;
+      }
+      ops = new FileOutputStream(filePath);
+      ObjectOutputStream oops = new ObjectOutputStream(ops);
+      oops.writeObject(data);
+    } catch (FileNotFoundException e) {
+      e.printStackTrace();
+    } catch (IOException e) {
+      e.printStackTrace();
+    } finally {
+      if (ops != null) {
+        try {
+          ops.close();
+        } catch (IOException e) {
+          e.printStackTrace();
+        }
+      }
+    }
+  }
+
+  /**
+   * 从文件中读取对象
+   *
+   * @param filePath 文件路径
+   * @return 如果读取成功，返回相应的Obj对象，读取失败，返回null
+   */
+  public static Object readObjFromFile(String filePath) {
+    if (TextUtils.isEmpty(filePath)) {
+      ALog.e(TAG, "文件路径为空");
+      return null;
+    }
+    File file = new File(filePath);
+    if (!file.exists()) {
+      ALog.e(TAG, String.format("文件【%s】不存在", filePath));
+      return null;
+    }
+    FileInputStream fis = null;
+    try {
+      fis = new FileInputStream(filePath);
+      ObjectInputStream oois = new ObjectInputStream(fis);
+      return oois.readObject();
+    } catch (FileNotFoundException e) {
+      e.printStackTrace();
+    } catch (IOException e) {
+      e.printStackTrace();
+    } catch (ClassNotFoundException e) {
+      e.printStackTrace();
+    } finally {
+      if (fis != null) {
+        try {
+          fis.close();
+        } catch (IOException e) {
+          e.printStackTrace();
+        }
+      }
+    }
+    return null;
+  }
 
   /**
    * 合并文件
@@ -187,6 +366,54 @@ public class FileUtil {
   }
 
   /**
+   * 读取下载配置文件
+   */
+  public static Properties loadConfig(File file) {
+    Properties properties = new Properties();
+    FileInputStream fis = null;
+    if (!file.exists()) {
+      createFile(file.getPath());
+    }
+    try {
+      fis = new FileInputStream(file);
+      properties.load(fis);
+    } catch (Exception e) {
+      e.printStackTrace();
+    } finally {
+      try {
+        if (fis != null) {
+          fis.close();
+        }
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+    }
+    return properties;
+  }
+
+  /**
+   * 保存配置文件
+   */
+  public static void saveConfig(File file, Properties properties) {
+    FileOutputStream fos = null;
+    try {
+      fos = new FileOutputStream(file, false);
+      properties.store(fos, null);
+    } catch (Exception e) {
+      e.printStackTrace();
+    } finally {
+      try {
+        if (fos != null) {
+          fos.flush();
+          fos.close();
+        }
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+    }
+  }
+
+  /**
    * getSDPathList
    */
   private static List<String> getVolumeList(final Context context) {
@@ -258,8 +485,10 @@ public class FileUtil {
   }
 
   /**
-   * Raturns all available SD-Cards in the system (include emulated) Warning: Hack! Based on Android source code of version 4.3
-   * (API 18) Because there is no standard way to get it. TODO: Test on future Android versions 4.2+
+   * Raturns all available SD-Cards in the system (include emulated) Warning: Hack! Based on Android
+   * source code of version 4.3
+   * (API 18) Because there is no standard way to get it. TODO: Test on future Android versions
+   * 4.2+
    *
    * @return paths to all available SD-Cards in the system (include emulated)
    */
@@ -322,9 +551,11 @@ public class FileUtil {
   }
 
   /**
-   * Scan the /proc/mounts file and look for lines like this: /dev/block/vold/179:1 /mnt/sdcard vfat
+   * Scan the /proc/mounts file and look for lines like this: /dev/block/vold/179:1 /mnt/sdcard
+   * vfat
    * rw,dirsync,nosuid,nodev,noexec ,relatime,uid=1000,gid=1015,fmask=0602,dmask=0602,allow_utime=0020,
-   * codepage=cp437,iocharset= iso8859-1,shortname=mixed,utf8,errors=remount-ro 0 0 When one is found, split it into its
+   * codepage=cp437,iocharset= iso8859-1,shortname=mixed,utf8,errors=remount-ro 0 0 When one is
+   * found, split it into its
    * elements and then pull out the path to the that mount point and add it to the arraylist
    */
   private static List<String> readMountsFile() {

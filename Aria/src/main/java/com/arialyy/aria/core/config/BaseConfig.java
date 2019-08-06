@@ -3,7 +3,7 @@ package com.arialyy.aria.core.config;
 import android.text.TextUtils;
 import com.arialyy.aria.core.AriaManager;
 import com.arialyy.aria.util.ALog;
-import com.arialyy.aria.util.CommonUtil;
+import com.arialyy.aria.util.FileUtil;
 import java.io.Serializable;
 
 abstract class BaseConfig implements Serializable {
@@ -42,8 +42,8 @@ abstract class BaseConfig implements Serializable {
     }
     if (!TextUtils.isEmpty(path)) {
       String tempPath = String.format("%s%s", basePath, path);
-      CommonUtil.deleteFile(tempPath);
-      CommonUtil.writeObjToFile(tempPath, this);
+      FileUtil.deleteFile(tempPath);
+      FileUtil.writeObjToFile(tempPath, this);
     } else {
       ALog.e(TAG, String.format("保存配置失败，配置类型：%s，原因：路径错误", getType()));
     }

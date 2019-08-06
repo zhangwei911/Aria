@@ -5,7 +5,7 @@ apply plugin: 'com.jfrog.bintray'
 apply plugin: 'com.github.dcendents.android-maven'
 //输入：gradlew bintray 执行
 
-//############################## jar、sources、doc 打包 start #######################################
+//############################## jar、sources、doc 打包 create #######################################
 task sourcesJar(type: Jar) {
   from android.sourceSets.main.java.srcDirs
   classifier = 'sources'
@@ -73,7 +73,7 @@ artifacts {
 }
 //############################## jar、sources、doc 打包 end #######################################
 
-//################################# jcenter 上传配置 start #########################################
+//################################# jcenter 上传配置 create #########################################
 bintray {
 //  user = hasProperty("bintrayUser") ? getProperty("bintrayUser") : getProperty("BINTRAY_USER")
 //  groupHash = hasProperty("bintrayKey") ? getProperty("bintrayKey") : getProperty("BINTRAY_KEY")
