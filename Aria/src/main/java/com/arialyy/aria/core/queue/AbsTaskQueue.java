@@ -112,7 +112,7 @@ public abstract class AbsTaskQueue<TASK extends AbsTask, TASK_WRAPPER extends Ab
         task.stop(TaskSchedulerType.TYPE_STOP_NOT_NEXT);
       }
     }
-
+    ThreadTaskManager.getInstance().removeAllThreadTask();
     mCachePool.clear();
   }
 
