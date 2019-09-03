@@ -82,7 +82,7 @@ final class M3U8InfoThread implements Runnable {
     this.mTaskWrapper = taskWrapper;
     mEntity = taskWrapper.getEntity();
     mConnectTimeOut =
-        AriaManager.getInstance(AriaManager.APP).getDownloadConfig().getConnectTimeOut();
+        AriaManager.getInstance().getDownloadConfig().getConnectTimeOut();
     onFileInfoCallback = callback;
     mTaskDelegate = taskWrapper.asHttp();
     mEntity.getM3U8Entity().setLive(mTaskWrapper.getRequestType() == AbsTaskWrapper.M3U8_LIVE);

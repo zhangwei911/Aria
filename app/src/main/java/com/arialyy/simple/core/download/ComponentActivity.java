@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.arialyy.simple.core.download;
 
 import android.os.Bundle;
@@ -28,27 +27,22 @@ import com.arialyy.simple.R;
 import com.arialyy.simple.base.BaseActivity;
 import com.arialyy.simple.base.adapter.RvItemClickSupport;
 import com.arialyy.simple.common.NormalToAdapter;
-import com.arialyy.simple.core.download.mutil.MultiTaskActivity;
-import com.arialyy.simple.databinding.ActivityDownloadMeanBinding;
+import com.arialyy.simple.core.download.fragment.FragmentActivity;
+import com.arialyy.simple.databinding.ActivityComponentBinding;
 import com.arialyy.simple.modlue.CommonModule;
 import com.arialyy.simple.to.NormalTo;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by Lyy on 2016/10/13.
- */
-public class DownloadActivity extends BaseActivity<ActivityDownloadMeanBinding> {
-  private NormalTo mTo;
-
+public class ComponentActivity extends BaseActivity<ActivityComponentBinding> {
   @Override protected int setLayoutId() {
-    return R.layout.activity_download_mean;
+    return R.layout.activity_component;
   }
 
   @Override protected void init(Bundle savedInstanceState) {
     super.init(savedInstanceState);
-    mTo = getIntent().getParcelableExtra(MainActivity.KEY_MAIN_DATA);
-    setTitle(mTo.title);
+    NormalTo to = getIntent().getParcelableExtra(MainActivity.KEY_MAIN_DATA);
+    setTitle(to.title);
 
     final List<NormalTo> data = new ArrayList<>();
     getBinding().list.setLayoutManager(new GridLayoutManager(this, 2));
@@ -56,7 +50,7 @@ public class DownloadActivity extends BaseActivity<ActivityDownloadMeanBinding> 
     getBinding().list.setAdapter(adapter);
     final CommonModule module = ViewModelProviders.of(this).get(CommonModule.class);
 
-    module.getDownloadData(this).observe(this,
+    module.getComponentData(this).observe(this,
         new Observer<List<NormalTo>>() {
           @Override public void onChanged(@Nullable List<NormalTo> normalTos) {
             if (normalTos != null) {
@@ -65,34 +59,17 @@ public class DownloadActivity extends BaseActivity<ActivityDownloadMeanBinding> 
             }
           }
         });
-
     RvItemClickSupport.addTo(getBinding().list).setOnItemClickListener(
         new RvItemClickSupport.OnItemClickListener() {
           @Override public void onItemClicked(RecyclerView recyclerView, int position, View v) {
             switch (position) {
               case 0:
-                module.startNextActivity(DownloadActivity.this, data.get(position),
-                    SingleTaskActivity.class);
+                module.startNextActivity(ComponentActivity.this, data.get(position),
+                    FragmentActivity.class);
                 break;
               case 1:
-                module.startNextActivity(DownloadActivity.this, data.get(position),
-                    MultiTaskActivity.class);
-                break;
-              case 2:
-                module.startNextActivity(DownloadActivity.this, data.get(position),
-                    HighestPriorityActivity.class);
-                break;
-              case 3:
-                module.startNextActivity(DownloadActivity.this, data.get(position),
-                    KotlinDownloadActivity.class);
-                break;
-              case 4:
-                // 服务中
-                break;
-              case 5:
-                // 组件中使用
-                module.startNextActivity(DownloadActivity.this, data.get(position),
-                    ComponentActivity.class);
+                DownloadDialog dialog = new DownloadDialog(ComponentActivity.this);
+                dialog.show();
                 break;
             }
           }

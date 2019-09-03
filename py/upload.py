@@ -43,13 +43,14 @@ def test():
 
 @app.route('/upload/', methods=['GET', 'POST'])
 def upload_file():
-    print 'upload'
     if request.method == 'POST':
-        print 'post'
+        print(request.values)
+        print('params = ' + request.values.get('params'))
+
         file = request.files['file']
-        print file
+        print(file)
         if file and allowed_file(file.filename):
-            print 'start save'
+            print('start save')
             filename = secure_filename(file.filename)
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
             # file_url = url_for('uploaded_file', filename=filename)

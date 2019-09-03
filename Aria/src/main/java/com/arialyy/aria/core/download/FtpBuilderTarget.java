@@ -17,7 +17,7 @@ package com.arialyy.aria.core.download;
 
 import androidx.annotation.CheckResult;
 import androidx.annotation.NonNull;
-import com.arialyy.aria.core.common.AbsStartTarget;
+import com.arialyy.aria.core.common.AbsBuilderTarget;
 import com.arialyy.aria.core.common.Suggest;
 import com.arialyy.aria.core.common.ftp.FtpDelegate;
 import com.arialyy.aria.core.inf.ITaskWrapper;
@@ -26,10 +26,10 @@ import com.arialyy.aria.util.CommonUtil;
 /**
  * 处理ftp第一次下载等逻辑
  */
-public class FtpStartTarget extends AbsStartTarget<FtpStartTarget> {
-  private DNormalConfigHandler<FtpStartTarget> mConfigHandler;
+public class FtpBuilderTarget extends AbsBuilderTarget<FtpBuilderTarget> {
+  private DNormalConfigHandler<FtpBuilderTarget> mConfigHandler;
 
-  FtpStartTarget(String url, String targetName) {
+  FtpBuilderTarget(String url, String targetName) {
     mConfigHandler = new DNormalConfigHandler<>(this, -1, targetName);
     mConfigHandler.setUrl(url);
     getTaskWrapper().asFtp().setUrlEntity(CommonUtil.getFtpUrlInfo(url));
@@ -40,7 +40,7 @@ public class FtpStartTarget extends AbsStartTarget<FtpStartTarget> {
    * 设置登陆、字符串编码、ftps等参数
    */
   @CheckResult(suggest = Suggest.TASK_CONTROLLER)
-  public FtpDelegate<FtpStartTarget> option() {
+  public FtpDelegate<FtpBuilderTarget> option() {
     return new FtpDelegate<>(this, getTaskWrapper());
   }
 
@@ -51,7 +51,7 @@ public class FtpStartTarget extends AbsStartTarget<FtpStartTarget> {
    * 2、如果保存路径是文件夹路径，如：/mnt/sdcard/，则使用FTP服务器该文件的文件名
    */
   @CheckResult(suggest = Suggest.TASK_CONTROLLER)
-  public FtpStartTarget setFilePath(@NonNull String filePath) {
+  public FtpBuilderTarget setFilePath(@NonNull String filePath) {
     int lastIndex = mConfigHandler.getUrl().lastIndexOf("/");
     getEntity().setFileName(mConfigHandler.getUrl().substring(lastIndex + 1));
     mConfigHandler.setTempFilePath(filePath);
@@ -67,7 +67,7 @@ public class FtpStartTarget extends AbsStartTarget<FtpStartTarget> {
    * @param forceDownload {@code true}强制下载，不考虑文件路径是否被占用
    */
   @CheckResult(suggest = Suggest.TASK_CONTROLLER)
-  public FtpStartTarget setFilePath(@NonNull String filePath, boolean forceDownload) {
+  public FtpBuilderTarget setFilePath(@NonNull String filePath, boolean forceDownload) {
     mConfigHandler.setTempFilePath(filePath);
     mConfigHandler.setForceDownload(forceDownload);
     return this;

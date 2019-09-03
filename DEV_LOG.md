@@ -1,8 +1,16 @@
 ## 开发日志
   + v_3.7
+    - fix bug https://github.com/AriaLyy/Aria/issues/450
+    - fix bug https://github.com/AriaLyy/Aria/issues/466
+    - fix bug https://github.com/AriaLyy/Aria/issues/454
+    - 移除隐藏api的反射 https://github.com/AriaLyy/Aria/issues/456
+    - 新增ftp免证书登陆功能h ttps://github.com/AriaLyy/Aria/issues/455
     - 适配androidX
     - 修复组合任务，恢复下载，会出现进度显示为0的问题
-  + v_3.6.6
+    - m3u8点播下载新增创建ts索引功能
+    - 修复多任务的m3u8点播下载时，一个任务调用`jumpIndex`，其它m3u8任务也会自动调用`jumpIndex`的问题
+    - 添加权限检查
+  + v_3.6.6 (2019/8/7)
     - fix bug https://github.com/AriaLyy/Aria/issues/426
     - fix bug https://github.com/AriaLyy/Aria/issues/429
     - fix bug https://github.com/AriaLyy/Aria/issues/428

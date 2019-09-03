@@ -15,8 +15,11 @@
  */
 package com.arialyy.aria.core.common.controller;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.os.Handler;
 import android.os.Looper;
+import com.arialyy.aria.core.AriaManager;
 import com.arialyy.aria.core.download.CheckDEntityUtil;
 import com.arialyy.aria.core.download.CheckDGEntityUtil;
 import com.arialyy.aria.core.download.CheckFtpDirEntityUtil;
@@ -27,13 +30,12 @@ import com.arialyy.aria.core.inf.AbsTaskWrapper;
 import com.arialyy.aria.core.inf.ICheckEntityUtil;
 import com.arialyy.aria.core.inf.ITask;
 import com.arialyy.aria.core.inf.ITaskWrapper;
-import com.arialyy.aria.core.scheduler.DownloadGroupSchedulers;
-import com.arialyy.aria.core.scheduler.DownloadSchedulers;
 import com.arialyy.aria.core.scheduler.ISchedulers;
-import com.arialyy.aria.core.scheduler.UploadSchedulers;
+import com.arialyy.aria.core.scheduler.TaskSchedulers;
 import com.arialyy.aria.core.upload.CheckUEntityUtil;
 import com.arialyy.aria.core.upload.UTaskWrapper;
 import com.arialyy.aria.util.ALog;
+import com.arialyy.aria.util.CommonUtil;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
@@ -41,28 +43,31 @@ import java.lang.reflect.InvocationTargetException;
  * 功能控制器
  */
 public abstract class FeatureController {
+  private final String TAG;
 
   private AbsTaskWrapper mTaskWrapper;
 
   FeatureController(AbsTaskWrapper wrapper) {
     mTaskWrapper = wrapper;
+    TAG = CommonUtil.getClassName(getClass());
   }
 
   /**
    * 使用对应等控制器，注意：
-   * 1、对于不存在的任务（第一次下载），只能使用{@link ControllerType#START_CONTROLLER}
-   * 2、对于已存在的任务，只能使用{@link ControllerType#NORMAL_CONTROLLER}
+   * 1、对于不存在的任务（第一次下载），只能使用{@link ControllerType#CREATE_CONTROLLER}
+   * 2、对于已存在的任务，只能使用{@link ControllerType#TASK_CONTROLLER}
    *
-   * @param clazz {@link ControllerType#START_CONTROLLER}、{@link ControllerType#NORMAL_CONTROLLER}
+   * @param clazz {@link ControllerType#CREATE_CONTROLLER}、{@link ControllerType#TASK_CONTROLLER}
    */
   public static <T extends FeatureController> T newInstance(@ControllerType Class<T> clazz,
       AbsTaskWrapper wrapper) {
-    if (wrapper.getEntity().getId() == -1 && clazz != ControllerType.START_CONTROLLER) {
-      throw new IllegalArgumentException("对于不存在的任务（第一次下载），只能使用\"ControllerType.START_CONTROLLER\"");
-    }
-    if (wrapper.getEntity().getId() != -1 && clazz != ControllerType.NORMAL_CONTROLLER) {
+    if (wrapper.getEntity().getId() == -1 && clazz != ControllerType.CREATE_CONTROLLER) {
       throw new IllegalArgumentException(
-          "对于已存在的任务，只能使用\" ControllerType.NORMAL_CONTROLLER\"，请检查是否重复调用#create()方法");
+          "对于不存在的任务（第一次下载），只能使用\"ControllerType.CREATE_CONTROLLER\"");
+    }
+    if (wrapper.getEntity().getId() != -1 && clazz != ControllerType.TASK_CONTROLLER) {
+      throw new IllegalArgumentException(
+          "对于已存在的任务，只能使用\" ControllerType.TASK_CONTROLLER\"，请检查是否重复调用#create()方法");
     }
 
     Class[] paramTypes = { AbsTaskWrapper.class };
@@ -106,8 +111,11 @@ public abstract class FeatureController {
    * 如果检查实体失败，将错误回调
    */
   boolean checkConfig() {
+    if (!checkPermission()) {
+      return false;
+    }
     boolean b = checkEntity();
-    ISchedulers schedulers = getScheduler();
+    TaskSchedulers schedulers = TaskSchedulers.getInstance();
     if (!b && schedulers != null) {
       new Handler(Looper.getMainLooper(), schedulers).obtainMessage(ISchedulers.CHECK_FAIL,
           checkTaskType(), -1, null).sendToTarget();
@@ -116,17 +124,39 @@ public abstract class FeatureController {
     return b;
   }
 
-  private ISchedulers getScheduler() {
-    if (mTaskWrapper instanceof DTaskWrapper) {
-      return DownloadSchedulers.getInstance();
+  /**
+   * 检查权限，需要的权限有
+   * {@link Manifest.permission#WRITE_EXTERNAL_STORAGE}
+   * {@link Manifest.permission#READ_EXTERNAL_STORAGE}
+   * {@link Manifest.permission#INTERNET}
+   *
+   * @return {@code false} 缺少权限
+   */
+  private boolean checkPermission() {
+
+    if (AriaManager.getInstance()
+        .getAPP()
+        .checkCallingOrSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        != PackageManager.PERMISSION_GRANTED) {
+      ALog.e(TAG, "启动失败，缺少权限：Manifest.permission.WRITE_EXTERNAL_STORAGE");
+      return false;
     }
-    if (mTaskWrapper instanceof UTaskWrapper) {
-      return UploadSchedulers.getInstance();
+    if (AriaManager.getInstance()
+        .getAPP()
+        .checkCallingOrSelfPermission(Manifest.permission.INTERNET)
+        != PackageManager.PERMISSION_GRANTED) {
+      ALog.e(TAG, "启动失败，缺少权限：Manifest.permission.INTERNET");
+      return false;
     }
-    if (mTaskWrapper instanceof DGTaskWrapper) {
-      return DownloadGroupSchedulers.getInstance();
+    if (AriaManager.getInstance()
+        .getAPP()
+        .checkCallingOrSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
+        != PackageManager.PERMISSION_GRANTED) {
+      ALog.e(TAG, "启动失败，缺少权限：Manifest.permission.READ_EXTERNAL_STORAGE");
+      return false;
     }
-    return null;
+
+    return true;
   }
 
   private boolean checkEntity() {

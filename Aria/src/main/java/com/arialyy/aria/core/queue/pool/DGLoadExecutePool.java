@@ -26,6 +26,6 @@ class DGLoadExecutePool<TASK extends AbsTask> extends DLoadExecutePool<TASK> {
   private final String TAG = "DGLoadExecutePool";
 
   @Override protected int getMaxSize() {
-    return AriaManager.getInstance(AriaManager.APP).getDGroupConfig().getMaxTaskNum();
+    return AriaManager.getInstance().getDGroupConfig().getMaxTaskNum();
   }
 }

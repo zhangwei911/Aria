@@ -42,7 +42,7 @@ public class DownloadDialog extends AbsDialog implements View.OnClickListener {
   private long mTaskId = -1;
 
   private static final String DOWNLOAD_URL =
-      "http://static.gaoshouyou.com/d/4b/d7/e04b308d9cd7f0ad4cac18d1a514544c.apk";
+      "http://sdkdown.muzhiwan.com/openfile/2019/07/12/com.nswj.acing.mzw_5d283abee9a3c.apk";
 
   public DownloadDialog(Context context) {
     super(context);
@@ -82,7 +82,7 @@ public class DownloadDialog extends AbsDialog implements View.OnClickListener {
         if (mTaskId == -1) {
           mTaskId = Aria.download(this)
               .load(DOWNLOAD_URL)
-              .setFilePath(Environment.getExternalStorageDirectory().getPath() + "/飞机大战.apk")
+              .setFilePath(Environment.getExternalStorageDirectory().getPath() + "/女神危机.apk")
               .create();
           mStart.setText(getContext().getString(R.string.stop));
           break;

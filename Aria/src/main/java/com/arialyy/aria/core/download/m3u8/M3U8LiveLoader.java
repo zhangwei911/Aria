@@ -153,6 +153,9 @@ public class M3U8LiveLoader extends BaseM3U8Loader {
    * @return {@code true} 合并成功，{@code false}合并失败
    */
   public boolean mergeFile() {
+    if (getEntity().getM3U8Entity().isGenerateIndexFile()) {
+      return generateIndexFile();
+    }
     ITsMergeHandler mergeHandler = mTaskWrapper.asM3U8().getMergeHandler();
     String cacheDir = getCacheDir();
     List<String> partPath = new ArrayList<>();

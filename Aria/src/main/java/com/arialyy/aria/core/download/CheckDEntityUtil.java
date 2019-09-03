@@ -190,17 +190,14 @@ public class CheckDEntityUtil implements ICheckEntityUtil {
   }
 
   private boolean checkFtps() {
-    if (mWrapper.getRequestType() == ITaskWrapper.D_FTP && mWrapper.asFtp()
-        .getUrlEntity().isFtps) {
-      if (TextUtils.isEmpty(mWrapper.asFtp().getUrlEntity().storePath)) {
-        ALog.e(TAG, "证书路径为空");
-        return false;
-      }
-      if (TextUtils.isEmpty(mWrapper.asFtp().getUrlEntity().keyAlias)) {
-        ALog.e(TAG, "证书别名为空");
-        return false;
-      }
-    }
+    //if (mWrapper.getRequestType() == ITaskWrapper.D_FTP && mWrapper.asFtp()
+    //    .getUrlEntity().isFtps) {
+    //  String ftpUrl = mEntity.getUrl();
+    //  if (!ftpUrl.startsWith("ftps") && !ftpUrl.startsWith("sftp")) {
+    //    ALog.e(TAG, String.format("地址【%s】错误，ftps地址开头必须是：ftps或sftp", ftpUrl));
+    //    return false;
+    //  }
+    //}
     return true;
   }
 }

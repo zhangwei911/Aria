@@ -37,7 +37,7 @@ public class DownloadGroupTask extends AbsGroupTask<DGTaskWrapper> {
   private DownloadGroupTask(DGTaskWrapper taskWrapper, Handler outHandler) {
     mTaskWrapper = taskWrapper;
     mOutHandler = outHandler;
-    mContext = AriaManager.APP;
+    mContext = AriaManager.getInstance().getAPP();
     mListener = new DownloadGroupListener(this, mOutHandler);
   }
 

@@ -94,8 +94,9 @@ public class FtpDownloadActivity extends BaseActivity<ActivityFtpDownloadBinding
           mTaskId = Aria.download(this).loadFtp(mUrl)
               .setFilePath(mFilePath, true)
               .option()
-              .login("8L8e", "8guD")
-              .controller(ControllerType.START_CONTROLLER)
+              .login("lao", "123456")
+              .asFtps()
+              .controller(ControllerType.CREATE_CONTROLLER)
               .create();
           getBinding().setStateStr(getString(R.string.stop));
           break;
@@ -107,8 +108,9 @@ public class FtpDownloadActivity extends BaseActivity<ActivityFtpDownloadBinding
           Aria.download(this)
               .loadFtp(mTaskId)
               .option()
-              .login("8L8e", "8guD")
-              .controller(ControllerType.NORMAL_CONTROLLER)
+              .login("lao", "123456")
+              .asFtps()
+              .controller(ControllerType.TASK_CONTROLLER)
               .resume();
           getBinding().setStateStr(getString(R.string.stop));
         }

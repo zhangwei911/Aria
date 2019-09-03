@@ -87,7 +87,7 @@ class SimpleSchedulers implements ISchedulers {
     boolean isNotNetRetry = config.appCfg.isNotNetRetry();
 
     final int reTryNum = num;
-    if ((!NetUtils.isConnected(AriaManager.APP) && !isNotNetRetry)
+    if ((!NetUtils.isConnected(AriaManager.getInstance().getAPP()) && !isNotNetRetry)
         || loaderUtil.getDownloader() == null // 如果获取不到文件信息，loader为空
         || loaderUtil.getEntity().getFailNum() > reTryNum) {
       mQueue.removeTaskFromExecQ(loaderUtil);

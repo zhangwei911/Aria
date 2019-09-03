@@ -17,7 +17,7 @@
 package com.arialyy.aria.core.queue;
 
 import com.arialyy.aria.core.AriaManager;
-import com.arialyy.aria.core.scheduler.UploadSchedulers;
+import com.arialyy.aria.core.scheduler.TaskSchedulers;
 import com.arialyy.aria.core.upload.UTaskWrapper;
 import com.arialyy.aria.core.upload.UploadTask;
 import com.arialyy.aria.util.ALog;
@@ -46,11 +46,11 @@ public class UploadTaskQueue extends AbsTaskQueue<UploadTask, UTaskWrapper> {
   }
 
   @Override public int getOldMaxNum() {
-    return AriaManager.getInstance(AriaManager.APP).getUploadConfig().oldMaxTaskNum;
+    return AriaManager.getInstance().getUploadConfig().oldMaxTaskNum;
   }
 
   @Override public int getMaxTaskNum() {
-    return AriaManager.getInstance(AriaManager.APP).getUploadConfig().getMaxTaskNum();
+    return AriaManager.getInstance().getUploadConfig().getMaxTaskNum();
   }
 
   @Override public UploadTask createTask(UTaskWrapper wrapper) {
@@ -58,7 +58,7 @@ public class UploadTaskQueue extends AbsTaskQueue<UploadTask, UTaskWrapper> {
     UploadTask task = null;
     if (!mCachePool.taskExits(wrapper.getKey()) && !mExecutePool.taskExits(wrapper.getKey())) {
       task = (UploadTask) TaskFactory.getInstance()
-          .createTask(wrapper, UploadSchedulers.getInstance());
+          .createTask(wrapper, TaskSchedulers.getInstance());
       addTask(task);
     } else {
       ALog.w(TAG, "任务已存在");

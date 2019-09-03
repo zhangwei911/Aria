@@ -15,6 +15,7 @@
  */
 package com.arialyy.aria.core.download.m3u8;
 
+import java.lang.ref.SoftReference;
 import java.lang.ref.WeakReference;
 import java.util.List;
 
@@ -31,7 +32,7 @@ public class M3U8TaskConfig {
   /**
    * #EXTINF 标签信息处理器
    */
-  private WeakReference<IVodTsUrlConverter> vodUrlConverter;
+  private SoftReference<IVodTsUrlConverter> vodUrlConverter;
 
   /**
    * 缓存目录
@@ -199,7 +200,7 @@ public class M3U8TaskConfig {
   }
 
   public void setVodUrlConverter(IVodTsUrlConverter vodUrlConverter) {
-    this.vodUrlConverter = new WeakReference<>(vodUrlConverter);
+    this.vodUrlConverter = new SoftReference<>(vodUrlConverter);
   }
 
   public List<String> getUrls() {

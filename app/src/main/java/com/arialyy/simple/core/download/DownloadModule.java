@@ -23,7 +23,7 @@ import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.util.CommonUtil;
 import com.arialyy.simple.R;
 import com.arialyy.simple.base.BaseModule;
-import com.arialyy.simple.core.download.multi_download.FileListEntity;
+import com.arialyy.simple.core.download.mutil.FileListEntity;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;

@@ -34,6 +34,7 @@ public class FTPSDelegate<TARGET extends AbsTarget> extends BaseDelegate<TARGET>
   public FTPSDelegate(TARGET target, AbsTaskWrapper wrapper) {
     super(target, wrapper);
     mUrlEntity = getTaskWrapper().asFtp().getUrlEntity();
+    mUrlEntity.isFtps = true;
   }
 
   /**
@@ -89,6 +90,17 @@ public class FTPSDelegate<TARGET extends AbsTarget> extends BaseDelegate<TARGET>
       throw new NullPointerException("证书路径为空");
     }
     mUrlEntity.storePath = storePath;
+    return this;
+  }
+
+  /**
+   * 设置安全模式，默认true
+   *
+   * @param isImplicit true 隐式，false 显式
+   */
+  @CheckResult(suggest = Suggest.TO_CONTROLLER)
+  public FTPSDelegate<TARGET> setImplicit(boolean isImplicit) {
+    mUrlEntity.isImplicit = isImplicit;
     return this;
   }
 }

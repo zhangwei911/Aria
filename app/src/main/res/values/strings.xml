@@ -62,6 +62,11 @@
     <item>组件中使用</item>
   </string-array>
 
+  <string-array name="component_items">
+    <item>fragment中使用</item>
+    <item>dialog中使用</item>
+  </string-array>
+
 
   <string-array name="test_apk_download_url">
     <item>http://static.gaoshouyou.com/d/d4/4f/d6d48db3794fb9ecf47e83c346570881.apk</item>

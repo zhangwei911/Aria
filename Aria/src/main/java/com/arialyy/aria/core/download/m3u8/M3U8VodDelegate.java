@@ -110,6 +110,6 @@ public class M3U8VodDelegate<TARGET extends AbsTarget> extends BaseDelegate<TARG
       return;
     }
 
-    EventMsgUtil.getDefault().post(new PeerIndexEvent(index));
+    EventMsgUtil.getDefault().post(new PeerIndexEvent(mTaskWrapper.getKey(), index));
   }
 }

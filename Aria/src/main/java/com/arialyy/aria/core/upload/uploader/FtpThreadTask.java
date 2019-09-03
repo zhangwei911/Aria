@@ -101,12 +101,10 @@ class FtpThreadTask extends AbsFtpThreadTask<UploadEntity, UTaskWrapper> {
         if (file != null) {
           file.close();
         }
-        if (client != null && client.isConnected()) {
-          client.disconnect();
-        }
       } catch (IOException e) {
         e.printStackTrace();
       }
+      closeClient(client);
       onThreadComplete();
     }
     return this;

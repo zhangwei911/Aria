@@ -22,14 +22,14 @@ import com.arialyy.annotations.TaskEnum;
 import com.arialyy.aria.core.AriaManager;
 import com.arialyy.aria.core.command.CancelAllCmd;
 import com.arialyy.aria.core.command.NormalCmdFactory;
-import com.arialyy.aria.core.common.AbsStartTarget;
+import com.arialyy.aria.core.common.AbsBuilderTarget;
 import com.arialyy.aria.core.common.ProxyHelper;
 import com.arialyy.aria.core.event.EventMsgUtil;
 import com.arialyy.aria.core.inf.AbsEntity;
 import com.arialyy.aria.core.inf.AbsReceiver;
 import com.arialyy.aria.core.inf.ITask;
 import com.arialyy.aria.core.inf.ReceiverType;
-import com.arialyy.aria.core.scheduler.UploadSchedulers;
+import com.arialyy.aria.core.scheduler.TaskSchedulers;
 import com.arialyy.aria.orm.DbEntity;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CheckUtil;
@@ -52,7 +52,7 @@ public class UploadReceiver extends AbsReceiver {
    */
   @Deprecated
   public UploadReceiver setMaxSpeed(int maxSpeed) {
-    AriaManager.getInstance(AriaManager.APP).getUploadConfig().setMaxSpeed(maxSpeed);
+    AriaManager.getInstance().getUploadConfig().setMaxSpeed(maxSpeed);
     return this;
   }
 
@@ -62,15 +62,15 @@ public class UploadReceiver extends AbsReceiver {
    * @param filePath 文件路径
    */
   @CheckResult
-  public HttpStartTarget load(@NonNull String filePath) {
+  public HttpBuilderTarget load(@NonNull String filePath) {
     CheckUtil.checkUploadPath(filePath);
-    return new HttpStartTarget(filePath, targetName);
+    return new HttpBuilderTarget(filePath, targetName);
   }
 
   /**
    * 用于任务停止、删除等操作
    *
-   * @param taskId 任务id，可从{@link AbsStartTarget#create()}、{@link AbsStartTarget#add()}、{@link
+   * @param taskId 任务id，可从{@link AbsBuilderTarget#create()}、{@link AbsBuilderTarget#add()}、{@link
    * AbsEntity#getId()}读取任务id
    */
   @CheckResult
@@ -85,15 +85,15 @@ public class UploadReceiver extends AbsReceiver {
    * @param filePath 文件路径
    */
   @CheckResult
-  public FtpStartTarget loadFtp(@NonNull String filePath) {
+  public FtpBuilderTarget loadFtp(@NonNull String filePath) {
     CheckUtil.checkUploadPath(filePath);
-    return new FtpStartTarget(filePath, targetName);
+    return new FtpBuilderTarget(filePath, targetName);
   }
 
   /**
    * 加载FTP单文件上传任务，用于任务第一次上传，如果需要控制任务停止或删除等操作，请使用{@link #load(long)}
    *
-   * @param taskId 任务id，可从{@link AbsStartTarget#create()}、{@link AbsStartTarget#add()}、{@link
+   * @param taskId 任务id，可从{@link AbsBuilderTarget#create()}、{@link AbsBuilderTarget#add()}、{@link
    * AbsEntity#getId()}读取任务id
    */
   @CheckResult
@@ -226,7 +226,7 @@ public class UploadReceiver extends AbsReceiver {
    * 如果文件已经上传完成，只删除上传记录
    */
   public void removeAllTask(boolean removeFile) {
-    final AriaManager am = AriaManager.getInstance(AriaManager.APP);
+    final AriaManager am = AriaManager.getInstance();
     CancelAllCmd cancelCmd =
         (CancelAllCmd) CommonUtil.createNormalCmd(new UTaskWrapper(null),
             NormalCmdFactory.TASK_CANCEL_ALL, ITask.UPLOAD);
@@ -256,7 +256,7 @@ public class UploadReceiver extends AbsReceiver {
     if (set != null && !set.isEmpty()) {
       for (Integer type : set) {
         if (type == ProxyHelper.PROXY_TYPE_UPLOAD) {
-          UploadSchedulers.getInstance().register(obj, TaskEnum.UPLOAD);
+          TaskSchedulers.getInstance().register(obj, TaskEnum.UPLOAD);
         }
       }
     } else {
@@ -272,7 +272,7 @@ public class UploadReceiver extends AbsReceiver {
     if (needRmListener) {
       unRegisterListener();
     }
-    AriaManager.getInstance(AriaManager.APP).removeReceiver(OBJ_MAP.get(getKey()));
+    AriaManager.getInstance().removeReceiver(OBJ_MAP.get(getKey()));
   }
 
   @Override public String getType() {
@@ -294,7 +294,7 @@ public class UploadReceiver extends AbsReceiver {
     if (set != null) {
       for (Integer integer : set) {
         if (integer == ProxyHelper.PROXY_TYPE_UPLOAD) {
-          UploadSchedulers.getInstance().unRegister(obj);
+          TaskSchedulers.getInstance().unRegister(obj);
         }
       }
     }

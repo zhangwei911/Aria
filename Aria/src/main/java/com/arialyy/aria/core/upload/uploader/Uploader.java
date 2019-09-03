@@ -37,7 +37,7 @@ class Uploader extends NormalFileer<UploadEntity, UTaskWrapper> {
     super(listener, taskEntity);
     mTempFile = new File(mEntity.getFilePath());
     setUpdateInterval(
-        AriaManager.getInstance(AriaManager.APP).getUploadConfig().getUpdateInterval());
+        AriaManager.getInstance().getUploadConfig().getUpdateInterval());
   }
 
   @Override protected boolean handleNewTask() {

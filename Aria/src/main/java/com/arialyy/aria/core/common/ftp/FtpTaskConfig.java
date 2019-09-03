@@ -15,6 +15,7 @@
  */
 package com.arialyy.aria.core.common.ftp;
 
+import aria.apache.commons.net.ftp.FTPClientConfig;
 import com.arialyy.aria.core.FtpUrlEntity;
 import com.arialyy.aria.core.inf.ITaskConfig;
 import java.lang.ref.WeakReference;
@@ -46,6 +47,19 @@ public class FtpTaskConfig implements ITaskConfig {
    * 上传到服务器文件的新文件名{@link FtpInterceptHandler#getNewFileName()}
    */
   private String newFileName;
+
+  /**
+   * client配置信息
+   */
+  private FTPClientConfig clientConfig;
+
+  public FTPClientConfig getClientConfig() {
+    return clientConfig;
+  }
+
+  public void setClientConfig(FTPClientConfig clientConfig) {
+    this.clientConfig = clientConfig;
+  }
 
   public String getNewFileName() {
     return newFileName;

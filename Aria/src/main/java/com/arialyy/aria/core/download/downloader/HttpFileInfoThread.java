@@ -33,6 +33,7 @@ import com.arialyy.aria.exception.TaskException;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CheckUtil;
 import com.arialyy.aria.util.CommonUtil;
+import com.arialyy.aria.util.FileUtil;
 import com.arialyy.aria.util.RecordUtil;
 import java.io.BufferedReader;
 import java.io.File;
@@ -66,7 +67,7 @@ public class HttpFileInfoThread implements Runnable {
     this.mTaskWrapper = taskWrapper;
     mEntity = taskWrapper.getEntity();
     mConnectTimeOut =
-        AriaManager.getInstance(AriaManager.APP).getDownloadConfig().getConnectTimeOut();
+        AriaManager.getInstance().getDownloadConfig().getConnectTimeOut();
     onFileInfoCallback = callback;
     mTaskDelegate = taskWrapper.asHttp();
   }
@@ -121,7 +122,7 @@ public class HttpFileInfoThread implements Runnable {
     }
     long len = lenAdapter.handleFileLen(conn.getHeaderFields());
 
-    if (!CommonUtil.checkSDMemorySpace(mEntity.getFilePath(), len)) {
+    if (!FileUtil.checkSDMemorySpace(mEntity.getFilePath(), len)) {
       failDownload(new TaskException(TAG,
           String.format("下载失败，内存空间不足；filePath: %s, url: %s", mEntity.getDownloadPath(),
               mEntity.getUrl())), false);

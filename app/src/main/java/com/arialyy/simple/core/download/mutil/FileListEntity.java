@@ -13,17 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.arialyy.simple.core.download.multi_download;
 
-import android.content.Context;
-import com.arialyy.simple.base.BaseModule;
+package com.arialyy.simple.core.download.mutil;
 
 /**
- * Created by lyy on 2017/7/14.
+ * Created by AriaL on 2017/1/6.
  */
-public class MultiModule extends BaseModule{
-  public MultiModule(Context context) {
-    super(context);
-  }
 
+public class FileListEntity {
+  public String name, key, downloadPath;
+  public boolean isGroup = false;
+
+  public String[] urls, names;
 }

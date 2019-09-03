@@ -47,8 +47,8 @@ Aria有以下特点：
 [![Compiler](https://api.bintray.com/packages/arialyy/maven/AriaCompiler/images/download.svg)](https://bintray.com/arialyy/maven/AriaCompiler/_latestVersion)
 
 ```java
-compile 'com.arialyy.aria:aria-core:3.6.5'
-annotationProcessor 'com.arialyy.aria:aria-compiler:3.6.5'
+compile 'com.arialyy.aria:aria-core:3.6.6'
+annotationProcessor 'com.arialyy.aria:aria-compiler:3.6.6'
 ```
 如果出现android support依赖错误，请将 `compile 'com.arialyy.aria:aria-core:<last-version>'`替换为
 ```
@@ -67,6 +67,7 @@ __⚠️注意：3.5.4以下版本升级时，需要更新[配置文件](https:/
 <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS"/>
 <uses-permission android:name="android.permission.INTERNET"/>
 <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
 <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
 ```
 
@@ -127,25 +128,15 @@ protected void onCreate(Bundle savedInstanceState) {
 
 
 ### 版本日志
-  + v_3.6.5
-    - fix bug https://github.com/AriaLyy/Aria/issues/403
-    - fix bug https://github.com/AriaLyy/Aria/issues/414
-    - fix bug https://github.com/AriaLyy/Aria/issues/406
-    - fix bug https://github.com/AriaLyy/Aria/issues/407
-    - fix bug https://github.com/AriaLyy/Aria/issues/416
-    - fix bug https://github.com/AriaLyy/Aria/issues/420
-    - fix bug https://github.com/AriaLyy/Aria/issues/422
-    - 新增ftp上传拦截器 https://github.com/AriaLyy/Aria/issues/402
-    - 重构线程任务模块
-    - 新增m3u8协议的文件下载
-    - 修复拦截器可能出现的空指针问题
-    - 移除`DownloadGroupEntity`字段`groupHash`的主键约束，`DownloadEntity`字段`groupHash`的外键约束，`TaskRecord`字段`dGroupHash`的外键约束
-    - 优化关联查询的性能
-    - 修复任务记录删除失败的问题
-    - 优化网络连接状态获取的逻辑
-    - 修复配置文件的某些配置失效的问题
-    - 新增m3u8切片状态注解`@M3U8.onPeerStart`，`@M3U8.onPeerComplete`，`@M3U8.onPeerFail`
-    - 新增动态指定m3u8协议视频的下载功能（边下边播下载支持）,[详情](https://aria.laoyuyu.me/aria_doc/download/m3u8_vod.html)
+ + v_3.6.6
+    - fix bug https://github.com/AriaLyy/Aria/issues/426
+    - fix bug https://github.com/AriaLyy/Aria/issues/429
+    - fix bug https://github.com/AriaLyy/Aria/issues/428
+    - fix bug https://github.com/AriaLyy/Aria/issues/427
+    - fix bug https://github.com/AriaLyy/Aria/issues/431
+    - fix bug https://github.com/AriaLyy/Aria/issues/441
+    - 修复普通下载任务、组合任务共享执行队列、缓存池的问题
+    - 修复组合任务启动失败时，`DownloadGroupEntity`的状态变为执行中的问题
 
 [更多版本记录](https://github.com/AriaLyy/Aria/blob/master/DEV_LOG.md)
 

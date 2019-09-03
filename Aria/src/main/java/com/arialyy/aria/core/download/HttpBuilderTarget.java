@@ -17,24 +17,24 @@ package com.arialyy.aria.core.download;
 
 import androidx.annotation.CheckResult;
 import androidx.annotation.NonNull;
-import com.arialyy.aria.core.common.AbsStartTarget;
+import com.arialyy.aria.core.common.AbsBuilderTarget;
 import com.arialyy.aria.core.common.Suggest;
 import com.arialyy.aria.core.common.http.HttpDelegate;
 import com.arialyy.aria.core.download.m3u8.M3U8Delegate;
 import com.arialyy.aria.core.inf.IHttpFileLenAdapter;
 import com.arialyy.aria.core.inf.ITaskWrapper;
 
-public class HttpStartTarget extends AbsStartTarget<HttpStartTarget> {
+public class HttpBuilderTarget extends AbsBuilderTarget<HttpBuilderTarget> {
 
-  private DNormalConfigHandler<HttpStartTarget> mConfigHandler;
+  private DNormalConfigHandler<HttpBuilderTarget> mConfigHandler;
 
-  HttpStartTarget(String url, String targetName) {
+  HttpBuilderTarget(String url, String targetName) {
     mConfigHandler = new DNormalConfigHandler<>(this, -1, targetName);
     getTaskWrapper().setRequestType(ITaskWrapper.D_HTTP);
     mConfigHandler.setUrl(url);
   }
 
-  @CheckResult(suggest = Suggest.TASK_CONTROLLER) public M3U8Delegate<HttpStartTarget> asM3U8() {
+  @CheckResult(suggest = Suggest.TASK_CONTROLLER) public M3U8Delegate<HttpBuilderTarget> asM3U8() {
     return new M3U8Delegate<>(this, getTaskWrapper());
   }
 
@@ -42,7 +42,7 @@ public class HttpStartTarget extends AbsStartTarget<HttpStartTarget> {
    * 设置http请求参数，header等信息
    */
   @CheckResult(suggest = Suggest.TASK_CONTROLLER)
-  public HttpDelegate<HttpStartTarget> option() {
+  public HttpDelegate<HttpBuilderTarget> option() {
     return new HttpDelegate<>(this, getTaskWrapper());
   }
 
@@ -53,7 +53,7 @@ public class HttpStartTarget extends AbsStartTarget<HttpStartTarget> {
    * @param use {@code true} 使用
    */
   @CheckResult(suggest = Suggest.TASK_CONTROLLER)
-  public HttpStartTarget useServerFileName(boolean use) {
+  public HttpBuilderTarget useServerFileName(boolean use) {
     getTaskWrapper().asHttp().setUseServerFileName(use);
     return this;
   }
@@ -66,7 +66,7 @@ public class HttpStartTarget extends AbsStartTarget<HttpStartTarget> {
    * @param filePath 路径必须为文件路径，不能为文件夹路径
    */
   @CheckResult(suggest = Suggest.TASK_CONTROLLER)
-  public HttpStartTarget setFilePath(@NonNull String filePath) {
+  public HttpBuilderTarget setFilePath(@NonNull String filePath) {
     mConfigHandler.setTempFilePath(filePath);
     return this;
   }
@@ -80,7 +80,7 @@ public class HttpStartTarget extends AbsStartTarget<HttpStartTarget> {
    * @param forceDownload {@code true}强制下载，不考虑文件路径是否被占用
    */
   @CheckResult(suggest = Suggest.TASK_CONTROLLER)
-  public HttpStartTarget setFilePath(@NonNull String filePath, boolean forceDownload) {
+  public HttpBuilderTarget setFilePath(@NonNull String filePath, boolean forceDownload) {
     mConfigHandler.setTempFilePath(filePath);
     mConfigHandler.setForceDownload(forceDownload);
     return this;
@@ -90,7 +90,7 @@ public class HttpStartTarget extends AbsStartTarget<HttpStartTarget> {
    * 如果你需要使用header中特定的key来设置文件长度，或有定制文件长度的需要，那么你可以通过该方法自行处理文件长度
    */
   @CheckResult(suggest = Suggest.TASK_CONTROLLER)
-  public HttpStartTarget setFileLenAdapter(IHttpFileLenAdapter adapter) {
+  public HttpBuilderTarget setFileLenAdapter(IHttpFileLenAdapter adapter) {
     if (adapter == null) {
       throw new IllegalArgumentException("adapter为空");
     }

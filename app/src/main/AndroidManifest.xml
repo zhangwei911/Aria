@@ -5,6 +5,7 @@
 
   <uses-permission android:name="android.permission.INTERNET"/>
   <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+  <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
   <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
 
   <application
@@ -32,9 +33,9 @@
 
     <activity android:name=".core.download.DownloadActivity"/>
     <activity android:name=".core.download.SingleTaskActivity"/>
-    <activity android:name=".core.download.multi_download.MultiTaskActivity"/>
-    <activity android:name=".core.download.fragment_download.FragmentActivity"/>
-    <activity android:name=".core.download.multi_download.MultiDownloadActivity"/>
+    <activity android:name=".core.download.mutil.MultiTaskActivity"/>
+    <activity android:name=".core.download.fragment.FragmentActivity"/>
+    <activity android:name=".core.download.mutil.MultiDownloadActivity"/>
     <activity android:name=".core.download.HighestPriorityActivity"/>
     <activity android:name=".core.download.group.DownloadGroupActivity"/>
     <activity android:name=".core.download.FtpDownloadActivity"/>
@@ -42,6 +43,7 @@
     <activity android:name=".core.upload.HttpUploadActivity"/>
     <activity android:name=".core.upload.FtpUploadActivity"/>
     <activity android:name=".core.download.KotlinDownloadActivity"/>
+    <activity android:name=".core.download.ComponentActivity"/>
     <activity
         android:name=".core.FullScreenCodeActivity"
         android:screenOrientation="landscape"
@@ -50,7 +52,7 @@
     <activity android:name=".core.download.m3u8.M3U8VodDLoadActivity"/>
     <activity android:name=".core.download.m3u8.M3U8LiveDLoadActivity"/>
 
-    <service android:name=".core.download.service_download.DownloadService"/>
+    <service android:name=".core.download.service.DownloadService"/>
 
     <provider
         android:name="androidx.core.content.FileProvider"

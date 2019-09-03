@@ -39,10 +39,10 @@ public abstract class BaseDelegate<TARGET extends AbsTarget> {
 
   /**
    * 使用对应等控制器，注意：
-   * 1、对于不存在的任务（第一次下载），只能使用{@link ControllerType#START_CONTROLLER}
-   * 2、对于已存在的任务，只能使用{@link ControllerType#NORMAL_CONTROLLER}
+   * 1、对于不存在的任务（第一次下载），只能使用{@link ControllerType#CREATE_CONTROLLER}
+   * 2、对于已存在的任务，只能使用{@link ControllerType#TASK_CONTROLLER}
    *
-   * @param clazz {@link ControllerType#START_CONTROLLER}、{@link ControllerType#NORMAL_CONTROLLER}
+   * @param clazz {@link ControllerType#CREATE_CONTROLLER}、{@link ControllerType#TASK_CONTROLLER}
    */
   @CheckResult(suggest = Suggest.TASK_CONTROLLER)
   public synchronized <T extends FeatureController> T controller(@ControllerType Class<T> clazz) {

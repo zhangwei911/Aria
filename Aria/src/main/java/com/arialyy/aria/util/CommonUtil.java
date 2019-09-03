@@ -77,6 +77,7 @@ public class CommonUtil {
     long time = System.currentTimeMillis();
     long timeD = time - lastClickTime;
     if (0 < timeD && timeD < 500) {
+      ALog.i(TAG, "操作太频繁了，缓一下吧～");
       return true;
     }
     lastClickTime = time;
@@ -93,54 +94,6 @@ public class CommonUtil {
   public static String convertFtpChar(String charSet, String str)
       throws UnsupportedEncodingException {
     return new String(str.getBytes(charSet), SERVER_CHARSET);
-  }
-
-  /**
-   * 检查SD内存空间是否充足
-   *
-   * @param filePath 文件保存路径
-   * @param fileSize 文件大小
-   * @return {@code false} 内存空间不足，{@code true}内存空间足够
-   */
-  public static boolean checkSDMemorySpace(String filePath, long fileSize) {
-    List<String> dirs = FileUtil.getSDPathList(AriaManager.APP);
-    if (dirs == null || dirs.isEmpty()) {
-      return true;
-    }
-    for (String path : dirs) {
-      if (filePath.contains(path)) {
-        if (fileSize > 0 && fileSize > getAvailableExternalMemorySize(path)) {
-          return false;
-        }
-      }
-    }
-    return true;
-  }
-
-  /**
-   * sdcard 可用大小
-   *
-   * @param sdcardPath sdcard 根路径
-   * @return 单位为：byte
-   */
-  public static long getAvailableExternalMemorySize(String sdcardPath) {
-    StatFs stat = new StatFs(sdcardPath);
-    long blockSize = stat.getBlockSize();
-    long availableBlocks = stat.getAvailableBlocks();
-    return availableBlocks * blockSize;
-  }
-
-  /**
-   * sdcard 总大小
-   *
-   * @param sdcardPath sdcard 根路径
-   * @return 单位为：byte
-   */
-  public static long getTotalExternalMemorySize(String sdcardPath) {
-    StatFs stat = new StatFs(sdcardPath);
-    long blockSize = stat.getBlockSize();
-    long totalBlocks = stat.getBlockCount();
-    return totalBlocks * blockSize;
   }
 
   /**
@@ -818,7 +771,8 @@ public class CommonUtil {
    * @param fileName 文件名
    */
   public static String getFileConfigPath(boolean isDownload, String fileName) {
-    return AriaManager.APP.getFilesDir().getPath() + (isDownload ? AriaManager.DOWNLOAD_TEMP_DIR
+    return AriaManager.getInstance().getAPP().getFilesDir().getPath() + (isDownload
+        ? AriaManager.DOWNLOAD_TEMP_DIR
         : AriaManager.UPLOAD_TEMP_DIR) + fileName + ".properties";
   }
 }

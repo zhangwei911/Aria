@@ -17,7 +17,7 @@ package com.arialyy.aria.core.upload;
 
 import androidx.annotation.CheckResult;
 import androidx.annotation.NonNull;
-import com.arialyy.aria.core.common.AbsStartTarget;
+import com.arialyy.aria.core.common.AbsBuilderTarget;
 import com.arialyy.aria.core.common.Suggest;
 import com.arialyy.aria.core.common.ftp.FtpDelegate;
 import com.arialyy.aria.core.common.ftp.IFtpUploadInterceptor;
@@ -27,10 +27,10 @@ import com.arialyy.aria.core.inf.AbsTaskWrapper;
  * Created by Aria.Lao on 2017/7/27.
  * ftp单任务上传
  */
-public class FtpStartTarget extends AbsStartTarget<FtpStartTarget> {
-  private UNormalConfigHandler<FtpStartTarget> mConfigHandler;
+public class FtpBuilderTarget extends AbsBuilderTarget<FtpBuilderTarget> {
+  private UNormalConfigHandler<FtpBuilderTarget> mConfigHandler;
 
-  FtpStartTarget(String filePath, String targetName) {
+  FtpBuilderTarget(String filePath, String targetName) {
     mConfigHandler = new UNormalConfigHandler<>(this, -1, targetName);
     mConfigHandler.setFilePath(filePath);
     getTaskWrapper().setRequestType(AbsTaskWrapper.U_FTP);
@@ -42,7 +42,7 @@ public class FtpStartTarget extends AbsStartTarget<FtpStartTarget> {
    * @param tempUrl 上传路径
    */
   @CheckResult(suggest = Suggest.TASK_CONTROLLER)
-  public FtpStartTarget setUploadUrl(String tempUrl) {
+  public FtpBuilderTarget setUploadUrl(String tempUrl) {
     mConfigHandler.setTempUrl(tempUrl);
     return this;
   }
@@ -51,7 +51,7 @@ public class FtpStartTarget extends AbsStartTarget<FtpStartTarget> {
    * FTP文件上传拦截器，如果远端已有同名文件，可使用该拦截器控制覆盖文件或修改该文件上传到服务器端端的文件名
    */
   @CheckResult(suggest = Suggest.TASK_CONTROLLER)
-  public FtpStartTarget setUploadInterceptor(@NonNull IFtpUploadInterceptor uploadInterceptor) {
+  public FtpBuilderTarget setUploadInterceptor(@NonNull IFtpUploadInterceptor uploadInterceptor) {
     return mConfigHandler.setUploadInterceptor(uploadInterceptor);
   }
 
@@ -59,7 +59,7 @@ public class FtpStartTarget extends AbsStartTarget<FtpStartTarget> {
    * 设置登陆、字符串编码、ftps等参数
    */
   @CheckResult(suggest = Suggest.TASK_CONTROLLER)
-  public FtpDelegate<FtpStartTarget> option() {
+  public FtpDelegate<FtpBuilderTarget> option() {
     return new FtpDelegate<>(this, getTaskWrapper());
   }
 }

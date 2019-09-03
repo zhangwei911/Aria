@@ -14,13 +14,15 @@
  * limitations under the License.
  */
 
-package com.arialyy.simple.core.download.fragment_download;
+package com.arialyy.simple.core.download.fragment;
 
 import android.os.Bundle;
 import com.arialyy.aria.core.Aria;
+import com.arialyy.simple.MainActivity;
 import com.arialyy.simple.R;
 import com.arialyy.simple.base.BaseActivity;
 import com.arialyy.simple.databinding.FragmentDownloadBinding;
+import com.arialyy.simple.to.NormalTo;
 
 /**
  * Created by lyy on 2017/1/4.
@@ -33,7 +35,9 @@ public class FragmentActivity extends BaseActivity<FragmentDownloadBinding> {
 
   @Override protected void init(Bundle savedInstanceState) {
     super.init(savedInstanceState);
-    setTile("Fragment 中使用");
+
+    final NormalTo to = getIntent().getParcelableExtra(MainActivity.KEY_MAIN_DATA);
+    setTitle(to.title);
     Aria.download(this).register();
   }
 }

@@ -67,7 +67,7 @@ public class SSLContextUtil {
       if (sslContext != null) {
         return sslContext;
       }
-      InputStream caInput = AriaManager.APP.getAssets().open(caPath);
+      InputStream caInput = AriaManager.getInstance().getAPP().getAssets().open(caPath);
       Certificate ca = loadCert(caInput);
       return createContext(caAlias, ca, protocol, cacheKey);
     } catch (IOException | CertificateException e) {

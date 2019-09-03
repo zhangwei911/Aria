@@ -16,7 +16,7 @@
 package com.arialyy.aria.core.download;
 
 import androidx.annotation.CheckResult;
-import com.arialyy.aria.core.common.AbsStartTarget;
+import com.arialyy.aria.core.common.AbsBuilderTarget;
 import com.arialyy.aria.core.common.Suggest;
 import com.arialyy.aria.core.common.ftp.FtpDelegate;
 import com.arialyy.aria.core.manager.SubTaskManager;
@@ -26,10 +26,10 @@ import com.arialyy.aria.util.CommonUtil;
  * Created by Aria.Lao on 2017/7/26.
  * ftp文件夹下载
  */
-public class FtpDirStartTarget extends AbsStartTarget<FtpDirStartTarget> {
-  private FtpDirConfigHandler<FtpDirStartTarget> mConfigHandler;
+public class FtpDirBuilderTarget extends AbsBuilderTarget<FtpDirBuilderTarget> {
+  private FtpDirConfigHandler<FtpDirBuilderTarget> mConfigHandler;
 
-  FtpDirStartTarget(String url, String targetName) {
+  FtpDirBuilderTarget(String url, String targetName) {
     setTargetName(targetName);
     mConfigHandler = new FtpDirConfigHandler<>(this, -1);
     getEntity().setGroupHash(url);
@@ -56,7 +56,7 @@ public class FtpDirStartTarget extends AbsStartTarget<FtpDirStartTarget> {
    * @param dirPath 任务组保存文件夹路径
    */
   @CheckResult(suggest = Suggest.TASK_CONTROLLER)
-  public FtpDirStartTarget setDirPath(String dirPath) {
+  public FtpDirBuilderTarget setDirPath(String dirPath) {
     return mConfigHandler.setDirPath(dirPath);
   }
 
@@ -64,7 +64,7 @@ public class FtpDirStartTarget extends AbsStartTarget<FtpDirStartTarget> {
    * 设置任务组别名
    */
   @CheckResult(suggest = Suggest.TASK_CONTROLLER)
-  public FtpDirStartTarget setGroupAlias(String alias) {
+  public FtpDirBuilderTarget setGroupAlias(String alias) {
     mConfigHandler.setGroupAlias(alias);
     return this;
   }
@@ -73,7 +73,7 @@ public class FtpDirStartTarget extends AbsStartTarget<FtpDirStartTarget> {
    * 设置登陆、字符串编码、ftps等参数
    */
   @CheckResult(suggest = Suggest.TASK_CONTROLLER)
-  public FtpDelegate<FtpDirStartTarget> option() {
+  public FtpDelegate<FtpDirBuilderTarget> option() {
     return new FtpDelegate<>(this, getTaskWrapper());
   }
 

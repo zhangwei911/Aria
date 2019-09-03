@@ -22,7 +22,8 @@ import com.arialyy.aria.core.common.ftp.AbsFtpInfoThread;
 import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.exception.AriaIOException;
-import com.arialyy.aria.util.CommonUtil;
+import com.arialyy.aria.util.ALog;
+import com.arialyy.aria.util.FileUtil;
 
 /**
  * Created by Aria.Lao on 2017/7/25.
@@ -37,7 +38,7 @@ class FtpFileInfoThread extends AbsFtpInfoThread<DownloadEntity, DTaskWrapper> {
 
   @Override protected void handleFile(String remotePath, FTPFile ftpFile) {
     super.handleFile(remotePath, ftpFile);
-    if (!CommonUtil.checkSDMemorySpace(mEntity.getFilePath(), ftpFile.getSize())) {
+    if (!FileUtil.checkSDMemorySpace(mEntity.getFilePath(), ftpFile.getSize())) {
       mCallback.onFail(mEntity, new AriaIOException(TAG,
               String.format("获取ftp文件信息失败，内存空间不足, filePath: %s", mEntity.getFilePath())),
           false);
@@ -49,6 +50,7 @@ class FtpFileInfoThread extends AbsFtpInfoThread<DownloadEntity, DTaskWrapper> {
   }
 
   @Override protected void onPreComplete(int code) {
+    ALog.i(TAG, "FTP下载预处理完成");
     super.onPreComplete(code);
     if (mSize != mTaskWrapper.getEntity().getFileSize()) {
       mTaskWrapper.setNewTask(true);

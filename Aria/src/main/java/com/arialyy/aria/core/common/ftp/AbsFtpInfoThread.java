@@ -18,17 +18,15 @@ package com.arialyy.aria.core.common.ftp;
 import android.net.TrafficStats;
 import android.os.Process;
 import android.text.TextUtils;
-
 import aria.apache.commons.net.ftp.FTP;
 import aria.apache.commons.net.ftp.FTPClient;
+import aria.apache.commons.net.ftp.FTPClientConfig;
 import aria.apache.commons.net.ftp.FTPFile;
 import aria.apache.commons.net.ftp.FTPReply;
 import aria.apache.commons.net.ftp.FTPSClient;
-
 import com.arialyy.aria.core.AriaManager;
 import com.arialyy.aria.core.FtpUrlEntity;
 import com.arialyy.aria.core.common.OnFileInfoCallback;
-import com.arialyy.aria.core.common.ProtocolType;
 import com.arialyy.aria.core.inf.AbsEntity;
 import com.arialyy.aria.core.inf.AbsTaskWrapper;
 import com.arialyy.aria.core.upload.UploadEntity;
@@ -40,7 +38,6 @@ import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
 import com.arialyy.aria.util.Regular;
 import com.arialyy.aria.util.SSLContextUtil;
-
 import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
@@ -48,7 +45,6 @@ import java.net.UnknownHostException;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import javax.net.ssl.SSLContext;
 
 /**
@@ -72,7 +68,7 @@ public abstract class AbsFtpInfoThread<ENTITY extends AbsEntity, TASK_WRAPPER ex
     mEntity = taskWrapper.getEntity();
     mTaskDelegate = taskWrapper.asFtp();
     mConnectTimeOut =
-        AriaManager.getInstance(AriaManager.APP).getDownloadConfig().getConnectTimeOut();
+        AriaManager.getInstance().getDownloadConfig().getConnectTimeOut();
     mCallback = callback;
     if (mEntity instanceof UploadEntity) {
       isUpload = true;
@@ -98,10 +94,7 @@ public abstract class AbsFtpInfoThread<ENTITY extends AbsEntity, TASK_WRAPPER ex
         return;
       }
       String remotePath = CommonUtil.convertFtpChar(charSet, getRemotePath());
-      if (mTaskDelegate.getUrlEntity().isFtps) {
-        ((FTPSClient) client).execPROT("P");
-        //((FTPSClient) client).enterLocalActiveMode();
-      }
+
       FTPFile[] files = client.listFiles(remotePath);
       boolean isExist = files.length != 0;
       if (!isExist && !isUpload) {
@@ -207,9 +200,10 @@ public abstract class AbsFtpInfoThread<ENTITY extends AbsEntity, TASK_WRAPPER ex
       Matcher m = p.matcher(urlEntity.hostName);
       if (m.find() && m.groupCount() > 0) {
         client = newInstanceClient(urlEntity);
-        InetAddress ip = InetAddress.getByName(urlEntity.hostName);
         client.setConnectTimeout(mConnectTimeOut);  // 连接10s超时
-        client.connect(ip, Integer.parseInt(urlEntity.port));
+        InetAddress ip = InetAddress.getByName(urlEntity.hostName);
+
+        client = connect(client, new InetAddress[] { ip }, 0, Integer.parseInt(urlEntity.port));
         mTaskDelegate.getUrlEntity().validAddr = ip;
       } else {
         DNSQueryThread dnsThread = new DNSQueryThread(urlEntity.hostName);
@@ -217,12 +211,6 @@ public abstract class AbsFtpInfoThread<ENTITY extends AbsEntity, TASK_WRAPPER ex
         dnsThread.join(mConnectTimeOut);
         InetAddress[] ips = dnsThread.getIps();
         client = connect(newInstanceClient(urlEntity), ips, 0, Integer.parseInt(urlEntity.port));
-      }
-
-      if (urlEntity.isFtps) {
-        int code = ((FTPSClient) client).execAUTH(
-            TextUtils.isEmpty(urlEntity.protocol) ? ProtocolType.TLS : urlEntity.protocol);
-        ALog.d(TAG, String.format("cod：%s，msg：%s", code, client.getReplyString()));
       }
 
       if (client == null) {
@@ -292,6 +280,7 @@ public abstract class AbsFtpInfoThread<ENTITY extends AbsEntity, TASK_WRAPPER ex
   protected void closeClient(FTPClient client) {
     try {
       if (client != null && client.isConnected()) {
+        client.logout();
         client.disconnect();
       }
     } catch (IOException e) {
@@ -303,17 +292,30 @@ public abstract class AbsFtpInfoThread<ENTITY extends AbsEntity, TASK_WRAPPER ex
    * 创建FTP/FTPS客户端
    */
   private FTPClient newInstanceClient(FtpUrlEntity urlEntity) {
-    FTPClient temp = null;
+    FTPClient temp;
     if (urlEntity.isFtps) {
-      SSLContext sslContext =
-          SSLContextUtil.getSSLContext(urlEntity.keyAlias, urlEntity.storePath, urlEntity.protocol);
+      FTPSClient sClient;
+      SSLContext sslContext = SSLContextUtil.getSSLContext(urlEntity.keyAlias, urlEntity.storePath,
+          urlEntity.protocol);
       if (sslContext == null) {
-        sslContext = SSLContextUtil.getDefaultSLLContext(urlEntity.protocol);
+        sClient = new FTPSClient(urlEntity.protocol, urlEntity.isImplicit);
+      } else {
+        sClient = new FTPSClient(true, sslContext);
       }
-      temp = new FTPSClient(true, sslContext);
+
+      temp = sClient;
     } else {
       temp = new FTPClient();
     }
+
+    FTPClientConfig clientConfig;
+    if (mTaskWrapper.asFtp().getClientConfig() != null) {
+      clientConfig = mTaskWrapper.asFtp().getClientConfig();
+    } else {
+      clientConfig = new FTPClientConfig(FTPClientConfig.SYST_UNIX);
+      clientConfig.setServerLanguageCode("en");
+    }
+    temp.configure(clientConfig);
 
     return temp;
   }
@@ -330,18 +332,20 @@ public abstract class AbsFtpInfoThread<ENTITY extends AbsEntity, TASK_WRAPPER ex
       client.setConnectTimeout(mConnectTimeOut);  //需要先设置超时，这样才不会出现阻塞
       client.connect(ips[index], port);
       mTaskDelegate.getUrlEntity().validAddr = ips[index];
+
+      FtpUrlEntity urlEntity = mTaskWrapper.asFtp().getUrlEntity();
+      if (urlEntity.isFtps) {
+        FTPSClient sClient = (FTPSClient) client;
+        sClient.execPBSZ(0);
+        sClient.execPROT("P");
+      }
+
       return client;
     } catch (IOException e) {
-      //e.printStackTrace();
-      try {
-        if (client.isConnected()) {
-          client.disconnect();
-        }
-      } catch (IOException e1) {
-        e1.printStackTrace();
-      }
+      e.printStackTrace();
+      closeClient(client);
       if (index + 1 >= ips.length) {
-        ALog.w(TAG, "遇到[ECONNREFUSED-连接被服务器拒绝]错误，已没有其他地址，链接失败");
+        ALog.w(TAG, "遇到[ECONNREFUSED-连接被服务器拒绝]错误，已没有其他地址，链接失败；如果是ftps，请检查端口是否使用了ftp的端口而不是ftps的端口");
         return null;
       }
       try {

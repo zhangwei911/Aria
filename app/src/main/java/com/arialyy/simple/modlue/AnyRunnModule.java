@@ -113,7 +113,7 @@ public class AnyRunnModule {
           .setStorePath("/mnt/sdcard/Download/server.crt")
           .setAlias("www.laoyuyu.me")
           .setStorePass("123456")
-          .controller(ControllerType.START_CONTROLLER)
+          .controller(ControllerType.CREATE_CONTROLLER)
           .create();
     } else {
       Aria.download(this).load(mEntity.getId()).resume();

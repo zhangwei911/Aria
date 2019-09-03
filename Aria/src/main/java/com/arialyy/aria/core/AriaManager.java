@@ -86,7 +86,7 @@ import org.xml.sax.SAXException;
    * activity 和其Dialog、Fragment的映射表
    */
   private Map<String, List<String>> mSubClass = new ConcurrentHashMap<>();
-  public static Context APP;
+  private static Context APP;
   private DownloadConfig mDConfig;
   private UploadConfig mUConfig;
   private AppConfig mAConfig;
@@ -96,27 +96,38 @@ import org.xml.sax.SAXException;
 
   private AriaManager(Context context) {
     APP = context.getApplicationContext();
-    initDb(APP);
-    regAppLifeCallback(context);
-    initConfig();
-    initAria();
-    amendTaskState();
-    regNetCallBack(context);
   }
 
-  public static AriaManager getInstance(Context context) {
+  public static AriaManager getInstance() {
+    if (INSTANCE == null) {
+      throw new NullPointerException("请使用AriaManager.init(context)初始化管理器");
+    }
+    return INSTANCE;
+  }
+
+  static AriaManager init(Context context) {
     if (INSTANCE == null) {
       synchronized (LOCK) {
         if (INSTANCE == null) {
           INSTANCE = new AriaManager(context);
+          INSTANCE.initData();
         }
       }
     }
     return INSTANCE;
   }
 
-  static AriaManager getInstance() {
-    return INSTANCE;
+  private void initData() {
+    initDb(APP);
+    regAppLifeCallback(APP);
+    initConfig();
+    initAria();
+    amendTaskState();
+    regNetCallBack(APP);
+  }
+
+  public Context getAPP() {
+    return APP;
   }
 
   /**

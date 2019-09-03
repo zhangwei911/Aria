@@ -19,7 +19,7 @@ import android.text.TextUtils;
 import androidx.annotation.CheckResult;
 import com.arialyy.aria.core.common.Suggest;
 import com.arialyy.aria.core.common.controller.NormalController;
-import com.arialyy.aria.core.common.controller.StartController;
+import com.arialyy.aria.core.common.controller.BuilderController;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
 
@@ -84,7 +84,7 @@ public abstract class AbsTarget<TARGET extends AbsTarget> {
   /**
    * 重置状态，将任务状态设置为未开始状态
    * 注意：如果在后续方法调用链中没有调用 {@link NormalController#stop()}、{@link NormalController#cancel()}、
-   * {@link NormalController#resume()}、{@link StartController#create()}、{@link StartController#add()}
+   * {@link NormalController#resume()}、{@link BuilderController#create()}、{@link BuilderController#add()}
    * 等操作任务的方法，那么你需要调用{@link NormalController#save()}才能将修改保存到数据库
    */
   @CheckResult(suggest = "after use #create()、#stop()、#cancel()、#resume()、#save()?")

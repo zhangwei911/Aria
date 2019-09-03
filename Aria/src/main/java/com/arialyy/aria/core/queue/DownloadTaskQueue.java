@@ -20,7 +20,7 @@ import com.arialyy.aria.core.AriaManager;
 import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.download.DownloadTask;
 import com.arialyy.aria.core.inf.TaskSchedulerType;
-import com.arialyy.aria.core.scheduler.DownloadSchedulers;
+import com.arialyy.aria.core.scheduler.TaskSchedulers;
 import com.arialyy.aria.util.ALog;
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -51,7 +51,7 @@ public class DownloadTaskQueue extends AbsTaskQueue<DownloadTask, DTaskWrapper> 
   }
 
   @Override public int getOldMaxNum() {
-    return AriaManager.getInstance(AriaManager.APP).getDownloadConfig().oldMaxTaskNum;
+    return AriaManager.getInstance().getDownloadConfig().oldMaxTaskNum;
   }
 
   /**
@@ -72,7 +72,7 @@ public class DownloadTaskQueue extends AbsTaskQueue<DownloadTask, DTaskWrapper> 
         }
       }
     }
-    int maxSize = AriaManager.getInstance(AriaManager.APP).getDownloadConfig().getMaxTaskNum();
+    int maxSize = AriaManager.getInstance().getDownloadConfig().getMaxTaskNum();
     int currentSize = mExecutePool.size();
     if (currentSize == 0 || currentSize < maxSize) {
       startTask(task);
@@ -102,7 +102,7 @@ public class DownloadTaskQueue extends AbsTaskQueue<DownloadTask, DTaskWrapper> 
     DownloadTask task = null;
     if (!mCachePool.taskExits(wrapper.getKey()) && !mExecutePool.taskExits(wrapper.getKey())) {
       task = (DownloadTask) TaskFactory.getInstance()
-          .createTask(wrapper, DownloadSchedulers.getInstance());
+          .createTask(wrapper, TaskSchedulers.getInstance());
       addTask(task);
     } else {
       ALog.w(TAG, "任务已存在");
@@ -117,6 +117,6 @@ public class DownloadTaskQueue extends AbsTaskQueue<DownloadTask, DTaskWrapper> 
   }
 
   @Override public int getMaxTaskNum() {
-    return AriaManager.getInstance(AriaManager.APP).getDownloadConfig().getMaxTaskNum();
+    return AriaManager.getInstance().getDownloadConfig().getMaxTaskNum();
   }
 }

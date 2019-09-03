@@ -32,7 +32,7 @@ import com.arialyy.aria.core.inf.IEntity;
 import com.arialyy.frame.util.show.L;
 import com.arialyy.simple.R;
 import com.arialyy.simple.base.BaseActivity;
-import com.arialyy.simple.core.download.multi_download.DownloadAdapter;
+import com.arialyy.simple.core.download.mutil.DownloadAdapter;
 import com.arialyy.simple.databinding.ActivityHighestPriorityBinding;
 import com.arialyy.simple.util.AppUtil;
 import com.arialyy.simple.widget.HorizontalProgressBarWithNumber;

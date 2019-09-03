@@ -79,7 +79,7 @@ public class FTPDirDownloadActivity extends BaseActivity<ActivityDownloadGroupBi
               .setGroupAlias("ftp文件夹下载")
               .option()
               .login("8L8e", "8guD")
-              .controller(ControllerType.START_CONTROLLER)
+              .controller(ControllerType.CREATE_CONTROLLER)
               .create();
           getBinding().setStateStr(getString(R.string.stop));
           break;
@@ -92,7 +92,7 @@ public class FTPDirDownloadActivity extends BaseActivity<ActivityDownloadGroupBi
               .loadFtpDir(mTaskId)
               .option()
               .login("8L8e", "8guD")
-              .controller(ControllerType.NORMAL_CONTROLLER)
+              .controller(ControllerType.TASK_CONTROLLER)
               .resume();
           getBinding().setStateStr(getString(R.string.stop));
         }

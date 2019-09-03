@@ -19,7 +19,7 @@ package com.arialyy.aria.core.queue;
 import com.arialyy.aria.core.AriaManager;
 import com.arialyy.aria.core.download.DGTaskWrapper;
 import com.arialyy.aria.core.download.DownloadGroupTask;
-import com.arialyy.aria.core.scheduler.DownloadGroupSchedulers;
+import com.arialyy.aria.core.scheduler.TaskSchedulers;
 import com.arialyy.aria.util.ALog;
 
 /**
@@ -48,7 +48,7 @@ public class DownloadGroupTaskQueue
   }
 
   @Override public int getMaxTaskNum() {
-    return AriaManager.getInstance(AriaManager.APP).getDGroupConfig().getMaxTaskNum();
+    return AriaManager.getInstance().getDGroupConfig().getMaxTaskNum();
   }
 
   @Override public DownloadGroupTask createTask(DGTaskWrapper wrapper) {
@@ -56,7 +56,7 @@ public class DownloadGroupTaskQueue
     DownloadGroupTask task = null;
     if (!mCachePool.taskExits(wrapper.getKey()) && !mExecutePool.taskExits(wrapper.getKey())) {
       task = (DownloadGroupTask) TaskFactory.getInstance()
-          .createTask(wrapper, DownloadGroupSchedulers.getInstance());
+          .createTask(wrapper, TaskSchedulers.getInstance());
       addTask(task);
     } else {
       ALog.w(TAG, "任务已存在");
@@ -65,6 +65,6 @@ public class DownloadGroupTaskQueue
   }
 
   @Override public int getOldMaxNum() {
-    return AriaManager.getInstance(AriaManager.APP).getDGroupConfig().oldMaxTaskNum;
+    return AriaManager.getInstance().getDGroupConfig().oldMaxTaskNum;
   }
 }

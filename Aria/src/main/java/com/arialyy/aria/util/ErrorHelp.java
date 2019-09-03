@@ -46,7 +46,8 @@ public class ErrorHelp {
    * @return "/mnt/sdcard/Android/data/{package_name}/files/log/*"
    */
   private static String getLogPath() {
-    String path = String.format("%slog/AriaCrash_%s.log", CommonUtil.getAppPath(AriaManager.APP),
+    String path = String.format("%slog/AriaCrash_%s.log",
+        CommonUtil.getAppPath(AriaManager.getInstance().getAPP()),
         getData("yyyy-MM-dd_HH_mm_ss"));
 
     File log = new File(path);

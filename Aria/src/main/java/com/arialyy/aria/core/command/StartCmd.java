@@ -50,13 +50,13 @@ final class StartCmd<T extends AbsTaskWrapper> extends AbsNormalCmd<T> {
 
   @Override public void executeCmd() {
     if (!canExeCmd) return;
-    if (!NetUtils.isConnected(AriaManager.APP)) {
+    if (!NetUtils.isConnected(AriaManager.getInstance().getAPP())) {
       ALog.e(TAG, "启动任务失败，网络未连接");
       return;
     }
     String mod;
     int maxTaskNum = mQueue.getMaxTaskNum();
-    AriaManager manager = AriaManager.getInstance(AriaManager.APP);
+    AriaManager manager = AriaManager.getInstance();
     if (isDownloadCmd) {
       mod = manager.getDownloadConfig().getQueueMod();
     } else {

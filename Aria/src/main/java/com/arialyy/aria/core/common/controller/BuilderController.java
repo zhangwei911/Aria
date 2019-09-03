@@ -21,11 +21,11 @@ import com.arialyy.aria.core.inf.AbsTaskWrapper;
 import com.arialyy.aria.util.CommonUtil;
 
 /**
- * 启动控制器
+ * 创建任务时使用的控制器
  */
-public final class StartController extends FeatureController implements IStartFeature {
+public final class BuilderController extends FeatureController implements IStartFeature {
 
-  public StartController(AbsTaskWrapper wrapper) {
+  public BuilderController(AbsTaskWrapper wrapper) {
     super(wrapper);
   }
 

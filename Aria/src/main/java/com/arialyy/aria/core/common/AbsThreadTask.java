@@ -89,7 +89,7 @@ public abstract class AbsThreadTask<ENTITY extends AbsNormalEntity, TASK_WRAPPER
     mEntity = mTaskWrapper.getEntity();
     mLastSaveTime = System.currentTimeMillis();
     mConfigThreadPool = Executors.newCachedThreadPool();
-    mAridManager = AriaManager.getInstance(AriaManager.APP);
+    mAridManager = AriaManager.getInstance();
     if (getMaxSpeed() > 0) {
       mSpeedBandUtil = new BandwidthLimiter(getMaxSpeed(), config.startThreadNum);
     }
@@ -375,13 +375,14 @@ public abstract class AbsThreadTask<ENTITY extends AbsNormalEntity, TASK_WRAPPER
    * 重试ts分片
    */
   private void retryM3U8Peer(boolean needRetry) {
-    boolean isConnected = NetUtils.isConnected(AriaManager.APP);
+    boolean isConnected = NetUtils.isConnected(AriaManager.getInstance().getAPP());
     if (!isConnected && !isNotNetRetry) {
       ALog.w(TAG, String.format("ts切片【%s】重试失败，网络未连接", getFileName()));
       sendFailMsg(null);
       return;
     }
-    if (mFailTimes < RETRY_NUM && needRetry && (NetUtils.isConnected(AriaManager.APP)
+    if (mFailTimes < RETRY_NUM && needRetry && (NetUtils.isConnected(
+        AriaManager.getInstance().getAPP())
         || isNotNetRetry) && !isBreak()) {
       ALog.w(TAG, String.format("ts切片【%s】正在重试", getFileName()));
       mFailTimes++;
@@ -399,12 +400,13 @@ public abstract class AbsThreadTask<ENTITY extends AbsNormalEntity, TASK_WRAPPER
    * @param needRetry 是否可以重试
    */
   private void retryBlockTask(boolean needRetry) {
-    if (!NetUtils.isConnected(AriaManager.APP) && !isNotNetRetry) {
+    if (!NetUtils.isConnected(AriaManager.getInstance().getAPP()) && !isNotNetRetry) {
       ALog.w(TAG, String.format("分块【%s】重试失败，网络未连接", getFileName()));
       sendFailMsg(null);
       return;
     }
-    if (mFailTimes < RETRY_NUM && needRetry && (NetUtils.isConnected(AriaManager.APP)
+    if (mFailTimes < RETRY_NUM && needRetry && (NetUtils.isConnected(
+        AriaManager.getInstance().getAPP())
         || isNotNetRetry) && !isBreak()) {
       ALog.w(TAG, String.format("分块【%s】正在重试", getFileName()));
       mFailTimes++;

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.arialyy.simple.core.download.service_download;
+package com.arialyy.simple.core.download.service;
 
 import android.app.Service;
 import android.content.Intent;

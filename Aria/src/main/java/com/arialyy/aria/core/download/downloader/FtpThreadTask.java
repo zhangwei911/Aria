@@ -105,13 +105,10 @@ class FtpThreadTask extends AbsFtpThreadTask<DownloadEntity, DTaskWrapper> {
         if (is != null) {
           is.close();
         }
-        if (client != null && client.isConnected()) {
-          client.disconnect();
-        }
       } catch (IOException e) {
         e.printStackTrace();
       }
-
+      closeClient(client);
       onThreadComplete();
     }
     return this;

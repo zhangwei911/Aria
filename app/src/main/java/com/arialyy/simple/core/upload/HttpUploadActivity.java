@@ -20,6 +20,8 @@ import android.os.Bundle;
 import android.view.View;
 import com.arialyy.annotations.Upload;
 import com.arialyy.aria.core.Aria;
+import com.arialyy.aria.core.common.RequestEnum;
+import com.arialyy.aria.core.common.controller.ControllerType;
 import com.arialyy.aria.core.upload.UploadEntity;
 import com.arialyy.aria.core.upload.UploadTask;
 import com.arialyy.frame.util.FileUtil;
@@ -38,7 +40,7 @@ public class HttpUploadActivity extends BaseActivity<ActivityUploadBinding> {
   private static final String TAG = "HttpUploadActivity";
   HorizontalProgressBarWithNumber mPb;
 
-  private final String FILE_PATH = "/mnt/sdcard/test.apk";
+  private final String FILE_PATH = "/mnt/sdcard/ggsg14.apk";
   private UploadEntity mEntity;
 
   @Override protected int setLayoutId() {
@@ -72,10 +74,14 @@ public class HttpUploadActivity extends BaseActivity<ActivityUploadBinding> {
 
   void upload() {
     Aria.upload(HttpUploadActivity.this).load(FILE_PATH)
-        .setUploadUrl(
-            "http://lib-test.xzxyun.com:8042/Api/upload?data={\"type\":\"1\",\"fileType\":\".apk\"}")
+        //.setUploadUrl("http://lib-test.xzxyun.com:8042/Api/upload?data={\"type\":\"1\",\"fileType\":\".apk\"}")
+        .setUploadUrl("http://9.9.9.205:5000/upload/")
         //.setTempUrl("http://192.168.1.6:8080/upload/sign_file/").setAttachment("file")
         //.addHeader("iplanetdirectorypro", "11a09102fb934ad0bc206f9c611d7933")
+        .option()
+        .setRequestType(RequestEnum.POST)
+        .setParam("params", "bbbbbbbb")
+        .controller(ControllerType.CREATE_CONTROLLER)
         .create();
   }
 

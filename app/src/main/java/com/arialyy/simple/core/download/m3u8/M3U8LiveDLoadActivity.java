@@ -250,7 +250,7 @@ public class M3U8LiveDLoadActivity extends BaseActivity<ActivityM3u8LiveBinding>
             return parentUrl + tsUrl;
           }
         })
-        .controller(ControllerType.START_CONTROLLER)
+        .controller(ControllerType.CREATE_CONTROLLER)
         //.setLiveTsUrlConvert(new IVodTsUrlConverter() {
         //  @Override public List<String> convert(String m3u8Url, List<String> tsUrls) {
         //    int peerIndex = m3u8Url.lastIndexOf("/");

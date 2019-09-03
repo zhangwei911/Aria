@@ -43,6 +43,28 @@ public class CommonModule extends BaseViewModule {
     context.startActivity(intent);
   }
 
+  public LiveData<List<NormalTo>> getComponentData(Context context) {
+    List<NormalTo> list = new ArrayList<>();
+    String[] titles = context.getResources().getStringArray(R.array.component_items);
+    int[] icons = new int[] {
+        R.drawable.ic_fragment,
+        R.drawable.ic_dialog
+    };
+    int i = 0;
+    for (String title : titles) {
+      NormalTo to = new NormalTo();
+      to.icon = icons[i];
+      to.title = title;
+      i++;
+      list.add(to);
+    }
+    mLiveData.postValue(list);
+    return mLiveData;
+  }
+
+  /**
+   * http下载功能页面数据
+   */
   public LiveData<List<NormalTo>> getDownloadData(Context context) {
     List<NormalTo> list = new ArrayList<>();
     String[] titles = context.getResources().getStringArray(R.array.download_items);
@@ -66,6 +88,9 @@ public class CommonModule extends BaseViewModule {
     return mLiveData;
   }
 
+  /**
+   * 首页数据
+   */
   public LiveData<List<NormalTo>> getMainData(Context context) {
     List<NormalTo> list = new ArrayList<>();
     String[] titles = context.getResources().getStringArray(R.array.main_items);

@@ -36,7 +36,7 @@ final class ResumeAllCmd<T extends AbsTaskWrapper> extends AbsNormalCmd<T> {
   }
 
   @Override public void executeCmd() {
-    if (!NetUtils.isConnected(AriaManager.APP)) {
+    if (!NetUtils.isConnected(AriaManager.getInstance().getAPP())) {
       ALog.w(TAG, "恢复任务失败，网络未连接");
       return;
     }

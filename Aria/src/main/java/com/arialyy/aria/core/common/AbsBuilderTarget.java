@@ -16,20 +16,20 @@
 package com.arialyy.aria.core.common;
 
 import com.arialyy.aria.core.common.controller.IStartFeature;
-import com.arialyy.aria.core.common.controller.StartController;
+import com.arialyy.aria.core.common.controller.BuilderController;
 import com.arialyy.aria.core.inf.AbsTarget;
 
 /**
  * 处理第一次下载
  */
-public abstract class AbsStartTarget<TARGET extends AbsStartTarget> extends AbsTarget<TARGET>
+public abstract class AbsBuilderTarget<TARGET extends AbsBuilderTarget> extends AbsTarget<TARGET>
     implements IStartFeature {
 
-  private StartController mStartController;
+  private BuilderController mStartController;
 
-  private synchronized StartController getController() {
+  private synchronized BuilderController getController() {
     if (mStartController == null) {
-      mStartController = new StartController(getTaskWrapper());
+      mStartController = new BuilderController(getTaskWrapper());
     }
     return mStartController;
   }

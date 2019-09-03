@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.arialyy.simple.core.download.service_download;
+package com.arialyy.simple.core.download.service;
 
 import android.app.NotificationManager;
 import android.content.Context;

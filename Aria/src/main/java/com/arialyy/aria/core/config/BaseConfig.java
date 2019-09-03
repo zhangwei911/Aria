@@ -24,7 +24,7 @@ abstract class BaseConfig implements Serializable {
    * 保存配置
    */
   void save() {
-    String basePath = AriaManager.APP.getFilesDir().getPath();
+    String basePath = AriaManager.getInstance().getAPP().getFilesDir().getPath();
     String path = null;
     switch (getType()) {
       case TYPE_DOWNLOAD:

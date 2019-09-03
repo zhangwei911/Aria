@@ -25,6 +25,7 @@ import com.arialyy.aria.core.upload.UploadEntity;
 import com.arialyy.aria.exception.BaseException;
 import com.arialyy.aria.exception.TaskException;
 import com.arialyy.aria.util.ALog;
+import com.arialyy.aria.util.CommonUtil;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -36,6 +37,7 @@ import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -65,8 +67,9 @@ class HttpThreadTask extends AbsThreadTask<UploadEntity, UTaskWrapper> {
     }
     URL url;
     try {
-      url = new URL(getEntity().getUrl());
       HttpTaskConfig taskDelegate = getTaskWrapper().asHttp();
+      url = new URL(CommonUtil.convertUrl(getConfig().url));
+
       mHttpConn = (HttpURLConnection) url.openConnection();
       mHttpConn.setRequestMethod(taskDelegate.getRequestEnum().name);
       mHttpConn.setUseCaches(false);
@@ -90,11 +93,20 @@ class HttpThreadTask extends AbsThreadTask<UploadEntity, UTaskWrapper> {
       mOutputStream = mHttpConn.getOutputStream();
       PrintWriter writer =
           new PrintWriter(new OutputStreamWriter(mOutputStream, taskDelegate.getCharSet()), true);
+      // 添加参数
+      Map<String, String> params = taskDelegate.getParams();
+      if (params != null && !params.isEmpty()) {
+        for (String key : params.keySet()) {
+          addFormField(writer, key, params.get(key));
+        }
+      }
+
       //添加文件上传表单字段
       keys = taskDelegate.getFormFields().keySet();
       for (String key : keys) {
         addFormField(writer, key, taskDelegate.getFormFields().get(key));
       }
+
       uploadFile(writer, taskDelegate.getAttachment(), uploadFile);
       getEntity().setResponseStr(finish(writer));
       sendCompleteMsg();

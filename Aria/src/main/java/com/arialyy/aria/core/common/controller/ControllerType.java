@@ -22,9 +22,9 @@ import java.lang.annotation.RetentionPolicy;
   /**
    * 仅用于第一次创建任务，后续可调用`#create()、#add()、#setHighestPriority()`方法。
    */
-  Class<StartController> START_CONTROLLER = StartController.class;
+  Class<BuilderController> CREATE_CONTROLLER = BuilderController.class;
   /**
    * 用于后续的任务控制，后续可调用`#stop()、#resume()、#cancel()、#cancel(boolean)、#retry()、#restart()`方法。
    */
-  Class<NormalController> NORMAL_CONTROLLER = NormalController.class;
+  Class<NormalController> TASK_CONTROLLER = NormalController.class;
 }

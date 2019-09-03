@@ -15,8 +15,9 @@
  */
 package com.arialyy.aria.core.common.ftp;
 
-import androidx.annotation.CheckResult;
 import android.text.TextUtils;
+import androidx.annotation.CheckResult;
+import aria.apache.commons.net.ftp.FTPClientConfig;
 import com.arialyy.aria.core.FtpUrlEntity;
 import com.arialyy.aria.core.common.BaseDelegate;
 import com.arialyy.aria.core.common.Suggest;
@@ -74,6 +75,15 @@ public class FtpDelegate<TARGET extends AbsTarget> extends BaseDelegate<TARGET> 
   @CheckResult(suggest = Suggest.TO_CONTROLLER)
   public FTPSDelegate<TARGET> asFtps() {
     return new FTPSDelegate<>(mTarget, mWrapper);
+  }
+
+  /**
+   * 配置ftp客户端信息
+   */
+  @CheckResult(suggest = Suggest.TO_CONTROLLER)
+  public FtpDelegate<TARGET> setFtpClentConfig(FTPClientConfig config) {
+    getTaskWrapper().asFtp().setClientConfig(config);
+    return this;
   }
 
   //@Override public TARGET setProxy(Proxy proxy) {

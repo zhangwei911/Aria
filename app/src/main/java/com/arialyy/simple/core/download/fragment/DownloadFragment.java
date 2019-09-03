@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.arialyy.simple.core.download.fragment_download;
+package com.arialyy.simple.core.download.fragment;
 
 import android.os.Bundle;
 import android.os.Environment;
@@ -41,6 +41,7 @@ public class DownloadFragment extends AbsFragment<FragmentDownloadBinding>
 
   private static final String DOWNLOAD_URL =
       "https://res5.d.cn/2137e42d610b3488d9420c6421529386eee5bdbfd9be1fafe0a05d6dabaec8c156ddbd00581055bbaeac03904fb63310e80010680235d16bd4c040b50096a0c20dd1c4b0854529a1.apk";
+  private static final String FILE_NAME = "王者军团";
 
   @Override protected void init(Bundle savedInstanceState) {
     mStart = mRootView.findViewById(R.id.start);
@@ -51,7 +52,6 @@ public class DownloadFragment extends AbsFragment<FragmentDownloadBinding>
     DownloadEntity entity = Aria.download(this).getFirstDownloadEntity(DOWNLOAD_URL);
     if (entity != null) {
       getBinding().setFileSize(CommonUtil.formatFileSize(entity.getFileSize()));
-      int state = entity.getState();
       getBinding().setProgress(entity.getPercent());
       if (entity.getState() == IEntity.STATE_RUNNING) {
         getBinding().setStateStr(getString(R.string.stop));
@@ -62,6 +62,8 @@ public class DownloadFragment extends AbsFragment<FragmentDownloadBinding>
     } else {
       getBinding().setStateStr(getString(R.string.start));
     }
+    getBinding().setUrl(DOWNLOAD_URL);
+    getBinding().setFileName(FILE_NAME);
     Aria.download(this).register();
   }
 
@@ -71,7 +73,9 @@ public class DownloadFragment extends AbsFragment<FragmentDownloadBinding>
         if (mTaskId == -1) {
           mTaskId = Aria.download(this)
               .load(DOWNLOAD_URL)
-              .setFilePath(Environment.getExternalStorageDirectory().getPath() + "/王者军团.apk")
+              .setFilePath(
+                  Environment.getExternalStorageDirectory().getPath() + String.format("%s.apk",
+                      FILE_NAME))
               .create();
           getBinding().setStateStr(getString(R.string.stop));
           break;

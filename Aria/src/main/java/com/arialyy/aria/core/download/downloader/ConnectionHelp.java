@@ -109,7 +109,7 @@ public class ConnectionHelp {
       urlConn = url.openConnection();
     }
     if (urlConn instanceof HttpsURLConnection) {
-      AriaManager manager = AriaManager.getInstance(AriaManager.APP);
+      AriaManager manager = AriaManager.getInstance();
       conn = (HttpsURLConnection) urlConn;
       SSLContext sslContext =
           SSLContextUtil.getSSLContextFromAssets(manager.getDownloadConfig().getCaName(),

@@ -30,7 +30,7 @@ class DLoadExecutePool<TASK extends AbsTask> extends BaseExecutePool<TASK> {
   private final String TAG = "DownloadExecutePool";
 
   @Override protected int getMaxSize() {
-    return AriaManager.getInstance(AriaManager.APP).getDownloadConfig().getMaxTaskNum();
+    return AriaManager.getInstance().getDownloadConfig().getMaxTaskNum();
   }
 
   @Override public boolean putTask(TASK task) {

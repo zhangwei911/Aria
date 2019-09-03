@@ -22,9 +22,7 @@ import com.arialyy.aria.core.download.DownloadGroupTask;
 import com.arialyy.aria.core.download.DownloadTask;
 import com.arialyy.aria.core.inf.AbsTaskWrapper;
 import com.arialyy.aria.core.inf.ITask;
-import com.arialyy.aria.core.scheduler.DownloadSchedulers;
 import com.arialyy.aria.core.scheduler.ISchedulers;
-import com.arialyy.aria.core.scheduler.UploadSchedulers;
 import com.arialyy.aria.core.upload.UTaskWrapper;
 import com.arialyy.aria.core.upload.UploadTask;
 
@@ -56,7 +54,6 @@ class TaskFactory {
    * @param schedulers 对应的任务调度器
    * @param <TASK_ENTITY> {@link DTaskWrapper}、{@link UTaskWrapper}、{@link
    * DGTaskWrapper}
-   * @param <SCHEDULER> {@link DownloadSchedulers}、{@link UploadSchedulers}
    * @return {@link DownloadTask}、{@link UploadTask}、{@link DownloadGroupTask}
    */
   <TASK_ENTITY extends AbsTaskWrapper, SCHEDULER extends ISchedulers> ITask createTask(

@@ -116,7 +116,7 @@ import com.arialyy.aria.util.ALog;
               + "请参考【https://aria.laoyuyu.me/aria_doc/create/any_java.html】，参数请使用 download(this) 或 upload(this);"
               + "不要使用 download(getContext()) 或 upload(getContext())");
     }
-    return AriaManager.getInstance(context);
+    return AriaManager.init(context);
   }
 
   /**
@@ -126,7 +126,7 @@ import com.arialyy.aria.util.ALog;
    * {@link #download(Object)}、{@link #upload(Object)}
    */
   public static AriaManager init(Context context) {
-    return AriaManager.getInstance(context);
+    return get(context);
   }
 
   private static Context convertContext(Object obj) {

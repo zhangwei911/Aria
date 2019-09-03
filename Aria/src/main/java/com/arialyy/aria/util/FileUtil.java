@@ -21,7 +21,11 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.os.Build;
 import android.os.Environment;
+import android.os.StatFs;
+import android.os.storage.StorageManager;
+import android.os.storage.StorageVolume;
 import android.text.TextUtils;
+import com.arialyy.aria.core.AriaManager;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -34,13 +38,11 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.SequenceInputStream;
 import java.io.Serializable;
-import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.LinkedHashMap;
@@ -149,7 +151,16 @@ public class FileUtil {
       ALog.e(TAG, "删除文件失败，路径为空");
       return false;
     }
-    File file = new File(path);
+    return deleteFile(new File(path));
+  }
+
+  /**
+   * 删除文件
+   *
+   * @param file 文件路径
+   * @return {@code true}删除成功、{@code false}删除失败
+   */
+  public static boolean deleteFile(File file) {
     if (file.exists()) {
       final File to = new File(file.getAbsolutePath() + System.currentTimeMillis());
       if (file.renameTo(to)) {
@@ -346,16 +357,59 @@ public class FileUtil {
   }
 
   /**
+   * 检查SD内存空间是否充足
+   *
+   * @param filePath 文件保存路径
+   * @param fileSize 文件大小
+   * @return {@code false} 内存空间不足，{@code true}内存空间足够
+   */
+  public static boolean checkSDMemorySpace(String filePath, long fileSize) {
+    List<String> dirs = FileUtil.getSDPathList(AriaManager.getInstance().getAPP());
+    if (dirs == null || dirs.isEmpty()) {
+      return true;
+    }
+    for (String path : dirs) {
+      if (filePath.contains(path)) {
+        if (fileSize > 0 && fileSize > getAvailableExternalMemorySize(path)) {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+
+  /**
+   * sdcard 可用大小
+   *
+   * @param sdcardPath sdcard 根路径
+   * @return 单位为：byte
+   */
+  public static long getAvailableExternalMemorySize(String sdcardPath) {
+    StatFs stat = new StatFs(sdcardPath);
+    long blockSize = stat.getBlockSize();
+    long availableBlocks = stat.getAvailableBlocks();
+    return availableBlocks * blockSize;
+  }
+
+  /**
+   * sdcard 总大小
+   *
+   * @param sdcardPath sdcard 根路径
+   * @return 单位为：byte
+   */
+  public static long getTotalExternalMemorySize(String sdcardPath) {
+    StatFs stat = new StatFs(sdcardPath);
+    long blockSize = stat.getBlockSize();
+    long totalBlocks = stat.getBlockCount();
+    return totalBlocks * blockSize;
+  }
+
+  /**
    * 获取SD卡目录列表
    */
   public static List<String> getSDPathList(Context context) {
     List<String> paths;
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-      paths = getVolumeList(context);
-      if (paths == null || paths.isEmpty()) {
-        paths = getStorageDirectories();
-      }
-    } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD) {
       paths = getVolumeList(context);
     } else {
       List<String> mounts = readMountsFile();
@@ -417,17 +471,22 @@ public class FileUtil {
    * getSDPathList
    */
   private static List<String> getVolumeList(final Context context) {
-    List<String> pathList = null;
-    try {
-      android.os.storage.StorageManager manager =
-          (android.os.storage.StorageManager) context.getSystemService(Context.STORAGE_SERVICE);
-      Method method = manager.getClass().getMethod("getVolumePaths");
-      String[] paths = (String[]) method.invoke(manager);
-      pathList = Arrays.asList(paths);
-    } catch (Exception e) {
-      e.printStackTrace();
+    List<String> pathList = new ArrayList<>();
+
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+      StorageManager manager = (StorageManager) context.getSystemService(Context.STORAGE_SERVICE);
+      List<StorageVolume> volumes = manager.getStorageVolumes();
+      for (StorageVolume volume : volumes) {
+        String state = volume.getState();
+        if (state.equals(Environment.MEDIA_MOUNTED)) {
+          pathList.add(volume.toString());
+        }
+      }
+    } else {
+      pathList.addAll(getStorageDirectories());
     }
-    if (pathList == null || pathList.isEmpty()) {
+
+    if (pathList.isEmpty()) {
       pathList = new ArrayList<>();
       pathList.add(EXTERNAL_STORAGE_PATH);
     }
@@ -588,7 +647,7 @@ public class FileUtil {
 
   private static List<String> readVoldFile() {
     // read /etc/vold.conf or /etc/vold.fstab (it depends on version what
-    // config file is present)
+    // clientConfig file is present)
     List<String> vold = null;
     Scanner scanner = null;
     try {

@@ -39,7 +39,7 @@ public class DownloadTask extends AbsNormalTask<DTaskWrapper> {
   private DownloadTask(DTaskWrapper taskWrapper, Handler outHandler) {
     mTaskWrapper = taskWrapper;
     mOutHandler = outHandler;
-    mContext = AriaManager.APP;
+    mContext = AriaManager.getInstance().getAPP();
     if (taskWrapper.getRequestType() == AbsTaskWrapper.M3U8_VOD
         || taskWrapper.getRequestType() == AbsTaskWrapper.M3U8_LIVE) {
       mListener = new M3U8Listener(this, mOutHandler);

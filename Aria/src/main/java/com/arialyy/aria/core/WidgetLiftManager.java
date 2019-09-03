@@ -80,7 +80,7 @@ final class WidgetLiftManager {
   private PopupWindow.OnDismissListener createPopupWindowListener(final PopupWindow popupWindow) {
     return new PopupWindow.OnDismissListener() {
       @Override public void onDismiss() {
-        AriaManager.getInstance(AriaManager.APP).removeReceiver(popupWindow);
+        AriaManager.getInstance().removeReceiver(popupWindow);
       }
     };
   }
@@ -120,7 +120,7 @@ final class WidgetLiftManager {
     return new Dialog.OnCancelListener() {
 
       @Override public void onCancel(DialogInterface dialog) {
-        AriaManager.getInstance(AriaManager.APP).removeReceiver(dialog);
+        AriaManager.getInstance().removeReceiver(dialog);
       }
     };
   }
@@ -132,7 +132,7 @@ final class WidgetLiftManager {
     return new Dialog.OnDismissListener() {
 
       @Override public void onDismiss(DialogInterface dialog) {
-        AriaManager.getInstance(AriaManager.APP).removeReceiver(dialog);
+        AriaManager.getInstance().removeReceiver(dialog);
       }
     };
   }

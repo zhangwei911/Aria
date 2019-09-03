@@ -16,7 +16,7 @@
 package com.arialyy.aria.core.download;
 
 import androidx.annotation.CheckResult;
-import com.arialyy.aria.core.common.AbsStartTarget;
+import com.arialyy.aria.core.common.AbsBuilderTarget;
 import com.arialyy.aria.core.common.Suggest;
 import com.arialyy.aria.core.common.http.HttpDelegate;
 import com.arialyy.aria.core.inf.IHttpFileLenAdapter;
@@ -29,10 +29,10 @@ import java.util.List;
  * Created by AriaL on 2017/6/29.
  * 下载任务组
  */
-public class GroupStartTarget extends AbsStartTarget<GroupStartTarget> {
-  private HttpGroupConfigHandler<GroupStartTarget> mConfigHandler;
+public class GroupBuilderTarget extends AbsBuilderTarget<GroupBuilderTarget> {
+  private HttpGroupConfigHandler<GroupBuilderTarget> mConfigHandler;
 
-  GroupStartTarget(List<String> urls, String targetName) {
+  GroupBuilderTarget(List<String> urls, String targetName) {
     setTargetName(targetName);
     mConfigHandler = new HttpGroupConfigHandler<>(this, -1);
     getTaskWrapper().setRequestType(ITaskWrapper.DG_HTTP);
@@ -43,7 +43,7 @@ public class GroupStartTarget extends AbsStartTarget<GroupStartTarget> {
    * 设置http请求参数，header等信息
    */
   @CheckResult(suggest = Suggest.TASK_CONTROLLER)
-  public HttpDelegate<GroupStartTarget> option() {
+  public HttpDelegate<GroupBuilderTarget> option() {
     return new HttpDelegate<>(this, getTaskWrapper());
   }
 
@@ -56,7 +56,7 @@ public class GroupStartTarget extends AbsStartTarget<GroupStartTarget> {
    * @param fileSize 任务组总大小
    */
   @CheckResult(suggest = Suggest.TASK_CONTROLLER)
-  public GroupStartTarget setFileSize(long fileSize) {
+  public GroupBuilderTarget setFileSize(long fileSize) {
     if (fileSize <= 0) {
       ALog.e(TAG, "文件大小不能小于 0");
       return this;
@@ -75,7 +75,7 @@ public class GroupStartTarget extends AbsStartTarget<GroupStartTarget> {
    * 3、由于网络或其它原因的存在，这种方式获取的组合任务大小有可能是不准确的。
    */
   @CheckResult(suggest = Suggest.TASK_CONTROLLER)
-  public GroupStartTarget unknownSize() {
+  public GroupBuilderTarget unknownSize() {
     ((DGTaskWrapper) getTaskWrapper()).setUnknownSize(true);
     return this;
   }
@@ -96,7 +96,7 @@ public class GroupStartTarget extends AbsStartTarget<GroupStartTarget> {
    * @deprecated {@link #setSubFileName(List)} 请使用该api
    */
   @CheckResult(suggest = Suggest.TASK_CONTROLLER)
-  @Deprecated public GroupStartTarget setSubTaskFileName(List<String> subTaskFileName) {
+  @Deprecated public GroupBuilderTarget setSubTaskFileName(List<String> subTaskFileName) {
     return setSubFileName(subTaskFileName);
   }
 
@@ -104,7 +104,7 @@ public class GroupStartTarget extends AbsStartTarget<GroupStartTarget> {
    * 设置任务组别名
    */
   @CheckResult(suggest = Suggest.TASK_CONTROLLER)
-  public GroupStartTarget setGroupAlias(String alias) {
+  public GroupBuilderTarget setGroupAlias(String alias) {
     mConfigHandler.setGroupAlias(alias);
     return this;
   }
@@ -129,7 +129,7 @@ public class GroupStartTarget extends AbsStartTarget<GroupStartTarget> {
    * @param dirPath 任务组保存文件夹路径
    */
   @CheckResult(suggest = Suggest.TASK_CONTROLLER)
-  public GroupStartTarget setDirPath(String dirPath) {
+  public GroupBuilderTarget setDirPath(String dirPath) {
     return mConfigHandler.setDirPath(dirPath);
   }
 
@@ -137,7 +137,7 @@ public class GroupStartTarget extends AbsStartTarget<GroupStartTarget> {
    * 设置子任务文件名，该方法必须在{@link #setDirPath(String)}之后调用，否则不生效
    */
   @CheckResult(suggest = Suggest.TASK_CONTROLLER)
-  public GroupStartTarget setSubFileName(List<String> subTaskFileName) {
+  public GroupBuilderTarget setSubFileName(List<String> subTaskFileName) {
     return mConfigHandler.setSubFileName(subTaskFileName);
   }
 
@@ -145,7 +145,7 @@ public class GroupStartTarget extends AbsStartTarget<GroupStartTarget> {
    * 如果你需要使用header中特定的key来设置文件长度，或有定制文件长度的需要，那么你可以通过该方法自行处理文件长度
    */
   @CheckResult(suggest = Suggest.TASK_CONTROLLER)
-  public GroupStartTarget setFileLenAdapter(IHttpFileLenAdapter adapter) {
+  public GroupBuilderTarget setFileLenAdapter(IHttpFileLenAdapter adapter) {
 
     if (adapter == null) {
       throw new IllegalArgumentException("adapter为空");

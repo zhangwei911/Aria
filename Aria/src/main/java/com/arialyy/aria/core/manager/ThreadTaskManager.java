@@ -53,6 +53,32 @@ public class ThreadTaskManager {
   }
 
   /**
+   * 删除所有线程任务
+   */
+  public void removeAllThreadTask() {
+    if (mThreadTasks.isEmpty()) {
+      return;
+    }
+    try {
+      LOCK.tryLock(2, TimeUnit.SECONDS);
+      for (Set<FutureContainer> threads : mThreadTasks.values()) {
+        for (FutureContainer container : threads) {
+          if (container.future.isDone() || container.future.isCancelled()) {
+            continue;
+          }
+          container.threadTask.destroy();
+        }
+        threads.clear();
+      }
+      mThreadTasks.clear();
+    } catch (InterruptedException e) {
+      e.printStackTrace();
+    } finally {
+      LOCK.unlock();
+    }
+  }
+
+  /**
    * 启动线程任务
    *
    * @param key 任务对应的key{@link AbsTaskWrapper#getKey()}

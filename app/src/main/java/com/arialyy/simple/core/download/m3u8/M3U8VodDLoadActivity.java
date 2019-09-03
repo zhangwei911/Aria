@@ -30,7 +30,7 @@ import com.arialyy.annotations.Download;
 import com.arialyy.annotations.M3U8;
 import com.arialyy.aria.core.Aria;
 import com.arialyy.aria.core.common.controller.ControllerType;
-import com.arialyy.aria.core.common.controller.StartController;
+import com.arialyy.aria.core.common.controller.BuilderController;
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.download.DownloadTask;
 import com.arialyy.aria.core.download.m3u8.IBandWidthUrlConverter;
@@ -299,7 +299,7 @@ public class M3U8VodDLoadActivity extends BaseActivity<ActivityM3u8VodBinding> {
                   return newUrls;
                 }
               })
-              .controller(ControllerType.NORMAL_CONTROLLER)
+              .controller(ControllerType.TASK_CONTROLLER)
               .resume();
         }
         break;
@@ -341,11 +341,11 @@ public class M3U8VodDLoadActivity extends BaseActivity<ActivityM3u8VodBinding> {
           }
         })
         .generateIndexFile()
-        .controller(ControllerType.START_CONTROLLER)
+        .controller(ControllerType.CREATE_CONTROLLER)
         .create();
   }
 
-  private Class<StartController> c = StartController.class;
+  private Class<BuilderController> c = BuilderController.class;
 
   @Override protected void dataCallback(int result, Object data) {
     super.dataCallback(result, data);

@@ -18,17 +18,18 @@ package com.arialyy.aria.core.common.ftp;
 import android.text.TextUtils;
 import aria.apache.commons.net.ftp.FTP;
 import aria.apache.commons.net.ftp.FTPClient;
+import aria.apache.commons.net.ftp.FTPClientConfig;
 import aria.apache.commons.net.ftp.FTPReply;
 import aria.apache.commons.net.ftp.FTPSClient;
 import com.arialyy.aria.core.FtpUrlEntity;
 import com.arialyy.aria.core.common.AbsThreadTask;
-import com.arialyy.aria.core.common.ProtocolType;
 import com.arialyy.aria.core.common.SubThreadConfig;
 import com.arialyy.aria.core.inf.AbsNormalEntity;
 import com.arialyy.aria.core.inf.AbsTaskWrapper;
 import com.arialyy.aria.exception.AriaIOException;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.SSLContextUtil;
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import javax.net.ssl.SSLContext;
@@ -43,6 +44,17 @@ public abstract class AbsFtpThreadTask<ENTITY extends AbsNormalEntity, TASK_WRAP
 
   protected AbsFtpThreadTask(SubThreadConfig<TASK_WRAPPER> config) {
     super(config);
+  }
+
+  protected void closeClient(FTPClient client) {
+    try {
+      if (client != null && client.isConnected()) {
+        client.logout();
+        client.disconnect();
+      }
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
   }
 
   /**
@@ -77,9 +89,9 @@ public abstract class AbsFtpThreadTask<ENTITY extends AbsNormalEntity, TASK_WRAP
 
     try {
       if (urlEntity.isFtps) {
-        int code = ((FTPSClient) client).execAUTH(
-            TextUtils.isEmpty(urlEntity.protocol) ? ProtocolType.TLS : urlEntity.protocol);
-        ALog.d(TAG, String.format("cod：%s，msg：%s", code, client.getReplyString()));
+        FTPSClient sClient = (FTPSClient) client;
+        sClient.execPBSZ(0);
+        sClient.execPROT("P");
       }
 
       if (urlEntity.needLogin) {
@@ -109,10 +121,8 @@ public abstract class AbsFtpThreadTask<ENTITY extends AbsNormalEntity, TASK_WRAP
       client.enterLocalPassiveMode();
       client.setFileType(FTP.BINARY_FILE_TYPE);
       client.setControlKeepAliveTimeout(5000);
-      if (getTaskWrapper().asFtp().getUrlEntity().isFtps) {
-        ((FTPSClient) client).execPROT("P");
-      }
-    } catch (java.io.IOException e) {
+    } catch (IOException e) {
+      closeClient(client);
       e.printStackTrace();
     }
     return client;
@@ -124,15 +134,28 @@ public abstract class AbsFtpThreadTask<ENTITY extends AbsNormalEntity, TASK_WRAP
   private FTPClient newInstanceClient(FtpUrlEntity urlEntity) {
     FTPClient temp;
     if (urlEntity.isFtps) {
-      SSLContext sslContext =
-          SSLContextUtil.getSSLContext(urlEntity.keyAlias, urlEntity.storePath, urlEntity.protocol);
+      FTPSClient sClient;
+      SSLContext sslContext = SSLContextUtil.getSSLContext(urlEntity.keyAlias, urlEntity.storePath,
+          urlEntity.protocol);
       if (sslContext == null) {
-        sslContext = SSLContextUtil.getDefaultSLLContext(urlEntity.protocol);
+        sClient = new FTPSClient(urlEntity.protocol, urlEntity.isImplicit);
+      } else {
+        sClient = new FTPSClient(true, sslContext);
       }
-      temp = new FTPSClient(true, sslContext);
+
+      temp = sClient;
     } else {
       temp = new FTPClient();
     }
+
+    FTPClientConfig clientConfig;
+    if (mTaskWrapper.asFtp().getClientConfig() != null) {
+      clientConfig = mTaskWrapper.asFtp().getClientConfig();
+    } else {
+      clientConfig = new FTPClientConfig(FTPClientConfig.SYST_UNIX);
+      clientConfig.setServerLanguageCode("en");
+    }
+    temp.configure(clientConfig);
 
     return temp;
   }

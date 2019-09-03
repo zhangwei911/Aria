@@ -326,7 +326,13 @@ class DelegateFind extends AbsDelegate {
     String sql = String.format("SELECT rowid, * FROM %s WHERE %s", CommonUtil.getClassName(clazz),
         expression[0]);
     String[] params = new String[expression.length - 1];
-    System.arraycopy(expression, 1, params, 0, params.length);
+    try {
+      // 处理系统出现的问题：https://github.com/AriaLyy/Aria/issues/450
+      System.arraycopy(expression, 1, params, 0, params.length);
+    } catch (Exception e) {
+      e.printStackTrace();
+      return null;
+    }
 
     return exeNormalDataSql(db, clazz, sql, params);
   }
@@ -348,7 +354,13 @@ class DelegateFind extends AbsDelegate {
         expression[0], (page - 1) * num, num);
 
     String[] params = new String[expression.length - 1];
-    System.arraycopy(expression, 1, params, 0, params.length);
+    try {
+      // 处理系统出现的问题：https://github.com/AriaLyy/Aria/issues/450
+      System.arraycopy(expression, 1, params, 0, params.length);
+    } catch (Exception e) {
+      e.printStackTrace();
+      return null;
+    }
 
     return exeNormalDataSql(db, clazz, sql, params);
   }

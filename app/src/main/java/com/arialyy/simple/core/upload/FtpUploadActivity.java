@@ -131,7 +131,7 @@ public class FtpUploadActivity extends BaseActivity<ActivityFtpUploadBinding> {
                   })
               .option()
               .login("8L8e", "8guD")
-              .controller(ControllerType.START_CONTROLLER)
+              .controller(ControllerType.CREATE_CONTROLLER)
               .create();
           getBinding().setStateStr(getString(R.string.stop));
           break;
@@ -144,7 +144,7 @@ public class FtpUploadActivity extends BaseActivity<ActivityFtpUploadBinding> {
               .loadFtp(mTaskId)
               .option()
               .login("8L8e", "8guD")
-              .controller(ControllerType.NORMAL_CONTROLLER)
+              .controller(ControllerType.TASK_CONTROLLER)
               .resume();
           getBinding().setStateStr(getString(R.string.stop));
         }

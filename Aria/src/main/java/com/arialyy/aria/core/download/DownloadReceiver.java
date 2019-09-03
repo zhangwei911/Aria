@@ -22,15 +22,14 @@ import com.arialyy.annotations.TaskEnum;
 import com.arialyy.aria.core.AriaManager;
 import com.arialyy.aria.core.command.CancelAllCmd;
 import com.arialyy.aria.core.command.NormalCmdFactory;
-import com.arialyy.aria.core.common.AbsStartTarget;
+import com.arialyy.aria.core.common.AbsBuilderTarget;
 import com.arialyy.aria.core.common.ProxyHelper;
 import com.arialyy.aria.core.event.EventMsgUtil;
 import com.arialyy.aria.core.inf.AbsEntity;
 import com.arialyy.aria.core.inf.AbsReceiver;
 import com.arialyy.aria.core.inf.ITask;
 import com.arialyy.aria.core.inf.ReceiverType;
-import com.arialyy.aria.core.scheduler.DownloadGroupSchedulers;
-import com.arialyy.aria.core.scheduler.DownloadSchedulers;
+import com.arialyy.aria.core.scheduler.TaskSchedulers;
 import com.arialyy.aria.orm.DbEntity;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CheckUtil;
@@ -55,7 +54,7 @@ public class DownloadReceiver extends AbsReceiver {
    */
   @Deprecated
   public DownloadReceiver setMaxSpeed(int maxSpeed) {
-    AriaManager.getInstance(AriaManager.APP).getDownloadConfig().setMaxSpeed(maxSpeed);
+    AriaManager.getInstance().getDownloadConfig().setMaxSpeed(maxSpeed);
     return this;
   }
 
@@ -65,15 +64,15 @@ public class DownloadReceiver extends AbsReceiver {
    * @param url 下载地址
    */
   @CheckResult
-  public HttpStartTarget load(@NonNull String url) {
+  public HttpBuilderTarget load(@NonNull String url) {
     CheckUtil.checkUrlInvalidThrow(url);
-    return new HttpStartTarget(url, targetName);
+    return new HttpBuilderTarget(url, targetName);
   }
 
   /**
    * 用于任务停止、删除等操作
    *
-   * @param taskId 任务id，可从{@link AbsStartTarget#create()}、{@link AbsStartTarget#add()}、{@link
+   * @param taskId 任务id，可从{@link AbsBuilderTarget#create()}、{@link AbsBuilderTarget#add()}、{@link
    * AbsEntity#getId()}读取任务id
    */
   @CheckResult
@@ -88,15 +87,15 @@ public class DownloadReceiver extends AbsReceiver {
    * @param urls 组合任务只任务列被，如果任务组的中的下载地址改变了，则任务从新的一个任务组
    */
   @CheckResult
-  public GroupStartTarget loadGroup(List<String> urls) {
+  public GroupBuilderTarget loadGroup(List<String> urls) {
     CheckUtil.checkDownloadUrls(urls);
-    return new GroupStartTarget(urls, targetName);
+    return new GroupBuilderTarget(urls, targetName);
   }
 
   /**
    * 加载组合任务，用于任务停止、删除等操作
    *
-   * @param taskId 任务id，可从{@link AbsStartTarget#create()}、{@link AbsStartTarget#add()}、{@link
+   * @param taskId 任务id，可从{@link AbsBuilderTarget#create()}、{@link AbsBuilderTarget#add()}、{@link
    * * AbsEntity#getId()}读取任务id
    */
   @CheckResult
@@ -109,15 +108,15 @@ public class DownloadReceiver extends AbsReceiver {
    * 加载ftp单任务下载地址，用于任务第一次下载，如果需要控制任务停止或删除等操作，请使用{@link #loadFtp(long)}
    */
   @CheckResult
-  public FtpStartTarget loadFtp(@NonNull String url) {
+  public FtpBuilderTarget loadFtp(@NonNull String url) {
     CheckUtil.checkUrlInvalidThrow(url);
-    return new FtpStartTarget(url, targetName);
+    return new FtpBuilderTarget(url, targetName);
   }
 
   /**
    * 用于任务停止、删除等操作
    *
-   * @param taskId 任务id，可从{@link AbsStartTarget#create()}、{@link AbsStartTarget#add()}、{@link
+   * @param taskId 任务id，可从{@link AbsBuilderTarget#create()}、{@link AbsBuilderTarget#add()}、{@link
    * AbsEntity#getId()}读取任务id
    */
   @CheckResult
@@ -130,15 +129,15 @@ public class DownloadReceiver extends AbsReceiver {
    * 加载ftp文件夹下载地址，用于任务第一次下载，如果需要控制任务停止或删除等操作，请使用{@link #loadFtpDir(long)}
    */
   @CheckResult
-  public FtpDirStartTarget loadFtpDir(@NonNull String dirUrl) {
+  public FtpDirBuilderTarget loadFtpDir(@NonNull String dirUrl) {
     CheckUtil.checkUrlInvalidThrow(dirUrl);
-    return new FtpDirStartTarget(dirUrl, targetName);
+    return new FtpDirBuilderTarget(dirUrl, targetName);
   }
 
   /**
    * 加载ftp文件夹下载地址，用于任务停止、删除等操作
    *
-   * @param taskId 任务id，可从{@link AbsStartTarget#create()}、{@link AbsStartTarget#add()}、{@link
+   * @param taskId 任务id，可从{@link AbsBuilderTarget#create()}、{@link AbsBuilderTarget#add()}、{@link
    * AbsEntity#getId()}读取任务id
    */
   @CheckResult
@@ -164,13 +163,13 @@ public class DownloadReceiver extends AbsReceiver {
     if (set != null && !set.isEmpty()) {
       for (Integer type : set) {
         if (type == ProxyHelper.PROXY_TYPE_DOWNLOAD) {
-          DownloadSchedulers.getInstance().register(obj, TaskEnum.DOWNLOAD);
+          TaskSchedulers.getInstance().register(obj, TaskEnum.DOWNLOAD);
         } else if (type == ProxyHelper.PROXY_TYPE_DOWNLOAD_GROUP) {
-          DownloadGroupSchedulers.getInstance().register(obj, TaskEnum.DOWNLOAD_GROUP);
+          TaskSchedulers.getInstance().register(obj, TaskEnum.DOWNLOAD_GROUP);
         } else if (type == ProxyHelper.PROXY_TYPE_M3U8_PEER) {
-          DownloadSchedulers.getInstance().register(obj, TaskEnum.M3U8_PEER);
+          TaskSchedulers.getInstance().register(obj, TaskEnum.M3U8_PEER);
         } else if (type == ProxyHelper.PROXY_TYPE_DOWNLOAD_GROUP_SUB) {
-          DownloadGroupSchedulers.getInstance().register(obj, TaskEnum.DOWNLOAD_GROUP_SUB);
+          TaskSchedulers.getInstance().register(obj, TaskEnum.DOWNLOAD_GROUP_SUB);
         }
       }
     } else {
@@ -193,7 +192,7 @@ public class DownloadReceiver extends AbsReceiver {
     if (needRmListener) {
       unRegisterListener();
     }
-    AriaManager.getInstance(AriaManager.APP).removeReceiver(OBJ_MAP.get(getKey()));
+    AriaManager.getInstance().removeReceiver(OBJ_MAP.get(getKey()));
   }
 
   @Override public String getType() {
@@ -214,9 +213,9 @@ public class DownloadReceiver extends AbsReceiver {
     if (set != null) {
       for (Integer integer : set) {
         if (integer == ProxyHelper.PROXY_TYPE_DOWNLOAD) {
-          DownloadSchedulers.getInstance().unRegister(obj);
+          TaskSchedulers.getInstance().unRegister(obj);
         } else if (integer == ProxyHelper.PROXY_TYPE_DOWNLOAD_GROUP) {
-          DownloadGroupSchedulers.getInstance().unRegister(obj);
+          TaskSchedulers.getInstance().unRegister(obj);
         }
       }
     }
@@ -454,7 +453,7 @@ public class DownloadReceiver extends AbsReceiver {
    * 如果文件已经下载完成，只删除下载记录
    */
   public void removeAllTask(boolean removeFile) {
-    final AriaManager ariaManager = AriaManager.getInstance(AriaManager.APP);
+    final AriaManager ariaManager = AriaManager.getInstance();
     CancelAllCmd cancelCmd =
         (CancelAllCmd) CommonUtil.createNormalCmd(new DTaskWrapper(null),
             NormalCmdFactory.TASK_CANCEL_ALL, ITask.DOWNLOAD);

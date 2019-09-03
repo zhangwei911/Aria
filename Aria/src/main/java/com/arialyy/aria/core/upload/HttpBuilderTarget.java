@@ -16,7 +16,7 @@
 package com.arialyy.aria.core.upload;
 
 import androidx.annotation.CheckResult;
-import com.arialyy.aria.core.common.AbsStartTarget;
+import com.arialyy.aria.core.common.AbsBuilderTarget;
 import com.arialyy.aria.core.common.Suggest;
 import com.arialyy.aria.core.common.http.HttpDelegate;
 import com.arialyy.aria.core.inf.AbsTaskWrapper;
@@ -25,10 +25,10 @@ import com.arialyy.aria.core.inf.AbsTaskWrapper;
  * Created by lyy on 2017/2/28.
  * http 单文件上传
  */
-public class HttpStartTarget extends AbsStartTarget<HttpStartTarget> {
-  private UNormalConfigHandler<HttpStartTarget> mConfigHandler;
+public class HttpBuilderTarget extends AbsBuilderTarget<HttpBuilderTarget> {
+  private UNormalConfigHandler<HttpBuilderTarget> mConfigHandler;
 
-  HttpStartTarget(String filePath, String targetName) {
+  HttpBuilderTarget(String filePath, String targetName) {
 
     mConfigHandler = new UNormalConfigHandler<>(this, -1, targetName);
     mConfigHandler.setFilePath(filePath);
@@ -43,7 +43,7 @@ public class HttpStartTarget extends AbsStartTarget<HttpStartTarget> {
    * @param tempUrl 上传路径
    */
   @CheckResult(suggest = Suggest.TASK_CONTROLLER)
-  public HttpStartTarget setUploadUrl(String tempUrl) {
+  public HttpBuilderTarget setUploadUrl(String tempUrl) {
     mConfigHandler.setTempUrl(tempUrl);
     return this;
   }
@@ -52,7 +52,7 @@ public class HttpStartTarget extends AbsStartTarget<HttpStartTarget> {
    * 设置http请求参数，header等信息
    */
   @CheckResult(suggest = Suggest.TASK_CONTROLLER)
-  public HttpDelegate<HttpStartTarget> option() {
+  public HttpDelegate<HttpBuilderTarget> option() {
     return new HttpDelegate<>(this, getTaskWrapper());
   }
 }

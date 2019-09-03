@@ -93,7 +93,7 @@ class KotlinDownloadActivity : BaseActivity<ActivitySingleKotlinBinding>() {
         .get(HttpDownloadModule::class.java)
     mModule!!.getHttpDownloadInfo(this)
         .observe(this, Observer { entity ->
-          if (entity == null) {
+          if (entity == null || entity.id < 0) {
             return@Observer
           }
           if (entity.state == IEntity.STATE_STOP) {

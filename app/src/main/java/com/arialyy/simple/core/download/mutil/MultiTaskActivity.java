@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.arialyy.simple.core.download.multi_download;
+package com.arialyy.simple.core.download.mutil;
 
 import android.content.Intent;
 import android.os.Bundle;

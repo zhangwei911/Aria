@@ -19,9 +19,11 @@ public class PeerIndexEvent {
 
   public int peerIndex;
   public long createTime;
+  public String key;
 
-  public PeerIndexEvent(int peerIndex) {
+  public PeerIndexEvent(String key, int peerIndex) {
     this.peerIndex = peerIndex;
+    this.key = key;
     createTime = System.currentTimeMillis();
   }
 }

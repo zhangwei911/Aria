@@ -37,7 +37,7 @@ public final class Configuration {
 
   private Configuration() {
     //删除老版本的配置文件
-    String basePath = AriaManager.APP.getFilesDir().getPath();
+    String basePath = AriaManager.getInstance().getAPP().getFilesDir().getPath();
     del351Config(basePath);
     File newDCfg = new File(String.format("%s%s", basePath, DOWNLOAD_CONFIG_FILE));
     File newUCfg = new File(String.format("%s%s", basePath, UPLOAD_CONFIG_FILE));
@@ -89,7 +89,7 @@ public final class Configuration {
    * @return {@code true}配置存在，{@code false}配置不存在
    */
   public boolean configExists() {
-    String basePath = AriaManager.APP.getFilesDir().getPath();
+    String basePath = AriaManager.getInstance().getAPP().getFilesDir().getPath();
     return (new File(String.format("%s%s", basePath, DOWNLOAD_CONFIG_FILE))).exists()
         && (new File(String.format("%s%s", basePath, UPLOAD_CONFIG_FILE))).exists()
         && (new File(String.format("%s%s", basePath, APP_CONFIG_FILE))).exists()

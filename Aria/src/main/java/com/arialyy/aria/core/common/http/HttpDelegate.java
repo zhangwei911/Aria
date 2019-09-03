@@ -78,6 +78,15 @@ public class HttpDelegate<TARGET extends AbsTarget> extends BaseDelegate<TARGET>
   }
 
   /**
+   * 设置http表单字段
+   */
+  @CheckResult(suggest = Suggest.TO_CONTROLLER)
+  public HttpDelegate<TARGET> setFormFields(Map<String, String> params) {
+    getTaskWrapper().asHttp().setFormFields(params);
+    return this;
+  }
+
+  /**
    * 给url请求添加Header数据
    * 如果新的header数据和数据保存的不一致，则更新数据库中对应的header数据
    *

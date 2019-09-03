@@ -59,7 +59,7 @@ public class VideoPlayerFragment extends BaseFragment<FragmentVideoPlayerBinding
     getBinding().surfaceView.getHolder().addCallback(new SurfaceHolder.Callback() {
       @Override public void surfaceCreated(SurfaceHolder holder) {
         mSurfaceHolder = holder;
-        //startNewPlayer(mPlayers.valueAt(0));
+        startNewPlayer(mPlayers.valueAt(0));
       }
 
       @Override
