@@ -13,27 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.arialyy.aria.core.upload;
+package com.arialyy.aria.core.upload.normal;
 
 import androidx.annotation.CheckResult;
-import androidx.annotation.NonNull;
 import com.arialyy.aria.core.common.AbsBuilderTarget;
 import com.arialyy.aria.core.common.Suggest;
-import com.arialyy.aria.core.common.ftp.FtpDelegate;
-import com.arialyy.aria.core.common.ftp.IFtpUploadInterceptor;
+import com.arialyy.aria.core.common.http.HttpDelegate;
 import com.arialyy.aria.core.inf.AbsTaskWrapper;
 
 /**
- * Created by Aria.Lao on 2017/7/27.
- * ftp单任务上传
+ * Created by lyy on 2017/2/28.
+ * http 单文件上传
  */
-public class FtpBuilderTarget extends AbsBuilderTarget<FtpBuilderTarget> {
-  private UNormalConfigHandler<FtpBuilderTarget> mConfigHandler;
+public class HttpBuilderTarget extends AbsBuilderTarget<HttpBuilderTarget> {
+  private UNormalConfigHandler<HttpBuilderTarget> mConfigHandler;
 
-  FtpBuilderTarget(String filePath, String targetName) {
+  HttpBuilderTarget(String filePath, String targetName) {
+
     mConfigHandler = new UNormalConfigHandler<>(this, -1, targetName);
     mConfigHandler.setFilePath(filePath);
-    getTaskWrapper().setRequestType(AbsTaskWrapper.U_FTP);
+    //http暂时不支持断点上传
+    getTaskWrapper().setSupportBP(false);
+    getTaskWrapper().setRequestType(AbsTaskWrapper.U_HTTP);
   }
 
   /**
@@ -42,24 +43,16 @@ public class FtpBuilderTarget extends AbsBuilderTarget<FtpBuilderTarget> {
    * @param tempUrl 上传路径
    */
   @CheckResult(suggest = Suggest.TASK_CONTROLLER)
-  public FtpBuilderTarget setUploadUrl(String tempUrl) {
+  public HttpBuilderTarget setUploadUrl(String tempUrl) {
     mConfigHandler.setTempUrl(tempUrl);
     return this;
   }
 
   /**
-   * FTP文件上传拦截器，如果远端已有同名文件，可使用该拦截器控制覆盖文件或修改该文件上传到服务器端端的文件名
+   * 设置http请求参数，header等信息
    */
   @CheckResult(suggest = Suggest.TASK_CONTROLLER)
-  public FtpBuilderTarget setUploadInterceptor(@NonNull IFtpUploadInterceptor uploadInterceptor) {
-    return mConfigHandler.setUploadInterceptor(uploadInterceptor);
-  }
-
-  /**
-   * 设置登陆、字符串编码、ftps等参数
-   */
-  @CheckResult(suggest = Suggest.TASK_CONTROLLER)
-  public FtpDelegate<FtpBuilderTarget> option() {
-    return new FtpDelegate<>(this, getTaskWrapper());
+  public HttpDelegate<HttpBuilderTarget> option() {
+    return new HttpDelegate<>(this, getTaskWrapper());
   }
 }

@@ -13,13 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.arialyy.aria.core.download;
+package com.arialyy.aria.core.download.normal;
 
 import androidx.annotation.CheckResult;
 import androidx.annotation.NonNull;
 import com.arialyy.aria.core.common.AbsNormalTarget;
 import com.arialyy.aria.core.common.Suggest;
 import com.arialyy.aria.core.common.ftp.FtpDelegate;
+import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.inf.ITaskWrapper;
 import com.arialyy.aria.util.CommonUtil;
 

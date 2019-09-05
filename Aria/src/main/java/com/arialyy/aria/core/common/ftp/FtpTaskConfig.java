@@ -16,7 +16,6 @@
 package com.arialyy.aria.core.common.ftp;
 
 import aria.apache.commons.net.ftp.FTPClientConfig;
-import com.arialyy.aria.core.FtpUrlEntity;
 import com.arialyy.aria.core.inf.ITaskConfig;
 import java.lang.ref.SoftReference;
 import java.net.Proxy;

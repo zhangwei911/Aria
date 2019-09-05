@@ -16,7 +16,7 @@
 package com.arialyy.aria.core.download.group;
 
 import aria.apache.commons.net.ftp.FTPFile;
-import com.arialyy.aria.core.FtpUrlEntity;
+import com.arialyy.aria.core.common.ftp.FtpUrlEntity;
 import com.arialyy.aria.core.common.CompleteInfo;
 import com.arialyy.aria.core.common.OnFileInfoCallback;
 import com.arialyy.aria.core.common.ftp.AbsFtpInfoThread;

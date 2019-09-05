@@ -24,6 +24,16 @@ import com.arialyy.aria.core.command.CancelAllCmd;
 import com.arialyy.aria.core.command.NormalCmdFactory;
 import com.arialyy.aria.core.common.AbsBuilderTarget;
 import com.arialyy.aria.core.common.ProxyHelper;
+import com.arialyy.aria.core.download.group.FtpDirBuilderTarget;
+import com.arialyy.aria.core.download.group.FtpDirNormalTarget;
+import com.arialyy.aria.core.download.group.GroupBuilderTarget;
+import com.arialyy.aria.core.download.group.GroupNormalTarget;
+import com.arialyy.aria.core.download.group.GroupTargetFactory;
+import com.arialyy.aria.core.download.normal.FtpBuilderTarget;
+import com.arialyy.aria.core.download.normal.FtpNormalTarget;
+import com.arialyy.aria.core.download.normal.HttpBuilderTarget;
+import com.arialyy.aria.core.download.normal.HttpNormalTarget;
+import com.arialyy.aria.core.download.normal.DNormalTargetFactory;
 import com.arialyy.aria.core.event.EventMsgUtil;
 import com.arialyy.aria.core.inf.AbsEntity;
 import com.arialyy.aria.core.inf.AbsReceiver;
@@ -66,7 +76,8 @@ public class DownloadReceiver extends AbsReceiver {
   @CheckResult
   public HttpBuilderTarget load(@NonNull String url) {
     CheckUtil.checkUrlInvalidThrow(url);
-    return new HttpBuilderTarget(url, targetName);
+    return DNormalTargetFactory.getInstance()
+        .generateBuilderTarget(HttpBuilderTarget.class, url, targetName);
   }
 
   /**
@@ -78,7 +89,8 @@ public class DownloadReceiver extends AbsReceiver {
   @CheckResult
   public HttpNormalTarget load(long taskId) {
     CheckUtil.checkTaskId(taskId);
-    return new HttpNormalTarget(taskId, targetName);
+    return DNormalTargetFactory.getInstance()
+        .generateNormalTarget(HttpNormalTarget.class, taskId, targetName);
   }
 
   /**
@@ -89,7 +101,7 @@ public class DownloadReceiver extends AbsReceiver {
   @CheckResult
   public GroupBuilderTarget loadGroup(List<String> urls) {
     CheckUtil.checkDownloadUrls(urls);
-    return new GroupBuilderTarget(urls, targetName);
+    return GroupTargetFactory.getInstance().generateGroupBuilderTarget(urls, targetName);
   }
 
   /**
@@ -101,7 +113,8 @@ public class DownloadReceiver extends AbsReceiver {
   @CheckResult
   public GroupNormalTarget loadGroup(long taskId) {
     CheckUtil.checkTaskId(taskId);
-    return new GroupNormalTarget(taskId, targetName);
+    return GroupTargetFactory.getInstance()
+        .generateNormalTarget(GroupNormalTarget.class, taskId, targetName);
   }
 
   /**
@@ -110,7 +123,8 @@ public class DownloadReceiver extends AbsReceiver {
   @CheckResult
   public FtpBuilderTarget loadFtp(@NonNull String url) {
     CheckUtil.checkUrlInvalidThrow(url);
-    return new FtpBuilderTarget(url, targetName);
+    return DNormalTargetFactory.getInstance()
+        .generateBuilderTarget(FtpBuilderTarget.class, url, targetName);
   }
 
   /**
@@ -122,7 +136,8 @@ public class DownloadReceiver extends AbsReceiver {
   @CheckResult
   public FtpNormalTarget loadFtp(long taskId) {
     CheckUtil.checkTaskId(taskId);
-    return new FtpNormalTarget(taskId, targetName);
+    return DNormalTargetFactory.getInstance()
+        .generateNormalTarget(FtpNormalTarget.class, taskId, targetName);
   }
 
   /**
@@ -131,7 +146,7 @@ public class DownloadReceiver extends AbsReceiver {
   @CheckResult
   public FtpDirBuilderTarget loadFtpDir(@NonNull String dirUrl) {
     CheckUtil.checkUrlInvalidThrow(dirUrl);
-    return new FtpDirBuilderTarget(dirUrl, targetName);
+    return GroupTargetFactory.getInstance().generateDirBuilderTarget(dirUrl, targetName);
   }
 
   /**
@@ -143,7 +158,8 @@ public class DownloadReceiver extends AbsReceiver {
   @CheckResult
   public FtpDirNormalTarget loadFtpDir(long taskId) {
     CheckUtil.checkTaskId(taskId);
-    return new FtpDirNormalTarget(taskId, targetName);
+    return GroupTargetFactory.getInstance()
+        .generateNormalTarget(FtpDirNormalTarget.class, taskId, targetName);
   }
 
   /**

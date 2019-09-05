@@ -25,7 +25,6 @@ import aria.apache.commons.net.ftp.FTPFile;
 import aria.apache.commons.net.ftp.FTPReply;
 import aria.apache.commons.net.ftp.FTPSClient;
 import com.arialyy.aria.core.AriaManager;
-import com.arialyy.aria.core.FtpUrlEntity;
 import com.arialyy.aria.core.common.OnFileInfoCallback;
 import com.arialyy.aria.core.inf.AbsEntity;
 import com.arialyy.aria.core.inf.AbsTaskWrapper;

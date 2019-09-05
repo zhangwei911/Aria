@@ -30,6 +30,11 @@ import com.arialyy.aria.core.inf.AbsReceiver;
 import com.arialyy.aria.core.inf.ITask;
 import com.arialyy.aria.core.inf.ReceiverType;
 import com.arialyy.aria.core.scheduler.TaskSchedulers;
+import com.arialyy.aria.core.upload.normal.FtpBuilderTarget;
+import com.arialyy.aria.core.upload.normal.FtpNormalTarget;
+import com.arialyy.aria.core.upload.normal.HttpBuilderTarget;
+import com.arialyy.aria.core.upload.normal.HttpNormalTarget;
+import com.arialyy.aria.core.upload.normal.UNormalTargetFactory;
 import com.arialyy.aria.orm.DbEntity;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CheckUtil;
@@ -64,7 +69,8 @@ public class UploadReceiver extends AbsReceiver {
   @CheckResult
   public HttpBuilderTarget load(@NonNull String filePath) {
     CheckUtil.checkUploadPath(filePath);
-    return new HttpBuilderTarget(filePath, targetName);
+    return UNormalTargetFactory.getInstance()
+        .generateBuilderTarget(HttpBuilderTarget.class, filePath, targetName);
   }
 
   /**
@@ -76,7 +82,8 @@ public class UploadReceiver extends AbsReceiver {
   @CheckResult
   public HttpNormalTarget load(long taskId) {
     CheckUtil.checkTaskId(taskId);
-    return new HttpNormalTarget(taskId, targetName);
+    return UNormalTargetFactory.getInstance()
+        .generateNormalTarget(HttpNormalTarget.class, taskId, targetName);
   }
 
   /**
@@ -87,7 +94,8 @@ public class UploadReceiver extends AbsReceiver {
   @CheckResult
   public FtpBuilderTarget loadFtp(@NonNull String filePath) {
     CheckUtil.checkUploadPath(filePath);
-    return new FtpBuilderTarget(filePath, targetName);
+    return UNormalTargetFactory.getInstance()
+        .generateBuilderTarget(FtpBuilderTarget.class, filePath, targetName);
   }
 
   /**
@@ -99,7 +107,8 @@ public class UploadReceiver extends AbsReceiver {
   @CheckResult
   public FtpNormalTarget loadFtp(long taskId) {
     CheckUtil.checkTaskId(taskId);
-    return new FtpNormalTarget(taskId, targetName);
+    return UNormalTargetFactory.getInstance()
+        .generateNormalTarget(FtpNormalTarget.class, taskId, targetName);
   }
 
   /**

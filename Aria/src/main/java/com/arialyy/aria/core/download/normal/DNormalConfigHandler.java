@@ -13,9 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.arialyy.aria.core.download;
+package com.arialyy.aria.core.download.normal;
 
 import android.text.TextUtils;
+import com.arialyy.aria.core.download.DTaskWrapper;
+import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.event.ErrorEvent;
 import com.arialyy.aria.core.inf.AbsTarget;
 import com.arialyy.aria.core.inf.IConfigHandler;
@@ -57,7 +59,7 @@ class DNormalConfigHandler<TARGET extends AbsTarget> implements IConfigHandler {
     }
   }
 
-  TARGET updateUrl(String newUrl) {
+  public TARGET updateUrl(String newUrl) {
     if (TextUtils.isEmpty(newUrl)) {
       ALog.e(TAG, "url更新失败，newUrl为null");
       return mTarget;

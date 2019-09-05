@@ -13,12 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.arialyy.aria.core.download;
+package com.arialyy.aria.core.download.group;
 
 import androidx.annotation.CheckResult;
-import com.arialyy.aria.core.common.AbsNormalTarget;
+import com.arialyy.aria.core.common.AbsBuilderTarget;
 import com.arialyy.aria.core.common.Suggest;
 import com.arialyy.aria.core.common.ftp.FtpDelegate;
+import com.arialyy.aria.core.download.DownloadGroupEntity;
 import com.arialyy.aria.core.manager.SubTaskManager;
 import com.arialyy.aria.util.CommonUtil;
 
@@ -26,21 +27,14 @@ import com.arialyy.aria.util.CommonUtil;
  * Created by Aria.Lao on 2017/7/26.
  * ftp文件夹下载
  */
-public class FtpDirNormalTarget extends AbsNormalTarget<FtpDirNormalTarget> {
-  private FtpDirConfigHandler<FtpDirNormalTarget> mConfigHandler;
+public class FtpDirBuilderTarget extends AbsBuilderTarget<FtpDirBuilderTarget> {
+  private FtpDirConfigHandler<FtpDirBuilderTarget> mConfigHandler;
 
-  FtpDirNormalTarget(long taskId, String targetName) {
+  FtpDirBuilderTarget(String url, String targetName) {
     setTargetName(targetName);
-    mConfigHandler = new FtpDirConfigHandler<>(this, taskId);
-    getTaskWrapper().asFtp().setUrlEntity(CommonUtil.getFtpUrlInfo(getEntity().getKey()));
-  }
-
-  @Override public boolean isRunning() {
-    return mConfigHandler.isRunning();
-  }
-
-  @Override public boolean taskExists() {
-    return mConfigHandler.taskExists();
+    mConfigHandler = new FtpDirConfigHandler<>(this, -1);
+    getEntity().setGroupHash(url);
+    getTaskWrapper().asFtp().setUrlEntity(CommonUtil.getFtpUrlInfo(url));
   }
 
   /**
@@ -63,15 +57,24 @@ public class FtpDirNormalTarget extends AbsNormalTarget<FtpDirNormalTarget> {
    * @param dirPath 任务组保存文件夹路径
    */
   @CheckResult(suggest = Suggest.TASK_CONTROLLER)
-  public FtpDirNormalTarget modifyDirPath(String dirPath) {
+  public FtpDirBuilderTarget setDirPath(String dirPath) {
     return mConfigHandler.setDirPath(dirPath);
+  }
+
+  /**
+   * 设置任务组别名
+   */
+  @CheckResult(suggest = Suggest.TASK_CONTROLLER)
+  public FtpDirBuilderTarget setGroupAlias(String alias) {
+    mConfigHandler.setGroupAlias(alias);
+    return this;
   }
 
   /**
    * 设置登陆、字符串编码、ftps等参数
    */
   @CheckResult(suggest = Suggest.TASK_CONTROLLER)
-  public FtpDelegate<FtpDirNormalTarget> option() {
+  public FtpDelegate<FtpDirBuilderTarget> option() {
     return new FtpDelegate<>(this, getTaskWrapper());
   }
 

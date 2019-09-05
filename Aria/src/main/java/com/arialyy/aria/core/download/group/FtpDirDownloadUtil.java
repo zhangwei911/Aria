@@ -17,7 +17,7 @@ package com.arialyy.aria.core.download.group;
 
 import android.net.Uri;
 import android.text.TextUtils;
-import com.arialyy.aria.core.FtpUrlEntity;
+import com.arialyy.aria.core.common.ftp.FtpUrlEntity;
 import com.arialyy.aria.core.common.CompleteInfo;
 import com.arialyy.aria.core.common.OnFileInfoCallback;
 import com.arialyy.aria.core.download.DGTaskWrapper;
