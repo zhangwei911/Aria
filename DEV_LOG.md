@@ -3,6 +3,8 @@
     - fix bug https://github.com/AriaLyy/Aria/issues/450
     - fix bug https://github.com/AriaLyy/Aria/issues/466
     - fix bug https://github.com/AriaLyy/Aria/issues/454
+    - fix bug https://github.com/AriaLyy/Aria/issues/467
+    - fix bug https://github.com/AriaLyy/Aria/issues/459
     - 移除隐藏api的反射 https://github.com/AriaLyy/Aria/issues/456
     - 新增ftp免证书登陆功能h ttps://github.com/AriaLyy/Aria/issues/455
     - 适配androidX

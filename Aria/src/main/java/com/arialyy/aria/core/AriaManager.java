@@ -200,7 +200,7 @@ import org.xml.sax.SAXException;
     Class[] clazzs = new Class[] {
         DownloadEntity.class, UploadEntity.class, DownloadGroupEntity.class
     };
-    String sql = "UPDATE %s SET state=2 WHERE state IN (3,4,5,6)";
+    String sql = "UPDATE %s SET state=2 WHERE state IN (4,5,6)";
     for (Class clazz : clazzs) {
       if (!mDbWrapper.tableExists(clazz)) {
         continue;

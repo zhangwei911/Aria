@@ -16,7 +16,6 @@
 package com.arialyy.aria.core.download.m3u8;
 
 import java.lang.ref.SoftReference;
-import java.lang.ref.WeakReference;
 import java.util.List;
 
 /**
@@ -67,7 +66,7 @@ public class M3U8TaskConfig {
   /**
    * 码率url转换器
    */
-  private WeakReference<IBandWidthUrlConverter> bandWidthUrlConverter;
+  private SoftReference<IBandWidthUrlConverter> bandWidthUrlConverter;
 
   /**
    * 码率地址
@@ -77,7 +76,7 @@ public class M3U8TaskConfig {
   /**
    * 直播下载，ts url转换器
    */
-  private WeakReference<ILiveTsUrlConverter> liveTsUrlConverter;
+  private SoftReference<ILiveTsUrlConverter> liveTsUrlConverter;
 
   /**
    * 直播的m3u8文件更新间隔
@@ -136,7 +135,7 @@ public class M3U8TaskConfig {
   }
 
   public void setLiveTsUrlConverter(ILiveTsUrlConverter liveTsUrlConverter) {
-    this.liveTsUrlConverter = new WeakReference<>(liveTsUrlConverter);
+    this.liveTsUrlConverter = new SoftReference<>(liveTsUrlConverter);
   }
 
   public String getBandWidthUrl() {
@@ -152,7 +151,7 @@ public class M3U8TaskConfig {
   }
 
   public void setBandWidthUrlConverter(IBandWidthUrlConverter bandWidthUrlConverter) {
-    this.bandWidthUrlConverter = new WeakReference<>(bandWidthUrlConverter);
+    this.bandWidthUrlConverter = new SoftReference<>(bandWidthUrlConverter);
   }
 
   public int getBandWidth() {

@@ -28,6 +28,7 @@ import com.arialyy.aria.exception.BaseException;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
 import com.arialyy.aria.util.ErrorHelp;
+import java.lang.ref.SoftReference;
 import java.lang.ref.WeakReference;
 
 public abstract class BaseListener<ENTITY extends AbsEntity, TASK_WRAPPER extends AbsTaskWrapper<ENTITY>,
@@ -35,7 +36,7 @@ public abstract class BaseListener<ENTITY extends AbsEntity, TASK_WRAPPER extend
     implements IEventListener {
   protected static String TAG;
   protected static final int RUN_SAVE_INTERVAL = 5 * 1000;  //5s保存一次下载中的进度
-  protected WeakReference<Handler> outHandler;
+  protected SoftReference<Handler> outHandler;
   private long mLastLen;   //上一次发送长度
   private boolean isFirst = true;
   private TASK mTask;
@@ -46,7 +47,7 @@ public abstract class BaseListener<ENTITY extends AbsEntity, TASK_WRAPPER extend
   private long mUpdateInterval;
 
   protected BaseListener(TASK task, Handler outHandler) {
-    this.outHandler = new WeakReference<>(outHandler);
+    this.outHandler = new SoftReference<>(outHandler);
     mTask = new WeakReference<>(task).get();
     mEntity = mTask.getTaskWrapper().getEntity();
     mTaskWrapper = mTask.getTaskWrapper();

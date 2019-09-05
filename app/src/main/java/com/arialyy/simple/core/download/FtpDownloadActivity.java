@@ -23,6 +23,7 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import com.arialyy.annotations.Download;
 import com.arialyy.aria.core.Aria;
+import com.arialyy.aria.core.common.ProtocolType;
 import com.arialyy.aria.core.common.controller.ControllerType;
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.download.DownloadTask;
@@ -47,6 +48,7 @@ public class FtpDownloadActivity extends BaseActivity<ActivityFtpDownloadBinding
   private String mUrl, mFilePath;
   private FtpDownloadModule mModule;
   private long mTaskId;
+  private String user = "tester", passw = "password";
 
   @Override protected void init(Bundle savedInstanceState) {
     super.init(savedInstanceState);
@@ -94,7 +96,8 @@ public class FtpDownloadActivity extends BaseActivity<ActivityFtpDownloadBinding
           mTaskId = Aria.download(this).loadFtp(mUrl)
               .setFilePath(mFilePath, true)
               .option()
-              .login("lao", "123456")
+              //.login("lao", "123456")
+              .login(user, passw)
               .asFtps()
               .controller(ControllerType.CREATE_CONTROLLER)
               .create();
@@ -108,8 +111,9 @@ public class FtpDownloadActivity extends BaseActivity<ActivityFtpDownloadBinding
           Aria.download(this)
               .loadFtp(mTaskId)
               .option()
-              .login("lao", "123456")
+              .login(user, passw)
               .asFtps()
+              .setProtocol(ProtocolType.SSL)
               .controller(ControllerType.TASK_CONTROLLER)
               .resume();
           getBinding().setStateStr(getString(R.string.stop));

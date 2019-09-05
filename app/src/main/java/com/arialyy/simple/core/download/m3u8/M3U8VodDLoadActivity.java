@@ -16,6 +16,7 @@
 
 package com.arialyy.simple.core.download.m3u8;
 
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -29,11 +30,10 @@ import androidx.lifecycle.ViewModelProviders;
 import com.arialyy.annotations.Download;
 import com.arialyy.annotations.M3U8;
 import com.arialyy.aria.core.Aria;
-import com.arialyy.aria.core.common.controller.ControllerType;
 import com.arialyy.aria.core.common.controller.BuilderController;
+import com.arialyy.aria.core.common.controller.ControllerType;
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.download.DownloadTask;
-import com.arialyy.aria.core.download.m3u8.IBandWidthUrlConverter;
 import com.arialyy.aria.core.download.m3u8.ITsMergeHandler;
 import com.arialyy.aria.core.download.m3u8.IVodTsUrlConverter;
 import com.arialyy.aria.core.download.m3u8.M3U8Entity;
@@ -281,16 +281,17 @@ public class M3U8VodDLoadActivity extends BaseActivity<ActivityM3u8VodBinding> {
           Aria.download(this)
               .load(mTaskId)
               .asM3U8()
-              .setBandWidthUrlConverter(new IBandWidthUrlConverter() {
-                @Override public String convert(String bandWidthUrl) {
-                  int index = mUrl.lastIndexOf("/");
-                  return mUrl.substring(0, index + 1) + bandWidthUrl;
-                }
-              })
+              //.setBandWidthUrlConverter(new IBandWidthUrlConverter() {
+              //  @Override public String convert(String bandWidthUrl) {
+              //    int index = mUrl.lastIndexOf("/");
+              //    return mUrl.substring(0, index + 1) + bandWidthUrl;
+              //  }
+              //})
               .setTsUrlConvert(new IVodTsUrlConverter() {
                 @Override public List<String> convert(String m3u8Url, List<String> tsUrls) {
-                  int index = m3u8Url.lastIndexOf("/");
-                  String parentUrl = m3u8Url.substring(0, index + 1);
+
+                  Uri uri = Uri.parse(m3u8Url);
+                  String parentUrl = uri.getAuthority() + "://" + uri.getHost();
                   List<String> newUrls = new ArrayList<>();
                   for (String url : tsUrls) {
                     newUrls.add(parentUrl + url);
@@ -316,16 +317,22 @@ public class M3U8VodDLoadActivity extends BaseActivity<ActivityM3u8VodBinding> {
         .useServerFileName(true)
         .setFilePath(mFilePath, true)
         .asM3U8()
-        .setBandWidthUrlConverter(new IBandWidthUrlConverter() {
-          @Override public String convert(String bandWidthUrl) {
-            int index = mUrl.lastIndexOf("/");
-            return mUrl.substring(0, index + 1) + bandWidthUrl;
-          }
-        })
+        //.setBandWidthUrlConverter(new IBandWidthUrlConverter() {
+        //  @Override public String convert(String bandWidthUrl) {
+        //    int index = mUrl.lastIndexOf("/");
+        //    return mUrl.substring(0, index + 1) + bandWidthUrl;
+        //  }
+        //})
         .setTsUrlConvert(new IVodTsUrlConverter() {
           @Override public List<String> convert(String m3u8Url, List<String> tsUrls) {
-            int index = m3u8Url.lastIndexOf("/");
-            String parentUrl = m3u8Url.substring(0, index + 1);
+            //int index = m3u8Url.lastIndexOf("/");
+            //String parentUrl = m3u8Url.substring(0, index + 1);
+            //List<String> newUrls = new ArrayList<>();
+            //for (String url : tsUrls) {
+            //  newUrls.add(parentUrl + url);
+            //}
+            Uri uri = Uri.parse(m3u8Url);
+            String parentUrl = uri.getScheme() + "://" + uri.getHost();
             List<String> newUrls = new ArrayList<>();
             for (String url : tsUrls) {
               newUrls.add(parentUrl + url);

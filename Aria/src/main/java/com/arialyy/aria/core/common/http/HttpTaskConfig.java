@@ -19,7 +19,7 @@ package com.arialyy.aria.core.common.http;
 import com.arialyy.aria.core.common.RequestEnum;
 import com.arialyy.aria.core.inf.IHttpFileLenAdapter;
 import com.arialyy.aria.core.inf.ITaskConfig;
-import java.lang.ref.WeakReference;
+import java.lang.ref.SoftReference;
 import java.net.CookieManager;
 import java.net.Proxy;
 import java.util.HashMap;
@@ -78,7 +78,7 @@ public class HttpTaskConfig implements ITaskConfig {
    */
   private Map<String, String> formFields = new HashMap<>();
 
-  private WeakReference<IHttpFileLenAdapter> fileLenAdapter;
+  private SoftReference<IHttpFileLenAdapter> fileLenAdapter;
 
   public IHttpFileLenAdapter getFileLenAdapter() {
     return fileLenAdapter == null ? null : fileLenAdapter.get();
@@ -88,7 +88,7 @@ public class HttpTaskConfig implements ITaskConfig {
    * 如果是匿名内部类，完成后需要将adapter设置为空，否则会出现内存泄漏
    */
   public void setFileLenAdapter(IHttpFileLenAdapter fileLenAdapter) {
-    this.fileLenAdapter = new WeakReference<>(fileLenAdapter);
+    this.fileLenAdapter = new SoftReference<>(fileLenAdapter);
   }
 
   public Map<String, String> getFormFields() {

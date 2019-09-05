@@ -12,7 +12,7 @@ Aria有以下特点：
    - 支持下载FTP文件夹
    - 支持HTTP表单上传
    - 支持文件FTP断点续传上传
-   - 支持FTPS/SFTP断点续传，[see](https://aria.laoyuyu.me/aria_doc/download/ftps.html)
+   - 支持FTPS断点续传，[see](https://aria.laoyuyu.me/aria_doc/download/ftps.html)
  + 支持https地址下载
    - 在配置文件中很容易就可以设置CA证书的信息
  + 支持[多线程分块下载](https://aria.laoyuyu.me/aria_doc/start/config.html)，能更有效的发挥机器IO性能

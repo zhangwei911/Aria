@@ -5,6 +5,7 @@ import com.arialyy.aria.core.download.DGTaskWrapper;
 import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.download.DownloadGroupEntity;
+import com.arialyy.aria.core.inf.AbsEntity;
 import com.arialyy.aria.core.inf.AbsTask;
 import com.arialyy.aria.core.inf.AbsTaskWrapper;
 import com.arialyy.aria.core.inf.IEntity;
@@ -104,7 +105,11 @@ final class ResumeAllCmd<T extends AbsTaskWrapper> extends AbsNormalCmd<T> {
    */
   private void resumeWaitTask() {
     int maxTaskNum = mQueue.getMaxTaskNum();
-    if (mWaitList == null || mWaitList.isEmpty()) return;
+    if (mWaitList == null || mWaitList.isEmpty()) {
+      return;
+    }
+    List<AbsEntity> resumeEntities = new ArrayList<>();
+
     for (AbsTaskWrapper te : mWaitList) {
       if (te instanceof DTaskWrapper) {
         mQueue = DownloadTaskQueue.getInstance();
@@ -119,7 +124,11 @@ final class ResumeAllCmd<T extends AbsTaskWrapper> extends AbsNormalCmd<T> {
         te.getEntity().setState(IEntity.STATE_WAIT);
         AbsTask task = createTask(te);
         sendWaitState(task);
+        resumeEntities.add(te.getEntity());
       }
+    }
+    if (!resumeEntities.isEmpty()) {
+      DbEntity.updateManyData(resumeEntities);
     }
   }
 }

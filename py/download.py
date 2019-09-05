@@ -15,7 +15,8 @@ def downloader(filename):
     data = request.values.get('key')
     print(data)
     dirpath = '/Users/aria/dev/ftp'
-    return send_from_directory(dirpath, filename, as_attachment=True)  # as_attachment=True 一定要写，不然会变成打开，而不是下载
+    # as_attachment=True 一定要写，不然会变成打开，而不是下载
+    return send_from_directory(dirpath, filename, as_attachment=True)
 
 
 @app.route("/download1", methods=['POST', 'GET'])
@@ -27,7 +28,9 @@ def downloader1():
     data = request.values.get('key')
     print(data)
     dirpath = 'D:/test'
-    return send_from_directory(dirpath, filename, as_attachment=True)  # as_attachment=True 一定要写，不然会变成打开，而不是下载
+    # as_attachment=True 一定要写，不然会变成打开，而不是下载
+    return send_from_directory(dirpath, filename, as_attachment=True)
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', debug=True)  # 需要关闭防火墙

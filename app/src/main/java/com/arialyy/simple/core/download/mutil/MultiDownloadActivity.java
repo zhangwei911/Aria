@@ -53,6 +53,10 @@ public class MultiDownloadActivity extends BaseActivity<ActivityMultiDownloadBin
     setTitle("下载列表");
     List<AbsEntity> temps = Aria.download(this).getTotalTaskList();
     if (temps != null && !temps.isEmpty()) {
+
+      for (AbsEntity temp : temps){
+        ALog.d(TAG, "state = " + temp.getState());
+      }
       mData.addAll(temps);
     }
     mAdapter = new DownloadAdapter(this, mData);

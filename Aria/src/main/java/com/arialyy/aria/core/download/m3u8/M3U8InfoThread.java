@@ -133,7 +133,7 @@ final class M3U8InfoThread implements Runnable {
         if (line.startsWith("#EXT-X-ENDLIST")) {
           break;
         }
-        //ALog.d(TAG, line);
+        ALog.d(TAG, line);
         if (line.startsWith("#EXTINF")) {
           String info = reader.readLine();
           mInfos.add(info);

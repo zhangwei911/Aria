@@ -145,10 +145,10 @@ public abstract class AbsFileer<ENTITY extends AbsNormalEntity, TASK_WRAPPER ext
             || mStateManager.isFail()
             || !isRunning()
             || isBreak()) {
-          ALog.d(TAG, "isComplete = " + mStateManager.isComplete()
-              + "; isFail = " + mStateManager.isFail()
-              + "; isRunning = " + isRunning()
-              + "; isBreak = " + isBreak());
+          //ALog.d(TAG, "isComplete = " + mStateManager.isComplete()
+          //    + "; isFail = " + mStateManager.isFail()
+          //    + "; isRunning = " + isRunning()
+          //    + "; isBreak = " + isBreak());
           ThreadTaskManager.getInstance().removeTaskThread(mTaskWrapper.getKey());
           closeTimer();
           onDestroy();
