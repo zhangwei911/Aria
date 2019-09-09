@@ -28,6 +28,7 @@ public interface ITaskWrapper<ENTITY extends AbsEntity> {
    * HTTP单任务载
    */
   int D_HTTP = 1;
+
   /**
    * HTTP任务组下载
    */
@@ -37,6 +38,7 @@ public interface ITaskWrapper<ENTITY extends AbsEntity> {
    * FTP单文件下载
    */
   int D_FTP = 3;
+
   /**
    * FTP文件夹下载，为避免登录过多，子任务由单线程进行处理
    */
@@ -46,6 +48,7 @@ public interface ITaskWrapper<ENTITY extends AbsEntity> {
    * HTTP单文件上传
    */
   int U_HTTP = 5;
+
   /**
    * FTP单文件上传
    */
@@ -60,6 +63,21 @@ public interface ITaskWrapper<ENTITY extends AbsEntity> {
    * m3u8直播
    */
   int M3U8_LIVE = 8;
+
+  /**
+   * TCP 文件下载
+   */
+  int D_TCP = 9;
+
+  /**
+   * TCP 文件上传
+   */
+  int U_TCP = 10;
+
+  /**
+   * TCP 分片上传
+   */
+  int U_TCP_PEER = 11;
 
   ENTITY getEntity();
 }

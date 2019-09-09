@@ -51,7 +51,7 @@ public class CheckDEntityUtil implements ICheckEntityUtil {
       return false;
     }
 
-    boolean b = checkFtps() && checkUrl() && checkFilePath();
+    boolean b = checkUrl() && checkFilePath();
     if (b) {
       mEntity.save();
     }
@@ -186,18 +186,6 @@ public class CheckDEntityUtil implements ICheckEntityUtil {
     if (!TextUtils.isEmpty(mWrapper.getTempUrl())) {
       mEntity.setUrl(mWrapper.getTempUrl());
     }
-    return true;
-  }
-
-  private boolean checkFtps() {
-    //if (mWrapper.getRequestType() == ITaskWrapper.D_FTP && mWrapper.asFtp()
-    //    .getUrlEntity().isFtps) {
-    //  String ftpUrl = mEntity.getUrl();
-    //  if (!ftpUrl.startsWith("ftps") && !ftpUrl.startsWith("sftp")) {
-    //    ALog.e(TAG, String.format("地址【%s】错误，ftps地址开头必须是：ftps或sftp", ftpUrl));
-    //    return false;
-    //  }
-    //}
     return true;
   }
 }

@@ -15,7 +15,6 @@
  */
 package com.arialyy.aria.core.download;
 
-import android.text.TextUtils;
 import androidx.annotation.CheckResult;
 import androidx.annotation.NonNull;
 import com.arialyy.annotations.TaskEnum;
@@ -24,16 +23,15 @@ import com.arialyy.aria.core.command.CancelAllCmd;
 import com.arialyy.aria.core.command.NormalCmdFactory;
 import com.arialyy.aria.core.common.AbsBuilderTarget;
 import com.arialyy.aria.core.common.ProxyHelper;
-import com.arialyy.aria.core.download.group.FtpDirBuilderTarget;
-import com.arialyy.aria.core.download.group.FtpDirNormalTarget;
-import com.arialyy.aria.core.download.group.GroupBuilderTarget;
-import com.arialyy.aria.core.download.group.GroupNormalTarget;
-import com.arialyy.aria.core.download.group.GroupTargetFactory;
-import com.arialyy.aria.core.download.normal.FtpBuilderTarget;
-import com.arialyy.aria.core.download.normal.FtpNormalTarget;
-import com.arialyy.aria.core.download.normal.HttpBuilderTarget;
-import com.arialyy.aria.core.download.normal.HttpNormalTarget;
-import com.arialyy.aria.core.download.normal.DNormalTargetFactory;
+import com.arialyy.aria.core.download.target.DTargetFactory;
+import com.arialyy.aria.core.download.target.FtpBuilderTarget;
+import com.arialyy.aria.core.download.target.FtpDirBuilderTarget;
+import com.arialyy.aria.core.download.target.FtpDirNormalTarget;
+import com.arialyy.aria.core.download.target.FtpNormalTarget;
+import com.arialyy.aria.core.download.target.GroupBuilderTarget;
+import com.arialyy.aria.core.download.target.GroupNormalTarget;
+import com.arialyy.aria.core.download.target.HttpBuilderTarget;
+import com.arialyy.aria.core.download.target.HttpNormalTarget;
 import com.arialyy.aria.core.event.EventMsgUtil;
 import com.arialyy.aria.core.inf.AbsEntity;
 import com.arialyy.aria.core.inf.AbsReceiver;
@@ -76,8 +74,8 @@ public class DownloadReceiver extends AbsReceiver {
   @CheckResult
   public HttpBuilderTarget load(@NonNull String url) {
     CheckUtil.checkUrlInvalidThrow(url);
-    return DNormalTargetFactory.getInstance()
-        .generateBuilderTarget(HttpBuilderTarget.class, url, targetName);
+    return DTargetFactory.getInstance()
+        .generateBuilderTarget(HttpBuilderTarget.class, url);
   }
 
   /**
@@ -89,8 +87,8 @@ public class DownloadReceiver extends AbsReceiver {
   @CheckResult
   public HttpNormalTarget load(long taskId) {
     CheckUtil.checkTaskId(taskId);
-    return DNormalTargetFactory.getInstance()
-        .generateNormalTarget(HttpNormalTarget.class, taskId, targetName);
+    return DTargetFactory.getInstance()
+        .generateNormalTarget(HttpNormalTarget.class, taskId);
   }
 
   /**
@@ -101,7 +99,7 @@ public class DownloadReceiver extends AbsReceiver {
   @CheckResult
   public GroupBuilderTarget loadGroup(List<String> urls) {
     CheckUtil.checkDownloadUrls(urls);
-    return GroupTargetFactory.getInstance().generateGroupBuilderTarget(urls, targetName);
+    return DTargetFactory.getInstance().generateGroupBuilderTarget(urls);
   }
 
   /**
@@ -113,8 +111,8 @@ public class DownloadReceiver extends AbsReceiver {
   @CheckResult
   public GroupNormalTarget loadGroup(long taskId) {
     CheckUtil.checkTaskId(taskId);
-    return GroupTargetFactory.getInstance()
-        .generateNormalTarget(GroupNormalTarget.class, taskId, targetName);
+    return DTargetFactory.getInstance()
+        .generateNormalTarget(GroupNormalTarget.class, taskId);
   }
 
   /**
@@ -123,8 +121,8 @@ public class DownloadReceiver extends AbsReceiver {
   @CheckResult
   public FtpBuilderTarget loadFtp(@NonNull String url) {
     CheckUtil.checkUrlInvalidThrow(url);
-    return DNormalTargetFactory.getInstance()
-        .generateBuilderTarget(FtpBuilderTarget.class, url, targetName);
+    return DTargetFactory.getInstance()
+        .generateBuilderTarget(FtpBuilderTarget.class, url);
   }
 
   /**
@@ -136,8 +134,8 @@ public class DownloadReceiver extends AbsReceiver {
   @CheckResult
   public FtpNormalTarget loadFtp(long taskId) {
     CheckUtil.checkTaskId(taskId);
-    return DNormalTargetFactory.getInstance()
-        .generateNormalTarget(FtpNormalTarget.class, taskId, targetName);
+    return DTargetFactory.getInstance()
+        .generateNormalTarget(FtpNormalTarget.class, taskId);
   }
 
   /**
@@ -146,7 +144,7 @@ public class DownloadReceiver extends AbsReceiver {
   @CheckResult
   public FtpDirBuilderTarget loadFtpDir(@NonNull String dirUrl) {
     CheckUtil.checkUrlInvalidThrow(dirUrl);
-    return GroupTargetFactory.getInstance().generateDirBuilderTarget(dirUrl, targetName);
+    return DTargetFactory.getInstance().generateDirBuilderTarget(dirUrl);
   }
 
   /**
@@ -158,21 +156,17 @@ public class DownloadReceiver extends AbsReceiver {
   @CheckResult
   public FtpDirNormalTarget loadFtpDir(long taskId) {
     CheckUtil.checkTaskId(taskId);
-    return GroupTargetFactory.getInstance()
-        .generateNormalTarget(FtpDirNormalTarget.class, taskId, targetName);
+    return DTargetFactory.getInstance()
+        .generateNormalTarget(FtpDirNormalTarget.class, taskId);
   }
 
   /**
    * 将当前类注册到Aria
    */
   public void register() {
-    if (TextUtils.isEmpty(targetName)) {
-      ALog.e(TAG, "download register target null");
-      return;
-    }
     Object obj = OBJ_MAP.get(getKey());
     if (obj == null) {
-      ALog.e(TAG, String.format("【%s】观察者为空", targetName));
+      ALog.e(TAG, String.format("【%s】观察者为空", getTargetName()));
       return;
     }
     Set<Integer> set = ProxyHelper.getInstance().checkProxyType(obj.getClass());
@@ -216,13 +210,9 @@ public class DownloadReceiver extends AbsReceiver {
   }
 
   @Override protected void unRegisterListener() {
-    if (TextUtils.isEmpty(targetName)) {
-      ALog.e(TAG, "download unRegisterListener target null");
-      return;
-    }
     Object obj = OBJ_MAP.get(getKey());
     if (obj == null) {
-      ALog.e(TAG, String.format("【%s】观察者为空", targetName));
+      ALog.e(TAG, String.format("【%s】观察者为空", getTargetName()));
       return;
     }
     Set<Integer> set = ProxyHelper.getInstance().mProxyCache.get(obj.getClass().getName());

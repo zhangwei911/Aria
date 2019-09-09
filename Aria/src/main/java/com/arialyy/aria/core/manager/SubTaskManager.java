@@ -30,10 +30,8 @@ import java.util.List;
 public class SubTaskManager {
   private String TAG = "SubTaskManager";
   private DGTaskWrapper mEntity;
-  private String mTargetName;
 
-  public SubTaskManager(String targetName, DGTaskWrapper entity) {
-    mTargetName = targetName;
+  public SubTaskManager(DGTaskWrapper entity) {
     mEntity = entity;
   }
 
@@ -44,9 +42,8 @@ public class SubTaskManager {
    */
   public void startSubTask(String url) {
     if (checkUrl(url)) {
-      EventMsgUtil.getDefault()
-          .post(
-              CommonUtil.createGroupCmd(mTargetName, mEntity, GroupCmdFactory.SUB_TASK_START, url));
+      EventMsgUtil.getDefault().post(
+          CommonUtil.createGroupCmd(mEntity, GroupCmdFactory.SUB_TASK_START, url));
     }
   }
 
@@ -57,9 +54,8 @@ public class SubTaskManager {
    */
   public void stopSubTask(String url) {
     if (checkUrl(url)) {
-      EventMsgUtil.getDefault()
-          .post(
-              CommonUtil.createGroupCmd(mTargetName, mEntity, GroupCmdFactory.SUB_TASK_STOP, url));
+      EventMsgUtil.getDefault().post(
+          CommonUtil.createGroupCmd(mEntity, GroupCmdFactory.SUB_TASK_STOP, url));
     }
   }
 

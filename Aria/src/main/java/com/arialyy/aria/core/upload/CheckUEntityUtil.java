@@ -17,7 +17,6 @@ package com.arialyy.aria.core.upload;
 
 import android.text.TextUtils;
 import com.arialyy.aria.core.inf.ICheckEntityUtil;
-import com.arialyy.aria.core.inf.ITaskWrapper;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CheckUtil;
 import java.io.File;
@@ -43,7 +42,7 @@ public class CheckUEntityUtil implements ICheckEntityUtil {
       return false;
     }
 
-    boolean b = checkFtps() && checkUrl() && checkFilePath();
+    boolean b = checkUrl() && checkFilePath();
     if (b) {
       mEntity.save();
     }
@@ -88,18 +87,6 @@ public class CheckUEntityUtil implements ICheckEntityUtil {
       return false;
     }
     mEntity.setUrl(url);
-    return true;
-  }
-
-  private boolean checkFtps() {
-    //if (mWrapper.getRequestType() == ITaskWrapper.U_FTP && mWrapper.asFtp()
-    //    .getUrlEntity().isFtps) {
-    //  String ftpUrl = mEntity.getUrl();
-    //  if (!ftpUrl.startsWith("ftps") && !ftpUrl.startsWith("sftp")) {
-    //    ALog.e(TAG, String.format("地址【%s】错误，ftps地址开头必须是：ftps或sftp", ftpUrl));
-    //    return false;
-    //  }
-    //}
     return true;
   }
 }

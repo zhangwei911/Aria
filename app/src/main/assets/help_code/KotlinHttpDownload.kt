@@ -21,7 +21,7 @@ import android.widget.Button
 import android.widget.Toast
 import com.arialyy.annotations.Download
 import com.arialyy.aria.core.Aria
-import com.arialyy.aria.core.download.normal.HttpNormalTarget
+import com.arialyy.aria.core.download.target.HttpNormalTarget
 import com.arialyy.aria.core.download.DownloadTask
 import com.arialyy.aria.core.inf.IEntity
 import com.arialyy.simple.R

@@ -30,11 +30,11 @@ import com.arialyy.aria.core.inf.AbsReceiver;
 import com.arialyy.aria.core.inf.ITask;
 import com.arialyy.aria.core.inf.ReceiverType;
 import com.arialyy.aria.core.scheduler.TaskSchedulers;
-import com.arialyy.aria.core.upload.normal.FtpBuilderTarget;
-import com.arialyy.aria.core.upload.normal.FtpNormalTarget;
-import com.arialyy.aria.core.upload.normal.HttpBuilderTarget;
-import com.arialyy.aria.core.upload.normal.HttpNormalTarget;
-import com.arialyy.aria.core.upload.normal.UNormalTargetFactory;
+import com.arialyy.aria.core.upload.target.FtpBuilderTarget;
+import com.arialyy.aria.core.upload.target.FtpNormalTarget;
+import com.arialyy.aria.core.upload.target.HttpBuilderTarget;
+import com.arialyy.aria.core.upload.target.HttpNormalTarget;
+import com.arialyy.aria.core.upload.target.UTargetFactory;
 import com.arialyy.aria.orm.DbEntity;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CheckUtil;
@@ -69,8 +69,8 @@ public class UploadReceiver extends AbsReceiver {
   @CheckResult
   public HttpBuilderTarget load(@NonNull String filePath) {
     CheckUtil.checkUploadPath(filePath);
-    return UNormalTargetFactory.getInstance()
-        .generateBuilderTarget(HttpBuilderTarget.class, filePath, targetName);
+    return UTargetFactory.getInstance()
+        .generateBuilderTarget(HttpBuilderTarget.class, filePath);
   }
 
   /**
@@ -82,8 +82,8 @@ public class UploadReceiver extends AbsReceiver {
   @CheckResult
   public HttpNormalTarget load(long taskId) {
     CheckUtil.checkTaskId(taskId);
-    return UNormalTargetFactory.getInstance()
-        .generateNormalTarget(HttpNormalTarget.class, taskId, targetName);
+    return UTargetFactory.getInstance()
+        .generateNormalTarget(HttpNormalTarget.class, taskId);
   }
 
   /**
@@ -94,8 +94,8 @@ public class UploadReceiver extends AbsReceiver {
   @CheckResult
   public FtpBuilderTarget loadFtp(@NonNull String filePath) {
     CheckUtil.checkUploadPath(filePath);
-    return UNormalTargetFactory.getInstance()
-        .generateBuilderTarget(FtpBuilderTarget.class, filePath, targetName);
+    return UTargetFactory.getInstance()
+        .generateBuilderTarget(FtpBuilderTarget.class, filePath);
   }
 
   /**
@@ -107,8 +107,8 @@ public class UploadReceiver extends AbsReceiver {
   @CheckResult
   public FtpNormalTarget loadFtp(long taskId) {
     CheckUtil.checkTaskId(taskId);
-    return UNormalTargetFactory.getInstance()
-        .generateNormalTarget(FtpNormalTarget.class, taskId, targetName);
+    return UTargetFactory.getInstance()
+        .generateNormalTarget(FtpNormalTarget.class, taskId);
   }
 
   /**
@@ -252,13 +252,9 @@ public class UploadReceiver extends AbsReceiver {
    * 将当前类注册到Aria
    */
   public void register() {
-    if (TextUtils.isEmpty(targetName)) {
-      ALog.e(TAG, "upload register target null");
-      return;
-    }
     Object obj = OBJ_MAP.get(getKey());
     if (obj == null) {
-      ALog.e(TAG, String.format("【%s】观察者为空", targetName));
+      ALog.e(TAG, String.format("【%s】观察者为空", getTargetName()));
       return;
     }
     Set<Integer> set = ProxyHelper.getInstance().checkProxyType(obj.getClass());
@@ -289,13 +285,9 @@ public class UploadReceiver extends AbsReceiver {
   }
 
   @Override protected void unRegisterListener() {
-    if (TextUtils.isEmpty(targetName)) {
-      ALog.e(TAG, "upload unRegisterListener target null");
-      return;
-    }
     Object obj = OBJ_MAP.get(getKey());
     if (obj == null) {
-      ALog.e(TAG, String.format("【%s】观察者为空", targetName));
+      ALog.e(TAG, String.format("【%s】观察者为空", getTargetName()));
       return;
     }
 

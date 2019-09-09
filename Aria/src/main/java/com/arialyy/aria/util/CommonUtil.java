@@ -24,11 +24,11 @@ import android.os.Environment;
 import android.text.TextUtils;
 import android.util.Base64;
 import com.arialyy.aria.core.AriaManager;
-import com.arialyy.aria.core.common.ftp.FtpUrlEntity;
 import com.arialyy.aria.core.command.AbsGroupCmd;
 import com.arialyy.aria.core.command.AbsNormalCmd;
 import com.arialyy.aria.core.command.GroupCmdFactory;
 import com.arialyy.aria.core.command.NormalCmdFactory;
+import com.arialyy.aria.core.common.ftp.FtpUrlEntity;
 import com.arialyy.aria.core.inf.AbsGroupTaskWrapper;
 import com.arialyy.aria.core.inf.AbsTaskWrapper;
 import com.arialyy.aria.core.inf.ITask;
@@ -558,9 +558,9 @@ public class CommonUtil {
    *
    * @param childUrl 子任务url
    */
-  public static <T extends AbsGroupTaskWrapper> AbsGroupCmd createGroupCmd(String target, T entity,
-      int cmd, String childUrl) {
-    return GroupCmdFactory.getInstance().createCmd(target, entity, cmd, childUrl);
+  public static <T extends AbsGroupTaskWrapper> AbsGroupCmd createGroupCmd(T entity, int cmd,
+      String childUrl) {
+    return GroupCmdFactory.getInstance().createCmd(entity, cmd, childUrl);
   }
 
   /**

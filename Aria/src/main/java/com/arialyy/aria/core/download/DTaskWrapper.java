@@ -18,6 +18,7 @@ package com.arialyy.aria.core.download;
 import com.arialyy.aria.core.config.Configuration;
 import com.arialyy.aria.core.config.DownloadConfig;
 import com.arialyy.aria.core.download.m3u8.M3U8TaskConfig;
+import com.arialyy.aria.core.download.tcp.TcpTaskConfig;
 import com.arialyy.aria.core.inf.AbsTaskWrapper;
 
 /**
@@ -35,12 +36,21 @@ public class DTaskWrapper extends AbsTaskWrapper<DownloadEntity> {
    */
   private boolean isGroupTask = false;
 
+  /**
+   * M3u8任务配置信息
+   */
   private M3U8TaskConfig m3u8TaskConfig;
+
+  /**
+   * TCP任务配置信息
+   */
+  private TcpTaskConfig tcpTaskConfig;
 
   /**
    * 文件下载url的临时保存变量
    */
   private String mTempUrl;
+
   /**
    * 文件保存路径的临时变量
    */
@@ -60,6 +70,13 @@ public class DTaskWrapper extends AbsTaskWrapper<DownloadEntity> {
       m3u8TaskConfig = new M3U8TaskConfig();
     }
     return m3u8TaskConfig;
+  }
+
+  public TcpTaskConfig asTcp() {
+    if (tcpTaskConfig == null) {
+      tcpTaskConfig = new TcpTaskConfig();
+    }
+    return tcpTaskConfig;
   }
 
   /**
