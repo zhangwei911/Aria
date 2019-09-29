@@ -17,9 +17,9 @@ package com.arialyy.aria.core.upload.target;
 
 import androidx.annotation.CheckResult;
 import com.arialyy.aria.core.common.AbsBuilderTarget;
-import com.arialyy.aria.core.common.Suggest;
-import com.arialyy.aria.core.common.http.HttpDelegate;
-import com.arialyy.aria.core.inf.AbsTaskWrapper;
+import com.arialyy.aria.core.inf.Suggest;
+import com.arialyy.aria.core.common.HttpDelegate;
+import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
 
 /**
  * Created by lyy on 2017/2/28.

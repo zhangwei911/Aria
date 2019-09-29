@@ -22,7 +22,7 @@ import com.arialyy.aria.core.event.ErrorEvent;
 import com.arialyy.aria.core.inf.AbsTarget;
 import com.arialyy.aria.core.inf.IConfigHandler;
 import com.arialyy.aria.core.manager.TaskWrapperManager;
-import com.arialyy.aria.core.queue.DownloadTaskQueue;
+import com.arialyy.aria.core.queue.DTaskQueue;
 import com.arialyy.aria.orm.DbEntity;
 import com.arialyy.aria.util.ALog;
 
@@ -83,7 +83,7 @@ class DNormalConfigHandler<TARGET extends AbsTarget> implements IConfigHandler {
   }
 
   @Override public boolean isRunning() {
-    return DownloadTaskQueue.getInstance().taskIsRunning(mEntity.getKey());
+    return DTaskQueue.getInstance().taskIsRunning(mEntity.getKey());
   }
 
   void setForceDownload(boolean forceDownload) {

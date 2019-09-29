@@ -26,8 +26,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.arialyy.annotations.Download;
 import com.arialyy.annotations.DownloadGroup;
 import com.arialyy.aria.core.Aria;
-import com.arialyy.aria.core.download.DownloadGroupTask;
-import com.arialyy.aria.core.download.DownloadTask;
+import com.arialyy.aria.core.task.DownloadGroupTask;
+import com.arialyy.aria.core.task.DownloadTask;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.frame.util.FileUtil;
 import com.arialyy.simple.R;
@@ -105,7 +105,7 @@ public class MultiTaskActivity extends BaseActivity<ActivityMultiBinding> {
   }
 
   @Download.onTaskComplete void taskComplete(DownloadTask task) {
-    Log.d(TAG, FileUtil.getFileMD5(new File(task.getDownloadPath())));
+    Log.d(TAG, FileUtil.getFileMD5(new File(task.getFilePath())));
   }
 
   //############################### 任务组 ##############################

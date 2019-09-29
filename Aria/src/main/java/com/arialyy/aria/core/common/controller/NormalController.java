@@ -18,9 +18,9 @@ package com.arialyy.aria.core.common.controller;
 import com.arialyy.aria.core.command.CancelCmd;
 import com.arialyy.aria.core.command.NormalCmdFactory;
 import com.arialyy.aria.core.event.EventMsgUtil;
-import com.arialyy.aria.core.inf.AbsTaskWrapper;
+import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
 import com.arialyy.aria.util.ALog;
-import com.arialyy.aria.util.CommonUtil;
+import com.arialyy.aria.core.command.CmdHelper;
 
 /**
  * 启动控制器
@@ -39,7 +39,7 @@ public final class NormalController extends FeatureController implements INormal
   public void stop() {
     if (checkConfig()) {
       EventMsgUtil.getDefault()
-          .post(CommonUtil.createNormalCmd(getTaskWrapper(), NormalCmdFactory.TASK_STOP,
+          .post(CmdHelper.createNormalCmd(getTaskWrapper(), NormalCmdFactory.TASK_STOP,
               checkTaskType()));
     }
   }
@@ -51,7 +51,7 @@ public final class NormalController extends FeatureController implements INormal
   public void resume() {
     if (checkConfig()) {
       EventMsgUtil.getDefault()
-          .post(CommonUtil.createNormalCmd(getTaskWrapper(), NormalCmdFactory.TASK_START,
+          .post(CmdHelper.createNormalCmd(getTaskWrapper(), NormalCmdFactory.TASK_START,
               checkTaskType()));
     }
   }
@@ -63,7 +63,7 @@ public final class NormalController extends FeatureController implements INormal
   public void cancel() {
     if (checkConfig()) {
       EventMsgUtil.getDefault()
-          .post(CommonUtil.createNormalCmd(getTaskWrapper(), NormalCmdFactory.TASK_CANCEL,
+          .post(CmdHelper.createNormalCmd(getTaskWrapper(), NormalCmdFactory.TASK_CANCEL,
               checkTaskType()));
     }
   }
@@ -76,10 +76,10 @@ public final class NormalController extends FeatureController implements INormal
     if (checkConfig()) {
       int taskType = checkTaskType();
       EventMsgUtil.getDefault()
-          .post(CommonUtil.createNormalCmd(getTaskWrapper(), NormalCmdFactory.TASK_STOP, taskType));
+          .post(CmdHelper.createNormalCmd(getTaskWrapper(), NormalCmdFactory.TASK_STOP, taskType));
       EventMsgUtil.getDefault()
           .post(
-              CommonUtil.createNormalCmd(getTaskWrapper(), NormalCmdFactory.TASK_START, taskType));
+              CmdHelper.createNormalCmd(getTaskWrapper(), NormalCmdFactory.TASK_START, taskType));
     }
   }
 
@@ -93,7 +93,7 @@ public final class NormalController extends FeatureController implements INormal
   public void cancel(boolean removeFile) {
     if (checkConfig()) {
       CancelCmd cancelCmd =
-          (CancelCmd) CommonUtil.createNormalCmd(getTaskWrapper(), NormalCmdFactory.TASK_CANCEL,
+          (CancelCmd) CmdHelper.createNormalCmd(getTaskWrapper(), NormalCmdFactory.TASK_CANCEL,
               checkTaskType());
       cancelCmd.removeFile = removeFile;
       EventMsgUtil.getDefault().post(cancelCmd);
@@ -107,7 +107,7 @@ public final class NormalController extends FeatureController implements INormal
   public void reStart() {
     if (checkConfig()) {
       EventMsgUtil.getDefault()
-          .post(CommonUtil.createNormalCmd(getTaskWrapper(), NormalCmdFactory.TASK_RESTART,
+          .post(CmdHelper.createNormalCmd(getTaskWrapper(), NormalCmdFactory.TASK_RESTART,
               checkTaskType()));
     }
   }

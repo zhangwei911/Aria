@@ -18,7 +18,7 @@ package com.arialyy.aria.core.queue.pool;
 
 import android.text.TextUtils;
 import com.arialyy.aria.core.AriaManager;
-import com.arialyy.aria.core.inf.AbsTask;
+import com.arialyy.aria.core.task.AbsTask;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
 import java.util.Map;

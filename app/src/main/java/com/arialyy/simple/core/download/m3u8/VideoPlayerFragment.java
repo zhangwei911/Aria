@@ -13,7 +13,7 @@ import android.widget.SeekBar;
 import androidx.annotation.RequiresApi;
 import androidx.lifecycle.ViewModelProviders;
 import com.arialyy.aria.core.download.DownloadEntity;
-import com.arialyy.aria.core.download.m3u8.M3U8Entity;
+import com.arialyy.aria.core.download.M3U8Entity;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.frame.base.BaseFragment;
 import com.arialyy.simple.R;

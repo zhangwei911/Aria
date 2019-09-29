@@ -17,9 +17,9 @@ package com.arialyy.aria.core.download.target;
 
 import androidx.annotation.CheckResult;
 import com.arialyy.aria.core.common.AbsNormalTarget;
-import com.arialyy.aria.core.common.Suggest;
-import com.arialyy.aria.core.common.http.HttpDelegate;
-import com.arialyy.aria.core.inf.ITaskWrapper;
+import com.arialyy.aria.core.inf.Suggest;
+import com.arialyy.aria.core.common.HttpDelegate;
+import com.arialyy.aria.core.wrapper.ITaskWrapper;
 import com.arialyy.aria.core.manager.SubTaskManager;
 import java.util.List;
 

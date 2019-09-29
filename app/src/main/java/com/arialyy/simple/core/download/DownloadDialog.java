@@ -24,7 +24,7 @@ import android.widget.TextView;
 import com.arialyy.annotations.Download;
 import com.arialyy.aria.core.Aria;
 import com.arialyy.aria.core.download.DownloadEntity;
-import com.arialyy.aria.core.download.DownloadTask;
+import com.arialyy.aria.core.task.DownloadTask;
 import com.arialyy.aria.util.CommonUtil;
 import com.arialyy.frame.core.AbsDialog;
 import com.arialyy.simple.R;

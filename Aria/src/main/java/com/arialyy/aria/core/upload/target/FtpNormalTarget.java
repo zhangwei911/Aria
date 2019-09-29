@@ -17,9 +17,10 @@ package com.arialyy.aria.core.upload.target;
 
 import androidx.annotation.CheckResult;
 import com.arialyy.aria.core.common.AbsNormalTarget;
-import com.arialyy.aria.core.common.Suggest;
-import com.arialyy.aria.core.common.ftp.FtpDelegate;
-import com.arialyy.aria.core.inf.AbsTaskWrapper;
+import com.arialyy.aria.core.inf.Suggest;
+import com.arialyy.aria.core.common.FtpDelegate;
+import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
+import com.arialyy.aria.core.inf.IOptionConstant;
 import com.arialyy.aria.core.upload.UploadEntity;
 import com.arialyy.aria.util.CommonUtil;
 
@@ -32,7 +33,9 @@ public class FtpNormalTarget extends AbsNormalTarget<FtpNormalTarget> {
 
   FtpNormalTarget(long taskId) {
     mConfigHandler = new UNormalConfigHandler<>(this, taskId);
-    getTaskWrapper().asFtp().setUrlEntity(CommonUtil.getFtpUrlInfo(getEntity().getUrl()));
+    getTaskWrapper().getOptionParams()
+        .setParams(IOptionConstant.ftpUrlEntity, CommonUtil.getFtpUrlInfo(getEntity().getUrl()));
+
     getTaskWrapper().setRequestType(AbsTaskWrapper.U_FTP);
   }
 

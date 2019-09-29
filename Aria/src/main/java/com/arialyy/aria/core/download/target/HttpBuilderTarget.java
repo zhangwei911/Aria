@@ -18,11 +18,12 @@ package com.arialyy.aria.core.download.target;
 import androidx.annotation.CheckResult;
 import androidx.annotation.NonNull;
 import com.arialyy.aria.core.common.AbsBuilderTarget;
-import com.arialyy.aria.core.common.Suggest;
-import com.arialyy.aria.core.common.http.HttpDelegate;
+import com.arialyy.aria.core.common.HttpDelegate;
 import com.arialyy.aria.core.download.m3u8.M3U8Delegate;
-import com.arialyy.aria.core.inf.IHttpFileLenAdapter;
-import com.arialyy.aria.core.inf.ITaskWrapper;
+import com.arialyy.aria.core.processor.IHttpFileLenAdapter;
+import com.arialyy.aria.core.inf.IOptionConstant;
+import com.arialyy.aria.core.inf.Suggest;
+import com.arialyy.aria.core.wrapper.ITaskWrapper;
 
 public class HttpBuilderTarget extends AbsBuilderTarget<HttpBuilderTarget> {
 
@@ -54,7 +55,7 @@ public class HttpBuilderTarget extends AbsBuilderTarget<HttpBuilderTarget> {
    */
   @CheckResult(suggest = Suggest.TASK_CONTROLLER)
   public HttpBuilderTarget useServerFileName(boolean use) {
-    getTaskWrapper().asHttp().setUseServerFileName(use);
+    getTaskWrapper().getOptionParams().setParams(IOptionConstant.useServerFileName, use);
     return this;
   }
 
@@ -94,7 +95,8 @@ public class HttpBuilderTarget extends AbsBuilderTarget<HttpBuilderTarget> {
     if (adapter == null) {
       throw new IllegalArgumentException("adapter为空");
     }
-    getTaskWrapper().asHttp().setFileLenAdapter(adapter);
+
+    getTaskWrapper().getOptionParams().setParams(IOptionConstant.fileLenAdapter, adapter);
     return this;
   }
 }

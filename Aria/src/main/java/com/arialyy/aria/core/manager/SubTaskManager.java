@@ -20,7 +20,7 @@ import com.arialyy.aria.core.command.GroupCmdFactory;
 import com.arialyy.aria.core.download.DGTaskWrapper;
 import com.arialyy.aria.core.event.EventMsgUtil;
 import com.arialyy.aria.util.ALog;
-import com.arialyy.aria.util.CommonUtil;
+import com.arialyy.aria.core.command.CmdHelper;
 import java.util.List;
 
 /**
@@ -43,7 +43,7 @@ public class SubTaskManager {
   public void startSubTask(String url) {
     if (checkUrl(url)) {
       EventMsgUtil.getDefault().post(
-          CommonUtil.createGroupCmd(mEntity, GroupCmdFactory.SUB_TASK_START, url));
+          CmdHelper.createGroupCmd(mEntity, GroupCmdFactory.SUB_TASK_START, url));
     }
   }
 
@@ -55,7 +55,7 @@ public class SubTaskManager {
   public void stopSubTask(String url) {
     if (checkUrl(url)) {
       EventMsgUtil.getDefault().post(
-          CommonUtil.createGroupCmd(mEntity, GroupCmdFactory.SUB_TASK_STOP, url));
+          CmdHelper.createGroupCmd(mEntity, GroupCmdFactory.SUB_TASK_STOP, url));
     }
   }
 

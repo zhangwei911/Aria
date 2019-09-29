@@ -30,9 +30,8 @@ import androidx.lifecycle.ViewModelProviders
 import com.arialyy.annotations.Download
 import com.arialyy.aria.core.Aria
 import com.arialyy.aria.core.download.DownloadEntity
-import com.arialyy.aria.core.download.DownloadTask
 import com.arialyy.aria.core.inf.IEntity
-import com.arialyy.aria.core.scheduler.ISchedulers
+import com.arialyy.aria.core.listener.ISchedulers
 import com.arialyy.aria.util.ALog
 import com.arialyy.aria.util.CommonUtil
 import com.arialyy.frame.util.show.T
@@ -59,10 +58,22 @@ class KotlinDownloadActivity : BaseActivity<ActivitySingleKotlinBinding>() {
       intent: Intent
     ) {
       if (intent.action == ISchedulers.ARIA_TASK_INFO_ACTION) {
-        ALog.d(TAG, "state = " + intent.getIntExtra(ISchedulers.TASK_STATE, -1))
-        ALog.d(TAG, "type = " + intent.getIntExtra(ISchedulers.TASK_TYPE, -1))
-        ALog.d(TAG, "speed = " + intent.getLongExtra(ISchedulers.TASK_SPEED, -1))
-        ALog.d(TAG, "percent = " + intent.getIntExtra(ISchedulers.TASK_PERCENT, -1))
+        ALog.d(
+            TAG,
+            "state = " + intent.getIntExtra(ISchedulers.TASK_STATE, -1)
+        )
+        ALog.d(
+            TAG, "type = " + intent.getIntExtra(ISchedulers.TASK_TYPE, -1)
+        )
+        ALog.d(
+            TAG,
+            "speed = " + intent.getLongExtra(ISchedulers.TASK_SPEED, -1)
+        )
+        ALog.d(
+            TAG, "percent = " + intent.getIntExtra(
+            ISchedulers.TASK_PERCENT, -1
+        )
+        )
         ALog.d(
             TAG, "entity = " + intent.getParcelableExtra<DownloadEntity>(
             ISchedulers.TASK_ENTITY
@@ -167,28 +178,28 @@ class KotlinDownloadActivity : BaseActivity<ActivitySingleKotlinBinding>() {
   }
 
   @Download.onWait
-  fun onWait(task: DownloadTask) {
+  fun onWait(task: com.arialyy.aria.core.task.DownloadTask) {
     if (task.key == mUrl) {
       Log.d(TAG, "wait ==> " + task.downloadEntity.fileName)
     }
   }
 
   @Download.onPre
-  fun onPre(task: DownloadTask) {
+  fun onPre(task: com.arialyy.aria.core.task.DownloadTask) {
     if (task.key == mUrl) {
       binding.stateStr = getString(R.string.stop)
     }
   }
 
   @Download.onTaskStart
-  fun taskStart(task: DownloadTask) {
+  fun taskStart(task: com.arialyy.aria.core.task.DownloadTask) {
     if (task.key == mUrl) {
       binding.fileSize = task.convertFileSize
     }
   }
 
   @Download.onTaskRunning
-  fun running(task: DownloadTask) {
+  fun running(task: com.arialyy.aria.core.task.DownloadTask) {
     if (task.key == mUrl) {
       //Log.d(TAG, task.getKey());
       val len = task.fileSize
@@ -202,14 +213,14 @@ class KotlinDownloadActivity : BaseActivity<ActivitySingleKotlinBinding>() {
   }
 
   @Download.onTaskResume
-  fun taskResume(task: DownloadTask) {
+  fun taskResume(task: com.arialyy.aria.core.task.DownloadTask) {
     if (task.key == mUrl) {
       binding.stateStr = getString(R.string.stop)
     }
   }
 
   @Download.onTaskStop
-  fun taskStop(task: DownloadTask) {
+  fun taskStop(task: com.arialyy.aria.core.task.DownloadTask) {
     if (task.key == mUrl) {
       binding.stateStr = getString(R.string.resume)
       binding.speed = ""
@@ -217,7 +228,7 @@ class KotlinDownloadActivity : BaseActivity<ActivitySingleKotlinBinding>() {
   }
 
   @Download.onTaskCancel
-  fun taskCancel(task: DownloadTask) {
+  fun taskCancel(task: com.arialyy.aria.core.task.DownloadTask) {
     if (task.key == mUrl) {
       binding.progress = 0
       binding.stateStr = getString(R.string.start)
@@ -231,7 +242,7 @@ class KotlinDownloadActivity : BaseActivity<ActivitySingleKotlinBinding>() {
    */
   @Download.onTaskFail
   fun taskFail(
-    task: DownloadTask,
+    task: com.arialyy.aria.core.task.DownloadTask,
     e: Exception
   ) {
     if (task.key == mUrl) {
@@ -242,7 +253,7 @@ class KotlinDownloadActivity : BaseActivity<ActivitySingleKotlinBinding>() {
   }
 
   @Download.onTaskComplete
-  fun taskComplete(task: DownloadTask) {
+  fun taskComplete(task: com.arialyy.aria.core.task.DownloadTask) {
 
     if (task.key == mUrl) {
       binding.progress = 100

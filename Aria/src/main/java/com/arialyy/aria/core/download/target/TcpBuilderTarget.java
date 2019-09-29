@@ -18,9 +18,9 @@ package com.arialyy.aria.core.download.target;
 import androidx.annotation.CheckResult;
 import androidx.annotation.NonNull;
 import com.arialyy.aria.core.common.AbsBuilderTarget;
-import com.arialyy.aria.core.common.Suggest;
+import com.arialyy.aria.core.inf.Suggest;
 import com.arialyy.aria.core.download.tcp.TcpDelegate;
-import com.arialyy.aria.core.inf.ITaskWrapper;
+import com.arialyy.aria.core.wrapper.ITaskWrapper;
 
 /**
  * @Author aria

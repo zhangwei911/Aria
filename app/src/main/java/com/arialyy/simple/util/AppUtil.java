@@ -24,7 +24,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.text.TextUtils;
 import androidx.core.content.FileProvider;
-import com.arialyy.aria.core.inf.AbsEntity;
+import com.arialyy.aria.core.common.AbsEntity;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
 import com.arialyy.aria.util.FileUtil;

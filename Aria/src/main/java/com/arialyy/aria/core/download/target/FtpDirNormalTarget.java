@@ -17,9 +17,10 @@ package com.arialyy.aria.core.download.target;
 
 import androidx.annotation.CheckResult;
 import com.arialyy.aria.core.common.AbsNormalTarget;
-import com.arialyy.aria.core.common.Suggest;
-import com.arialyy.aria.core.common.ftp.FtpDelegate;
+import com.arialyy.aria.core.inf.Suggest;
+import com.arialyy.aria.core.common.FtpDelegate;
 import com.arialyy.aria.core.download.DownloadGroupEntity;
+import com.arialyy.aria.core.inf.IOptionConstant;
 import com.arialyy.aria.core.manager.SubTaskManager;
 import com.arialyy.aria.util.CommonUtil;
 
@@ -32,7 +33,8 @@ public class FtpDirNormalTarget extends AbsNormalTarget<FtpDirNormalTarget> {
 
   FtpDirNormalTarget(long taskId) {
     mConfigHandler = new FtpDirConfigHandler<>(this, taskId);
-    getTaskWrapper().asFtp().setUrlEntity(CommonUtil.getFtpUrlInfo(getEntity().getKey()));
+    getTaskWrapper().getOptionParams()
+        .setParams(IOptionConstant.ftpUrlEntity, CommonUtil.getFtpUrlInfo(getEntity().getKey()));
   }
 
   @Override public boolean isRunning() {

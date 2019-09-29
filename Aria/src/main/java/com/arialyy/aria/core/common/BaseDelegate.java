@@ -19,7 +19,8 @@ import androidx.annotation.CheckResult;
 import com.arialyy.aria.core.common.controller.ControllerType;
 import com.arialyy.aria.core.common.controller.FeatureController;
 import com.arialyy.aria.core.inf.AbsTarget;
-import com.arialyy.aria.core.inf.AbsTaskWrapper;
+import com.arialyy.aria.core.inf.Suggest;
+import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
 import com.arialyy.aria.util.CommonUtil;
 
 public abstract class BaseDelegate<TARGET extends AbsTarget> {

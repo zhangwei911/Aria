@@ -17,8 +17,8 @@ package com.arialyy.aria.core.common.controller;
 
 import com.arialyy.aria.core.command.NormalCmdFactory;
 import com.arialyy.aria.core.event.EventMsgUtil;
-import com.arialyy.aria.core.inf.AbsTaskWrapper;
-import com.arialyy.aria.util.CommonUtil;
+import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
+import com.arialyy.aria.core.command.CmdHelper;
 
 /**
  * 创建任务时使用的控制器
@@ -37,7 +37,7 @@ public final class BuilderController extends FeatureController implements IStart
   public long add() {
     if (checkConfig()) {
       EventMsgUtil.getDefault()
-          .post(CommonUtil.createNormalCmd(getTaskWrapper(), NormalCmdFactory.TASK_CREATE,
+          .post(CmdHelper.createNormalCmd(getTaskWrapper(), NormalCmdFactory.TASK_CREATE,
               checkTaskType()));
       return getEntity().getId();
     }
@@ -52,7 +52,7 @@ public final class BuilderController extends FeatureController implements IStart
   public long create() {
     if (checkConfig()) {
       EventMsgUtil.getDefault()
-          .post(CommonUtil.createNormalCmd(getTaskWrapper(), NormalCmdFactory.TASK_START,
+          .post(CmdHelper.createNormalCmd(getTaskWrapper(), NormalCmdFactory.TASK_START,
               checkTaskType()));
       return getEntity().getId();
     }
@@ -63,7 +63,7 @@ public final class BuilderController extends FeatureController implements IStart
   @Override public long setHighestPriority() {
     if (checkConfig()) {
       EventMsgUtil.getDefault()
-          .post(CommonUtil.createNormalCmd(getTaskWrapper(), NormalCmdFactory.TASK_HIGHEST_PRIORITY,
+          .post(CmdHelper.createNormalCmd(getTaskWrapper(), NormalCmdFactory.TASK_HIGHEST_PRIORITY,
               checkTaskType()));
       return getEntity().getId();
     }

@@ -17,13 +17,14 @@ package com.arialyy.aria.core.download.m3u8;
 
 import androidx.annotation.CheckResult;
 import com.arialyy.aria.core.common.BaseDelegate;
-import com.arialyy.aria.core.common.Suggest;
+import com.arialyy.aria.core.inf.Suggest;
 import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.event.EventMsgUtil;
 import com.arialyy.aria.core.event.PeerIndexEvent;
 import com.arialyy.aria.core.inf.AbsTarget;
-import com.arialyy.aria.core.inf.AbsTaskWrapper;
-import com.arialyy.aria.core.queue.DownloadTaskQueue;
+import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
+import com.arialyy.aria.core.inf.IOptionConstant;
+import com.arialyy.aria.core.queue.DTaskQueue;
 import com.arialyy.aria.util.ALog;
 
 /**
@@ -64,7 +65,7 @@ public class M3U8VodDelegate<TARGET extends AbsTarget> extends BaseDelegate<TARG
       ALog.e(TAG, "同时下载的分片数量不能小于1");
       return this;
     }
-    mTaskWrapper.asM3U8().setMaxTsQueueNum(num);
+    mTaskWrapper.getM3U8Params().setParams(IOptionConstant.maxTsQueueNum, num);
     return this;
   }
 
@@ -84,7 +85,7 @@ public class M3U8VodDelegate<TARGET extends AbsTarget> extends BaseDelegate<TARG
       ALog.e(TAG, "切片索引不能小于1");
       return this;
     }
-    mTaskWrapper.asM3U8().setJumpIndex(index);
+    mTaskWrapper.getM3U8Params().setParams(IOptionConstant.jumpIndex, index);
     return this;
   }
 
@@ -103,7 +104,7 @@ public class M3U8VodDelegate<TARGET extends AbsTarget> extends BaseDelegate<TARG
       return;
     }
 
-    if (!DownloadTaskQueue.getInstance().taskIsRunning(mTaskWrapper.getKey())) {
+    if (!DTaskQueue.getInstance().taskIsRunning(mTaskWrapper.getKey())) {
       ALog.e(TAG,
           String.format("任务【%s】没有运行，如果你希望在启动任务时初始化索引位置，请调用setPeerIndex(xxx）",
               mTaskWrapper.getKey()));

@@ -20,21 +20,22 @@ import android.os.Bundle;
 import android.os.Message;
 import com.arialyy.annotations.TaskEnum;
 import com.arialyy.aria.core.AriaManager;
-import com.arialyy.aria.core.download.DownloadGroupTask;
-import com.arialyy.aria.core.download.DownloadTask;
-import com.arialyy.aria.core.inf.AbsEntity;
-import com.arialyy.aria.core.inf.AbsNormalEntity;
-import com.arialyy.aria.core.inf.AbsTask;
-import com.arialyy.aria.core.inf.GroupSendParams;
+import com.arialyy.aria.core.task.DownloadGroupTask;
+import com.arialyy.aria.core.task.DownloadTask;
+import com.arialyy.aria.core.common.AbsEntity;
+import com.arialyy.aria.core.common.AbsNormalEntity;
+import com.arialyy.aria.core.task.AbsTask;
+import com.arialyy.aria.core.group.GroupSendParams;
 import com.arialyy.aria.core.inf.IEntity;
-import com.arialyy.aria.core.inf.ITask;
+import com.arialyy.aria.core.listener.ISchedulers;
+import com.arialyy.aria.core.task.ITask;
 import com.arialyy.aria.core.inf.TaskSchedulerType;
 import com.arialyy.aria.core.manager.TaskWrapperManager;
-import com.arialyy.aria.core.queue.DownloadGroupTaskQueue;
-import com.arialyy.aria.core.queue.DownloadTaskQueue;
+import com.arialyy.aria.core.queue.DGroupTaskQueue;
+import com.arialyy.aria.core.queue.DTaskQueue;
 import com.arialyy.aria.core.queue.ITaskQueue;
-import com.arialyy.aria.core.queue.UploadTaskQueue;
-import com.arialyy.aria.core.upload.UploadTask;
+import com.arialyy.aria.core.queue.UTaskQueue;
+import com.arialyy.aria.core.task.UploadTask;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.NetUtils;
 import java.util.Iterator;
@@ -78,13 +79,13 @@ public class TaskSchedulers<TASK extends ITask> implements ISchedulers {
   ITaskQueue getQueue(TASK curTask) {
     int taskType = curTask.getTaskType();
     if (taskType == ITask.DOWNLOAD) {
-      return DownloadTaskQueue.getInstance();
+      return DTaskQueue.getInstance();
     }
     if (taskType == ITask.DOWNLOAD_GROUP) {
-      return DownloadGroupTaskQueue.getInstance();
+      return DGroupTaskQueue.getInstance();
     }
     if (taskType == ITask.UPLOAD) {
-      return UploadTaskQueue.getInstance();
+      return UTaskQueue.getInstance();
     }
     throw new NullPointerException("任务类型错误，type = " + taskType);
   }

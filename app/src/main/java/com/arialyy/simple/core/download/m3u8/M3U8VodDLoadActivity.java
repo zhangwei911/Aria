@@ -33,11 +33,11 @@ import com.arialyy.aria.core.Aria;
 import com.arialyy.aria.core.common.controller.BuilderController;
 import com.arialyy.aria.core.common.controller.ControllerType;
 import com.arialyy.aria.core.download.DownloadEntity;
-import com.arialyy.aria.core.download.DownloadTask;
-import com.arialyy.aria.core.download.m3u8.ITsMergeHandler;
-import com.arialyy.aria.core.download.m3u8.IVodTsUrlConverter;
-import com.arialyy.aria.core.download.m3u8.M3U8Entity;
+import com.arialyy.aria.core.download.M3U8Entity;
 import com.arialyy.aria.core.inf.IEntity;
+import com.arialyy.aria.core.processor.ITsMergeHandler;
+import com.arialyy.aria.core.processor.IVodTsUrlConverter;
+import com.arialyy.aria.core.task.DownloadTask;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
 import com.arialyy.frame.util.show.T;
@@ -259,7 +259,7 @@ public class M3U8VodDLoadActivity extends BaseActivity<ActivityM3u8VodBinding> {
           Toast.LENGTH_SHORT).show();
       getBinding().setStateStr(getString(R.string.re_start));
       getBinding().setSpeed("");
-      ALog.d(TAG, "md5: " + CommonUtil.getFileMD5(new File(task.getDownloadPath())));
+      ALog.d(TAG, "md5: " + CommonUtil.getFileMD5(new File(task.getFilePath())));
     }
   }
 
@@ -350,6 +350,16 @@ public class M3U8VodDLoadActivity extends BaseActivity<ActivityM3u8VodBinding> {
         .generateIndexFile()
         .controller(ControllerType.CREATE_CONTROLLER)
         .create();
+
+    Aria.download(M3U8VodDLoadActivity.this)
+        .load(mUrl)
+        .useServerFileName(true)
+        .setFilePath(mFilePath, true)
+        .asM3U8().setTsUrlConvert(new IVodTsUrlConverter() {
+      @Override public List<String> convert(String m3u8Url, List<String> tsUrls) {
+        return null;
+      }
+    });
   }
 
   private Class<BuilderController> c = BuilderController.class;

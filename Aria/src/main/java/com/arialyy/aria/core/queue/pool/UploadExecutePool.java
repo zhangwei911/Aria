@@ -16,7 +16,7 @@
 package com.arialyy.aria.core.queue.pool;
 
 import com.arialyy.aria.core.AriaManager;
-import com.arialyy.aria.core.inf.AbsTask;
+import com.arialyy.aria.core.task.AbsTask;
 
 /**
  * Created by Aria.Lao on 2017/7/17.

@@ -23,7 +23,7 @@ import com.arialyy.aria.core.Aria;
 import com.arialyy.aria.core.common.RequestEnum;
 import com.arialyy.aria.core.common.controller.ControllerType;
 import com.arialyy.aria.core.upload.UploadEntity;
-import com.arialyy.aria.core.upload.UploadTask;
+import com.arialyy.aria.core.task.UploadTask;
 import com.arialyy.frame.util.FileUtil;
 import com.arialyy.frame.util.show.L;
 import com.arialyy.simple.R;

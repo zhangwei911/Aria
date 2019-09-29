@@ -15,8 +15,8 @@
  */
 package com.arialyy.aria.core.scheduler;
 
-import com.arialyy.aria.core.inf.AbsNormalEntity;
-import com.arialyy.aria.core.inf.ITask;
+import com.arialyy.aria.core.common.AbsNormalEntity;
+import com.arialyy.aria.core.task.ITask;
 
 /**
  * Created by Aria.Lao on 2019/6/26.

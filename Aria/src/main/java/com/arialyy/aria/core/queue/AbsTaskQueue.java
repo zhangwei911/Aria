@@ -16,10 +16,10 @@
 
 package com.arialyy.aria.core.queue;
 
-import com.arialyy.aria.core.download.DownloadGroupTask;
-import com.arialyy.aria.core.download.DownloadTask;
-import com.arialyy.aria.core.inf.AbsTask;
-import com.arialyy.aria.core.inf.AbsTaskWrapper;
+import com.arialyy.aria.core.task.DownloadGroupTask;
+import com.arialyy.aria.core.task.DownloadTask;
+import com.arialyy.aria.core.task.AbsTask;
+import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
 import com.arialyy.aria.core.inf.IEntity;
 import com.arialyy.aria.core.inf.TaskSchedulerType;
 import com.arialyy.aria.core.manager.TaskWrapperManager;
@@ -29,7 +29,7 @@ import com.arialyy.aria.core.queue.pool.BaseExecutePool;
 import com.arialyy.aria.core.queue.pool.DGLoadSharePool;
 import com.arialyy.aria.core.queue.pool.DLoadSharePool;
 import com.arialyy.aria.core.queue.pool.UploadSharePool;
-import com.arialyy.aria.core.upload.UploadTask;
+import com.arialyy.aria.core.task.UploadTask;
 import com.arialyy.aria.util.ALog;
 
 /**
@@ -153,10 +153,10 @@ public abstract class AbsTaskQueue<TASK extends AbsTask, TASK_WRAPPER extends Ab
     return mExecutePool.size();
   }
 
-  @Override public void setMaxTaskNum(int downloadNum) {
+  @Override public void setMaxTaskNum(int maxNum) {
     int oldMaxSize = getOldMaxNum();
-    int diff = downloadNum - oldMaxSize;
-    if (oldMaxSize == downloadNum) {
+    int diff = maxNum - oldMaxSize;
+    if (oldMaxSize == maxNum) {
       ALog.w(TAG, "设置的下载任务数和配置文件的下载任务数一直，跳过");
       return;
     }
@@ -169,7 +169,7 @@ public abstract class AbsTaskQueue<TASK extends AbsTask, TASK_WRAPPER extends Ab
         }
       }
     }
-    mExecutePool.setMaxNum(downloadNum);
+    mExecutePool.setMaxNum(maxNum);
     if (diff >= 1) {
       for (int i = 0; i < diff; i++) {
         TASK nextTask = getNextTask();

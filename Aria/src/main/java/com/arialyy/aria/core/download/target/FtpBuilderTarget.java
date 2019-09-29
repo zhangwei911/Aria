@@ -18,10 +18,11 @@ package com.arialyy.aria.core.download.target;
 import androidx.annotation.CheckResult;
 import androidx.annotation.NonNull;
 import com.arialyy.aria.core.common.AbsBuilderTarget;
-import com.arialyy.aria.core.common.Suggest;
-import com.arialyy.aria.core.common.ftp.FtpDelegate;
+import com.arialyy.aria.core.inf.Suggest;
+import com.arialyy.aria.core.common.FtpDelegate;
 import com.arialyy.aria.core.download.DownloadEntity;
-import com.arialyy.aria.core.inf.ITaskWrapper;
+import com.arialyy.aria.core.inf.IOptionConstant;
+import com.arialyy.aria.core.wrapper.ITaskWrapper;
 import com.arialyy.aria.util.CommonUtil;
 
 /**
@@ -33,7 +34,8 @@ public class FtpBuilderTarget extends AbsBuilderTarget<FtpBuilderTarget> {
   FtpBuilderTarget(String url) {
     mConfigHandler = new DNormalConfigHandler<>(this, -1);
     mConfigHandler.setUrl(url);
-    getTaskWrapper().asFtp().setUrlEntity(CommonUtil.getFtpUrlInfo(url));
+    getTaskWrapper().getOptionParams()
+        .setParams(IOptionConstant.ftpUrlEntity, CommonUtil.getFtpUrlInfo(url));
     getTaskWrapper().setRequestType(ITaskWrapper.D_FTP);
   }
 

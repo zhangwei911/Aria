@@ -19,13 +19,13 @@ import android.text.TextUtils;
 import androidx.annotation.CheckResult;
 import com.arialyy.aria.core.download.DGTaskWrapper;
 import com.arialyy.aria.core.download.DownloadGroupEntity;
-import com.arialyy.aria.core.download.DownloadGroupTask;
+import com.arialyy.aria.core.task.DownloadGroupTask;
 import com.arialyy.aria.core.event.ErrorEvent;
 import com.arialyy.aria.core.inf.AbsTarget;
 import com.arialyy.aria.core.inf.IConfigHandler;
 import com.arialyy.aria.core.manager.SubTaskManager;
 import com.arialyy.aria.core.manager.TaskWrapperManager;
-import com.arialyy.aria.core.queue.DownloadGroupTaskQueue;
+import com.arialyy.aria.core.queue.DGroupTaskQueue;
 import com.arialyy.aria.orm.DbEntity;
 import com.arialyy.aria.util.CommonUtil;
 
@@ -77,7 +77,7 @@ abstract class AbsGroupConfigHandler<TARGET extends AbsTarget> implements IConfi
   }
 
   @Override public boolean isRunning() {
-    DownloadGroupTask task = DownloadGroupTaskQueue.getInstance().getTask(getEntity().getKey());
+    DownloadGroupTask task = DGroupTaskQueue.getInstance().getTask(getEntity().getKey());
     return task != null && task.isRunning();
   }
 

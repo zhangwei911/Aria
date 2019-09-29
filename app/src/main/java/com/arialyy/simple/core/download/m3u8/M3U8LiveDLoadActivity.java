@@ -29,8 +29,8 @@ import com.arialyy.annotations.Download;
 import com.arialyy.aria.core.Aria;
 import com.arialyy.aria.core.common.controller.ControllerType;
 import com.arialyy.aria.core.download.DownloadEntity;
-import com.arialyy.aria.core.download.DownloadTask;
-import com.arialyy.aria.core.download.m3u8.ILiveTsUrlConverter;
+import com.arialyy.aria.core.processor.ILiveTsUrlConverter;
+import com.arialyy.aria.core.task.DownloadTask;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
 import com.arialyy.frame.util.show.T;
@@ -200,7 +200,7 @@ public class M3U8LiveDLoadActivity extends BaseActivity<ActivityM3u8LiveBinding>
           Toast.LENGTH_SHORT).show();
       getBinding().setStateStr(getString(R.string.re_start));
       getBinding().setSpeed("");
-      ALog.d(TAG, "md5: " + CommonUtil.getFileMD5(new File(task.getDownloadPath())));
+      ALog.d(TAG, "md5: " + CommonUtil.getFileMD5(new File(task.getFilePath())));
     }
   }
 

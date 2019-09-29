@@ -15,16 +15,17 @@
  */
 package com.arialyy.aria.core.upload.target;
 
-import com.arialyy.aria.core.common.ftp.IFtpUploadInterceptor;
+import com.arialyy.aria.core.processor.IFtpUploadInterceptor;
+import com.arialyy.aria.core.common.AbsEntity;
 import com.arialyy.aria.core.event.ErrorEvent;
-import com.arialyy.aria.core.inf.AbsEntity;
 import com.arialyy.aria.core.inf.AbsTarget;
 import com.arialyy.aria.core.inf.IConfigHandler;
+import com.arialyy.aria.core.inf.IOptionConstant;
 import com.arialyy.aria.core.manager.TaskWrapperManager;
-import com.arialyy.aria.core.queue.UploadTaskQueue;
+import com.arialyy.aria.core.queue.UTaskQueue;
 import com.arialyy.aria.core.upload.UTaskWrapper;
 import com.arialyy.aria.core.upload.UploadEntity;
-import com.arialyy.aria.core.upload.UploadTask;
+import com.arialyy.aria.core.task.UploadTask;
 import com.arialyy.aria.orm.DbEntity;
 import com.arialyy.aria.util.CommonUtil;
 import java.io.File;
@@ -65,7 +66,8 @@ class UNormalConfigHandler<TARGET extends AbsTarget> implements IConfigHandler {
     if (uploadInterceptor == null) {
       throw new NullPointerException("ftp拦截器为空");
     }
-    getTaskWrapper().asFtp().setUploadInterceptor(uploadInterceptor);
+    getTaskWrapper().getOptionParams()
+        .setObjs(IOptionConstant.uploadInterceptor, uploadInterceptor);
     return mTarget;
   }
 
@@ -78,13 +80,14 @@ class UNormalConfigHandler<TARGET extends AbsTarget> implements IConfigHandler {
   }
 
   @Override public boolean isRunning() {
-    UploadTask task = UploadTaskQueue.getInstance().getTask(mEntity.getKey());
+    UploadTask task = UTaskQueue.getInstance().getTask(mEntity.getKey());
     return task != null && task.isRunning();
   }
 
   void setTempUrl(String tempUrl) {
     getTaskWrapper().setTempUrl(tempUrl);
-    getTaskWrapper().asFtp().setUrlEntity(CommonUtil.getFtpUrlInfo(tempUrl));
+    getTaskWrapper().getOptionParams()
+        .setParams(IOptionConstant.ftpUrlEntity, CommonUtil.getFtpUrlInfo(tempUrl));
   }
 
   private UTaskWrapper getTaskWrapper() {

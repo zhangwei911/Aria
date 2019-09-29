@@ -17,11 +17,11 @@ package com.arialyy.aria.core.upload.target;
 
 import androidx.annotation.CheckResult;
 import androidx.annotation.NonNull;
+import com.arialyy.aria.core.processor.IFtpUploadInterceptor;
 import com.arialyy.aria.core.common.AbsBuilderTarget;
-import com.arialyy.aria.core.common.Suggest;
-import com.arialyy.aria.core.common.ftp.FtpDelegate;
-import com.arialyy.aria.core.common.ftp.IFtpUploadInterceptor;
-import com.arialyy.aria.core.inf.AbsTaskWrapper;
+import com.arialyy.aria.core.common.FtpDelegate;
+import com.arialyy.aria.core.inf.Suggest;
+import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
 
 /**
  * Created by Aria.Lao on 2017/7/27.

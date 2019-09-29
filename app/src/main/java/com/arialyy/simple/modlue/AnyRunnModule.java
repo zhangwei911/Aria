@@ -22,7 +22,7 @@ import com.arialyy.annotations.Download;
 import com.arialyy.aria.core.Aria;
 import com.arialyy.aria.core.common.controller.ControllerType;
 import com.arialyy.aria.core.download.DownloadEntity;
-import com.arialyy.aria.core.download.DownloadTask;
+import com.arialyy.aria.core.task.DownloadTask;
 import com.arialyy.aria.util.CommonUtil;
 import com.arialyy.frame.util.show.L;
 import com.arialyy.simple.util.AppUtil;
@@ -77,7 +77,7 @@ public class AnyRunnModule {
 
   @Download.onTaskComplete void taskComplete(DownloadTask task) {
     L.d(TAG, "path ==> " + task.getDownloadEntity().getDownloadPath());
-    L.d(TAG, "md5Code ==> " + CommonUtil.getFileMD5(new File(task.getDownloadPath())));
+    L.d(TAG, "md5Code ==> " + CommonUtil.getFileMD5(new File(task.getFilePath())));
   }
 
   public void start(String url) {

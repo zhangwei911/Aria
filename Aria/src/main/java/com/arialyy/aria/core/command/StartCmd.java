@@ -22,16 +22,17 @@ import com.arialyy.aria.core.download.DGTaskWrapper;
 import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.download.DownloadGroupEntity;
-import com.arialyy.aria.core.inf.AbsTask;
-import com.arialyy.aria.core.inf.AbsTaskWrapper;
+import com.arialyy.aria.core.task.AbsTask;
+import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
 import com.arialyy.aria.core.inf.IEntity;
-import com.arialyy.aria.core.inf.ITaskWrapper;
+import com.arialyy.aria.core.inf.IOptionConstant;
 import com.arialyy.aria.core.manager.TaskWrapperManager;
-import com.arialyy.aria.core.queue.DownloadGroupTaskQueue;
-import com.arialyy.aria.core.queue.DownloadTaskQueue;
-import com.arialyy.aria.core.queue.UploadTaskQueue;
+import com.arialyy.aria.core.queue.DGroupTaskQueue;
+import com.arialyy.aria.core.queue.DTaskQueue;
+import com.arialyy.aria.core.queue.UTaskQueue;
 import com.arialyy.aria.core.upload.UTaskWrapper;
 import com.arialyy.aria.core.upload.UploadEntity;
+import com.arialyy.aria.core.wrapper.ITaskWrapper;
 import com.arialyy.aria.orm.DbEntity;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
@@ -156,22 +157,24 @@ final class StartCmd<T extends AbsTaskWrapper> extends AbsNormalCmd<T> {
     }
 
     private void handleTask(List<AbsTaskWrapper> waitList) {
-      for (AbsTaskWrapper te : waitList) {
-        if (te.getEntity() == null) continue;
-        AbsTask task = getTask(te.getKey());
+      for (AbsTaskWrapper wrapper : waitList) {
+        if (wrapper.getEntity() == null) continue;
+        AbsTask task = getTask(wrapper.getKey());
         if (task != null) continue;
-        if (te instanceof DTaskWrapper) {
-          if (te.getRequestType() == ITaskWrapper.D_FTP
-              || te.getRequestType() == ITaskWrapper.U_FTP) {
-            te.asFtp().setUrlEntity(CommonUtil.getFtpUrlInfo(te.getEntity().getKey()));
+        if (wrapper instanceof DTaskWrapper) {
+          if (wrapper.getRequestType() == ITaskWrapper.D_FTP
+              || wrapper.getRequestType() == ITaskWrapper.U_FTP) {
+            wrapper.getOptionParams()
+                .setParams(IOptionConstant.ftpUrlEntity,
+                    CommonUtil.getFtpUrlInfo(wrapper.getEntity().getKey()));
           }
-          mQueue = DownloadTaskQueue.getInstance();
-        } else if (te instanceof UTaskWrapper) {
-          mQueue = UploadTaskQueue.getInstance();
-        } else if (te instanceof DGTaskWrapper) {
-          mQueue = DownloadGroupTaskQueue.getInstance();
+          mQueue = DTaskQueue.getInstance();
+        } else if (wrapper instanceof UTaskWrapper) {
+          mQueue = UTaskQueue.getInstance();
+        } else if (wrapper instanceof DGTaskWrapper) {
+          mQueue = DGroupTaskQueue.getInstance();
         }
-        createTask(te);
+        createTask(wrapper);
       }
     }
   }

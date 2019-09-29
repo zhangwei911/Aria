@@ -16,9 +16,9 @@
 package com.arialyy.aria.core.command;
 
 import com.arialyy.aria.core.AriaManager;
-import com.arialyy.aria.core.download.DownloadTask;
-import com.arialyy.aria.core.inf.AbsTaskWrapper;
-import com.arialyy.aria.core.queue.DownloadTaskQueue;
+import com.arialyy.aria.core.task.DownloadTask;
+import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
+import com.arialyy.aria.core.queue.DTaskQueue;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.NetUtils;
 
@@ -50,7 +50,7 @@ final class HighestPriorityCmd<T extends AbsTaskWrapper> extends AbsNormalCmd<T>
       task = (DownloadTask) createTask();
     }
     if (task != null) {
-      ((DownloadTaskQueue) mQueue).setTaskHighestPriority(task);
+      ((DTaskQueue) mQueue).setTaskHighestPriority(task);
     }
   }
 }

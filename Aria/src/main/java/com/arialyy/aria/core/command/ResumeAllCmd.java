@@ -5,14 +5,14 @@ import com.arialyy.aria.core.download.DGTaskWrapper;
 import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.download.DownloadGroupEntity;
-import com.arialyy.aria.core.inf.AbsEntity;
-import com.arialyy.aria.core.inf.AbsTask;
-import com.arialyy.aria.core.inf.AbsTaskWrapper;
+import com.arialyy.aria.core.common.AbsEntity;
+import com.arialyy.aria.core.task.AbsTask;
+import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
 import com.arialyy.aria.core.inf.IEntity;
 import com.arialyy.aria.core.manager.TaskWrapperManager;
-import com.arialyy.aria.core.queue.DownloadGroupTaskQueue;
-import com.arialyy.aria.core.queue.DownloadTaskQueue;
-import com.arialyy.aria.core.queue.UploadTaskQueue;
+import com.arialyy.aria.core.queue.DGroupTaskQueue;
+import com.arialyy.aria.core.queue.DTaskQueue;
+import com.arialyy.aria.core.queue.UTaskQueue;
 import com.arialyy.aria.core.upload.UTaskWrapper;
 import com.arialyy.aria.core.upload.UploadEntity;
 import com.arialyy.aria.orm.DbEntity;
@@ -112,11 +112,11 @@ final class ResumeAllCmd<T extends AbsTaskWrapper> extends AbsNormalCmd<T> {
 
     for (AbsTaskWrapper te : mWaitList) {
       if (te instanceof DTaskWrapper) {
-        mQueue = DownloadTaskQueue.getInstance();
+        mQueue = DTaskQueue.getInstance();
       } else if (te instanceof UTaskWrapper) {
-        mQueue = UploadTaskQueue.getInstance();
+        mQueue = UTaskQueue.getInstance();
       } else if (te instanceof DGTaskWrapper) {
-        mQueue = DownloadGroupTaskQueue.getInstance();
+        mQueue = DGroupTaskQueue.getInstance();
       }
       if (mQueue.getCurrentExePoolNum() < maxTaskNum) {
         startTask(createTask(te));

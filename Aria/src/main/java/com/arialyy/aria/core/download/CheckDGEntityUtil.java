@@ -18,6 +18,7 @@ package com.arialyy.aria.core.download;
 import android.text.TextUtils;
 import com.arialyy.aria.core.common.RequestEnum;
 import com.arialyy.aria.core.inf.ICheckEntityUtil;
+import com.arialyy.aria.core.inf.IOptionConstant;
 import com.arialyy.aria.orm.DbEntity;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
@@ -133,9 +134,10 @@ public class CheckDGEntityUtil implements ICheckEntityUtil {
       return false;
     }
 
-    if (mWrapper.asHttp().getRequestEnum() == RequestEnum.POST) {
-      for (DTaskWrapper subTask : mWrapper.getSubTaskWrapper()) {
-        subTask.asHttp().setRequestEnum(RequestEnum.POST);
+    if (mWrapper.getOptionParams().getParam(IOptionConstant.requestEnum)
+        == RequestEnum.POST) {
+      for (DTaskWrapper subWrapper : mWrapper.getSubTaskWrapper()) {
+        subWrapper.getOptionParams().setParams(IOptionConstant.requestEnum, RequestEnum.POST);
       }
     }
 

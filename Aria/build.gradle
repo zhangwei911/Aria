@@ -7,8 +7,8 @@ android {
   defaultConfig {
     minSdkVersion rootProject.ext.minSdkVersion
     targetSdkVersion rootProject.ext.targetSdkVersion
-    versionCode 329
-    versionName "3.2.9"
+    versionCode rootProject.ext.versionCode
+    versionName rootProject.ext.versionName
   }
   buildTypes {
     release {
@@ -26,9 +26,13 @@ dependencies {
   testImplementation 'junit:junit:4.12'
   implementation "androidx.appcompat:appcompat:${rootProject.ext.XAppcompatVersion}"
   api project(':AriaAnnotations')
-  api 'com.arialyy.aria:aria-ftp-plug:1.0.4' // 打包时用这个
+  api project(path: ':PublicComponent')
+
+    api 'com.arialyy.aria:aria-ftp-plug:1.0.4'
+  implementation project(path: ':HttpComponent') // 打包时用这个
 
   //    compile project(':AriaFtpPlug')
+//  implementation project(path: ':AriaFtpComponent')
 
 }
 apply from: 'bintray-release.gradle'

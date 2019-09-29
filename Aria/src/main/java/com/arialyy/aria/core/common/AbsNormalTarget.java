@@ -18,7 +18,6 @@ package com.arialyy.aria.core.common;
 import com.arialyy.aria.core.common.controller.INormalFeature;
 import com.arialyy.aria.core.common.controller.NormalController;
 import com.arialyy.aria.core.download.DownloadGroupEntity;
-import com.arialyy.aria.core.inf.AbsNormalEntity;
 import com.arialyy.aria.core.inf.AbsTarget;
 import com.arialyy.aria.core.inf.IEntity;
 import com.arialyy.aria.core.manager.TaskWrapperManager;

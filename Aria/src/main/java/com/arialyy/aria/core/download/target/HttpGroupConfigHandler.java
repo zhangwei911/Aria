@@ -18,7 +18,6 @@ package com.arialyy.aria.core.download.target;
 import androidx.annotation.CheckResult;
 import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.download.DownloadEntity;
-import com.arialyy.aria.core.download.target.AbsGroupConfigHandler;
 import com.arialyy.aria.core.inf.AbsTarget;
 import com.arialyy.aria.orm.DbEntity;
 import com.arialyy.aria.util.ALog;

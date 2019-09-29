@@ -34,18 +34,16 @@ import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import com.arialyy.aria.core.command.CommandManager;
 import com.arialyy.aria.core.common.QueueMod;
-import com.arialyy.aria.core.common.RecordHandler;
 import com.arialyy.aria.core.config.AppConfig;
-import com.arialyy.aria.core.config.Configuration;
 import com.arialyy.aria.core.config.DGroupConfig;
 import com.arialyy.aria.core.config.DownloadConfig;
 import com.arialyy.aria.core.config.UploadConfig;
-import com.arialyy.aria.core.config.XMLReader;
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.download.DownloadGroupEntity;
 import com.arialyy.aria.core.download.DownloadReceiver;
 import com.arialyy.aria.core.inf.AbsReceiver;
 import com.arialyy.aria.core.inf.IReceiver;
+import com.arialyy.aria.core.inf.IRecordHandler;
 import com.arialyy.aria.core.inf.ReceiverType;
 import com.arialyy.aria.core.upload.UploadEntity;
 import com.arialyy.aria.core.upload.UploadReceiver;
@@ -53,19 +51,13 @@ import com.arialyy.aria.orm.DbEntity;
 import com.arialyy.aria.orm.DelegateWrapper;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.AriaCrashHandler;
-import com.arialyy.aria.util.CommonUtil;
 import com.arialyy.aria.util.RecordUtil;
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
-import org.xml.sax.SAXException;
 
 /**
  * Created by lyy on 2016/12/1. https://github.com/AriaLyy/Aria Aria管理器，任务操作在这里执行
@@ -73,12 +65,8 @@ import org.xml.sax.SAXException;
 @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH) public class AriaManager {
   private static final String TAG = "AriaManager";
   private static final Object LOCK = new Object();
-  public static final String DOWNLOAD_TEMP_DIR = "/Aria/temp/download/";
-  public static final String UPLOAD_TEMP_DIR = "/Aria/temp/upload/";
-  /**
-   * 是否已经联网，true 已经联网
-   */
-  private static boolean isConnectedNet = true;
+
+
 
   @SuppressLint("StaticFieldLeak") private static volatile AriaManager INSTANCE = null;
   private Map<String, AbsReceiver> mReceivers = new ConcurrentHashMap<>();
@@ -87,12 +75,9 @@ import org.xml.sax.SAXException;
    */
   private Map<String, List<String>> mSubClass = new ConcurrentHashMap<>();
   private static Context APP;
-  private DownloadConfig mDConfig;
-  private UploadConfig mUConfig;
-  private AppConfig mAConfig;
-  private DGroupConfig mDGConfig;
   private Handler mAriaHandler;
   private DelegateWrapper mDbWrapper;
+  private AriaConfig mConfig;
 
   private AriaManager(Context context) {
     APP = context.getApplicationContext();
@@ -118,55 +103,18 @@ import org.xml.sax.SAXException;
   }
 
   private void initData() {
+    mConfig = AriaConfig.init(APP);
     initDb(APP);
     regAppLifeCallback(APP);
-    initConfig();
     initAria();
     amendTaskState();
-    regNetCallBack(APP);
   }
 
   public Context getAPP() {
     return APP;
   }
 
-  /**
-   * 注册网络监听，只有配置了检查网络{@link AppConfig#isNetCheck()}才会注册事件
-   */
-  private void regNetCallBack(Context context) {
-    if (!getAppConfig().isNetCheck()) {
-      return;
-    }
-    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-      return;
-    }
-    ConnectivityManager cm =
-        (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-    if (cm == null) {
-      return;
-    }
 
-    NetworkRequest.Builder builder = new NetworkRequest.Builder();
-    NetworkRequest request = builder.addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
-        .addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
-        .addTransportType(NetworkCapabilities.TRANSPORT_CELLULAR)
-        .build();
-
-    cm.registerNetworkCallback(request, new ConnectivityManager.NetworkCallback() {
-
-      @Override public void onLost(Network network) {
-        super.onLost(network);
-        isConnectedNet = false;
-        ALog.d(TAG, "onLost");
-      }
-
-      @Override public void onAvailable(Network network) {
-        super.onAvailable(network);
-        ALog.d(TAG, "onAvailable");
-        isConnectedNet = true;
-      }
-    });
-  }
 
   /**
    * 初始化数据库
@@ -186,10 +134,11 @@ import org.xml.sax.SAXException;
   }
 
   private void initAria() {
-    if (mAConfig.getUseAriaCrashHandler()) {
+    AppConfig appConfig = mConfig.getAConfig();
+    if (appConfig.getUseAriaCrashHandler()) {
       Thread.setDefaultUncaughtExceptionHandler(new AriaCrashHandler());
     }
-    mAConfig.setLogLevel(mAConfig.getLogLevel());
+    appConfig.setLogLevel(appConfig.getLogLevel());
     CommandManager.init();
   }
 
@@ -217,9 +166,7 @@ import org.xml.sax.SAXException;
     return mAriaHandler;
   }
 
-  public boolean isConnectedNet() {
-    return isConnectedNet;
-  }
+
 
   public Map<String, AbsReceiver> getReceiver() {
     return mReceivers;
@@ -237,7 +184,7 @@ import org.xml.sax.SAXException;
    * @deprecated 后续版本会删除该api
    */
   @Deprecated public AriaManager setUploadQueueMod(QueueMod mod) {
-    mUConfig.setQueueMod(mod.tag);
+    mConfig.getUConfig().setQueueMod(mod.tag);
     return this;
   }
 
@@ -253,7 +200,7 @@ import org.xml.sax.SAXException;
    * @deprecated 后续版本会删除该api
    */
   @Deprecated public AriaManager setDownloadQueueMod(QueueMod mod) {
-    mDConfig.setQueueMod(mod.tag);
+    mConfig.getDConfig().setQueueMod(mod.tag);
     return this;
   }
 
@@ -267,7 +214,7 @@ import org.xml.sax.SAXException;
    * </pre>
    */
   public DownloadConfig getDownloadConfig() {
-    return mDConfig;
+    return mConfig.getDConfig();
   }
 
   /**
@@ -280,14 +227,14 @@ import org.xml.sax.SAXException;
    * </pre>
    */
   public UploadConfig getUploadConfig() {
-    return mUConfig;
+    return mConfig.getUConfig();
   }
 
   /**
    * 获取APP配置
    */
   public AppConfig getAppConfig() {
-    return mAConfig;
+    return mConfig.getAConfig();
   }
 
   /**
@@ -300,7 +247,7 @@ import org.xml.sax.SAXException;
    * </pre>
    */
   public DGroupConfig getDGroupConfig() {
-    return mDGConfig;
+    return mConfig.getDGConfig();
   }
 
   /**
@@ -335,13 +282,13 @@ import org.xml.sax.SAXException;
   public void delRecord(int type, String key, boolean removeFile) {
     switch (type) {
       case 1: // 删除普通任务记录
-        RecordUtil.delTaskRecord(key, RecordHandler.TYPE_DOWNLOAD, removeFile, true);
+        RecordUtil.delTaskRecord(key, IRecordHandler.TYPE_DOWNLOAD, removeFile, true);
         break;
       case 2:
         RecordUtil.delGroupTaskRecord(key, removeFile);
         break;
       case 3:
-        RecordUtil.delTaskRecord(key, RecordHandler.TYPE_UPLOAD);
+        RecordUtil.delTaskRecord(key, IRecordHandler.TYPE_UPLOAD);
         break;
     }
   }
@@ -440,58 +387,6 @@ import org.xml.sax.SAXException;
    */
   private String createKey(@ReceiverType String type, Object obj) {
     return String.format("%s_%s_%s", obj.getClass().getName(), type, obj.hashCode());
-  }
-
-  /**
-   * 初始化配置文件
-   */
-  private void initConfig() {
-    mDConfig = Configuration.getInstance().downloadCfg;
-    mUConfig = Configuration.getInstance().uploadCfg;
-    mAConfig = Configuration.getInstance().appCfg;
-    mDGConfig = Configuration.getInstance().dGroupCfg;
-
-    File xmlFile = new File(APP.getFilesDir().getPath() + Configuration.XML_FILE);
-    File tempDir = new File(APP.getFilesDir().getPath() + "/temp");
-    if (!xmlFile.exists()) {
-      loadConfig();
-    } else {
-      try {
-        String md5Code = CommonUtil.getFileMD5(xmlFile);
-        File file = new File(APP.getFilesDir().getPath() + "/temp.xml");
-        if (file.exists()) {
-          file.delete();
-        }
-        CommonUtil.createFileFormInputStream(APP.getAssets().open("aria_config.xml"),
-            file.getPath());
-        if (!CommonUtil.checkMD5(md5Code, file) || !Configuration.getInstance().configExists()) {
-          loadConfig();
-        }
-      } catch (IOException e) {
-        e.printStackTrace();
-      }
-    }
-    if (tempDir.exists()) {
-      File newDir = new File(APP.getFilesDir().getPath() + DOWNLOAD_TEMP_DIR);
-      newDir.mkdirs();
-      tempDir.renameTo(newDir);
-    }
-  }
-
-  /**
-   * 加载配置文件
-   */
-  private void loadConfig() {
-    try {
-      XMLReader helper = new XMLReader();
-      SAXParserFactory factory = SAXParserFactory.newInstance();
-      SAXParser parser = factory.newSAXParser();
-      parser.parse(APP.getAssets().open("aria_config.xml"), helper);
-      CommonUtil.createFileFormInputStream(APP.getAssets().open("aria_config.xml"),
-          APP.getFilesDir().getPath() + Configuration.XML_FILE);
-    } catch (ParserConfigurationException | IOException | SAXException e) {
-      ALog.e(TAG, e.toString());
-    }
   }
 
   /**

@@ -16,10 +16,9 @@
 package com.arialyy.aria.core.download.target;
 
 import com.arialyy.aria.core.download.DTaskWrapper;
-import com.arialyy.aria.core.download.target.AbsGroupConfigHandler;
 import com.arialyy.aria.core.inf.AbsTarget;
-import com.arialyy.aria.core.inf.AbsTaskWrapper;
-import com.arialyy.aria.core.inf.ITaskWrapper;
+import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
+import com.arialyy.aria.core.wrapper.ITaskWrapper;
 import java.util.List;
 
 /**

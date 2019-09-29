@@ -15,10 +15,10 @@
  */
 package com.arialyy.aria.core.scheduler;
 
-import com.arialyy.aria.core.download.DownloadGroupTask;
-import com.arialyy.aria.core.download.DownloadTask;
-import com.arialyy.aria.core.inf.ITask;
-import com.arialyy.aria.core.upload.UploadTask;
+import com.arialyy.aria.core.task.DownloadGroupTask;
+import com.arialyy.aria.core.task.DownloadTask;
+import com.arialyy.aria.core.task.ITask;
+import com.arialyy.aria.core.task.UploadTask;
 
 /**
  * Created by Aria.Lao on 2017/6/7.

@@ -17,10 +17,12 @@ package com.arialyy.aria.core.download.m3u8;
 
 import androidx.annotation.CheckResult;
 import com.arialyy.aria.core.common.BaseDelegate;
-import com.arialyy.aria.core.common.Suggest;
+import com.arialyy.aria.core.processor.ILiveTsUrlConverter;
+import com.arialyy.aria.core.inf.Suggest;
 import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.inf.AbsTarget;
-import com.arialyy.aria.core.inf.AbsTaskWrapper;
+import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
+import com.arialyy.aria.core.inf.IOptionConstant;
 import com.arialyy.aria.util.ALog;
 
 /**
@@ -41,7 +43,8 @@ public class M3U8LiveDelegate<TARGET extends AbsTarget> extends BaseDelegate<TAR
    */
   @CheckResult(suggest = Suggest.TO_CONTROLLER)
   public M3U8LiveDelegate<TARGET> setLiveTsUrlConvert(ILiveTsUrlConverter converter) {
-    ((DTaskWrapper) getTaskWrapper()).asM3U8().setLiveTsUrlConverter(converter);
+    ((DTaskWrapper) getTaskWrapper()).getM3U8Params()
+        .setParams(IOptionConstant.liveTsUrlConverter, converter);
     return this;
   }
 
@@ -56,7 +59,8 @@ public class M3U8LiveDelegate<TARGET extends AbsTarget> extends BaseDelegate<TAR
       ALog.e(TAG, "间隔时间错误");
       return this;
     }
-    ((DTaskWrapper) getTaskWrapper()).asM3U8().setLiveUpdateInterval(interval);
+    ((DTaskWrapper) getTaskWrapper()).getM3U8Params()
+        .setParams(IOptionConstant.liveUpdateInterval, interval);
     return this;
   }
 }

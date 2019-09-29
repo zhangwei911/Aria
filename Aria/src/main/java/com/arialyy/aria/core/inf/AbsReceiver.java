@@ -16,9 +16,9 @@
 
 package com.arialyy.aria.core.inf;
 
-import com.arialyy.aria.core.queue.DownloadGroupTaskQueue;
-import com.arialyy.aria.core.queue.DownloadTaskQueue;
-import com.arialyy.aria.core.queue.UploadTaskQueue;
+import com.arialyy.aria.core.queue.DGroupTaskQueue;
+import com.arialyy.aria.core.queue.DTaskQueue;
+import com.arialyy.aria.core.queue.UTaskQueue;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -85,7 +85,7 @@ public abstract class AbsReceiver implements IReceiver {
   }
 
   /**
-   * 移除{@link DownloadTaskQueue}、{@link DownloadGroupTaskQueue}、{@link UploadTaskQueue}中注册的观察者
+   * 移除{@link DTaskQueue}、{@link DGroupTaskQueue}、{@link UTaskQueue}中注册的观察者
    */
   protected abstract void unRegisterListener();
 }

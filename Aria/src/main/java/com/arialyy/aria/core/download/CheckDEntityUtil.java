@@ -16,11 +16,11 @@
 package com.arialyy.aria.core.download;
 
 import android.text.TextUtils;
-import com.arialyy.aria.core.common.RecordHandler;
-import com.arialyy.aria.core.download.m3u8.M3U8Entity;
 import com.arialyy.aria.core.inf.ICheckEntityUtil;
+import com.arialyy.aria.core.inf.IOptionConstant;
+import com.arialyy.aria.core.inf.IRecordHandler;
 import com.arialyy.aria.core.inf.ITargetHandler;
-import com.arialyy.aria.core.inf.ITaskWrapper;
+import com.arialyy.aria.core.wrapper.ITaskWrapper;
 import com.arialyy.aria.orm.DbEntity;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CheckUtil;
@@ -64,20 +64,24 @@ public class CheckDEntityUtil implements ICheckEntityUtil {
 
   private void handleM3U8() {
     File file = new File(mWrapper.getTempFilePath());
+    int bandWidth = (int) mWrapper.getM3U8Params().getParam(IOptionConstant.bandWidth);
     // 缓存文件夹格式：问文件夹/.文件名_码率
-    String cacheDir = String.format("%s/.%s_%s", file.getParent(), file.getName(),
-        mWrapper.asM3U8().getBandWidth());
-    mWrapper.asM3U8().setCacheDir(cacheDir);
+    String cacheDir = String.format("%s/.%s_%s", file.getParent(), file.getName(), bandWidth);
+
+    mWrapper.getM3U8Params().setParams(IOptionConstant.cacheDir, cacheDir);
     M3U8Entity m3U8Entity = mEntity.getM3U8Entity();
+
+    Object temp = mWrapper.getM3U8Params().getParam(IOptionConstant.generateIndexFileTemp);
+    boolean generateIndexFileTemp = temp != null && (boolean) temp;
     if (m3U8Entity == null) {
       m3U8Entity = new M3U8Entity();
       m3U8Entity.setFilePath(mEntity.getFilePath());
       m3U8Entity.setPeerIndex(0);
       m3U8Entity.setCacheDir(cacheDir);
-      m3U8Entity.setGenerateIndexFile(mWrapper.asM3U8().isGenerateIndexFileTemp());
+      m3U8Entity.setGenerateIndexFile(generateIndexFileTemp);
       m3U8Entity.insert();
     } else {
-      m3U8Entity.setGenerateIndexFile(mWrapper.asM3U8().isGenerateIndexFileTemp());
+      m3U8Entity.setGenerateIndexFile(generateIndexFileTemp);
       m3U8Entity.update();
     }
     if (mWrapper.getRequestType() == ITaskWrapper.M3U8_VOD) {
@@ -92,8 +96,8 @@ public class CheckDEntityUtil implements ICheckEntityUtil {
       }
     }
 
-    if (mWrapper.asM3U8().getBandWidthUrlConverter() != null
-        && mWrapper.asM3U8().getBandWidth() == 0) {
+    if (mWrapper.getM3U8Params().getHandler(IOptionConstant.bandWidthUrlConverter) != null
+        && bandWidth == 0) {
       ALog.w(TAG, "你已经设置了码率url转换器，但是没有设置码率，Aria框架将采用第一个获取到的码率");
     }
   }
@@ -140,7 +144,7 @@ public class CheckDEntityUtil implements ICheckEntityUtil {
           return false;
         } else {
           ALog.w(TAG, String.format("保存路径【%s】已经被其它任务占用，当前任务将覆盖该路径的文件", filePath));
-          RecordUtil.delTaskRecord(filePath, RecordHandler.TYPE_DOWNLOAD);
+          RecordUtil.delTaskRecord(filePath, IRecordHandler.TYPE_DOWNLOAD);
         }
       }
 
@@ -149,7 +153,7 @@ public class CheckDEntityUtil implements ICheckEntityUtil {
       mEntity.setFileName(newFile.getName());
 
       // 如过使用Content-Disposition中的文件名，将不会执行重命名工作
-      if (mWrapper.asHttp().isUseServerFileName()
+      if ((boolean) mWrapper.getOptionParams().getParam(IOptionConstant.useServerFileName)
           || mWrapper.getRequestType() == ITaskWrapper.M3U8_LIVE) {
         return true;
       }

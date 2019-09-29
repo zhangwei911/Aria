@@ -17,10 +17,15 @@ package com.arialyy.aria.core.download.m3u8;
 
 import androidx.annotation.CheckResult;
 import com.arialyy.aria.core.common.BaseDelegate;
-import com.arialyy.aria.core.common.Suggest;
 import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.inf.AbsTarget;
-import com.arialyy.aria.core.inf.AbsTaskWrapper;
+import com.arialyy.aria.core.inf.IOptionConstant;
+import com.arialyy.aria.core.inf.Suggest;
+import com.arialyy.aria.core.processor.IBandWidthUrlConverter;
+import com.arialyy.aria.core.processor.ITsMergeHandler;
+import com.arialyy.aria.core.processor.IVodTsUrlConverter;
+import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
+import com.arialyy.aria.util.ComponentUtil;
 
 /**
  * m3u8 委托
@@ -30,6 +35,7 @@ public class M3U8Delegate<TARGET extends AbsTarget> extends BaseDelegate<TARGET>
 
   public M3U8Delegate(TARGET target, AbsTaskWrapper wrapper) {
     super(target, wrapper);
+    ComponentUtil.getInstance().checkComponentExist(ComponentUtil.COMPONENT_TYPE_M3U8);
     mTaskWrapper = (DTaskWrapper) getTaskWrapper();
     mTaskWrapper.setRequestType(AbsTaskWrapper.M3U8_VOD);
   }
@@ -40,7 +46,7 @@ public class M3U8Delegate<TARGET extends AbsTarget> extends BaseDelegate<TARGET>
    */
   @CheckResult(suggest = Suggest.TO_CONTROLLER)
   public M3U8Delegate<TARGET> generateIndexFile() {
-    mTaskWrapper.asM3U8().setGenerateIndexFileTemp(true);
+    mTaskWrapper.getM3U8Params().setParams(IOptionConstant.generateIndexFileTemp, true);
     return this;
   }
 
@@ -51,7 +57,7 @@ public class M3U8Delegate<TARGET extends AbsTarget> extends BaseDelegate<TARGET>
    */
   @CheckResult(suggest = Suggest.TO_CONTROLLER)
   public M3U8Delegate<TARGET> merge(boolean merge) {
-    mTaskWrapper.asM3U8().setMergeFile(merge);
+    mTaskWrapper.getM3U8Params().setParams(IOptionConstant.mergeFile, merge);
     return this;
   }
 
@@ -61,7 +67,7 @@ public class M3U8Delegate<TARGET extends AbsTarget> extends BaseDelegate<TARGET>
    */
   @CheckResult(suggest = Suggest.TO_CONTROLLER)
   public M3U8Delegate<TARGET> setMergeHandler(ITsMergeHandler handler) {
-    mTaskWrapper.asM3U8().setMergeHandler(handler);
+    mTaskWrapper.getM3U8Params().setParams(IOptionConstant.mergeHandler, handler);
     return this;
   }
 
@@ -73,7 +79,7 @@ public class M3U8Delegate<TARGET extends AbsTarget> extends BaseDelegate<TARGET>
    */
   @CheckResult(suggest = Suggest.TO_CONTROLLER)
   public M3U8Delegate<TARGET> setTsUrlConvert(IVodTsUrlConverter converter) {
-    mTaskWrapper.asM3U8().setVodUrlConverter(converter);
+    mTaskWrapper.getM3U8Params().setParams(IOptionConstant.vodUrlConverter, converter);
     return this;
   }
 
@@ -84,7 +90,7 @@ public class M3U8Delegate<TARGET extends AbsTarget> extends BaseDelegate<TARGET>
    */
   @CheckResult(suggest = Suggest.TO_CONTROLLER)
   public M3U8Delegate<TARGET> setBandWidth(int bandWidth) {
-    mTaskWrapper.asM3U8().setBandWidth(bandWidth);
+    mTaskWrapper.getM3U8Params().setParams(IOptionConstant.bandWidth, bandWidth);
     return this;
   }
 
@@ -96,7 +102,7 @@ public class M3U8Delegate<TARGET extends AbsTarget> extends BaseDelegate<TARGET>
    */
   @CheckResult(suggest = Suggest.TO_CONTROLLER)
   public M3U8Delegate<TARGET> setBandWidthUrlConverter(IBandWidthUrlConverter converter) {
-    mTaskWrapper.asM3U8().setBandWidthUrlConverter(converter);
+    mTaskWrapper.getM3U8Params().setParams(IOptionConstant.bandWidthUrlConverter, converter);
     return this;
   }
 

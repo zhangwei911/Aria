@@ -16,7 +16,9 @@
 package com.arialyy.aria.core.download;
 
 import android.text.TextUtils;
+import com.arialyy.aria.core.FtpUrlEntity;
 import com.arialyy.aria.core.inf.ICheckEntityUtil;
+import com.arialyy.aria.core.inf.IOptionConstant;
 import com.arialyy.aria.orm.DbEntity;
 import com.arialyy.aria.util.ALog;
 import java.io.File;
@@ -83,12 +85,15 @@ public class CheckFtpDirEntityUtil implements ICheckEntityUtil {
     if (b) {
       mEntity.save();
     }
-    if (mWrapper.asFtp().getUrlEntity().isFtps) {
-      if (TextUtils.isEmpty(mWrapper.asFtp().getUrlEntity().storePath)) {
+    FtpUrlEntity urlEntity =
+        (FtpUrlEntity) mWrapper.getOptionParams().getParam(IOptionConstant.ftpUrlEntity);
+    assert urlEntity != null;
+    if (urlEntity.isFtps) {
+      if (TextUtils.isEmpty(urlEntity.storePath)) {
         ALog.e(TAG, "证书路径为空");
         return false;
       }
-      if (TextUtils.isEmpty(mWrapper.asFtp().getUrlEntity().keyAlias)) {
+      if (TextUtils.isEmpty(urlEntity.keyAlias)) {
         ALog.e(TAG, "证书别名为空");
         return false;
       }

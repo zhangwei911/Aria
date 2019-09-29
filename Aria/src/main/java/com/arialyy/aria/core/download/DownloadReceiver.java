@@ -33,15 +33,17 @@ import com.arialyy.aria.core.download.target.GroupNormalTarget;
 import com.arialyy.aria.core.download.target.HttpBuilderTarget;
 import com.arialyy.aria.core.download.target.HttpNormalTarget;
 import com.arialyy.aria.core.event.EventMsgUtil;
-import com.arialyy.aria.core.inf.AbsEntity;
+import com.arialyy.aria.core.common.AbsEntity;
 import com.arialyy.aria.core.inf.AbsReceiver;
-import com.arialyy.aria.core.inf.ITask;
+import com.arialyy.aria.core.task.ITask;
 import com.arialyy.aria.core.inf.ReceiverType;
 import com.arialyy.aria.core.scheduler.TaskSchedulers;
 import com.arialyy.aria.orm.DbEntity;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CheckUtil;
+import com.arialyy.aria.core.command.CmdHelper;
 import com.arialyy.aria.util.CommonUtil;
+import com.arialyy.aria.util.ComponentUtil;
 import com.arialyy.aria.util.DbDataHelper;
 import java.util.ArrayList;
 import java.util.List;
@@ -73,6 +75,7 @@ public class DownloadReceiver extends AbsReceiver {
    */
   @CheckResult
   public HttpBuilderTarget load(@NonNull String url) {
+    ComponentUtil.getInstance().checkComponentExist(ComponentUtil.COMPONENT_TYPE_HTTP);
     CheckUtil.checkUrlInvalidThrow(url);
     return DTargetFactory.getInstance()
         .generateBuilderTarget(HttpBuilderTarget.class, url);
@@ -86,6 +89,7 @@ public class DownloadReceiver extends AbsReceiver {
    */
   @CheckResult
   public HttpNormalTarget load(long taskId) {
+    ComponentUtil.getInstance().checkComponentExist(ComponentUtil.COMPONENT_TYPE_HTTP);
     CheckUtil.checkTaskId(taskId);
     return DTargetFactory.getInstance()
         .generateNormalTarget(HttpNormalTarget.class, taskId);
@@ -98,6 +102,7 @@ public class DownloadReceiver extends AbsReceiver {
    */
   @CheckResult
   public GroupBuilderTarget loadGroup(List<String> urls) {
+    ComponentUtil.getInstance().checkComponentExist(ComponentUtil.COMPONENT_TYPE_HTTP);
     CheckUtil.checkDownloadUrls(urls);
     return DTargetFactory.getInstance().generateGroupBuilderTarget(urls);
   }
@@ -110,6 +115,7 @@ public class DownloadReceiver extends AbsReceiver {
    */
   @CheckResult
   public GroupNormalTarget loadGroup(long taskId) {
+    ComponentUtil.getInstance().checkComponentExist(ComponentUtil.COMPONENT_TYPE_HTTP);
     CheckUtil.checkTaskId(taskId);
     return DTargetFactory.getInstance()
         .generateNormalTarget(GroupNormalTarget.class, taskId);
@@ -120,6 +126,7 @@ public class DownloadReceiver extends AbsReceiver {
    */
   @CheckResult
   public FtpBuilderTarget loadFtp(@NonNull String url) {
+    ComponentUtil.getInstance().checkComponentExist(ComponentUtil.COMPONENT_TYPE_FTP);
     CheckUtil.checkUrlInvalidThrow(url);
     return DTargetFactory.getInstance()
         .generateBuilderTarget(FtpBuilderTarget.class, url);
@@ -133,6 +140,7 @@ public class DownloadReceiver extends AbsReceiver {
    */
   @CheckResult
   public FtpNormalTarget loadFtp(long taskId) {
+    ComponentUtil.getInstance().checkComponentExist(ComponentUtil.COMPONENT_TYPE_FTP);
     CheckUtil.checkTaskId(taskId);
     return DTargetFactory.getInstance()
         .generateNormalTarget(FtpNormalTarget.class, taskId);
@@ -143,6 +151,7 @@ public class DownloadReceiver extends AbsReceiver {
    */
   @CheckResult
   public FtpDirBuilderTarget loadFtpDir(@NonNull String dirUrl) {
+    ComponentUtil.getInstance().checkComponentExist(ComponentUtil.COMPONENT_TYPE_FTP);
     CheckUtil.checkUrlInvalidThrow(dirUrl);
     return DTargetFactory.getInstance().generateDirBuilderTarget(dirUrl);
   }
@@ -155,6 +164,7 @@ public class DownloadReceiver extends AbsReceiver {
    */
   @CheckResult
   public FtpDirNormalTarget loadFtpDir(long taskId) {
+    ComponentUtil.getInstance().checkComponentExist(ComponentUtil.COMPONENT_TYPE_FTP);
     CheckUtil.checkTaskId(taskId);
     return DTargetFactory.getInstance()
         .generateNormalTarget(FtpDirNormalTarget.class, taskId);
@@ -461,7 +471,7 @@ public class DownloadReceiver extends AbsReceiver {
   public void removeAllTask(boolean removeFile) {
     final AriaManager ariaManager = AriaManager.getInstance();
     CancelAllCmd cancelCmd =
-        (CancelAllCmd) CommonUtil.createNormalCmd(new DTaskWrapper(null),
+        (CancelAllCmd) CmdHelper.createNormalCmd(new DTaskWrapper(null),
             NormalCmdFactory.TASK_CANCEL_ALL, ITask.DOWNLOAD);
     cancelCmd.removeFile = removeFile;
     EventMsgUtil.getDefault().post(cancelCmd);

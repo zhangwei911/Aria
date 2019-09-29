@@ -18,10 +18,9 @@ package com.arialyy.aria.core.download.tcp;
 import android.text.TextUtils;
 import androidx.annotation.CheckResult;
 import com.arialyy.aria.core.common.BaseDelegate;
-import com.arialyy.aria.core.common.Suggest;
-import com.arialyy.aria.core.download.DTaskWrapper;
+import com.arialyy.aria.core.inf.Suggest;
 import com.arialyy.aria.core.inf.AbsTarget;
-import com.arialyy.aria.core.inf.AbsTaskWrapper;
+import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
 import com.arialyy.aria.util.ALog;
 import java.nio.charset.Charset;
 
@@ -36,7 +35,7 @@ public class TcpDelegate<TARGET extends AbsTarget> extends BaseDelegate<TARGET> 
   public TcpDelegate(TARGET target, AbsTaskWrapper wrapper) {
     super(target, wrapper);
 
-    mTcpConfig = ((DTaskWrapper) wrapper).asTcp();
+    mTcpConfig = (TcpTaskConfig) wrapper.getTaskOption();
   }
 
   /**

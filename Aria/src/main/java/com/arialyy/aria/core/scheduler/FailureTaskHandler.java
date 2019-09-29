@@ -16,8 +16,8 @@
 package com.arialyy.aria.core.scheduler;
 
 import com.arialyy.aria.core.AriaManager;
-import com.arialyy.aria.core.inf.AbsEntity;
-import com.arialyy.aria.core.inf.ITask;
+import com.arialyy.aria.core.common.AbsEntity;
+import com.arialyy.aria.core.task.ITask;
 import com.arialyy.aria.core.manager.TaskWrapperManager;
 import com.arialyy.aria.core.queue.ITaskQueue;
 import com.arialyy.aria.util.ALog;

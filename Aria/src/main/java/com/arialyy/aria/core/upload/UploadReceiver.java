@@ -21,15 +21,16 @@ import androidx.annotation.NonNull;
 import com.arialyy.annotations.TaskEnum;
 import com.arialyy.aria.core.AriaManager;
 import com.arialyy.aria.core.command.CancelAllCmd;
+import com.arialyy.aria.core.command.CmdHelper;
 import com.arialyy.aria.core.command.NormalCmdFactory;
 import com.arialyy.aria.core.common.AbsBuilderTarget;
+import com.arialyy.aria.core.common.AbsEntity;
 import com.arialyy.aria.core.common.ProxyHelper;
 import com.arialyy.aria.core.event.EventMsgUtil;
-import com.arialyy.aria.core.inf.AbsEntity;
 import com.arialyy.aria.core.inf.AbsReceiver;
-import com.arialyy.aria.core.inf.ITask;
 import com.arialyy.aria.core.inf.ReceiverType;
 import com.arialyy.aria.core.scheduler.TaskSchedulers;
+import com.arialyy.aria.core.task.ITask;
 import com.arialyy.aria.core.upload.target.FtpBuilderTarget;
 import com.arialyy.aria.core.upload.target.FtpNormalTarget;
 import com.arialyy.aria.core.upload.target.HttpBuilderTarget;
@@ -38,7 +39,7 @@ import com.arialyy.aria.core.upload.target.UTargetFactory;
 import com.arialyy.aria.orm.DbEntity;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CheckUtil;
-import com.arialyy.aria.util.CommonUtil;
+import com.arialyy.aria.util.ComponentUtil;
 import java.util.List;
 import java.util.Set;
 
@@ -68,6 +69,7 @@ public class UploadReceiver extends AbsReceiver {
    */
   @CheckResult
   public HttpBuilderTarget load(@NonNull String filePath) {
+    ComponentUtil.getInstance().checkComponentExist(ComponentUtil.COMPONENT_TYPE_HTTP);
     CheckUtil.checkUploadPath(filePath);
     return UTargetFactory.getInstance()
         .generateBuilderTarget(HttpBuilderTarget.class, filePath);
@@ -81,6 +83,7 @@ public class UploadReceiver extends AbsReceiver {
    */
   @CheckResult
   public HttpNormalTarget load(long taskId) {
+    ComponentUtil.getInstance().checkComponentExist(ComponentUtil.COMPONENT_TYPE_HTTP);
     CheckUtil.checkTaskId(taskId);
     return UTargetFactory.getInstance()
         .generateNormalTarget(HttpNormalTarget.class, taskId);
@@ -93,6 +96,7 @@ public class UploadReceiver extends AbsReceiver {
    */
   @CheckResult
   public FtpBuilderTarget loadFtp(@NonNull String filePath) {
+    ComponentUtil.getInstance().checkComponentExist(ComponentUtil.COMPONENT_TYPE_FTP);
     CheckUtil.checkUploadPath(filePath);
     return UTargetFactory.getInstance()
         .generateBuilderTarget(FtpBuilderTarget.class, filePath);
@@ -106,6 +110,7 @@ public class UploadReceiver extends AbsReceiver {
    */
   @CheckResult
   public FtpNormalTarget loadFtp(long taskId) {
+    ComponentUtil.getInstance().checkComponentExist(ComponentUtil.COMPONENT_TYPE_FTP);
     CheckUtil.checkTaskId(taskId);
     return UTargetFactory.getInstance()
         .generateNormalTarget(FtpNormalTarget.class, taskId);
@@ -237,7 +242,7 @@ public class UploadReceiver extends AbsReceiver {
   public void removeAllTask(boolean removeFile) {
     final AriaManager am = AriaManager.getInstance();
     CancelAllCmd cancelCmd =
-        (CancelAllCmd) CommonUtil.createNormalCmd(new UTaskWrapper(null),
+        (CancelAllCmd) CmdHelper.createNormalCmd(new UTaskWrapper(null),
             NormalCmdFactory.TASK_CANCEL_ALL, ITask.UPLOAD);
     cancelCmd.removeFile = removeFile;
 
