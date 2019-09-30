@@ -44,7 +44,7 @@ public class M3U8LiveDelegate<TARGET extends AbsTarget> extends BaseDelegate<TAR
   @CheckResult(suggest = Suggest.TO_CONTROLLER)
   public M3U8LiveDelegate<TARGET> setLiveTsUrlConvert(ILiveTsUrlConverter converter) {
     ((DTaskWrapper) getTaskWrapper()).getM3U8Params()
-        .setParams(IOptionConstant.liveTsUrlConverter, converter);
+        .setObjs(IOptionConstant.liveTsUrlConverter, converter);
     return this;
   }
 

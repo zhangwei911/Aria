@@ -23,6 +23,8 @@ import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.inf.IEntity;
 import com.arialyy.aria.core.inf.IUtil;
 import com.arialyy.aria.core.listener.IDGroupListener;
+import com.arialyy.aria.core.listener.IEventListener;
+import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
 import java.util.Map;
@@ -49,12 +51,12 @@ public abstract class AbsGroupUtil implements IUtil, Runnable {
   private DGTaskWrapper mGTWrapper;
   private GroupRunState mState;
 
-  protected AbsGroupUtil(IDGroupListener listener, DGTaskWrapper groupWrapper) {
-    mListener = listener;
-    mGTWrapper = groupWrapper;
+  protected AbsGroupUtil(AbsTaskWrapper groupWrapper, IEventListener listener) {
+    mListener = (IDGroupListener) listener;
+    mGTWrapper = (DGTaskWrapper) groupWrapper;
     mUpdateInterval = Configuration.getInstance().downloadCfg.getUpdateInterval();
     mState = new GroupRunState(groupWrapper.getKey(), mListener,
-        groupWrapper.getSubTaskWrapper().size(), mSubQueue);
+        mGTWrapper.getSubTaskWrapper().size(), mSubQueue);
     mScheduler = new Handler(Looper.getMainLooper(), SimpleSchedulers.newInstance(mState));
     initState();
   }

@@ -22,6 +22,8 @@ import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.inf.IEntity;
 import com.arialyy.aria.core.inf.OnFileInfoCallback;
+import com.arialyy.aria.core.listener.IEventListener;
+import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
 import com.arialyy.aria.exception.AriaIOException;
 import com.arialyy.aria.exception.BaseException;
 import com.arialyy.aria.core.group.AbsGroupUtil;
@@ -46,8 +48,8 @@ public class DGroupLoaderUtil extends AbsGroupUtil {
   private boolean getLenComplete = false;
   private List<DTaskWrapper> mTempWrapper = new ArrayList<>();
 
-  public DGroupLoaderUtil(IDGroupListener listener, DGTaskWrapper taskWrapper) {
-    super(listener, taskWrapper);
+  public DGroupLoaderUtil(AbsTaskWrapper taskWrapper, IEventListener listener) {
+    super(taskWrapper, listener);
     taskWrapper.generateTaskOption(HttpTaskOption.class);
   }
 

@@ -24,7 +24,6 @@ import com.arialyy.aria.core.listener.BaseDListener;
 import com.arialyy.aria.core.listener.IDLoadListener;
 import com.arialyy.aria.core.listener.ISchedulers;
 import com.arialyy.aria.core.task.AbsTask;
-import com.arialyy.aria.core.task.DownloadTask;
 import com.arialyy.aria.util.CommonUtil;
 
 /**
@@ -32,7 +31,7 @@ import com.arialyy.aria.util.CommonUtil;
  */
 public class M3U8Listener extends BaseDListener implements IDLoadListener {
 
-  M3U8Listener(AbsTask<DTaskWrapper> task, Handler outHandler) {
+  public M3U8Listener(AbsTask<DTaskWrapper> task, Handler outHandler) {
     super(task, outHandler);
   }
 

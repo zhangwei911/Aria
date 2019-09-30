@@ -19,13 +19,15 @@ import android.text.TextUtils;
 import com.arialyy.aria.core.common.AbsEntity;
 import com.arialyy.aria.core.common.CompleteInfo;
 import com.arialyy.aria.core.download.DTaskWrapper;
-import com.arialyy.aria.core.download.DownloadEntity;
-import com.arialyy.aria.core.processor.IVodTsUrlConverter;
 import com.arialyy.aria.core.inf.OnFileInfoCallback;
+import com.arialyy.aria.core.listener.IEventListener;
 import com.arialyy.aria.core.loader.AbsLoader;
 import com.arialyy.aria.core.loader.AbsNormalLoaderUtil;
+import com.arialyy.aria.core.processor.IVodTsUrlConverter;
+import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
 import com.arialyy.aria.exception.BaseException;
 import com.arialyy.aria.exception.M3U8Exception;
+import com.arialyy.aria.http.HttpTaskOption;
 import com.arialyy.aria.m3u8.M3U8InfoThread;
 import com.arialyy.aria.m3u8.M3U8Listener;
 import com.arialyy.aria.m3u8.M3U8TaskOption;
@@ -43,28 +45,32 @@ import java.util.List;
  */
 public class M3U8VodUtil extends AbsNormalLoaderUtil {
 
-  private M3U8Listener mListener;
   private List<String> mUrls = new ArrayList<>();
   private M3U8TaskOption mM3U8Option;
 
-  public M3U8VodUtil(DTaskWrapper wrapper, M3U8Listener listener) {
+  public M3U8VodUtil(AbsTaskWrapper wrapper, IEventListener listener) {
     super(wrapper, listener);
-    wrapper.generateM3u8Option(M3U8TaskOption.class);
-    mListener = listener;
-    mM3U8Option = (M3U8TaskOption) wrapper.getM3u8Option();
+  }
+
+  @Override public DTaskWrapper getTaskWrapper() {
+    return (DTaskWrapper) super.getTaskWrapper();
   }
 
   @Override protected AbsLoader createLoader() {
-    return new M3U8VodLoader((M3U8Listener) getListener(), (DTaskWrapper) getTaskWrapper());
+    getTaskWrapper().generateM3u8Option(M3U8TaskOption.class);
+    getTaskWrapper().generateTaskOption(HttpTaskOption.class);
+    mM3U8Option = (M3U8TaskOption) getTaskWrapper().getM3u8Option();
+    return new M3U8VodLoader((M3U8Listener) getListener(), getTaskWrapper());
   }
 
   @Override protected Runnable createInfoThread() {
-    return new M3U8InfoThread((DTaskWrapper) getTaskWrapper(), new OnFileInfoCallback() {
+    return new M3U8InfoThread(getTaskWrapper(), new OnFileInfoCallback() {
       @Override public void onComplete(String key, CompleteInfo info) {
         IVodTsUrlConverter converter = mM3U8Option.getVodUrlConverter();
         if (converter != null) {
           if (TextUtils.isEmpty(mM3U8Option.getBandWidthUrl())) {
-            mUrls.addAll(converter.convert(getEntity().getUrl(), (List<String>) info.obj));
+            mUrls.addAll(
+                converter.convert(getTaskWrapper().getEntity().getUrl(), (List<String>) info.obj));
           } else {
             mUrls.addAll(
                 converter.convert(mM3U8Option.getBandWidthUrl(), (List<String>) info.obj));
@@ -81,7 +87,7 @@ public class M3U8VodUtil extends AbsNormalLoaderUtil {
         }
         mM3U8Option.setUrls(mUrls);
         if (isStop()) {
-          getListener().onStop(getEntity().getCurrentProgress());
+          getListener().onStop(getTaskWrapper().getEntity().getCurrentProgress());
         } else if (isCancel()) {
           getListener().onCancel();
         } else {
@@ -93,9 +99,5 @@ public class M3U8VodUtil extends AbsNormalLoaderUtil {
         fail(e, needRetry);
       }
     });
-  }
-
-  private DownloadEntity getEntity() {
-    return (DownloadEntity) getTaskWrapper().getEntity();
   }
 }

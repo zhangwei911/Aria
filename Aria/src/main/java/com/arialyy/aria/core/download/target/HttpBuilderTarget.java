@@ -96,7 +96,7 @@ public class HttpBuilderTarget extends AbsBuilderTarget<HttpBuilderTarget> {
       throw new IllegalArgumentException("adapter为空");
     }
 
-    getTaskWrapper().getOptionParams().setParams(IOptionConstant.fileLenAdapter, adapter);
+    getTaskWrapper().getOptionParams().setObjs(IOptionConstant.fileLenAdapter, adapter);
     return this;
   }
 }

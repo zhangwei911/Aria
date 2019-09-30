@@ -25,8 +25,8 @@ import com.arialyy.aria.core.AriaConfig;
 import com.arialyy.aria.core.ThreadRecord;
 import com.arialyy.aria.core.common.SubThreadConfig;
 import com.arialyy.aria.core.inf.IEntity;
-import com.arialyy.aria.core.listener.ISchedulers;
 import com.arialyy.aria.core.inf.IThreadState;
+import com.arialyy.aria.core.listener.ISchedulers;
 import com.arialyy.aria.core.manager.ThreadTaskManager;
 import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
 import com.arialyy.aria.core.wrapper.ITaskWrapper;
@@ -62,16 +62,16 @@ public class ThreadTask implements IThreadTask, IThreadTaskObserver {
   private Handler mStateHandler;
   private SubThreadConfig mConfig;
   /**
-   * 当前子线程相对于总长度的位置
+   * 当前线程的下去区间的进度
    */
-  protected long mChildCurrentLocation = 0;
+  private long mRangeProgress;
   private IThreadTaskAdapter mAdapter;
-  protected ThreadRecord mRecord;
+  private ThreadRecord mRecord;
 
   private Thread mConfigThread = new Thread(new Runnable() {
     @Override public void run() {
       Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
-      final long currentTemp = mChildCurrentLocation;
+      final long currentTemp = mRangeProgress;
       writeConfig(false, currentTemp);
     }
   });
@@ -86,7 +86,7 @@ public class ThreadTask implements IThreadTask, IThreadTaskObserver {
     mConfigThreadPool = Executors.newCachedThreadPool();
 
     isNotNetRetry = AriaConfig.getInstance().getAConfig().isNotNetRetry();
-    mChildCurrentLocation = mRecord.startLocation;
+    mRangeProgress = mRecord.startLocation;
   }
 
   /**
@@ -94,6 +94,7 @@ public class ThreadTask implements IThreadTask, IThreadTaskObserver {
    */
   public void setAdapter(IThreadTaskAdapter adapter) {
     mAdapter = adapter;
+    mAdapter.setThreadStateObserver(this);
   }
 
   /**
@@ -166,7 +167,7 @@ public class ThreadTask implements IThreadTask, IThreadTaskObserver {
   public void breakTask() {
     taskBreak = true;
     if (mTaskWrapper.isSupportBP()) {
-      final long currentTemp = mChildCurrentLocation;
+      final long currentTemp = mRangeProgress;
       updateState(IThreadState.STATE_STOP, null);
       ALog.d(TAG, String.format("任务【%s】thread__%s__中断【停止位置：%s】", getFileName(),
           mRecord.threadId, currentTemp));
@@ -239,7 +240,7 @@ public class ThreadTask implements IThreadTask, IThreadTaskObserver {
       ALog.i(TAG, String.format("任务【%s】已停止", getFileName()));
     } else {
       if (mTaskWrapper.isSupportBP()) {
-        final long stopLocation = mChildCurrentLocation;
+        final long stopLocation = mRangeProgress;
         ALog.d(TAG,
             String.format("任务【%s】thread__%s__停止【当前线程停止位置：%s】", getFileName(),
                 mRecord.threadId, stopLocation));
@@ -295,20 +296,20 @@ public class ThreadTask implements IThreadTask, IThreadTaskObserver {
    *
    * @param needRetry 是否需要重试，一般是网络错误才需要重试
    */
-  @Override public void updateFailState(@Nullable BaseException e, boolean needRetry) {
-
+  @Override public synchronized void updateFailState(@Nullable BaseException e, boolean needRetry) {
+    fail(mRangeProgress, e, needRetry);
   }
 
   @Override
   public synchronized void updateProgress(long len) {
-    mChildCurrentLocation += len;
+    mRangeProgress += len;
     Thread loopThread = mStateHandler.getLooper().getThread();
     if (!loopThread.isAlive() || loopThread.isInterrupted()) {
       return;
     }
     mStateHandler.obtainMessage(IThreadState.STATE_RUNNING, len).sendToTarget();
     if (System.currentTimeMillis() - mLastSaveTime > 5000
-        && mChildCurrentLocation < mRecord.endLocation) {
+        && mRangeProgress < mRecord.endLocation) {
       mLastSaveTime = System.currentTimeMillis();
       if (!mConfigThreadPool.isShutdown()) {
         mConfigThreadPool.execute(mConfigThread);
@@ -325,16 +326,6 @@ public class ThreadTask implements IThreadTask, IThreadTaskObserver {
     updateState(IThreadState.STATE_CANCEL, null);
     ALog.d(TAG,
         String.format("任务【%s】thread__%s__取消", getFileName(), mRecord.threadId));
-  }
-
-  /**
-   * 线程任务失败
-   *
-   * @param subCurrentLocation 当前线程下载进度
-   * @param ex 异常信息
-   */
-  protected void fail(long subCurrentLocation, BaseException ex) {
-    fail(subCurrentLocation, ex, true);
   }
 
   /**
@@ -451,7 +442,7 @@ public class ThreadTask implements IThreadTask, IThreadTaskObserver {
   /**
    * 发送失败信息
    */
-  protected void sendFailMsg(@Nullable BaseException e) {
+  private void sendFailMsg(@Nullable BaseException e) {
     if (e != null) {
       Bundle b = new Bundle();
       b.putSerializable(IThreadState.KEY_ERROR_INFO, e);
@@ -467,7 +458,7 @@ public class ThreadTask implements IThreadTask, IThreadTaskObserver {
    * @param isComplete 当前线程是否完成 {@code true}完成
    * @param record 当前下载进度
    */
-  protected void writeConfig(boolean isComplete, final long record) {
+  private void writeConfig(boolean isComplete, final long record) {
     if (mRecord != null) {
       mRecord.isComplete = isComplete;
       if (mConfig.isBlock) {
@@ -487,6 +478,7 @@ public class ThreadTask implements IThreadTask, IThreadTaskObserver {
     isDestroy = false;
     Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
     TrafficStats.setThreadStatsTag(UUID.randomUUID().toString().hashCode());
+    mAdapter.call(this);
     return this;
   }
 }

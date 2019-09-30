@@ -291,7 +291,7 @@ public class M3U8VodDLoadActivity extends BaseActivity<ActivityM3u8VodBinding> {
                 @Override public List<String> convert(String m3u8Url, List<String> tsUrls) {
 
                   Uri uri = Uri.parse(m3u8Url);
-                  String parentUrl = uri.getAuthority() + "://" + uri.getHost();
+                  String parentUrl = "http://" + uri.getHost();
                   List<String> newUrls = new ArrayList<>();
                   for (String url : tsUrls) {
                     newUrls.add(parentUrl + url);
@@ -325,12 +325,6 @@ public class M3U8VodDLoadActivity extends BaseActivity<ActivityM3u8VodBinding> {
         //})
         .setTsUrlConvert(new IVodTsUrlConverter() {
           @Override public List<String> convert(String m3u8Url, List<String> tsUrls) {
-            //int index = m3u8Url.lastIndexOf("/");
-            //String parentUrl = m3u8Url.substring(0, index + 1);
-            //List<String> newUrls = new ArrayList<>();
-            //for (String url : tsUrls) {
-            //  newUrls.add(parentUrl + url);
-            //}
             Uri uri = Uri.parse(m3u8Url);
             String parentUrl = uri.getScheme() + "://" + uri.getHost();
             List<String> newUrls = new ArrayList<>();
@@ -350,16 +344,6 @@ public class M3U8VodDLoadActivity extends BaseActivity<ActivityM3u8VodBinding> {
         .generateIndexFile()
         .controller(ControllerType.CREATE_CONTROLLER)
         .create();
-
-    Aria.download(M3U8VodDLoadActivity.this)
-        .load(mUrl)
-        .useServerFileName(true)
-        .setFilePath(mFilePath, true)
-        .asM3U8().setTsUrlConvert(new IVodTsUrlConverter() {
-      @Override public List<String> convert(String m3u8Url, List<String> tsUrls) {
-        return null;
-      }
-    });
   }
 
   private Class<BuilderController> c = BuilderController.class;

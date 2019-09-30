@@ -61,7 +61,7 @@ final class HttpDThreadTaskAdapter extends BaseHttpThreadTaskAdapter {
     BufferedInputStream is = null;
     BufferedRandomAccessFile file = null;
     try {
-      URL url = ConnectionHelp.handleUrl(getConfig().url, mTaskOption);
+      URL url = ConnectionHelp.handleUrl(getThreadConfig().url, mTaskOption);
       conn = ConnectionHelp.handleConnection(url, mTaskOption);
       if (mTaskWrapper.isSupportBP()) {
         ALog.d(TAG,
@@ -103,12 +103,12 @@ final class HttpDThreadTaskAdapter extends BaseHttpThreadTaskAdapter {
       is = new BufferedInputStream(ConnectionHelp.convertInputStream(conn));
       if (mTaskOption.isChunked()) {
         readChunked(is);
-      } else if (getConfig().isOpenDynamicFile) {
+      } else if (getThreadConfig().isOpenDynamicFile) {
         readDynamicFile(is);
       } else {
         //创建可设置位置的文件
         file =
-            new BufferedRandomAccessFile(getConfig().tempFile, "rwd",
+            new BufferedRandomAccessFile(getThreadConfig().tempFile, "rwd",
                 getTaskConfig().getBuffSize());
         //设置每条线程写入文件的位置
         file.seek(getThreadRecord().startLocation);
@@ -150,7 +150,7 @@ final class HttpDThreadTaskAdapter extends BaseHttpThreadTaskAdapter {
   private void readChunked(InputStream is) {
     FileOutputStream fos = null;
     try {
-      fos = new FileOutputStream(getConfig().tempFile, true);
+      fos = new FileOutputStream(getThreadConfig().tempFile, true);
       byte[] buffer = new byte[getTaskConfig().getBuffSize()];
       int len;
       while (getThreadTask().isLive() && (len = is.read(buffer)) != -1) {
@@ -167,7 +167,7 @@ final class HttpDThreadTaskAdapter extends BaseHttpThreadTaskAdapter {
     } catch (IOException e) {
       fail(new AriaIOException(TAG,
           String.format("文件下载失败，savePath: %s, url: %s", getEntity().getFilePath(),
-              getConfig().url)), true);
+              getThreadConfig().url)), true);
     } finally {
       if (fos != null) {
         try {
@@ -188,7 +188,7 @@ final class HttpDThreadTaskAdapter extends BaseHttpThreadTaskAdapter {
     ReadableByteChannel fic = null;
     try {
       int len;
-      fos = new FileOutputStream(getConfig().tempFile, true);
+      fos = new FileOutputStream(getThreadConfig().tempFile, true);
       foc = fos.getChannel();
       fic = Channels.newChannel(is);
       ByteBuffer bf = ByteBuffer.allocate(getTaskConfig().getBuffSize());
@@ -219,7 +219,7 @@ final class HttpDThreadTaskAdapter extends BaseHttpThreadTaskAdapter {
     } catch (IOException e) {
       fail(new AriaIOException(TAG,
           String.format("文件下载失败，savePath: %s, url: %s", getEntity().getFilePath(),
-              getConfig().url), e), true);
+              getThreadConfig().url), e), true);
     } finally {
       try {
         if (fos != null) {

@@ -23,6 +23,7 @@ import com.arialyy.aria.core.group.GroupSendParams;
 import com.arialyy.aria.core.inf.IEntity;
 import com.arialyy.aria.core.inf.IRecordHandler;
 import com.arialyy.aria.core.inf.TaskSchedulerType;
+import com.arialyy.aria.core.task.AbsTask;
 import com.arialyy.aria.core.task.DownloadGroupTask;
 import com.arialyy.aria.exception.BaseException;
 import com.arialyy.aria.util.ALog;
@@ -34,14 +35,14 @@ import com.arialyy.aria.util.RecordUtil;
  * Created by Aria.Lao on 2017/7/20. 任务组下载事件
  */
 public class DownloadGroupListener
-    extends BaseListener<DownloadGroupEntity, DGTaskWrapper, DownloadGroupTask>
+    extends BaseListener<DownloadGroupEntity, DGTaskWrapper, AbsTask<DGTaskWrapper>>
     implements IDGroupListener {
   private GroupSendParams<DownloadGroupTask, DownloadEntity> mSeedEntity;
 
-  public DownloadGroupListener(DownloadGroupTask task, Handler outHandler) {
+  public DownloadGroupListener(AbsTask<DGTaskWrapper> task, Handler outHandler) {
     super(task, outHandler);
     mSeedEntity = new GroupSendParams<>();
-    mSeedEntity.groupTask = task;
+    mSeedEntity.groupTask = (DownloadGroupTask) task;
   }
 
   @Override

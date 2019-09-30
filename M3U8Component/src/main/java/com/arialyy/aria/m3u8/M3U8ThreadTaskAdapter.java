@@ -60,7 +60,7 @@ public class M3U8ThreadTaskAdapter extends AbsThreadTaskAdapter {
     HttpURLConnection conn = null;
     BufferedInputStream is = null;
     try {
-      URL url = ConnectionHelp.handleUrl(getConfig().url, mHttpTaskOption);
+      URL url = ConnectionHelp.handleUrl(getThreadConfig().url, mHttpTaskOption);
       conn = ConnectionHelp.handleConnection(url, mHttpTaskOption);
       ALog.d(TAG, String.format("分片【%s】开始下载", getThreadRecord().threadId));
       ConnectionHelp.setConnectParam(mHttpTaskOption, conn);
@@ -92,21 +92,21 @@ public class M3U8ThreadTaskAdapter extends AbsThreadTaskAdapter {
       is = new BufferedInputStream(ConnectionHelp.convertInputStream(conn));
       if (mHttpTaskOption.isChunked()) {
         readChunked(is);
-      } else if (getConfig().isOpenDynamicFile) {
+      } else if (getThreadConfig().isOpenDynamicFile) {
         readDynamicFile(is);
       }
     } catch (MalformedURLException e) {
       fail(new TaskException(TAG,
           String.format("分片【%s】下载失败，filePath: %s, url: %s", getThreadRecord().threadId,
-              getConfig().tempFile.getPath(), getEntity().getUrl()), e), false);
+              getThreadConfig().tempFile.getPath(), getEntity().getUrl()), e), false);
     } catch (IOException e) {
       fail(new TaskException(TAG,
           String.format("分片【%s】下载失败，filePath: %s, url: %s", getThreadRecord().threadId,
-              getConfig().tempFile.getPath(), getEntity().getUrl()), e), true);
+              getThreadConfig().tempFile.getPath(), getEntity().getUrl()), e), true);
     } catch (Exception e) {
       fail(new TaskException(TAG,
           String.format("分片【%s】下载失败，filePath: %s, url: %s", getThreadRecord().threadId,
-              getConfig().tempFile.getPath(), getEntity().getUrl()), e), false);
+              getThreadConfig().tempFile.getPath(), getEntity().getUrl()), e), false);
     } finally {
       try {
         if (is != null) {
@@ -127,7 +127,7 @@ public class M3U8ThreadTaskAdapter extends AbsThreadTaskAdapter {
   private void readChunked(InputStream is) {
     FileOutputStream fos = null;
     try {
-      fos = new FileOutputStream(getConfig().tempFile, true);
+      fos = new FileOutputStream(getThreadConfig().tempFile, true);
       byte[] buffer = new byte[getTaskConfig().getBuffSize()];
       int len;
       while (getThreadTask().isLive() && (len = is.read(buffer)) != -1) {
@@ -143,8 +143,8 @@ public class M3U8ThreadTaskAdapter extends AbsThreadTaskAdapter {
       handleComplete();
     } catch (IOException e) {
       fail(new AriaIOException(TAG,
-          String.format("文件下载失败，savePath: %s, url: %s", getConfig().tempFile.getPath(),
-              getConfig().url), e), true);
+          String.format("文件下载失败，savePath: %s, url: %s", getThreadConfig().tempFile.getPath(),
+              getThreadConfig().url), e), true);
     } finally {
       if (fos != null) {
         try {
@@ -165,7 +165,7 @@ public class M3U8ThreadTaskAdapter extends AbsThreadTaskAdapter {
     ReadableByteChannel fic = null;
     try {
       int len;
-      fos = new FileOutputStream(getConfig().tempFile, true);
+      fos = new FileOutputStream(getThreadConfig().tempFile, true);
       foc = fos.getChannel();
       fic = Channels.newChannel(is);
       ByteBuffer bf = ByteBuffer.allocate(getTaskConfig().getBuffSize());
@@ -186,8 +186,8 @@ public class M3U8ThreadTaskAdapter extends AbsThreadTaskAdapter {
       handleComplete();
     } catch (IOException e) {
       fail(new AriaIOException(TAG,
-          String.format("文件下载失败，savePath: %s, url: %s", getConfig().tempFile.getPath(),
-              getConfig().url), e), true);
+          String.format("文件下载失败，savePath: %s, url: %s", getThreadConfig().tempFile.getPath(),
+              getThreadConfig().url), e), true);
     } finally {
       try {
         if (fos != null) {

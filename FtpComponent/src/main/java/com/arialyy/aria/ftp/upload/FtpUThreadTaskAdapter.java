@@ -66,9 +66,9 @@ class FtpUThreadTaskAdapter extends BaseFtpThreadTaskAdapter {
       }
 
       file =
-          new BufferedRandomAccessFile(getConfig().tempFile, "rwd", getTaskConfig().getBuffSize());
+          new BufferedRandomAccessFile(getThreadConfig().tempFile, "rwd", getTaskConfig().getBuffSize());
       if (getThreadRecord().startLocation != 0) {
-        //file.skipBytes((int) getConfig().START_LOCATION);
+        //file.skipBytes((int) getThreadConfig().START_LOCATION);
         file.seek(getThreadRecord().startLocation);
       }
       boolean complete = upload(client, file);
@@ -81,7 +81,7 @@ class FtpUThreadTaskAdapter extends BaseFtpThreadTaskAdapter {
     } catch (IOException e) {
       fail(new AriaIOException(TAG,
           String.format("上传失败，filePath: %s, uploadUrl: %s", getEntity().getFilePath(),
-              getConfig().url)), true);
+              getThreadConfig().url)), true);
     } catch (Exception e) {
       fail(new AriaIOException(TAG, null, e), false);
     } finally {

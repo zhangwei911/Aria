@@ -62,7 +62,7 @@ final class HttpUThreadTaskAdapter extends BaseHttpThreadTaskAdapter {
     }
     URL url;
     try {
-      url = new URL(CommonUtil.convertUrl(getConfig().url));
+      url = new URL(CommonUtil.convertUrl(getThreadConfig().url));
 
       mHttpConn = (HttpURLConnection) url.openConnection();
       mHttpConn.setRequestMethod(mTaskOption.getRequestEnum().name);

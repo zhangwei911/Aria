@@ -37,7 +37,7 @@ public abstract class AbsThreadTaskAdapter implements IThreadTaskAdapter {
   /**
    * 当前线程的下去区间的进度
    */
-  private long mRangeProgress = 0;
+  private long mRangeProgress;
   private ThreadRecord mThreadRecord;
   private IThreadTaskObserver mObserver;
   private AbsTaskWrapper mWrapper;
@@ -75,9 +75,7 @@ public abstract class AbsThreadTaskAdapter implements IThreadTaskAdapter {
     return mThreadRecord;
   }
 
-  @Deprecated
   protected AbsTaskWrapper getTaskWrapper() {
-    // TODO: 2019-09-18 需要修改方法名称为：getWrapper
     return mWrapper;
   }
 
@@ -95,9 +93,7 @@ public abstract class AbsThreadTaskAdapter implements IThreadTaskAdapter {
   /**
    * 获取线程配置信息
    */
-  @Deprecated
-  protected SubThreadConfig getConfig() {
-    // TODO: 2019-09-18 需要修改方法名称为：getThreadConfig
+  protected SubThreadConfig getThreadConfig() {
     return mThreadConfig;
   }
 
@@ -108,7 +104,7 @@ public abstract class AbsThreadTaskAdapter implements IThreadTaskAdapter {
   @Override public void setMaxSpeed(int speed) {
     if (mSpeedBandUtil == null) {
       mSpeedBandUtil =
-          new BandwidthLimiter(getTaskConfig().getMaxSpeed(), getConfig().startThreadNum);
+          new BandwidthLimiter(getTaskConfig().getMaxSpeed(), getThreadConfig().startThreadNum);
     }
     mSpeedBandUtil.setMaxRate(speed);
   }

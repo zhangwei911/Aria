@@ -15,10 +15,10 @@
  */
 package com.arialyy.aria.m3u8;
 
-import com.arialyy.aria.core.processor.IBandWidthUrlConverter;
 import com.arialyy.aria.core.inf.ITaskOption;
-import com.arialyy.aria.core.processor.ITsMergeHandler;
+import com.arialyy.aria.core.processor.IBandWidthUrlConverter;
 import com.arialyy.aria.core.processor.ILiveTsUrlConverter;
+import com.arialyy.aria.core.processor.ITsMergeHandler;
 import com.arialyy.aria.core.processor.IVodTsUrlConverter;
 import java.lang.ref.SoftReference;
 import java.util.List;
@@ -101,7 +101,7 @@ public class M3U8TaskOption implements ITaskOption {
   /**
    * 生成索引占位字段
    */
-  private boolean generateIndexFileTemp;
+  private boolean generateIndexFileTemp = false;
 
   public boolean isGenerateIndexFileTemp() {
     return generateIndexFileTemp;

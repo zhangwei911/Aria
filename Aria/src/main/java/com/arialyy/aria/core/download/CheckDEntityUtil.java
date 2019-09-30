@@ -64,7 +64,8 @@ public class CheckDEntityUtil implements ICheckEntityUtil {
 
   private void handleM3U8() {
     File file = new File(mWrapper.getTempFilePath());
-    int bandWidth = (int) mWrapper.getM3U8Params().getParam(IOptionConstant.bandWidth);
+    Object bw = mWrapper.getM3U8Params().getParam(IOptionConstant.bandWidth);
+    int bandWidth = bw == null ? 0 : (int) bw;
     // 缓存文件夹格式：问文件夹/.文件名_码率
     String cacheDir = String.format("%s/.%s_%s", file.getParent(), file.getName(), bandWidth);
 
@@ -153,8 +154,8 @@ public class CheckDEntityUtil implements ICheckEntityUtil {
       mEntity.setFileName(newFile.getName());
 
       // 如过使用Content-Disposition中的文件名，将不会执行重命名工作
-      if ((boolean) mWrapper.getOptionParams().getParam(IOptionConstant.useServerFileName)
-          || mWrapper.getRequestType() == ITaskWrapper.M3U8_LIVE) {
+      Object usf = mWrapper.getOptionParams().getParam(IOptionConstant.useServerFileName);
+      if ((usf != null && (boolean) usf) || mWrapper.getRequestType() == ITaskWrapper.M3U8_LIVE) {
         return true;
       }
       if (!TextUtils.isEmpty(mEntity.getFilePath())) {

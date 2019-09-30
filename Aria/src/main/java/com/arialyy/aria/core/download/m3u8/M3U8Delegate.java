@@ -67,7 +67,7 @@ public class M3U8Delegate<TARGET extends AbsTarget> extends BaseDelegate<TARGET>
    */
   @CheckResult(suggest = Suggest.TO_CONTROLLER)
   public M3U8Delegate<TARGET> setMergeHandler(ITsMergeHandler handler) {
-    mTaskWrapper.getM3U8Params().setParams(IOptionConstant.mergeHandler, handler);
+    mTaskWrapper.getM3U8Params().setObjs(IOptionConstant.mergeHandler, handler);
     return this;
   }
 
@@ -79,7 +79,7 @@ public class M3U8Delegate<TARGET extends AbsTarget> extends BaseDelegate<TARGET>
    */
   @CheckResult(suggest = Suggest.TO_CONTROLLER)
   public M3U8Delegate<TARGET> setTsUrlConvert(IVodTsUrlConverter converter) {
-    mTaskWrapper.getM3U8Params().setParams(IOptionConstant.vodUrlConverter, converter);
+    mTaskWrapper.getM3U8Params().setObjs(IOptionConstant.vodUrlConverter, converter);
     return this;
   }
 
@@ -102,7 +102,7 @@ public class M3U8Delegate<TARGET extends AbsTarget> extends BaseDelegate<TARGET>
    */
   @CheckResult(suggest = Suggest.TO_CONTROLLER)
   public M3U8Delegate<TARGET> setBandWidthUrlConverter(IBandWidthUrlConverter converter) {
-    mTaskWrapper.getM3U8Params().setParams(IOptionConstant.bandWidthUrlConverter, converter);
+    mTaskWrapper.getM3U8Params().setObjs(IOptionConstant.bandWidthUrlConverter, converter);
     return this;
   }
 

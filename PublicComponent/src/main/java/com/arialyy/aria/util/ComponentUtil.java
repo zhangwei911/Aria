@@ -20,10 +20,8 @@ import com.arialyy.aria.core.TaskOptionParams;
 import com.arialyy.aria.core.inf.IEventHandler;
 import com.arialyy.aria.core.inf.ITaskOption;
 import com.arialyy.aria.core.inf.IUtil;
-import com.arialyy.aria.core.listener.BaseListener;
 import com.arialyy.aria.core.listener.IEventListener;
 import com.arialyy.aria.core.task.AbsTask;
-import com.arialyy.aria.core.task.ITask;
 import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
 import com.arialyy.aria.core.wrapper.ITaskWrapper;
 import java.lang.ref.SoftReference;
@@ -42,8 +40,8 @@ public class ComponentUtil {
   public static final int COMPONENT_TYPE_FTP = 2;
   public static final int COMPONENT_TYPE_M3U8 = 3;
 
-  private static volatile ComponentUtil INSTANCE = null;
   private String TAG = CommonUtil.getClassName(getClass());
+  private static volatile ComponentUtil INSTANCE = null;
 
   private ComponentUtil() {
 
@@ -99,7 +97,7 @@ public class ComponentUtil {
    *
    * @return 返回下载工具，创建失败返回null
    */
-  public <T extends IUtil> T buildUtil(ITaskWrapper wrapper, IEventListener listener) {
+  public <T extends IUtil> T buildUtil(AbsTaskWrapper wrapper, IEventListener listener) {
     int requestType = wrapper.getRequestType();
     String className = null;
     switch (requestType) {
@@ -122,10 +120,10 @@ public class ComponentUtil {
         className = "com.arialyy.aria.http.upload.HttpULoaderUtil";
         break;
       case ITaskWrapper.D_FTP_DIR:
-        className = "com.arialyy.aria.http.download.DGroupLoaderUtil";
+        className = "com.arialyy.aria.ftp.download.FtpDirDLoaderUtil";
         break;
       case ITaskWrapper.DG_HTTP:
-        className = "com.arialyy.aria.ftp.download.FtpDirDLoaderUtil";
+        className = "com.arialyy.aria.http.download.DGroupLoaderUtil";
         break;
     }
     if (className == null) {
@@ -158,7 +156,7 @@ public class ComponentUtil {
    * @param wrapperType 任务类型{@link ITaskWrapper}
    * @return 返回事件监听，如果创建失败返回null
    */
-  public <T extends IEventListener> T buildListener(int wrapperType, ITask task,
+  public <T extends IEventListener> T buildListener(int wrapperType, AbsTask task,
       Handler outHandler) {
     String className = null, errorStr = "请添加FTP插件";
     switch (wrapperType) {
@@ -217,6 +215,7 @@ public class ComponentUtil {
     try {
       taskOption = clazz.newInstance();
       for (Field field : fields) {
+        field.setAccessible(true);
         Class type = field.getType();
         String key = field.getName();
         if (type != SoftReference.class) {

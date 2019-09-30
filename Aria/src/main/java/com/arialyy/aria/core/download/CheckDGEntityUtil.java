@@ -134,8 +134,7 @@ public class CheckDGEntityUtil implements ICheckEntityUtil {
       return false;
     }
 
-    if (mWrapper.getOptionParams().getParam(IOptionConstant.requestEnum)
-        == RequestEnum.POST) {
+    if (mWrapper.getOptionParams().getParam(IOptionConstant.requestEnum) == RequestEnum.POST) {
       for (DTaskWrapper subWrapper : mWrapper.getSubTaskWrapper()) {
         subWrapper.getOptionParams().setParams(IOptionConstant.requestEnum, RequestEnum.POST);
       }

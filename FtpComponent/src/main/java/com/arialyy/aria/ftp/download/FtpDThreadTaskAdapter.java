@@ -83,16 +83,16 @@ final class FtpDThreadTaskAdapter extends BaseFtpThreadTaskAdapter {
         return;
       }
 
-      if (getConfig().isOpenDynamicFile) {
+      if (getThreadConfig().isOpenDynamicFile) {
         readDynamicFile(is);
       } else {
         readNormal(is);
         handleComplete();
       }
     } catch (IOException e) {
-      fail(new AriaIOException(TAG, String.format("下载失败【%s】", getConfig().url), e), true);
+      fail(new AriaIOException(TAG, String.format("下载失败【%s】", getThreadConfig().url), e), true);
     } catch (Exception e) {
-      fail(new AriaIOException(TAG, String.format("下载失败【%s】", getConfig().url), e), false);
+      fail(new AriaIOException(TAG, String.format("下载失败【%s】", getThreadConfig().url), e), false);
     } finally {
       try {
         if (is != null) {
@@ -127,7 +127,7 @@ final class FtpDThreadTaskAdapter extends BaseFtpThreadTaskAdapter {
     ReadableByteChannel fic = null;
     try {
       int len;
-      fos = new FileOutputStream(getConfig().tempFile, true);
+      fos = new FileOutputStream(getThreadConfig().tempFile, true);
       foc = fos.getChannel();
       fic = Channels.newChannel(is);
       ByteBuffer bf = ByteBuffer.allocate(getTaskConfig().getBuffSize());
@@ -154,7 +154,7 @@ final class FtpDThreadTaskAdapter extends BaseFtpThreadTaskAdapter {
       }
       handleComplete();
     } catch (IOException e) {
-      fail(new AriaIOException(TAG, String.format("下载失败【%s】", getConfig().url), e), true);
+      fail(new AriaIOException(TAG, String.format("下载失败【%s】", getThreadConfig().url), e), true);
     } finally {
       try {
         if (fos != null) {
@@ -179,7 +179,7 @@ final class FtpDThreadTaskAdapter extends BaseFtpThreadTaskAdapter {
     BufferedRandomAccessFile file = null;
     try {
       file =
-          new BufferedRandomAccessFile(getConfig().tempFile, "rwd", getTaskConfig().getBuffSize());
+          new BufferedRandomAccessFile(getThreadConfig().tempFile, "rwd", getTaskConfig().getBuffSize());
       file.seek(getThreadRecord().startLocation);
       byte[] buffer = new byte[getTaskConfig().getBuffSize()];
       int len;
@@ -201,7 +201,7 @@ final class FtpDThreadTaskAdapter extends BaseFtpThreadTaskAdapter {
         }
       }
     } catch (IOException e) {
-      fail(new AriaIOException(TAG, String.format("下载失败【%s】", getConfig().url), e), true);
+      fail(new AriaIOException(TAG, String.format("下载失败【%s】", getThreadConfig().url), e), true);
     } finally {
       try {
         if (file != null) {
