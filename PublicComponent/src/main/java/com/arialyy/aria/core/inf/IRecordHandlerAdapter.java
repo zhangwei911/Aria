@@ -27,6 +27,11 @@ import com.arialyy.aria.core.ThreadRecord;
 public interface IRecordHandlerAdapter {
 
   /**
+   * 记录处理前的操作，可用来删除任务记录
+   */
+  void onPre();
+
+  /**
    * 处理任务记录
    */
   void handlerTaskRecord(TaskRecord record);

@@ -52,19 +52,18 @@ public class M3U8LiveLoader extends BaseM3U8Loader {
   private static final int EXEC_MAX_NUM = 4;
   private Handler mStateHandler;
   private ArrayBlockingQueue<Long> mFlagQueue = new ArrayBlockingQueue<>(EXEC_MAX_NUM);
-  private LiveStateManager mManager;
   private ReentrantLock LOCK = new ReentrantLock();
   private Condition mCondition = LOCK.newCondition();
   private LinkedBlockingQueue<String> mPeerQueue = new LinkedBlockingQueue<>();
 
-  public M3U8LiveLoader(M3U8Listener listener, DTaskWrapper wrapper) {
+  M3U8LiveLoader(M3U8Listener listener, DTaskWrapper wrapper) {
     super(listener, wrapper);
   }
 
   @Override protected IThreadState createStateManager(Looper looper) {
-    mManager = new LiveStateManager(looper, mListener);
-    mStateHandler = new Handler(looper, mManager);
-    return mManager;
+    LiveStateManager manager = new LiveStateManager(looper, mListener);
+    mStateHandler = new Handler(looper, manager);
+    return manager;
   }
 
   void offerPeer(String peerUrl) {

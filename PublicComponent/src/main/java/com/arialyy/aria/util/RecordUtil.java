@@ -16,16 +16,16 @@
 package com.arialyy.aria.util;
 
 import android.text.TextUtils;
-import com.arialyy.aria.core.inf.IRecordHandler;
-import com.arialyy.aria.core.wrapper.RecordWrapper;
 import com.arialyy.aria.core.TaskRecord;
 import com.arialyy.aria.core.ThreadRecord;
+import com.arialyy.aria.core.common.AbsEntity;
+import com.arialyy.aria.core.common.AbsNormalEntity;
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.download.DownloadGroupEntity;
 import com.arialyy.aria.core.download.M3U8Entity;
-import com.arialyy.aria.core.common.AbsEntity;
-import com.arialyy.aria.core.common.AbsNormalEntity;
+import com.arialyy.aria.core.inf.IRecordHandler;
 import com.arialyy.aria.core.upload.UploadEntity;
+import com.arialyy.aria.core.wrapper.RecordWrapper;
 import com.arialyy.aria.orm.DbEntity;
 import java.io.File;
 import java.util.List;
@@ -148,13 +148,13 @@ public class RecordUtil {
      * 处理任务未完成的情况
      */
     if (!entity.isComplete()) {
-      if (record.taskType == TaskRecord.TYPE_M3U8_VOD) { // 删除ts分片文件
+      if (recordIsM3U8(record.taskType)) { // 删除ts分片文件
         removeTsCache(targetFile, record.bandWidth);
       } else if (record.isBlock) { // 删除分块文件
         removeBlockFile(record);
       }
     } else if (removeFile) { // 处理任务完成情况
-      if (record.taskType == TaskRecord.TYPE_M3U8_VOD) {
+      if (recordIsM3U8(record.taskType)) {
         removeTsCache(targetFile, record.bandWidth);
       }
       removeTargetFile(targetFile);
@@ -162,6 +162,16 @@ public class RecordUtil {
 
     // 成功与否都将删除记录
     removeRecord(filePath);
+  }
+
+  /**
+   * 任务记录是否是m3u8记录
+   *
+   * @param recordType 任务记录类型
+   * @return true 为m3u8任务
+   */
+  private static boolean recordIsM3U8(int recordType) {
+    return recordType == TaskRecord.TYPE_M3U8_VOD || recordType == TaskRecord.TYPE_M3U8_LIVE;
   }
 
   /**
@@ -208,13 +218,13 @@ public class RecordUtil {
      * 处理任务未完成的情况
      */
     if (!entity.isComplete()) {
-      if (record.taskType == TaskRecord.TYPE_M3U8_VOD) { // 删除ts分片文件
+      if (recordIsM3U8(record.taskType)) { // 删除ts分片文件
         removeTsCache(targetFile, record.bandWidth);
       } else if (record.isBlock) { // 删除分块文件
         removeBlockFile(record);
       }
     } else if (removeFile) { // 处理任务完成情况
-      if (record.taskType == TaskRecord.TYPE_M3U8_VOD) {
+      if (recordIsM3U8(record.taskType)) {
         removeTsCache(targetFile, record.bandWidth);
       }
       removeTargetFile(targetFile);
@@ -357,7 +367,8 @@ public class RecordUtil {
         tr.taskKey = newPath;
         File blockFile = new File(String.format(IRecordHandler.SUB_PATH, oldPath, tr.threadId));
         if (blockFile.exists()) {
-          blockFile.renameTo(new File(String.format(IRecordHandler.SUB_PATH, newPath, tr.threadId)));
+          blockFile.renameTo(
+              new File(String.format(IRecordHandler.SUB_PATH, newPath, tr.threadId)));
         }
       }
       DbEntity.updateManyData(record.threadRecords);

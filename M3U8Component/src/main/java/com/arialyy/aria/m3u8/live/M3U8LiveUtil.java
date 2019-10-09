@@ -154,6 +154,7 @@ public class M3U8LiveUtil extends AbsNormalLoaderUtil {
         mInfoPool.execute(mInfoThread);
       }
     }, 0, mM3U8Option.getLiveUpdateInterval(), TimeUnit.MILLISECONDS);
+    getLoader().start();
   }
 
   private void closeTimer() {

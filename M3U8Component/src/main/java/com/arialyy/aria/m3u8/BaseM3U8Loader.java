@@ -15,6 +15,7 @@
  */
 package com.arialyy.aria.m3u8;
 
+import com.arialyy.aria.core.common.RecordHandler;
 import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.download.M3U8Entity;
@@ -127,8 +128,10 @@ public abstract class BaseM3U8Loader extends AbsLoader {
   }
 
   @Override protected IRecordHandler getRecordHandler(AbsTaskWrapper wrapper) {
-
-    return null;
+    RecordHandler handler = new RecordHandler(wrapper);
+    M3U8RecordAdapter adapter = new M3U8RecordAdapter((DTaskWrapper) wrapper);
+    handler.setAdapter(adapter);
+    return handler;
   }
 
   protected DownloadEntity getEntity() {

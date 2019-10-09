@@ -21,8 +21,10 @@ import com.arialyy.aria.core.common.AbsRecordHandlerAdapter;
 import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.download.M3U8Entity;
+import com.arialyy.aria.core.inf.IRecordHandler;
 import com.arialyy.aria.core.wrapper.ITaskWrapper;
 import com.arialyy.aria.util.ALog;
+import com.arialyy.aria.util.RecordUtil;
 import java.io.File;
 import java.util.ArrayList;
 
@@ -33,9 +35,16 @@ import java.util.ArrayList;
 public class M3U8RecordAdapter extends AbsRecordHandlerAdapter {
   private M3U8TaskOption mOption;
 
-  public M3U8RecordAdapter(DTaskWrapper wrapper) {
+  M3U8RecordAdapter(DTaskWrapper wrapper) {
     super(wrapper);
     mOption = (M3U8TaskOption) wrapper.getM3u8Option();
+  }
+
+  @Override public void onPre() {
+    super.onPre();
+    if (getWrapper().getRequestType() == ITaskWrapper.M3U8_LIVE){
+      RecordUtil.delTaskRecord(getEntity().getFilePath(), IRecordHandler.TYPE_DOWNLOAD);
+    }
   }
 
   /**

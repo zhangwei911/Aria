@@ -219,7 +219,18 @@ public class M3U8LiveDLoadActivity extends BaseActivity<ActivityM3u8LiveBinding>
         if (Aria.download(this).load(mEntity.getId()).isRunning()) {
           Aria.download(this).load(mEntity.getId()).stop();
         } else {
-          Aria.download(this).load(mEntity.getId()).resume();
+          Aria.download(this).load(mEntity.getId())
+              .asM3U8()
+              .asLive()
+              .setLiveTsUrlConvert(new ILiveTsUrlConverter() {
+                @Override public String convert(String m3u8Url, String tsUrl) {
+                  int index = m3u8Url.lastIndexOf("/");
+                  String parentUrl = m3u8Url.substring(0, index + 1);
+                  return parentUrl + tsUrl;
+                }
+              })
+              .controller(ControllerType.TASK_CONTROLLER)
+              .resume();
         }
         break;
       case R.id.cancel:

@@ -27,6 +27,9 @@ public abstract class AbsRecordHandlerAdapter implements IRecordHandlerAdapter {
   private AbsTaskWrapper mWrapper;
   protected String TAG = CommonUtil.getClassName(getClass());
 
+  @Override public void onPre() {
+  }
+
   public AbsRecordHandlerAdapter(AbsTaskWrapper wrapper) {
     mWrapper = wrapper;
   }

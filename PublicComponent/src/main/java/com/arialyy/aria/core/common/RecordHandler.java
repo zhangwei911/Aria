@@ -70,6 +70,7 @@ public class RecordHandler implements IRecordHandler {
     if (mConfigFile.exists()) {
       convertDb();
     } else {
+      mAdapter.onPre();
       mTaskRecord = DbDataHelper.getTaskRecord(getFilePath());
       if (mTaskRecord == null) {
         initRecord(true);
