@@ -20,16 +20,16 @@ import android.text.TextUtils;
 import com.arialyy.aria.core.FtpUrlEntity;
 import com.arialyy.aria.core.common.AbsEntity;
 import com.arialyy.aria.core.common.CompleteInfo;
-import com.arialyy.aria.core.download.DGTaskWrapper;
 import com.arialyy.aria.core.download.DTaskWrapper;
+import com.arialyy.aria.core.group.AbsGroupUtil;
+import com.arialyy.aria.core.group.AbsSubDLoadUtil;
 import com.arialyy.aria.core.inf.IEntity;
 import com.arialyy.aria.core.inf.OnFileInfoCallback;
+import com.arialyy.aria.core.listener.IEventListener;
+import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
 import com.arialyy.aria.exception.BaseException;
 import com.arialyy.aria.ftp.FtpDirInfoThread;
 import com.arialyy.aria.ftp.FtpTaskOption;
-import com.arialyy.aria.core.group.AbsGroupUtil;
-import com.arialyy.aria.core.group.AbsSubDLoadUtil;
-import com.arialyy.aria.core.listener.IDGroupListener;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -41,14 +41,14 @@ public class FtpDirDLoaderUtil extends AbsGroupUtil {
   private ReentrantLock LOCK = new ReentrantLock();
   private Condition condition = LOCK.newCondition();
 
-  public FtpDirDLoaderUtil(IDGroupListener listener, DGTaskWrapper wrapper) {
-    super(listener, wrapper);
+  public FtpDirDLoaderUtil(AbsTaskWrapper wrapper, IEventListener listener) {
+    super(wrapper, listener);
     wrapper.generateTaskOption(FtpTaskOption.class);
   }
 
   @Override
   protected AbsSubDLoadUtil createSubLoader(DTaskWrapper wrapper, boolean needGetFileInfo) {
-    return new SubDLoaderUtil(getScheduler(), wrapper, needGetFileInfo);
+    return new FtpSubDLoaderUtil(getScheduler(), wrapper, needGetFileInfo);
   }
 
   @Override protected boolean onStart() {
@@ -109,9 +109,15 @@ public class FtpDirDLoaderUtil extends AbsGroupUtil {
     String remotePath = uri.getPath();
     urlEntity.remotePath = TextUtils.isEmpty(remotePath) ? "/" : remotePath;
 
-    FtpTaskOption subOption = ((FtpTaskOption) subWrapper.getTaskOption());
+    FtpTaskOption subOption = new FtpTaskOption();
     subOption.setUrlEntity(urlEntity);
     subOption.setCharSet(option.getCharSet());
     subOption.setProxy(option.getProxy());
+    subOption.setClientConfig(option.getClientConfig());
+    subOption.setNewFileName(option.getNewFileName());
+    subOption.setProxy(option.getProxy());
+    subOption.setUploadInterceptor(option.getUploadInterceptor());
+
+    subWrapper.setTaskOption(subOption);
   }
 }

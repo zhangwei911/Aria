@@ -84,6 +84,10 @@ public abstract class AbsTaskWrapper<ENTITY extends AbsEntity>
    */
   private TaskOptionParams optionParams = new TaskOptionParams();
 
+  public void setTaskOption(ITaskOption option) {
+    this.taskOption = option;
+  }
+
   public ITaskOption getTaskOption() {
     return taskOption;
   }

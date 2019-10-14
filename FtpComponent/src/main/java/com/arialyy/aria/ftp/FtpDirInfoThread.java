@@ -91,10 +91,17 @@ public class FtpDirInfoThread extends AbsFtpInfoThread<DownloadGroupEntity, DGTa
   }
 
   private void cloneInfo(DTaskWrapper subWrapper, FtpUrlEntity urlEntity) {
-    FtpTaskOption subOption = (FtpTaskOption) subWrapper.getTaskOption();
+    FtpTaskOption subOption = new FtpTaskOption();
     subOption.setUrlEntity(urlEntity);
     subOption.setCharSet(mTaskOption.getCharSet());
     subOption.setProxy(mTaskOption.getProxy());
+    subOption.setClientConfig(mTaskOption.getClientConfig());
+    subOption.setNewFileName(mTaskOption.getNewFileName());
+    subOption.setProxy(mTaskOption.getProxy());
+    subOption.setUploadInterceptor(mTaskOption.getUploadInterceptor());
+
+    subWrapper.setTaskOption(subOption);
+
   }
 
   @Override protected void failDownload(BaseException e, boolean needRetry) {

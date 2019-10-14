@@ -43,7 +43,7 @@ public abstract class BaseFtpThreadTaskAdapter extends AbsThreadTaskAdapter {
 
   protected BaseFtpThreadTaskAdapter(SubThreadConfig config) {
     super(config);
-
+    mTaskOption = (FtpTaskOption) getTaskWrapper().getTaskOption();
   }
 
   protected void closeClient(FTPClient client) {

@@ -55,9 +55,6 @@ public abstract class AbsGroupUtil implements IUtil, Runnable {
     mListener = (IDGroupListener) listener;
     mGTWrapper = (DGTaskWrapper) groupWrapper;
     mUpdateInterval = Configuration.getInstance().downloadCfg.getUpdateInterval();
-    mState = new GroupRunState(groupWrapper.getKey(), mListener,
-        mGTWrapper.getSubTaskWrapper().size(), mSubQueue);
-    mScheduler = new Handler(Looper.getMainLooper(), SimpleSchedulers.newInstance(mState));
     initState();
   }
 
@@ -84,6 +81,8 @@ public abstract class AbsGroupUtil implements IUtil, Runnable {
    * 初始化组合任务状态
    */
   protected void initState() {
+    mState = new GroupRunState(getWrapper().getKey(), mListener,
+        mGTWrapper.getSubTaskWrapper().size(), mSubQueue);
     for (DTaskWrapper wrapper : mGTWrapper.getSubTaskWrapper()) {
       if (wrapper.getEntity().getState() == IEntity.STATE_COMPLETE) {
         mState.updateCompleteNum();
@@ -94,6 +93,7 @@ public abstract class AbsGroupUtil implements IUtil, Runnable {
       }
     }
     mState.updateProgress(mCurrentLocation);
+    mScheduler = new Handler(Looper.getMainLooper(), SimpleSchedulers.newInstance(mState));
   }
 
   @Override public String getKey() {

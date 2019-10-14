@@ -19,11 +19,13 @@ import com.arialyy.aria.core.common.AbsEntity;
 import com.arialyy.aria.core.common.CompleteInfo;
 import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.inf.OnFileInfoCallback;
+import com.arialyy.aria.core.listener.IEventListener;
 import com.arialyy.aria.core.listener.IUploadListener;
 import com.arialyy.aria.core.loader.AbsLoader;
 import com.arialyy.aria.core.loader.AbsNormalLoaderUtil;
 import com.arialyy.aria.core.loader.NormalLoader;
 import com.arialyy.aria.core.upload.UTaskWrapper;
+import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
 import com.arialyy.aria.exception.BaseException;
 import com.arialyy.aria.ftp.FtpTaskOption;
 
@@ -33,15 +35,15 @@ import com.arialyy.aria.ftp.FtpTaskOption;
  */
 public class FtpULoaderUtil extends AbsNormalLoaderUtil {
 
-  public FtpULoaderUtil(DTaskWrapper wrapper, IUploadListener uploadListener) {
-    super(wrapper, uploadListener);
+  public FtpULoaderUtil(AbsTaskWrapper wrapper, IEventListener listener) {
+    super(wrapper, listener);
     wrapper.generateTaskOption(FtpTaskOption.class);
   }
 
   @Override protected AbsLoader createLoader() {
     NormalLoader loader = new NormalLoader(getListener(), getTaskWrapper());
     loader.setAdapter(new FtpULoaferAdapter(getTaskWrapper()));
-    return null;
+    return loader;
   }
 
   @Override protected Runnable createInfoThread() {

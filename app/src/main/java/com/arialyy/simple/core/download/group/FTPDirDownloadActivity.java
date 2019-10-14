@@ -35,10 +35,11 @@ import com.arialyy.simple.widget.SubStateLinearLayout;
  * Created by lyy on 2017/7/6.
  */
 public class FTPDirDownloadActivity extends BaseActivity<ActivityDownloadGroupBinding> {
-  private static final String dir = "ftp://9.9.9.205:2121/upload/测试";
+  private static final String dir = "ftp://9.9.9.50:2121/upload/测试";
 
   private SubStateLinearLayout mChildList;
   private long mTaskId = -1;
+  private String user = "lao", pwd = "123456";
 
   @Override protected void init(Bundle savedInstanceState) {
     super.init(savedInstanceState);
@@ -78,7 +79,7 @@ public class FTPDirDownloadActivity extends BaseActivity<ActivityDownloadGroupBi
                   Environment.getExternalStorageDirectory().getPath() + "/Download/ftp_dir")
               .setGroupAlias("ftp文件夹下载")
               .option()
-              .login("8L8e", "8guD")
+              .login(user, pwd)
               .controller(ControllerType.CREATE_CONTROLLER)
               .create();
           getBinding().setStateStr(getString(R.string.stop));
@@ -91,7 +92,7 @@ public class FTPDirDownloadActivity extends BaseActivity<ActivityDownloadGroupBi
           Aria.download(this)
               .loadFtpDir(mTaskId)
               .option()
-              .login("8L8e", "8guD")
+              .login(user, pwd)
               .controller(ControllerType.TASK_CONTROLLER)
               .resume();
           getBinding().setStateStr(getString(R.string.stop));
@@ -144,6 +145,8 @@ public class FTPDirDownloadActivity extends BaseActivity<ActivityDownloadGroupBi
   @DownloadGroup.onTaskComplete() void taskComplete(DownloadGroupTask task) {
     getBinding().setProgress(100);
     mChildList.updateChildProgress(task.getEntity().getSubEntities());
+    getBinding().setStateStr(getString(R.string.re_start));
+    getBinding().setSpeed("");
     T.showShort(this, "任务组下载完成");
     L.d(TAG, "任务组下载完成");
   }

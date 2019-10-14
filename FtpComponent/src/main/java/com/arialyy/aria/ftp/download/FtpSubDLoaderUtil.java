@@ -13,57 +13,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.arialyy.aria.http.download;
+package com.arialyy.aria.ftp.download;
 
 import android.os.Handler;
-import com.arialyy.aria.core.common.AbsEntity;
-import com.arialyy.aria.core.common.CompleteInfo;
 import com.arialyy.aria.core.download.DTaskWrapper;
-import com.arialyy.aria.core.inf.OnFileInfoCallback;
-import com.arialyy.aria.core.listener.ISchedulers;
-import com.arialyy.aria.core.loader.NormalLoader;
-import com.arialyy.aria.exception.BaseException;
 import com.arialyy.aria.core.group.AbsSubDLoadUtil;
 import com.arialyy.aria.core.group.ChildDLoadListener;
-import com.arialyy.aria.http.HttpFileInfoThread;
-import com.arialyy.aria.http.HttpTaskOption;
+import com.arialyy.aria.core.loader.NormalLoader;
 
 /**
  * @Author lyy
  * @Date 2019-09-28
  */
-class SubDLoaderUtil extends AbsSubDLoadUtil {
+class FtpSubDLoaderUtil extends AbsSubDLoadUtil {
   /**
    * @param schedulers 调度器
    * @param needGetInfo {@code true} 需要获取文件信息。{@code false} 不需要获取文件信息
    */
-  SubDLoaderUtil(Handler schedulers, DTaskWrapper taskWrapper, boolean needGetInfo) {
+  FtpSubDLoaderUtil(Handler schedulers, DTaskWrapper taskWrapper, boolean needGetInfo) {
     super(schedulers, taskWrapper, needGetInfo);
-    taskWrapper.generateTaskOption(HttpTaskOption.class);
   }
 
   @Override protected NormalLoader createLoader(ChildDLoadListener listener, DTaskWrapper wrapper) {
     NormalLoader loader = new NormalLoader(listener, wrapper);
-    HttpDLoaderAdapter adapter = new HttpDLoaderAdapter(wrapper);
+    FtpDLoaderAdapter adapter = new FtpDLoaderAdapter(wrapper);
     loader.setAdapter(adapter);
     return loader;
   }
 
   @Override public void start() {
-    if (isNeedGetInfo()) {
-      new Thread(new HttpFileInfoThread(getWrapper(), new OnFileInfoCallback() {
-
-        @Override public void onComplete(String url, CompleteInfo info) {
-          getDownloader().start();
-        }
-
-        @Override public void onFail(AbsEntity entity, BaseException e, boolean needRetry) {
-          getSchedulers().obtainMessage(ISchedulers.FAIL, SubDLoaderUtil.this).sendToTarget();
-        }
-      })).start();
-    } else {
-      getDownloader().start();
-    }
+    getDownloader().start();
   }
 }
-

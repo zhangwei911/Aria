@@ -25,12 +25,12 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import com.arialyy.annotations.Upload;
 import com.arialyy.aria.core.Aria;
-import com.arialyy.aria.core.processor.FtpInterceptHandler;
-import com.arialyy.aria.core.processor.IFtpUploadInterceptor;
 import com.arialyy.aria.core.common.controller.ControllerType;
 import com.arialyy.aria.core.inf.IEntity;
-import com.arialyy.aria.core.upload.UploadEntity;
+import com.arialyy.aria.core.processor.FtpInterceptHandler;
+import com.arialyy.aria.core.processor.IFtpUploadInterceptor;
 import com.arialyy.aria.core.task.UploadTask;
+import com.arialyy.aria.core.upload.UploadEntity;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
 import com.arialyy.frame.util.FileUtil;
@@ -53,6 +53,7 @@ public class FtpUploadActivity extends BaseActivity<ActivityFtpUploadBinding> {
   private String mUrl;
   private UploadModule mModule;
   private long mTaskId = -1;
+  private String user = "lao", pwd = "123456";
 
   @Override protected void init(Bundle savedInstanceState) {
     setTile("D_FTP 文件上传");
@@ -117,20 +118,8 @@ public class FtpUploadActivity extends BaseActivity<ActivityFtpUploadBinding> {
           mTaskId = Aria.upload(this)
               .loadFtp(mFilePath)
               .setUploadUrl(mUrl)
-              .setUploadInterceptor(
-                  new IFtpUploadInterceptor() {
-
-                    @Override
-                    public FtpInterceptHandler onIntercept(UploadEntity entity,
-                        List<String> fileList) {
-                      FtpInterceptHandler.Builder builder = new FtpInterceptHandler.Builder();
-                      //builder.coverServerFile();
-                      builder.resetFileName("test.zip");
-                      return builder.build();
-                    }
-                  })
               .option()
-              .login("8L8e", "8guD")
+              .login(user, pwd)
               .controller(ControllerType.CREATE_CONTROLLER)
               .create();
           getBinding().setStateStr(getString(R.string.stop));
@@ -143,7 +132,7 @@ public class FtpUploadActivity extends BaseActivity<ActivityFtpUploadBinding> {
           Aria.upload(this)
               .loadFtp(mTaskId)
               .option()
-              .login("8L8e", "8guD")
+              .login(user, pwd)
               .controller(ControllerType.TASK_CONTROLLER)
               .resume();
           getBinding().setStateStr(getString(R.string.stop));

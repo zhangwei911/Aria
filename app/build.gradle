@@ -74,6 +74,7 @@ dependencies {
   implementation 'com.pddstudio:highlightjs-android:1.5.0'
   implementation 'org.greenrobot:eventbus:3.1.1'
   implementation project(path: ':M3U8Component')
+  implementation project(path: ':FtpComponent')
 }
 repositories {
   mavenCentral()

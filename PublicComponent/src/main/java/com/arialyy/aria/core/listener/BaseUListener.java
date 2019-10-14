@@ -27,10 +27,10 @@ import com.arialyy.aria.util.RecordUtil;
 /**
  * 下载监听类
  */
-class BaseUListener extends BaseListener<UploadEntity, UTaskWrapper, AbsTask<UTaskWrapper>>
+public class BaseUListener extends BaseListener<UploadEntity, UTaskWrapper, AbsTask<UTaskWrapper>>
     implements IUploadListener {
 
-  BaseUListener(AbsTask<UTaskWrapper> task, Handler outHandler) {
+  public BaseUListener(AbsTask<UTaskWrapper> task, Handler outHandler) {
     super(task, outHandler);
   }
 

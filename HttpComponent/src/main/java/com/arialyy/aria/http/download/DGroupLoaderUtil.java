@@ -17,7 +17,6 @@ package com.arialyy.aria.http.download;
 
 import com.arialyy.aria.core.common.AbsEntity;
 import com.arialyy.aria.core.common.CompleteInfo;
-import com.arialyy.aria.core.download.DGTaskWrapper;
 import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.inf.IEntity;
@@ -28,7 +27,6 @@ import com.arialyy.aria.exception.AriaIOException;
 import com.arialyy.aria.exception.BaseException;
 import com.arialyy.aria.core.group.AbsGroupUtil;
 import com.arialyy.aria.core.group.AbsSubDLoadUtil;
-import com.arialyy.aria.core.listener.IDGroupListener;
 import com.arialyy.aria.http.HttpFileInfoThread;
 import com.arialyy.aria.http.HttpTaskOption;
 import com.arialyy.aria.util.ALog;
@@ -55,7 +53,7 @@ public class DGroupLoaderUtil extends AbsGroupUtil {
 
   @Override
   protected AbsSubDLoadUtil createSubLoader(DTaskWrapper wrapper, boolean needGetFileInfo) {
-    return new SubDLoaderUtil(getScheduler(), wrapper, needGetFileInfo);
+    return new HttpSubDLoaderUtil(getScheduler(), wrapper, needGetFileInfo);
   }
 
   @Override public void onPreCancel() {

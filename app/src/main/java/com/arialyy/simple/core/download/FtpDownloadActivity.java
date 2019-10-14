@@ -48,7 +48,7 @@ public class FtpDownloadActivity extends BaseActivity<ActivityFtpDownloadBinding
   private String mUrl, mFilePath;
   private FtpDownloadModule mModule;
   private long mTaskId;
-  private String user = "tester", passw = "password";
+  private String user = "lao", passw = "123456";
 
   @Override protected void init(Bundle savedInstanceState) {
     super.init(savedInstanceState);
@@ -96,9 +96,8 @@ public class FtpDownloadActivity extends BaseActivity<ActivityFtpDownloadBinding
           mTaskId = Aria.download(this).loadFtp(mUrl)
               .setFilePath(mFilePath, true)
               .option()
-              //.login("lao", "123456")
               .login(user, passw)
-              .asFtps()
+              //.asFtps()
               .controller(ControllerType.CREATE_CONTROLLER)
               .create();
           getBinding().setStateStr(getString(R.string.stop));
@@ -112,8 +111,8 @@ public class FtpDownloadActivity extends BaseActivity<ActivityFtpDownloadBinding
               .loadFtp(mTaskId)
               .option()
               .login(user, passw)
-              .asFtps()
-              .setProtocol(ProtocolType.SSL)
+              //.asFtps()
+              //.setProtocol(ProtocolType.SSL)
               .controller(ControllerType.TASK_CONTROLLER)
               .resume();
           getBinding().setStateStr(getString(R.string.stop));
