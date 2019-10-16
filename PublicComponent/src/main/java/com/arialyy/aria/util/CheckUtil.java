@@ -19,11 +19,11 @@ package com.arialyy.aria.util;
 import android.text.TextUtils;
 import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.download.DownloadEntity;
-import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
 import com.arialyy.aria.core.upload.UTaskWrapper;
 import com.arialyy.aria.core.upload.UploadEntity;
-import com.arialyy.aria.exception.ParamException;
+import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
 import java.io.File;
+import java.lang.reflect.Modifier;
 import java.util.List;
 
 /**
@@ -34,24 +34,13 @@ public class CheckUtil {
   private static final String TAG = "CheckUtil";
 
   /**
-   * 检查ftp上传路径，如果ftp上传路径为空，抛出空指针异常
-   * 如果ftp上传路径不是以"ftp"或"sftp"，抛出参数异常
-   *
-   * @param ftpUrl ftp上传路径
+   * 检查成员类是否是静态和public
    */
-  public static void checkFtpUploadUrl(String ftpUrl) {
-    if (TextUtils.isEmpty(ftpUrl)) {
-      throw new ParamException("ftp上传路径为空");
-    } else if (!ftpUrl.startsWith("ftp") || !ftpUrl.startsWith("sftp")) {
-      throw new ParamException("ftp上传路径无效");
+  public static void checkMemberClass(Class clazz) {
+    int modifiers = clazz.getModifiers();
+    if (!clazz.isMemberClass() || !Modifier.isStatic(modifiers) || Modifier.isPrivate(modifiers)) {
+      ALog.e(TAG, "为了放置内存泄漏，请使用静态的成员类(public static class xxx)或文件类(A.java)");
     }
-  }
-
-  /**
-   * 判空
-   */
-  public static void checkNull(Object obj) {
-    if (obj == null) throw new IllegalArgumentException("不能传入空对象");
   }
 
   /**
@@ -62,15 +51,6 @@ public class CheckUtil {
    */
   public static void checkPageParams(int page, int num) {
     if (page < 1 || num < 1) throw new NullPointerException("page和num不能小于1");
-  }
-
-  /**
-   * 检查下载实体
-   */
-  public static void checkDownloadEntity(DownloadEntity entity) {
-    checkUrlInvalidThrow(entity.getUrl());
-    entity.setUrl(entity.getUrl());
-    checkPath(entity.getDownloadPath());
   }
 
   /**
@@ -147,15 +127,6 @@ public class CheckUtil {
   public static void checkDownloadUrls(List<String> urls) {
     if (urls == null || urls.isEmpty()) {
       throw new IllegalArgumentException("链接组不能为null");
-    }
-  }
-
-  /**
-   * 检查下载任务组保存路径
-   */
-  public static void checkDownloadPaths(List<String> paths) {
-    if (paths == null || paths.isEmpty()) {
-      throw new IllegalArgumentException("链接保存路径不能为null");
     }
   }
 

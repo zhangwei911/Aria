@@ -27,7 +27,7 @@ import com.arialyy.aria.http.HttpTaskOption;
  * @Date 2019-09-19
  */
 public class HttpULoaderUtil extends AbsNormalLoaderUtil {
-  protected HttpULoaderUtil(AbsTaskWrapper wrapper, IEventListener listener) {
+  public HttpULoaderUtil(AbsTaskWrapper wrapper, IEventListener listener) {
     super(wrapper, listener);
     wrapper.generateTaskOption(HttpTaskOption.class);
   }

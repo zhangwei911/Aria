@@ -18,19 +18,19 @@ package com.arialyy.aria.core.common;
 import android.text.TextUtils;
 import androidx.annotation.CheckResult;
 import androidx.annotation.NonNull;
-import com.arialyy.aria.core.inf.Suggest;
 import com.arialyy.aria.core.inf.AbsTarget;
-import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
 import com.arialyy.aria.core.inf.IOptionConstant;
+import com.arialyy.aria.core.inf.Suggest;
+import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
 import com.arialyy.aria.util.ALog;
 import java.net.Proxy;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * HTTP协议处理
+ * HTTP任务设置
  */
-public class HttpDelegate<TARGET extends AbsTarget> extends BaseDelegate<TARGET> {
+public class HttpDelegate<TARGET extends AbsTarget> extends BaseOption<TARGET> {
 
   private Map<String, String> params;
   private Map<String, String> headers;

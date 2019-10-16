@@ -23,12 +23,12 @@ import com.arialyy.aria.core.inf.Suggest;
 import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
 import com.arialyy.aria.util.CommonUtil;
 
-public abstract class BaseDelegate<TARGET extends AbsTarget> {
+public abstract class BaseOption<TARGET extends AbsTarget> {
   protected final String TAG;
   protected TARGET mTarget;
   protected AbsTaskWrapper mWrapper;
 
-  public BaseDelegate(TARGET target, AbsTaskWrapper wrapper) {
+  public BaseOption(TARGET target, AbsTaskWrapper wrapper) {
     TAG = CommonUtil.getClassName(getClass());
     mTarget = target;
     mWrapper = wrapper;

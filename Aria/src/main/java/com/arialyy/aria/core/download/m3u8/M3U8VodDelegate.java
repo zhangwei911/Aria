@@ -16,7 +16,7 @@
 package com.arialyy.aria.core.download.m3u8;
 
 import androidx.annotation.CheckResult;
-import com.arialyy.aria.core.common.BaseDelegate;
+import com.arialyy.aria.core.common.BaseOption;
 import com.arialyy.aria.core.inf.Suggest;
 import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.event.EventMsgUtil;
@@ -30,7 +30,7 @@ import com.arialyy.aria.util.ALog;
 /**
  * m3u8点播文件参数设置
  */
-public class M3U8VodDelegate<TARGET extends AbsTarget> extends BaseDelegate<TARGET> {
+public class M3U8VodDelegate<TARGET extends AbsTarget> extends BaseOption<TARGET> {
   private DTaskWrapper mTaskWrapper;
 
   M3U8VodDelegate(TARGET target, AbsTaskWrapper wrapper) {

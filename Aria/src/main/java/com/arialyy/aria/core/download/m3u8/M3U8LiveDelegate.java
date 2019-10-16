@@ -16,19 +16,20 @@
 package com.arialyy.aria.core.download.m3u8;
 
 import androidx.annotation.CheckResult;
-import com.arialyy.aria.core.common.BaseDelegate;
-import com.arialyy.aria.core.processor.ILiveTsUrlConverter;
-import com.arialyy.aria.core.inf.Suggest;
+import com.arialyy.aria.core.common.BaseOption;
 import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.inf.AbsTarget;
-import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
 import com.arialyy.aria.core.inf.IOptionConstant;
+import com.arialyy.aria.core.inf.Suggest;
+import com.arialyy.aria.core.processor.ILiveTsUrlConverter;
+import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
 import com.arialyy.aria.util.ALog;
+import com.arialyy.aria.util.CheckUtil;
 
 /**
  * m3u8直播参数设置
  */
-public class M3U8LiveDelegate<TARGET extends AbsTarget> extends BaseDelegate<TARGET> {
+public class M3U8LiveDelegate<TARGET extends AbsTarget> extends BaseOption<TARGET> {
 
   M3U8LiveDelegate(TARGET target, AbsTaskWrapper wrapper) {
     super(target, wrapper);
@@ -43,6 +44,7 @@ public class M3U8LiveDelegate<TARGET extends AbsTarget> extends BaseDelegate<TAR
    */
   @CheckResult(suggest = Suggest.TO_CONTROLLER)
   public M3U8LiveDelegate<TARGET> setLiveTsUrlConvert(ILiveTsUrlConverter converter) {
+    CheckUtil.checkMemberClass(converter.getClass());
     ((DTaskWrapper) getTaskWrapper()).getM3U8Params()
         .setObjs(IOptionConstant.liveTsUrlConverter, converter);
     return this;

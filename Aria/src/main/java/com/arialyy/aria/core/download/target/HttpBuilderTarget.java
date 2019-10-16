@@ -24,6 +24,7 @@ import com.arialyy.aria.core.processor.IHttpFileLenAdapter;
 import com.arialyy.aria.core.inf.IOptionConstant;
 import com.arialyy.aria.core.inf.Suggest;
 import com.arialyy.aria.core.wrapper.ITaskWrapper;
+import com.arialyy.aria.util.CheckUtil;
 
 public class HttpBuilderTarget extends AbsBuilderTarget<HttpBuilderTarget> {
 
@@ -95,7 +96,7 @@ public class HttpBuilderTarget extends AbsBuilderTarget<HttpBuilderTarget> {
     if (adapter == null) {
       throw new IllegalArgumentException("adapter为空");
     }
-
+    CheckUtil.checkMemberClass(adapter.getClass());
     getTaskWrapper().getOptionParams().setObjs(IOptionConstant.fileLenAdapter, adapter);
     return this;
   }

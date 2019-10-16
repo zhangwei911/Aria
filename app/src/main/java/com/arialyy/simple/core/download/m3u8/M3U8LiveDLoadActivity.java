@@ -212,27 +212,28 @@ public class M3U8LiveDLoadActivity extends BaseActivity<ActivityM3u8LiveBinding>
   public void onClick(View view) {
     switch (view.getId()) {
       case R.id.start:
-        if (!AppUtil.chekEntityValid(mEntity)) {
-          startD();
-          break;
-        }
-        if (Aria.download(this).load(mEntity.getId()).isRunning()) {
-          Aria.download(this).load(mEntity.getId()).stop();
-        } else {
-          Aria.download(this).load(mEntity.getId())
-              .asM3U8()
-              .asLive()
-              .setLiveTsUrlConvert(new ILiveTsUrlConverter() {
-                @Override public String convert(String m3u8Url, String tsUrl) {
-                  int index = m3u8Url.lastIndexOf("/");
-                  String parentUrl = m3u8Url.substring(0, index + 1);
-                  return parentUrl + tsUrl;
-                }
-              })
-              .controller(ControllerType.TASK_CONTROLLER)
-              .resume();
-        }
-        break;
+        startD();
+        //if (!AppUtil.chekEntityValid(mEntity)) {
+        //  startD();
+        //  break;
+        //}
+        //if (Aria.download(this).load(mEntity.getId()).isRunning()) {
+        //  Aria.download(this).load(mEntity.getId()).stop();
+        //} else {
+        //  Aria.download(this).load(mEntity.getId())
+        //      .asM3U8()
+        //      .asLive()
+        //      .setLiveTsUrlConvert(new ILiveTsUrlConverter() {
+        //        @Override public String convert(String m3u8Url, String tsUrl) {
+        //          int index = m3u8Url.lastIndexOf("/");
+        //          String parentUrl = m3u8Url.substring(0, index + 1);
+        //          return parentUrl + tsUrl;
+        //        }
+        //      })
+        //      .controller(ControllerType.TASK_CONTROLLER)
+        //      .resume();
+        //}
+        //break;
       case R.id.cancel:
         if (AppUtil.chekEntityValid(mEntity)) {
           Aria.download(this).load(mEntity.getId()).cancel(true);
@@ -254,13 +255,7 @@ public class M3U8LiveDLoadActivity extends BaseActivity<ActivityM3u8LiveBinding>
         //  }
         //})
         .asLive()
-        .setLiveTsUrlConvert(new ILiveTsUrlConverter() {
-          @Override public String convert(String m3u8Url, String tsUrl) {
-            int index = m3u8Url.lastIndexOf("/");
-            String parentUrl = m3u8Url.substring(0, index + 1);
-            return parentUrl + tsUrl;
-          }
-        })
+        .setLiveTsUrlConvert(new LiveTsUrlConverter())
         .controller(ControllerType.CREATE_CONTROLLER)
         //.setLiveTsUrlConvert(new IVodTsUrlConverter() {
         //  @Override public List<String> convert(String m3u8Url, List<String> tsUrls) {
@@ -283,6 +278,14 @@ public class M3U8LiveDLoadActivity extends BaseActivity<ActivityM3u8LiveBinding>
       mModule.uploadUrl(this, String.valueOf(data));
     } else if (result == ModifyPathDialog.MODIFY_PATH_RESULT) {
       mModule.updateFilePath(this, String.valueOf(data));
+    }
+  }
+
+  static class LiveTsUrlConverter implements ILiveTsUrlConverter {
+    @Override public String convert(String m3u8Url, String tsUrl) {
+      int index = m3u8Url.lastIndexOf("/");
+      String parentUrl = m3u8Url.substring(0, index + 1);
+      return parentUrl + tsUrl;
     }
   }
 }

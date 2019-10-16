@@ -16,7 +16,7 @@
 package com.arialyy.aria.core.download.m3u8;
 
 import androidx.annotation.CheckResult;
-import com.arialyy.aria.core.common.BaseDelegate;
+import com.arialyy.aria.core.common.BaseOption;
 import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.inf.AbsTarget;
 import com.arialyy.aria.core.inf.IOptionConstant;
@@ -25,12 +25,13 @@ import com.arialyy.aria.core.processor.IBandWidthUrlConverter;
 import com.arialyy.aria.core.processor.ITsMergeHandler;
 import com.arialyy.aria.core.processor.IVodTsUrlConverter;
 import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
+import com.arialyy.aria.util.CheckUtil;
 import com.arialyy.aria.util.ComponentUtil;
 
 /**
  * m3u8 委托
  */
-public class M3U8Delegate<TARGET extends AbsTarget> extends BaseDelegate<TARGET> {
+public class M3U8Delegate<TARGET extends AbsTarget> extends BaseOption<TARGET> {
   private DTaskWrapper mTaskWrapper;
 
   public M3U8Delegate(TARGET target, AbsTaskWrapper wrapper) {
@@ -67,6 +68,7 @@ public class M3U8Delegate<TARGET extends AbsTarget> extends BaseDelegate<TARGET>
    */
   @CheckResult(suggest = Suggest.TO_CONTROLLER)
   public M3U8Delegate<TARGET> setMergeHandler(ITsMergeHandler handler) {
+    CheckUtil.checkMemberClass(handler.getClass());
     mTaskWrapper.getM3U8Params().setObjs(IOptionConstant.mergeHandler, handler);
     return this;
   }
@@ -79,6 +81,7 @@ public class M3U8Delegate<TARGET extends AbsTarget> extends BaseDelegate<TARGET>
    */
   @CheckResult(suggest = Suggest.TO_CONTROLLER)
   public M3U8Delegate<TARGET> setTsUrlConvert(IVodTsUrlConverter converter) {
+    CheckUtil.checkMemberClass(converter.getClass());
     mTaskWrapper.getM3U8Params().setObjs(IOptionConstant.vodUrlConverter, converter);
     return this;
   }
@@ -102,6 +105,7 @@ public class M3U8Delegate<TARGET extends AbsTarget> extends BaseDelegate<TARGET>
    */
   @CheckResult(suggest = Suggest.TO_CONTROLLER)
   public M3U8Delegate<TARGET> setBandWidthUrlConverter(IBandWidthUrlConverter converter) {
+    CheckUtil.checkMemberClass(converter.getClass());
     mTaskWrapper.getM3U8Params().setObjs(IOptionConstant.bandWidthUrlConverter, converter);
     return this;
   }

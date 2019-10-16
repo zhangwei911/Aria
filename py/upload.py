@@ -6,7 +6,7 @@ from werkzeug import secure_filename
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif', 'rar', 'apk'])
 
 app = Flask(__name__)
-app.config['UPLOAD_FOLDER'] = 'd:/db/'
+app.config['UPLOAD_FOLDER'] = '/Users/aria/temp/test/'
 app.config['MAX_CONTENT_LENGTH'] = 1600 * 1024 * 1024
 
 """

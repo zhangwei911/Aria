@@ -28,7 +28,7 @@ import com.arialyy.aria.util.ALog;
 /**
  * Created by laoyuyu on 2018/3/9.
  */
-public class FtpDelegate<TARGET extends AbsTarget> extends BaseDelegate<TARGET> {
+public class FtpDelegate<TARGET extends AbsTarget> extends BaseOption<TARGET> {
   private static final String TAG = "FtpDelegate";
 
   public FtpDelegate(TARGET target, AbsTaskWrapper wrapper) {

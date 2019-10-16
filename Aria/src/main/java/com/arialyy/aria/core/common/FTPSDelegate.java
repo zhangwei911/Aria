@@ -28,7 +28,7 @@ import com.arialyy.aria.util.ALog;
 /**
  * D_FTP SSL/TSL 参数委托
  */
-public class FTPSDelegate<TARGET extends AbsTarget> extends BaseDelegate<TARGET> {
+public class FTPSDelegate<TARGET extends AbsTarget> extends BaseOption<TARGET> {
 
   private FtpUrlEntity mUrlEntity;
 

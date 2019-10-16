@@ -17,13 +17,14 @@
 package com.arialyy.simple.core.upload;
 
 import android.os.Bundle;
+import android.os.Environment;
 import android.view.View;
 import com.arialyy.annotations.Upload;
 import com.arialyy.aria.core.Aria;
 import com.arialyy.aria.core.common.RequestEnum;
 import com.arialyy.aria.core.common.controller.ControllerType;
-import com.arialyy.aria.core.upload.UploadEntity;
 import com.arialyy.aria.core.task.UploadTask;
+import com.arialyy.aria.core.upload.UploadEntity;
 import com.arialyy.frame.util.FileUtil;
 import com.arialyy.frame.util.show.L;
 import com.arialyy.simple.R;
@@ -40,7 +41,9 @@ public class HttpUploadActivity extends BaseActivity<ActivityUploadBinding> {
   private static final String TAG = "HttpUploadActivity";
   HorizontalProgressBarWithNumber mPb;
 
-  private final String FILE_PATH = "/mnt/sdcard/ggsg14.apk";
+  //private final String FILE_PATH = "/mnt/sdcard/ggsg14.apk";
+  private final String FILE_PATH =
+      Environment.getExternalStorageDirectory().getPath() + "/Download/PaNTFS15562.zip";
   private UploadEntity mEntity;
 
   @Override protected int setLayoutId() {

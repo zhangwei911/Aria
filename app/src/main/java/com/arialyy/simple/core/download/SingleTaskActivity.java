@@ -31,11 +31,11 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import com.arialyy.annotations.Download;
 import com.arialyy.aria.core.Aria;
-import com.arialyy.aria.core.processor.IHttpFileLenAdapter;
 import com.arialyy.aria.core.common.controller.ControllerType;
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.inf.IEntity;
 import com.arialyy.aria.core.listener.ISchedulers;
+import com.arialyy.aria.core.processor.IHttpFileLenAdapter;
 import com.arialyy.aria.core.task.DownloadTask;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
@@ -291,18 +291,7 @@ public class SingleTaskActivity extends BaseActivity<ActivitySingleBinding> {
         .load(mUrl)
         .useServerFileName(true)
         .setFilePath(mFilePath, true)
-        .setFileLenAdapter(new IHttpFileLenAdapter() {
-          @Override public long handleFileLen(Map<String, List<String>> headers) {
-
-            List<String> sLength = headers.get("Content-Length");
-            if (sLength == null || sLength.isEmpty()) {
-              return -1;
-            }
-            String temp = sLength.get(0);
-
-            return Long.parseLong(temp);
-          }
-        })
+        .setFileLenAdapter(new FileLenAdapter())
         .option()
         .addHeader("1", "@")
         .controller(ControllerType.CREATE_CONTROLLER)
@@ -325,6 +314,19 @@ public class SingleTaskActivity extends BaseActivity<ActivitySingleBinding> {
       mModule.uploadUrl(this, String.valueOf(data));
     } else if (result == ModifyPathDialog.MODIFY_PATH_RESULT) {
       mModule.updateFilePath(this, String.valueOf(data));
+    }
+  }
+
+  static class FileLenAdapter implements IHttpFileLenAdapter {
+    @Override public long handleFileLen(Map<String, List<String>> headers) {
+
+      List<String> sLength = headers.get("Content-Length");
+      if (sLength == null || sLength.isEmpty()) {
+        return -1;
+      }
+      String temp = sLength.get(0);
+
+      return Long.parseLong(temp);
     }
   }
 }
