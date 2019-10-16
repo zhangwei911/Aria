@@ -28,7 +28,7 @@ dependencies {
   api project(':AriaAnnotations')
   api project(path: ':PublicComponent')
 
-    api 'com.arialyy.aria:aria-ftp-plug:1.0.4'
+//    api 'com.arialyy.aria:aria-ftp-plug:1.0.4'
   implementation project(path: ':HttpComponent') // 打包时用这个
 
   //    compile project(':AriaFtpPlug')

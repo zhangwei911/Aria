@@ -16,11 +16,7 @@
 package com.arialyy.aria.core.download.tcp;
 
 import android.text.TextUtils;
-import androidx.annotation.CheckResult;
 import com.arialyy.aria.core.common.BaseOption;
-import com.arialyy.aria.core.inf.Suggest;
-import com.arialyy.aria.core.inf.AbsTarget;
-import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
 import com.arialyy.aria.util.ALog;
 import java.nio.charset.Charset;
 
@@ -28,26 +24,26 @@ import java.nio.charset.Charset;
  * @Author aria
  * @Date 2019-09-06
  */
-public class TcpDelegate<TARGET extends AbsTarget> extends BaseOption<TARGET> {
+public class TcpDelegate extends BaseOption {
 
-  private TcpTaskConfig mTcpConfig;
+  private String params;
+  private String heartbeatInfo;
+  private long heartbeat;
+  private String charset;
 
-  public TcpDelegate(TARGET target, AbsTaskWrapper wrapper) {
-    super(target, wrapper);
-
-    mTcpConfig = (TcpTaskConfig) wrapper.getTaskOption();
+  public TcpDelegate() {
+    super();
   }
 
   /**
    * 上传给tcp服务的初始数据，一般是文件名、文件路径等信息
    */
-  @CheckResult(suggest = Suggest.TO_CONTROLLER)
-  public TcpDelegate<TARGET> setParam(String params) {
+  public TcpDelegate setParam(String params) {
     if (TextUtils.isEmpty(params)) {
       ALog.w(TAG, "tcp传输的数据不能为空");
       return this;
     }
-    mTcpConfig.setParams(params);
+    this.params = params;
     return this;
   }
 
@@ -56,41 +52,39 @@ public class TcpDelegate<TARGET extends AbsTarget> extends BaseOption<TARGET> {
    *
    * @param heartbeatInfo 心跳包数据
    */
-  @CheckResult(suggest = Suggest.TO_CONTROLLER)
-  public TcpDelegate<TARGET> setHeartbeatInfo(String heartbeatInfo) {
+  public TcpDelegate setHeartbeatInfo(String heartbeatInfo) {
     if (TextUtils.isEmpty(heartbeatInfo)) {
       ALog.w(TAG, "心跳包传输的数据不能为空");
       return this;
     }
-    mTcpConfig.setHeartbeat(heartbeatInfo);
+    this.heartbeatInfo = heartbeatInfo;
     return this;
   }
 
   /**
    * 心跳间隔，默认1s
    *
-   * @param interval 单位毫秒
+   * @param heartbeat 单位毫秒
    */
-  @CheckResult(suggest = Suggest.TO_CONTROLLER)
-  public TcpDelegate<TARGET> setHeartbeatInterval(long interval) {
-    if (interval <= 0) {
+  public TcpDelegate setHeartbeatInterval(long heartbeat) {
+    if (heartbeat <= 0) {
       ALog.w(TAG, "心跳间隔不能小于1毫秒");
       return this;
     }
-    mTcpConfig.setHeartbeatInterval(interval);
+    this.heartbeat = heartbeat;
     return this;
   }
 
   /**
    * 数据传输编码，默认"utf-8"
    */
-  public TcpDelegate<TARGET> setCharset(String charset) {
+  public TcpDelegate setCharset(String charset) {
     if (!Charset.isSupported(charset)) {
       ALog.w(TAG, "不支持的编码");
       return this;
     }
 
-    mTcpConfig.setCharset(charset);
+    this.charset = charset;
     return this;
   }
 }

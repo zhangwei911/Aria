@@ -20,7 +20,7 @@ import android.os.Environment;
 import android.view.View;
 import com.arialyy.annotations.DownloadGroup;
 import com.arialyy.aria.core.Aria;
-import com.arialyy.aria.core.common.controller.ControllerType;
+import com.arialyy.aria.core.common.FtpOption;
 import com.arialyy.aria.core.download.DownloadGroupEntity;
 import com.arialyy.aria.core.inf.IEntity;
 import com.arialyy.aria.core.task.DownloadGroupTask;
@@ -78,9 +78,7 @@ public class FTPDirDownloadActivity extends BaseActivity<ActivityDownloadGroupBi
               .setDirPath(
                   Environment.getExternalStorageDirectory().getPath() + "/Download/ftp_dir")
               .setGroupAlias("ftp文件夹下载")
-              .option()
-              .login(user, pwd)
-              .controller(ControllerType.CREATE_CONTROLLER)
+              .option(getFtpOption())
               .create();
           getBinding().setStateStr(getString(R.string.stop));
           break;
@@ -91,9 +89,7 @@ public class FTPDirDownloadActivity extends BaseActivity<ActivityDownloadGroupBi
         } else {
           Aria.download(this)
               .loadFtpDir(mTaskId)
-              .option()
-              .login(user, pwd)
-              .controller(ControllerType.TASK_CONTROLLER)
+              .option(getFtpOption())
               .resume();
           getBinding().setStateStr(getString(R.string.stop));
         }
@@ -103,6 +99,12 @@ public class FTPDirDownloadActivity extends BaseActivity<ActivityDownloadGroupBi
         mTaskId = -1;
         break;
     }
+  }
+
+  private FtpOption getFtpOption() {
+    FtpOption option = new FtpOption();
+    option.login(user, pwd);
+    return option;
   }
 
   @DownloadGroup.onPre() protected void onPre(DownloadGroupTask task) {

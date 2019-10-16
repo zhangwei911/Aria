@@ -36,14 +36,18 @@ public abstract class AbsNormalTarget<TARGET extends AbsNormalTarget> extends Ab
    *
    * @return {@code true} 任务正在执行
    */
-  public abstract boolean isRunning();
+  public boolean isRunning() {
+    return false;
+  }
 
   /**
    * 任务是否存在
    *
    * @return {@code true} 任务存在
    */
-  public abstract boolean taskExists();
+  public boolean taskExists() {
+    return false;
+  }
 
   private NormalController mNormalController;
 

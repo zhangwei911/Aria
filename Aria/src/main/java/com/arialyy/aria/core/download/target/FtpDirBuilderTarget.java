@@ -17,10 +17,9 @@ package com.arialyy.aria.core.download.target;
 
 import androidx.annotation.CheckResult;
 import com.arialyy.aria.core.common.AbsBuilderTarget;
-import com.arialyy.aria.core.inf.Suggest;
-import com.arialyy.aria.core.common.FtpDelegate;
+import com.arialyy.aria.core.common.FtpOption;
 import com.arialyy.aria.core.download.DownloadGroupEntity;
-import com.arialyy.aria.core.inf.IOptionConstant;
+import com.arialyy.aria.core.inf.Suggest;
 import com.arialyy.aria.core.manager.SubTaskManager;
 import com.arialyy.aria.util.CommonUtil;
 
@@ -30,12 +29,12 @@ import com.arialyy.aria.util.CommonUtil;
  */
 public class FtpDirBuilderTarget extends AbsBuilderTarget<FtpDirBuilderTarget> {
   private FtpDirConfigHandler<FtpDirBuilderTarget> mConfigHandler;
+  private String url;
 
   FtpDirBuilderTarget(String url) {
+    this.url = url;
     mConfigHandler = new FtpDirConfigHandler<>(this, -1);
     getEntity().setGroupHash(url);
-    getTaskWrapper().getOptionParams()
-        .setParams(IOptionConstant.ftpUrlEntity, CommonUtil.getFtpUrlInfo(url));
   }
 
   /**
@@ -75,8 +74,13 @@ public class FtpDirBuilderTarget extends AbsBuilderTarget<FtpDirBuilderTarget> {
    * 设置登陆、字符串编码、ftps等参数
    */
   @CheckResult(suggest = Suggest.TASK_CONTROLLER)
-  public FtpDelegate<FtpDirBuilderTarget> option() {
-    return new FtpDelegate<>(this, getTaskWrapper());
+  public FtpDirBuilderTarget option(FtpOption option) {
+    if (option == null) {
+      throw new NullPointerException("ftp 任务配置为空");
+    }
+    option.setFtpUrlEntity(CommonUtil.getFtpUrlInfo(url));
+    getTaskWrapper().getOptionParams().setParams(option);
+    return this;
   }
 
   @Override public DownloadGroupEntity getEntity() {

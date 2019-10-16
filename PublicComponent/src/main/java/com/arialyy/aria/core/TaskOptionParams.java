@@ -15,8 +15,11 @@
  */
 package com.arialyy.aria.core;
 
+import com.arialyy.aria.core.common.BaseOption;
 import com.arialyy.aria.core.inf.IEventHandler;
 import com.arialyy.aria.core.inf.IOptionConstant;
+import com.arialyy.aria.util.CommonUtil;
+import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -37,6 +40,34 @@ public class TaskOptionParams {
    * 事件处理对象
    */
   private Map<String, IEventHandler> handler = new HashMap<>();
+
+  /**
+   * 设置任务参数
+   *
+   * @param option 任务配置
+   */
+  public void setParams(BaseOption option) {
+    Field[] fields = CommonUtil.getFields(option.getClass());
+
+    for (Field field : fields) {
+      field.setAccessible(true);
+      try {
+        if (field.getType() == IEventHandler.class) {
+          Object eventHandler = field.get(option);
+          if (eventHandler != null) {
+            setObjs(field.getName(), (IEventHandler) eventHandler);
+          }
+        } else {
+          Object params = field.get(option);
+          if (params != null) {
+            setParams(field.getName(), params);
+          }
+        }
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
+    }
+  }
 
   /**
    * 设置普通参数
@@ -60,11 +91,11 @@ public class TaskOptionParams {
     return params;
   }
 
-  public Object getParam(String key){
+  public Object getParam(String key) {
     return params.get(key);
   }
 
-  public IEventHandler getHandler(String key){
+  public IEventHandler getHandler(String key) {
     return handler.get(key);
   }
 

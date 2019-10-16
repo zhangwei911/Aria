@@ -18,11 +18,14 @@ package com.arialyy.aria.core.download.target;
 import androidx.annotation.CheckResult;
 import androidx.annotation.NonNull;
 import com.arialyy.aria.core.common.AbsBuilderTarget;
-import com.arialyy.aria.core.common.HttpDelegate;
-import com.arialyy.aria.core.download.m3u8.M3U8Delegate;
-import com.arialyy.aria.core.processor.IHttpFileLenAdapter;
+import com.arialyy.aria.core.common.HttpOption;
+import com.arialyy.aria.core.download.DTaskWrapper;
+import com.arialyy.aria.core.download.m3u8.M3U8LiveOption;
+import com.arialyy.aria.core.download.m3u8.M3U8VodOption;
 import com.arialyy.aria.core.inf.IOptionConstant;
 import com.arialyy.aria.core.inf.Suggest;
+import com.arialyy.aria.core.processor.IHttpFileLenAdapter;
+import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
 import com.arialyy.aria.core.wrapper.ITaskWrapper;
 import com.arialyy.aria.util.CheckUtil;
 
@@ -36,16 +39,37 @@ public class HttpBuilderTarget extends AbsBuilderTarget<HttpBuilderTarget> {
     mConfigHandler.setUrl(url);
   }
 
-  @CheckResult(suggest = Suggest.TASK_CONTROLLER) public M3U8Delegate<HttpBuilderTarget> asM3U8() {
-    return new M3U8Delegate<>(this, getTaskWrapper());
+  @CheckResult(suggest = Suggest.TASK_CONTROLLER)
+  public HttpBuilderTarget m3u8VodOption(M3U8VodOption m3U8VodOption) {
+    if (m3U8VodOption == null){
+      throw new NullPointerException("m3u8任务设置为空");
+    }
+    getTaskWrapper().setRequestType(AbsTaskWrapper.M3U8_VOD);
+    getTaskWrapper().getEntity().setFileSize(m3U8VodOption.getFileSize());
+    ((DTaskWrapper) getTaskWrapper()).getM3U8Params().setParams(m3U8VodOption);
+    return this;
+  }
+
+  @CheckResult(suggest = Suggest.TASK_CONTROLLER)
+  public HttpBuilderTarget m3u8LiveOption(M3U8LiveOption m3U8LiveOption) {
+    if (m3U8LiveOption == null){
+      throw new NullPointerException("m3u8任务设置为空");
+    }
+    getTaskWrapper().setRequestType(AbsTaskWrapper.M3U8_LIVE);
+    ((DTaskWrapper) getTaskWrapper()).getM3U8Params().setParams(m3U8LiveOption);
+    return this;
   }
 
   /**
    * 设置http请求参数，header等信息
    */
   @CheckResult(suggest = Suggest.TASK_CONTROLLER)
-  public HttpDelegate<HttpBuilderTarget> option() {
-    return new HttpDelegate<>(this, getTaskWrapper());
+  public HttpBuilderTarget option(HttpOption option) {
+    if (option == null) {
+      throw new NullPointerException("任务配置为空");
+    }
+    getTaskWrapper().getOptionParams().setParams(option);
+    return this;
   }
 
   /**

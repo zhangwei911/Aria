@@ -31,6 +31,7 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import com.arialyy.annotations.Download;
 import com.arialyy.aria.core.Aria;
+import com.arialyy.aria.core.common.HttpOption;
 import com.arialyy.aria.core.common.controller.ControllerType;
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.inf.IEntity;
@@ -287,14 +288,14 @@ public class SingleTaskActivity extends BaseActivity<ActivitySingleBinding> {
   }
 
   private void startD() {
+    HttpOption option = new HttpOption();
+    option.addHeader("1", "@");
     mTaskId = Aria.download(SingleTaskActivity.this)
         .load(mUrl)
         .useServerFileName(true)
         .setFilePath(mFilePath, true)
         .setFileLenAdapter(new FileLenAdapter())
-        .option()
-        .addHeader("1", "@")
-        .controller(ControllerType.CREATE_CONTROLLER)
+        .option(option)
         .create();
   }
 

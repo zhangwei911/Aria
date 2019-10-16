@@ -15,54 +15,46 @@
  */
 package com.arialyy.aria.core.download.m3u8;
 
-import androidx.annotation.CheckResult;
-import com.arialyy.aria.core.common.BaseOption;
-import com.arialyy.aria.core.download.DTaskWrapper;
-import com.arialyy.aria.core.inf.AbsTarget;
-import com.arialyy.aria.core.inf.IOptionConstant;
-import com.arialyy.aria.core.inf.Suggest;
 import com.arialyy.aria.core.processor.ILiveTsUrlConverter;
-import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CheckUtil;
 
 /**
  * m3u8直播参数设置
  */
-public class M3U8LiveDelegate<TARGET extends AbsTarget> extends BaseOption<TARGET> {
+public class M3U8LiveOption extends M3U8Option {
 
-  M3U8LiveDelegate(TARGET target, AbsTaskWrapper wrapper) {
-    super(target, wrapper);
-    getTaskWrapper().setRequestType(AbsTaskWrapper.M3U8_LIVE);
+  private ILiveTsUrlConverter liveTsUrlConverter;
+  private long liveUpdateInterval;
+
+  public M3U8LiveOption() {
+    super();
   }
 
   /**
    * M3U8 ts 文件url转换器，对于某些服务器，返回的ts地址可以是相对地址，也可能是处理过的
    * 对于这种情况，你需要使用url转换器将地址转换为可正常访问的http地址
    *
-   * @param converter {@link ILiveTsUrlConverter}
+   * @param liveTsUrlConverter {@link ILiveTsUrlConverter}
    */
-  @CheckResult(suggest = Suggest.TO_CONTROLLER)
-  public M3U8LiveDelegate<TARGET> setLiveTsUrlConvert(ILiveTsUrlConverter converter) {
-    CheckUtil.checkMemberClass(converter.getClass());
-    ((DTaskWrapper) getTaskWrapper()).getM3U8Params()
-        .setObjs(IOptionConstant.liveTsUrlConverter, converter);
+  public M3U8LiveOption setLiveTsUrlConvert(ILiveTsUrlConverter liveTsUrlConverter) {
+    CheckUtil.checkMemberClass(liveTsUrlConverter.getClass());
+    this.liveTsUrlConverter = liveTsUrlConverter;
     return this;
   }
 
   /**
    * 设置直播的m3u8文件更新间隔，默认10000微秒。
    *
-   * @param interval 更新间隔，单位微秒
+   * @param liveUpdateInterval 更新间隔，单位微秒
    */
-  @CheckResult(suggest = Suggest.TO_CONTROLLER)
-  public M3U8LiveDelegate<TARGET> setM3U8FileUpdateInterval(long interval) {
-    if (interval <= 1) {
+  public M3U8LiveOption setM3U8FileUpdateInterval(long liveUpdateInterval) {
+    if (liveUpdateInterval <= 1) {
       ALog.e(TAG, "间隔时间错误");
       return this;
     }
-    ((DTaskWrapper) getTaskWrapper()).getM3U8Params()
-        .setParams(IOptionConstant.liveUpdateInterval, interval);
+
+    this.liveUpdateInterval = liveUpdateInterval;
     return this;
   }
 }

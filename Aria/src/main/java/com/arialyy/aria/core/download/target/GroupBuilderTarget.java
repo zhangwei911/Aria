@@ -17,7 +17,7 @@ package com.arialyy.aria.core.download.target;
 
 import androidx.annotation.CheckResult;
 import com.arialyy.aria.core.common.AbsBuilderTarget;
-import com.arialyy.aria.core.common.HttpDelegate;
+import com.arialyy.aria.core.common.HttpOption;
 import com.arialyy.aria.core.download.DGTaskWrapper;
 import com.arialyy.aria.core.inf.IOptionConstant;
 import com.arialyy.aria.core.inf.Suggest;
@@ -45,8 +45,12 @@ public class GroupBuilderTarget extends AbsBuilderTarget<GroupBuilderTarget> {
    * 设置http请求参数，header等信息
    */
   @CheckResult(suggest = Suggest.TASK_CONTROLLER)
-  public HttpDelegate<GroupBuilderTarget> option() {
-    return new HttpDelegate<>(this, getTaskWrapper());
+  public GroupBuilderTarget option(HttpOption option) {
+    if (option == null) {
+      throw new NullPointerException("任务配置为空");
+    }
+    getTaskWrapper().getOptionParams().setParams(option);
+    return this;
   }
 
   /**

@@ -20,7 +20,7 @@ import android.os.Environment;
 import android.util.Log;
 import com.arialyy.annotations.Download;
 import com.arialyy.aria.core.Aria;
-import com.arialyy.aria.core.common.controller.ControllerType;
+import com.arialyy.aria.core.common.FtpOption;
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.task.DownloadTask;
 import com.arialyy.aria.util.CommonUtil;
@@ -108,16 +108,19 @@ public class AnyRunnModule {
       Aria.download(this)
           .loadFtp(url)
           .setFilePath(Environment.getExternalStorageDirectory().getPath() + "/Download/")
-          .option()
-          .asFtps()
-          .setStorePath("/mnt/sdcard/Download/server.crt")
-          .setAlias("www.laoyuyu.me")
-          .setStorePass("123456")
-          .controller(ControllerType.CREATE_CONTROLLER)
+          .option(getFtpOption())
           .create();
     } else {
       Aria.download(this).load(mEntity.getId()).resume();
     }
+  }
+
+  private FtpOption getFtpOption() {
+    FtpOption option = new FtpOption();
+    option.setStorePath("/mnt/sdcard/Download/server.crt")
+        .setAlias("www.laoyuyu.me")
+        .setStorePass("123456");
+    return option;
   }
 
   public void stop(String url) {

@@ -17,8 +17,8 @@ package com.arialyy.aria.core.upload.target;
 
 import androidx.annotation.CheckResult;
 import com.arialyy.aria.core.common.AbsBuilderTarget;
+import com.arialyy.aria.core.common.HttpOption;
 import com.arialyy.aria.core.inf.Suggest;
-import com.arialyy.aria.core.common.HttpDelegate;
 import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
 
 /**
@@ -52,7 +52,12 @@ public class HttpBuilderTarget extends AbsBuilderTarget<HttpBuilderTarget> {
    * 设置http请求参数，header等信息
    */
   @CheckResult(suggest = Suggest.TASK_CONTROLLER)
-  public HttpDelegate<HttpBuilderTarget> option() {
-    return new HttpDelegate<>(this, getTaskWrapper());
+  public HttpBuilderTarget option(HttpOption option) {
+
+    if (option == null) {
+      throw new NullPointerException("任务配置为空");
+    }
+    getTaskWrapper().getOptionParams().setParams(option);
+    return this;
   }
 }

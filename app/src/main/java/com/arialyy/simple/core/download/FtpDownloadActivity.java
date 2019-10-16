@@ -23,8 +23,7 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import com.arialyy.annotations.Download;
 import com.arialyy.aria.core.Aria;
-import com.arialyy.aria.core.ProtocolType;
-import com.arialyy.aria.core.common.controller.ControllerType;
+import com.arialyy.aria.core.common.FtpOption;
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.inf.IEntity;
 import com.arialyy.aria.core.task.DownloadTask;
@@ -89,16 +88,14 @@ public class FtpDownloadActivity extends BaseActivity<ActivityFtpDownloadBinding
   }
 
   public void onClick(View view) {
+
     switch (view.getId()) {
       case R.id.start:
 
         if (mTaskId == -1) {
           mTaskId = Aria.download(this).loadFtp(mUrl)
               .setFilePath(mFilePath, true)
-              .option()
-              .login(user, passw)
-              //.asFtps()
-              .controller(ControllerType.CREATE_CONTROLLER)
+              .option(getFtpOption())
               .create();
           getBinding().setStateStr(getString(R.string.stop));
           break;
@@ -109,11 +106,7 @@ public class FtpDownloadActivity extends BaseActivity<ActivityFtpDownloadBinding
         } else {
           Aria.download(this)
               .loadFtp(mTaskId)
-              .option()
-              .login(user, passw)
-              //.asFtps()
-              //.setProtocol(ProtocolType.SSL)
-              .controller(ControllerType.TASK_CONTROLLER)
+              .option(getFtpOption())
               .resume();
           getBinding().setStateStr(getString(R.string.stop));
         }
@@ -125,6 +118,12 @@ public class FtpDownloadActivity extends BaseActivity<ActivityFtpDownloadBinding
         mTaskId = -1;
         break;
     }
+  }
+
+  private FtpOption getFtpOption() {
+    FtpOption option = new FtpOption();
+    option.login(user, passw);
+    return option;
   }
 
   public void chooseUrl() {

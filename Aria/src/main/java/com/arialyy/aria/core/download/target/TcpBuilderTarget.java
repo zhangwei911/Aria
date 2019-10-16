@@ -34,14 +34,14 @@ public class TcpBuilderTarget extends AbsBuilderTarget<TcpBuilderTarget> {
     mConfigHandler = new DNormalConfigHandler<>(this, -1);
     getTaskWrapper().setRequestType(ITaskWrapper.D_TCP);
   }
-
-  /**
-   * 设置tcp相应信息
-   */
-  @CheckResult(suggest = Suggest.TASK_CONTROLLER)
-  public TcpDelegate<TcpBuilderTarget> option() {
-    return new TcpDelegate<>(this, getTaskWrapper());
-  }
+  //
+  ///**
+  // * 设置tcp相应信息
+  // */
+  //@CheckResult(suggest = Suggest.TASK_CONTROLLER)
+  //public TcpBuilderTarget option(T) {
+  //  return new TcpDelegate<>(this, getTaskWrapper());
+  //}
 
   /**
    * 设置文件存储路径，如果需要修改新的文件名，修改路径便可。

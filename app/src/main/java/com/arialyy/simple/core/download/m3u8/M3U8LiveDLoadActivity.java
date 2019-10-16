@@ -27,8 +27,9 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import com.arialyy.annotations.Download;
 import com.arialyy.aria.core.Aria;
-import com.arialyy.aria.core.common.controller.ControllerType;
 import com.arialyy.aria.core.download.DownloadEntity;
+import com.arialyy.aria.core.download.m3u8.M3U8LiveOption;
+import com.arialyy.aria.core.processor.IBandWidthUrlConverter;
 import com.arialyy.aria.core.processor.ILiveTsUrlConverter;
 import com.arialyy.aria.core.task.DownloadTask;
 import com.arialyy.aria.util.ALog;
@@ -213,27 +214,18 @@ public class M3U8LiveDLoadActivity extends BaseActivity<ActivityM3u8LiveBinding>
     switch (view.getId()) {
       case R.id.start:
         startD();
-        //if (!AppUtil.chekEntityValid(mEntity)) {
-        //  startD();
-        //  break;
-        //}
-        //if (Aria.download(this).load(mEntity.getId()).isRunning()) {
-        //  Aria.download(this).load(mEntity.getId()).stop();
-        //} else {
-        //  Aria.download(this).load(mEntity.getId())
-        //      .asM3U8()
-        //      .asLive()
-        //      .setLiveTsUrlConvert(new ILiveTsUrlConverter() {
-        //        @Override public String convert(String m3u8Url, String tsUrl) {
-        //          int index = m3u8Url.lastIndexOf("/");
-        //          String parentUrl = m3u8Url.substring(0, index + 1);
-        //          return parentUrl + tsUrl;
-        //        }
-        //      })
-        //      .controller(ControllerType.TASK_CONTROLLER)
-        //      .resume();
-        //}
-        //break;
+        if (!AppUtil.chekEntityValid(mEntity)) {
+          startD();
+          break;
+        }
+        if (Aria.download(this).load(mEntity.getId()).isRunning()) {
+          Aria.download(this).load(mEntity.getId()).stop();
+        } else {
+          Aria.download(this).load(mEntity.getId())
+              .m3u8LiveOption(getLiveoption())
+              .resume();
+        }
+        break;
       case R.id.cancel:
         if (AppUtil.chekEntityValid(mEntity)) {
           Aria.download(this).load(mEntity.getId()).cancel(true);
@@ -247,29 +239,16 @@ public class M3U8LiveDLoadActivity extends BaseActivity<ActivityM3u8LiveBinding>
         .load(mUrl)
         .useServerFileName(true)
         .setFilePath(mFilePath, true)
-        .asM3U8()
-        //.setBandWidthUrlConverter(new IBandWidthUrlConverter() {
-        //  @Override public String convert(String bandWidthUrl) {
-        //    int peerIndex = mUrl.lastIndexOf("/");
-        //    return mUrl.substring(0, peerIndex + 1) + bandWidthUrl;
-        //  }
-        //})
-        .asLive()
-        .setLiveTsUrlConvert(new LiveTsUrlConverter())
-        .controller(ControllerType.CREATE_CONTROLLER)
-        //.setLiveTsUrlConvert(new IVodTsUrlConverter() {
-        //  @Override public List<String> convert(String m3u8Url, List<String> tsUrls) {
-        //    int peerIndex = m3u8Url.lastIndexOf("/");
-        //    String parentUrl = m3u8Url.substring(0, peerIndex + 1);
-        //    List<String> newUrls = new ArrayList<>();
-        //    for (String url : tsUrls) {
-        //      newUrls.add(parentUrl + url);
-        //    }
-        //
-        //    return newUrls;
-        //  }
-        //})
+        .m3u8LiveOption(getLiveoption())
         .create();
+  }
+
+  private M3U8LiveOption getLiveoption() {
+    M3U8LiveOption option = new M3U8LiveOption();
+    option
+        .setLiveTsUrlConvert(new LiveTsUrlConverter());
+    //.setBandWidthUrlConverter(new BandWidthUrlConverter(mUrl));
+    return option;
   }
 
   @Override protected void dataCallback(int result, Object data) {
@@ -286,6 +265,19 @@ public class M3U8LiveDLoadActivity extends BaseActivity<ActivityM3u8LiveBinding>
       int index = m3u8Url.lastIndexOf("/");
       String parentUrl = m3u8Url.substring(0, index + 1);
       return parentUrl + tsUrl;
+    }
+  }
+
+  static class BandWidthUrlConverter implements IBandWidthUrlConverter {
+    String url;
+
+    BandWidthUrlConverter(String url) {
+      this.url = url;
+    }
+
+    @Override public String convert(String bandWidthUrl) {
+      int peerIndex = url.lastIndexOf("/");
+      return url.substring(0, peerIndex + 1) + bandWidthUrl;
     }
   }
 }

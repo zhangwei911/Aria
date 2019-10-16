@@ -17,10 +17,10 @@ package com.arialyy.aria.core.download.target;
 
 import androidx.annotation.CheckResult;
 import com.arialyy.aria.core.common.AbsNormalTarget;
+import com.arialyy.aria.core.common.HttpOption;
 import com.arialyy.aria.core.inf.Suggest;
-import com.arialyy.aria.core.common.HttpDelegate;
-import com.arialyy.aria.core.wrapper.ITaskWrapper;
 import com.arialyy.aria.core.manager.SubTaskManager;
+import com.arialyy.aria.core.wrapper.ITaskWrapper;
 import java.util.List;
 
 /**
@@ -39,8 +39,12 @@ public class GroupNormalTarget extends AbsNormalTarget<GroupNormalTarget> {
    * 设置http请求参数，header等信息
    */
   @CheckResult(suggest = Suggest.TASK_CONTROLLER)
-  public HttpDelegate<GroupNormalTarget> option() {
-    return new HttpDelegate<>(this, getTaskWrapper());
+  public GroupNormalTarget option(HttpOption option) {
+    if (option == null) {
+      throw new NullPointerException("任务配置为空");
+    }
+    getTaskWrapper().getOptionParams().setParams(option);
+    return this;
   }
 
   /**

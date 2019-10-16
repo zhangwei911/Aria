@@ -17,12 +17,13 @@ package com.arialyy.aria.core.upload.target;
 
 import androidx.annotation.CheckResult;
 import androidx.annotation.NonNull;
-import com.arialyy.aria.core.processor.IFtpUploadInterceptor;
 import com.arialyy.aria.core.common.AbsBuilderTarget;
-import com.arialyy.aria.core.common.FtpDelegate;
+import com.arialyy.aria.core.common.FtpOption;
 import com.arialyy.aria.core.inf.Suggest;
+import com.arialyy.aria.core.processor.IFtpUploadInterceptor;
 import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
 import com.arialyy.aria.util.CheckUtil;
+import com.arialyy.aria.util.CommonUtil;
 
 /**
  * Created by Aria.Lao on 2017/7/27.
@@ -30,6 +31,7 @@ import com.arialyy.aria.util.CheckUtil;
  */
 public class FtpBuilderTarget extends AbsBuilderTarget<FtpBuilderTarget> {
   private UNormalConfigHandler<FtpBuilderTarget> mConfigHandler;
+  private String url;
 
   FtpBuilderTarget(String filePath) {
     mConfigHandler = new UNormalConfigHandler<>(this, -1);
@@ -44,6 +46,7 @@ public class FtpBuilderTarget extends AbsBuilderTarget<FtpBuilderTarget> {
    */
   @CheckResult(suggest = Suggest.TASK_CONTROLLER)
   public FtpBuilderTarget setUploadUrl(String tempUrl) {
+    url = tempUrl;
     mConfigHandler.setTempUrl(tempUrl);
     return this;
   }
@@ -61,7 +64,12 @@ public class FtpBuilderTarget extends AbsBuilderTarget<FtpBuilderTarget> {
    * 设置登陆、字符串编码、ftps等参数
    */
   @CheckResult(suggest = Suggest.TASK_CONTROLLER)
-  public FtpDelegate<FtpBuilderTarget> option() {
-    return new FtpDelegate<>(this, getTaskWrapper());
+  public FtpBuilderTarget option(FtpOption option) {
+    if (option == null) {
+      throw new NullPointerException("ftp 任务配置为空");
+    }
+    option.setFtpUrlEntity(CommonUtil.getFtpUrlInfo(url));
+    getTaskWrapper().getOptionParams().setParams(option);
+    return this;
   }
 }

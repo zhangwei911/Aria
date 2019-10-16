@@ -86,8 +86,6 @@ class UNormalConfigHandler<TARGET extends AbsTarget> implements IConfigHandler {
 
   void setTempUrl(String tempUrl) {
     getTaskWrapper().setTempUrl(tempUrl);
-    getTaskWrapper().getOptionParams()
-        .setParams(IOptionConstant.ftpUrlEntity, CommonUtil.getFtpUrlInfo(tempUrl));
   }
 
   private UTaskWrapper getTaskWrapper() {

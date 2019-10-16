@@ -31,10 +31,11 @@ import com.arialyy.annotations.Download;
 import com.arialyy.annotations.M3U8;
 import com.arialyy.aria.core.Aria;
 import com.arialyy.aria.core.common.controller.BuilderController;
-import com.arialyy.aria.core.common.controller.ControllerType;
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.download.M3U8Entity;
+import com.arialyy.aria.core.download.m3u8.M3U8VodOption;
 import com.arialyy.aria.core.inf.IEntity;
+import com.arialyy.aria.core.processor.IBandWidthUrlConverter;
 import com.arialyy.aria.core.processor.ITsMergeHandler;
 import com.arialyy.aria.core.processor.IVodTsUrlConverter;
 import com.arialyy.aria.core.task.DownloadTask;
@@ -122,7 +123,7 @@ public class M3U8VodDLoadActivity extends BaseActivity<ActivityM3u8VodBinding> {
 
   @Subscribe(threadMode = ThreadMode.MAIN)
   public void jumpIndex(PeerIndex index) {
-    Aria.download(this).load(mUrl).asM3U8().asVod().jumPeerIndex(index.index);
+    Aria.download(this).load(mTaskId).m3u8VodOption().jumPeerIndex(index.index);
   }
 
   @Override
@@ -280,27 +281,7 @@ public class M3U8VodDLoadActivity extends BaseActivity<ActivityM3u8VodBinding> {
         } else {
           Aria.download(this)
               .load(mTaskId)
-              .asM3U8()
-              //.setBandWidthUrlConverter(new IBandWidthUrlConverter() {
-              //  @Override public String convert(String bandWidthUrl) {
-              //    int index = mUrl.lastIndexOf("/");
-              //    return mUrl.substring(0, index + 1) + bandWidthUrl;
-              //  }
-              //})
-              .setTsUrlConvert(new IVodTsUrlConverter() {
-                @Override public List<String> convert(String m3u8Url, List<String> tsUrls) {
-
-                  Uri uri = Uri.parse(m3u8Url);
-                  String parentUrl = "http://" + uri.getHost();
-                  List<String> newUrls = new ArrayList<>();
-                  for (String url : tsUrls) {
-                    newUrls.add(parentUrl + url);
-                  }
-
-                  return newUrls;
-                }
-              })
-              .controller(ControllerType.TASK_CONTROLLER)
+              .m3u8VodOption(getM3U8Option())
               .resume();
         }
         break;
@@ -316,34 +297,18 @@ public class M3U8VodDLoadActivity extends BaseActivity<ActivityM3u8VodBinding> {
         .load(mUrl)
         .useServerFileName(true)
         .setFilePath(mFilePath, true)
-        .asM3U8()
-        //.setBandWidthUrlConverter(new IBandWidthUrlConverter() {
-        //  @Override public String convert(String bandWidthUrl) {
-        //    int index = mUrl.lastIndexOf("/");
-        //    return mUrl.substring(0, index + 1) + bandWidthUrl;
-        //  }
-        //})
-        .setTsUrlConvert(new IVodTsUrlConverter() {
-          @Override public List<String> convert(String m3u8Url, List<String> tsUrls) {
-            Uri uri = Uri.parse(m3u8Url);
-            String parentUrl = uri.getScheme() + "://" + uri.getHost();
-            List<String> newUrls = new ArrayList<>();
-            for (String url : tsUrls) {
-              newUrls.add(parentUrl + url);
-            }
-
-            return newUrls;
-          }
-        })
-        .setMergeHandler(new ITsMergeHandler() {
-          public boolean merge(@Nullable M3U8Entity m3U8Entity, List<String> tsPath) {
-            ALog.d(TAG, "合并TS....");
-            return false;
-          }
-        })
-        .generateIndexFile()
-        .controller(ControllerType.CREATE_CONTROLLER)
+        .m3u8VodOption(getM3U8Option())
         .create();
+  }
+
+  private M3U8VodOption getM3U8Option() {
+    M3U8VodOption option = new M3U8VodOption();
+    option
+        .generateIndexFile()
+        .setTsUrlConvert(new VodTsUrlConverter())
+        .setMergeHandler(new TsMergeHandler());
+    //.setBandWidthUrlConverter(new BandWidthUrlConverter(mUrl));
+    return option;
   }
 
   private Class<BuilderController> c = BuilderController.class;
@@ -354,6 +319,40 @@ public class M3U8VodDLoadActivity extends BaseActivity<ActivityM3u8VodBinding> {
       mModule.uploadUrl(this, String.valueOf(data));
     } else if (result == ModifyPathDialog.MODIFY_PATH_RESULT) {
       mModule.updateFilePath(this, String.valueOf(data));
+    }
+  }
+
+  static class VodTsUrlConverter implements IVodTsUrlConverter {
+    @Override public List<String> convert(String m3u8Url, List<String> tsUrls) {
+      Uri uri = Uri.parse(m3u8Url);
+      String parentUrl = "http://" + uri.getHost();
+      List<String> newUrls = new ArrayList<>();
+      for (String url : tsUrls) {
+        newUrls.add(parentUrl + url);
+      }
+
+      return newUrls;
+    }
+  }
+
+  static class TsMergeHandler implements ITsMergeHandler {
+    public boolean merge(@Nullable M3U8Entity m3U8Entity, List<String> tsPath) {
+      ALog.d("TsMergeHandler", "合并TS....");
+      return false;
+    }
+  }
+
+  static class BandWidthUrlConverter implements IBandWidthUrlConverter {
+
+    private String url;
+
+    BandWidthUrlConverter(String url) {
+      this.url = url;
+    }
+
+    @Override public String convert(String bandWidthUrl) {
+      int index = url.lastIndexOf("/");
+      return url.substring(0, index + 1) + bandWidthUrl;
     }
   }
 }

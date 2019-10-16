@@ -25,10 +25,8 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import com.arialyy.annotations.Upload;
 import com.arialyy.aria.core.Aria;
-import com.arialyy.aria.core.common.controller.ControllerType;
+import com.arialyy.aria.core.common.FtpOption;
 import com.arialyy.aria.core.inf.IEntity;
-import com.arialyy.aria.core.processor.FtpInterceptHandler;
-import com.arialyy.aria.core.processor.IFtpUploadInterceptor;
 import com.arialyy.aria.core.task.UploadTask;
 import com.arialyy.aria.core.upload.UploadEntity;
 import com.arialyy.aria.util.ALog;
@@ -42,7 +40,6 @@ import com.arialyy.simple.databinding.ActivityFtpUploadBinding;
 import com.arialyy.simple.util.AppUtil;
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 
 /**
  * Created by lyy on 2017/7/28. Ftp 文件上传demo
@@ -118,9 +115,7 @@ public class FtpUploadActivity extends BaseActivity<ActivityFtpUploadBinding> {
           mTaskId = Aria.upload(this)
               .loadFtp(mFilePath)
               .setUploadUrl(mUrl)
-              .option()
-              .login(user, pwd)
-              .controller(ControllerType.CREATE_CONTROLLER)
+              .option(getOption())
               .create();
           getBinding().setStateStr(getString(R.string.stop));
           break;
@@ -131,9 +126,7 @@ public class FtpUploadActivity extends BaseActivity<ActivityFtpUploadBinding> {
         } else {
           Aria.upload(this)
               .loadFtp(mTaskId)
-              .option()
-              .login(user, pwd)
-              .controller(ControllerType.TASK_CONTROLLER)
+              .option(getOption())
               .resume();
           getBinding().setStateStr(getString(R.string.stop));
         }
@@ -145,6 +138,12 @@ public class FtpUploadActivity extends BaseActivity<ActivityFtpUploadBinding> {
         getBinding().setStateStr(getString(R.string.start));
         break;
     }
+  }
+
+  private FtpOption getOption() {
+    FtpOption option = new FtpOption();
+    option.login(user, pwd);
+    return option;
   }
 
   @Upload.onWait void onWait(UploadTask task) {
