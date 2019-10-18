@@ -295,7 +295,6 @@ public class M3U8VodDLoadActivity extends BaseActivity<ActivityM3u8VodBinding> {
   private void startD() {
     mTaskId = Aria.download(M3U8VodDLoadActivity.this)
         .load(mUrl)
-        .useServerFileName(true)
         .setFilePath(mFilePath, true)
         .m3u8VodOption(getM3U8Option())
         .create();

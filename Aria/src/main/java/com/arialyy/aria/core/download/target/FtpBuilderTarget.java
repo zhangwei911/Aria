@@ -44,7 +44,7 @@ public class FtpBuilderTarget extends AbsBuilderTarget<FtpBuilderTarget> {
     if (option == null) {
       throw new NullPointerException("ftp 任务配置为空");
     }
-    option.setFtpUrlEntity(CommonUtil.getFtpUrlInfo(mConfigHandler.getUrl()));
+    option.setUrlEntity(CommonUtil.getFtpUrlInfo(mConfigHandler.getUrl()));
     getTaskWrapper().getOptionParams().setParams(option);
     return this;
   }

@@ -20,19 +20,13 @@ android {
     abortOnError false
   }
 }
-
 dependencies {
   implementation fileTree(include: ['*.jar'], dir: 'libs')
   testImplementation 'junit:junit:4.12'
   implementation "androidx.appcompat:appcompat:${rootProject.ext.XAppcompatVersion}"
   api project(':AriaAnnotations')
   api project(path: ':PublicComponent')
-
-//    api 'com.arialyy.aria:aria-ftp-plug:1.0.4'
-  implementation project(path: ':HttpComponent') // 打包时用这个
-
-  //    compile project(':AriaFtpPlug')
-//  implementation project(path: ':AriaFtpComponent')
-
+  api project(path: ':HttpComponent')
 }
+
 apply from: 'bintray-release.gradle'

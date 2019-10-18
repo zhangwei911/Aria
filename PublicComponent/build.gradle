@@ -27,3 +27,5 @@ dependencies {
   implementation "androidx.appcompat:appcompat:${rootProject.ext.XAppcompatVersion}"
   testImplementation 'junit:junit:4.12'
 }
+
+apply from: 'bintray-release.gradle'

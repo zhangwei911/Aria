@@ -18,6 +18,7 @@ package com.arialyy.aria.core;
 import com.arialyy.aria.core.common.BaseOption;
 import com.arialyy.aria.core.inf.IEventHandler;
 import com.arialyy.aria.core.inf.IOptionConstant;
+import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
 import java.lang.reflect.Field;
 import java.util.HashMap;

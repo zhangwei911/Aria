@@ -74,7 +74,7 @@ public class FtpDirNormalTarget extends AbsNormalTarget<FtpDirNormalTarget> {
     if (option == null) {
       throw new NullPointerException("ftp 任务配置为空");
     }
-    option.setFtpUrlEntity(CommonUtil.getFtpUrlInfo(getEntity().getKey()));
+    option.setUrlEntity(CommonUtil.getFtpUrlInfo(getEntity().getKey()));
     getTaskWrapper().getOptionParams().setParams(option);
     return this;
   }

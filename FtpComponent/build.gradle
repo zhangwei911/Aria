@@ -27,7 +27,8 @@ dependencies {
 
   implementation "androidx.appcompat:appcompat:${rootProject.ext.XAppcompatVersion}"
 
-  testImplementation 'junit:junit:4.12'
-  implementation project(path: ':AriaFtpPlug')
+//  implementation project(path: ':AriaFtpPlug')
   implementation project(path: ':PublicComponent')
 }
+
+apply from: 'bintray-release.gradle'

@@ -22,6 +22,7 @@ import com.arialyy.aria.core.AriaManager;
 import com.arialyy.aria.core.command.CancelAllCmd;
 import com.arialyy.aria.core.command.NormalCmdFactory;
 import com.arialyy.aria.core.common.AbsBuilderTarget;
+import com.arialyy.aria.core.common.ErrorCode;
 import com.arialyy.aria.core.common.ProxyHelper;
 import com.arialyy.aria.core.download.target.DTargetFactory;
 import com.arialyy.aria.core.download.target.FtpBuilderTarget;
@@ -193,7 +194,7 @@ public class DownloadReceiver extends AbsReceiver {
         }
       }
     } else {
-      ALog.w(TAG, "没有Aria的注解方法");
+      ALog.e(TAG, "没有Aria的注解方法");
     }
   }
 

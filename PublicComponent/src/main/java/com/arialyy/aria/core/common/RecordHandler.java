@@ -185,19 +185,6 @@ public class RecordHandler implements IRecordHandler {
   }
 
   /**
-   * 获取记录类型
-   *
-   * @return {@link #TYPE_DOWNLOAD}、{@link #TYPE_UPLOAD}
-   */
-  private int getRecordType() {
-    if (mEntity instanceof DownloadEntity) {
-      return TYPE_DOWNLOAD;
-    } else {
-      return TYPE_UPLOAD;
-    }
-  }
-
-  /**
    * 获取任务路径
    *
    * @return 任务文件路径

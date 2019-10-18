@@ -62,15 +62,6 @@ class UNormalConfigHandler<TARGET extends AbsTarget> implements IConfigHandler {
     mEntity.setFileSize(file.length());
   }
 
-  TARGET setUploadInterceptor(IFtpUploadInterceptor uploadInterceptor) {
-    if (uploadInterceptor == null) {
-      throw new NullPointerException("ftp拦截器为空");
-    }
-    getTaskWrapper().getOptionParams()
-        .setObjs(IOptionConstant.uploadInterceptor, uploadInterceptor);
-    return mTarget;
-  }
-
   @Override public AbsEntity getEntity() {
     return mEntity;
   }

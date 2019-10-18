@@ -21,6 +21,7 @@ import android.util.Log;
 import android.view.View;
 import com.arialyy.annotations.DownloadGroup;
 import com.arialyy.aria.core.Aria;
+import com.arialyy.aria.core.common.HttpOption;
 import com.arialyy.aria.core.processor.IHttpFileLenAdapter;
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.download.DownloadGroupEntity;
@@ -99,18 +100,7 @@ public class DownloadGroupActivity extends BaseActivity<ActivityDownloadGroupBin
               //.setSubFileName(getModule(GroupModule.class).getSubName2())
               .setSubFileName(getModule(GroupModule.class).getSubName())
               .unknownSize()
-              .setFileLenAdapter(new IHttpFileLenAdapter() {
-                @Override public long handleFileLen(Map<String, List<String>> headers) {
-
-                  List<String> sLength = headers.get("Content-Length");
-                  if (sLength == null || sLength.isEmpty()) {
-                    return -1;
-                  }
-                  String temp = sLength.get(0);
-
-                  return Long.parseLong(temp);
-                }
-              })
+              .option(getHttpOption())
               .setFileSize(114981416)
               //.updateUrls(temp)
               .create();
@@ -130,6 +120,12 @@ public class DownloadGroupActivity extends BaseActivity<ActivityDownloadGroupBin
         mTaskId = -1;
         break;
     }
+  }
+
+  private HttpOption getHttpOption(){
+    HttpOption option = new HttpOption();
+    option.setFileLenAdapter(new HttpFileLenAdapter());
+    return option;
   }
 
   @DownloadGroup.onWait void taskWait(DownloadGroupTask task) {
@@ -246,5 +242,18 @@ public class DownloadGroupActivity extends BaseActivity<ActivityDownloadGroupBin
 
   @DownloadGroup.onSubTaskFail void onSubTaskFail(DownloadGroupTask groupTask,
       DownloadEntity subEntity) {
+  }
+
+  static class HttpFileLenAdapter implements IHttpFileLenAdapter{
+    @Override public long handleFileLen(Map<String, List<String>> headers) {
+
+      List<String> sLength = headers.get("Content-Length");
+      if (sLength == null || sLength.isEmpty()) {
+        return -1;
+      }
+      String temp = sLength.get(0);
+
+      return Long.parseLong(temp);
+    }
   }
 }

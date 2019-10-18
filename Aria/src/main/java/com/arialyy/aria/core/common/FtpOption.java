@@ -18,7 +18,9 @@ package com.arialyy.aria.core.common;
 import android.text.TextUtils;
 import com.arialyy.aria.core.FtpUrlEntity;
 import com.arialyy.aria.core.ProtocolType;
+import com.arialyy.aria.core.processor.IFtpUploadInterceptor;
 import com.arialyy.aria.util.ALog;
+import com.arialyy.aria.util.CheckUtil;
 
 /**
  * Created by laoyuyu on 2018/3/9.
@@ -27,9 +29,10 @@ public class FtpOption extends BaseOption {
 
   private String charSet, userName, password, account;
   private boolean isNeedLogin = false;
-  private FtpUrlEntity ftpUrlEntity;
+  private FtpUrlEntity urlEntity;
   private String protocol, keyAlias, storePass, storePath;
   private boolean isImplicit = true;
+  private IFtpUploadInterceptor uploadInterceptor;
 
   public FtpOption() {
     super();
@@ -128,19 +131,31 @@ public class FtpOption extends BaseOption {
     return this;
   }
 
-  public void setFtpUrlEntity(FtpUrlEntity ftpUrlEntity) {
-    this.ftpUrlEntity = ftpUrlEntity;
-    ftpUrlEntity.needLogin = isNeedLogin;
-    ftpUrlEntity.user = userName;
-    ftpUrlEntity.password = password;
-    ftpUrlEntity.account = account;
+  /**
+   * FTP文件上传拦截器，如果远端已有同名文件，可使用该拦截器控制覆盖文件或修改该文件上传到服务器端端文件名
+   */
+  public FtpOption setUploadInterceptor(IFtpUploadInterceptor uploadInterceptor) {
+    if (uploadInterceptor == null) {
+      throw new NullPointerException("ftp拦截器为空");
+    }
+    CheckUtil.checkMemberClass(uploadInterceptor.getClass());
+    this.uploadInterceptor = uploadInterceptor;
+    return this;
+  }
+
+  public void setUrlEntity(FtpUrlEntity urlEntity) {
+    this.urlEntity = urlEntity;
+    urlEntity.needLogin = isNeedLogin;
+    urlEntity.user = userName;
+    urlEntity.password = password;
+    urlEntity.account = account;
     if (!TextUtils.isEmpty(storePath)) {
-      ftpUrlEntity.isFtps = true;
-      ftpUrlEntity.protocol = protocol;
-      ftpUrlEntity.keyAlias = keyAlias;
-      ftpUrlEntity.storePass = storePass;
-      ftpUrlEntity.storePath = storePath;
-      ftpUrlEntity.isImplicit = isImplicit;
+      urlEntity.isFtps = true;
+      urlEntity.protocol = protocol;
+      urlEntity.keyAlias = keyAlias;
+      urlEntity.storePass = storePass;
+      urlEntity.storePath = storePath;
+      urlEntity.isImplicit = isImplicit;
     }
   }
 }

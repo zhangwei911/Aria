@@ -29,3 +29,5 @@ dependencies {
   implementation project(path: ':HttpComponent')
   implementation project(path: ':PublicComponent')
 }
+
+apply from: 'bintray-release.gradle'

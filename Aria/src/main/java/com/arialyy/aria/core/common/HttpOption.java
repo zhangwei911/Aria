@@ -18,8 +18,12 @@ package com.arialyy.aria.core.common;
 import android.text.TextUtils;
 import androidx.annotation.CheckResult;
 import androidx.annotation.NonNull;
+import com.arialyy.aria.core.download.target.HttpBuilderTarget;
+import com.arialyy.aria.core.inf.IOptionConstant;
 import com.arialyy.aria.core.inf.Suggest;
+import com.arialyy.aria.core.processor.IHttpFileLenAdapter;
 import com.arialyy.aria.util.ALog;
+import com.arialyy.aria.util.CheckUtil;
 import java.net.Proxy;
 import java.util.HashMap;
 import java.util.Map;
@@ -34,6 +38,8 @@ public class HttpOption extends BaseOption {
   private RequestEnum requestEnum = RequestEnum.GET;
   private Map<String, String> formFields;
   private Proxy proxy;
+  private boolean useServerFileName = false;
+  private IHttpFileLenAdapter fileLenAdapter;
 
   public HttpOption() {
     super();
@@ -129,6 +135,29 @@ public class HttpOption extends BaseOption {
    */
   public HttpOption setUrlProxy(Proxy proxy) {
     this.proxy = proxy;
+    return this;
+  }
+
+  /**
+   * 是否使用服务器通过content-disposition传递的文件名，内容格式{@code attachment;filename=***}
+   * 如果获取不到服务器文件名，则使用用户设置的文件名
+   *
+   * @param use {@code true} 使用
+   */
+  public HttpOption useServerFileName(boolean use) {
+    this.useServerFileName = use;
+    return this;
+  }
+
+  /**
+   * 如果你需要使用header中特定的key来设置文件长度，或有定制文件长度的需要，那么你可以通过该方法自行处理文件长度
+   */
+  public HttpOption setFileLenAdapter(IHttpFileLenAdapter fileLenAdapter) {
+    if (fileLenAdapter == null) {
+      throw new IllegalArgumentException("adapter为空");
+    }
+    CheckUtil.checkMemberClass(fileLenAdapter.getClass());
+    this.fileLenAdapter = fileLenAdapter;
     return this;
   }
 }

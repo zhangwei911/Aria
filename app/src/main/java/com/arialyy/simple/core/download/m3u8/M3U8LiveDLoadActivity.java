@@ -237,7 +237,6 @@ public class M3U8LiveDLoadActivity extends BaseActivity<ActivityM3u8LiveBinding>
   private void startD() {
     Aria.download(M3U8LiveDLoadActivity.this)
         .load(mUrl)
-        .useServerFileName(true)
         .setFilePath(mFilePath, true)
         .m3u8LiveOption(getLiveoption())
         .create();

@@ -292,7 +292,6 @@ class KotlinDownloadActivity : BaseActivity<ActivitySingleKotlinBinding>() {
         //.addHeader("Accept-Encoding", "gzip, deflate")
         //.addHeader("DNT", "1")
         //.addHeader("Cookie", "BAIDUID=648E5FF020CC69E8DD6F492D1068AAA9:FG=1; BIDUPSID=648E5FF020CC69E8DD6F492D1068AAA9; PSTM=1519099573; BD_UPN=12314753; locale=zh; BDSVRTM=0")
-        .useServerFileName(true)
         .setFilePath(mFilePath!!, true)
         .create()
   }

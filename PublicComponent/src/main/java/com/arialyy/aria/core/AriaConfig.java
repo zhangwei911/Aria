@@ -124,21 +124,23 @@ public class AriaConfig {
         .addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
         .addTransportType(NetworkCapabilities.TRANSPORT_CELLULAR)
         .build();
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+      cm.registerNetworkCallback(request, new ConnectivityManager.NetworkCallback() {
 
-    cm.registerNetworkCallback(request, new ConnectivityManager.NetworkCallback() {
+        @Override public void onLost(Network network) {
+          super.onLost(network);
+          isConnectedNet = false;
+          ALog.d(TAG, "onLost");
+        }
 
-      @Override public void onLost(Network network) {
-        super.onLost(network);
-        isConnectedNet = false;
-        ALog.d(TAG, "onLost");
-      }
+        @Override public void onAvailable(Network network) {
+          super.onAvailable(network);
+          ALog.d(TAG, "onAvailable");
+          isConnectedNet = true;
+        }
+      });
+    }
 
-      @Override public void onAvailable(Network network) {
-        super.onAvailable(network);
-        ALog.d(TAG, "onAvailable");
-        isConnectedNet = true;
-      }
-    });
   }
 
   public boolean isConnectedNet() {

@@ -17,6 +17,7 @@
 package com.arialyy.aria.util;
 
 import android.text.TextUtils;
+import com.arialyy.aria.core.common.ErrorCode;
 import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.upload.UTaskWrapper;
@@ -39,7 +40,7 @@ public class CheckUtil {
   public static void checkMemberClass(Class clazz) {
     int modifiers = clazz.getModifiers();
     if (!clazz.isMemberClass() || !Modifier.isStatic(modifiers) || Modifier.isPrivate(modifiers)) {
-      ALog.e(TAG, "为了放置内存泄漏，请使用静态的成员类(public static class xxx)或文件类(A.java)");
+      ALog.e(TAG, "为了防止内存泄漏，请使用静态的成员类(public static class xxx)或文件类(A.java)");
     }
   }
 
@@ -54,21 +55,13 @@ public class CheckUtil {
   }
 
   /**
-   * 检测下载链接是否为null
-   */
-  public static void checkPath(String path) {
-    if (TextUtils.isEmpty(path)) {
-      throw new IllegalArgumentException("保存路径不能为null");
-    }
-  }
-
-  /**
    * 检测url是否合法，如果url不合法，将抛异常
    */
-  public static void checkTaskId(long taskId) {
+  public static ErrorCode checkTaskId(long taskId) {
     if (taskId < 0) {
-      throw new IllegalArgumentException("任务id不能小于0");
+      return ErrorCode.ERROR_CODE_TASK_ID_NULL;
     }
+    return ErrorCode.ERROR_CODE_NORMAL;
   }
 
   /**
@@ -152,38 +145,6 @@ public class CheckUtil {
     } else if (entity instanceof UTaskWrapper) {
       checkUploadTaskEntity(((UTaskWrapper) entity).getEntity());
     }
-  }
-
-  /**
-   * 检查命令实体
-   *
-   * @param checkType 删除命令和停止命令不需要检查下载链接和保存路径
-   * @return {@code false}实体无效
-   */
-  public static boolean checkCmdEntity(AbsTaskWrapper entity, boolean checkType) {
-    boolean b = false;
-    if (entity instanceof DTaskWrapper) {
-      DownloadEntity entity1 = ((DTaskWrapper) entity).getEntity();
-      if (entity1 == null) {
-        ALog.e(TAG, "下载实体不能为空");
-      } else if (checkType && TextUtils.isEmpty(entity1.getUrl())) {
-        ALog.e(TAG, "下载链接不能为空");
-      } else if (checkType && TextUtils.isEmpty(entity1.getDownloadPath())) {
-        ALog.e(TAG, "保存路径不能为空");
-      } else {
-        b = true;
-      }
-    } else if (entity instanceof UTaskWrapper) {
-      UploadEntity entity1 = ((UTaskWrapper) entity).getEntity();
-      if (entity1 == null) {
-        ALog.e(TAG, "上传实体不能为空");
-      } else if (TextUtils.isEmpty(entity1.getFilePath())) {
-        ALog.e(TAG, "上传文件路径不能为空");
-      } else {
-        b = true;
-      }
-    }
-    return b;
   }
 
   /**

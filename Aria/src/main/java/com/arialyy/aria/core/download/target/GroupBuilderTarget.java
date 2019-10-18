@@ -19,13 +19,10 @@ import androidx.annotation.CheckResult;
 import com.arialyy.aria.core.common.AbsBuilderTarget;
 import com.arialyy.aria.core.common.HttpOption;
 import com.arialyy.aria.core.download.DGTaskWrapper;
-import com.arialyy.aria.core.inf.IOptionConstant;
 import com.arialyy.aria.core.inf.Suggest;
 import com.arialyy.aria.core.manager.SubTaskManager;
-import com.arialyy.aria.core.processor.IHttpFileLenAdapter;
 import com.arialyy.aria.core.wrapper.ITaskWrapper;
 import com.arialyy.aria.util.ALog;
-import com.arialyy.aria.util.CheckUtil;
 import java.util.List;
 
 /**
@@ -145,19 +142,5 @@ public class GroupBuilderTarget extends AbsBuilderTarget<GroupBuilderTarget> {
   @CheckResult(suggest = Suggest.TASK_CONTROLLER)
   public GroupBuilderTarget setSubFileName(List<String> subTaskFileName) {
     return mConfigHandler.setSubFileName(subTaskFileName);
-  }
-
-  /**
-   * 如果你需要使用header中特定的key来设置文件长度，或有定制文件长度的需要，那么你可以通过该方法自行处理文件长度
-   */
-  @CheckResult(suggest = Suggest.TASK_CONTROLLER)
-  public GroupBuilderTarget setFileLenAdapter(IHttpFileLenAdapter adapter) {
-
-    if (adapter == null) {
-      throw new IllegalArgumentException("adapter为空");
-    }
-    CheckUtil.checkMemberClass(adapter.getClass());
-    getTaskWrapper().getOptionParams().setObjs(IOptionConstant.fileLenAdapter, adapter);
-    return this;
   }
 }

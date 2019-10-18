@@ -21,26 +21,6 @@ import java.util.List;
 
 /**
  * FTP文件上传拦截器，如果远端已有同名文件，可使用该拦截器控制覆盖文件或修改该文件上传到服务器端端文件名
- * <pre>
- *   <code>
- *     Aria.upload(this)
- *         .loadFtp(FILE_PATH)
- *         .setUploadUrl(URL)
- *         .setUploadInterceptor(
- *             new IFtpUploadInterceptor() {
- *
- *               @Override
- *               public FtpInterceptHandler onIntercept(UploadEntity entity, List<String> fileList) {
- *                 FtpInterceptHandler.Builder builder = new FtpInterceptHandler.Builder();
- *                 builder.coverServerFile();
- *                 //builder.resetFileName("test");
- *                 return builder.build();
- *               }
- *          })
- *         .create();
- *   </code>
- *
- * </pre>
  */
 public interface IFtpUploadInterceptor extends IEventHandler {
 

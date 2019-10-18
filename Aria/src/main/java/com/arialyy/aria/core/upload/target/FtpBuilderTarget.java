@@ -16,13 +16,10 @@
 package com.arialyy.aria.core.upload.target;
 
 import androidx.annotation.CheckResult;
-import androidx.annotation.NonNull;
 import com.arialyy.aria.core.common.AbsBuilderTarget;
 import com.arialyy.aria.core.common.FtpOption;
 import com.arialyy.aria.core.inf.Suggest;
-import com.arialyy.aria.core.processor.IFtpUploadInterceptor;
 import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
-import com.arialyy.aria.util.CheckUtil;
 import com.arialyy.aria.util.CommonUtil;
 
 /**
@@ -52,15 +49,6 @@ public class FtpBuilderTarget extends AbsBuilderTarget<FtpBuilderTarget> {
   }
 
   /**
-   * FTP文件上传拦截器，如果远端已有同名文件，可使用该拦截器控制覆盖文件或修改该文件上传到服务器端端的文件名
-   */
-  @CheckResult(suggest = Suggest.TASK_CONTROLLER)
-  public FtpBuilderTarget setUploadInterceptor(@NonNull IFtpUploadInterceptor uploadInterceptor) {
-    CheckUtil.checkMemberClass(uploadInterceptor.getClass());
-    return mConfigHandler.setUploadInterceptor(uploadInterceptor);
-  }
-
-  /**
    * 设置登陆、字符串编码、ftps等参数
    */
   @CheckResult(suggest = Suggest.TASK_CONTROLLER)
@@ -68,7 +56,7 @@ public class FtpBuilderTarget extends AbsBuilderTarget<FtpBuilderTarget> {
     if (option == null) {
       throw new NullPointerException("ftp 任务配置为空");
     }
-    option.setFtpUrlEntity(CommonUtil.getFtpUrlInfo(url));
+    option.setUrlEntity(CommonUtil.getFtpUrlInfo(url));
     getTaskWrapper().getOptionParams().setParams(option);
     return this;
   }
