@@ -16,6 +16,7 @@
 package com.arialyy.aria.core.download.target;
 
 import android.text.TextUtils;
+import com.arialyy.aria.core.common.AbsNormalTarget;
 import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.event.ErrorEvent;
@@ -47,11 +48,16 @@ class DNormalConfigHandler<TARGET extends AbsTarget> implements IConfigHandler {
 
   private void initTarget(long taskId) {
     mWrapper = TaskWrapperManager.getInstance().getNormalTaskWrapper(DTaskWrapper.class, taskId);
-    if (taskId != -1 && mWrapper.getEntity().getId() == -1) {
-      mWrapper.setErrorEvent(new ErrorEvent(taskId, String.format("没有id为%s的任务", taskId)));
+    // 判断已存在的任务
+    if (mTarget instanceof AbsNormalTarget) {
+      if (taskId < 0) {
+        mWrapper.setErrorEvent(new ErrorEvent(taskId, "任务id为空"));
+      } else if (mWrapper.getEntity().getId() < 0) {
+        mWrapper.setErrorEvent(new ErrorEvent(taskId, "任务信息不存在"));
+      }
     }
-    mEntity = mWrapper.getEntity();
 
+    mEntity = mWrapper.getEntity();
     mTarget.setTaskWrapper(mWrapper);
     if (mEntity != null) {
       getWrapper().setTempFilePath(mEntity.getFilePath());

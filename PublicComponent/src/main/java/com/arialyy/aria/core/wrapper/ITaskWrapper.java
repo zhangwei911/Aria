@@ -22,7 +22,7 @@ import com.arialyy.aria.core.inf.IEntity;
  */
 public interface ITaskWrapper {
 
-  int DEFAULT = 0;
+  int ERROR = 0;
 
   /**
    * HTTP单任务载

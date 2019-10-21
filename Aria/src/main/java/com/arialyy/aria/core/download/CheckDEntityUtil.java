@@ -16,6 +16,7 @@
 package com.arialyy.aria.core.download;
 
 import android.text.TextUtils;
+import com.arialyy.aria.core.common.ErrorCode;
 import com.arialyy.aria.core.inf.ICheckEntityUtil;
 import com.arialyy.aria.core.inf.IOptionConstant;
 import com.arialyy.aria.core.inf.IRecordHandler;
@@ -24,6 +25,7 @@ import com.arialyy.aria.core.wrapper.ITaskWrapper;
 import com.arialyy.aria.orm.DbEntity;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CheckUtil;
+import com.arialyy.aria.util.CommonUtil;
 import com.arialyy.aria.util.RecordUtil;
 import java.io.File;
 
@@ -31,7 +33,7 @@ import java.io.File;
  * 检查下载任务实体
  */
 public class CheckDEntityUtil implements ICheckEntityUtil {
-  private final String TAG = "CheckDLoadEntity";
+  private final String TAG = CommonUtil.getClassName(getClass());
   private DTaskWrapper mWrapper;
   private DownloadEntity mEntity;
 
@@ -47,7 +49,7 @@ public class CheckDEntityUtil implements ICheckEntityUtil {
   @Override
   public boolean checkEntity() {
     if (mWrapper.getErrorEvent() != null) {
-      ALog.e(TAG, mWrapper.getErrorEvent().errorMsg);
+      ALog.e(TAG, String.format("下载失败，%s", mWrapper.getErrorEvent().errorMsg));
       return false;
     }
 
@@ -179,7 +181,7 @@ public class CheckDEntityUtil implements ICheckEntityUtil {
     if (TextUtils.isEmpty(url)) {
       ALog.e(TAG, "下载失败，url为null");
       return false;
-    } else if (!CheckUtil.checkUrlNotThrow(url)) {
+    } else if (!CheckUtil.checkUrl(url)) {
       ALog.e(TAG, "下载失败，url【" + url + "】错误");
       return false;
     }

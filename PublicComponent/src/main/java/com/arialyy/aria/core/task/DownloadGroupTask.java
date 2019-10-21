@@ -62,7 +62,6 @@ public class DownloadGroupTask extends AbsGroupTask<DGTaskWrapper> {
     Handler outHandler;
 
     public Builder(DGTaskWrapper taskEntity) {
-      CheckUtil.checkTaskEntity(taskEntity);
       this.taskEntity = taskEntity;
     }
 

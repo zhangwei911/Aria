@@ -16,6 +16,7 @@
 package com.arialyy.aria.core.upload;
 
 import android.text.TextUtils;
+import com.arialyy.aria.core.common.ErrorCode;
 import com.arialyy.aria.core.inf.ICheckEntityUtil;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CheckUtil;
@@ -38,7 +39,7 @@ public class CheckUEntityUtil implements ICheckEntityUtil {
   @Override
   public boolean checkEntity() {
     if (mWrapper.getErrorEvent() != null) {
-      ALog.e(TAG, mWrapper.getErrorEvent().errorMsg);
+      ALog.e(TAG, String.format("上传失败，%s", mWrapper.getErrorEvent().errorMsg));
       return false;
     }
 
@@ -77,7 +78,7 @@ public class CheckUEntityUtil implements ICheckEntityUtil {
     if (TextUtils.isEmpty(url)) {
       ALog.e(TAG, "上传失败，url为null");
       return false;
-    } else if (!CheckUtil.checkUrlNotThrow(url)) {
+    } else if (!CheckUtil.checkUrl(url)) {
       ALog.e(TAG, "上传失败，url【" + url + "】错误");
       return false;
     }

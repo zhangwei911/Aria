@@ -296,7 +296,7 @@ public class HttpFileInfoThread implements Runnable {
       newUrl = uri.getHost() + newUrl;
     }
 
-    if (!CheckUtil.checkUrlNotThrow(newUrl)) {
+    if (!CheckUtil.checkUrl(newUrl)) {
       failDownload(new TaskException(TAG, "下载失败，重定向url错误"), false);
       return;
     }

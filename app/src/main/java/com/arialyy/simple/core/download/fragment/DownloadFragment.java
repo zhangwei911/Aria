@@ -74,7 +74,7 @@ public class DownloadFragment extends AbsFragment<FragmentDownloadBinding>
           mTaskId = Aria.download(this)
               .load(DOWNLOAD_URL)
               .setFilePath(
-                  Environment.getExternalStorageDirectory().getPath() + String.format("%s.apk",
+                  Environment.getExternalStorageDirectory().getPath() + String.format("/%s.apk",
                       FILE_NAME))
               .create();
           getBinding().setStateStr(getString(R.string.stop));

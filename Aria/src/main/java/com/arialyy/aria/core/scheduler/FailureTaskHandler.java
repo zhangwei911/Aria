@@ -84,7 +84,7 @@ class FailureTaskHandler<TASK extends ITask> {
   private void retryTask(final TASK task) {
     long interval = task.getTaskWrapper().getConfig().getReTryInterval();
     final int num = task.getTaskWrapper().getConfig().getReTryNum();
-    final ITaskQueue queue = mSchedulers.getQueue(task);
+    final ITaskQueue queue = mSchedulers.getQueue(task.getTaskType());
     mAriaManager.getAriaHandler().postDelayed(new Runnable() {
       @Override public void run() {
         AbsEntity entity = task.getTaskWrapper().getEntity();

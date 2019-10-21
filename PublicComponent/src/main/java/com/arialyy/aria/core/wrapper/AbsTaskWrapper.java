@@ -17,7 +17,6 @@ package com.arialyy.aria.core.wrapper;
 
 import com.arialyy.aria.core.TaskOptionParams;
 import com.arialyy.aria.core.common.AbsEntity;
-import com.arialyy.aria.core.common.ErrorCode;
 import com.arialyy.aria.core.config.BaseTaskConfig;
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.download.DownloadGroupEntity;
@@ -26,8 +25,6 @@ import com.arialyy.aria.core.inf.IEntity;
 import com.arialyy.aria.core.inf.ITaskOption;
 import com.arialyy.aria.core.upload.UploadEntity;
 import com.arialyy.aria.util.ComponentUtil;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by lyy on 2017/2/23. 所有任务实体的父类
@@ -86,15 +83,6 @@ public abstract class AbsTaskWrapper<ENTITY extends AbsEntity>
    * 任务配置信息
    */
   private TaskOptionParams optionParams = new TaskOptionParams();
-
-  /**
-   * 初始状态列表
-   */
-  private List<ErrorCode> errorCode = new ArrayList<>();
-
-  public List<ErrorCode> getErrorCode() {
-    return errorCode;
-  }
 
   public void setTaskOption(ITaskOption option) {
     this.taskOption = option;

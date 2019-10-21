@@ -294,7 +294,7 @@ final public class M3U8InfoThread implements Runnable {
       newUrl = uri.getHost() + newUrl;
     }
 
-    if (!CheckUtil.checkUrlNotThrow(newUrl)) {
+    if (!CheckUtil.checkUrl(newUrl)) {
       failDownload("下载失败，重定向url错误", false);
       return;
     }

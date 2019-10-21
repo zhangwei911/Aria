@@ -15,19 +15,18 @@
  */
 package com.arialyy.aria.core.upload.target;
 
-import com.arialyy.aria.core.processor.IFtpUploadInterceptor;
 import com.arialyy.aria.core.common.AbsEntity;
+import com.arialyy.aria.core.common.AbsNormalTarget;
+import com.arialyy.aria.core.common.ErrorCode;
 import com.arialyy.aria.core.event.ErrorEvent;
 import com.arialyy.aria.core.inf.AbsTarget;
 import com.arialyy.aria.core.inf.IConfigHandler;
-import com.arialyy.aria.core.inf.IOptionConstant;
 import com.arialyy.aria.core.manager.TaskWrapperManager;
 import com.arialyy.aria.core.queue.UTaskQueue;
+import com.arialyy.aria.core.task.UploadTask;
 import com.arialyy.aria.core.upload.UTaskWrapper;
 import com.arialyy.aria.core.upload.UploadEntity;
-import com.arialyy.aria.core.task.UploadTask;
 import com.arialyy.aria.orm.DbEntity;
-import com.arialyy.aria.util.CommonUtil;
 import java.io.File;
 
 /**
@@ -35,7 +34,6 @@ import java.io.File;
  * 普通上传任务通用功能处理
  */
 class UNormalConfigHandler<TARGET extends AbsTarget> implements IConfigHandler {
-  private String TAG = "UNormalDelegate";
   private UploadEntity mEntity;
   private TARGET mTarget;
   private UTaskWrapper mWrapper;
@@ -47,9 +45,15 @@ class UNormalConfigHandler<TARGET extends AbsTarget> implements IConfigHandler {
 
   private void initTarget(long taskId) {
     mWrapper = TaskWrapperManager.getInstance().getNormalTaskWrapper(UTaskWrapper.class, taskId);
-    if (taskId != -1 && mWrapper.getEntity().getId() == -1) {
-      mWrapper.setErrorEvent(new ErrorEvent(taskId, String.format("没有id为%s的任务", taskId)));
+    // 判断已存在的任务
+    if (mTarget instanceof AbsNormalTarget) {
+      if (taskId < 0) {
+        mWrapper.setErrorEvent(new ErrorEvent(taskId, "任务id为空"));
+      } else if (mWrapper.getEntity().getId() < 0) {
+        mWrapper.setErrorEvent(new ErrorEvent(taskId, "任务信息不存在"));
+      }
     }
+
     mEntity = mWrapper.getEntity();
     mTarget.setTaskWrapper(mWrapper);
     getTaskWrapper().setTempUrl(mEntity.getUrl());

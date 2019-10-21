@@ -21,17 +21,11 @@ import android.app.Activity;
 import android.app.Application;
 import android.app.Dialog;
 import android.content.Context;
-import android.net.ConnectivityManager;
-import android.net.Network;
-import android.net.NetworkCapabilities;
-import android.net.NetworkRequest;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.widget.PopupWindow;
-import androidx.fragment.app.DialogFragment;
-import androidx.fragment.app.Fragment;
 import com.arialyy.aria.core.command.CommandManager;
 import com.arialyy.aria.core.common.QueueMod;
 import com.arialyy.aria.core.config.AppConfig;
@@ -53,6 +47,8 @@ import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.AriaCrashHandler;
 import com.arialyy.aria.util.RecordUtil;
 import java.io.File;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -60,13 +56,18 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Created by lyy on 2016/12/1. https://github.com/AriaLyy/Aria Aria管理器，任务操作在这里执行
+ * Created by lyy on 2016/12/1. https://github.com/AriaLyy/Aria
+ * Aria管理器，任务操作在这里执行
  */
 @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH) public class AriaManager {
   private static final String TAG = "AriaManager";
   private static final Object LOCK = new Object();
 
-
+  /**
+   * android、androidx、support的fragment、dialogFragment类名
+   */
+  private static List<String> mFragmentClassName = new ArrayList<>();
+  private static List<String> mDialogFragmentClassName = new ArrayList<>();
 
   @SuppressLint("StaticFieldLeak") private static volatile AriaManager INSTANCE = null;
   private Map<String, AbsReceiver> mReceivers = new ConcurrentHashMap<>();
@@ -78,6 +79,19 @@ import java.util.concurrent.ConcurrentHashMap;
   private Handler mAriaHandler;
   private DelegateWrapper mDbWrapper;
   private AriaConfig mConfig;
+
+  static {
+    mFragmentClassName.add("androidx.fragment.app.Fragment");
+    mFragmentClassName.add("androidx.fragment.app.DialogFragment");
+    mFragmentClassName.add("android.app.Fragment");
+    mFragmentClassName.add("android.app.DialogFragment");
+    mFragmentClassName.add("android.support.v4.app.Fragment");
+    mFragmentClassName.add("android.support.v4.app.DialogFragment");
+
+    mDialogFragmentClassName.add("androidx.fragment.app.DialogFragment");
+    mDialogFragmentClassName.add("android.app.DialogFragment");
+    mDialogFragmentClassName.add("android.support.v4.app.DialogFragment");
+  }
 
   private AriaManager(Context context) {
     APP = context.getApplicationContext();
@@ -113,8 +127,6 @@ import java.util.concurrent.ConcurrentHashMap;
   public Context getAPP() {
     return APP;
   }
-
-
 
   /**
    * 初始化数据库
@@ -165,8 +177,6 @@ import java.util.concurrent.ConcurrentHashMap;
     }
     return mAriaHandler;
   }
-
-
 
   public Map<String, AbsReceiver> getReceiver() {
     return mReceivers;
@@ -303,25 +313,12 @@ import java.util.concurrent.ConcurrentHashMap;
       needRmReceiver = widgetLiftManager.handleDialogLift((Dialog) obj);
     } else if (obj instanceof PopupWindow) {
       needRmReceiver = widgetLiftManager.handlePopupWindowLift((PopupWindow) obj);
-    } else if (obj instanceof DialogFragment) {
-      needRmReceiver = widgetLiftManager.handleDialogFragmentLift((DialogFragment) obj);
-    } else if (obj instanceof android.app.DialogFragment) {
-      needRmReceiver = widgetLiftManager.handleDialogFragmentLift((android.app.DialogFragment) obj);
+    } else if (isDialogFragment(obj.getClass())) {
+      needRmReceiver = widgetLiftManager.handleDialogFragmentLift(getDialog(obj));
     }
-
     if (receiver == null) {
-      AbsReceiver absReceiver;
-      switch (type) {
-        case ReceiverType.DOWNLOAD:
-          absReceiver = new DownloadReceiver();
-          break;
-        case ReceiverType.UPLOAD:
-          absReceiver = new UploadReceiver();
-          break;
-        default:
-          absReceiver = new DownloadReceiver();
-          break;
-      }
+      AbsReceiver absReceiver =
+          type.equals(ReceiverType.DOWNLOAD) ? new DownloadReceiver() : new UploadReceiver();
       absReceiver.targetName = obj.getClass().getName();
       AbsReceiver.OBJ_MAP.put(absReceiver.getKey(), obj);
       absReceiver.needRmListener = needRmReceiver;
@@ -339,14 +336,8 @@ import java.util.concurrent.ConcurrentHashMap;
    * @return {@link #createKey(String, Object)}
    */
   private String getKey(@ReceiverType String type, Object obj) {
-    if (obj instanceof DialogFragment) {
-      relateSubClass(type, obj, ((DialogFragment) obj).getActivity());
-    } else if (obj instanceof android.app.DialogFragment) {
-      relateSubClass(type, obj, ((android.app.DialogFragment) obj).getActivity());
-    } else if (obj instanceof Fragment) {
-      relateSubClass(type, obj, ((Fragment) obj).getActivity());
-    } else if (obj instanceof android.app.Fragment) {
-      relateSubClass(type, obj, ((android.app.Fragment) obj).getActivity());
+    if (isFragment(obj.getClass())) {
+      relateSubClass(type, obj, getFragmentActivity(obj));
     } else if (obj instanceof Dialog) {
       Activity activity = ((Dialog) obj).getOwnerActivity();
       if (activity != null) {
@@ -362,9 +353,85 @@ import java.util.concurrent.ConcurrentHashMap;
   }
 
   /**
+   * 获取fragment的activity
+   *
+   * @return 获取失败，返回null
+   */
+  static Activity getFragmentActivity(Object obj) {
+    try {
+      Method method = obj.getClass().getMethod("getActivity");
+      return (Activity) method.invoke(obj);
+    } catch (NoSuchMethodException e) {
+      e.printStackTrace();
+    } catch (IllegalAccessException e) {
+      e.printStackTrace();
+    } catch (InvocationTargetException e) {
+      e.printStackTrace();
+    }
+    return null;
+  }
+
+  /**
+   * 判断注解对象是否是fragment
+   *
+   * @return true 对象是fragment
+   */
+  static boolean isFragment(Class subClazz) {
+    Class parentClass = subClazz.getSuperclass();
+    if (parentClass == null) {
+      return false;
+    } else {
+      String parentName = parentClass.getName();
+      if (mFragmentClassName.contains(parentName)) {
+        return true;
+      } else {
+        return isFragment(parentClass);
+      }
+    }
+  }
+
+  /**
+   * 判断对象是否是DialogFragment
+   *
+   * @return true 对象是DialogFragment
+   */
+  private boolean isDialogFragment(Class subClazz) {
+    Class parentClass = subClazz.getSuperclass();
+    if (parentClass == null) {
+      return false;
+    } else {
+      String parentName = parentClass.getName();
+      if (mFragmentClassName.contains(parentName)) {
+        return true;
+      } else {
+        return isDialogFragment(parentClass);
+      }
+    }
+  }
+
+  /**
+   * 获取DialogFragment的dialog
+   *
+   * @return 获取失败，返回null
+   */
+  private Dialog getDialog(Object obj) {
+    try {
+      Method method = obj.getClass().getMethod("getDialog");
+      return (Dialog) method.invoke(obj);
+    } catch (NoSuchMethodException e) {
+      e.printStackTrace();
+    } catch (IllegalAccessException e) {
+      e.printStackTrace();
+    } catch (InvocationTargetException e) {
+      e.printStackTrace();
+    }
+    return null;
+  }
+
+  /**
    * 关联Activity类和Fragment间的关系
    *
-   * @param sub Frgament或dialog类
+   * @param sub Fragment或dialog类
    * @param activity activity寄主类
    */
   private void relateSubClass(@ReceiverType String type, Object sub, Activity activity) {

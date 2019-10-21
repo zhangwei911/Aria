@@ -17,15 +17,17 @@ package com.arialyy.aria.core.download.target;
 
 import android.text.TextUtils;
 import androidx.annotation.CheckResult;
+import com.arialyy.aria.core.common.AbsNormalTarget;
+import com.arialyy.aria.core.common.ErrorCode;
 import com.arialyy.aria.core.download.DGTaskWrapper;
 import com.arialyy.aria.core.download.DownloadGroupEntity;
-import com.arialyy.aria.core.task.DownloadGroupTask;
 import com.arialyy.aria.core.event.ErrorEvent;
 import com.arialyy.aria.core.inf.AbsTarget;
 import com.arialyy.aria.core.inf.IConfigHandler;
 import com.arialyy.aria.core.manager.SubTaskManager;
 import com.arialyy.aria.core.manager.TaskWrapperManager;
 import com.arialyy.aria.core.queue.DGroupTaskQueue;
+import com.arialyy.aria.core.task.DownloadGroupTask;
 import com.arialyy.aria.orm.DbEntity;
 import com.arialyy.aria.util.CommonUtil;
 
@@ -44,9 +46,15 @@ abstract class AbsGroupConfigHandler<TARGET extends AbsTarget> implements IConfi
     TAG = CommonUtil.getClassName(getClass());
     mTarget = target;
     mWrapper = TaskWrapperManager.getInstance().getGroupWrapper(DGTaskWrapper.class, taskId);
-    if (taskId != -1 && mWrapper.getEntity().getId() == -1) {
-      mWrapper.setErrorEvent(new ErrorEvent(taskId, String.format("没有id为%s的任务", taskId)));
+    // 判断已存在的任务
+    if (mTarget instanceof AbsNormalTarget) {
+      if (taskId < 0) {
+        mWrapper.setErrorEvent(new ErrorEvent(taskId, "任务id为空"));
+      } else if (mWrapper.getEntity().getId() < 0) {
+        mWrapper.setErrorEvent(new ErrorEvent(taskId, "任务信息不存在"));
+      }
     }
+
     mTarget.setTaskWrapper(mWrapper);
     if (getEntity() != null) {
       getTaskWrapper().setDirPathTemp(getEntity().getDirPath());

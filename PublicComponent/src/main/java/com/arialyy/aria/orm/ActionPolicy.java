@@ -46,7 +46,7 @@ public enum ActionPolicy {
   /**
    * 父表有变更时,子表将外键列设置成一个默认的值，default配置的值
    */
-  SET_DEFAULT("SET DEFAULT"),
+  SET_DEFAULT("SET ERROR"),
 
   /**
    * 在父表上update/delete记录时，同步update/delete掉子表的匹配记录

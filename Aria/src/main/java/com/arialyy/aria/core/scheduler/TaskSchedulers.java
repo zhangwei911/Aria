@@ -20,21 +20,21 @@ import android.os.Bundle;
 import android.os.Message;
 import com.arialyy.annotations.TaskEnum;
 import com.arialyy.aria.core.AriaManager;
-import com.arialyy.aria.core.task.DownloadGroupTask;
-import com.arialyy.aria.core.task.DownloadTask;
 import com.arialyy.aria.core.common.AbsEntity;
 import com.arialyy.aria.core.common.AbsNormalEntity;
-import com.arialyy.aria.core.task.AbsTask;
 import com.arialyy.aria.core.group.GroupSendParams;
 import com.arialyy.aria.core.inf.IEntity;
-import com.arialyy.aria.core.listener.ISchedulers;
-import com.arialyy.aria.core.task.ITask;
 import com.arialyy.aria.core.inf.TaskSchedulerType;
+import com.arialyy.aria.core.listener.ISchedulers;
 import com.arialyy.aria.core.manager.TaskWrapperManager;
 import com.arialyy.aria.core.queue.DGroupTaskQueue;
 import com.arialyy.aria.core.queue.DTaskQueue;
 import com.arialyy.aria.core.queue.ITaskQueue;
 import com.arialyy.aria.core.queue.UTaskQueue;
+import com.arialyy.aria.core.task.AbsTask;
+import com.arialyy.aria.core.task.DownloadGroupTask;
+import com.arialyy.aria.core.task.DownloadTask;
+import com.arialyy.aria.core.task.ITask;
 import com.arialyy.aria.core.task.UploadTask;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.NetUtils;
@@ -74,10 +74,9 @@ public class TaskSchedulers<TASK extends ITask> implements ISchedulers {
   /**
    * 通过任务类型获取任务队列
    *
-   * @param curTask 当前接收到的的任务
+   * @param taskType 任务类型
    */
-  ITaskQueue getQueue(TASK curTask) {
-    int taskType = curTask.getTaskType();
+  ITaskQueue getQueue(int taskType) {
     if (taskType == ITask.DOWNLOAD) {
       return DTaskQueue.getInstance();
     }
@@ -171,6 +170,11 @@ public class TaskSchedulers<TASK extends ITask> implements ISchedulers {
   }
 
   @Override public boolean handleMessage(Message msg) {
+    if (msg.what == CHECK_FAIL) {
+      handlePreFailTask(msg.arg1);
+      return true;
+    }
+
     if (msg.arg1 == IS_SUB_TASK) {
       return handleSubEvent(msg);
     }
@@ -180,11 +184,11 @@ public class TaskSchedulers<TASK extends ITask> implements ISchedulers {
     }
 
     TASK task = (TASK) msg.obj;
-    if (task == null && msg.what != ISchedulers.CHECK_FAIL) {
+    if (task == null) {
       ALog.e(TAG, "请传入下载任务");
       return true;
     }
-    handleNormalEvent(task, msg.what, msg.arg1);
+    handleNormalEvent(task, msg.what);
     return true;
   }
 
@@ -292,8 +296,8 @@ public class TaskSchedulers<TASK extends ITask> implements ISchedulers {
   /**
    * 处理普通任务和任务组的事件
    */
-  private void handleNormalEvent(TASK task, int what, int arg1) {
-    ITaskQueue queue = getQueue(task);
+  private void handleNormalEvent(TASK task, int what) {
+    ITaskQueue queue = getQueue(task.getTaskType());
     switch (what) {
       case STOP:
         if (task.getState() == IEntity.STATE_WAIT) {
@@ -324,9 +328,6 @@ public class TaskSchedulers<TASK extends ITask> implements ISchedulers {
       case FAIL:
         handleFailTask(queue, task);
         break;
-      case CHECK_FAIL:
-        handlePreFailTask(queue, arg1);
-        break;
     }
 
     if (what == FAIL || what == CHECK_FAIL) {
@@ -343,8 +344,13 @@ public class TaskSchedulers<TASK extends ITask> implements ISchedulers {
     normalTaskCallback(what, task);
   }
 
-  private void handlePreFailTask(ITaskQueue queue, int taskType) {
-    startNextTask(queue, TaskSchedulerType.TYPE_DEFAULT);
+  /**
+   * 处理what为{@link #CHECK_FAIL}信息错误的任务
+   *
+   * @param taskType 任务类型
+   */
+  private void handlePreFailTask(int taskType) {
+    startNextTask(getQueue(taskType), TaskSchedulerType.TYPE_DEFAULT);
 
     // 发送广播
     boolean canSend = mAriaManager.getAppConfig().isUseBroadcast();

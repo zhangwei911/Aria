@@ -20,9 +20,10 @@ import androidx.annotation.NonNull;
 import com.arialyy.annotations.TaskEnum;
 import com.arialyy.aria.core.AriaManager;
 import com.arialyy.aria.core.command.CancelAllCmd;
+import com.arialyy.aria.core.command.CmdHelper;
 import com.arialyy.aria.core.command.NormalCmdFactory;
 import com.arialyy.aria.core.common.AbsBuilderTarget;
-import com.arialyy.aria.core.common.ErrorCode;
+import com.arialyy.aria.core.common.AbsEntity;
 import com.arialyy.aria.core.common.ProxyHelper;
 import com.arialyy.aria.core.download.target.DTargetFactory;
 import com.arialyy.aria.core.download.target.FtpBuilderTarget;
@@ -34,15 +35,13 @@ import com.arialyy.aria.core.download.target.GroupNormalTarget;
 import com.arialyy.aria.core.download.target.HttpBuilderTarget;
 import com.arialyy.aria.core.download.target.HttpNormalTarget;
 import com.arialyy.aria.core.event.EventMsgUtil;
-import com.arialyy.aria.core.common.AbsEntity;
 import com.arialyy.aria.core.inf.AbsReceiver;
-import com.arialyy.aria.core.task.ITask;
 import com.arialyy.aria.core.inf.ReceiverType;
 import com.arialyy.aria.core.scheduler.TaskSchedulers;
+import com.arialyy.aria.core.task.ITask;
 import com.arialyy.aria.orm.DbEntity;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CheckUtil;
-import com.arialyy.aria.core.command.CmdHelper;
 import com.arialyy.aria.util.CommonUtil;
 import com.arialyy.aria.util.ComponentUtil;
 import com.arialyy.aria.util.DbDataHelper;
@@ -77,7 +76,6 @@ public class DownloadReceiver extends AbsReceiver {
   @CheckResult
   public HttpBuilderTarget load(@NonNull String url) {
     ComponentUtil.getInstance().checkComponentExist(ComponentUtil.COMPONENT_TYPE_HTTP);
-    CheckUtil.checkUrlInvalidThrow(url);
     return DTargetFactory.getInstance()
         .generateBuilderTarget(HttpBuilderTarget.class, url);
   }
@@ -91,7 +89,6 @@ public class DownloadReceiver extends AbsReceiver {
   @CheckResult
   public HttpNormalTarget load(long taskId) {
     ComponentUtil.getInstance().checkComponentExist(ComponentUtil.COMPONENT_TYPE_HTTP);
-    CheckUtil.checkTaskId(taskId);
     return DTargetFactory.getInstance()
         .generateNormalTarget(HttpNormalTarget.class, taskId);
   }
@@ -104,7 +101,6 @@ public class DownloadReceiver extends AbsReceiver {
   @CheckResult
   public GroupBuilderTarget loadGroup(List<String> urls) {
     ComponentUtil.getInstance().checkComponentExist(ComponentUtil.COMPONENT_TYPE_HTTP);
-    CheckUtil.checkDownloadUrls(urls);
     return DTargetFactory.getInstance().generateGroupBuilderTarget(urls);
   }
 
@@ -117,7 +113,6 @@ public class DownloadReceiver extends AbsReceiver {
   @CheckResult
   public GroupNormalTarget loadGroup(long taskId) {
     ComponentUtil.getInstance().checkComponentExist(ComponentUtil.COMPONENT_TYPE_HTTP);
-    CheckUtil.checkTaskId(taskId);
     return DTargetFactory.getInstance()
         .generateNormalTarget(GroupNormalTarget.class, taskId);
   }
@@ -128,7 +123,6 @@ public class DownloadReceiver extends AbsReceiver {
   @CheckResult
   public FtpBuilderTarget loadFtp(@NonNull String url) {
     ComponentUtil.getInstance().checkComponentExist(ComponentUtil.COMPONENT_TYPE_FTP);
-    CheckUtil.checkUrlInvalidThrow(url);
     return DTargetFactory.getInstance()
         .generateBuilderTarget(FtpBuilderTarget.class, url);
   }
@@ -142,7 +136,6 @@ public class DownloadReceiver extends AbsReceiver {
   @CheckResult
   public FtpNormalTarget loadFtp(long taskId) {
     ComponentUtil.getInstance().checkComponentExist(ComponentUtil.COMPONENT_TYPE_FTP);
-    CheckUtil.checkTaskId(taskId);
     return DTargetFactory.getInstance()
         .generateNormalTarget(FtpNormalTarget.class, taskId);
   }
@@ -153,7 +146,6 @@ public class DownloadReceiver extends AbsReceiver {
   @CheckResult
   public FtpDirBuilderTarget loadFtpDir(@NonNull String dirUrl) {
     ComponentUtil.getInstance().checkComponentExist(ComponentUtil.COMPONENT_TYPE_FTP);
-    CheckUtil.checkUrlInvalidThrow(dirUrl);
     return DTargetFactory.getInstance().generateDirBuilderTarget(dirUrl);
   }
 
@@ -166,7 +158,6 @@ public class DownloadReceiver extends AbsReceiver {
   @CheckResult
   public FtpDirNormalTarget loadFtpDir(long taskId) {
     ComponentUtil.getInstance().checkComponentExist(ComponentUtil.COMPONENT_TYPE_FTP);
-    CheckUtil.checkTaskId(taskId);
     return DTargetFactory.getInstance()
         .generateNormalTarget(FtpDirNormalTarget.class, taskId);
   }
@@ -244,7 +235,10 @@ public class DownloadReceiver extends AbsReceiver {
    * @param taskId 任务实体唯一id
    */
   public DownloadEntity getDownloadEntity(long taskId) {
-    CheckUtil.checkTaskId(taskId);
+    if (taskId < 0) {
+      ALog.e(TAG, "taskId错误");
+      return null;
+    }
     return DbEntity.findFirst(DownloadEntity.class, "rowid=?", String.valueOf(taskId));
   }
 
@@ -255,7 +249,9 @@ public class DownloadReceiver extends AbsReceiver {
    * @return 如果url错误或查找不到数据，则返回null
    */
   public DownloadEntity getFirstDownloadEntity(String downloadUrl) {
-    CheckUtil.checkUrl(downloadUrl);
+    if (!CheckUtil.checkUrl(downloadUrl)) {
+      return null;
+    }
     return DbEntity.findFirst(DownloadEntity.class, "url=? and isGroupChild='false'", downloadUrl);
   }
 
@@ -265,7 +261,9 @@ public class DownloadReceiver extends AbsReceiver {
    * @return 如果url错误或查找不到数据，则返回null
    */
   public List<DownloadEntity> getDownloadEntity(String downloadUrl) {
-    CheckUtil.checkUrl(downloadUrl);
+    if (!CheckUtil.checkUrl(downloadUrl)) {
+      return null;
+    }
     return DbEntity.findDatas(DownloadEntity.class, "url=? and isGroupChild='false'", downloadUrl);
   }
 
@@ -276,7 +274,9 @@ public class DownloadReceiver extends AbsReceiver {
    * @return 如果实体不存在，返回null
    */
   public DownloadGroupEntity getGroupEntity(long taskId) {
-    CheckUtil.checkTaskId(taskId);
+    if (taskId < 0) {
+      ALog.e(TAG, "任务Id错误");
+    }
     return DbDataHelper.getDGEntity(taskId);
   }
 
@@ -287,7 +287,9 @@ public class DownloadReceiver extends AbsReceiver {
    * @return 如果实体不存在，返回null
    */
   public DownloadGroupEntity getGroupEntity(List<String> urls) {
-    CheckUtil.checkDownloadUrls(urls);
+    if (CheckUtil.checkDownloadUrlsIsEmpty(urls)){
+      return null;
+    }
     return DbDataHelper.getDGEntity(CommonUtil.getMd5Code(urls));
   }
 
@@ -298,7 +300,9 @@ public class DownloadReceiver extends AbsReceiver {
    * @return 如果实体不存在，返回null
    */
   public DownloadGroupEntity getFtpDirEntity(String url) {
-    CheckUtil.checkUrl(url);
+    if (!CheckUtil.checkUrl(url)) {
+      return null;
+    }
     return DbDataHelper.getDGEntity(url);
   }
 

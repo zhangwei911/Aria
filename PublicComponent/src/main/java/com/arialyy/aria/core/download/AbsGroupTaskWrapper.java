@@ -15,7 +15,6 @@
  */
 package com.arialyy.aria.core.download;
 
-import com.arialyy.aria.core.event.ErrorEvent;
 import com.arialyy.aria.core.common.AbsEntity;
 import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
 import java.util.List;
@@ -25,19 +24,6 @@ import java.util.List;
  */
 public abstract class AbsGroupTaskWrapper<ENTITY extends AbsEntity, SUB extends AbsTaskWrapper>
     extends AbsTaskWrapper<ENTITY> {
-
-  /**
-   * 错误信息
-   */
-  private ErrorEvent errorEvent;
-
-  public ErrorEvent getErrorEvent() {
-    return errorEvent;
-  }
-
-  public void setErrorEvent(ErrorEvent errorEvent) {
-    this.errorEvent = errorEvent;
-  }
 
   public AbsGroupTaskWrapper(ENTITY entity) {
     super(entity);

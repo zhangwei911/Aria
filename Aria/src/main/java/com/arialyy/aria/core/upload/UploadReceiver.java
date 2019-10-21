@@ -70,7 +70,7 @@ public class UploadReceiver extends AbsReceiver {
   @CheckResult
   public HttpBuilderTarget load(@NonNull String filePath) {
     ComponentUtil.getInstance().checkComponentExist(ComponentUtil.COMPONENT_TYPE_HTTP);
-    CheckUtil.checkUploadPath(filePath);
+    CheckUtil.checkUploadPathIsEmpty(filePath);
     return UTargetFactory.getInstance()
         .generateBuilderTarget(HttpBuilderTarget.class, filePath);
   }
@@ -84,7 +84,6 @@ public class UploadReceiver extends AbsReceiver {
   @CheckResult
   public HttpNormalTarget load(long taskId) {
     ComponentUtil.getInstance().checkComponentExist(ComponentUtil.COMPONENT_TYPE_HTTP);
-    CheckUtil.checkTaskId(taskId);
     return UTargetFactory.getInstance()
         .generateNormalTarget(HttpNormalTarget.class, taskId);
   }
@@ -97,7 +96,7 @@ public class UploadReceiver extends AbsReceiver {
   @CheckResult
   public FtpBuilderTarget loadFtp(@NonNull String filePath) {
     ComponentUtil.getInstance().checkComponentExist(ComponentUtil.COMPONENT_TYPE_FTP);
-    CheckUtil.checkUploadPath(filePath);
+    CheckUtil.checkUploadPathIsEmpty(filePath);
     return UTargetFactory.getInstance()
         .generateBuilderTarget(FtpBuilderTarget.class, filePath);
   }
@@ -111,7 +110,6 @@ public class UploadReceiver extends AbsReceiver {
   @CheckResult
   public FtpNormalTarget loadFtp(long taskId) {
     ComponentUtil.getInstance().checkComponentExist(ComponentUtil.COMPONENT_TYPE_FTP);
-    CheckUtil.checkTaskId(taskId);
     return UTargetFactory.getInstance()
         .generateNormalTarget(FtpNormalTarget.class, taskId);
   }

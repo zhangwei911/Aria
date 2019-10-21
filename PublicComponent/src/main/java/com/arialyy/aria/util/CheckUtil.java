@@ -17,13 +17,6 @@
 package com.arialyy.aria.util;
 
 import android.text.TextUtils;
-import com.arialyy.aria.core.common.ErrorCode;
-import com.arialyy.aria.core.download.DTaskWrapper;
-import com.arialyy.aria.core.download.DownloadEntity;
-import com.arialyy.aria.core.upload.UTaskWrapper;
-import com.arialyy.aria.core.upload.UploadEntity;
-import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
-import java.io.File;
 import java.lang.reflect.Modifier;
 import java.util.List;
 
@@ -55,51 +48,11 @@ public class CheckUtil {
   }
 
   /**
-   * 检测url是否合法，如果url不合法，将抛异常
-   */
-  public static ErrorCode checkTaskId(long taskId) {
-    if (taskId < 0) {
-      return ErrorCode.ERROR_CODE_TASK_ID_NULL;
-    }
-    return ErrorCode.ERROR_CODE_NORMAL;
-  }
-
-  /**
-   * 检测url是否合法，如果url不合法，将抛异常
-   */
-  public static void checkUrlInvalidThrow(String url) {
-    if (TextUtils.isEmpty(url)) {
-      throw new IllegalArgumentException("url不能为null");
-    } else if (!url.startsWith("http") && !url.startsWith("ftp") && !url.startsWith("sftp")) {
-      throw new IllegalArgumentException("url错误");
-    }
-    int index = url.indexOf("://");
-    if (index == -1) {
-      throw new IllegalArgumentException("url不合法");
-    }
-  }
-
-  /**
-   * 检测url是否合法，如果url不合法，将抛出{@link IllegalArgumentException}异常
-   */
-  public static void checkUrl(String url) {
-    if (TextUtils.isEmpty(url)) {
-      throw new NullPointerException("url为空");
-    } else if (!url.startsWith("http") && !url.startsWith("ftp") && !url.startsWith("sftp")) {
-      throw new IllegalArgumentException(String.format("url【%s】错误", url));
-    }
-    int index = url.indexOf("://");
-    if (index == -1) {
-      throw new IllegalArgumentException(String.format("url【%s】不合法", url));
-    }
-  }
-
-  /**
    * 检测url是否合法
    *
    * @return {@code true} 合法，{@code false} 非法
    */
-  public static boolean checkUrlNotThrow(String url) {
+  public static boolean checkUrl(String url) {
     if (TextUtils.isEmpty(url)) {
       ALog.e(TAG, "url不能为null");
       return false;
@@ -116,65 +69,23 @@ public class CheckUtil {
 
   /**
    * 检测下载链接组是否为null
+   *
+   * @return true 组合任务url为空
    */
-  public static void checkDownloadUrls(List<String> urls) {
+  public static boolean checkDownloadUrlsIsEmpty(List<String> urls) {
     if (urls == null || urls.isEmpty()) {
-      throw new IllegalArgumentException("链接组不能为null");
+      ALog.e(TAG, "链接组不能为null");
+      return true;
     }
+    return false;
   }
 
   /**
    * 检测上传地址是否为null
    */
-  public static void checkUploadPath(String uploadPath) {
+  public static void checkUploadPathIsEmpty(String uploadPath) {
     if (TextUtils.isEmpty(uploadPath)) {
       throw new IllegalArgumentException("上传地址不能为null");
-    }
-    File file = new File(uploadPath);
-    if (!file.exists()) {
-      throw new IllegalArgumentException("上传文件不存在");
-    }
-  }
-
-  /**
-   * 检查任务实体
-   */
-  public static void checkTaskEntity(AbsTaskWrapper entity) {
-    if (entity instanceof DTaskWrapper) {
-      checkDownloadTaskEntity(((DTaskWrapper) entity).getEntity());
-    } else if (entity instanceof UTaskWrapper) {
-      checkUploadTaskEntity(((UTaskWrapper) entity).getEntity());
-    }
-  }
-
-  /**
-   * 检查上传实体是否合法
-   */
-  private static void checkUploadTaskEntity(UploadEntity entity) {
-    if (entity == null) {
-      throw new NullPointerException("上传实体不能为空");
-    } else if (TextUtils.isEmpty(entity.getFilePath())) {
-      throw new IllegalArgumentException("上传文件路径不能为空");
-    } else if (TextUtils.isEmpty(entity.getFileName())) {
-      throw new IllegalArgumentException("上传文件名不能为空");
-    }
-  }
-
-  /**
-   * 检测下载实体是否合法
-   * 合法(true)
-   *
-   * @param entity 下载实体
-   */
-  private static void checkDownloadTaskEntity(DownloadEntity entity) {
-    if (entity == null) {
-      throw new NullPointerException("下载实体不能为空");
-    } else if (TextUtils.isEmpty(entity.getUrl())) {
-      throw new IllegalArgumentException("下载链接不能为空");
-    } else if (TextUtils.isEmpty(entity.getFileName())) {
-      throw new NullPointerException("文件名不能为null");
-    } else if (TextUtils.isEmpty(entity.getDownloadPath())) {
-      throw new NullPointerException("文件保存路径不能为null");
     }
   }
 }

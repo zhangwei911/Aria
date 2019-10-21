@@ -24,8 +24,6 @@ import android.app.Service;
 import android.content.Context;
 import android.os.Build;
 import android.widget.PopupWindow;
-import androidx.fragment.app.DialogFragment;
-import androidx.fragment.app.Fragment;
 import com.arialyy.aria.core.download.DownloadReceiver;
 import com.arialyy.aria.core.upload.UploadReceiver;
 import com.arialyy.aria.util.ALog;
@@ -136,14 +134,8 @@ import com.arialyy.aria.util.ALog;
       return (Service) obj;
     } else if (obj instanceof Activity) {
       return (Activity) obj;
-    } else if (obj instanceof DialogFragment) {
-      return ((DialogFragment) obj).getContext();
-    } else if (obj instanceof android.app.DialogFragment) {
-      return ((android.app.DialogFragment) obj).getActivity();
-    } else if (obj instanceof Fragment) {
-      return ((Fragment) obj).getContext();
-    } else if (obj instanceof android.app.Fragment) {
-      return ((android.app.Fragment) obj).getActivity();
+    } else if (AriaManager.isFragment(obj.getClass())) {
+      return AriaManager.getFragmentActivity(obj);
     } else if (obj instanceof Dialog) {
       return ((Dialog) obj).getContext();
     } else if (obj instanceof PopupWindow) {

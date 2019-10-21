@@ -184,7 +184,7 @@ class DelegateCommon extends AbsDelegate {
         if (SqlUtil.isDefault(field)) {
           Default d = field.getAnnotation(Default.class);
           if (!TextUtils.isEmpty(d.value())) {
-            sb.append(" DEFAULT ").append("'").append(d.value()).append("'");
+            sb.append(" ERROR ").append("'").append(d.value()).append("'");
           }
         }
 
