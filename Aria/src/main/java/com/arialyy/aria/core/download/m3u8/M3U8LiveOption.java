@@ -22,7 +22,7 @@ import com.arialyy.aria.util.CheckUtil;
 /**
  * m3u8直播参数设置
  */
-public class M3U8LiveOption extends M3U8Option {
+public class M3U8LiveOption extends M3U8Option<M3U8LiveOption> {
 
   private ILiveTsUrlConverter liveTsUrlConverter;
   private long liveUpdateInterval;

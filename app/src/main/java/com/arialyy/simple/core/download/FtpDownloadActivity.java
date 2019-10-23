@@ -93,10 +93,10 @@ public class FtpDownloadActivity extends BaseActivity<ActivityFtpDownloadBinding
       case R.id.start:
 
         if (mTaskId == -1) {
-           Aria.download(this).loadFtp(mUrl)
+           mTaskId = Aria.download(this).loadFtp(mUrl)
               .setFilePath(mFilePath, true)
-              .option(getFtpOption());
-              //.create();
+              .option(getFtpOption())
+              .create();
           getBinding().setStateStr(getString(R.string.stop));
           break;
         }

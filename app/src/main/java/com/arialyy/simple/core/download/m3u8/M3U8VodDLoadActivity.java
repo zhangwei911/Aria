@@ -304,7 +304,7 @@ public class M3U8VodDLoadActivity extends BaseActivity<ActivityM3u8VodBinding> {
     M3U8VodOption option = new M3U8VodOption();
     option
         .generateIndexFile()
-        .setTsUrlConvert(new VodTsUrlConverter())
+        .setVodTsUrlConvert(new VodTsUrlConverter())
         .setMergeHandler(new TsMergeHandler());
     //.setBandWidthUrlConverter(new BandWidthUrlConverter(mUrl));
     return option;

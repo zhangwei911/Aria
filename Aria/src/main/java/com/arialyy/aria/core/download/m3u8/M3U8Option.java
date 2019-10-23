@@ -25,13 +25,12 @@ import com.arialyy.aria.util.ComponentUtil;
 /**
  * m3u8任务设置
  */
-public class M3U8Option extends BaseOption {
+public class M3U8Option<OP extends M3U8Option> extends BaseOption {
 
   private boolean generateIndexFileTemp = false;
   private boolean mergeFile = false;
   private int bandWidth;
   private ITsMergeHandler mergeHandler;
-  private IVodTsUrlConverter vodUrlConverter;
   private IBandWidthUrlConverter bandWidthUrlConverter;
 
   M3U8Option() {
@@ -43,9 +42,9 @@ public class M3U8Option extends BaseOption {
    * 生成m3u8索引文件
    * 注意：创建索引文件，{@link #merge(boolean)}方法设置与否都不再合并文件
    */
-  public M3U8Option generateIndexFile() {
+  public OP generateIndexFile() {
     this.generateIndexFileTemp = true;
-    return this;
+    return (OP) this;
   }
 
   /**
@@ -53,31 +52,19 @@ public class M3U8Option extends BaseOption {
    *
    * @param mergeFile {@code true}合并所有ts文件为一个
    */
-  public M3U8Option merge(boolean mergeFile) {
+  public OP merge(boolean mergeFile) {
     this.mergeFile = mergeFile;
-    return this;
+    return (OP) this;
   }
 
   /**
    * 如果你希望使用自行处理ts文件的合并，可以使用{@link ITsMergeHandler}处理ts文件的合并
    * 需要注意的是：只有{@link #merge(boolean)}设置合并ts文件，该方法才会生效
    */
-  public M3U8Option setMergeHandler(ITsMergeHandler mergeHandler) {
+  public OP setMergeHandler(ITsMergeHandler mergeHandler) {
     CheckUtil.checkMemberClass(mergeHandler.getClass());
     this.mergeHandler = mergeHandler;
-    return this;
-  }
-
-  /**
-   * M3U8 ts 文件url转换器，对于某些服务器，返回的ts地址可以是相对地址，也可能是处理过的
-   * 对于这种情况，你需要使用url转换器将地址转换为可正常访问的http地址
-   *
-   * @param vodUrlConverter {@link IVodTsUrlConverter}
-   */
-  public M3U8Option setTsUrlConvert(IVodTsUrlConverter vodUrlConverter) {
-    CheckUtil.checkMemberClass(vodUrlConverter.getClass());
-    this.vodUrlConverter = vodUrlConverter;
-    return this;
+    return (OP) this;
   }
 
   /**
@@ -85,9 +72,9 @@ public class M3U8Option extends BaseOption {
    *
    * @param bandWidth 指定的码率
    */
-  public M3U8Option setBandWidth(int bandWidth) {
+  public OP setBandWidth(int bandWidth) {
     this.bandWidth = bandWidth;
-    return this;
+    return (OP) this;
   }
 
   /**
@@ -96,9 +83,9 @@ public class M3U8Option extends BaseOption {
    *
    * @param bandWidthUrlConverter {@link IBandWidthUrlConverter}
    */
-  public M3U8Option setBandWidthUrlConverter(IBandWidthUrlConverter bandWidthUrlConverter) {
+  public OP setBandWidthUrlConverter(IBandWidthUrlConverter bandWidthUrlConverter) {
     CheckUtil.checkMemberClass(bandWidthUrlConverter.getClass());
     this.bandWidthUrlConverter = bandWidthUrlConverter;
-    return this;
+    return (OP) this;
   }
 }

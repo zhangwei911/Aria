@@ -37,7 +37,7 @@ public abstract class AbsBuilderTarget<TARGET extends AbsBuilderTarget> extends 
   /**
    * 添加任务
    *
-   * @return 正常添加，返回任务id，否则返回-1
+   * @return 添加成功，返回任务id，创建失败，返回-1
    */
   @Override
   public long add() {
@@ -47,7 +47,7 @@ public abstract class AbsBuilderTarget<TARGET extends AbsBuilderTarget> extends 
   /**
    * 开始任务
    *
-   * @return 正常启动，返回任务id，否则返回-1
+   * @return 创建成功，返回任务id，创建失败，返回-1
    */
   @Override
   public long create() {

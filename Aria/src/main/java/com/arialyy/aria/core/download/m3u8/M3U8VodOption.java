@@ -15,18 +15,33 @@
  */
 package com.arialyy.aria.core.download.m3u8;
 
+import com.arialyy.aria.core.processor.IVodTsUrlConverter;
 import com.arialyy.aria.util.ALog;
+import com.arialyy.aria.util.CheckUtil;
 
 /**
  * m3u8点播文件参数设置
  */
-public class M3U8VodOption extends M3U8Option {
+public class M3U8VodOption extends M3U8Option<M3U8VodOption> {
   private long fileSize;
   private int maxTsQueueNum;
   private int jumpIndex;
+  private IVodTsUrlConverter vodUrlConverter;
 
   public M3U8VodOption() {
     super();
+  }
+
+  /**
+   * M3U8 ts 文件url转换器，对于某些服务器，返回的ts地址可以是相对地址，也可能是处理过的
+   * 对于这种情况，你需要使用url转换器将地址转换为可正常访问的http地址
+   *
+   * @param vodUrlConverter {@link IVodTsUrlConverter}
+   */
+  public M3U8VodOption setVodTsUrlConvert(IVodTsUrlConverter vodUrlConverter) {
+    CheckUtil.checkMemberClass(vodUrlConverter.getClass());
+    this.vodUrlConverter = vodUrlConverter;
+    return this;
   }
 
   /**

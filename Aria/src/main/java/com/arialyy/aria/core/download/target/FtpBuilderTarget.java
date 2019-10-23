@@ -39,8 +39,7 @@ public class FtpBuilderTarget extends AbsBuilderTarget<FtpBuilderTarget> {
   /**
    * 设置登陆、字符串编码、ftps等参数
    */
-  @com.arialyy.aria.core.common.CheckResult(suggest = Suggest.TASK_CONTROLLER)
-  //@CheckResult(suggest = Suggest.TASK_CONTROLLER)
+  @CheckResult(suggest = Suggest.TASK_CONTROLLER)
   public FtpBuilderTarget option(FtpOption option) {
     if (option == null) {
       throw new NullPointerException("ftp 任务配置为空");
