@@ -43,22 +43,29 @@ Aria有以下特点：
 ![m3u8点播文件边下边看](https://github.com/AriaLyy/Aria/blob/master/img/m3u8VodDownload.gif)
 
 ## 引入库
-[![Core](https://api.bintray.com/packages/arialyy/maven/AriaApi/images/download.svg)](https://bintray.com/arialyy/maven/AriaApi/_latestVersion)
-[![Compiler](https://api.bintray.com/packages/arialyy/maven/AriaCompiler/images/download.svg)](https://bintray.com/arialyy/maven/AriaCompiler/_latestVersion)
+[![license](http://img.shields.io/badge/license-Apache2.0-brightgreen.svg?style=flat)](https://github.com/AriaLyy/Aria/blob/master/LICENSE)
+[![Core](https://img.shields.io/badge/Core-3.7.1-blue)](https://github.com/AriaLyy/Aria)
+[![Compiler](https://img.shields.io/badge/Compiler-3.7.1-blue)](https://github.com/AriaLyy/Aria)
+[![FtpComponent](https://img.shields.io/badge/FtpComponent-3.7.1-orange)](https://github.com/AriaLyy/Aria)
+[![M3U8Component](https://img.shields.io/badge/M3U8Component-3.7.1-orange)](https://github.com/AriaLyy/Aria)
 
 ```java
-compile 'com.arialyy.aria:aria-core:3.6.6'
-annotationProcessor 'com.arialyy.aria:aria-compiler:3.6.6'
+implementation 'com.arialyy.aria:core:3.7.1'
+annotationProcessor 'com.arialyy.aria:compiler:3.7.1'
+implementation 'com.arialyy.aria:ftpComponent:3.7.1' # 如果需要使用ftp，请增加该组件
+implementation 'com.arialyy.aria:m3u8Component:3.7.1' # 如果需要使用m3u8下载功能，请增加该组件
 ```
 如果出现android support依赖错误，请将 `compile 'com.arialyy.aria:aria-core:<last-version>'`替换为
 ```
 api('com.arialyy.aria:aria-core:<last-version>'){
-   exclude group: 'com.android.support'
+   exclude group: 'androidx.appcompat.app'
 }
 ```
 如果你使用的是kotlin，请使用kotlin官方提供的方法配置apt，[kotlin kapt官方配置传送门](https://www.kotlincn.net/docs/reference/kapt.html)
 
 __⚠️注意：3.5.4以下版本升级时，需要更新[配置文件](https://aria.laoyuyu.me/aria_doc/start/config.html)！！__
+
+__⚠️注意：3.7 以上版本已经适配了AndroidX__
 
 ***
 ## 使用
@@ -126,17 +133,27 @@ protected void onCreate(Bundle savedInstanceState) {
 }
 ```
 
+### [文档地址](https://aria.laoyuyu.me/aria_doc/)
+
 
 ### 版本日志
- + v_3.6.6
-    - fix bug https://github.com/AriaLyy/Aria/issues/426
-    - fix bug https://github.com/AriaLyy/Aria/issues/429
-    - fix bug https://github.com/AriaLyy/Aria/issues/428
-    - fix bug https://github.com/AriaLyy/Aria/issues/427
-    - fix bug https://github.com/AriaLyy/Aria/issues/431
-    - fix bug https://github.com/AriaLyy/Aria/issues/441
-    - 修复普通下载任务、组合任务共享执行队列、缓存池的问题
-    - 修复组合任务启动失败时，`DownloadGroupEntity`的状态变为执行中的问题
+  + v_3.7
+    - fix bug https://github.com/AriaLyy/Aria/issues/450
+    - fix bug https://github.com/AriaLyy/Aria/issues/466
+    - fix bug https://github.com/AriaLyy/Aria/issues/454
+    - fix bug https://github.com/AriaLyy/Aria/issues/467
+    - fix bug https://github.com/AriaLyy/Aria/issues/459
+    - fix bug https://github.com/AriaLyy/Aria/issues/487
+    - fix bug https://github.com/AriaLyy/Aria/issues/483
+    - fix bug https://github.com/AriaLyy/Aria/issues/482
+    - fix bug https://github.com/AriaLyy/Aria/issues/473
+    - 移除隐藏api的反射 https://github.com/AriaLyy/Aria/issues/456
+    - 新增ftp免证书登陆功能h ttps://github.com/AriaLyy/Aria/issues/455
+    - 适配androidX
+    - 修复组合任务，恢复下载，会出现进度显示为0的问题
+    - m3u8点播下载新增创建ts索引功能
+    - 修复多任务的m3u8点播下载时，一个任务调用`jumpIndex`，其它m3u8任务也会自动调用`jumpIndex`的问题
+    - 添加权限检查
 
 [更多版本记录](https://github.com/AriaLyy/Aria/blob/master/DEV_LOG.md)
 

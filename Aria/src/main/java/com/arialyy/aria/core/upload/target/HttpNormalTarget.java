@@ -20,6 +20,7 @@ import com.arialyy.aria.core.common.AbsNormalTarget;
 import com.arialyy.aria.core.common.HttpOption;
 import com.arialyy.aria.core.inf.Suggest;
 import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
+import com.arialyy.aria.util.ALog;
 
 /**
  * Created by lyy on 2017/2/28.
@@ -55,6 +56,10 @@ public class HttpNormalTarget extends AbsNormalTarget<HttpNormalTarget> {
     }
     getTaskWrapper().getOptionParams().setParams(option);
     return this;
+  }
+
+  @Override public void resume() {
+    ALog.e(TAG, "http上传任务没有恢复功能");
   }
 
   @Override public boolean isRunning() {

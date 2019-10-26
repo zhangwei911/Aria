@@ -99,7 +99,7 @@ public class NormalLoader extends AbsLoader {
       ((IDLoadListener) mListener).onPostPre(getEntity().getFileSize());
     }
     File file = new File(getEntity().getFilePath());
-    if (!file.getParentFile().exists()) {
+    if (file.getParentFile() != null && !file.getParentFile().exists()) {
       file.getParentFile().mkdirs();
     }
   }
