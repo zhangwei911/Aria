@@ -334,7 +334,7 @@ public class M3U8VodLoader extends BaseM3U8Loader {
   }
 
   /**
-   * 重指定位置恢复任务
+   * 从指定位置恢复任务
    */
   private synchronized void resumeTask() {
     if (isBreak()) {

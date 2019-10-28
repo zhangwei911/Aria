@@ -310,8 +310,6 @@ public class M3U8VodDLoadActivity extends BaseActivity<ActivityM3u8VodBinding> {
     return option;
   }
 
-  private Class<BuilderController> c = BuilderController.class;
-
   @Override protected void dataCallback(int result, Object data) {
     super.dataCallback(result, data);
     if (result == ModifyUrlDialog.MODIFY_URL_DIALOG_RESULT) {

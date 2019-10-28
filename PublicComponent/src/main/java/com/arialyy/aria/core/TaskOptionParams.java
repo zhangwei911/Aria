@@ -18,10 +18,19 @@ package com.arialyy.aria.core;
 import com.arialyy.aria.core.common.BaseOption;
 import com.arialyy.aria.core.inf.IEventHandler;
 import com.arialyy.aria.core.inf.IOptionConstant;
+import com.arialyy.aria.core.processor.FtpInterceptHandler;
+import com.arialyy.aria.core.processor.IBandWidthUrlConverter;
+import com.arialyy.aria.core.processor.IFtpUploadInterceptor;
+import com.arialyy.aria.core.processor.IHttpFileLenAdapter;
+import com.arialyy.aria.core.processor.ILiveTsUrlConverter;
+import com.arialyy.aria.core.processor.ITsMergeHandler;
+import com.arialyy.aria.core.processor.IVodTsUrlConverter;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -31,6 +40,8 @@ import java.util.Map;
  * @Date 2019-09-10
  */
 public class TaskOptionParams {
+
+  private static List<Class> PROCESSORES = new ArrayList<>();
 
   /**
    * 普通参数
@@ -42,18 +53,29 @@ public class TaskOptionParams {
    */
   private Map<String, IEventHandler> handler = new HashMap<>();
 
+  static {
+    PROCESSORES.add(FtpInterceptHandler.class);
+    PROCESSORES.add(IBandWidthUrlConverter.class);
+    PROCESSORES.add(IFtpUploadInterceptor.class);
+    PROCESSORES.add(IHttpFileLenAdapter.class);
+    PROCESSORES.add(ILiveTsUrlConverter.class);
+    PROCESSORES.add(ITsMergeHandler.class);
+    PROCESSORES.add(IVodTsUrlConverter.class);
+  }
+
   /**
    * 设置任务参数
    *
    * @param option 任务配置
    */
   public void setParams(BaseOption option) {
-    Field[] fields = CommonUtil.getFields(option.getClass());
+    List<Field> fields = CommonUtil.getAllFields(option.getClass());
 
     for (Field field : fields) {
       field.setAccessible(true);
       try {
-        if (field.getType() == IEventHandler.class) {
+
+        if (PROCESSORES.contains(field.getType())) {
           Object eventHandler = field.get(option);
           if (eventHandler != null) {
             setObjs(field.getName(), (IEventHandler) eventHandler);

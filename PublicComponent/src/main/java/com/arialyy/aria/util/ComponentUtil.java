@@ -28,6 +28,7 @@ import java.lang.ref.SoftReference;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.util.List;
 
 /**
  * 组件工具，用于跨组件创建对应的工具类
@@ -210,7 +211,7 @@ public class ComponentUtil {
    * @return 构建失败，返回null
    */
   public <T extends ITaskOption> T buildTaskOption(Class<T> clazz, TaskOptionParams params) {
-    Field[] fields = CommonUtil.getFields(clazz);
+    List<Field> fields = CommonUtil.getAllFields(clazz);
     T taskOption = null;
     try {
       taskOption = clazz.newInstance();

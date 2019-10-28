@@ -16,9 +16,10 @@
 
 package com.arialyy.aria.http;
 
+import android.text.TextUtils;
 import com.arialyy.aria.core.common.RequestEnum;
-import com.arialyy.aria.core.processor.IHttpFileLenAdapter;
 import com.arialyy.aria.core.inf.ITaskOption;
+import com.arialyy.aria.core.processor.IHttpFileLenAdapter;
 import java.lang.ref.SoftReference;
 import java.net.CookieManager;
 import java.net.Proxy;
@@ -140,7 +141,7 @@ public class HttpTaskOption implements ITaskOption {
   }
 
   public String getCharSet() {
-    return charSet;
+    return TextUtils.isEmpty(charSet) ? "utf-8" : charSet;
   }
 
   public void setCharSet(String charSet) {

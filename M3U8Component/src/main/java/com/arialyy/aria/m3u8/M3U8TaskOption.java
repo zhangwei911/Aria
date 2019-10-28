@@ -120,7 +120,7 @@ public class M3U8TaskOption implements ITaskOption {
   }
 
   public int getMaxTsQueueNum() {
-    return maxTsQueueNum;
+    return maxTsQueueNum == 0 ? 4 : maxTsQueueNum;
   }
 
   public void setMaxTsQueueNum(int maxTsQueueNum) {
@@ -128,7 +128,7 @@ public class M3U8TaskOption implements ITaskOption {
   }
 
   public long getLiveUpdateInterval() {
-    return liveUpdateInterval;
+    return liveUpdateInterval == 0 ? 10 * 1000 : liveUpdateInterval;
   }
 
   public void setLiveUpdateInterval(long liveUpdateInterval) {

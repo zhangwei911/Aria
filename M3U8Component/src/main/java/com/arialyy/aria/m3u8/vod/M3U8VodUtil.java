@@ -82,7 +82,7 @@ public class M3U8VodUtil extends AbsNormalLoaderUtil {
           fail(new M3U8Exception(TAG, "获取地址失败"), false);
           return;
         } else if (!mUrls.get(0).startsWith("http")) {
-          fail(new M3U8Exception(TAG, "地址错误，请使用IM3U8UrlExtInfHandler处理你的url信息"), false);
+          fail(new M3U8Exception(TAG, "地址错误，请使用IVodTsUrlConverter处理你的url信息"), false);
           return;
         }
         mM3U8Option.setUrls(mUrls);
