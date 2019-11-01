@@ -55,7 +55,7 @@ annotationProcessor 'com.arialyy.aria:compiler:3.7.3'
 implementation 'com.arialyy.aria:ftpComponent:3.7.3' # 如果需要使用ftp，请增加该组件
 implementation 'com.arialyy.aria:m3u8Component:3.7.3' # 如果需要使用m3u8下载功能，请增加该组件
 ```
-如果出现android support依赖错误，请将 `compile 'com.arialyy.aria:aria-core:<last-version>'`替换为
+如果出现android support依赖错误，请将 `compile 'com.arialyy.aria:core:<last-version>'`替换为
 ```
 api('com.arialyy.aria:aria-core:<last-version>'){
    exclude group: 'androidx.appcompat.app'
