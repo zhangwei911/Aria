@@ -257,7 +257,11 @@ public class DownloadAdapter extends AbsRVAdapter<AbsEntity, DownloadAdapter.Sim
         case IEntity.STATE_STOP:
         case IEntity.STATE_PRE:
         case IEntity.STATE_POST_PRE:
-          start(entity);
+          if (entity.getId() < 0){
+            start(entity);
+          }else {
+            resume(entity);
+          }
           break;
         case IEntity.STATE_RUNNING:
           stop(entity);
@@ -287,6 +291,24 @@ public class DownloadAdapter extends AbsRVAdapter<AbsEntity, DownloadAdapter.Sim
         break;
       case AbsTaskWrapper.DG_HTTP:
         Aria.download(getContext()).load(entity.getId()).cancel(true);
+        break;
+    }
+  }
+
+  private void resume(AbsEntity entity){
+    switch (entity.getTaskType()) {
+      case AbsTaskWrapper.D_FTP:
+        //Aria.download(getContext()).loadFtp((DownloadEntity) entity).login("lao", "123456").create();
+        Aria.download(getContext()).loadFtp(entity.getId()).resume();
+        break;
+      case AbsTaskWrapper.D_FTP_DIR:
+        Aria.download(getContext()).loadFtpDir(entity.getId()).resume();
+        break;
+      case AbsTaskWrapper.D_HTTP:
+        Aria.download(getContext()).load(entity.getId()).resume();
+        break;
+      case AbsTaskWrapper.DG_HTTP:
+        Aria.download(getContext()).loadGroup(entity.getId()).resume();
         break;
     }
   }

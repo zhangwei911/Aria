@@ -401,7 +401,7 @@ import java.util.concurrent.ConcurrentHashMap;
       return false;
     } else {
       String parentName = parentClass.getName();
-      if (mFragmentClassName.contains(parentName)) {
+      if (mDialogFragmentClassName.contains(parentName)) {
         return true;
       } else {
         return isDialogFragment(parentClass);

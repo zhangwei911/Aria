@@ -101,6 +101,9 @@ public class MultiTaskActivity extends BaseActivity<ActivityMultiBinding> {
   }
 
   @Download.onTaskFail void taskFail(DownloadTask task) {
+    if (task == null || task.getEntity() == null){
+      return;
+    }
     mAdapter.updateBtState(task.getKey(), true);
   }
 

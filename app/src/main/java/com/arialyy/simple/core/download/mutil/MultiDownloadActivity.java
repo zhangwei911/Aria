@@ -103,6 +103,9 @@ public class MultiDownloadActivity extends BaseActivity<ActivityMultiDownloadBin
   }
 
   @Download.onTaskFail void taskFail(DownloadTask task) {
+    if (task == null || task.getEntity() == null){
+      return;
+    }
     mAdapter.updateState(task.getEntity());
   }
 

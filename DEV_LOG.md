@@ -1,5 +1,10 @@
 ## 开发日志
-  + v_3.7
+  + v_3.7.4
+    - 修复一个class被莫名改变的问题
+  + v_3.7.3 (2019/10/31)
+    - fix bug https://github.com/AriaLyy/Aria/issues/495
+    - fix bug https://github.com/AriaLyy/Aria/issues/496
+  + v_3.7.2 (2019/10/28)
     - fix bug https://github.com/AriaLyy/Aria/issues/450
     - fix bug https://github.com/AriaLyy/Aria/issues/466
     - fix bug https://github.com/AriaLyy/Aria/issues/454

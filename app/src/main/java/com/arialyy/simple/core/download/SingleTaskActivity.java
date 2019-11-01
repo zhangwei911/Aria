@@ -289,8 +289,8 @@ public class SingleTaskActivity extends BaseActivity<ActivitySingleBinding> {
   private void startD() {
     HttpOption option = new HttpOption();
     option.addHeader("1", "@")
-        .setFileLenAdapter(new FileLenAdapter())
-        .useServerFileName(true);
+        .useServerFileName(true)
+        .setFileLenAdapter(new FileLenAdapter());
     mTaskId = Aria.download(SingleTaskActivity.this)
         .load(mUrl)
         .setFilePath(mFilePath, true)

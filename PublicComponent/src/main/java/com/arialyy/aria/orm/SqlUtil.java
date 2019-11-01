@@ -16,6 +16,7 @@
 package com.arialyy.aria.orm;
 
 import android.text.TextUtils;
+import com.arialyy.aria.core.AriaConfig;
 import com.arialyy.aria.orm.annotation.Default;
 import com.arialyy.aria.orm.annotation.Foreign;
 import com.arialyy.aria.orm.annotation.Ignore;
@@ -178,7 +179,8 @@ final class SqlUtil {
     int modifiers = field.getModifiers();
     String fieldName = field.getName();
     return (ignore != null && ignore.value()) || fieldName.equals("rowID") || fieldName.equals(
-        "shadow$_klass_") || fieldName.equals("shadow$_monitor_") || field.isSynthetic() || Modifier
+        AriaConfig.IGNORE_CLASS_KLASS) || fieldName.equals(AriaConfig.IGNORE_CLASS_MONITOR)
+        || field.isSynthetic() || Modifier
         .isStatic(modifiers) || Modifier.isFinal(modifiers);
   }
 

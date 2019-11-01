@@ -626,6 +626,16 @@ public class CommonUtil {
       Collections.addAll(fields, personClazz.getDeclaredFields());
     }
     Collections.addAll(fields, clazz.getDeclaredFields());
+    List<Field> ignore = new ArrayList<>();
+    for (Field field : fields) {
+      if (field.getName().equals(AriaConfig.IGNORE_CLASS_KLASS) || field.getName()
+          .equals(AriaConfig.IGNORE_CLASS_MONITOR)) {
+        ignore.add(field);
+      }
+    }
+    if (!ignore.isEmpty()){
+      fields.removeAll(ignore);
+    }
     return fields;
   }
 

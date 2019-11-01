@@ -43,6 +43,8 @@ public class AriaConfig {
 
   public static final String DOWNLOAD_TEMP_DIR = "/Aria/temp/download/";
   public static final String UPLOAD_TEMP_DIR = "/Aria/temp/upload/";
+  public static final String IGNORE_CLASS_KLASS = "shadow$_klass_";
+  public static final String IGNORE_CLASS_MONITOR = "shadow$_monitor_";
 
   private static volatile AriaConfig Instance;
   private static Context APP;

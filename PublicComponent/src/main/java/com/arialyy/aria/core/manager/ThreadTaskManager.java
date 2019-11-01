@@ -48,7 +48,7 @@ public class ThreadTaskManager {
   }
 
   private ThreadTaskManager() {
-    mExePool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+    mExePool = Executors.newCachedThreadPool();
   }
 
   /**
