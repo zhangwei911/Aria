@@ -1,6 +1,8 @@
 ## 开发日志
-  + v_3.7.4
+  + v_3.7.4 (2019/11/2)
     - 修复一个class被莫名改变的问题
+    - 修复非分块模式下导致的一个下载失败问题
+    - fix bug https://github.com/AriaLyy/Aria/issues/493
   + v_3.7.3 (2019/10/31)
     - fix bug https://github.com/AriaLyy/Aria/issues/495
     - fix bug https://github.com/AriaLyy/Aria/issues/496
@@ -15,7 +17,7 @@
     - fix bug https://github.com/AriaLyy/Aria/issues/482
     - fix bug https://github.com/AriaLyy/Aria/issues/473
     - 移除隐藏api的反射 https://github.com/AriaLyy/Aria/issues/456
-    - 新增ftp免证书登陆功能h ttps://github.com/AriaLyy/Aria/issues/455
+    - 新增ftp免证书登陆功能 https://github.com/AriaLyy/Aria/issues/455
     - 适配androidX
     - 修复组合任务，恢复下载，会出现进度显示为0的问题
     - m3u8点播下载新增创建ts索引功能
