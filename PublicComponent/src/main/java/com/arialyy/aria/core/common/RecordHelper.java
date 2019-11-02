@@ -20,7 +20,10 @@ import com.arialyy.aria.core.ThreadRecord;
 import com.arialyy.aria.core.inf.IRecordHandler;
 import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
 import com.arialyy.aria.util.ALog;
+import com.arialyy.aria.util.BufferedRandomAccessFile;
+import com.arialyy.aria.util.FileUtil;
 import java.io.File;
+import java.io.IOException;
 
 /**
  * 任务记录帮助类，用于处理统一的逻辑
@@ -37,6 +40,44 @@ public class RecordHelper {
   public RecordHelper(AbsTaskWrapper wrapper, TaskRecord record) {
     mWrapper = wrapper;
     mTaskRecord = record;
+  }
+
+  /**
+   * 处理非分块的，多线程任务
+   */
+  public void handleMutilRecord() {
+    // 默认线程分块长度
+    long blockSize = mWrapper.getEntity().getFileSize() / mTaskRecord.threadRecords.size();
+    File temp = new File(mTaskRecord.filePath);
+    boolean fileExists = false;
+    if (!temp.exists()) {
+      BufferedRandomAccessFile tempFile = null;
+      try {
+        tempFile = new BufferedRandomAccessFile(temp, "rw");
+        tempFile.setLength(mWrapper.getEntity().getFileSize());
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+
+    } else {
+      fileExists = true;
+    }
+    // 处理文件被删除的情况
+    if (fileExists) {
+      for (int i = 0; i < mTaskRecord.threadNum; i++) {
+        long startL = i * blockSize, endL = (i + 1) * blockSize;
+        ThreadRecord tr = mTaskRecord.threadRecords.get(i);
+        tr.startLocation = startL;
+        tr.isComplete = false;
+
+        //最后一个线程的结束位置即为文件的总长度
+        if (tr.threadId == (mTaskRecord.threadNum - 1)) {
+          endL = mWrapper.getEntity().getFileSize();
+        }
+        tr.endLocation = endL;
+      }
+    }
+    mWrapper.setNewTask(false);
   }
 
   /**

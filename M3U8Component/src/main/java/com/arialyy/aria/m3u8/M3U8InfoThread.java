@@ -355,7 +355,7 @@ final public class M3U8InfoThread implements Runnable {
       File keyF = new File(info.keyPath);
       if (!keyF.exists()) {
         ALog.d(TAG, "密钥不存在，下载密钥");
-        FileUtil.createFile(keyF.getPath());
+        FileUtil.createFile(keyF);
       } else {
         return;
       }

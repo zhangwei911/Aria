@@ -38,7 +38,7 @@ public class HttpDownloadModule extends BaseViewModule {
   //"http://202.98.201.103:7000/vrs/TPK/ZTC440402001Z.tpk";
   private final String defFilePath =
       Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getPath()
-          + "/ZTC440402001Z.tpk";
+          + "/TOTWOO-v3.5.6.apk";
 
   private MutableLiveData<DownloadEntity> liveData = new MutableLiveData<>();
   private DownloadEntity singDownloadInfo;

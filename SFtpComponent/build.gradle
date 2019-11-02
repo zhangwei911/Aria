@@ -26,8 +26,8 @@ dependencies {
   implementation fileTree(dir: 'libs', include: ['*.jar'])
 
   implementation "androidx.appcompat:appcompat:${rootProject.ext.XAppcompatVersion}"
-
-  implementation project(path: ':PublicComponent')
+  implementation "com.jcraft:jsch:0.1.55"
+  implementation "com.jcraft:jzlib:1.1.3"
+  implementation project(path: ':FtpComponent')
+  compile project(path: ':PublicComponent')
 }
-
-apply from: 'bintray-release.gradle'

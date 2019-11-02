@@ -86,22 +86,23 @@ public class FileUtil {
       ALog.e(TAG, "文件路径不能为null");
       return false;
     }
-    File file = new File(path);
+    return createFile(new File(path));
+  }
+
+  /**
+   * 创建文件 当文件不存在的时候就创建一个文件。 如果文件存在，先删除原文件，然后重新创建一个新文件
+   *
+   * @return {@code true} 创建成功、{@code false} 创建失败
+   */
+  public static boolean createFile(File file) {
     if (file.getParentFile() == null || !file.getParentFile().exists()) {
       ALog.d(TAG, "目标文件所在路径不存在，准备创建……");
       if (!createDir(file.getParent())) {
-        ALog.d(TAG, "创建目录文件所在的目录失败！文件路径【" + path + "】");
+        ALog.d(TAG, "创建目录文件所在的目录失败！文件路径【" + file.getPath() + "】");
       }
     }
-    // 创建目标文件
-    if (file.exists()) {
-      final File to = new File(file.getAbsolutePath() + System.currentTimeMillis());
-      if (file.renameTo(to)) {
-        to.delete();
-      } else {
-        file.delete();
-      }
-    }
+    // 文件存在，删除文件
+    deleteFile(file);
     try {
       if (file.createNewFile()) {
         //ALog.d(TAG, "创建文件成功:" + file.getAbsolutePath());
@@ -327,7 +328,7 @@ public class FileUtil {
         ALog.d(TAG, String.format("block = %s", block));
         File subFile = new File(subPath);
         if (!subFile.exists()) {
-          subFile.createNewFile();
+          createFile(subFile);
         }
         FileOutputStream fos = new FileOutputStream(subFile);
         FileChannel sfoc = fos.getChannel();

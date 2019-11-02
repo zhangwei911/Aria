@@ -38,15 +38,19 @@ public class HttpRecordAdapter extends AbsRecordHandlerAdapter {
 
   @Override public void onPre() {
     super.onPre();
-    if (getWrapper().getRequestType() == ITaskWrapper.U_HTTP){
+    if (getWrapper().getRequestType() == ITaskWrapper.U_HTTP) {
       RecordUtil.delTaskRecord(getEntity().getFilePath(), IRecordHandler.TYPE_UPLOAD);
     }
   }
 
   @Override public void handlerTaskRecord(TaskRecord record) {
     RecordHelper helper = new RecordHelper(getWrapper(), record);
-    if (record.isBlock) {
-      helper.handleBlockRecord();
+    if (getWrapper().isSupportBP()) {
+      if (record.isBlock) {
+        helper.handleBlockRecord();
+      } else {
+        helper.handleMutilRecord();
+      }
     } else if (!getWrapper().isSupportBP()) {
       helper.handleNoSupportBPRecord();
     } else {
@@ -81,7 +85,8 @@ public class HttpRecordAdapter extends AbsRecordHandlerAdapter {
     record.threadNum = threadNum;
 
     int requestType = getWrapper().getRequestType();
-    if (requestType == ITaskWrapper.D_FTP || requestType == ITaskWrapper.D_FTP_DIR) {
+    if (requestType == ITaskWrapper.D_FTP || requestType == ITaskWrapper.D_FTP_DIR
+        || requestType == ITaskWrapper.D_HTTP || requestType == ITaskWrapper.DG_HTTP) {
       record.isBlock = threadNum > 1 && Configuration.getInstance().downloadCfg.isUseBlock();
       // 线程数为1，或者使用了分块，则认为是使用动态长度文件
       record.isOpenDynamicFile = threadNum == 1 || record.isBlock;

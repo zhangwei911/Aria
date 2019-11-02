@@ -86,8 +86,8 @@ public class RecordHandler implements IRecordHandler {
           mTaskRecord.threadNum = mAdapter.initTaskThreadNum();
           initRecord(false);
         }
-        mAdapter.handlerTaskRecord(mTaskRecord);
       }
+      mAdapter.handlerTaskRecord(mTaskRecord);
     }
     saveRecord();
     return mTaskRecord;
@@ -145,7 +145,7 @@ public class RecordHandler implements IRecordHandler {
         }
         mTaskRecord.threadRecords.add(tRecord);
       }
-      mConfigFile.delete();
+      FileUtil.deleteFile(mConfigFile);
     }
   }
 

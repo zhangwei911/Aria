@@ -150,7 +150,7 @@ public class M3U8LiveLoader extends BaseM3U8Loader {
     config.stateHandler = mStateHandler;
 
     if (!config.tempFile.exists()) {
-      FileUtil.createFile(config.tempFile.getPath());
+      FileUtil.createFile(config.tempFile);
     }
     ThreadTask threadTask = new ThreadTask(config);
     M3U8ThreadTaskAdapter adapter = new M3U8ThreadTaskAdapter(config);

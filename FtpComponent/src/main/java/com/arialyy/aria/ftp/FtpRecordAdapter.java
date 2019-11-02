@@ -21,9 +21,8 @@ import com.arialyy.aria.core.common.AbsRecordHandlerAdapter;
 import com.arialyy.aria.core.common.RecordHelper;
 import com.arialyy.aria.core.config.Configuration;
 import com.arialyy.aria.core.download.DownloadEntity;
-import com.arialyy.aria.core.common.AbsNormalEntity;
-import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
 import com.arialyy.aria.core.inf.IRecordHandler;
+import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
 import com.arialyy.aria.core.wrapper.ITaskWrapper;
 import com.arialyy.aria.util.RecordUtil;
 import java.util.ArrayList;
@@ -40,8 +39,12 @@ public class FtpRecordAdapter extends AbsRecordHandlerAdapter {
 
   @Override public void handlerTaskRecord(TaskRecord record) {
     RecordHelper helper = new RecordHelper(getWrapper(), record);
-    if (record.isBlock) {
-      helper.handleBlockRecord();
+    if (getWrapper().isSupportBP()) {
+      if (record.isBlock) {
+        helper.handleBlockRecord();
+      } else {
+        helper.handleMutilRecord();
+      }
     } else if (record.threadNum == 1) {
       helper.handleSingleThreadRecord();
     }
@@ -104,6 +107,4 @@ public class FtpRecordAdapter extends AbsRecordHandlerAdapter {
       return 1;
     }
   }
-
-
 }

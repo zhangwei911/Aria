@@ -52,7 +52,7 @@ public class AppUtil {
     String path = String.format("%s/code/%s", context.getFilesDir().getPath(), fileName);
     File ftpCode = new File(path);
     if (!ftpCode.exists()) {
-      FileUtil.createFile(path);
+      FileUtil.createFile(ftpCode);
       CommonUtil.createFileFormInputStream(context.getAssets()
               .open(String.format("help_code/%s", fileName)),
           path);

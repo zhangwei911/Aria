@@ -79,7 +79,7 @@ public class ErrorHelp {
     try {
       File file = new File(getLogPath());
       if (!file.exists()) {
-        FileUtil.createFile(file.getPath());
+        FileUtil.createFile(file);
       }
       writer = new PrintWriter(new FileWriter(file.getPath(), true));
       writer.append(stringBuffer);

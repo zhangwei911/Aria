@@ -53,7 +53,7 @@ import javax.net.ssl.SSLContext;
 public abstract class AbsFtpInfoThread<ENTITY extends AbsEntity, TASK_WRAPPER extends AbsTaskWrapper<ENTITY>>
     implements Runnable {
 
-  private final String TAG = "AbsFtpInfoThread";
+  private final String TAG = CommonUtil.getClassName(getClass());
   protected ENTITY mEntity;
   protected TASK_WRAPPER mTaskWrapper;
   protected FtpTaskOption mTaskOption;

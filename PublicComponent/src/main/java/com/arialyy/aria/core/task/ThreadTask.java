@@ -367,8 +367,8 @@ public class ThreadTask implements IThreadTask, IThreadTaskObserver {
         || isNotNetRetry) && !isBreak()) {
       ALog.w(TAG, String.format("ts切片【%s】正在重试", getFileName()));
       mFailTimes++;
-      mConfig.tempFile.delete();
-      FileUtil.createFile(mConfig.tempFile.getPath());
+      FileUtil.deleteFile(mConfig.tempFile);
+      FileUtil.createFile(mConfig.tempFile);
       ThreadTaskManager.getInstance().retryThread(this);
     } else {
       sendFailMsg(null);

@@ -28,6 +28,7 @@ import com.arialyy.aria.core.wrapper.ITaskWrapper;
 import com.arialyy.aria.http.HttpRecordAdapter;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.BufferedRandomAccessFile;
+import com.arialyy.aria.util.FileUtil;
 import java.io.File;
 import java.io.IOException;
 
@@ -43,16 +44,15 @@ final class HttpDLoaderAdapter extends AbsNormalLoaderAdapter {
   @Override public boolean handleNewTask(TaskRecord record, int totalThreadNum) {
     if (!record.isBlock) {
       if (getTempFile().exists()) {
-        getTempFile().delete();
+        FileUtil.deleteFile(getTempFile());
       }
-      //CommonUtil.createFile(mTempFile.getPath());
     } else {
       for (int i = 0; i < totalThreadNum; i++) {
         File blockFile =
             new File(String.format(IRecordHandler.SUB_PATH, getTempFile().getPath(), i));
         if (blockFile.exists()) {
           ALog.d(TAG, String.format("分块【%s】已经存在，将删除该分块", i));
-          blockFile.delete();
+          FileUtil.deleteFile(blockFile);
         }
       }
     }

@@ -434,7 +434,7 @@ public class M3U8VodLoader extends BaseM3U8Loader {
     config.stateHandler = mStateHandler;
     config.peerIndex = index;
     if (!config.tempFile.exists()) {
-      FileUtil.createFile(config.tempFile.getPath());
+      FileUtil.createFile(config.tempFile);
     }
     ThreadTask threadTask = new ThreadTask(config);
     M3U8ThreadTaskAdapter adapter = new M3U8ThreadTaskAdapter(config);
