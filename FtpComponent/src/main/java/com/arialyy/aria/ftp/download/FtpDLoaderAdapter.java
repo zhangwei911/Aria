@@ -16,32 +16,33 @@
 package com.arialyy.aria.ftp.download;
 
 import com.arialyy.aria.core.TaskRecord;
-import com.arialyy.aria.core.task.AbsNormalLoaderAdapter;
 import com.arialyy.aria.core.common.RecordHandler;
 import com.arialyy.aria.core.common.SubThreadConfig;
+import com.arialyy.aria.core.inf.IRecordHandler;
+import com.arialyy.aria.core.task.AbsNormalLoaderAdapter;
+import com.arialyy.aria.core.task.IThreadTask;
 import com.arialyy.aria.core.task.ThreadTask;
 import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
-import com.arialyy.aria.core.inf.IRecordHandler;
-import com.arialyy.aria.core.task.IThreadTask;
 import com.arialyy.aria.core.wrapper.ITaskWrapper;
 import com.arialyy.aria.ftp.FtpRecordAdapter;
 import com.arialyy.aria.util.ALog;
+import com.arialyy.aria.util.FileUtil;
 import java.io.File;
 
 /**
  * @Author lyy
  * @Date 2019-09-19
  */
-final class FtpDLoaderAdapter extends AbsNormalLoaderAdapter {
+public class FtpDLoaderAdapter extends AbsNormalLoaderAdapter {
 
-  FtpDLoaderAdapter(ITaskWrapper wrapper) {
+  public FtpDLoaderAdapter(ITaskWrapper wrapper) {
     super(wrapper);
   }
 
   @Override public boolean handleNewTask(TaskRecord record, int totalThreadNum) {
     if (!record.isBlock) {
       if (getTempFile().exists()) {
-        getTempFile().delete();
+        FileUtil.deleteFile(getTempFile());
       }
       //CommonUtil.createFile(mTempFile.getPath());
     } else {
@@ -50,7 +51,7 @@ final class FtpDLoaderAdapter extends AbsNormalLoaderAdapter {
             new File(String.format(IRecordHandler.SUB_PATH, getTempFile().getPath(), i));
         if (blockFile.exists()) {
           ALog.d(TAG, String.format("分块【%s】已经存在，将删除该分块", i));
-          blockFile.delete();
+          FileUtil.deleteFile(blockFile);
         }
       }
     }

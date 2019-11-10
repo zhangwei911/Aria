@@ -24,23 +24,30 @@ import com.arialyy.aria.core.common.SubThreadConfig;
 import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.inf.IThreadState;
 import com.arialyy.aria.core.listener.IEventListener;
+import com.arialyy.aria.core.listener.ISchedulers;
 import com.arialyy.aria.core.manager.ThreadTaskManager;
+import com.arialyy.aria.core.processor.ITsMergeHandler;
 import com.arialyy.aria.core.task.ThreadTask;
 import com.arialyy.aria.m3u8.BaseM3U8Loader;
-import com.arialyy.aria.core.processor.ITsMergeHandler;
 import com.arialyy.aria.m3u8.IdGenerator;
 import com.arialyy.aria.m3u8.M3U8Listener;
+import com.arialyy.aria.m3u8.M3U8TaskOption;
 import com.arialyy.aria.m3u8.M3U8ThreadTaskAdapter;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.FileUtil;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FilenameFilter;
+import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
+
+import static com.arialyy.aria.m3u8.M3U8InfoThread.M3U8_INDEX_FORMAT;
 
 /**
  * M3U8点播文件下载器
@@ -49,15 +56,21 @@ public class M3U8LiveLoader extends BaseM3U8Loader {
   /**
    * 最大执行数
    */
-  private static final int EXEC_MAX_NUM = 4;
+  private static int EXEC_MAX_NUM = 4;
   private Handler mStateHandler;
   private ArrayBlockingQueue<Long> mFlagQueue = new ArrayBlockingQueue<>(EXEC_MAX_NUM);
   private ReentrantLock LOCK = new ReentrantLock();
   private Condition mCondition = LOCK.newCondition();
-  private LinkedBlockingQueue<String> mPeerQueue = new LinkedBlockingQueue<>();
+  private LinkedBlockingQueue<ExtInfo> mPeerQueue = new LinkedBlockingQueue<>();
+  private ExtInfo mCurExtInfo;
+  private FileOutputStream mIndexFos;
 
   M3U8LiveLoader(M3U8Listener listener, DTaskWrapper wrapper) {
     super(listener, wrapper);
+    if (((M3U8TaskOption) wrapper.getM3u8Option()).isGenerateIndexFile()) {
+      ALog.i(TAG, "直播文件下载，创建索引文件的操作将导致只能同时下载一个切片");
+      EXEC_MAX_NUM = 1;
+    }
   }
 
   @Override protected IThreadState createStateManager(Looper looper) {
@@ -66,8 +79,8 @@ public class M3U8LiveLoader extends BaseM3U8Loader {
     return manager;
   }
 
-  void offerPeer(String peerUrl) {
-    mPeerQueue.offer(peerUrl);
+  void offerPeer(ExtInfo extInfo) {
+    mPeerQueue.offer(extInfo);
   }
 
   @Override protected void handleTask() {
@@ -80,13 +93,14 @@ public class M3U8LiveLoader extends BaseM3U8Loader {
           try {
             LOCK.lock();
             while (mFlagQueue.size() < EXEC_MAX_NUM) {
-              String url = mPeerQueue.poll();
-              if (url == null) {
+              ExtInfo extInfo = mPeerQueue.poll();
+              if (extInfo == null) {
                 break;
               }
-              ThreadTask task = createThreadTask(cacheDir, index, url);
+              mCurExtInfo = extInfo;
+              ThreadTask task = createThreadTask(cacheDir, index, extInfo.url);
               getTaskList().put(index, task);
-              mFlagQueue.offer(startThreadTask(task));
+              mFlagQueue.offer(startThreadTask(task, task.getConfig().peerIndex));
               index++;
             }
             if (mFlagQueue.size() > 0) {
@@ -106,11 +120,15 @@ public class M3U8LiveLoader extends BaseM3U8Loader {
     return mTempFile.length();
   }
 
-  private void notifyLock() {
+  private void notifyLock(boolean success, int peerId) {
     try {
       LOCK.lock();
       long id = mFlagQueue.take();
-      ALog.d(TAG, String.format("线程【%s】完成", id));
+      if (success) {
+        ALog.d(TAG, String.format("切片【%s】下载成功", peerId));
+      } else {
+        ALog.e(TAG, String.format("切片【%s】下载失败", peerId));
+      }
       mCondition.signalAll();
     } catch (InterruptedException e) {
       e.printStackTrace();
@@ -119,13 +137,27 @@ public class M3U8LiveLoader extends BaseM3U8Loader {
     }
   }
 
+  @Override protected void onPostStop() {
+    super.onPostStop();
+    if (mIndexFos != null) {
+      try {
+        mIndexFos.close();
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+    }
+  }
+
   /**
    * 启动线程任务
    *
    * @return 线程唯一id标志
    */
-  private long startThreadTask(ThreadTask task) {
+  private long startThreadTask(ThreadTask task, int indexId) {
     ThreadTaskManager.getInstance().startThread(mTaskWrapper.getKey(), task);
+    ((M3U8Listener) mListener).onPeerStart(mTaskWrapper.getKey(),
+        task.getConfig().tempFile.getPath(),
+        indexId);
     return IdGenerator.getInstance().nextId();
   }
 
@@ -139,6 +171,7 @@ public class M3U8LiveLoader extends BaseM3U8Loader {
     record.tsUrl = tsUrl;
     record.threadType = TaskRecord.TYPE_M3U8_LIVE;
     record.threadId = indexId;
+    mRecord.threadRecords.add(record);
 
     SubThreadConfig config = new SubThreadConfig();
     config.url = tsUrl;
@@ -148,6 +181,7 @@ public class M3U8LiveLoader extends BaseM3U8Loader {
     config.taskWrapper = mTaskWrapper;
     config.record = record;
     config.stateHandler = mStateHandler;
+    config.peerIndex = indexId;
 
     if (!config.tempFile.exists()) {
       FileUtil.createFile(config.tempFile);
@@ -163,10 +197,7 @@ public class M3U8LiveLoader extends BaseM3U8Loader {
    *
    * @return {@code true} 合并成功，{@code false}合并失败
    */
-  public boolean mergeFile() {
-    if (getEntity().getM3U8Entity().isGenerateIndexFile()) {
-      return generateIndexFile();
-    }
+  boolean mergeFile() {
     ITsMergeHandler mergeHandler = mM3U8Option.getMergeHandler();
     String cacheDir = getCacheDir();
     List<String> partPath = new ArrayList<>();
@@ -213,7 +244,7 @@ public class M3U8LiveLoader extends BaseM3U8Loader {
     /**
      * 任务状态回调
      */
-    private IEventListener mListener;
+    private M3U8Listener mListener;
     private long mProgress; //当前总进度
     private Looper mLooper;
 
@@ -222,7 +253,7 @@ public class M3U8LiveLoader extends BaseM3U8Loader {
      */
     LiveStateManager(Looper looper, IEventListener listener) {
       mLooper = looper;
-      mListener = listener;
+      mListener = (M3U8Listener) listener;
     }
 
     /**
@@ -234,6 +265,7 @@ public class M3U8LiveLoader extends BaseM3U8Loader {
     }
 
     @Override public boolean handleMessage(Message msg) {
+      int peerIndex = msg.getData().getInt(ISchedulers.DATA_M3U8_PEER_INDEX);
       switch (msg.what) {
         case STATE_STOP:
           if (isBreak()) {
@@ -248,13 +280,44 @@ public class M3U8LiveLoader extends BaseM3U8Loader {
           }
           break;
         case STATE_COMPLETE:
-          notifyLock();
+          notifyLock(true, peerIndex);
+          if (mM3U8Option.isGenerateIndexFile() && !isBreak()) {
+            addExtInf(mCurExtInfo.url, mCurExtInfo.extInf);
+          }
+          mListener.onPeerComplete(mTaskWrapper.getKey(),
+              msg.getData().getString(ISchedulers.DATA_M3U8_PEER_PATH), peerIndex);
           break;
         case STATE_RUNNING:
           mProgress += (long) msg.obj;
           break;
+        case STATE_FAIL:
+          notifyLock(false, peerIndex);
+          mListener.onPeerFail(mTaskWrapper.getKey(),
+              msg.getData().getString(ISchedulers.DATA_M3U8_PEER_PATH), peerIndex);
+          break;
       }
       return false;
+    }
+
+    /**
+     * 给索引文件添加extInfo信息
+     */
+    private void addExtInf(String url, String extInf) {
+      File indexFile =
+          new File(String.format(M3U8_INDEX_FORMAT, getEntity().getFilePath()));
+      if (!indexFile.exists()) {
+        ALog.e(TAG, String.format("索引文件【%s】不存在，添加peer的extInf失败", indexFile.getPath()));
+        return;
+      }
+      try {
+        if (mIndexFos == null) {
+          mIndexFos = new FileOutputStream(indexFile, true);
+        }
+        mIndexFos.write(extInf.concat("\r\n").getBytes(Charset.forName("UTF-8")));
+        mIndexFos.write(url.concat("\r\n").getBytes(Charset.forName("UTF-8")));
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
     }
 
     @Override public boolean isFail() {
@@ -267,6 +330,16 @@ public class M3U8LiveLoader extends BaseM3U8Loader {
 
     @Override public long getCurrentProgress() {
       return mProgress;
+    }
+  }
+
+  static class ExtInfo {
+    String url;
+    String extInf;
+
+    ExtInfo(String url, String extInf) {
+      this.url = url;
+      this.extInf = extInf;
     }
   }
 }

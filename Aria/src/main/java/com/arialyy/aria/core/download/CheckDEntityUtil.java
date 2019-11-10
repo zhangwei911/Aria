@@ -16,13 +16,10 @@
 package com.arialyy.aria.core.download;
 
 import android.text.TextUtils;
-import com.arialyy.aria.core.common.ErrorCode;
 import com.arialyy.aria.core.inf.ICheckEntityUtil;
 import com.arialyy.aria.core.inf.IOptionConstant;
-import com.arialyy.aria.core.inf.IRecordHandler;
 import com.arialyy.aria.core.inf.ITargetHandler;
 import com.arialyy.aria.core.wrapper.ITaskWrapper;
-import com.arialyy.aria.orm.DbEntity;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CheckUtil;
 import com.arialyy.aria.util.CommonUtil;
@@ -74,17 +71,13 @@ public class CheckDEntityUtil implements ICheckEntityUtil {
     mWrapper.getM3U8Params().setParams(IOptionConstant.cacheDir, cacheDir);
     M3U8Entity m3U8Entity = mEntity.getM3U8Entity();
 
-    Object temp = mWrapper.getM3U8Params().getParam(IOptionConstant.generateIndexFileTemp);
-    boolean generateIndexFileTemp = temp != null && (boolean) temp;
     if (m3U8Entity == null) {
       m3U8Entity = new M3U8Entity();
       m3U8Entity.setFilePath(mEntity.getFilePath());
       m3U8Entity.setPeerIndex(0);
       m3U8Entity.setCacheDir(cacheDir);
-      m3U8Entity.setGenerateIndexFile(generateIndexFileTemp);
       m3U8Entity.insert();
     } else {
-      m3U8Entity.setGenerateIndexFile(generateIndexFileTemp);
       m3U8Entity.update();
     }
     if (mWrapper.getRequestType() == ITaskWrapper.M3U8_VOD) {
@@ -140,15 +133,19 @@ public class CheckDEntityUtil implements ICheckEntityUtil {
   private boolean checkPathConflicts(String filePath) {
     //设置文件保存路径，如果新文件路径和旧文件路径不同，则修改路径
     if (!filePath.equals(mEntity.getFilePath())) {
+
+      //if (DbEntity.checkDataExist(DownloadEntity.class, "downloadPath=?", filePath)) {
+      //  if (!mWrapper.isForceDownload()) {
+      //    ALog.e(TAG, String.format("下载失败，保存路径【%s】已经被其它任务占用，请设置其它保存路径", filePath));
+      //    return false;
+      //  } else {
+      //    ALog.w(TAG, String.format("保存路径【%s】已经被其它任务占用，当前任务将覆盖该路径的文件", filePath));
+      //    RecordUtil.delTaskRecord(filePath, IRecordHandler.TYPE_DOWNLOAD);
+      //  }
+      //}
       // 检查路径冲突
-      if (DbEntity.checkDataExist(DownloadEntity.class, "downloadPath=?", filePath)) {
-        if (!mWrapper.isForceDownload()) {
-          ALog.e(TAG, String.format("下载失败，保存路径【%s】已经被其它任务占用，请设置其它保存路径", filePath));
-          return false;
-        } else {
-          ALog.w(TAG, String.format("保存路径【%s】已经被其它任务占用，当前任务将覆盖该路径的文件", filePath));
-          RecordUtil.delTaskRecord(filePath, IRecordHandler.TYPE_DOWNLOAD);
-        }
+      if (!CheckUtil.checkAndHandlePathConflicts(mWrapper.isForceDownload(), filePath)) {
+        return false;
       }
 
       File newFile = new File(filePath);

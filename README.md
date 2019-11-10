@@ -23,7 +23,7 @@ Aria有以下特点：
 
 [怎样使用Aria?](#使用)
 
-如果你觉得Aria对你有帮助，您的star和issues将是对我最大支持.`^_^`
+如果你觉得Aria对你有帮助，你的star和issues将是对我最大支持，当然，也非常欢迎你能PR，[PR方法](https://www.zhihu.com/question/21682976/answer/79489643)`^_^`
 
 ## 示例
 * 多任务下载
@@ -44,16 +44,16 @@ Aria有以下特点：
 
 ## 引入库
 [![license](http://img.shields.io/badge/license-Apache2.0-brightgreen.svg?style=flat)](https://github.com/AriaLyy/Aria/blob/master/LICENSE)
-[![Core](https://img.shields.io/badge/Core-3.7.4-blue)](https://github.com/AriaLyy/Aria)
-[![Compiler](https://img.shields.io/badge/Compiler-3.7.4-blue)](https://github.com/AriaLyy/Aria)
-[![FtpComponent](https://img.shields.io/badge/FtpComponent-3.7.4-orange)](https://github.com/AriaLyy/Aria)
-[![M3U8Component](https://img.shields.io/badge/M3U8Component-3.7.4-orange)](https://github.com/AriaLyy/Aria)
+[![Core](https://img.shields.io/badge/Core-3.7.5-blue)](https://github.com/AriaLyy/Aria)
+[![Compiler](https://img.shields.io/badge/Compiler-3.7.5-blue)](https://github.com/AriaLyy/Aria)
+[![FtpComponent](https://img.shields.io/badge/FtpComponent-3.7.5-orange)](https://github.com/AriaLyy/Aria)
+[![M3U8Component](https://img.shields.io/badge/M3U8Component-3.7.5-orange)](https://github.com/AriaLyy/Aria)
 
 ```java
-implementation 'com.arialyy.aria:core:3.7.4'
-annotationProcessor 'com.arialyy.aria:compiler:3.7.4'
-implementation 'com.arialyy.aria:ftpComponent:3.7.4' # 如果需要使用ftp，请增加该组件
-implementation 'com.arialyy.aria:m3u8Component:3.7.4' # 如果需要使用m3u8下载功能，请增加该组件
+implementation 'com.arialyy.aria:core:3.7.5'
+annotationProcessor 'com.arialyy.aria:compiler:3.7.5'
+implementation 'com.arialyy.aria:ftpComponent:3.7.5' # 如果需要使用ftp，请增加该组件
+implementation 'com.arialyy.aria:m3u8Component:3.7.5' # 如果需要使用m3u8下载功能，请增加该组件
 ```
 如果出现android support依赖错误，请将 `compile 'com.arialyy.aria:core:<last-version>'`替换为
 ```
@@ -137,10 +137,11 @@ protected void onCreate(Bundle savedInstanceState) {
 
 
 ### 版本日志
-    + v_3.7.4 (2019/11/2)
-       - 修复一个class被莫名改变的问题
-       - 修复非分块模式下导致的一个下载失败问题
-       - fix bug https://github.com/AriaLyy/Aria/issues/493
++ v_3.7.5 (2019/11/10)
+    - fix bug https://github.com/AriaLyy/Aria/issues/500
+    - fix bug https://github.com/AriaLyy/Aria/issues/508
+    - fix bug https://github.com/AriaLyy/Aria/issues/503
+    - 修复m3u8创建索引不成功的问题
 
 [更多版本记录](https://github.com/AriaLyy/Aria/blob/master/DEV_LOG.md)
 
@@ -164,7 +165,7 @@ protected void onCreate(Bundle savedInstanceState) {
  在提交问题前，希望你已经查看过[wiki](https://aria.laoyuyu.me/aria_doc/)或搜索过[issues](https://github.com/AriaLyy/Aria/issues)。</br>
 
 ## 打赏
- 如果觉得框架写的不错并且帮助到了你，可以请我喝杯热饮</br>
+ 如果觉得框架写的不错并且帮助到了你，可以请我喝杯热茶。`^_^`</br>
  <img src="https://raw.githubusercontent.com/AriaLyy/Aria/master/img/ali_pay.png" width=336 height=336/>
  <img src="https://raw.githubusercontent.com/AriaLyy/Aria/master/img/wx_pay.png" width=336 height=336/>
 

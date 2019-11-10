@@ -215,6 +215,7 @@ public class SingleTaskActivity extends BaseActivity<ActivitySingleBinding> {
 
   @Download.onTaskResume
   void taskResume(DownloadTask task) {
+    ALog.d(TAG, "resume");
     if (task.getKey().equals(mUrl)) {
       getBinding().setStateStr(getString(R.string.stop));
     }

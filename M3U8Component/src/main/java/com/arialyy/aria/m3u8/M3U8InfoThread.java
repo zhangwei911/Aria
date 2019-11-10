@@ -24,8 +24,8 @@ import com.arialyy.aria.core.common.CompleteInfo;
 import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.download.M3U8Entity;
-import com.arialyy.aria.core.processor.IBandWidthUrlConverter;
 import com.arialyy.aria.core.inf.OnFileInfoCallback;
+import com.arialyy.aria.core.processor.IBandWidthUrlConverter;
 import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
 import com.arialyy.aria.core.wrapper.ITaskWrapper;
 import com.arialyy.aria.exception.M3U8Exception;
@@ -39,7 +39,6 @@ import com.arialyy.aria.util.FileUtil;
 import com.arialyy.aria.util.Regular;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -55,6 +54,7 @@ import java.util.regex.Pattern;
 
 /**
  * 解析url中获取到到m3u8文件信息
+ * 协议地址：https://tools.ietf.org/html/rfc8216
  * https://www.cnblogs.com/renhui/p/10351870.html
  * https://blog.csdn.net/Guofengpu/article/details/54922865
  */
@@ -72,13 +72,9 @@ final public class M3U8InfoThread implements Runnable {
    * 是否停止获取切片信息，{@code true}停止获取切片信息
    */
   private boolean isStop = false;
-  /**
-   * m3u8文件信息
-   */
-  private List<String> mInfos = new ArrayList<>();
 
   public interface OnGetLivePeerCallback {
-    void onGetPeer(String url);
+    void onGetPeer(String url, String extInf);
   }
 
   public M3U8InfoThread(DTaskWrapper taskWrapper, OnFileInfoCallback callback) {
@@ -122,38 +118,51 @@ final public class M3U8InfoThread implements Runnable {
       }
       List<String> extInf = new ArrayList<>();
       boolean isLive = mTaskWrapper.getRequestType() == ITaskWrapper.M3U8_LIVE;
-      boolean isGenerateIndexFile = mTaskWrapper.getEntity().getM3U8Entity().isGenerateIndexFile();
+      boolean isGenerateIndexFile =
+          ((M3U8TaskOption) mTaskWrapper.getM3u8Option()).isGenerateIndexFile();
+      // 写入索引信息的流
+      FileOutputStream fos = null;
       if (isGenerateIndexFile) {
-        mInfos.add(line);
+        String indexPath = String.format(M3U8_INDEX_FORMAT, mEntity.getFilePath());
+        File indexFile = new File(indexPath);
+        if (!indexFile.exists()) {
+          FileUtil.createFile(indexPath);
+        }else {
+          //FileUtil.deleteFile(indexPath);
+        }
+        fos = new FileOutputStream(indexFile);
+        ALog.d(TAG, line);
+        addIndexInfo(isGenerateIndexFile, fos, line);
       }
       while ((line = reader.readLine()) != null) {
         if (isStop) {
           break;
         }
-        if (isGenerateIndexFile) {
-          mInfos.add(line);
-        }
-        if (line.startsWith("#EXT-X-ENDLIST")) {
-          break;
-        }
         ALog.d(TAG, line);
-        if (line.startsWith("#EXTINF")) {
-          String info = reader.readLine();
-          mInfos.add(info);
+        if (line.startsWith("#EXT-X-ENDLIST")) {
+          // 点播文件的下载写入结束标志，直播文件的下载在停止时才写入结束标志
+          addIndexInfo(isGenerateIndexFile && !isLive, fos, line);
+          break;
+        } else if (line.startsWith("#EXTINF")) {
+          String url = reader.readLine();
           if (isLive) {
             if (onGetPeerCallback != null) {
-              onGetPeerCallback.onGetPeer(info);
+              onGetPeerCallback.onGetPeer(url, line);
             }
           } else {
-            extInf.add(info);
+            extInf.add(url);
           }
+          ALog.d(TAG, url);
+          addIndexInfo(isGenerateIndexFile && !isLive, fos, line);
+          addIndexInfo(isGenerateIndexFile && !isLive, fos, url);
         } else if (line.startsWith("#EXT-X-STREAM-INF")) {
+          addIndexInfo(isGenerateIndexFile, fos, line);
           int setBand = mM3U8Option.getBandWidth();
           int bandWidth = getBandWidth(line);
           // 多码率的m3u8配置文件，清空信息
-          if (isGenerateIndexFile && mInfos != null) {
-            mInfos.clear();
-          }
+          //if (isGenerateIndexFile && mInfos != null) {
+          //  mInfos.clear();
+          //}
           if (setBand == 0) {
             handleBandWidth(conn, reader.readLine());
           } else if (bandWidth == setBand) {
@@ -162,8 +171,11 @@ final public class M3U8InfoThread implements Runnable {
             failDownload(String.format("【%s】码率不存在", bandWidth), false);
           }
           return;
-        } else if (line.startsWith("EXT-X-KEY")) {
+        } else if (line.startsWith("#EXT-X-KEY")) {
+          addIndexInfo(isGenerateIndexFile, fos, line);
           getKeyInfo(line);
+        } else {
+          addIndexInfo(isGenerateIndexFile, fos, line);
         }
       }
 
@@ -177,8 +189,11 @@ final public class M3U8InfoThread implements Runnable {
       }
       CompleteInfo info = new CompleteInfo();
       info.obj = extInf;
-      generateIndexFile();
+
       onFileInfoCallback.onComplete(mEntity.getKey(), info);
+      if (fos != null) {
+        fos.close();
+      }
     } else if (code == HttpURLConnection.HTTP_MOVED_TEMP
         || code == HttpURLConnection.HTTP_MOVED_PERM
         || code == HttpURLConnection.HTTP_SEE_OTHER
@@ -193,40 +208,19 @@ final public class M3U8InfoThread implements Runnable {
   }
 
   /**
-   * 创建索引文件
+   * 添加切片信息到索引文件中
+   * 直播下载的索引只记录头部信息，不记录EXTINF中的信息，该信息在onGetPeer的方法中添加。
+   * 点播下载记录所有信息
+   *
+   * @param write true 将信息写入文件
+   * @param info 切片信息
    */
-  private void generateIndexFile() {
-    if (mTaskWrapper.getEntity().getM3U8Entity().isGenerateIndexFile()) {
-
-      String indexPath = String.format(M3U8_INDEX_FORMAT, mEntity.getFilePath());
-      File indexFile = new File(indexPath);
-      if (indexFile.exists()) {
-        FileUtil.deleteFile(indexPath);
-      }
-      FileUtil.createFile(indexPath);
-
-      FileOutputStream fos = null;
-      try {
-        fos = new FileOutputStream(indexFile);
-        for (String str : mInfos) {
-          byte[] by = str.concat("\r\n").getBytes(Charset.forName("UTF-8"));
-          fos.write(by, 0, by.length);
-        }
-        fos.flush();
-      } catch (FileNotFoundException e) {
-        e.printStackTrace();
-      } catch (IOException e) {
-        e.printStackTrace();
-      } finally {
-        if (fos != null) {
-          try {
-            fos.close();
-          } catch (IOException e) {
-            e.printStackTrace();
-          }
-        }
-      }
+  private void addIndexInfo(boolean write, FileOutputStream fos, String info)
+      throws IOException {
+    if (!write) {
+      return;
     }
+    fos.write(info.concat("\r\n").getBytes(Charset.forName("UTF-8")));
   }
 
   /**

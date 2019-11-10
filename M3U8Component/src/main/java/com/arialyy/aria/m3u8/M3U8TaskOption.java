@@ -101,14 +101,14 @@ public class M3U8TaskOption implements ITaskOption {
   /**
    * 生成索引占位字段
    */
-  private boolean generateIndexFileTemp = false;
+  private boolean generateIndexFile = false;
 
-  public boolean isGenerateIndexFileTemp() {
-    return generateIndexFileTemp;
+  public boolean isGenerateIndexFile() {
+    return generateIndexFile;
   }
 
-  public void setGenerateIndexFileTemp(boolean generateIndexFileTemp) {
-    this.generateIndexFileTemp = generateIndexFileTemp;
+  public void setGenerateIndexFile(boolean generateIndexFile) {
+    this.generateIndexFile = generateIndexFile;
   }
 
   public int getJumpIndex() {

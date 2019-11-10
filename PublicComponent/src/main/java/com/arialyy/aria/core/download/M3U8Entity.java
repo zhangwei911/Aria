@@ -59,11 +59,6 @@ public class M3U8Entity extends DbEntity implements Parcelable {
   private String cacheDir;
 
   /**
-   * 生成索引
-   */
-  private boolean generateIndexFile;
-
-  /**
    * 加密key保存地址
    */
   public String keyPath;
@@ -113,14 +108,6 @@ public class M3U8Entity extends DbEntity implements Parcelable {
 
   public void setIv(String iv) {
     this.iv = iv;
-  }
-
-  public boolean isGenerateIndexFile() {
-    return generateIndexFile;
-  }
-
-  public void setGenerateIndexFile(boolean generateIndexFile) {
-    this.generateIndexFile = generateIndexFile;
   }
 
   public boolean isLive() {
@@ -248,7 +235,6 @@ public class M3U8Entity extends DbEntity implements Parcelable {
     dest.writeInt(this.peerNum);
     dest.writeByte(this.isLive ? (byte) 1 : (byte) 0);
     dest.writeString(this.cacheDir);
-    dest.writeByte(this.generateIndexFile ? (byte) 1 : (byte) 0);
     dest.writeString(this.keyPath);
     dest.writeString(this.keyUrl);
     dest.writeString(this.method);
@@ -261,7 +247,6 @@ public class M3U8Entity extends DbEntity implements Parcelable {
     this.peerNum = in.readInt();
     this.isLive = in.readByte() != 0;
     this.cacheDir = in.readString();
-    this.generateIndexFile = in.readByte() != 0;
     this.keyPath = in.readString();
     this.keyUrl = in.readString();
     this.method = in.readString();

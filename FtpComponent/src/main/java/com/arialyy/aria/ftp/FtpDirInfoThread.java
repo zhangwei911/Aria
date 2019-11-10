@@ -25,6 +25,7 @@ import com.arialyy.aria.core.download.DownloadGroupEntity;
 import com.arialyy.aria.core.inf.OnFileInfoCallback;
 import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
 import com.arialyy.aria.exception.BaseException;
+import com.arialyy.aria.util.CheckUtil;
 import com.arialyy.aria.util.CommonUtil;
 import com.arialyy.aria.util.RecordUtil;
 import java.nio.charset.Charset;
@@ -72,6 +73,9 @@ public class FtpDirInfoThread extends AbsFtpInfoThread<DownloadGroupEntity, DGTa
     entity.setGroupChild(true);
     entity.setConvertFileSize(CommonUtil.formatFileSize(ftpFile.getSize()));
     entity.setFileSize(ftpFile.getSize());
+
+    //if(CheckUtil.checkAndHandlePathConflicts(mTaskWrapper.is))
+
     entity.insert();
 
     DTaskWrapper subWrapper = new DTaskWrapper(entity);

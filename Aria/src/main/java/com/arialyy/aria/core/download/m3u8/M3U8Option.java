@@ -18,7 +18,6 @@ package com.arialyy.aria.core.download.m3u8;
 import com.arialyy.aria.core.common.BaseOption;
 import com.arialyy.aria.core.processor.IBandWidthUrlConverter;
 import com.arialyy.aria.core.processor.ITsMergeHandler;
-import com.arialyy.aria.core.processor.IVodTsUrlConverter;
 import com.arialyy.aria.util.CheckUtil;
 import com.arialyy.aria.util.ComponentUtil;
 
@@ -27,8 +26,8 @@ import com.arialyy.aria.util.ComponentUtil;
  */
 public class M3U8Option<OP extends M3U8Option> extends BaseOption {
 
-  private boolean generateIndexFileTemp = false;
-  private boolean mergeFile = false;
+  private boolean generateIndexFile = false;
+  private boolean mergeFile = true;
   private int bandWidth;
   private ITsMergeHandler mergeHandler;
   private IBandWidthUrlConverter bandWidthUrlConverter;
@@ -41,9 +40,10 @@ public class M3U8Option<OP extends M3U8Option> extends BaseOption {
   /**
    * 生成m3u8索引文件
    * 注意：创建索引文件，{@link #merge(boolean)}方法设置与否都不再合并文件
+   * 如果是直播文件下载，创建索引文件的操作将导致只能同时下载一个切片！！
    */
   public OP generateIndexFile() {
-    this.generateIndexFileTemp = true;
+    this.generateIndexFile = true;
     return (OP) this;
   }
 

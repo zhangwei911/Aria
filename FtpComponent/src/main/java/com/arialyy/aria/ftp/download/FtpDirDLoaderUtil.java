@@ -91,7 +91,6 @@ public class FtpDirDLoaderUtil extends AbsGroupUtil {
     } finally {
       LOCK.unlock();
     }
-    initState();
     for (DTaskWrapper wrapper : getWrapper().getSubTaskWrapper()) {
       if (needCloneInfo) {
         cloneInfo(wrapper);

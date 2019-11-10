@@ -90,10 +90,10 @@ public class M3U8VodDLoadActivity extends BaseActivity<ActivityM3u8VodBinding> {
         getBinding().setFilePath(entity.getFilePath());
         mUrl = entity.getUrl();
         mFilePath = entity.getFilePath();
-        mVideoFragment = new VideoPlayerFragment(0, entity);
-        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        ft.add(R.id.video_content, mVideoFragment);
-        ft.commit();
+        //mVideoFragment = new VideoPlayerFragment(0, entity);
+        //FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        //ft.add(R.id.video_content, mVideoFragment);
+        //ft.commit();
       }
     });
     getBinding().setViewModel(this);
@@ -176,7 +176,7 @@ public class M3U8VodDLoadActivity extends BaseActivity<ActivityM3u8VodBinding> {
   @M3U8.onPeerComplete
   void onPeerComplete(String m3u8Url, String peerPath, int peerIndex) {
     //ALog.d(TAG, "peer complete, path: " + peerPath + ", index: " + peerIndex);
-    mVideoFragment.addPlayer(peerIndex, peerPath);
+    //mVideoFragment.addPlayer(peerIndex, peerPath);
   }
 
   @M3U8.onPeerFail
@@ -217,6 +217,7 @@ public class M3U8VodDLoadActivity extends BaseActivity<ActivityM3u8VodBinding> {
 
   @Download.onTaskResume
   void taskResume(DownloadTask task) {
+    ALog.d(TAG, "m3u8 vod resume");
     if (task.getKey().equals(mUrl)) {
       getBinding().setStateStr(getString(R.string.stop));
     }
@@ -303,9 +304,10 @@ public class M3U8VodDLoadActivity extends BaseActivity<ActivityM3u8VodBinding> {
   private M3U8VodOption getM3U8Option() {
     M3U8VodOption option = new M3U8VodOption();
     option
-        .generateIndexFile()
-        .setVodTsUrlConvert(new VodTsUrlConverter())
-        .setMergeHandler(new TsMergeHandler());
+        //.generateIndexFile()
+        //.merge(true)
+        .setVodTsUrlConvert(new VodTsUrlConverter());
+        //.setMergeHandler(new TsMergeHandler());
     //.setBandWidthUrlConverter(new BandWidthUrlConverter(mUrl));
     return option;
   }

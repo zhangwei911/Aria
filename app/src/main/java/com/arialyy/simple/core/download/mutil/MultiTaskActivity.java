@@ -57,6 +57,7 @@ public class MultiTaskActivity extends BaseActivity<ActivityMultiBinding> {
     setTitle("多任务下载");
     mData.addAll(getModule(DownloadModule.class).createGroupTestList());
     mData.addAll(getModule(DownloadModule.class).createMultiTestList());
+    mData.addAll(getModule(DownloadModule.class).createM3u8TestList());
     mAdapter = new FileListAdapter(this, mData);
     mList = getBinding().list;
     mBar = findViewById(R.id.toolbar);

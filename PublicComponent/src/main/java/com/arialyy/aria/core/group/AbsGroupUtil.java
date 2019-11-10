@@ -80,7 +80,7 @@ public abstract class AbsGroupUtil implements IUtil, Runnable {
   /**
    * 初始化组合任务状态
    */
-  protected void initState() {
+  private void initState() {
     mState = new GroupRunState(getWrapper().getKey(), mListener,
         mGTWrapper.getSubTaskWrapper().size(), mSubQueue);
     for (DTaskWrapper wrapper : mGTWrapper.getSubTaskWrapper()) {

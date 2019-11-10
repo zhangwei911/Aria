@@ -16,24 +16,39 @@
 package com.arialyy.aria.sftp;
 
 import android.text.TextUtils;
+import com.arialyy.aria.util.ALog;
+import com.arialyy.aria.util.CommonUtil;
+import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.Properties;
 
 /**
- * sftp登录
+ * sftp工具类
  *
  * @author lyy
  */
-public class SFtpLogin {
-
+public class SFtpUtil {
+  private final String TAG = CommonUtil.getClassName(getClass());
+  /**
+   * 用于执行命令
+   */
+  public static final String CMD_TYPE_EXEC = "exec";
+  /**
+   * 用于处理文件
+   */
+  public static final String CMD_TYPE_SFTP = "sftp";
   private String ip, userName, password;
   private int port;
   private Session session;
   private boolean isLogin = false;
 
-  private SFtpLogin() {
+  private SFtpUtil() {
     createClient();
   }
 
@@ -55,6 +70,7 @@ public class SFtpLogin {
       config.put("StrictHostKeyChecking", "no");
       session.setConfig(config);// 为Session对象设置properties
       session.setTimeout(3000);// 设置超时
+      login();
       isLogin = true;
     } catch (JSchException e) {
       e.printStackTrace();
@@ -83,6 +99,65 @@ public class SFtpLogin {
     isLogin = false;
   }
 
+  public Session getSession() {
+    return session;
+  }
+
+  /**
+   * 执行命令
+   *
+   * @param cmd sftp命令
+   */
+  public void execCommand(String cmd) {
+    if (TextUtils.isEmpty(cmd)) {
+      ALog.e(TAG, "命令为空");
+      return;
+    }
+    if (!isLogin) {
+      ALog.e(TAG, "没有登录");
+      return;
+    }
+    ChannelExec channel = null;
+    try {
+      channel = (ChannelExec) session.openChannel(CMD_TYPE_EXEC);
+      channel.setCommand(cmd);
+      channel.connect();
+      String rst = getResult(channel.getInputStream());
+
+      ALog.i(TAG, String.format("result: %s", rst));
+    } catch (IOException e) {
+      e.printStackTrace();
+    } catch (JSchException e) {
+      e.printStackTrace();
+    } finally {
+      if (channel != null) {
+        channel.disconnect();
+      }
+    }
+  }
+
+  /**
+   * 执行命令后，获取服务器端返回的数据
+   *
+   * @return 服务器端返回的数据
+   */
+  private String getResult(InputStream in) throws IOException {
+    if (in == null){
+      ALog.e(TAG, "输入流为空");
+      return null;
+    }
+    StringBuilder sb = new StringBuilder();
+    BufferedReader isr = new BufferedReader(new InputStreamReader(in));
+    String line;
+    while ((line = isr.readLine()) != null) {
+      sb.append(line);
+    }
+    in.close();
+    isr.close();
+
+    return sb.toString();
+  }
+
   public static class Builder {
     private String ip, userName, password;
     private int port = 22;
@@ -107,8 +182,8 @@ public class SFtpLogin {
       return this;
     }
 
-    public SFtpLogin build() {
-      SFtpLogin login = new SFtpLogin();
+    public SFtpUtil build() {
+      SFtpUtil login = new SFtpUtil();
       login.ip = ip;
       login.userName = userName;
       login.password = password;

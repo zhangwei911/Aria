@@ -213,17 +213,10 @@ public class M3U8LiveDLoadActivity extends BaseActivity<ActivityM3u8LiveBinding>
   public void onClick(View view) {
     switch (view.getId()) {
       case R.id.start:
-        startD();
-        if (!AppUtil.chekEntityValid(mEntity)) {
-          startD();
-          break;
-        }
         if (Aria.download(this).load(mEntity.getId()).isRunning()) {
           Aria.download(this).load(mEntity.getId()).stop();
         } else {
-          Aria.download(this).load(mEntity.getId())
-              .m3u8LiveOption(getLiveoption())
-              .resume();
+          startD();
         }
         break;
       case R.id.cancel:
@@ -245,6 +238,7 @@ public class M3U8LiveDLoadActivity extends BaseActivity<ActivityM3u8LiveBinding>
   private M3U8LiveOption getLiveoption() {
     M3U8LiveOption option = new M3U8LiveOption();
     option
+        //.generateIndexFile()
         .setLiveTsUrlConvert(new LiveTsUrlConverter());
     //.setBandWidthUrlConverter(new BandWidthUrlConverter(mUrl));
     return option;

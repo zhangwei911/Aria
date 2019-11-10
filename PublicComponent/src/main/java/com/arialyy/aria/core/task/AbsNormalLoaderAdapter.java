@@ -22,7 +22,7 @@ import com.arialyy.aria.util.CommonUtil;
 import java.io.File;
 
 /**
- * 但文件任务适配器
+ * 单文件任务适配器
  *
  * @Author lyy
  * @Date 2019-09-19

@@ -1,4 +1,9 @@
 ## 开发日志
+  + v_3.7.5 (2019/11/10)
+    - fix bug https://github.com/AriaLyy/Aria/issues/500
+    - fix bug https://github.com/AriaLyy/Aria/issues/508
+    - fix bug https://github.com/AriaLyy/Aria/issues/503
+    - 修复m3u8创建索引不成功的问题
   + v_3.7.4 (2019/11/2)
     - 修复一个class被莫名改变的问题
     - 修复非分块模式下导致的一个下载失败问题

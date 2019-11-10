@@ -31,14 +31,16 @@ import com.arialyy.aria.core.inf.IThreadState;
 import com.arialyy.aria.core.listener.IEventListener;
 import com.arialyy.aria.core.listener.ISchedulers;
 import com.arialyy.aria.core.manager.ThreadTaskManager;
+import com.arialyy.aria.core.processor.ITsMergeHandler;
 import com.arialyy.aria.core.task.ThreadTask;
 import com.arialyy.aria.exception.BaseException;
+import com.arialyy.aria.exception.TaskException;
 import com.arialyy.aria.m3u8.BaseM3U8Loader;
-import com.arialyy.aria.core.processor.ITsMergeHandler;
 import com.arialyy.aria.m3u8.M3U8Listener;
 import com.arialyy.aria.m3u8.M3U8TaskOption;
 import com.arialyy.aria.m3u8.M3U8ThreadTaskAdapter;
 import com.arialyy.aria.util.ALog;
+import com.arialyy.aria.util.CommonUtil;
 import com.arialyy.aria.util.FileUtil;
 import java.io.File;
 import java.util.ArrayList;
@@ -219,6 +221,12 @@ public class M3U8VodLoader extends BaseM3U8Loader {
       }
     }
     mManager.updateStateCount();
+    if (mCompleteNum <= 0){
+      mListener.onStart(0);
+    }else {
+      int percent = mCompleteNum * 100 / mRecord.threadRecords.size();
+      mListener.onResume(percent);
+    }
   }
 
   /**
@@ -446,7 +454,7 @@ public class M3U8VodLoader extends BaseM3U8Loader {
    * M3U8线程状态管理
    */
   private class VodStateManager implements IThreadState {
-    private final String TAG = "M3U8ThreadStateManager";
+    private final String TAG = CommonUtil.getClassName(VodStateManager.class);
 
     /**
      * 任务状态回调
@@ -456,7 +464,7 @@ public class M3U8VodLoader extends BaseM3U8Loader {
     private int cancelNum = 0; // 已经取消的线程的数
     private int stopNum = 0;  // 已经停止的线程数
     private int failNum = 0;  // 失败的线程数
-    private long progress; //当前总进度
+    private long progress; //当前总进度，百分比进度
     private TaskRecord taskRecord; // 任务记录
     private Looper looper;
 
@@ -559,7 +567,14 @@ public class M3U8VodLoader extends BaseM3U8Loader {
                 "startThreadNum = %s, stopNum = %s, cancelNum = %s, failNum = %s, completeNum = %s, flagQueueSize = %s",
                 startThreadNum, stopNum, cancelNum, failNum, mCompleteNum, mFlagQueue.size()));
             ALog.d(TAG, String.format("vod任务【%s】完成", mTempFile.getName()));
-            if (mM3U8Option.isMergeFile()) {
+
+            if (mM3U8Option.isGenerateIndexFile()) {
+              if (generateIndexFile(false)){
+                listener.onComplete();
+              }else {
+                listener.onFail(false, new TaskException(TAG, "创建索引文件失败"));
+              }
+            } else if (mM3U8Option.isMergeFile()) {
               if (mergeFile()) {
                 listener.onComplete();
               } else {
@@ -572,7 +587,7 @@ public class M3U8VodLoader extends BaseM3U8Loader {
           }
           break;
         case STATE_RUNNING:
-          progress += (long) msg.obj;
+          //progress += (long) msg.obj;
           break;
       }
       return true;
@@ -596,6 +611,7 @@ public class M3U8VodLoader extends BaseM3U8Loader {
       int percent = completeNum * 100 / taskRecord.threadRecords.size();
       getEntity().setPercent(percent);
       getEntity().update();
+      progress = percent;
     }
 
     @Override public boolean isFail() {
@@ -625,9 +641,6 @@ public class M3U8VodLoader extends BaseM3U8Loader {
      * @return {@code true} 合并成功，{@code false}合并失败
      */
     private boolean mergeFile() {
-      if (getEntity().getM3U8Entity().isGenerateIndexFile()) {
-        return generateIndexFile();
-      }
       ITsMergeHandler mergeHandler = mM3U8Option.getMergeHandler();
       String cacheDir = getCacheDir();
       List<String> partPath = new ArrayList<>();

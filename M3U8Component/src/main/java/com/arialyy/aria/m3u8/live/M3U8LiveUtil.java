@@ -27,6 +27,7 @@ import com.arialyy.aria.core.processor.ILiveTsUrlConverter;
 import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
 import com.arialyy.aria.exception.BaseException;
 import com.arialyy.aria.exception.M3U8Exception;
+import com.arialyy.aria.exception.TaskException;
 import com.arialyy.aria.http.HttpTaskOption;
 import com.arialyy.aria.m3u8.M3U8InfoThread;
 import com.arialyy.aria.m3u8.M3U8Listener;
@@ -87,7 +88,7 @@ public class M3U8LiveUtil extends AbsNormalLoaderUtil {
           }
         });
     infoThread.setOnGetPeerCallback(new M3U8InfoThread.OnGetLivePeerCallback() {
-      @Override public void onGetPeer(String url) {
+      @Override public void onGetPeer(String url, String extInf) {
         if (mPeerUrls.contains(url)) {
           return;
         }
@@ -104,7 +105,7 @@ public class M3U8LiveUtil extends AbsNormalLoaderUtil {
           fail(new M3U8Exception(TAG, String.format("ts地址错误，url：%s", url)), false);
           return;
         }
-        getLoader().offerPeer(url);
+        getLoader().offerPeer(new M3U8LiveLoader.ExtInfo(url, extInf));
       }
     });
     return infoThread;
@@ -129,7 +130,13 @@ public class M3U8LiveUtil extends AbsNormalLoaderUtil {
     if (mInfoThread != null) {
       mInfoThread.setStop(true);
       closeTimer();
-      if (mM3U8Option.isMergeFile()) {
+      if (((M3U8TaskOption) getTaskWrapper().getM3u8Option()).isGenerateIndexFile()) {
+        if (getLoader().generateIndexFile(true)) {
+          getListener().onComplete();
+        } else {
+          getListener().onFail(false, new TaskException(TAG, "创建索引文件失败"));
+        }
+      } else if (mM3U8Option.isMergeFile()) {
         if (getLoader().mergeFile()) {
           getListener().onComplete();
         } else {

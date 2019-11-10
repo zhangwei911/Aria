@@ -68,8 +68,9 @@ public abstract class BaseM3U8Loader extends AbsLoader {
   /**
    * 创建索引文件
    */
-  protected boolean generateIndexFile() {
-    File tempFile = new File(M3U8InfoThread.M3U8_INDEX_FORMAT, getEntity().getFilePath());
+  public boolean generateIndexFile(boolean isLive) {
+    File tempFile =
+        new File(String.format(M3U8InfoThread.M3U8_INDEX_FORMAT, getEntity().getFilePath()));
     if (!tempFile.exists()) {
       ALog.e(TAG, "源索引文件不存在");
       return false;
@@ -85,21 +86,29 @@ public abstract class BaseM3U8Loader extends AbsLoader {
       int i = 0;
       while ((line = reader.readLine()) != null) {
         byte[] bytes;
-        if (line.startsWith("EXTINF")) {
+        if (line.startsWith("#EXTINF")) {
+          fos.write(line.concat("\r\n").getBytes(Charset.forName("UTF-8")));
           String tsPath = getTsFilePath(cacheDir, mRecord.threadRecords.get(i).threadId);
           bytes = tsPath.concat("\r\n").getBytes(Charset.forName("UTF-8"));
+          reader.readLine(); // 继续读一行，避免写入源索引文件的切片地址
           i++;
-        } else if (line.startsWith("EXT-X-KEY")) {
+        } else if (line.startsWith("#EXT-X-KEY")) {
           M3U8Entity m3U8Entity = getEntity().getM3U8Entity();
           String keyInfo = String.format("#EXT-X-KEY:METHOD=%s,URI=%s,IV=%s\r\n", m3U8Entity.method,
               m3U8Entity.keyPath, m3U8Entity.iv);
           bytes = keyInfo.getBytes(Charset.forName("UTF-8"));
         } else {
-          bytes = line.getBytes(Charset.forName("UTF-8"));
+          bytes = line.concat("\r\n").getBytes(Charset.forName("UTF-8"));
         }
         fos.write(bytes, 0, bytes.length);
       }
+      // 直播的索引文件需要在结束的时候才写入结束标志
+      if (isLive) {
+        fos.write("#EXT-X-ENDLIST".concat("\r\n").getBytes(Charset.forName("UTF-8")));
+      }
+
       fos.flush();
+      return true;
     } catch (FileNotFoundException e) {
       e.printStackTrace();
     } catch (IOException e) {

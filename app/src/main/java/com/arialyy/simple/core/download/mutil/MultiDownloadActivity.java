@@ -113,7 +113,7 @@ public class MultiDownloadActivity extends BaseActivity<ActivityMultiDownloadBin
     mAdapter.updateState(task.getEntity());
   }
 
-  @Download.onTaskRunning() void taskRunning(DownloadTask task) {
+  @Download.onTaskRunning void taskRunning(DownloadTask task) {
     mAdapter.setProgress(task.getEntity());
   }
 

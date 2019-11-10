@@ -33,6 +33,7 @@ import com.arialyy.aria.core.wrapper.ITaskWrapper;
 import com.arialyy.aria.exception.BaseException;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.BufferedRandomAccessFile;
+import com.arialyy.aria.util.CommonUtil;
 import com.arialyy.aria.util.ErrorHelp;
 import com.arialyy.aria.util.FileUtil;
 import com.arialyy.aria.util.NetUtils;
@@ -49,7 +50,7 @@ public class ThreadTask implements IThreadTask, IThreadTaskObserver {
    * 线程重试次数
    */
   private final int RETRY_NUM = 2;
-  private final String TAG = "AbsThreadTask";
+  private final String TAG = CommonUtil.getClassName(getClass());
   private IEntity mEntity;
   protected AbsTaskWrapper mTaskWrapper;
   private int mFailTimes = 0;
@@ -94,7 +95,7 @@ public class ThreadTask implements IThreadTask, IThreadTaskObserver {
    */
   public void setAdapter(IThreadTaskAdapter adapter) {
     mAdapter = adapter;
-    mAdapter.setThreadStateObserver(this);
+    mAdapter.attach(this);
   }
 
   /**
@@ -335,7 +336,7 @@ public class ThreadTask implements IThreadTask, IThreadTaskObserver {
    */
   protected void fail(final long subCurrentLocation, BaseException ex, boolean needRetry) {
     if (ex != null) {
-      ALog.e(TAG, ALog.getExceptionString(ex));
+      ex.printStackTrace();
     }
     if (mTaskWrapper.getRequestType() == ITaskWrapper.M3U8_VOD) {
       writeConfig(false, 0);

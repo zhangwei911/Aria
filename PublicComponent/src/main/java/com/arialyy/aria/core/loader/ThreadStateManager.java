@@ -19,9 +19,9 @@ import android.os.Bundle;
 import android.os.Looper;
 import android.os.Message;
 import com.arialyy.aria.core.TaskRecord;
-import com.arialyy.aria.core.listener.IEventListener;
 import com.arialyy.aria.core.inf.IRecordHandler;
 import com.arialyy.aria.core.inf.IThreadState;
+import com.arialyy.aria.core.listener.IEventListener;
 import com.arialyy.aria.exception.BaseException;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.FileUtil;
@@ -57,6 +57,13 @@ public class ThreadStateManager implements IThreadState {
     mTaskRecord = taskRecord;
     mThreadNum = mTaskRecord.threadNum;
     mListener = listener;
+  }
+
+  /**
+   * 不要使用handle更新启动线程的进度，因为有延迟
+   */
+  void updateProgress(long curProgress) {
+    mProgress = curProgress;
   }
 
   @Override public boolean handleMessage(Message msg) {

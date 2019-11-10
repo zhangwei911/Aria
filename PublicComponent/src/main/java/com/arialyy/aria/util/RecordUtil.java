@@ -295,7 +295,7 @@ public class RecordUtil {
   }
 
   /**
-   * 删除ts文件
+   * 删除ts文件，和索引文件（如果有的话）
    */
   private static void removeTsCache(File targetFile, long bandWidth) {
 
@@ -320,6 +320,12 @@ public class RecordUtil {
       if (cDir.exists()) {
         cDir.delete();
       }
+    }
+
+    File indexFile = new File(String.format("%s.index", targetFile.getPath()));
+
+    if (indexFile.exists()) {
+      indexFile.delete();
     }
   }
 

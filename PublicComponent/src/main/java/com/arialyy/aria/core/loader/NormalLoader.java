@@ -200,8 +200,7 @@ public class NormalLoader extends AbsLoader {
       ALog.d(TAG, String.format("进度修正，当前进度：%s", currentProgress));
       getEntity().setCurrentProgress(currentProgress);
     }
-    mStateHandler.obtainMessage(IThreadState.STATE_UPDATE_PROGRESS, currentProgress)
-        .sendToTarget();
+    mStateManager.updateProgress(currentProgress);
     startThreadTask();
   }
 

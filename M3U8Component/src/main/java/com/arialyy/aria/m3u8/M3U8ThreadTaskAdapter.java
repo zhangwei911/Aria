@@ -89,6 +89,14 @@ public class M3U8ThreadTaskAdapter extends AbsThreadTaskAdapter {
         }
       }
 
+      int code = conn.getResponseCode();
+      if (code != HttpURLConnection.HTTP_OK) {
+        fail(new TaskException(TAG,
+                String.format("连接错误，http错误码：%s，url：%s", code, getThreadConfig().url)),
+            false);
+        return;
+      }
+
       is = new BufferedInputStream(ConnectionHelp.convertInputStream(conn));
       if (mHttpTaskOption.isChunked()) {
         readChunked(is);

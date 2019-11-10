@@ -24,12 +24,14 @@ import com.arialyy.aria.core.common.FtpOption;
 import com.arialyy.aria.core.download.DownloadGroupEntity;
 import com.arialyy.aria.core.inf.IEntity;
 import com.arialyy.aria.core.task.DownloadGroupTask;
+import com.arialyy.aria.util.ALog;
 import com.arialyy.frame.util.show.L;
 import com.arialyy.frame.util.show.T;
 import com.arialyy.simple.R;
 import com.arialyy.simple.base.BaseActivity;
 import com.arialyy.simple.databinding.ActivityDownloadGroupBinding;
 import com.arialyy.simple.widget.SubStateLinearLayout;
+import java.security.AlgorithmConstraints;
 
 /**
  * Created by lyy on 2017/7/6.
@@ -128,6 +130,7 @@ public class FTPDirDownloadActivity extends BaseActivity<ActivityDownloadGroupBi
   }
 
   @DownloadGroup.onTaskResume() void taskResume(DownloadGroupTask task) {
+    ALog.d(TAG, "ftp dir resume");
   }
 
   @DownloadGroup.onTaskStop() void taskStop(DownloadGroupTask task) {

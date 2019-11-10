@@ -17,6 +17,9 @@
 package com.arialyy.aria.util;
 
 import android.text.TextUtils;
+import com.arialyy.aria.core.download.DownloadEntity;
+import com.arialyy.aria.core.inf.IRecordHandler;
+import com.arialyy.aria.orm.DbEntity;
 import java.lang.reflect.Modifier;
 import java.util.List;
 
@@ -26,6 +29,27 @@ import java.util.List;
  */
 public class CheckUtil {
   private static final String TAG = "CheckUtil";
+
+  /**
+   * 检查和处理路径冲突
+   *
+   * @param isForceDownload true，如果路径冲突，将删除其它任务的记录的
+   * @param filePath 文件保存路径
+   * @return false 任务不再执行，true 任务继续执行
+   */
+  public static boolean checkAndHandlePathConflicts(boolean isForceDownload, String filePath) {
+    if (DbEntity.checkDataExist(DownloadEntity.class, "downloadPath=?", filePath)) {
+      if (!isForceDownload) {
+        ALog.e(TAG, String.format("下载失败，保存路径【%s】已经被其它任务占用，请设置其它保存路径", filePath));
+        return false;
+      } else {
+        ALog.w(TAG, String.format("保存路径【%s】已经被其它任务占用，当前任务将覆盖该路径的文件", filePath));
+        RecordUtil.delTaskRecord(filePath, IRecordHandler.TYPE_DOWNLOAD);
+        return true;
+      }
+    }
+    return true;
+  }
 
   /**
    * 检查成员类是否是静态和public

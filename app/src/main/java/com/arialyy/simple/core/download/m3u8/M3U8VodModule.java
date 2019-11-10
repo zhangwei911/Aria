@@ -35,10 +35,12 @@ public class M3U8VodModule extends BaseViewModule {
   //private final String defUrl = "https://www.gaoya123.cn/2019/1557993797897.m3u8";
   // 多码率地址：
   //private final String defUrl = "http://devimages.apple.com/iphone/samples/bipbop/bipbopall.m3u8";
-  private final String defUrl = "http://cn1.fa1244.cn/hls/20190516/6d271eaa73b2e4cb51d13831b0c1ab4c/1557976262/index.m3u8";
+  //private final String defUrl = "http://cn1.fa1244.cn/hls/20190516/6d271eaa73b2e4cb51d13831b0c1ab4c/1557976262/index.m3u8";
+  private final String defUrl = "http://qn.shytong.cn/b83137769ff6b555/11b0c9970f9a3fa0.mp4.m3u8";
   private final String filePath =
       Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getPath()
-          + "/道士下山.ts";
+          //+ "/道士下山.ts";
+          + "/bb1.ts";
 
   private MutableLiveData<DownloadEntity> liveData = new MutableLiveData<>();
   private DownloadEntity singDownloadInfo;

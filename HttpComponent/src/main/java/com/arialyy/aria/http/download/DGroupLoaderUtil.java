@@ -73,7 +73,6 @@ public class DGroupLoaderUtil extends AbsGroupUtil {
 
   @Override protected boolean onStart() {
     super.onStart();
-    initState();
     if (getState().getCompleteNum() == getState().getSubSize()) {
       mListener.onComplete();
     } else {
@@ -91,6 +90,7 @@ public class DGroupLoaderUtil extends AbsGroupUtil {
         return getLenComplete;
       } else {
         for (DTaskWrapper wrapper : getWrapper().getSubTaskWrapper()) {
+          cloneHeader(wrapper);
           if (wrapper.getState() != IEntity.STATE_COMPLETE) {
             startSubLoader(createSubLoader(wrapper, true));
           }
@@ -179,7 +179,7 @@ public class DGroupLoaderUtil extends AbsGroupUtil {
    */
   private void cloneHeader(DTaskWrapper taskWrapper) {
     HttpTaskOption groupOption = (HttpTaskOption) getWrapper().getTaskOption();
-    HttpTaskOption subOption = (HttpTaskOption) taskWrapper.getTaskOption();
+    HttpTaskOption subOption = new HttpTaskOption();
 
     // 设置属性
     subOption.setFileLenAdapter(groupOption.getFileLenAdapter());
@@ -187,5 +187,6 @@ public class DGroupLoaderUtil extends AbsGroupUtil {
     subOption.setHeaders(groupOption.getHeaders());
     subOption.setProxy(groupOption.getProxy());
     subOption.setParams(groupOption.getParams());
+    taskWrapper.setTaskOption(subOption);
   }
 }

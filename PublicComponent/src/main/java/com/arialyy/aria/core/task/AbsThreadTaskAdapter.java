@@ -97,7 +97,7 @@ public abstract class AbsThreadTaskAdapter implements IThreadTaskAdapter {
     return mThreadConfig;
   }
 
-  @Override public void setThreadStateObserver(IThreadTaskObserver observer) {
+  @Override public void attach(IThreadTaskObserver observer) {
     mObserver = observer;
   }
 

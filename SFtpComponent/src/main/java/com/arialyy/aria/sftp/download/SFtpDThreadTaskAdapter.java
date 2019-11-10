@@ -13,30 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.arialyy.aria.core.task;
+package com.arialyy.aria.sftp.download;
+
+import com.arialyy.aria.core.common.SubThreadConfig;
+import com.arialyy.aria.core.task.AbsThreadTaskAdapter;
 
 /**
- * 线程适配器
+ * sftp 线程任务适配器
  *
- * @Author lyy
- * @Date 2019-09-18
+ * @author lyy
  */
-public interface IThreadTaskAdapter {
+public class SFtpDThreadTaskAdapter extends AbsThreadTaskAdapter {
 
-  /**
-   * 执行任务
-   */
-  void call(IThreadTask threadTask) throws Exception;
+  SFtpDThreadTaskAdapter(SubThreadConfig config) {
+    super(config);
+  }
 
-  /**
-   * 设置当前线程最大下载速度
-   *
-   * @param speed 单位为：kb
-   */
-  void setMaxSpeed(int speed);
+  @Override protected void handlerThreadTask() {
 
-  /**
-   * 注册观察者
-   */
-  void attach(IThreadTaskObserver observer);
+  }
 }

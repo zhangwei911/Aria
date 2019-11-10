@@ -24,6 +24,7 @@ import com.arialyy.aria.core.download.M3U8Entity;
 import com.arialyy.aria.core.inf.IRecordHandler;
 import com.arialyy.aria.core.wrapper.ITaskWrapper;
 import com.arialyy.aria.util.ALog;
+import com.arialyy.aria.util.FileUtil;
 import com.arialyy.aria.util.RecordUtil;
 import java.io.File;
 import java.util.ArrayList;
@@ -42,7 +43,7 @@ public class M3U8RecordAdapter extends AbsRecordHandlerAdapter {
 
   @Override public void onPre() {
     super.onPre();
-    if (getWrapper().getRequestType() == ITaskWrapper.M3U8_LIVE){
+    if (getWrapper().getRequestType() == ITaskWrapper.M3U8_LIVE) {
       RecordUtil.delTaskRecord(getEntity().getFilePath(), IRecordHandler.TYPE_DOWNLOAD);
     }
   }
@@ -54,18 +55,22 @@ public class M3U8RecordAdapter extends AbsRecordHandlerAdapter {
     String cacheDir = mOption.getCacheDir();
     long currentProgress = 0;
     int completeNum = 0;
+    File targetFile = new File(mTaskRecord.filePath);
+    if (!targetFile.exists()){
+      FileUtil.createFile(targetFile);
+    }
 
     M3U8Entity m3U8Entity = ((DownloadEntity) getEntity()).getM3U8Entity();
     // 重新下载所有切片
     boolean reDownload =
-        (m3U8Entity.getPeerNum() <= 0 || (m3U8Entity.isGenerateIndexFile() && !new File(
+        (m3U8Entity.getPeerNum() <= 0 || (mOption.isGenerateIndexFile() && !new File(
             String.format(M3U8InfoThread.M3U8_INDEX_FORMAT, getEntity().getFilePath())).exists()));
 
     for (ThreadRecord record : mTaskRecord.threadRecords) {
       File temp = new File(BaseM3U8Loader.getTsFilePath(cacheDir, record.threadId));
       if (!record.isComplete || reDownload) {
         if (temp.exists()) {
-          temp.delete();
+          FileUtil.deleteFile(temp);
         }
         record.startLocation = 0;
         //ALog.d(TAG, String.format("分片【%s】未完成，将重新下载该分片", record.threadId));
