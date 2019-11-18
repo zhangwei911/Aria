@@ -19,7 +19,8 @@ import androidx.annotation.CheckResult;
 import com.arialyy.aria.core.common.AbsBuilderTarget;
 import com.arialyy.aria.core.common.FtpOption;
 import com.arialyy.aria.core.inf.Suggest;
-import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
+import com.arialyy.aria.core.upload.UTaskWrapper;
+import com.arialyy.aria.core.wrapper.ITaskWrapper;
 import com.arialyy.aria.util.CommonUtil;
 
 /**
@@ -33,7 +34,7 @@ public class FtpBuilderTarget extends AbsBuilderTarget<FtpBuilderTarget> {
   FtpBuilderTarget(String filePath) {
     mConfigHandler = new UNormalConfigHandler<>(this, -1);
     mConfigHandler.setFilePath(filePath);
-    getTaskWrapper().setRequestType(AbsTaskWrapper.U_FTP);
+    getTaskWrapper().setRequestType(ITaskWrapper.U_FTP);
   }
 
   /**
@@ -45,6 +46,14 @@ public class FtpBuilderTarget extends AbsBuilderTarget<FtpBuilderTarget> {
   public FtpBuilderTarget setUploadUrl(String tempUrl) {
     url = tempUrl;
     mConfigHandler.setTempUrl(tempUrl);
+    return this;
+  }
+
+  /**
+   * 如果文件路径被其它任务占用，删除其它任务
+   */
+  public FtpBuilderTarget forceUpload() {
+    ((UTaskWrapper)getTaskWrapper()).setForceUpload(true);
     return this;
   }
 

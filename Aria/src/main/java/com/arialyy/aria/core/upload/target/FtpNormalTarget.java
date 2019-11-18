@@ -20,7 +20,7 @@ import com.arialyy.aria.core.common.AbsNormalTarget;
 import com.arialyy.aria.core.common.FtpOption;
 import com.arialyy.aria.core.inf.Suggest;
 import com.arialyy.aria.core.upload.UploadEntity;
-import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
+import com.arialyy.aria.core.wrapper.ITaskWrapper;
 import com.arialyy.aria.util.CommonUtil;
 
 /**
@@ -32,7 +32,7 @@ public class FtpNormalTarget extends AbsNormalTarget<FtpNormalTarget> {
 
   FtpNormalTarget(long taskId) {
     mConfigHandler = new UNormalConfigHandler<>(this, taskId);
-    getTaskWrapper().setRequestType(AbsTaskWrapper.U_FTP);
+    getTaskWrapper().setRequestType(ITaskWrapper.U_FTP);
   }
 
   /**

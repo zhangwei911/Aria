@@ -103,7 +103,7 @@ final class HttpDThreadTaskAdapter extends BaseHttpThreadTaskAdapter {
       is = new BufferedInputStream(ConnectionHelp.convertInputStream(conn));
       if (mTaskOption.isChunked()) {
         readChunked(is);
-      } else if (getThreadConfig().isOpenDynamicFile) {
+      } else if (getThreadConfig().isBlock) {
         readDynamicFile(is);
       } else {
         //创建可设置位置的文件

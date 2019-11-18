@@ -18,6 +18,7 @@ package com.arialyy.simple.core.upload;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.Log;
 import android.view.View;
 import androidx.annotation.Nullable;
@@ -40,6 +41,8 @@ import com.arialyy.simple.databinding.ActivityFtpUploadBinding;
 import com.arialyy.simple.util.AppUtil;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by lyy on 2017/7/28. Ftp 文件上传demo
@@ -111,32 +114,54 @@ public class FtpUploadActivity extends BaseActivity<ActivityFtpUploadBinding> {
   public void onClick(View view) {
     switch (view.getId()) {
       case R.id.start:
-        if (mTaskId == -1) {
-          mTaskId = Aria.upload(this)
-              .loadFtp(mFilePath)
-              .setUploadUrl(mUrl)
-              .option(getOption())
-              .create();
-          getBinding().setStateStr(getString(R.string.stop));
-          break;
-        }
-        if (Aria.upload(this).loadFtp(mTaskId).isRunning()) {
-          Aria.upload(this).loadFtp(mTaskId).stop();
-          getBinding().setStateStr(getString(R.string.resume));
-        } else {
-          Aria.upload(this)
-              .loadFtp(mTaskId)
-              .option(getOption())
-              .resume();
-          getBinding().setStateStr(getString(R.string.stop));
-        }
-
+        //if (mTaskId == -1) {
+        //  mTaskId = Aria.upload(this)
+        //      .loadFtp(mFilePath)
+        //      .setUploadUrl(mUrl)
+        //      .option(getOption())
+        //      .create();
+        //  getBinding().setStateStr(getString(R.string.stop));
+        //  break;
+        //}
+        //if (Aria.upload(this).loadFtp(mTaskId).isRunning()) {
+        //  Aria.upload(this).loadFtp(mTaskId).stop();
+        //  getBinding().setStateStr(getString(R.string.resume));
+        //} else {
+        //  Aria.upload(this)
+        //      .loadFtp(mTaskId)
+        //      .option(getOption())
+        //      .resume();
+        //  getBinding().setStateStr(getString(R.string.stop));
+        //}
+        upload();
         break;
       case R.id.cancel:
         Aria.upload(this).loadFtp(mTaskId).cancel();
         mTaskId = -1;
         getBinding().setStateStr(getString(R.string.start));
         break;
+    }
+  }
+
+  private void upload() {
+    List<String> paths = new ArrayList<>();
+    paths.add(Environment.getExternalStorageDirectory().getPath() + "/Download/img/img/1.jpg");
+    paths.add(Environment.getExternalStorageDirectory().getPath() + "/Download/img/img/2.jpg");
+    paths.add(Environment.getExternalStorageDirectory().getPath() + "/Download/img/img/3.jpg");
+    paths.add(Environment.getExternalStorageDirectory().getPath() + "/Download/img/img/4.jpg");
+    paths.add(Environment.getExternalStorageDirectory().getPath() + "/Download/img/img/5.jpg");
+    paths.add(Environment.getExternalStorageDirectory().getPath() + "/Download/img/img/6.jpg");
+    paths.add(Environment.getExternalStorageDirectory().getPath() + "/Download/img/img/7.jpg");
+    paths.add(Environment.getExternalStorageDirectory().getPath() + "/Download/img/img/8.jpg");
+    paths.add(Environment.getExternalStorageDirectory().getPath() + "/Download/img/img/9.jpg");
+    paths.add(Environment.getExternalStorageDirectory().getPath() + "/Download/img/img/10.jpg");
+    for (String path : paths) {
+      Aria.upload(this)
+          .loadFtp(path)
+          .setUploadUrl(mUrl)
+          .option(getOption())
+          .forceUpload()
+          .create();
     }
   }
 

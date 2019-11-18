@@ -1,4 +1,9 @@
 ## 开发日志
+  + v_3.7.6
+    - 增加强制上传的api`forceUpload()`
+    - 修复for循环上传文件出现的问题
+    - 移除创建任务的500ms间隔限制
+    - 修复多线程读写时可能出现的`database is locked`的问题
   + v_3.7.5 (2019/11/10)
     - fix bug https://github.com/AriaLyy/Aria/issues/500
     - fix bug https://github.com/AriaLyy/Aria/issues/508

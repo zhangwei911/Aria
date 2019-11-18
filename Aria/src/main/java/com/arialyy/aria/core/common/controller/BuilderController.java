@@ -19,6 +19,7 @@ import com.arialyy.aria.core.command.NormalCmdFactory;
 import com.arialyy.aria.core.event.EventMsgUtil;
 import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
 import com.arialyy.aria.core.command.CmdHelper;
+import com.arialyy.aria.util.ALog;
 
 /**
  * 创建任务时使用的控制器

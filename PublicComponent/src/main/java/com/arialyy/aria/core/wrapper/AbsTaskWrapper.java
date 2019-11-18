@@ -24,6 +24,7 @@ import com.arialyy.aria.core.event.ErrorEvent;
 import com.arialyy.aria.core.inf.IEntity;
 import com.arialyy.aria.core.inf.ITaskOption;
 import com.arialyy.aria.core.upload.UploadEntity;
+import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.ComponentUtil;
 
 /**

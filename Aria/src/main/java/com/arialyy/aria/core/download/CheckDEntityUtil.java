@@ -133,18 +133,8 @@ public class CheckDEntityUtil implements ICheckEntityUtil {
   private boolean checkPathConflicts(String filePath) {
     //设置文件保存路径，如果新文件路径和旧文件路径不同，则修改路径
     if (!filePath.equals(mEntity.getFilePath())) {
-
-      //if (DbEntity.checkDataExist(DownloadEntity.class, "downloadPath=?", filePath)) {
-      //  if (!mWrapper.isForceDownload()) {
-      //    ALog.e(TAG, String.format("下载失败，保存路径【%s】已经被其它任务占用，请设置其它保存路径", filePath));
-      //    return false;
-      //  } else {
-      //    ALog.w(TAG, String.format("保存路径【%s】已经被其它任务占用，当前任务将覆盖该路径的文件", filePath));
-      //    RecordUtil.delTaskRecord(filePath, IRecordHandler.TYPE_DOWNLOAD);
-      //  }
-      //}
       // 检查路径冲突
-      if (!CheckUtil.checkAndHandlePathConflicts(mWrapper.isForceDownload(), filePath)) {
+      if (!CheckUtil.checkDownloadPathConflicts(mWrapper.isForceDownload(), filePath)) {
         return false;
       }
 

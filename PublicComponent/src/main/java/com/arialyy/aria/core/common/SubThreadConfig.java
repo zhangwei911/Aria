@@ -35,8 +35,6 @@ public class SubThreadConfig {
   public ThreadRecord record;
   // 状态处理器
   public Handler stateHandler;
-  // 动态文件
-  public boolean isOpenDynamicFile;
   // m3u8切片索引
   public int peerIndex;
 }

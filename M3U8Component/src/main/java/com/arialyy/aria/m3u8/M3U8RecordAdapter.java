@@ -56,7 +56,7 @@ public class M3U8RecordAdapter extends AbsRecordHandlerAdapter {
     long currentProgress = 0;
     int completeNum = 0;
     File targetFile = new File(mTaskRecord.filePath);
-    if (!targetFile.exists()){
+    if (!targetFile.exists()) {
       FileUtil.createFile(targetFile);
     }
 
@@ -117,17 +117,15 @@ public class M3U8RecordAdapter extends AbsRecordHandlerAdapter {
     record.filePath = getEntity().getFilePath();
     record.threadRecords = new ArrayList<>();
     record.threadNum = threadNum;
+    record.isBlock = true;
 
     int requestType = getWrapper().getRequestType();
     if (requestType == ITaskWrapper.M3U8_VOD) {
       record.taskType = TaskRecord.TYPE_M3U8_VOD;
-      record.isOpenDynamicFile = true;
-      record.bandWidth = mOption.getBandWidth();
     } else if (requestType == ITaskWrapper.M3U8_LIVE) {
       record.taskType = TaskRecord.TYPE_M3U8_LIVE;
-      record.isOpenDynamicFile = true;
-      record.bandWidth = mOption.getBandWidth();
     }
+    record.bandWidth = mOption.getBandWidth();
     return record;
   }
 

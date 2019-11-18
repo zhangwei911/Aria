@@ -16,7 +16,6 @@
 package com.arialyy.aria.core.upload;
 
 import android.text.TextUtils;
-import com.arialyy.aria.core.common.ErrorCode;
 import com.arialyy.aria.core.inf.ICheckEntityUtil;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CheckUtil;
@@ -60,6 +59,11 @@ public class CheckUEntityUtil implements ICheckEntityUtil {
       return false;
     }
 
+    // 检查路径冲突
+    if (!CheckUtil.checkUploadPathConflicts(mWrapper.isForceUpload(), filePath)) {
+      return false;
+    }
+
     File file = new File(mEntity.getFilePath());
     if (!file.exists()) {
       ALog.e(TAG, "上传失败，文件【" + filePath + "】不存在");
@@ -69,6 +73,7 @@ public class CheckUEntityUtil implements ICheckEntityUtil {
       ALog.e(TAG, "上传失败，文件【" + filePath + "】不能是文件夹");
       return false;
     }
+
     return true;
   }
 

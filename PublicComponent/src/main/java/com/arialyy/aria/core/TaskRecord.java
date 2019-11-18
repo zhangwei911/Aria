@@ -79,12 +79,6 @@ public class TaskRecord extends DbEntity {
   public boolean isBlock = false;
 
   /**
-   * 是否是使用虚拟文件下载的
-   * {@code true}是，{@code false}不是
-   */
-  public boolean isOpenDynamicFile = false;
-
-  /**
    * 线程类型
    * {@link #TYPE_HTTP_FTP}、{@link #TYPE_M3U8_VOD}
    */

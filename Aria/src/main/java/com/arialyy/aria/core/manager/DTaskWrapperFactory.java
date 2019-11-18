@@ -45,11 +45,14 @@ class DTaskWrapperFactory implements INormalTEFactory<DownloadEntity, DTaskWrapp
    * 通过下载地址创建任务实体
    */
   @Override public DTaskWrapper create(long taskId) {
+    DTaskWrapper wrapper;
     if (taskId == -1) {
-      return new DTaskWrapper(new DownloadEntity());
+      wrapper = new DTaskWrapper(new DownloadEntity());
+    } else {
+      wrapper = new DTaskWrapper(getEntity(taskId));
     }
-
-    return new DTaskWrapper(getEntity(taskId));
+    wrapper.setRequestType(wrapper.getEntity().getTaskType());
+    return wrapper;
   }
 
   /**

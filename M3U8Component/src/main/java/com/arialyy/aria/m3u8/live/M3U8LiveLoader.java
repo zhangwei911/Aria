@@ -177,7 +177,6 @@ public class M3U8LiveLoader extends BaseM3U8Loader {
     config.url = tsUrl;
     config.tempFile = new File(getTsFilePath(cacheDir, indexId));
     config.isBlock = mRecord.isBlock;
-    config.isOpenDynamicFile = mRecord.isOpenDynamicFile;
     config.taskWrapper = mTaskWrapper;
     config.record = record;
     config.stateHandler = mStateHandler;

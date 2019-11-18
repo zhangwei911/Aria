@@ -142,7 +142,6 @@ public class NormalLoader extends AbsLoader {
             String.format(IRecordHandler.SUB_PATH, mTempFile.getPath(), record.threadId))
             : mTempFile;
     config.isBlock = mRecord.isBlock;
-    config.isOpenDynamicFile = mRecord.isOpenDynamicFile;
     config.startThreadNum = startNum;
     config.taskWrapper = mTaskWrapper;
     config.record = record;

@@ -125,7 +125,6 @@ public class RecordHandler implements IRecordHandler {
       }
       mTaskWrapper.setNewTask(false);
       mTaskRecord = mAdapter.createTaskRecord(threadNum);
-      mTaskRecord.isOpenDynamicFile = false;
       mTaskRecord.isBlock = false;
       File tempFile = new File(getFilePath());
       for (int i = 0; i < threadNum; i++) {

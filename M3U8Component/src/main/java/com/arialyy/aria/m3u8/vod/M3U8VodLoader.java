@@ -436,7 +436,6 @@ public class M3U8VodLoader extends BaseM3U8Loader {
     config.url = record.tsUrl;
     config.tempFile = new File(BaseM3U8Loader.getTsFilePath(cacheDir, record.threadId));
     config.isBlock = mRecord.isBlock;
-    config.isOpenDynamicFile = mRecord.isOpenDynamicFile;
     config.taskWrapper = mTaskWrapper;
     config.record = record;
     config.stateHandler = mStateHandler;

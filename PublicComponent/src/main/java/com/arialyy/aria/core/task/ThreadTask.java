@@ -463,8 +463,6 @@ public class ThreadTask implements IThreadTask, IThreadTaskObserver {
     if (mRecord != null) {
       mRecord.isComplete = isComplete;
       if (mConfig.isBlock) {
-        mRecord.startLocation = record;
-      } else if (mConfig.isOpenDynamicFile) {
         mRecord.startLocation = mConfig.tempFile.length();
       } else {
         if (0 < record && record < mRecord.endLocation) {

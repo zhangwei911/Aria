@@ -19,6 +19,7 @@ import androidx.annotation.CheckResult;
 import com.arialyy.aria.core.common.AbsBuilderTarget;
 import com.arialyy.aria.core.common.HttpOption;
 import com.arialyy.aria.core.inf.Suggest;
+import com.arialyy.aria.core.upload.UTaskWrapper;
 import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
 
 /**
@@ -58,6 +59,14 @@ public class HttpBuilderTarget extends AbsBuilderTarget<HttpBuilderTarget> {
       throw new NullPointerException("任务配置为空");
     }
     getTaskWrapper().getOptionParams().setParams(option);
+    return this;
+  }
+
+  /**
+   * 如果文件路径被其它任务占用，删除其它任务
+   */
+  public HttpBuilderTarget forceUpload() {
+    ((UTaskWrapper) getTaskWrapper()).setForceUpload(true);
     return this;
   }
 }

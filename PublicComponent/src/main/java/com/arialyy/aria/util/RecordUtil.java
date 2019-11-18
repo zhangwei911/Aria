@@ -128,7 +128,7 @@ public class RecordUtil {
       filePath = ((DownloadEntity) entity).getDownloadPath();
     } else if (entity instanceof UploadEntity) {
       type = IRecordHandler.TYPE_UPLOAD;
-      filePath = ((UploadEntity) entity).getFilePath();
+      filePath = entity.getFilePath();
     } else {
       ALog.w(TAG, "删除记录失败，未知类型");
       return;

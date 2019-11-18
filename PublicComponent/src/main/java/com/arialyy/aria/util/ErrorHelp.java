@@ -50,17 +50,7 @@ public class ErrorHelp {
         CommonUtil.getAppPath(AriaConfig.getInstance().getAPP()),
         getData("yyyy-MM-dd_HH_mm_ss"));
 
-    File log = new File(path);
-    if (!log.getParentFile().exists()) {
-      log.getParentFile().mkdirs();
-    }
-    if (!log.exists()) {
-      try {
-        log.createNewFile();
-      } catch (IOException e) {
-        e.printStackTrace();
-      }
-    }
+    FileUtil.createFile(path);
     return path;
   }
 

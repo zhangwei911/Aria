@@ -16,6 +16,7 @@
 package com.arialyy.aria.core.download;
 
 import android.os.Parcel;
+import android.text.TextUtils;
 import com.arialyy.aria.core.common.AbsGroupEntity;
 import com.arialyy.aria.core.wrapper.ITaskWrapper;
 import com.arialyy.aria.orm.annotation.Ignore;
@@ -48,7 +49,12 @@ public class DownloadGroupEntity extends AbsGroupEntity {
   }
 
   @Override public int getTaskType() {
-    return getKey().startsWith("ftp") ? ITaskWrapper.D_FTP_DIR : ITaskWrapper.DG_HTTP;
+    if (getSubEntities() == null || getSubEntities().isEmpty() || TextUtils.isEmpty(
+        getSubEntities().get(0).getUrl())) {
+      return ITaskWrapper.ERROR;
+    }
+    return getSubEntities().get(0).getUrl().startsWith("ftp") ? ITaskWrapper.D_FTP_DIR
+        : ITaskWrapper.DG_HTTP;
   }
 
   public DownloadGroupEntity() {

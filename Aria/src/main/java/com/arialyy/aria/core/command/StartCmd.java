@@ -18,27 +18,11 @@ package com.arialyy.aria.core.command;
 
 import com.arialyy.aria.core.AriaManager;
 import com.arialyy.aria.core.common.QueueMod;
-import com.arialyy.aria.core.download.DGTaskWrapper;
-import com.arialyy.aria.core.download.DTaskWrapper;
-import com.arialyy.aria.core.download.DownloadEntity;
-import com.arialyy.aria.core.download.DownloadGroupEntity;
+import com.arialyy.aria.core.inf.IEntity;
 import com.arialyy.aria.core.task.AbsTask;
 import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
-import com.arialyy.aria.core.inf.IEntity;
-import com.arialyy.aria.core.inf.IOptionConstant;
-import com.arialyy.aria.core.manager.TaskWrapperManager;
-import com.arialyy.aria.core.queue.DGroupTaskQueue;
-import com.arialyy.aria.core.queue.DTaskQueue;
-import com.arialyy.aria.core.queue.UTaskQueue;
-import com.arialyy.aria.core.upload.UTaskWrapper;
-import com.arialyy.aria.core.upload.UploadEntity;
-import com.arialyy.aria.core.wrapper.ITaskWrapper;
-import com.arialyy.aria.orm.DbEntity;
 import com.arialyy.aria.util.ALog;
-import com.arialyy.aria.util.CommonUtil;
 import com.arialyy.aria.util.NetUtils;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by lyy on 2016/8/22. 开始命令 队列模型{@link QueueMod#NOW}、{@link QueueMod#WAIT}
@@ -107,75 +91,6 @@ final class StartCmd<T extends AbsTaskWrapper> extends AbsNormalCmd<T> {
    * 当缓冲队列为null时，查找数据库中所有等待中的任务
    */
   private void findAllWaitTask() {
-    new Thread(new WaitTaskThread()).start();
-  }
-
-  private class WaitTaskThread implements Runnable {
-
-    @Override public void run() {
-      if (isDownloadCmd) {
-        handleTask(findWaitData(1));
-        handleTask(findWaitData(2));
-      } else {
-        handleTask(findWaitData(3));
-      }
-    }
-
-    private List<AbsTaskWrapper> findWaitData(int type) {
-      List<AbsTaskWrapper> waitList = new ArrayList<>();
-      TaskWrapperManager tManager = TaskWrapperManager.getInstance();
-      if (type == 1) { // 普通下载任务
-        List<DownloadEntity> dEntities = DbEntity.findDatas(DownloadEntity.class,
-            "isGroupChild=? and state=?", "false", "3");
-        if (dEntities != null && !dEntities.isEmpty()) {
-          for (DownloadEntity e : dEntities) {
-            waitList.add(tManager.getNormalTaskWrapper(DTaskWrapper.class, e.getId()));
-          }
-        }
-      } else if (type == 2) { // 组合任务
-        List<DownloadGroupEntity> dEntities =
-            DbEntity.findDatas(DownloadGroupEntity.class, "state=?", "3");
-        if (dEntities != null && !dEntities.isEmpty()) {
-          for (DownloadGroupEntity e : dEntities) {
-            if (e.getTaskType() == ITaskWrapper.DG_HTTP) {
-              waitList.add(tManager.getGroupWrapper(DGTaskWrapper.class, e.getId()));
-            } else if (e.getTaskType() == ITaskWrapper.D_FTP_DIR) {
-              waitList.add(tManager.getGroupWrapper(DGTaskWrapper.class, e.getId()));
-            }
-          }
-        }
-      } else if (type == 3) { //普通上传任务
-        List<UploadEntity> dEntities = DbEntity.findDatas(UploadEntity.class, "state=?", "3");
-
-        if (dEntities != null && !dEntities.isEmpty()) {
-          for (UploadEntity e : dEntities) {
-            waitList.add(tManager.getNormalTaskWrapper(UTaskWrapper.class, e.getId()));
-          }
-        }
-      }
-      return waitList;
-    }
-
-    private void handleTask(List<AbsTaskWrapper> waitList) {
-      for (AbsTaskWrapper wrapper : waitList) {
-        if (wrapper.getEntity() == null) continue;
-        AbsTask task = getTask(wrapper.getKey());
-        if (task != null) continue;
-        if (wrapper instanceof DTaskWrapper) {
-          if (wrapper.getRequestType() == ITaskWrapper.D_FTP
-              || wrapper.getRequestType() == ITaskWrapper.U_FTP) {
-            wrapper.getOptionParams()
-                .setParams(IOptionConstant.ftpUrlEntity,
-                    CommonUtil.getFtpUrlInfo(wrapper.getEntity().getKey()));
-          }
-          mQueue = DTaskQueue.getInstance();
-        } else if (wrapper instanceof UTaskWrapper) {
-          mQueue = UTaskQueue.getInstance();
-        } else if (wrapper instanceof DGTaskWrapper) {
-          mQueue = DGroupTaskQueue.getInstance();
-        }
-        createTask(wrapper);
-      }
-    }
+    new Thread(new ResumeThread(isDownloadCmd, IEntity.STATE_WAIT)).start();
   }
 }

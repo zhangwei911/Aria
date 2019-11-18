@@ -42,14 +42,17 @@ class DGTaskWrapperFactory implements IGroupWrapperFactory<DownloadGroupEntity, 
   }
 
   @Override public DGTaskWrapper getGroupWrapper(long taskId) {
+    DGTaskWrapper wrapper;
     if (taskId == -1) {
-      return new DGTaskWrapper(new DownloadGroupEntity());
+      wrapper = new DGTaskWrapper(new DownloadGroupEntity());
+    }else {
+      DownloadGroupEntity entity = getOrCreateHttpDGEntity(taskId);
+      wrapper = new DGTaskWrapper(entity);
+      if (entity.getSubEntities() != null && !entity.getSubEntities().isEmpty()) {
+        wrapper.setSubTaskWrapper(DbDataHelper.createDGSubTaskWrapper(entity));
+      }
     }
-    DownloadGroupEntity entity = getOrCreateHttpDGEntity(taskId);
-    DGTaskWrapper wrapper = new DGTaskWrapper(entity);
-    if (entity.getSubEntities() != null && !entity.getSubEntities().isEmpty()) {
-      wrapper.setSubTaskWrapper(DbDataHelper.createDGSubTaskWrapper(entity));
-    }
+    wrapper.setRequestType(wrapper.getEntity().getTaskType());
     return wrapper;
   }
 

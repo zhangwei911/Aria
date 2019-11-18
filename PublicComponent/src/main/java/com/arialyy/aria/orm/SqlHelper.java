@@ -76,9 +76,6 @@ final class SqlHelper extends SQLiteOpenHelper {
       // 需要使用如下语句：
       db.execSQL("PRAGMA foreign_keys=ON;");
     }
-    if (DBConfig.DEBUG) {
-      db.enableWriteAheadLogging();
-    }
   }
 
   @Override public void onCreate(SQLiteDatabase db) {
@@ -139,6 +136,7 @@ final class SqlHelper extends SQLiteOpenHelper {
                 SQLiteDatabase.CREATE_IF_NECESSARY);
       }
     }
+    db.enableWriteAheadLogging();
     return db;
   }
 

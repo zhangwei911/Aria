@@ -83,7 +83,7 @@ final class FtpDThreadTaskAdapter extends BaseFtpThreadTaskAdapter {
         return;
       }
 
-      if (getThreadConfig().isOpenDynamicFile) {
+      if (getThreadConfig().isBlock) {
         readDynamicFile(is);
       } else {
         readNormal(is);

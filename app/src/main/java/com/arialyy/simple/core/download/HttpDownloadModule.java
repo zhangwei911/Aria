@@ -34,6 +34,7 @@ public class HttpDownloadModule extends BaseViewModule {
 
   private final String defUrl =
       "http://hzdown.muzhiwan.com/2017/05/08/nl.noio.kingdom_59104935e56f0.apk";
+      //"https://ss1.baidu.com/-4o3dSag_xI4khGko9WTAnF6hhy/image/h%3D300/sign=a9e671b9a551f3dedcb2bf64a4eff0ec/4610b912c8fcc3cef70d70409845d688d53f20f7.jpg";
   //"http://9.9.9.205:5000/download/Cyberduck-6.9.4.30164.zip";
   //"http://202.98.201.103:7000/vrs/TPK/ZTC440402001Z.tpk";
   private final String defFilePath =
@@ -51,6 +52,7 @@ public class HttpDownloadModule extends BaseViewModule {
     //String url =
     //    "http://sdkdown.muzhiwan.com/openfile/2019/05/21/com.netease.tom.mzw_5ce3ef8754d05.apk";
     String url = "http://image.totwoo.com/totwoo-TOTWOO-v3.5.6.apk";
+    //String url = "https://ss1.baidu.com/-4o3dSag_xI4khGko9WTAnF6hhy/image/h%3D300/sign=a9e671b9a551f3dedcb2bf64a4eff0ec/4610b912c8fcc3cef70d70409845d688d53f20f7.jpg";
     String filePath = AppUtil.getConfigValue(context, HTTP_PATH_KEY, defFilePath);
 
     singDownloadInfo = Aria.download(context).getFirstDownloadEntity(url);

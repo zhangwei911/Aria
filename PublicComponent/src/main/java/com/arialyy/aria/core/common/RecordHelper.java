@@ -45,13 +45,13 @@ public class RecordHelper {
   /**
    * 处理非分块的，多线程任务
    */
-  public void handleMutilRecord() {
+  public void handleMultiRecord() {
     // 默认线程分块长度
     long blockSize = mWrapper.getEntity().getFileSize() / mTaskRecord.threadRecords.size();
     File temp = new File(mTaskRecord.filePath);
     boolean fileExists = false;
     if (!temp.exists()) {
-      BufferedRandomAccessFile tempFile = null;
+      BufferedRandomAccessFile tempFile;
       try {
         tempFile = new BufferedRandomAccessFile(temp, "rw");
         tempFile.setLength(mWrapper.getEntity().getFileSize());
@@ -145,10 +145,10 @@ public class RecordHelper {
       tr.startLocation = 0;
       tr.isComplete = false;
       tr.endLocation = mWrapper.getEntity().getFileSize();
-    } else if (mTaskRecord.isOpenDynamicFile) {
+    } else if (mTaskRecord.isBlock) {
       if (file.length() > mWrapper.getEntity().getFileSize()) {
         ALog.i(TAG, String.format("文件【%s】错误，任务重新开始", file.getPath()));
-        file.delete();
+        FileUtil.deleteFile(file);
         tr.startLocation = 0;
         tr.isComplete = false;
         tr.endLocation = mWrapper.getEntity().getFileSize();

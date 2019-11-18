@@ -100,7 +100,7 @@ public class M3U8ThreadTaskAdapter extends AbsThreadTaskAdapter {
       is = new BufferedInputStream(ConnectionHelp.convertInputStream(conn));
       if (mHttpTaskOption.isChunked()) {
         readChunked(is);
-      } else if (getThreadConfig().isOpenDynamicFile) {
+      } else if (getThreadConfig().isBlock) {
         readDynamicFile(is);
       }
     } catch (MalformedURLException e) {
