@@ -44,20 +44,20 @@ Aria有以下特点：
 
 ## 引入库
 [![license](http://img.shields.io/badge/license-Apache2.0-brightgreen.svg?style=flat)](https://github.com/AriaLyy/Aria/blob/master/LICENSE)
-[![Core](https://img.shields.io/badge/Core-3.7.5-blue)](https://github.com/AriaLyy/Aria)
-[![Compiler](https://img.shields.io/badge/Compiler-3.7.5-blue)](https://github.com/AriaLyy/Aria)
-[![FtpComponent](https://img.shields.io/badge/FtpComponent-3.7.5-orange)](https://github.com/AriaLyy/Aria)
-[![M3U8Component](https://img.shields.io/badge/M3U8Component-3.7.5-orange)](https://github.com/AriaLyy/Aria)
+[![Core](https://img.shields.io/badge/Core-3.7.6-blue)](https://github.com/AriaLyy/Aria)
+[![Compiler](https://img.shields.io/badge/Compiler-3.7.6-blue)](https://github.com/AriaLyy/Aria)
+[![FtpComponent](https://img.shields.io/badge/FtpComponent-3.7.6-orange)](https://github.com/AriaLyy/Aria)
+[![M3U8Component](https://img.shields.io/badge/M3U8Component-3.7.6-orange)](https://github.com/AriaLyy/Aria)
 
 ```java
-implementation 'com.arialyy.aria:core:3.7.5'
-annotationProcessor 'com.arialyy.aria:compiler:3.7.5'
-implementation 'com.arialyy.aria:ftpComponent:3.7.5' # 如果需要使用ftp，请增加该组件
-implementation 'com.arialyy.aria:m3u8Component:3.7.5' # 如果需要使用m3u8下载功能，请增加该组件
+implementation 'com.arialyy.aria:core:3.7.6'
+annotationProcessor 'com.arialyy.aria:compiler:3.7.6'
+implementation 'com.arialyy.aria:ftpComponent:3.7.6' # 如果需要使用ftp，请增加该组件
+implementation 'com.arialyy.aria:m3u8Component:3.7.6' # 如果需要使用m3u8下载功能，请增加该组件
 ```
 如果出现android support依赖错误，请将 `compile 'com.arialyy.aria:core:<last-version>'`替换为
 ```
-api('com.arialyy.aria:aria-core:<last-version>'){
+api('com.arialyy.aria:core:<last-version>'){
    exclude group: 'androidx.appcompat.app'
 }
 ```
@@ -65,7 +65,7 @@ api('com.arialyy.aria:aria-core:<last-version>'){
 
 __⚠️注意：3.5.4以下版本升级时，需要更新[配置文件](https://aria.laoyuyu.me/aria_doc/start/config.html)！！__
 
-__⚠️注意：3.7 以上版本已经适配了AndroidX__
+__⚠️注意：3.7 以上版本已经适配了AndroidX，如果是使用support库的，可使用[老版本](https://github.com/AriaLyy/Aria/tree/v3.6.6)__
 
 ***
 ## 使用
@@ -137,11 +137,14 @@ protected void onCreate(Bundle savedInstanceState) {
 
 
 ### 版本日志
-+ v_3.7.5 (2019/11/10)
-    - fix bug https://github.com/AriaLyy/Aria/issues/500
-    - fix bug https://github.com/AriaLyy/Aria/issues/508
-    - fix bug https://github.com/AriaLyy/Aria/issues/503
-    - 修复m3u8创建索引不成功的问题
+  + v_3.7.6 (2019/11/19)
+    - fix bug https://github.com/AriaLyy/Aria/issues/505
+    - fix bug https://github.com/AriaLyy/Aria/issues/516
+    - fix bug https://github.com/AriaLyy/Aria/issues/515
+    - 增加强制上传的api`forceUpload()`
+    - 修复for循环上传文件出现的问题
+    - 移除创建任务的500ms间隔限制
+    - 修复多线程读写时可能出现的`database is locked`的问题
 
 [更多版本记录](https://github.com/AriaLyy/Aria/blob/master/DEV_LOG.md)
 

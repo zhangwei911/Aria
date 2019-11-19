@@ -26,7 +26,7 @@ import com.arialyy.aria.core.loader.NormalLoader;
 import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
 import com.arialyy.aria.exception.BaseException;
 import com.arialyy.aria.ftp.FtpTaskOption;
-import com.arialyy.aria.sftp.AbsSFtpFileInfoThread;
+import com.arialyy.aria.sftp.SFtpInfoThread;
 import com.arialyy.aria.sftp.SFtpUtil;
 
 /**
@@ -57,15 +57,19 @@ public class SFtpDLoaderUtil extends AbsNormalLoaderUtil {
   }
 
   @Override protected Runnable createInfoThread() {
-    return new AbsSFtpFileInfoThread<>(mSftpUtil, (DTaskWrapper) getTaskWrapper(), new OnFileInfoCallback() {
-      @Override public void onComplete(String key, CompleteInfo info) {
+    DSFtpInfoThreadAdapter adapter = new DSFtpInfoThreadAdapter((DTaskWrapper) getTaskWrapper());
+    SFtpInfoThread infoThread = new SFtpInfoThread<>(mSftpUtil, (DTaskWrapper) getTaskWrapper(),
+        new OnFileInfoCallback() {
+          @Override public void onComplete(String key, CompleteInfo info) {
 
-      }
+          }
 
-      @Override public void onFail(AbsEntity entity, BaseException e, boolean needRetry) {
+          @Override public void onFail(AbsEntity entity, BaseException e, boolean needRetry) {
 
-        mSftpUtil.logout();
-      }
-    });
+          }
+        });
+    infoThread.setAdapter(adapter);
+
+    return infoThread;
   }
 }

@@ -28,6 +28,8 @@ import com.arialyy.annotations.Upload;
 import com.arialyy.aria.core.Aria;
 import com.arialyy.aria.core.common.FtpOption;
 import com.arialyy.aria.core.inf.IEntity;
+import com.arialyy.aria.core.processor.FtpInterceptHandler;
+import com.arialyy.aria.core.processor.IFtpUploadInterceptor;
 import com.arialyy.aria.core.task.UploadTask;
 import com.arialyy.aria.core.upload.UploadEntity;
 import com.arialyy.aria.util.ALog;
@@ -114,26 +116,27 @@ public class FtpUploadActivity extends BaseActivity<ActivityFtpUploadBinding> {
   public void onClick(View view) {
     switch (view.getId()) {
       case R.id.start:
-        //if (mTaskId == -1) {
-        //  mTaskId = Aria.upload(this)
-        //      .loadFtp(mFilePath)
-        //      .setUploadUrl(mUrl)
-        //      .option(getOption())
-        //      .create();
-        //  getBinding().setStateStr(getString(R.string.stop));
-        //  break;
-        //}
-        //if (Aria.upload(this).loadFtp(mTaskId).isRunning()) {
-        //  Aria.upload(this).loadFtp(mTaskId).stop();
-        //  getBinding().setStateStr(getString(R.string.resume));
-        //} else {
-        //  Aria.upload(this)
-        //      .loadFtp(mTaskId)
-        //      .option(getOption())
-        //      .resume();
-        //  getBinding().setStateStr(getString(R.string.stop));
-        //}
-        upload();
+        if (mTaskId == -1) {
+          mTaskId = Aria.upload(this)
+              .loadFtp(mFilePath)
+              .setUploadUrl(mUrl)
+              .option(getOption())
+              .forceUpload()
+              .create();
+          getBinding().setStateStr(getString(R.string.stop));
+          break;
+        }
+        if (Aria.upload(this).loadFtp(mTaskId).isRunning()) {
+          Aria.upload(this).loadFtp(mTaskId).stop();
+          getBinding().setStateStr(getString(R.string.resume));
+        } else {
+          Aria.upload(this)
+              .loadFtp(mTaskId)
+              .option(getOption())
+              .resume();
+          getBinding().setStateStr(getString(R.string.stop));
+        }
+        //upload();
         break;
       case R.id.cancel:
         Aria.upload(this).loadFtp(mTaskId).cancel();
@@ -168,6 +171,7 @@ public class FtpUploadActivity extends BaseActivity<ActivityFtpUploadBinding> {
   private FtpOption getOption() {
     FtpOption option = new FtpOption();
     option.login(user, pwd);
+    option.setUploadInterceptor(new FtpUploadInterceptor());
     return option;
   }
 
@@ -234,6 +238,15 @@ public class FtpUploadActivity extends BaseActivity<ActivityFtpUploadBinding> {
       } else {
         ALog.d(TAG, "没有选择文件");
       }
+    }
+  }
+
+  private static class FtpUploadInterceptor implements IFtpUploadInterceptor {
+    @Override public FtpInterceptHandler onIntercept(UploadEntity entity, List<String> fileList) {
+      FtpInterceptHandler.Builder builder = new FtpInterceptHandler.Builder();
+      //builder.coverServerFile(); // 覆盖远端同名文件
+      builder.resetFileName("test.zip"); //修改上传到远端服务器的文件名
+      return builder.build();
     }
   }
 }

@@ -1,5 +1,8 @@
 ## 开发日志
-  + v_3.7.6
+  + v_3.7.6 (2019/11/19)
+    - fix bug https://github.com/AriaLyy/Aria/issues/505
+    - fix bug https://github.com/AriaLyy/Aria/issues/516
+    - fix bug https://github.com/AriaLyy/Aria/issues/515
     - 增加强制上传的api`forceUpload()`
     - 修复for循环上传文件出现的问题
     - 移除创建任务的500ms间隔限制

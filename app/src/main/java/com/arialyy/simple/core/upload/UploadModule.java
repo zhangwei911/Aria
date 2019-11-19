@@ -37,7 +37,7 @@ public class UploadModule extends BaseViewModule {
   LiveData<UploadEntity> getFtpInfo(Context context) {
     String url = AppUtil.getConfigValue(context, FTP_URL_KEY, "ftp://9.9.9.50:2121/aa/你好");
     String filePath = AppUtil.getConfigValue(context, FTP_PATH_KEY,
-        Environment.getExternalStorageDirectory().getPath() + "/Download/PaNTFS15562.zip");
+        Environment.getExternalStorageDirectory().getPath() + "/Download/Folx P58.zip");
 
     UploadEntity entity = Aria.upload(context).getFirstUploadEntity(filePath);
     if (entity != null) {

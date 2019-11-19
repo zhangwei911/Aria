@@ -60,6 +60,7 @@ class FtpUFileInfoThread extends AbsFtpInfoThread<UploadEntity, UTaskWrapper> {
   @Override protected boolean onInterceptor(FTPClient client, FTPFile[] ftpFiles) {
     // 旧任务将不做处理，否则断点续传上传将失效
     if (!mTaskWrapper.isNewTask()) {
+      ALog.d(TAG, "任务是旧任务，忽略该拦截器");
       return true;
     }
     try {

@@ -170,9 +170,8 @@ public class CheckDGEntityUtil implements ICheckEntityUtil {
         if (!newName.equals(entity.getFileName())) {
           String oldPath = mEntity.getDirPath() + "/" + entity.getFileName();
           String newPath = mEntity.getDirPath() + "/" + newName;
-          if (DbEntity.checkDataExist(DownloadEntity.class, "downloadPath=? or isComplete='true'",
-              newPath)) {
-            ALog.w(TAG, String.format("更新文件名失败，路径【%s】已存在或文件已下载", newPath));
+          if (DbEntity.checkDataExist(DownloadEntity.class, "downloadPath=?", newPath)) {
+            ALog.w(TAG, String.format("更新文件名失败，路径【%s】被其它任务占用", newPath));
             return;
           }
 

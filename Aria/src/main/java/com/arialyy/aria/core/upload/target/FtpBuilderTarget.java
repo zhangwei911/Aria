@@ -35,6 +35,7 @@ public class FtpBuilderTarget extends AbsBuilderTarget<FtpBuilderTarget> {
     mConfigHandler = new UNormalConfigHandler<>(this, -1);
     mConfigHandler.setFilePath(filePath);
     getTaskWrapper().setRequestType(ITaskWrapper.U_FTP);
+    getTaskWrapper().setNewTask(true);
   }
 
   /**

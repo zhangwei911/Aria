@@ -95,13 +95,13 @@ public class DownloadGroupActivity extends BaseActivity<ActivityDownloadGroupBin
           mTaskId = Aria.download(this)
               .loadGroup(mUrls)
               .setDirPath(
-                  Environment.getExternalStorageDirectory().getPath() + "/Download/group_test_2")
-              .setGroupAlias("任务组测试")
+                  Environment.getExternalStorageDirectory().getPath() + "/Download/group_imgs")
+              .setGroupAlias("图片测试")
               //.setSubFileName(getModule(GroupModule.class).getSubName2())
-              .setSubFileName(getModule(GroupModule.class).getSubName())
+              //.setSubFileName(getModule(GroupModule.class).getSubName())
               .unknownSize()
               .option(getHttpOption())
-              .setFileSize(114981416)
+              //.setFileSize(114981416)
               //.updateUrls(temp)
               .create();
           getBinding().setStateStr(getString(R.string.stop));
