@@ -101,9 +101,6 @@ public class ComponentUtil {
   public <T extends IUtil> T buildUtil(AbsTaskWrapper wrapper, IEventListener listener) {
     int requestType = wrapper.getRequestType();
     String className = null;
-    if (requestType == 1){
-      throw  new IllegalArgumentException("xxxx");
-    }
     switch (requestType) {
       case ITaskWrapper.M3U8_LIVE:
         className = "com.arialyy.aria.m3u8.live.M3U8LiveUtil";

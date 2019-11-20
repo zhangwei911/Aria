@@ -53,4 +53,9 @@ public interface IThreadTaskObserver {
    * @param len 新增的长度
    */
   void updateProgress(long len);
+
+  /**
+   * 获取线程当前进度
+   */
+  long getThreadProgress();
 }

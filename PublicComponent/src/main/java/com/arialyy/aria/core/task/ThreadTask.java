@@ -318,6 +318,11 @@ public class ThreadTask implements IThreadTask, IThreadTaskObserver {
     }
   }
 
+  @Override
+  public long getThreadProgress() {
+    return mRangeProgress;
+  }
+
   /**
    * 取消任务
    */

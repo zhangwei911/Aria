@@ -34,10 +34,6 @@ public abstract class AbsThreadTaskAdapter implements IThreadTaskAdapter {
    * 速度限制工具
    */
   protected BandwidthLimiter mSpeedBandUtil;
-  /**
-   * 当前线程的下去区间的进度
-   */
-  private long mRangeProgress;
   private ThreadRecord mThreadRecord;
   private IThreadTaskObserver mObserver;
   private AbsTaskWrapper mWrapper;
@@ -48,7 +44,6 @@ public abstract class AbsThreadTaskAdapter implements IThreadTaskAdapter {
     mThreadRecord = config.record;
     mWrapper = config.taskWrapper;
     mThreadConfig = config;
-    mRangeProgress = mThreadRecord.startLocation;
     if (getTaskConfig().getMaxSpeed() > 0) {
       mSpeedBandUtil = new BandwidthLimiter(getTaskConfig().getMaxSpeed(), config.startThreadNum);
     }
@@ -68,7 +63,7 @@ public abstract class AbsThreadTaskAdapter implements IThreadTaskAdapter {
    * 当前线程的下去区间的进度
    */
   protected long getRangeProgress() {
-    return mRangeProgress;
+    return mObserver.getThreadProgress();
   }
 
   protected ThreadRecord getThreadRecord() {
