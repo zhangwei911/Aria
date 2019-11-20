@@ -73,6 +73,7 @@ public class DGroupLoaderUtil extends AbsGroupUtil {
 
   @Override protected boolean onStart() {
     super.onStart();
+    getState().setSubSize(getWrapper().getSubTaskWrapper().size());
     if (getState().getCompleteNum() == getState().getSubSize()) {
       mListener.onComplete();
     } else {

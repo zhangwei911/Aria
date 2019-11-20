@@ -308,7 +308,7 @@ public class M3U8VodDLoadActivity extends BaseActivity<ActivityM3u8VodBinding> {
         //.merge(true)
         .setVodTsUrlConvert(new VodTsUrlConverter());
         //.setMergeHandler(new TsMergeHandler());
-    //.setBandWidthUrlConverter(new BandWidthUrlConverter(mUrl));
+    option.setBandWidthUrlConverter(new BandWidthUrlConverter(mUrl));
     return option;
   }
 
@@ -324,7 +324,10 @@ public class M3U8VodDLoadActivity extends BaseActivity<ActivityM3u8VodBinding> {
   static class VodTsUrlConverter implements IVodTsUrlConverter {
     @Override public List<String> convert(String m3u8Url, List<String> tsUrls) {
       Uri uri = Uri.parse(m3u8Url);
-      String parentUrl = "http://" + uri.getHost();
+      //String parentUrl = "http://" + uri.getHost() + "/gear1/";
+      int index = m3u8Url.lastIndexOf("/");
+      String parentUrl = m3u8Url.substring(0, index + 1);
+      //String parentUrl = "http://" + uri.getHost() + "/";
       List<String> newUrls = new ArrayList<>();
       for (String url : tsUrls) {
         newUrls.add(parentUrl + url);

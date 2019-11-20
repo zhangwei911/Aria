@@ -72,12 +72,14 @@ public class GroupRunState {
 
   private String mGroupHash;
 
-  GroupRunState(String groupHash, IDGroupListener listener, int subSize,
-      SimpleSubQueue queue) {
+  GroupRunState(String groupHash, IDGroupListener listener, SimpleSubQueue queue) {
     this.listener = listener;
     this.queue = queue;
-    mSubSize = subSize;
     mGroupHash = groupHash;
+  }
+
+  public void setSubSize(int subSize){
+    mSubSize = subSize;
   }
 
   /**

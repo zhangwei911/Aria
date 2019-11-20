@@ -112,30 +112,4 @@ public abstract class AbsSubDLoadUtil implements IUtil {
       mSchedulers.obtainMessage(ISchedulers.STOP, this).sendToTarget();
     }
   }
-
-  //@Override public void start() {
-  //  if (mWrapper.getRequestType() == ITaskWrapper.D_HTTP) {
-  //    if (needGetInfo) {
-  //      new Thread(new HttpFileInfoThread(mWrapper, new OnFileInfoCallback() {
-  //
-  //        @Override public void onComplete(String url, CompleteInfo info) {
-  //          mDLoader = new Downloader(mListener, mWrapper);
-  //          mDLoader.start();
-  //        }
-  //
-  //        @Override public void onFail(AbsEntity entity, BaseException e, boolean needRetry) {
-  //          mSchedulers.obtainMessage(ISchedulers.FAIL, SubDLoadUtil.this).sendToTarget();
-  //        }
-  //      })).start();
-  //    } else {
-  //      mDLoader = new Downloader(mListener, mWrapper);
-  //      mDLoader.start();
-  //    }
-  //  } else if (mWrapper.getRequestType() == ITaskWrapper.D_FTP) {
-  //    mDLoader = new Downloader(mListener, mWrapper);
-  //    mDLoader.start();
-  //  } else {
-  //    ALog.w(TAG, String.format("不识别的类型，requestType：%s", mWrapper.getRequestType()));
-  //  }
-  //}
 }

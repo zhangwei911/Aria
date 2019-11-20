@@ -463,7 +463,8 @@ public class M3U8VodLoader extends BaseM3U8Loader {
     private int cancelNum = 0; // 已经取消的线程的数
     private int stopNum = 0;  // 已经停止的线程数
     private int failNum = 0;  // 失败的线程数
-    private long progress; //当前总进度，百分比进度
+    private long percent; //当前总进度，百分比进度
+    private long progress;
     private TaskRecord taskRecord; // 任务记录
     private Looper looper;
 
@@ -480,6 +481,7 @@ public class M3U8VodLoader extends BaseM3U8Loader {
         }
       }
       this.listener = listener;
+      progress = getEntity().getCurrentProgress();
     }
 
     private void updateStateCount() {
@@ -586,7 +588,7 @@ public class M3U8VodLoader extends BaseM3U8Loader {
           }
           break;
         case STATE_RUNNING:
-          //progress += (long) msg.obj;
+          progress += (long) msg.obj;
           break;
       }
       return true;
@@ -610,7 +612,7 @@ public class M3U8VodLoader extends BaseM3U8Loader {
       int percent = completeNum * 100 / taskRecord.threadRecords.size();
       getEntity().setPercent(percent);
       getEntity().update();
-      progress = percent;
+      this.percent = percent;
     }
 
     @Override public boolean isFail() {

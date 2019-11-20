@@ -1,4 +1,6 @@
 ## 开发日志
+  + v_3.7.8-pre-1(2019/11/20)
+    - fix bug https://github.com/AriaLyy/Aria/issues/526
   + v_3.7.7 (2019/11/20)
     - 修复ftp无法完成下载的问题
     - 修复一个http下载崩溃的问题

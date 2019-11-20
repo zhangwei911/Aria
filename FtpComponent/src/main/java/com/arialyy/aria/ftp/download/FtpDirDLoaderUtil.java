@@ -85,6 +85,8 @@ public class FtpDirDLoaderUtil extends AbsGroupUtil {
    * @param needCloneInfo 第一次下载，信息已经在{@link FtpDirInfoThread}中clone了
    */
   private void startDownload(boolean needCloneInfo) {
+    // ftp需要获取完成只任务信息才更新只任务数量
+    getState().setSubSize(getWrapper().getSubTaskWrapper().size());
     try {
       LOCK.lock();
       condition.signalAll();
