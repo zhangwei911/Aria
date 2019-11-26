@@ -44,16 +44,16 @@ Aria有以下特点：
 
 ## 引入库
 [![license](http://img.shields.io/badge/license-Apache2.0-brightgreen.svg?style=flat)](https://github.com/AriaLyy/Aria/blob/master/LICENSE)
-[![Core](https://img.shields.io/badge/Core-v_3.7.8-pre-1-blue)](https://github.com/AriaLyy/Aria)
-[![Compiler](https://img.shields.io/badge/Compiler-v_3.7.8-pre-1-blue)](https://github.com/AriaLyy/Aria)
-[![FtpComponent](https://img.shields.io/badge/FtpComponent-v_3.7.8-pre-1-orange)](https://github.com/AriaLyy/Aria)
-[![M3U8Component](https://img.shields.io/badge/M3U8Component-v_3.7.8-pre-1-orange)](https://github.com/AriaLyy/Aria)
+[![Core](https://img.shields.io/badge/Core-3.7.8-pre-1-blue)](https://github.com/AriaLyy/Aria)
+[![Compiler](https://img.shields.io/badge/Compiler-3.7.8-pre-1-blue)](https://github.com/AriaLyy/Aria)
+[![FtpComponent](https://img.shields.io/badge/FtpComponent-3.7.8-pre-1-orange)](https://github.com/AriaLyy/Aria)
+[![M3U8Component](https://img.shields.io/badge/M3U8Component-3.7.8-pre-1-orange)](https://github.com/AriaLyy/Aria)
 
 ```java
-implementation 'com.arialyy.aria:core:v_3.7.8-pre-1'
-annotationProcessor 'com.arialyy.aria:compiler:v_3.7.8-pre-1'
-implementation 'com.arialyy.aria:ftpComponent:v_3.7.8-pre-1' # 如果需要使用ftp，请增加该组件
-implementation 'com.arialyy.aria:m3u8Component:v_3.7.8-pre-1' # 如果需要使用m3u8下载功能，请增加该组件
+implementation 'com.arialyy.aria:core:3.7.8-pre-3'
+annotationProcessor 'com.arialyy.aria:compiler:3.7.8-pre-3'
+implementation 'com.arialyy.aria:ftpComponent:3.7.8-pre-3' # 如果需要使用ftp，请增加该组件
+implementation 'com.arialyy.aria:m3u8Component:3.7.8-pre-3' # 如果需要使用m3u8下载功能，请增加该组件
 ```
 如果出现android support依赖错误，请将 `compile 'com.arialyy.aria:core:<last-version>'`替换为
 ```
