@@ -91,6 +91,7 @@ final class StartCmd<T extends AbsTaskWrapper> extends AbsNormalCmd<T> {
    * 当缓冲队列为null时，查找数据库中所有等待中的任务
    */
   private void findAllWaitTask() {
-    new Thread(new ResumeThread(isDownloadCmd, IEntity.STATE_WAIT)).start();
+    new Thread(
+        new ResumeThread(isDownloadCmd, String.format("state=%s", IEntity.STATE_WAIT))).start();
   }
 }

@@ -137,7 +137,7 @@ protected void onCreate(Bundle savedInstanceState) {
 
 
 ### 版本日志
-  + v_v_3.7.8-pre-1 (2019/11/20)
+  + v_3.7.8-pre-1 (2019/11/20)
     - fix bug https://github.com/AriaLyy/Aria/issues/526
 
 [更多版本记录](https://github.com/AriaLyy/Aria/blob/master/DEV_LOG.md)

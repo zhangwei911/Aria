@@ -16,29 +16,10 @@
 package com.arialyy.aria.core.command;
 
 import com.arialyy.aria.core.AriaManager;
-import com.arialyy.aria.core.common.AbsEntity;
-import com.arialyy.aria.core.download.DGTaskWrapper;
-import com.arialyy.aria.core.download.DTaskWrapper;
-import com.arialyy.aria.core.download.DownloadEntity;
-import com.arialyy.aria.core.download.DownloadGroupEntity;
 import com.arialyy.aria.core.inf.IEntity;
-import com.arialyy.aria.core.inf.IOptionConstant;
-import com.arialyy.aria.core.manager.TaskWrapperManager;
-import com.arialyy.aria.core.queue.DGroupTaskQueue;
-import com.arialyy.aria.core.queue.DTaskQueue;
-import com.arialyy.aria.core.queue.UTaskQueue;
-import com.arialyy.aria.core.task.AbsTask;
-import com.arialyy.aria.core.upload.UTaskWrapper;
-import com.arialyy.aria.core.upload.UploadEntity;
 import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
-import com.arialyy.aria.core.wrapper.ITaskWrapper;
-import com.arialyy.aria.orm.DbEntity;
 import com.arialyy.aria.util.ALog;
-import com.arialyy.aria.util.CommonUtil;
 import com.arialyy.aria.util.NetUtils;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.Executors;
 
 /**
  * Created by AriaL on 2017/6/13.
@@ -50,7 +31,6 @@ import java.util.concurrent.Executors;
  */
 final class ResumeAllCmd<T extends AbsTaskWrapper> extends AbsNormalCmd<T> {
 
-
   ResumeAllCmd(T entity, int taskType) {
     super(entity, taskType);
   }
@@ -60,8 +40,7 @@ final class ResumeAllCmd<T extends AbsTaskWrapper> extends AbsNormalCmd<T> {
       ALog.w(TAG, "恢复任务失败，网络未连接");
       return;
     }
-    new Thread(new ResumeThread(isDownloadCmd, IEntity.STATE_COMPLETE)).start();
+    new Thread(new ResumeThread(isDownloadCmd,
+        String.format("state!=%s", IEntity.STATE_COMPLETE))).start();
   }
-
-
 }

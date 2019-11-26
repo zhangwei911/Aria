@@ -47,11 +47,11 @@ public class ResumeThread implements Runnable {
   private String TAG = CommonUtil.getClassName(getClass());
   private List<AbsTaskWrapper> mWaitList = new ArrayList<>();
   private boolean isDownloadCmd;
-  private int excludeState;
+  private String sqlCondition;
 
-  ResumeThread(boolean isDownload, int excludeState) {
+  ResumeThread(boolean isDownload, String sqlCondition) {
     this.isDownloadCmd = isDownload;
-    this.excludeState = excludeState;
+    this.sqlCondition = sqlCondition;
   }
 
   /**
@@ -63,8 +63,8 @@ public class ResumeThread implements Runnable {
     if (type == 1) {
       List<DownloadEntity> entities =
           DbEntity.findDatas(DownloadEntity.class,
-              "isGroupChild=? AND state!=? ORDER BY stopTime DESC", "false",
-              String.valueOf(excludeState));
+              String.format("NOT(isGroupChild) AND NOT(isComplete) AND %s ORDER BY stopTime DESC",
+                  sqlCondition));
       if (entities != null && !entities.isEmpty()) {
         for (DownloadEntity entity : entities) {
           addResumeEntity(TaskWrapperManager.getInstance()
@@ -73,8 +73,9 @@ public class ResumeThread implements Runnable {
       }
     } else if (type == 2) {
       List<DownloadGroupEntity> entities =
-          DbEntity.findDatas(DownloadGroupEntity.class, "state!=? ORDER BY stopTime DESC",
-              String.valueOf(excludeState));
+          DbEntity.findDatas(DownloadGroupEntity.class,
+              String.format("NOT(isComplete) AND %s ORDER BY stopTime DESC",
+                  sqlCondition));
       if (entities != null && !entities.isEmpty()) {
         for (DownloadGroupEntity entity : entities) {
           addResumeEntity(
@@ -84,8 +85,9 @@ public class ResumeThread implements Runnable {
       }
     } else if (type == 3) {
       List<UploadEntity> entities =
-          DbEntity.findDatas(UploadEntity.class, "state!=? ORDER BY stopTime DESC",
-              String.valueOf(excludeState));
+          DbEntity.findDatas(UploadEntity.class,
+              String.format("NOT(isComplete) AND %s ORDER BY stopTime DESC",
+                  sqlCondition));
       if (entities != null && !entities.isEmpty()) {
         for (UploadEntity entity : entities) {
           addResumeEntity(TaskWrapperManager.getInstance()
@@ -125,7 +127,7 @@ public class ResumeThread implements Runnable {
         queue = DGroupTaskQueue.getInstance();
       }
 
-      if (queue == null){
+      if (queue == null) {
         ALog.e(TAG, "任务类型错误");
         continue;
       }
