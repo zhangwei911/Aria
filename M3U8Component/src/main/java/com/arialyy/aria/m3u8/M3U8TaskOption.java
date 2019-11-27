@@ -17,6 +17,7 @@ package com.arialyy.aria.m3u8;
 
 import com.arialyy.aria.core.inf.ITaskOption;
 import com.arialyy.aria.core.processor.IBandWidthUrlConverter;
+import com.arialyy.aria.core.processor.IKeyUrlConverter;
 import com.arialyy.aria.core.processor.ILiveTsUrlConverter;
 import com.arialyy.aria.core.processor.ITsMergeHandler;
 import com.arialyy.aria.core.processor.IVodTsUrlConverter;
@@ -102,6 +103,19 @@ public class M3U8TaskOption implements ITaskOption {
    * 生成索引占位字段
    */
   private boolean generateIndexFile = false;
+
+  /**
+   * 加密密钥的解密处理器
+   */
+  private SoftReference<IKeyUrlConverter> keyUrlConverter;
+
+  public IKeyUrlConverter getKeyUrlConverter() {
+    return keyUrlConverter == null ? null : keyUrlConverter.get();
+  }
+
+  public void setKeyUrlConverter(IKeyUrlConverter keyUrlConverter) {
+    this.keyUrlConverter = new SoftReference<>(keyUrlConverter);
+  }
 
   public boolean isGenerateIndexFile() {
     return generateIndexFile;

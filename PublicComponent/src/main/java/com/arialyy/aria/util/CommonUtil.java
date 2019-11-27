@@ -71,15 +71,15 @@ public class CommonUtil {
       ALog.e(TAG, "sql语句表达式不能为null");
       return false;
     }
-    if (expression.length == 1) {
-      ALog.e(TAG, String.format("表达式需要写入参数，参数信息：%s", Arrays.toString(expression)));
-      return false;
-    }
+    //if (expression.length == 1) {
+    //  ALog.e(TAG, String.format("表达式需要写入参数，参数信息：%s", Arrays.toString(expression)));
+    //  return false;
+    //}
     String where = expression[0];
-    if (!where.contains("?")) {
-      ALog.e(TAG, String.format("请在where语句的'='后编写?，参数信息：%s", Arrays.toString(expression)));
-      return false;
-    }
+    //if (!where.contains("?")) {
+    //  ALog.e(TAG, String.format("请在where语句的'='后编写?，参数信息：%s", Arrays.toString(expression)));
+    //  return false;
+    //}
     Pattern pattern = Pattern.compile("\\?");
     Matcher matcher = pattern.matcher(where);
     int count = 0;

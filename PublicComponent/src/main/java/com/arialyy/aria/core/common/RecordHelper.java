@@ -63,7 +63,8 @@ public class RecordHelper {
       fileExists = true;
     }
     // 处理文件被删除的情况
-    if (fileExists) {
+    if (!fileExists) {
+      ALog.w(TAG, String.format("文件【%s】被删除，重新分配线程区间", mTaskRecord.filePath));
       for (int i = 0; i < mTaskRecord.threadNum; i++) {
         long startL = i * blockSize, endL = (i + 1) * blockSize;
         ThreadRecord tr = mTaskRecord.threadRecords.get(i);

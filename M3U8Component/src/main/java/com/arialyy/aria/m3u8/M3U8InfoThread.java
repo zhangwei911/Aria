@@ -26,6 +26,7 @@ import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.download.M3U8Entity;
 import com.arialyy.aria.core.inf.OnFileInfoCallback;
 import com.arialyy.aria.core.processor.IBandWidthUrlConverter;
+import com.arialyy.aria.core.processor.IKeyUrlConverter;
 import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
 import com.arialyy.aria.core.wrapper.ITaskWrapper;
 import com.arialyy.aria.exception.M3U8Exception;
@@ -127,7 +128,7 @@ final public class M3U8InfoThread implements Runnable {
         File indexFile = new File(indexPath);
         if (!indexFile.exists()) {
           FileUtil.createFile(indexPath);
-        }else {
+        } else {
           //FileUtil.deleteFile(indexPath);
         }
         fos = new FileOutputStream(indexFile);
@@ -353,7 +354,14 @@ final public class M3U8InfoThread implements Runnable {
       } else {
         return;
       }
-      URL url = ConnectionHelp.handleUrl(info.keyUrl, mHttpOption);
+
+      IKeyUrlConverter keyUrlConverter = mM3U8Option.getKeyUrlConverter();
+      String keyUrl = info.keyUrl;
+      if (keyUrlConverter != null) {
+        keyUrl = keyUrlConverter.convert(keyUrl);
+      }
+
+      URL url = ConnectionHelp.handleUrl(keyUrl, mHttpOption);
       conn = ConnectionHelp.handleConnection(url, mHttpOption);
       ConnectionHelp.setConnectParam(mHttpOption, conn);
       conn.setConnectTimeout(mConnectTimeOut);

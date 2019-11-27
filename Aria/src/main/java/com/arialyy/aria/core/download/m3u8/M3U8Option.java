@@ -17,6 +17,7 @@ package com.arialyy.aria.core.download.m3u8;
 
 import com.arialyy.aria.core.common.BaseOption;
 import com.arialyy.aria.core.processor.IBandWidthUrlConverter;
+import com.arialyy.aria.core.processor.IKeyUrlConverter;
 import com.arialyy.aria.core.processor.ITsMergeHandler;
 import com.arialyy.aria.util.CheckUtil;
 import com.arialyy.aria.util.ComponentUtil;
@@ -31,6 +32,7 @@ public class M3U8Option<OP extends M3U8Option> extends BaseOption {
   private int bandWidth;
   private ITsMergeHandler mergeHandler;
   private IBandWidthUrlConverter bandWidthUrlConverter;
+  private IKeyUrlConverter keyUrlConverter;
 
   M3U8Option() {
     super();
@@ -86,6 +88,17 @@ public class M3U8Option<OP extends M3U8Option> extends BaseOption {
   public OP setBandWidthUrlConverter(IBandWidthUrlConverter bandWidthUrlConverter) {
     CheckUtil.checkMemberClass(bandWidthUrlConverter.getClass());
     this.bandWidthUrlConverter = bandWidthUrlConverter;
+    return (OP) this;
+  }
+
+  /**
+   * M3U8 密钥url转换器，对于某些服务器，密钥的下载地址是被加密的，因此需要使用该方法将被加密的密钥解密成可被识别的http地址
+   *
+   * @param keyUrlConverter {@link IKeyUrlConverter}
+   */
+  public OP setKeyUrlConverter(IKeyUrlConverter keyUrlConverter) {
+    CheckUtil.checkMemberClass(keyUrlConverter.getClass());
+    this.keyUrlConverter = keyUrlConverter;
     return (OP) this;
   }
 }

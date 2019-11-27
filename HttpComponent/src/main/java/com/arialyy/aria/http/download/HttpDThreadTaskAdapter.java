@@ -24,6 +24,7 @@ import com.arialyy.aria.http.BaseHttpThreadTaskAdapter;
 import com.arialyy.aria.http.ConnectionHelp;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.BufferedRandomAccessFile;
+import com.arialyy.aria.util.FileUtil;
 import java.io.BufferedInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;

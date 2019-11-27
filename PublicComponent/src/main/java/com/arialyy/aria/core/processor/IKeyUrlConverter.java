@@ -13,20 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.arialyy.aria.core.command;
+package com.arialyy.aria.core.processor;
 
-import com.arialyy.aria.core.task.ITask;
-import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
+import com.arialyy.aria.core.inf.IEventHandler;
 
 /**
- * Created by AriaL on 2017/6/29.
- * 抽象命令工厂
+ * M3U8 密钥下载地址处理器，可用于解密被加密的密钥的下载地址
  */
-public abstract class AbsCmdFactory<TASK_ENTITY extends AbsTaskWrapper, CMD extends AbsCmd> {
+public interface IKeyUrlConverter extends IEventHandler {
 
   /**
-   * @param entity 下载实体
-   * {@link ITask#DOWNLOAD}、{@link ITask#DOWNLOAD_GROUP}、{@link ITask#UPLOAD}
+   * 将被加密的密钥下载地址转换为可使用的http下载地址
+   *
+   * @param keyUrl 加密的url地址
+   * @return 可正常访问的http地址
    */
-  public abstract CMD createCmd(TASK_ENTITY entity, int type, int taskType);
+  String convert(String keyUrl);
 }

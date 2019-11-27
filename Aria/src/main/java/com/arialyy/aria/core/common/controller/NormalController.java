@@ -16,11 +16,12 @@
 package com.arialyy.aria.core.common.controller;
 
 import com.arialyy.aria.core.command.CancelCmd;
+import com.arialyy.aria.core.command.CmdHelper;
 import com.arialyy.aria.core.command.NormalCmdFactory;
+import com.arialyy.aria.core.command.StartCmd;
 import com.arialyy.aria.core.event.EventMsgUtil;
 import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
 import com.arialyy.aria.util.ALog;
-import com.arialyy.aria.core.command.CmdHelper;
 
 /**
  * 启动控制器
@@ -49,10 +50,23 @@ public final class NormalController extends FeatureController implements INormal
    */
   @Override
   public void resume() {
+    resume(false);
+  }
+
+  /**
+   * 正常来说，当执行队列满时，调用恢复任务接口，只能将任务放到缓存队列中。
+   * 如果希望调用恢复接口，马上进入执行队列，需要使用该方法
+   *
+   * @param newStart true 立即将任务恢复到执行队列中
+   */
+  @Override public void resume(boolean newStart) {
     if (checkConfig()) {
+      StartCmd cmd =
+          (StartCmd) CmdHelper.createNormalCmd(getTaskWrapper(), NormalCmdFactory.TASK_START,
+              checkTaskType());
+      cmd.setNewStart(newStart);
       EventMsgUtil.getDefault()
-          .post(CmdHelper.createNormalCmd(getTaskWrapper(), NormalCmdFactory.TASK_START,
-              checkTaskType()));
+          .post(cmd);
     }
   }
 

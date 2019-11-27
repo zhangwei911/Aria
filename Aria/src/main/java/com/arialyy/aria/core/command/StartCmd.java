@@ -27,10 +27,20 @@ import com.arialyy.aria.util.NetUtils;
 /**
  * Created by lyy on 2016/8/22. 开始命令 队列模型{@link QueueMod#NOW}、{@link QueueMod#WAIT}
  */
-final class StartCmd<T extends AbsTaskWrapper> extends AbsNormalCmd<T> {
+final public class StartCmd<T extends AbsTaskWrapper> extends AbsNormalCmd<T> {
+
+  private boolean newStart = false;
 
   StartCmd(T entity, int taskType) {
     super(entity, taskType);
+  }
+
+  /**
+   * 立即执行任务
+   * @param newStart true 立即执行任务，无论执行队列是否满了
+   */
+  public void setNewStart(boolean newStart) {
+    this.newStart = newStart;
   }
 
   @Override public void executeCmd() {
@@ -71,7 +81,11 @@ final class StartCmd<T extends AbsTaskWrapper> extends AbsNormalCmd<T> {
             startTask();
           }
         } else {
-          sendWaitState(task);
+          if (newStart){
+            startTask();
+          }else {
+            sendWaitState(task);
+          }
         }
       }
     } else {

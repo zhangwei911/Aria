@@ -157,14 +157,6 @@ public abstract class AbsNormalCmd<T extends AbsTaskWrapper> extends AbsCmd<T> {
     mQueue.resumeTask(task);
   }
 
-  /**
-   * 启动指定任务
-   *
-   * @param task 指定任务
-   */
-  void startTask(AbsTask task) {
-    mQueue.startTask(task);
-  }
 
   /**
    * 从队列中获取任务
