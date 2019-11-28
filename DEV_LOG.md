@@ -1,4 +1,6 @@
 ## 开发日志
+  + v_3.7.9 (2019/11/28)
+    - fix bug https://github.com/AriaLyy/Aria/issues/537
   + v_3.7.8 (2019/11/28)
     - fix bug https://github.com/AriaLyy/Aria/issues/526
     - fix bug https://github.com/AriaLyy/Aria/issues/533

@@ -49,6 +49,7 @@ public class M3U8LiveDLoadActivity extends BaseActivity<ActivityM3u8LiveBinding>
   private String mFilePath;
   private M3U8LiveModule mModule;
   private DownloadEntity mEntity;
+  private long mTaskId;
 
   @Override
   protected void init(Bundle savedInstanceState) {
@@ -63,6 +64,7 @@ public class M3U8LiveDLoadActivity extends BaseActivity<ActivityM3u8LiveBinding>
           return;
         }
         mEntity = entity;
+        mTaskId = mEntity.getId();
         getBinding().setStateStr(getString(R.string.start));
         getBinding().setUrl(entity.getUrl());
         getBinding().setFilePath(entity.getFilePath());
@@ -213,22 +215,23 @@ public class M3U8LiveDLoadActivity extends BaseActivity<ActivityM3u8LiveBinding>
   public void onClick(View view) {
     switch (view.getId()) {
       case R.id.start:
-        if (Aria.download(this).load(mEntity.getId()).isRunning()) {
+        if (Aria.download(this).load(mTaskId).isRunning()) {
           Aria.download(this).load(mEntity.getId()).stop();
         } else {
           startD();
         }
         break;
       case R.id.cancel:
-        if (AppUtil.chekEntityValid(mEntity)) {
+        if (mTaskId != -1){
           Aria.download(this).load(mEntity.getId()).cancel(true);
+          mTaskId = -1;
         }
         break;
     }
   }
 
   private void startD() {
-    Aria.download(M3U8LiveDLoadActivity.this)
+    mTaskId = Aria.download(M3U8LiveDLoadActivity.this)
         .load(mUrl)
         .setFilePath(mFilePath, true)
         .m3u8LiveOption(getLiveoption())

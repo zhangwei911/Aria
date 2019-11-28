@@ -98,9 +98,6 @@ import java.util.concurrent.ConcurrentHashMap;
   }
 
   public static AriaManager getInstance() {
-    if (INSTANCE == null) {
-      throw new NullPointerException("请使用AriaManager.init(context)初始化管理器");
-    }
     return INSTANCE;
   }
 
