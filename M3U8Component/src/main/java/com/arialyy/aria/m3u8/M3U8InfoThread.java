@@ -360,6 +360,10 @@ final public class M3U8InfoThread implements Runnable {
       if (keyUrlConverter != null) {
         keyUrl = keyUrlConverter.convert(keyUrl);
       }
+      if (TextUtils.isEmpty(keyUrl)){
+        ALog.e(TAG, "m3u8密钥key url 为空");
+        return;
+      }
 
       URL url = ConnectionHelp.handleUrl(keyUrl, mHttpOption);
       conn = ConnectionHelp.handleConnection(url, mHttpOption);

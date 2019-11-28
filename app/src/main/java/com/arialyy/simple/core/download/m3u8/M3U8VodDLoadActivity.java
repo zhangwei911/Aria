@@ -36,6 +36,7 @@ import com.arialyy.aria.core.download.M3U8Entity;
 import com.arialyy.aria.core.download.m3u8.M3U8VodOption;
 import com.arialyy.aria.core.inf.IEntity;
 import com.arialyy.aria.core.processor.IBandWidthUrlConverter;
+import com.arialyy.aria.core.processor.IKeyUrlConverter;
 import com.arialyy.aria.core.processor.ITsMergeHandler;
 import com.arialyy.aria.core.processor.IVodTsUrlConverter;
 import com.arialyy.aria.core.task.DownloadTask;
@@ -308,6 +309,7 @@ public class M3U8VodDLoadActivity extends BaseActivity<ActivityM3u8VodBinding> {
         //.merge(true)
         .setVodTsUrlConvert(new VodTsUrlConverter());
         //.setMergeHandler(new TsMergeHandler());
+    option.setKeyUrlConverter(new KeyUrlConverter());
     option.setBandWidthUrlConverter(new BandWidthUrlConverter(mUrl));
     return option;
   }
@@ -355,6 +357,14 @@ public class M3U8VodDLoadActivity extends BaseActivity<ActivityM3u8VodBinding> {
     @Override public String convert(String bandWidthUrl) {
       int index = url.lastIndexOf("/");
       return url.substring(0, index + 1) + bandWidthUrl;
+    }
+  }
+
+  static  class KeyUrlConverter implements IKeyUrlConverter{
+
+    @Override public String convert(String keyUrl) {
+      ALog.d("TAG", "convertUrl....");
+      return null;
     }
   }
 }

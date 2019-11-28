@@ -1,9 +1,10 @@
 ## 开发日志
-  + v_3.7.8
+  + v_3.7.8 (2019/11/28)
     - fix bug https://github.com/AriaLyy/Aria/issues/526
     - fix bug https://github.com/AriaLyy/Aria/issues/533
     - fix bug https://github.com/AriaLyy/Aria/issues/535
     - 修复ftp无法完成下载的问题
+    - 修复一个非分块模式下，调用`updateUrl(newUrl)`后无法恢复下载的问题
     - 增加立即恢复任务的接口，正常来说，当执行队列满时，调用恢复任务接口，只能将任务放到缓存队列中。如果希望调用恢复接口，马上进入执行队列，需要调用`resume(true)`这个重载方法。
     - 增加M3U8加密密钥的下载地址转换器 https://github.com/AriaLyy/Aria/issues/522
   + v_3.7.7 (2019/11/20)

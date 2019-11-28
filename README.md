@@ -44,16 +44,16 @@ Aria有以下特点：
 
 ## 引入库
 [![license](http://img.shields.io/badge/license-Apache2.0-brightgreen.svg?style=flat)](https://github.com/AriaLyy/Aria/blob/master/LICENSE)
-[![Core](https://img.shields.io/badge/Core-3.7.8-pre-1-blue)](https://github.com/AriaLyy/Aria)
-[![Compiler](https://img.shields.io/badge/Compiler-3.7.8-pre-1-blue)](https://github.com/AriaLyy/Aria)
-[![FtpComponent](https://img.shields.io/badge/FtpComponent-3.7.8-pre-1-orange)](https://github.com/AriaLyy/Aria)
-[![M3U8Component](https://img.shields.io/badge/M3U8Component-3.7.8-pre-1-orange)](https://github.com/AriaLyy/Aria)
+[![Core](https://img.shields.io/badge/Core-3.7.8-blue)](https://github.com/AriaLyy/Aria)
+[![Compiler](https://img.shields.io/badge/Compiler-3.7.8-blue)](https://github.com/AriaLyy/Aria)
+[![FtpComponent](https://img.shields.io/badge/FtpComponent-3.7.8-orange)](https://github.com/AriaLyy/Aria)
+[![M3U8Component](https://img.shields.io/badge/M3U8Component-3.7.8-orange)](https://github.com/AriaLyy/Aria)
 
 ```java
-implementation 'com.arialyy.aria:core:3.7.8-pre-3'
-annotationProcessor 'com.arialyy.aria:compiler:3.7.8-pre-3'
-implementation 'com.arialyy.aria:ftpComponent:3.7.8-pre-3' # 如果需要使用ftp，请增加该组件
-implementation 'com.arialyy.aria:m3u8Component:3.7.8-pre-3' # 如果需要使用m3u8下载功能，请增加该组件
+implementation 'com.arialyy.aria:core:3.7.8'
+annotationProcessor 'com.arialyy.aria:compiler:3.7.8'
+implementation 'com.arialyy.aria:ftpComponent:3.7.8' # 如果需要使用ftp，请增加该组件
+implementation 'com.arialyy.aria:m3u8Component:3.7.8' # 如果需要使用m3u8下载功能，请增加该组件
 ```
 如果出现android support依赖错误，请将 `compile 'com.arialyy.aria:core:<last-version>'`替换为
 ```
@@ -137,8 +137,14 @@ protected void onCreate(Bundle savedInstanceState) {
 
 
 ### 版本日志
-  + v_3.7.8-pre-1 (2019/11/20)
+  + v_3.7.8 (2019/11/28)
     - fix bug https://github.com/AriaLyy/Aria/issues/526
+    - fix bug https://github.com/AriaLyy/Aria/issues/533
+    - fix bug https://github.com/AriaLyy/Aria/issues/535
+    - 修复ftp无法完成下载的问题
+    - 修复一个非分块模式下，调用`updateUrl(newUrl)`后无法恢复下载的问题
+    - 增加立即恢复任务的接口，正常来说，当执行队列满时，调用恢复任务接口，只能将任务放到缓存队列中。如果希望调用恢复接口，马上进入执行队列，需要调用`resume(true)`这个重载方法。
+    - 增加M3U8加密密钥的下载地址转换器 https://github.com/AriaLyy/Aria/issues/522
 
 [更多版本记录](https://github.com/AriaLyy/Aria/blob/master/DEV_LOG.md)
 
