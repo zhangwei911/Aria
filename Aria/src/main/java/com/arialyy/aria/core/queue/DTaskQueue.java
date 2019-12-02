@@ -16,14 +16,14 @@
 
 package com.arialyy.aria.core.queue;
 
-import com.arialyy.aria.core.AriaManager;
+import com.arialyy.aria.core.AriaConfig;
 import com.arialyy.aria.core.download.DTaskWrapper;
-import com.arialyy.aria.core.task.DownloadTask;
 import com.arialyy.aria.core.event.DMaxNumEvent;
 import com.arialyy.aria.core.event.Event;
 import com.arialyy.aria.core.event.EventMsgUtil;
 import com.arialyy.aria.core.inf.TaskSchedulerType;
 import com.arialyy.aria.core.scheduler.TaskSchedulers;
+import com.arialyy.aria.core.task.DownloadTask;
 import com.arialyy.aria.util.ALog;
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -60,7 +60,7 @@ public class DTaskQueue extends AbsTaskQueue<DownloadTask, DTaskWrapper> {
   }
 
   @Override public int getOldMaxNum() {
-    return AriaManager.getInstance().getDownloadConfig().oldMaxTaskNum;
+    return AriaConfig.getInstance().getDConfig().oldMaxTaskNum;
   }
 
   /**
@@ -81,7 +81,7 @@ public class DTaskQueue extends AbsTaskQueue<DownloadTask, DTaskWrapper> {
         }
       }
     }
-    int maxSize = AriaManager.getInstance().getDownloadConfig().getMaxTaskNum();
+    int maxSize = AriaConfig.getInstance().getDConfig().getMaxTaskNum();
     int currentSize = mExecutePool.size();
     if (currentSize == 0 || currentSize < maxSize) {
       startTask(task);
@@ -126,6 +126,6 @@ public class DTaskQueue extends AbsTaskQueue<DownloadTask, DTaskWrapper> {
   }
 
   @Override public int getMaxTaskNum() {
-    return AriaManager.getInstance().getDownloadConfig().getMaxTaskNum();
+    return AriaConfig.getInstance().getDConfig().getMaxTaskNum();
   }
 }

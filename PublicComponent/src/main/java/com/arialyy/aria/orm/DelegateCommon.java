@@ -221,4 +221,22 @@ class DelegateCommon extends AbsDelegate {
       db.execSQL(str);
     }
   }
+
+  /**
+   * 通过class 获取该class的表字段
+   *
+   * @return 表字段列表
+   */
+  List<String> getColumns(Class<? extends DbEntity> clazz) {
+    List<String> columns = new ArrayList<>();
+    List<Field> fields = CommonUtil.getAllFields(clazz);
+    for (Field field : fields) {
+      field.setAccessible(true);
+      if (SqlUtil.isIgnore(field)) {
+        continue;
+      }
+      columns.add(field.getName());
+    }
+    return columns;
+  }
 }

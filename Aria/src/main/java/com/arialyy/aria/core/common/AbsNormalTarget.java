@@ -32,6 +32,14 @@ public abstract class AbsNormalTarget<TARGET extends AbsNormalTarget> extends Ab
     implements INormalFeature {
 
   /**
+   * 是否忽略权限检查
+   */
+  public TARGET ignoreCheckPermissions() {
+    getController().ignoreCheckPermissions();
+    return (TARGET) this;
+  }
+
+  /**
    * 任务是否在执行
    *
    * @return {@code true} 任务正在执行

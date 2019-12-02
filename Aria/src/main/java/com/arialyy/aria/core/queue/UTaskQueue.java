@@ -16,6 +16,7 @@
 
 package com.arialyy.aria.core.queue;
 
+import com.arialyy.aria.core.AriaConfig;
 import com.arialyy.aria.core.AriaManager;
 import com.arialyy.aria.core.event.Event;
 import com.arialyy.aria.core.event.EventMsgUtil;
@@ -55,11 +56,11 @@ public class UTaskQueue extends AbsTaskQueue<UploadTask, UTaskWrapper> {
   }
 
   @Override public int getOldMaxNum() {
-    return AriaManager.getInstance().getUploadConfig().oldMaxTaskNum;
+    return AriaConfig.getInstance().getUConfig().oldMaxTaskNum;
   }
 
   @Override public int getMaxTaskNum() {
-    return AriaManager.getInstance().getUploadConfig().getMaxTaskNum();
+    return AriaConfig.getInstance().getUConfig().getMaxTaskNum();
   }
 
   @Override public UploadTask createTask(UTaskWrapper wrapper) {

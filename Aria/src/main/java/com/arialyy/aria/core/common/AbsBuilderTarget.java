@@ -15,8 +15,8 @@
  */
 package com.arialyy.aria.core.common;
 
-import com.arialyy.aria.core.common.controller.IStartFeature;
 import com.arialyy.aria.core.common.controller.BuilderController;
+import com.arialyy.aria.core.common.controller.IStartFeature;
 import com.arialyy.aria.core.inf.AbsTarget;
 
 /**
@@ -32,6 +32,14 @@ public abstract class AbsBuilderTarget<TARGET extends AbsBuilderTarget> extends 
       mStartController = new BuilderController(getTaskWrapper());
     }
     return mStartController;
+  }
+
+  /**
+   * 是否忽略权限检查
+   */
+  public TARGET ignoreCheckPermissions() {
+    getController().ignoreCheckPermissions();
+    return (TARGET) this;
   }
 
   /**

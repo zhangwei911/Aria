@@ -15,7 +15,7 @@
  */
 package com.arialyy.aria.core.command;
 
-import com.arialyy.aria.core.AriaManager;
+import com.arialyy.aria.core.AriaConfig;
 import com.arialyy.aria.core.inf.IEntity;
 import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
 import com.arialyy.aria.util.ALog;
@@ -36,7 +36,7 @@ final class ResumeAllCmd<T extends AbsTaskWrapper> extends AbsNormalCmd<T> {
   }
 
   @Override public void executeCmd() {
-    if (!NetUtils.isConnected(AriaManager.getInstance().getAPP())) {
+    if (!NetUtils.isConnected(AriaConfig.getInstance().getAPP())) {
       ALog.w(TAG, "恢复任务失败，网络未连接");
       return;
     }

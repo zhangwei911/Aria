@@ -100,14 +100,14 @@ final class SqlHelper extends SQLiteOpenHelper {
       } else if (oldVersion < 53) {
         handle366Update(db);
       } else {
-        handleDbUpdate(db, null, null);
+        handleDbUpdate(db, null);
       }
     }
   }
 
   @Override public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
     if (oldVersion > newVersion) {
-      handleDbUpdate(db, null, null);
+      handleDbUpdate(db, null);
     }
   }
 
@@ -145,10 +145,8 @@ final class SqlHelper extends SQLiteOpenHelper {
    *
    * @param modifyColumns 需要修改的表字段的映射，key为表名，
    * value{@code Map<String, String>}中的Map的key为老字段名称，value为该老字段对应的新字段名称
-   * @param delColumns 需要删除的表字段，key为表名，value{@code List<String>}为需要删除的字段列表
    */
-  private void handleDbUpdate(SQLiteDatabase db, Map<String, Map<String, String>> modifyColumns,
-      Map<String, List<String>> delColumns) {
+  private void handleDbUpdate(SQLiteDatabase db, Map<String, Map<String, String>> modifyColumns) {
     if (db == null) {
       ALog.e("SqlHelper", "db 为 null");
       return;
@@ -161,7 +159,7 @@ final class SqlHelper extends SQLiteOpenHelper {
       db.beginTransaction();
       Set<String> tables = DBConfig.mapping.keySet();
       for (String tableName : tables) {
-        Class clazz = DBConfig.mapping.get(tableName);
+        Class<? extends DbEntity> clazz = DBConfig.mapping.get(tableName);
         if (mDelegate.tableExists(db, clazz)) {
           //修改表名为中介表名
           String alertSql = String.format("ALTER TABLE %s RENAME TO %s_temp", tableName, tableName);
@@ -178,46 +176,57 @@ final class SqlHelper extends SQLiteOpenHelper {
 
           // 复制数据
           if (count > 0) {
-            // 获取旧表的所有字段名称
             Cursor columnC =
                 db.rawQuery(String.format("PRAGMA table_info(%s_temp)", tableName), null);
-            StringBuilder params = new StringBuilder();
+
+            // 获取新表的所有字段名称
+            List<String> newTabColumns = mDelegate.getColumns(clazz);
+            // 获取旧表的所有字段名称
+            List<String> oldTabColumns = new ArrayList<>();
 
             while (columnC.moveToNext()) {
               String columnName = columnC.getString(columnC.getColumnIndex("name"));
-              if (delColumns != null && delColumns.get(tableName) != null) {
-                List<String> delColumn = delColumns.get(tableName);
-                if (delColumn != null && !delColumn.isEmpty()) {
-                  if (delColumn.contains(columnName)) {
-                    continue;
-                  }
-                }
-              }
-
-              params.append(columnName).append(",");
+              oldTabColumns.add(columnName);
             }
             columnC.close();
+
+            // 旧表需要删除的字段，删除旧表有而新表没的字段
+            List<String> diffTab = getDiffColumn(newTabColumns, oldTabColumns);
+            StringBuilder params = new StringBuilder();
+
+            // 需要修改的列名映射表
+            Map<String, String> modifyMap = null;
+            if (modifyColumns != null) {
+              modifyMap = modifyColumns.get(tableName);
+            }
+
+            for (String column : oldTabColumns) {
+              if (!diffTab.isEmpty() && diffTab.contains(column)
+                  && (modifyMap != null && !modifyMap.containsKey(column))) { // 如果旧表字段有修改，忽略这个删除
+                continue;
+              }
+              params.append(column).append(",");
+            }
 
             String oldParamStr = params.toString();
             oldParamStr = oldParamStr.substring(0, oldParamStr.length() - 1);
             String newParamStr = oldParamStr;
             // 处理字段名称改变
-            if (modifyColumns != null) {
-              Map<String, String> columnMap = modifyColumns.get(tableName);
-              if (columnMap != null && !columnMap.isEmpty()) {
-                Set<String> keys = columnMap.keySet();
-                for (String key : keys) {
-                  if (newParamStr.contains(key)) {
-                    newParamStr = newParamStr.replace(key, columnMap.get(key));
-                  }
+            if (modifyMap != null && !modifyMap.isEmpty()) {
+              Set<String> keys = modifyMap.keySet();
+              for (String key : keys) {
+                if (newParamStr.contains(key)) {
+                  newParamStr = newParamStr.replace(key, modifyMap.get(key));
                 }
               }
             }
+
             //恢复数据
             String insertSql =
                 String.format("INSERT INTO %s (%s) SELECT %s FROM %s_temp", tableName, newParamStr,
                     oldParamStr, tableName);
             ALog.d(TAG, "insertSql = " + insertSql);
+
             db.execSQL(insertSql);
           }
           //删除中介表
@@ -232,6 +241,19 @@ final class SqlHelper extends SQLiteOpenHelper {
     } finally {
       db.endTransaction();
     }
+  }
+
+  /**
+   * 取新表差值（需要删除的字段）：旧表有而新表没的字段
+   *
+   * @param newTab 新表字段
+   * @param oldTab 旧表字段
+   * @return 旧表有而新表没的字段
+   */
+  private List<String> getDiffColumn(List<String> newTab, List<String> oldTab) {
+    List<String> temp = new ArrayList<>(oldTab); // 拷贝旧表字段
+    temp.removeAll(newTab);
+    return temp;
   }
 
   /**
@@ -256,7 +278,7 @@ final class SqlHelper extends SQLiteOpenHelper {
     modifyMap.put("ThreadRecord", threadRecordModify);
 
     // 执行升级操作
-    handleDbUpdate(db, modifyMap, null);
+    handleDbUpdate(db, modifyMap);
     delRepeatThreadRecord(db);
   }
 
@@ -273,7 +295,7 @@ final class SqlHelper extends SQLiteOpenHelper {
     modifyMap.put("ThreadRecord", threadRecordModify);
 
     // 执行升级操作
-    handleDbUpdate(db, modifyMap, null);
+    handleDbUpdate(db, modifyMap);
     delRepeatThreadRecord(db);
   }
 
@@ -307,7 +329,7 @@ final class SqlHelper extends SQLiteOpenHelper {
     modifyMap.put("ThreadRecord", threadRecordModify);
 
     // 执行升级操作
-    handleDbUpdate(db, modifyMap, null);
+    handleDbUpdate(db, modifyMap);
     delRepeatThreadRecord(db);
   }
 
@@ -360,15 +382,6 @@ final class SqlHelper extends SQLiteOpenHelper {
     dGEntityModifyMap.put("groupName", "groupHash");
     modifyMap.put("DownloadGroupEntity", dGEntityModifyMap);
 
-    // 删除字段
-    Map<String, List<String>> delColumnMap = new HashMap<>();
-    List<String> dEntityDel = new ArrayList<>();
-    dEntityDel.add("taskKey");
-    delColumnMap.put("DownloadEntity", dEntityDel);
-    List<String> dgEntityDel = new ArrayList<>();
-    dgEntityDel.add("subtask");
-    delColumnMap.put("DownloadGroupEntity", dgEntityDel);
-
-    handleDbUpdate(db, modifyMap, delColumnMap);
+    handleDbUpdate(db, modifyMap);
   }
 }

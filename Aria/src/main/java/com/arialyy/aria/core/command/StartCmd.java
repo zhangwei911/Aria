@@ -16,7 +16,7 @@
 
 package com.arialyy.aria.core.command;
 
-import com.arialyy.aria.core.AriaManager;
+import com.arialyy.aria.core.AriaConfig;
 import com.arialyy.aria.core.common.QueueMod;
 import com.arialyy.aria.core.inf.IEntity;
 import com.arialyy.aria.core.task.AbsTask;
@@ -37,6 +37,7 @@ final public class StartCmd<T extends AbsTaskWrapper> extends AbsNormalCmd<T> {
 
   /**
    * 立即执行任务
+   *
    * @param newStart true 立即执行任务，无论执行队列是否满了
    */
   public void setNewStart(boolean newStart) {
@@ -45,17 +46,17 @@ final public class StartCmd<T extends AbsTaskWrapper> extends AbsNormalCmd<T> {
 
   @Override public void executeCmd() {
     if (!canExeCmd) return;
-    if (!NetUtils.isConnected(AriaManager.getInstance().getAPP())) {
+    if (!NetUtils.isConnected(AriaConfig.getInstance().getAPP())) {
       ALog.e(TAG, "启动任务失败，网络未连接");
       return;
     }
     String mod;
     int maxTaskNum = mQueue.getMaxTaskNum();
-    AriaManager manager = AriaManager.getInstance();
+    AriaConfig config = AriaConfig.getInstance();
     if (isDownloadCmd) {
-      mod = manager.getDownloadConfig().getQueueMod();
+      mod = config.getDConfig().getQueueMod();
     } else {
-      mod = manager.getUploadConfig().getQueueMod();
+      mod = config.getUConfig().getQueueMod();
     }
 
     AbsTask task = getTask();
@@ -81,9 +82,9 @@ final public class StartCmd<T extends AbsTaskWrapper> extends AbsNormalCmd<T> {
             startTask();
           }
         } else {
-          if (newStart){
+          if (newStart) {
             startTask();
-          }else {
+          } else {
             sendWaitState(task);
           }
         }

@@ -23,8 +23,6 @@ import android.app.Dialog;
 import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.widget.PopupWindow;
 import com.arialyy.aria.core.command.CommandManager;
 import com.arialyy.aria.core.common.QueueMod;
@@ -76,7 +74,6 @@ import java.util.concurrent.ConcurrentHashMap;
    */
   private Map<String, List<String>> mSubClass = new ConcurrentHashMap<>();
   private static Context APP;
-  private Handler mAriaHandler;
   private DelegateWrapper mDbWrapper;
   private AriaConfig mConfig;
 
@@ -166,13 +163,6 @@ import java.util.concurrent.ConcurrentHashMap;
       String temp = String.format(sql, clazz.getSimpleName());
       DbEntity.exeSql(temp);
     }
-  }
-
-  public synchronized Handler getAriaHandler() {
-    if (mAriaHandler == null) {
-      mAriaHandler = new Handler(Looper.getMainLooper());
-    }
-    return mAriaHandler;
   }
 
   public Map<String, AbsReceiver> getReceiver() {

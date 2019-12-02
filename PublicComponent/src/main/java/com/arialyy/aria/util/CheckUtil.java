@@ -62,7 +62,7 @@ public class CheckUtil {
   public static boolean checkUploadPathConflicts(boolean isForceUpload, String filePath) {
     if (DbEntity.checkDataExist(UploadEntity.class, "filePath=?", filePath)) {
       if (!isForceUpload) {
-        ALog.e(TAG, String.format("上传失败，文件路径【%s】已经被其它任务占用，请设置其它保存路径", filePath));
+        ALog.e(TAG, String.format("上传失败，文件路径【%s】已经被其它任务占用，请设置其它文件路径", filePath));
         return false;
       } else {
         ALog.w(TAG, String.format("文件路径【%s】已经被其它任务占用，当前任务将覆盖该路径的文件", filePath));

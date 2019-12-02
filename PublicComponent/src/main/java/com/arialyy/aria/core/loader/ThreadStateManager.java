@@ -84,7 +84,7 @@ public class ThreadStateManager implements IThreadState {
         mFailNum++;
         if (isFail()) {
           Bundle b = msg.getData();
-          mListener.onFail(b.getBoolean(KEY_RETRY, true),
+          mListener.onFail(b.getBoolean(KEY_RETRY, false),
               (BaseException) b.getSerializable(KEY_ERROR_INFO));
           quitLooper();
         }

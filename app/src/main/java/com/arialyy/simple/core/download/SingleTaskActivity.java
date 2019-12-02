@@ -39,6 +39,7 @@ import com.arialyy.aria.core.processor.IHttpFileLenAdapter;
 import com.arialyy.aria.core.task.DownloadTask;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
+import com.arialyy.aria.util.FileUtil;
 import com.arialyy.frame.util.show.T;
 import com.arialyy.simple.R;
 import com.arialyy.simple.base.BaseActivity;
@@ -274,11 +275,13 @@ public class SingleTaskActivity extends BaseActivity<ActivitySingleBinding> {
           break;
         }
         if (Aria.download(this).load(mTaskId).isRunning()) {
-          Aria.download(this).load(mTaskId).stop();
+          Aria.download(this)
+              .load(mTaskId)
+              .stop();
         } else {
           mUrl = "http://sdkdown.muzhiwan.com/openfile/2019/07/11/com.netease.syfz.mzw_5d26f8d9cee27.apk";
           Aria.download(this).load(mTaskId)
-              .updateUrl(mUrl)
+              //.updateUrl(mUrl)
               .resume();
         }
         break;
@@ -297,6 +300,7 @@ public class SingleTaskActivity extends BaseActivity<ActivitySingleBinding> {
         .load(mUrl)
         .setFilePath(mFilePath, true)
         .option(option)
+        .ignoreCheckPermissions()
         .create();
   }
 

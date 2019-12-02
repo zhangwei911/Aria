@@ -19,6 +19,7 @@ import android.text.TextUtils;
 import androidx.annotation.CheckResult;
 import androidx.annotation.NonNull;
 import com.arialyy.annotations.TaskEnum;
+import com.arialyy.aria.core.AriaConfig;
 import com.arialyy.aria.core.AriaManager;
 import com.arialyy.aria.core.command.CancelAllCmd;
 import com.arialyy.aria.core.command.CmdHelper;
@@ -58,7 +59,7 @@ public class UploadReceiver extends AbsReceiver {
    */
   @Deprecated
   public UploadReceiver setMaxSpeed(int maxSpeed) {
-    AriaManager.getInstance().getUploadConfig().setMaxSpeed(maxSpeed);
+    AriaConfig.getInstance().getUConfig().setMaxSpeed(maxSpeed);
     return this;
   }
 

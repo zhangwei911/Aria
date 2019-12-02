@@ -33,7 +33,6 @@ import java.io.UnsupportedEncodingException;
  * Created by Aria.Lao on 2017/7/28. D_FTP 单线程上传任务，需要FTP 服务器给用户打开append和write的权限
  */
 class FtpUThreadTaskAdapter extends BaseFtpThreadTaskAdapter {
-  private final String TAG = "FtpThreadTask";
   private String dir, remotePath;
 
   FtpUThreadTaskAdapter(SubThreadConfig config) {
@@ -66,7 +65,8 @@ class FtpUThreadTaskAdapter extends BaseFtpThreadTaskAdapter {
       }
 
       file =
-          new BufferedRandomAccessFile(getThreadConfig().tempFile, "rwd", getTaskConfig().getBuffSize());
+          new BufferedRandomAccessFile(getThreadConfig().tempFile, "rwd",
+              getTaskConfig().getBuffSize());
       if (getThreadRecord().startLocation != 0) {
         //file.skipBytes((int) getThreadConfig().START_LOCATION);
         file.seek(getThreadRecord().startLocation);
@@ -103,10 +103,8 @@ class FtpUThreadTaskAdapter extends BaseFtpThreadTaskAdapter {
   private void initPath() throws UnsupportedEncodingException {
     dir = CommonUtil.convertFtpChar(charSet, mTaskOption.getUrlEntity().remotePath);
 
-    String fileName =
-        TextUtils.isEmpty(mTaskOption.getNewFileName()) ? CommonUtil.convertFtpChar(charSet,
-            getEntity().getFileName())
-            : CommonUtil.convertFtpChar(charSet, mTaskOption.getNewFileName());
+    String fileName = TextUtils.isEmpty(mTaskOption.getNewFileName()) ? getEntity().getFileName()
+        : mTaskOption.getNewFileName();
 
     remotePath =
         CommonUtil.convertFtpChar(charSet,

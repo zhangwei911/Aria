@@ -16,13 +16,13 @@
 
 package com.arialyy.aria.core.queue;
 
-import com.arialyy.aria.core.AriaManager;
+import com.arialyy.aria.core.AriaConfig;
 import com.arialyy.aria.core.download.DGTaskWrapper;
-import com.arialyy.aria.core.task.DownloadGroupTask;
 import com.arialyy.aria.core.event.DGMaxNumEvent;
 import com.arialyy.aria.core.event.Event;
 import com.arialyy.aria.core.event.EventMsgUtil;
 import com.arialyy.aria.core.scheduler.TaskSchedulers;
+import com.arialyy.aria.core.task.DownloadGroupTask;
 import com.arialyy.aria.util.ALog;
 
 /**
@@ -57,7 +57,7 @@ public class DGroupTaskQueue
   }
 
   @Override public int getMaxTaskNum() {
-    return AriaManager.getInstance().getDGroupConfig().getMaxTaskNum();
+    return AriaConfig.getInstance().getDConfig().getMaxTaskNum();
   }
 
   @Override public DownloadGroupTask createTask(DGTaskWrapper wrapper) {
@@ -74,6 +74,6 @@ public class DGroupTaskQueue
   }
 
   @Override public int getOldMaxNum() {
-    return AriaManager.getInstance().getDGroupConfig().oldMaxTaskNum;
+    return AriaConfig.getInstance().getDGConfig().oldMaxTaskNum;
   }
 }

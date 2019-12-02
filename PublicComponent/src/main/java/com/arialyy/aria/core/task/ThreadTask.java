@@ -353,7 +353,7 @@ public class ThreadTask implements IThreadTask, IThreadTaskObserver {
       } else {
         ALog.e(TAG, String.format("任务【%s】执行失败", getFileName()));
         ErrorHelp.saveError(TAG, "", ALog.getExceptionString(ex));
-        sendFailMsg(null);
+        sendFailMsg(null, needRetry);
       }
     }
   }
@@ -365,7 +365,7 @@ public class ThreadTask implements IThreadTask, IThreadTaskObserver {
     boolean isConnected = NetUtils.isConnected(AriaConfig.getInstance().getAPP());
     if (!isConnected && !isNotNetRetry) {
       ALog.w(TAG, String.format("ts切片【%s】重试失败，网络未连接", getFileName()));
-      sendFailMsg(null);
+      sendFailMsg(null, false);
       return;
     }
     if (mFailTimes < RETRY_NUM && needRetry && (NetUtils.isConnected(
@@ -377,7 +377,7 @@ public class ThreadTask implements IThreadTask, IThreadTaskObserver {
       FileUtil.createFile(mConfig.tempFile);
       ThreadTaskManager.getInstance().retryThread(this);
     } else {
-      sendFailMsg(null);
+      sendFailMsg(null, needRetry);
     }
   }
 
@@ -389,7 +389,7 @@ public class ThreadTask implements IThreadTask, IThreadTaskObserver {
   private void retryBlockTask(boolean needRetry) {
     if (!NetUtils.isConnected(AriaConfig.getInstance().getAPP()) && !isNotNetRetry) {
       ALog.w(TAG, String.format("分块【%s】重试失败，网络未连接", getFileName()));
-      sendFailMsg(null);
+      sendFailMsg(null, false);
       return;
     }
     if (mFailTimes < RETRY_NUM && needRetry && (NetUtils.isConnected(
@@ -400,7 +400,7 @@ public class ThreadTask implements IThreadTask, IThreadTaskObserver {
       handleBlockRecord();
       ThreadTaskManager.getInstance().retryThread(this);
     } else {
-      sendFailMsg(null);
+      sendFailMsg(null, needRetry);
     }
   }
 
@@ -448,13 +448,14 @@ public class ThreadTask implements IThreadTask, IThreadTaskObserver {
   /**
    * 发送失败信息
    */
-  private void sendFailMsg(@Nullable BaseException e) {
+  private void sendFailMsg(@Nullable BaseException e,boolean needRetry) {
+    Bundle b = new Bundle();
+    b.putBoolean(IThreadState.KEY_RETRY, needRetry);
     if (e != null) {
-      Bundle b = new Bundle();
       b.putSerializable(IThreadState.KEY_ERROR_INFO, e);
       updateState(IThreadState.STATE_FAIL, b);
     } else {
-      updateState(IThreadState.STATE_FAIL, null);
+      updateState(IThreadState.STATE_FAIL, b);
     }
   }
 

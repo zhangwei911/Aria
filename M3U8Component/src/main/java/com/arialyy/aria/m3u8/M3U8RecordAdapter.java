@@ -131,7 +131,8 @@ public class M3U8RecordAdapter extends AbsRecordHandlerAdapter {
 
   @Override public int initTaskThreadNum() {
     if (getWrapper().getRequestType() == ITaskWrapper.M3U8_VOD) {
-      return mOption.getUrls().size();
+      return
+          mOption.getUrls() == null || mOption.getUrls().isEmpty() ? 1 : mOption.getUrls().size();
     }
     if (getWrapper().getRequestType() == ITaskWrapper.M3U8_LIVE) {
       return 1;

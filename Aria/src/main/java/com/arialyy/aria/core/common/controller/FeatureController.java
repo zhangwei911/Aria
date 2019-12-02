@@ -19,21 +19,21 @@ import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Handler;
 import android.os.Looper;
-import com.arialyy.aria.core.AriaManager;
+import com.arialyy.aria.core.AriaConfig;
+import com.arialyy.aria.core.common.AbsEntity;
 import com.arialyy.aria.core.download.CheckDEntityUtil;
 import com.arialyy.aria.core.download.CheckDGEntityUtil;
 import com.arialyy.aria.core.download.CheckFtpDirEntityUtil;
 import com.arialyy.aria.core.download.DGTaskWrapper;
 import com.arialyy.aria.core.download.DTaskWrapper;
-import com.arialyy.aria.core.common.AbsEntity;
-import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
 import com.arialyy.aria.core.inf.ICheckEntityUtil;
-import com.arialyy.aria.core.task.ITask;
-import com.arialyy.aria.core.wrapper.ITaskWrapper;
 import com.arialyy.aria.core.listener.ISchedulers;
 import com.arialyy.aria.core.scheduler.TaskSchedulers;
+import com.arialyy.aria.core.task.ITask;
 import com.arialyy.aria.core.upload.CheckUEntityUtil;
 import com.arialyy.aria.core.upload.UTaskWrapper;
+import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
+import com.arialyy.aria.core.wrapper.ITaskWrapper;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
 import java.lang.reflect.Constructor;
@@ -46,6 +46,10 @@ public abstract class FeatureController {
   private final String TAG;
 
   private AbsTaskWrapper mTaskWrapper;
+  /**
+   * 是否忽略权限检查 true 忽略权限检查
+   */
+  private boolean ignoreCheckPermissions = false;
 
   FeatureController(AbsTaskWrapper wrapper) {
     mTaskWrapper = wrapper;
@@ -87,6 +91,13 @@ public abstract class FeatureController {
     return null;
   }
 
+  /**
+   * 是否忽略权限检查
+   */
+  public void ignoreCheckPermissions() {
+    this.ignoreCheckPermissions = true;
+  }
+
   protected AbsTaskWrapper getTaskWrapper() {
     return mTaskWrapper;
   }
@@ -111,7 +122,7 @@ public abstract class FeatureController {
    * 如果检查实体失败，将错误回调
    */
   boolean checkConfig() {
-    if (!checkPermission()) {
+    if (!ignoreCheckPermissions && !checkPermission()) {
       return false;
     }
     boolean b = checkEntity();
@@ -134,21 +145,21 @@ public abstract class FeatureController {
    */
   private boolean checkPermission() {
 
-    if (AriaManager.getInstance()
+    if (AriaConfig.getInstance()
         .getAPP()
         .checkCallingOrSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
         != PackageManager.PERMISSION_GRANTED) {
       ALog.e(TAG, "启动失败，缺少权限：Manifest.permission.WRITE_EXTERNAL_STORAGE");
       return false;
     }
-    if (AriaManager.getInstance()
+    if (AriaConfig.getInstance()
         .getAPP()
         .checkCallingOrSelfPermission(Manifest.permission.INTERNET)
         != PackageManager.PERMISSION_GRANTED) {
       ALog.e(TAG, "启动失败，缺少权限：Manifest.permission.INTERNET");
       return false;
     }
-    if (AriaManager.getInstance()
+    if (AriaConfig.getInstance()
         .getAPP()
         .checkCallingOrSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
         != PackageManager.PERMISSION_GRANTED) {

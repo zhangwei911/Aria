@@ -38,6 +38,8 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.SequenceInputStream;
 import java.io.Serializable;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
@@ -60,6 +62,21 @@ public class FileUtil {
   private static final Pattern DIR_SEPORATOR = Pattern.compile("/");
   private static final String EXTERNAL_STORAGE_PATH =
       Environment.getExternalStorageDirectory().getPath();
+
+  /**
+   * 获取m3u8 ts文件的缓存目录。
+   * 缓存文件夹格式：父文件夹/.文件名_码率
+   *
+   * @param path m3u8 文件下载路径
+   * @return m3u8 ts文件的缓存目录
+   */
+  public static String getTsCacheDir(String path, int bandWidth) {
+    if (TextUtils.isEmpty(path)) {
+      throw new NullPointerException("m3u8文保存路径为空");
+    }
+    File file = new File(path);
+    return String.format("%s/.%s_%s", file.getParent(), file.getName(), bandWidth);
+  }
 
   /**
    * 创建目录 当目录不存在的时候创建文件，否则返回false
@@ -409,9 +426,19 @@ public class FileUtil {
    * 获取SD卡目录列表
    */
   public static List<String> getSDPathList(Context context) {
-    List<String> paths;
+    List<String> paths = null;
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-      paths = getVolumeList(context);
+      try {
+        paths = getVolumeList(context);
+      } catch (ClassNotFoundException e) {
+        e.printStackTrace();
+      } catch (NoSuchMethodException e) {
+        e.printStackTrace();
+      } catch (IllegalAccessException e) {
+        e.printStackTrace();
+      } catch (InvocationTargetException e) {
+        e.printStackTrace();
+      }
     } else {
       List<String> mounts = readMountsFile();
       List<String> volds = readVoldFile();
@@ -471,16 +498,26 @@ public class FileUtil {
   /**
    * getSDPathList
    */
-  private static List<String> getVolumeList(final Context context) {
+  private static List<String> getVolumeList(final Context context)
+      throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException,
+      IllegalAccessException {
     List<String> pathList = new ArrayList<>();
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
       StorageManager manager = (StorageManager) context.getSystemService(Context.STORAGE_SERVICE);
       List<StorageVolume> volumes = manager.getStorageVolumes();
+
+      Class<?> volumeClass = StorageVolume.class;
+      Method getPath = volumeClass.getDeclaredMethod("getPath");
+      //Method isRemovable = volumeClass.getDeclaredMethod("isRemovable");
+      getPath.setAccessible(true);
+      //isRemovable.setAccessible(true);
+
       for (StorageVolume volume : volumes) {
         String state = volume.getState();
+
         if (state.equals(Environment.MEDIA_MOUNTED)) {
-          pathList.add(volume.toString());
+          pathList.add((String) getPath.invoke(volume));
         }
       }
     } else {

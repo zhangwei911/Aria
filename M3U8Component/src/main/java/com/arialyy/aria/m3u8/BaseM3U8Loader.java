@@ -15,6 +15,7 @@
  */
 package com.arialyy.aria.m3u8;
 
+import android.text.TextUtils;
 import com.arialyy.aria.core.common.RecordHandler;
 import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.download.DownloadEntity;
@@ -59,6 +60,9 @@ public abstract class BaseM3U8Loader extends AbsLoader {
 
   protected String getCacheDir() {
     String cacheDir = mM3U8Option.getCacheDir();
+    if (TextUtils.isEmpty(cacheDir)) {
+      cacheDir = FileUtil.getTsCacheDir(getEntity().getFilePath(), mM3U8Option.getBandWidth());
+    }
     if (!new File(cacheDir).exists()) {
       FileUtil.createDir(cacheDir);
     }

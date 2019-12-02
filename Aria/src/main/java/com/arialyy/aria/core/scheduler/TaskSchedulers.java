@@ -19,7 +19,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Message;
 import com.arialyy.annotations.TaskEnum;
-import com.arialyy.aria.core.AriaManager;
+import com.arialyy.aria.core.AriaConfig;
 import com.arialyy.aria.core.common.AbsEntity;
 import com.arialyy.aria.core.common.AbsNormalEntity;
 import com.arialyy.aria.core.group.GroupSendParams;
@@ -53,10 +53,10 @@ public class TaskSchedulers<TASK extends ITask> implements ISchedulers {
   private static FailureTaskHandler mFailureTaskHandler;
 
   private Map<String, Map<TaskEnum, ISchedulerListener>> mObservers = new ConcurrentHashMap<>();
-  private AriaManager mAriaManager;
+  private AriaConfig mAriaConfig;
 
   private TaskSchedulers() {
-    mAriaManager = AriaManager.getInstance();
+    mAriaConfig = AriaConfig.getInstance();
   }
 
   public static TaskSchedulers getInstance() {
@@ -230,11 +230,11 @@ public class TaskSchedulers<TASK extends ITask> implements ISchedulers {
       }
     }
 
-    boolean canSend = mAriaManager.getAppConfig().isUseBroadcast();
+    boolean canSend = mAriaConfig.getAConfig().isUseBroadcast();
     if (canSend) {
       Intent intent = new Intent(ISchedulers.ARIA_TASK_INFO_ACTION);
       intent.putExtras(data);
-      mAriaManager.getAPP().sendBroadcast(intent);
+      mAriaConfig.getAPP().sendBroadcast(intent);
     }
 
     return true;
@@ -284,9 +284,9 @@ public class TaskSchedulers<TASK extends ITask> implements ISchedulers {
       }
     }
 
-    boolean canSend = mAriaManager.getAppConfig().isUseBroadcast();
+    boolean canSend = mAriaConfig.getAConfig().isUseBroadcast();
     if (canSend) {
-      mAriaManager.getAPP().sendBroadcast(
+      mAriaConfig.getAPP().sendBroadcast(
           createData(msg.what, ITask.DOWNLOAD_GROUP_SUB, params.entity));
     }
 
@@ -353,13 +353,13 @@ public class TaskSchedulers<TASK extends ITask> implements ISchedulers {
     startNextTask(getQueue(taskType), TaskSchedulerType.TYPE_DEFAULT);
 
     // 发送广播
-    boolean canSend = mAriaManager.getAppConfig().isUseBroadcast();
+    boolean canSend = mAriaConfig.getAConfig().isUseBroadcast();
     if (canSend) {
       Intent intent = new Intent(ISchedulers.ARIA_TASK_INFO_ACTION);
       Bundle b = new Bundle();
       b.putInt(ISchedulers.TASK_TYPE, taskType);
       b.putInt(ISchedulers.TASK_STATE, ISchedulers.FAIL);
-      mAriaManager.getAPP().sendBroadcast(intent);
+      mAriaConfig.getAPP().sendBroadcast(intent);
     }
 
     // 处理回调
@@ -470,16 +470,16 @@ public class TaskSchedulers<TASK extends ITask> implements ISchedulers {
    * 发送普通任务的广播
    */
   private void sendNormalBroadcast(int state, TASK task) {
-    boolean canSend = mAriaManager.getAppConfig().isUseBroadcast();
+    boolean canSend = mAriaConfig.getAConfig().isUseBroadcast();
     if (!canSend) {
       return;
     }
     int type = task.getTaskType();
     if (type == ITask.DOWNLOAD || type == ITask.DOWNLOAD_GROUP) {
-      mAriaManager.getAPP().sendBroadcast(
+      mAriaConfig.getAPP().sendBroadcast(
           createData(state, type, task.getTaskWrapper().getEntity()));
     } else if (type == ITask.UPLOAD) {
-      mAriaManager.getAPP().sendBroadcast(
+      mAriaConfig.getAPP().sendBroadcast(
           createData(state, type, task.getTaskWrapper().getEntity()));
     } else {
       ALog.w(TAG, "发送广播失败，没有对应的任务");
@@ -519,9 +519,9 @@ public class TaskSchedulers<TASK extends ITask> implements ISchedulers {
     }
 
     int num = task.getTaskWrapper().getConfig().getReTryNum();
-    boolean isNotNetRetry = mAriaManager.getAppConfig().isNotNetRetry();
+    boolean isNotNetRetry = mAriaConfig.getAConfig().isNotNetRetry();
 
-    if ((!NetUtils.isConnected(mAriaManager.getAPP()) && !isNotNetRetry)
+    if ((!NetUtils.isConnected(mAriaConfig.getAPP()) && !isNotNetRetry)
         || task.getTaskWrapper().getEntity().getFailNum() > num) {
       queue.removeTaskFormQueue(task.getKey());
       startNextTask(queue, task.getSchedulerType());

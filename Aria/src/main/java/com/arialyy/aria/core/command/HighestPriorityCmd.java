@@ -15,6 +15,7 @@
  */
 package com.arialyy.aria.core.command;
 
+import com.arialyy.aria.core.AriaConfig;
 import com.arialyy.aria.core.AriaManager;
 import com.arialyy.aria.core.task.DownloadTask;
 import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
@@ -41,7 +42,7 @@ final class HighestPriorityCmd<T extends AbsTaskWrapper> extends AbsNormalCmd<T>
 
   @Override public void executeCmd() {
     if (!canExeCmd) return;
-    if (!NetUtils.isConnected(AriaManager.getInstance().getAPP())){
+    if (!NetUtils.isConnected(AriaConfig.getInstance().getAPP())){
       ALog.e(TAG, "启动任务失败，网络未连接");
       return;
     }

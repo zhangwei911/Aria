@@ -32,7 +32,7 @@ import java.util.Map;
 class DBConfig {
   /*adb pull /mnt/sdcard/Android/data/com.arialyy.simple/files/DB/AriaLyyDb d:/db*/
   static boolean DEBUG = false;
-  static Map<String, Class> mapping = new LinkedHashMap<>();
+  static Map<String, Class<? extends DbEntity>> mapping = new LinkedHashMap<>();
   static String DB_NAME;
   static int VERSION = 56;
 
@@ -51,8 +51,8 @@ class DBConfig {
   }
 
   static {
-    mapping.put("DownloadGroupEntity", DownloadGroupEntity.class);
     mapping.put("DownloadEntity", DownloadEntity.class);
+    mapping.put("DownloadGroupEntity", DownloadGroupEntity.class);
     mapping.put("UploadEntity", UploadEntity.class);
     mapping.put("ThreadRecord", ThreadRecord.class);
     mapping.put("TaskRecord", TaskRecord.class);

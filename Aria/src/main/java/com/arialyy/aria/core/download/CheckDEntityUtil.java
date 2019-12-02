@@ -23,6 +23,7 @@ import com.arialyy.aria.core.wrapper.ITaskWrapper;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CheckUtil;
 import com.arialyy.aria.util.CommonUtil;
+import com.arialyy.aria.util.FileUtil;
 import com.arialyy.aria.util.RecordUtil;
 import java.io.File;
 
@@ -65,8 +66,7 @@ public class CheckDEntityUtil implements ICheckEntityUtil {
     File file = new File(mWrapper.getTempFilePath());
     Object bw = mWrapper.getM3U8Params().getParam(IOptionConstant.bandWidth);
     int bandWidth = bw == null ? 0 : (int) bw;
-    // 缓存文件夹格式：问文件夹/.文件名_码率
-    String cacheDir = String.format("%s/.%s_%s", file.getParent(), file.getName(), bandWidth);
+    String cacheDir = FileUtil.getTsCacheDir(file.getPath(), bandWidth);
 
     mWrapper.getM3U8Params().setParams(IOptionConstant.cacheDir, cacheDir);
     M3U8Entity m3U8Entity = mEntity.getM3U8Entity();

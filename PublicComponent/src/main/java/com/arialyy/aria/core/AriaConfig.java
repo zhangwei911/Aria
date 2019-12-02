@@ -23,6 +23,8 @@ import android.net.Network;
 import android.net.NetworkCapabilities;
 import android.net.NetworkRequest;
 import android.os.Build;
+import android.os.Handler;
+import android.os.Looper;
 import com.arialyy.aria.core.config.AppConfig;
 import com.arialyy.aria.core.config.Configuration;
 import com.arialyy.aria.core.config.DGroupConfig;
@@ -56,6 +58,7 @@ public class AriaConfig {
    * 是否已经联网，true 已经联网
    */
   private static boolean isConnectedNet = true;
+  private Handler mAriaHandler;
 
   private AriaConfig(Context context) {
     APP = context.getApplicationContext();
@@ -103,6 +106,13 @@ public class AriaConfig {
 
   public DGroupConfig getDGConfig() {
     return mDGConfig;
+  }
+
+  public synchronized Handler getAriaHandler() {
+    if (mAriaHandler == null) {
+      mAriaHandler = new Handler(Looper.getMainLooper());
+    }
+    return mAriaHandler;
   }
 
   /**

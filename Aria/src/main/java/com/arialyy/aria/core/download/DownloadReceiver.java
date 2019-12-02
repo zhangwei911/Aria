@@ -18,6 +18,7 @@ package com.arialyy.aria.core.download;
 import androidx.annotation.CheckResult;
 import androidx.annotation.NonNull;
 import com.arialyy.annotations.TaskEnum;
+import com.arialyy.aria.core.AriaConfig;
 import com.arialyy.aria.core.AriaManager;
 import com.arialyy.aria.core.command.CancelAllCmd;
 import com.arialyy.aria.core.command.CmdHelper;
@@ -64,7 +65,7 @@ public class DownloadReceiver extends AbsReceiver {
    */
   @Deprecated
   public DownloadReceiver setMaxSpeed(int maxSpeed) {
-    AriaManager.getInstance().getDownloadConfig().setMaxSpeed(maxSpeed);
+    AriaConfig.getInstance().getDConfig().setMaxSpeed(maxSpeed);
     return this;
   }
 
@@ -287,7 +288,7 @@ public class DownloadReceiver extends AbsReceiver {
    * @return 如果实体不存在，返回null
    */
   public DownloadGroupEntity getGroupEntity(List<String> urls) {
-    if (CheckUtil.checkDownloadUrlsIsEmpty(urls)){
+    if (CheckUtil.checkDownloadUrlsIsEmpty(urls)) {
       return null;
     }
     return DbDataHelper.getDGEntity(CommonUtil.getMd5Code(urls));
