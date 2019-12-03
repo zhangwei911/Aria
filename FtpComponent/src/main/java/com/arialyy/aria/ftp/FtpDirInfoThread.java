@@ -74,7 +74,7 @@ public class FtpDirInfoThread extends AbsFtpInfoThread<DownloadGroupEntity, DGTa
     entity.setConvertFileSize(CommonUtil.formatFileSize(ftpFile.getSize()));
     entity.setFileSize(ftpFile.getSize());
 
-    //if(CheckUtil.checkDownloadPathConflicts(mTaskWrapper.is))
+    //if(CheckUtil.checkDPathConflicts(mTaskWrapper.is))
 
     entity.insert();
 

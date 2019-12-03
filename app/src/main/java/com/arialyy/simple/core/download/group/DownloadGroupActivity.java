@@ -96,11 +96,11 @@ public class DownloadGroupActivity extends BaseActivity<ActivityDownloadGroupBin
               .loadGroup(mUrls)
               .setDirPath(
                   Environment.getExternalStorageDirectory().getPath() + "/Download/group_imgs")
-              .setGroupAlias("图片测试")
               //.setSubFileName(getModule(GroupModule.class).getSubName2())
               //.setSubFileName(getModule(GroupModule.class).getSubName())
               .unknownSize()
               .option(getHttpOption())
+              .ignoreFilePathOccupy()
               //.setFileSize(114981416)
               //.updateUrls(temp)
               .create();

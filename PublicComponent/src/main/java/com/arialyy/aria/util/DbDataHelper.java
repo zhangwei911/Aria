@@ -52,10 +52,24 @@ public class DbDataHelper {
    * @param groupHash 组合任务Hash
    * @return 实体不存在，返回null
    */
-  public static DownloadGroupEntity getDGEntity(String groupHash) {
+  public static DownloadGroupEntity getDGEntityByHash(String groupHash) {
     List<DGEntityWrapper> wrapper =
         DbEntity.findRelationData(DGEntityWrapper.class, "DownloadGroupEntity.groupHash=?",
             groupHash);
+
+    return wrapper == null || wrapper.size() == 0 ? null : wrapper.get(0).groupEntity;
+  }
+
+  /**
+   * 获取组合任务实体、ftpDir任务实体
+   *
+   * @param dirPath 组合任务Hash
+   * @return 实体不存在，返回null
+   */
+  public static DownloadGroupEntity getDGEntityByPath(String dirPath) {
+    List<DGEntityWrapper> wrapper =
+        DbEntity.findRelationData(DGEntityWrapper.class, "DownloadGroupEntity.dirPath=?",
+            dirPath);
 
     return wrapper == null || wrapper.size() == 0 ? null : wrapper.get(0).groupEntity;
   }

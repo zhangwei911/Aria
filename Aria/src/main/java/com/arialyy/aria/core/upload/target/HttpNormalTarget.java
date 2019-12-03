@@ -33,6 +33,7 @@ public class HttpNormalTarget extends AbsNormalTarget<HttpNormalTarget> {
     mConfigHandler = new UNormalConfigHandler<>(this, taskId);
     getTaskWrapper().setSupportBP(false);
     getTaskWrapper().setRequestType(AbsTaskWrapper.U_HTTP);
+    getTaskWrapper().setNewTask(false);
   }
 
   /**

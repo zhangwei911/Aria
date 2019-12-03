@@ -29,11 +29,6 @@ public class UTaskWrapper extends AbsTaskWrapper<UploadEntity> {
    */
   private String tempUrl;
 
-  /**
-   * 如果文件路径被其它任务占用，设置为true时，删除其它任务
-   */
-  private boolean forceUpload = false;
-
   public UTaskWrapper(UploadEntity entity) {
     super(entity);
   }
@@ -51,14 +46,6 @@ public class UTaskWrapper extends AbsTaskWrapper<UploadEntity> {
    */
   @Override public String getKey() {
     return getEntity().getKey();
-  }
-
-  public boolean isForceUpload() {
-    return forceUpload;
-  }
-
-  public void setForceUpload(boolean forceUpload) {
-    this.forceUpload = forceUpload;
   }
 
   @Override public UploadConfig getConfig() {

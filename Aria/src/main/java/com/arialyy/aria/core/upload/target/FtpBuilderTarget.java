@@ -52,9 +52,12 @@ public class FtpBuilderTarget extends AbsBuilderTarget<FtpBuilderTarget> {
 
   /**
    * 如果文件路径被其它任务占用，删除其它任务
+   *
+   * @deprecated 使用 {@link #ignoreFilePathOccupy()}
    */
+  @Deprecated
   public FtpBuilderTarget forceUpload() {
-    ((UTaskWrapper)getTaskWrapper()).setForceUpload(true);
+    getTaskWrapper().setIgnoreFilePathOccupy(true);
     return this;
   }
 

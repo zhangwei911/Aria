@@ -16,12 +16,12 @@
 package com.arialyy.aria.core.download;
 
 import android.text.TextUtils;
-import com.arialyy.aria.core.common.ErrorCode;
 import com.arialyy.aria.core.common.RequestEnum;
 import com.arialyy.aria.core.inf.ICheckEntityUtil;
 import com.arialyy.aria.core.inf.IOptionConstant;
 import com.arialyy.aria.orm.DbEntity;
 import com.arialyy.aria.util.ALog;
+import com.arialyy.aria.util.CheckUtil;
 import com.arialyy.aria.util.CommonUtil;
 import com.arialyy.aria.util.RecordUtil;
 import java.io.File;
@@ -70,10 +70,9 @@ public class CheckDGEntityUtil implements ICheckEntityUtil {
       return false;
     }
 
-    if ((mEntity.getDirPath() == null || !mEntity.getDirPath().equals(mWrapper.getDirPathTemp()))
-        && DbEntity.checkDataExist(DownloadGroupEntity.class, "dirPath=?",
+    // 检查路径冲突
+    if (mWrapper.isNewTask() && !CheckUtil.checkDGPathConflicts(mWrapper.isIgnoreFilePathOccupy(),
         mWrapper.getDirPathTemp())) {
-      ALog.e(TAG, String.format("文件夹路径【%s】已被其它任务占用，请重新设置文件夹路径", mWrapper.getDirPathTemp()));
       return false;
     }
 

@@ -20,7 +20,7 @@ import com.arialyy.aria.core.common.controller.IStartFeature;
 import com.arialyy.aria.core.inf.AbsTarget;
 
 /**
- * 处理第一次下载
+ * 处理第一次创建的任务
  */
 public abstract class AbsBuilderTarget<TARGET extends AbsBuilderTarget> extends AbsTarget<TARGET>
     implements IStartFeature {
@@ -39,6 +39,15 @@ public abstract class AbsBuilderTarget<TARGET extends AbsBuilderTarget> extends 
    */
   public TARGET ignoreCheckPermissions() {
     getController().ignoreCheckPermissions();
+    return (TARGET) this;
+  }
+
+  /**
+   * 忽略文件占用，不管文件路径是否被其它任务占用，都执行上传\下载任务
+   * 需要注意的是：如果文件被其它任务占用，并且还调用了该方法，将自动删除占用了该文件路径的任务
+   */
+  public TARGET ignoreFilePathOccupy() {
+    getController().ignoreFilePathOccupy();
     return (TARGET) this;
   }
 

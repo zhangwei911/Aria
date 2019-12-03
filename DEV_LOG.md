@@ -1,10 +1,11 @@
 ## 开发日志
-  + v_3.7.10
+  + v_3.7.10 (2019/12/3)
     - fix bug https://github.com/AriaLyy/Aria/issues/543#issuecomment-559733124
     - fix bug https://github.com/AriaLyy/Aria/issues/542
     - fix bug https://github.com/AriaLyy/Aria/issues/547
     - 修复下载失败时，中断重试无效的问题
     - 增加忽略权限检查的api，`ignoreCheckPermissions()`
+    - 增加通用的的忽略文件路径被占用的api，`isIgnoreFilePathOccupy()`
   + v_3.7.9 (2019/11/28)
     - fix bug https://github.com/AriaLyy/Aria/issues/537
   + v_3.7.8 (2019/11/28)

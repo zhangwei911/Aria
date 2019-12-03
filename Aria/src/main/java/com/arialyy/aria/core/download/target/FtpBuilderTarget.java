@@ -34,6 +34,7 @@ public class FtpBuilderTarget extends AbsBuilderTarget<FtpBuilderTarget> {
     mConfigHandler = new DNormalConfigHandler<>(this, -1);
     mConfigHandler.setUrl(url);
     getTaskWrapper().setRequestType(ITaskWrapper.D_FTP);
+    getTaskWrapper().setNewTask(true);
   }
 
   /**
@@ -70,7 +71,9 @@ public class FtpBuilderTarget extends AbsBuilderTarget<FtpBuilderTarget> {
    *
    * @param filePath 路径必须为文件路径，不能为文件夹路径
    * @param forceDownload {@code true}强制下载，不考虑文件路径是否被占用
+   * @deprecated 使用 {@link #ignoreFilePathOccupy()}
    */
+  @Deprecated
   @CheckResult(suggest = Suggest.TASK_CONTROLLER)
   public FtpBuilderTarget setFilePath(@NonNull String filePath, boolean forceDownload) {
     mConfigHandler.setTempFilePath(filePath);

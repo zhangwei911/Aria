@@ -291,7 +291,7 @@ public class DownloadReceiver extends AbsReceiver {
     if (CheckUtil.checkDownloadUrlsIsEmpty(urls)) {
       return null;
     }
-    return DbDataHelper.getDGEntity(CommonUtil.getMd5Code(urls));
+    return DbDataHelper.getDGEntityByHash(CommonUtil.getMd5Code(urls));
   }
 
   /**
@@ -304,7 +304,7 @@ public class DownloadReceiver extends AbsReceiver {
     if (!CheckUtil.checkUrl(url)) {
       return null;
     }
-    return DbDataHelper.getDGEntity(url);
+    return DbDataHelper.getDGEntityByHash(url);
   }
 
   /**

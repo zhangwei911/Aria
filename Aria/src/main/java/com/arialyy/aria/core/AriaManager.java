@@ -282,7 +282,7 @@ import java.util.concurrent.ConcurrentHashMap;
         RecordUtil.delTaskRecord(key, IRecordHandler.TYPE_DOWNLOAD, removeFile, true);
         break;
       case 2:
-        RecordUtil.delGroupTaskRecord(key, removeFile);
+        RecordUtil.delGroupTaskRecordByHash(key, removeFile);
         break;
       case 3:
         RecordUtil.delTaskRecord(key, IRecordHandler.TYPE_UPLOAD);

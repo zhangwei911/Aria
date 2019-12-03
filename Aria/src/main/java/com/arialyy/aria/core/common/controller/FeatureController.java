@@ -98,6 +98,13 @@ public abstract class FeatureController {
     this.ignoreCheckPermissions = true;
   }
 
+  /**
+   * 强制执行任务，不管文件路径是否被占用
+   */
+  public void ignoreFilePathOccupy() {
+    mTaskWrapper.setIgnoreFilePathOccupy(true);
+  }
+
   protected AbsTaskWrapper getTaskWrapper() {
     return mTaskWrapper;
   }

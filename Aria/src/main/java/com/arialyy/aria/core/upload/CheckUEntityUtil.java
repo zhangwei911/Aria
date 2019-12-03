@@ -58,9 +58,9 @@ public class CheckUEntityUtil implements ICheckEntityUtil {
       ALog.e(TAG, "上传失败，文件路径【" + filePath + "】不合法");
       return false;
     }
-
-    // 检查路径冲突
-    if (!CheckUtil.checkUploadPathConflicts(mWrapper.isForceUpload(), filePath)) {
+    // 任务是新任务，并且路径冲突就不会继续执行
+    if (mWrapper.isNewTask() && !CheckUtil.checkUPathConflicts(
+        mWrapper.isIgnoreFilePathOccupy(), filePath)) {
       return false;
     }
 

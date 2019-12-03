@@ -54,11 +54,6 @@ public class DTaskWrapper extends AbsTaskWrapper<DownloadEntity> {
    */
   private String mTempFilePath;
 
-  /**
-   * {@code true}强制下载，不考虑文件路径是否被占用
-   */
-  private boolean forceDownload = false;
-
   public DTaskWrapper(DownloadEntity entity) {
     super(entity);
   }
@@ -123,13 +118,5 @@ public class DTaskWrapper extends AbsTaskWrapper<DownloadEntity> {
 
   public void setTempFilePath(String mTempFilePath) {
     this.mTempFilePath = mTempFilePath;
-  }
-
-  public boolean isForceDownload() {
-    return forceDownload;
-  }
-
-  public void setForceDownload(boolean forceDownload) {
-    this.forceDownload = forceDownload;
   }
 }

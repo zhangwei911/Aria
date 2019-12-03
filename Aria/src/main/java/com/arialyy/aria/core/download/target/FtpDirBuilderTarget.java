@@ -35,6 +35,7 @@ public class FtpDirBuilderTarget extends AbsBuilderTarget<FtpDirBuilderTarget> {
     this.url = url;
     mConfigHandler = new FtpDirConfigHandler<>(this, -1);
     getEntity().setGroupHash(url);
+    getTaskWrapper().setNewTask(true);
   }
 
   /**

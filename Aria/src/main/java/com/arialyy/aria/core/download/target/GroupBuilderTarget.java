@@ -34,8 +34,9 @@ public class GroupBuilderTarget extends AbsBuilderTarget<GroupBuilderTarget> {
 
   GroupBuilderTarget(List<String> urls) {
     mConfigHandler = new HttpGroupConfigHandler<>(this, -1);
-    getTaskWrapper().setRequestType(ITaskWrapper.DG_HTTP);
     mConfigHandler.setGroupUrl(urls);
+    getTaskWrapper().setRequestType(ITaskWrapper.DG_HTTP);
+    getTaskWrapper().setNewTask(true);
   }
 
   /**

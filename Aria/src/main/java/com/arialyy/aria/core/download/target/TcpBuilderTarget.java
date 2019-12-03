@@ -33,6 +33,7 @@ public class TcpBuilderTarget extends AbsBuilderTarget<TcpBuilderTarget> {
   TcpBuilderTarget(String ip, int port) {
     mConfigHandler = new DNormalConfigHandler<>(this, -1);
     getTaskWrapper().setRequestType(ITaskWrapper.D_TCP);
+    getTaskWrapper().setNewTask(true);
   }
   //
   ///**
@@ -56,18 +57,4 @@ public class TcpBuilderTarget extends AbsBuilderTarget<TcpBuilderTarget> {
     return this;
   }
 
-  /**
-   * 设置文件存储路径，如果需要修改新的文件名，修改路径便可。
-   * 如：原文件路径 /mnt/sdcard/test.zip
-   * 如果需要将test.zip改为game.zip，只需要重新设置文件路径为：/mnt/sdcard/game.zip
-   *
-   * @param filePath 路径必须为文件路径，不能为文件夹路径
-   * @param forceDownload {@code true}强制下载，不考虑文件路径是否被占用
-   */
-  @CheckResult(suggest = Suggest.TASK_CONTROLLER)
-  public TcpBuilderTarget setFilePath(@NonNull String filePath, boolean forceDownload) {
-    mConfigHandler.setTempFilePath(filePath);
-    mConfigHandler.setForceDownload(forceDownload);
-    return this;
-  }
 }

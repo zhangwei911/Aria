@@ -27,6 +27,7 @@ public class M3U8NormalTarget extends AbsNormalTarget<M3U8NormalTarget> {
 
   M3U8NormalTarget(DTaskWrapper wrapper) {
     setTaskWrapper(wrapper);
+    getTaskWrapper().setNewTask(false);
   }
 
   /**

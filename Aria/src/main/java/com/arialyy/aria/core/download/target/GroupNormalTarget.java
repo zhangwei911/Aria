@@ -33,6 +33,7 @@ public class GroupNormalTarget extends AbsNormalTarget<GroupNormalTarget> {
   GroupNormalTarget(long taskId) {
     mConfigHandler = new HttpGroupConfigHandler<>(this, taskId);
     getTaskWrapper().setRequestType(ITaskWrapper.DG_HTTP);
+    getTaskWrapper().setNewTask(false);
   }
 
   /**

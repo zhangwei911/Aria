@@ -33,6 +33,7 @@ public class FtpNormalTarget extends AbsNormalTarget<FtpNormalTarget> {
   FtpNormalTarget(long taskId) {
     mConfigHandler = new UNormalConfigHandler<>(this, taskId);
     getTaskWrapper().setRequestType(ITaskWrapper.U_FTP);
+    getTaskWrapper().setNewTask(false);
   }
 
   /**

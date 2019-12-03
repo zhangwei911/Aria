@@ -24,7 +24,6 @@ import com.arialyy.aria.core.event.ErrorEvent;
 import com.arialyy.aria.core.inf.IEntity;
 import com.arialyy.aria.core.inf.ITaskOption;
 import com.arialyy.aria.core.upload.UploadEntity;
-import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.ComponentUtil;
 
 /**
@@ -84,6 +83,19 @@ public abstract class AbsTaskWrapper<ENTITY extends AbsEntity>
    * 任务配置信息
    */
   private TaskOptionParams optionParams = new TaskOptionParams();
+
+  /**
+   * {@code true}强制下载\上传，不考虑文件路径是否被占用
+   */
+  private boolean ignoreFilePathOccupy = false;
+
+  public boolean isIgnoreFilePathOccupy() {
+    return ignoreFilePathOccupy;
+  }
+
+  public void setIgnoreFilePathOccupy(boolean ignoreFilePathOccupy) {
+    this.ignoreFilePathOccupy = ignoreFilePathOccupy;
+  }
 
   public void setTaskOption(ITaskOption option) {
     this.taskOption = option;

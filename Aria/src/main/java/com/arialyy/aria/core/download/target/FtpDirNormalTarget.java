@@ -32,6 +32,7 @@ public class FtpDirNormalTarget extends AbsNormalTarget<FtpDirNormalTarget> {
 
   FtpDirNormalTarget(long taskId) {
     mConfigHandler = new FtpDirConfigHandler<>(this, taskId);
+    getTaskWrapper().setNewTask(false);
   }
 
   @Override public boolean isRunning() {

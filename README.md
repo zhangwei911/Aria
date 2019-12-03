@@ -44,16 +44,16 @@ Aria有以下特点：
 
 ## 引入库
 [![license](http://img.shields.io/badge/license-Apache2.0-brightgreen.svg?style=flat)](https://github.com/AriaLyy/Aria/blob/master/LICENSE)
-[![Core](https://img.shields.io/badge/Core-3.7.9-blue)](https://github.com/AriaLyy/Aria)
-[![Compiler](https://img.shields.io/badge/Compiler-3.7.9-blue)](https://github.com/AriaLyy/Aria)
-[![FtpComponent](https://img.shields.io/badge/FtpComponent-3.7.9-orange)](https://github.com/AriaLyy/Aria)
-[![M3U8Component](https://img.shields.io/badge/M3U8Component-3.7.9-orange)](https://github.com/AriaLyy/Aria)
+[![Core](https://img.shields.io/badge/Core-3.7.10-blue)](https://github.com/AriaLyy/Aria)
+[![Compiler](https://img.shields.io/badge/Compiler-3.7.10-blue)](https://github.com/AriaLyy/Aria)
+[![FtpComponent](https://img.shields.io/badge/FtpComponent-3.7.10-orange)](https://github.com/AriaLyy/Aria)
+[![M3U8Component](https://img.shields.io/badge/M3U8Component-3.7.10-orange)](https://github.com/AriaLyy/Aria)
 
 ```java
-implementation 'com.arialyy.aria:core:3.7.9'
-annotationProcessor 'com.arialyy.aria:compiler:3.7.9'
-implementation 'com.arialyy.aria:ftpComponent:3.7.9' # 如果需要使用ftp，请增加该组件
-implementation 'com.arialyy.aria:m3u8Component:3.7.9' # 如果需要使用m3u8下载功能，请增加该组件
+implementation 'com.arialyy.aria:core:3.7.10'
+annotationProcessor 'com.arialyy.aria:compiler:3.7.10'
+implementation 'com.arialyy.aria:ftpComponent:3.7.10' # 如果需要使用ftp，请增加该组件
+implementation 'com.arialyy.aria:m3u8Component:3.7.10' # 如果需要使用m3u8下载功能，请增加该组件
 ```
 如果出现android support依赖错误，请将 `compile 'com.arialyy.aria:core:<last-version>'`替换为
 ```
@@ -137,8 +137,13 @@ protected void onCreate(Bundle savedInstanceState) {
 
 
 ### 版本日志
-  + v_3.7.9 (2019/11/28)
-    - fix bug https://github.com/AriaLyy/Aria/issues/537
+  + v_3.7.10 (2019/12/3)
+    - fix bug https://github.com/AriaLyy/Aria/issues/543#issuecomment-559733124
+    - fix bug https://github.com/AriaLyy/Aria/issues/542
+    - fix bug https://github.com/AriaLyy/Aria/issues/547
+    - 修复下载失败时，中断重试无效的问题
+    - 增加忽略权限检查的api，`ignoreCheckPermissions()`
+    - 增加通用的的忽略文件路径被占用的api，`isIgnoreFilePathOccupy()`
     
 [更多版本记录](https://github.com/AriaLyy/Aria/blob/master/DEV_LOG.md)
 

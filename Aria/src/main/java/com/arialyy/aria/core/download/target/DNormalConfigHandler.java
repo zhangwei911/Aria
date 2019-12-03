@@ -93,7 +93,7 @@ class DNormalConfigHandler<TARGET extends AbsTarget> implements IConfigHandler {
   }
 
   void setForceDownload(boolean forceDownload) {
-    getWrapper().setForceDownload(forceDownload);
+    getWrapper().setIgnoreFilePathOccupy(forceDownload);
   }
 
   void setUrl(String url) {

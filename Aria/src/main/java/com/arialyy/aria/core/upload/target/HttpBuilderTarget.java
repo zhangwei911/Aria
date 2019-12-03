@@ -19,7 +19,6 @@ import androidx.annotation.CheckResult;
 import com.arialyy.aria.core.common.AbsBuilderTarget;
 import com.arialyy.aria.core.common.HttpOption;
 import com.arialyy.aria.core.inf.Suggest;
-import com.arialyy.aria.core.upload.UTaskWrapper;
 import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
 
 /**
@@ -30,12 +29,12 @@ public class HttpBuilderTarget extends AbsBuilderTarget<HttpBuilderTarget> {
   private UNormalConfigHandler<HttpBuilderTarget> mConfigHandler;
 
   HttpBuilderTarget(String filePath) {
-
     mConfigHandler = new UNormalConfigHandler<>(this, -1);
     mConfigHandler.setFilePath(filePath);
     //http暂时不支持断点上传
     getTaskWrapper().setSupportBP(false);
     getTaskWrapper().setRequestType(AbsTaskWrapper.U_HTTP);
+    getTaskWrapper().setNewTask(true);
   }
 
   /**
@@ -64,9 +63,12 @@ public class HttpBuilderTarget extends AbsBuilderTarget<HttpBuilderTarget> {
 
   /**
    * 如果文件路径被其它任务占用，删除其它任务
+   *
+   * @deprecated 使用 {@link #ignoreFilePathOccupy()}
    */
+  @Deprecated
   public HttpBuilderTarget forceUpload() {
-    ((UTaskWrapper) getTaskWrapper()).setForceUpload(true);
+    getTaskWrapper().setIgnoreFilePathOccupy(true);
     return this;
   }
 }

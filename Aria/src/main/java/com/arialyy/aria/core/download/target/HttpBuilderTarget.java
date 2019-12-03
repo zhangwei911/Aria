@@ -22,12 +22,9 @@ import com.arialyy.aria.core.common.HttpOption;
 import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.download.m3u8.M3U8LiveOption;
 import com.arialyy.aria.core.download.m3u8.M3U8VodOption;
-import com.arialyy.aria.core.inf.IOptionConstant;
 import com.arialyy.aria.core.inf.Suggest;
-import com.arialyy.aria.core.processor.IHttpFileLenAdapter;
 import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
 import com.arialyy.aria.core.wrapper.ITaskWrapper;
-import com.arialyy.aria.util.CheckUtil;
 
 public class HttpBuilderTarget extends AbsBuilderTarget<HttpBuilderTarget> {
 
@@ -35,13 +32,14 @@ public class HttpBuilderTarget extends AbsBuilderTarget<HttpBuilderTarget> {
 
   HttpBuilderTarget(String url) {
     mConfigHandler = new DNormalConfigHandler<>(this, -1);
-    getTaskWrapper().setRequestType(ITaskWrapper.D_HTTP);
     mConfigHandler.setUrl(url);
+    getTaskWrapper().setRequestType(ITaskWrapper.D_HTTP);
+    getTaskWrapper().setNewTask(true);
   }
 
   @CheckResult(suggest = Suggest.TASK_CONTROLLER)
   public HttpBuilderTarget m3u8VodOption(M3U8VodOption m3U8VodOption) {
-    if (m3U8VodOption == null){
+    if (m3U8VodOption == null) {
       throw new NullPointerException("m3u8任务设置为空");
     }
     getTaskWrapper().setRequestType(AbsTaskWrapper.M3U8_VOD);
@@ -52,7 +50,7 @@ public class HttpBuilderTarget extends AbsBuilderTarget<HttpBuilderTarget> {
 
   @CheckResult(suggest = Suggest.TASK_CONTROLLER)
   public HttpBuilderTarget m3u8LiveOption(M3U8LiveOption m3U8LiveOption) {
-    if (m3U8LiveOption == null){
+    if (m3U8LiveOption == null) {
       throw new NullPointerException("m3u8任务设置为空");
     }
     getTaskWrapper().setRequestType(AbsTaskWrapper.M3U8_LIVE);
@@ -92,7 +90,9 @@ public class HttpBuilderTarget extends AbsBuilderTarget<HttpBuilderTarget> {
    *
    * @param filePath 路径必须为文件路径，不能为文件夹路径
    * @param forceDownload {@code true}强制下载，不考虑文件路径是否被占用
+   * @deprecated 使用 {@link #ignoreFilePathOccupy()}
    */
+  @Deprecated
   @CheckResult(suggest = Suggest.TASK_CONTROLLER)
   public HttpBuilderTarget setFilePath(@NonNull String filePath, boolean forceDownload) {
     mConfigHandler.setTempFilePath(filePath);

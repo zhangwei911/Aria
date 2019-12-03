@@ -42,12 +42,28 @@ public class RecordUtil {
    * @param removeFile {@code true} 无论任务是否完成，都会删除记录和文件；
    * {@code false} 如果任务已经完成，则只删除记录，不删除文件；任务未完成，记录和文件都会删除。
    */
-  public static void delGroupTaskRecord(String groupHash, boolean removeFile) {
+  public static void delGroupTaskRecordByHash(String groupHash, boolean removeFile) {
     if (TextUtils.isEmpty(groupHash)) {
       ALog.e(TAG, "删除下载任务组记录失败，groupHash为null");
       return;
     }
-    DownloadGroupEntity groupEntity = DbDataHelper.getDGEntity(groupHash);
+    DownloadGroupEntity groupEntity = DbDataHelper.getDGEntityByHash(groupHash);
+
+    delGroupTaskRecord(groupEntity, removeFile, true);
+  }
+
+  /**
+   * 根据路径删除组合任务记录
+   *
+   * @param removeFile {@code true} 无论任务是否完成，都会删除记录和文件；
+   * {@code false} 如果任务已经完成，则只删除记录，不删除文件；任务未完成，记录和文件都会删除。
+   */
+  public static void delGroupTaskRecordByPath(String dirPath, boolean removeFile) {
+    if (TextUtils.isEmpty(dirPath)) {
+      ALog.e(TAG, "删除下载任务组记录失败，组合任务路径为空");
+      return;
+    }
+    DownloadGroupEntity groupEntity = DbDataHelper.getDGEntityByPath(dirPath);
 
     delGroupTaskRecord(groupEntity, removeFile, true);
   }
