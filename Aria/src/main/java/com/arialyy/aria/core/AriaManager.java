@@ -290,19 +290,31 @@ import java.util.concurrent.ConcurrentHashMap;
     }
   }
 
-  private IReceiver putReceiver(@ReceiverType String type, Object obj) {
+  private IReceiver putReceiver(String type, Object obj) {
     final String key = getKey(type, obj);
     IReceiver receiver = mReceivers.get(key);
     boolean needRmReceiver = false;
     // 监控Dialog、fragment、popupWindow的生命周期
     final WidgetLiftManager widgetLiftManager = new WidgetLiftManager();
+    Context subParenActivity = null;
+
     if (obj instanceof Dialog) {
       needRmReceiver = widgetLiftManager.handleDialogLift((Dialog) obj);
+      subParenActivity = ((Dialog) obj).getOwnerActivity();
     } else if (obj instanceof PopupWindow) {
       needRmReceiver = widgetLiftManager.handlePopupWindowLift((PopupWindow) obj);
+      subParenActivity = ((PopupWindow) obj).getContentView().getContext();
     } else if (isDialogFragment(obj.getClass())) {
       needRmReceiver = widgetLiftManager.handleDialogFragmentLift(getDialog(obj));
+      subParenActivity = getFragmentActivity(obj);
+    } else if (isFragment(obj.getClass())) {
+      subParenActivity = getFragmentActivity(obj);
     }
+
+    if (subParenActivity instanceof Activity) {
+      relateSubClass(type, obj, (Activity) subParenActivity);
+    }
+
     if (receiver == null) {
       AbsReceiver absReceiver =
           type.equals(ReceiverType.DOWNLOAD) ? new DownloadReceiver() : new UploadReceiver();
@@ -313,30 +325,6 @@ import java.util.concurrent.ConcurrentHashMap;
       receiver = absReceiver;
     }
     return receiver;
-  }
-
-  /**
-   * 根据功能类型和控件类型获取对应的key
-   *
-   * @param type {@link ReceiverType}
-   * @param obj 观察者对象
-   * @return {@link #createKey(String, Object)}
-   */
-  private String getKey(@ReceiverType String type, Object obj) {
-    if (isFragment(obj.getClass())) {
-      relateSubClass(type, obj, getFragmentActivity(obj));
-    } else if (obj instanceof Dialog) {
-      Activity activity = ((Dialog) obj).getOwnerActivity();
-      if (activity != null) {
-        relateSubClass(type, obj, activity);
-      }
-    } else if (obj instanceof PopupWindow) {
-      Context context = ((PopupWindow) obj).getContentView().getContext();
-      if (context instanceof Activity) {
-        relateSubClass(type, obj, (Activity) context);
-      }
-    }
-    return createKey(type, obj);
   }
 
   /**
@@ -421,14 +409,17 @@ import java.util.concurrent.ConcurrentHashMap;
    * @param sub Fragment或dialog类
    * @param activity activity寄主类
    */
-  private void relateSubClass(@ReceiverType String type, Object sub, Activity activity) {
-    String key = createKey(type, activity);
-    List<String> list = mSubClass.get(key);
-    if (list == null) {
-      list = new ArrayList<>();
-      mSubClass.put(key, list);
+  private void relateSubClass(String type, Object sub, Activity activity) {
+    String key = getKey(type, activity);
+    List<String> subClass = mSubClass.get(key);
+    if (subClass == null) {
+      subClass = new ArrayList<>();
+      mSubClass.put(key, subClass);
     }
-    list.add(createKey(type, sub));
+    subClass.add(getKey(type, sub));
+    if (mReceivers.get(key) == null) { // 将activity填充进去
+      mReceivers.put(key, new DownloadReceiver());
+    }
   }
 
   /**
@@ -439,7 +430,7 @@ import java.util.concurrent.ConcurrentHashMap;
    * @return key的格式为：{@code String.format("%s_%s_%s", obj.getClass().getName(), type,
    * obj.hashCode());}
    */
-  private String createKey(@ReceiverType String type, Object obj) {
+  private String getKey(String type, Object obj) {
     return String.format("%s_%s_%s", obj.getClass().getName(), type, obj.hashCode());
   }
 

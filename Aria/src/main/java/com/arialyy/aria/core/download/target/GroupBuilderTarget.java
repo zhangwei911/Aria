@@ -15,11 +15,9 @@
  */
 package com.arialyy.aria.core.download.target;
 
-import androidx.annotation.CheckResult;
 import com.arialyy.aria.core.common.AbsBuilderTarget;
 import com.arialyy.aria.core.common.HttpOption;
 import com.arialyy.aria.core.download.DGTaskWrapper;
-import com.arialyy.aria.core.inf.Suggest;
 import com.arialyy.aria.core.manager.SubTaskManager;
 import com.arialyy.aria.core.wrapper.ITaskWrapper;
 import com.arialyy.aria.util.ALog;
@@ -42,7 +40,6 @@ public class GroupBuilderTarget extends AbsBuilderTarget<GroupBuilderTarget> {
   /**
    * 设置http请求参数，header等信息
    */
-  @CheckResult(suggest = Suggest.TASK_CONTROLLER)
   public GroupBuilderTarget option(HttpOption option) {
     if (option == null) {
       throw new NullPointerException("任务配置为空");
@@ -59,7 +56,6 @@ public class GroupBuilderTarget extends AbsBuilderTarget<GroupBuilderTarget> {
    *
    * @param fileSize 任务组总大小
    */
-  @CheckResult(suggest = Suggest.TASK_CONTROLLER)
   public GroupBuilderTarget setFileSize(long fileSize) {
     if (fileSize <= 0) {
       ALog.e(TAG, "文件大小不能小于 0");
@@ -78,7 +74,6 @@ public class GroupBuilderTarget extends AbsBuilderTarget<GroupBuilderTarget> {
    * 2、如果你的知道组合任务的总长度，请使用{@link #setFileSize(long)}设置组合任务的长度。
    * 3、由于网络或其它原因的存在，这种方式获取的组合任务大小有可能是不准确的。
    */
-  @CheckResult(suggest = Suggest.TASK_CONTROLLER)
   public GroupBuilderTarget unknownSize() {
     ((DGTaskWrapper) getTaskWrapper()).setUnknownSize(true);
     return this;
@@ -89,7 +84,6 @@ public class GroupBuilderTarget extends AbsBuilderTarget<GroupBuilderTarget> {
    *
    * @return 子任务管理器
    */
-  @CheckResult(suggest = Suggest.TASK_CONTROLLER)
   public SubTaskManager getSubTaskManager() {
     return mConfigHandler.getSubTaskManager();
   }
@@ -99,7 +93,6 @@ public class GroupBuilderTarget extends AbsBuilderTarget<GroupBuilderTarget> {
    *
    * @deprecated {@link #setSubFileName(List)} 请使用该api
    */
-  @CheckResult(suggest = Suggest.TASK_CONTROLLER)
   @Deprecated public GroupBuilderTarget setSubTaskFileName(List<String> subTaskFileName) {
     return setSubFileName(subTaskFileName);
   }
@@ -107,7 +100,6 @@ public class GroupBuilderTarget extends AbsBuilderTarget<GroupBuilderTarget> {
   /**
    * 设置任务组别名
    */
-  @CheckResult(suggest = Suggest.TASK_CONTROLLER)
   public GroupBuilderTarget setGroupAlias(String alias) {
     mConfigHandler.setGroupAlias(alias);
     return this;
@@ -132,7 +124,6 @@ public class GroupBuilderTarget extends AbsBuilderTarget<GroupBuilderTarget> {
    *
    * @param dirPath 任务组保存文件夹路径
    */
-  @CheckResult(suggest = Suggest.TASK_CONTROLLER)
   public GroupBuilderTarget setDirPath(String dirPath) {
     return mConfigHandler.setDirPath(dirPath);
   }
@@ -140,7 +131,6 @@ public class GroupBuilderTarget extends AbsBuilderTarget<GroupBuilderTarget> {
   /**
    * 设置子任务文件名，该方法必须在{@link #setDirPath(String)}之后调用，否则不生效
    */
-  @CheckResult(suggest = Suggest.TASK_CONTROLLER)
   public GroupBuilderTarget setSubFileName(List<String> subTaskFileName) {
     return mConfigHandler.setSubFileName(subTaskFileName);
   }

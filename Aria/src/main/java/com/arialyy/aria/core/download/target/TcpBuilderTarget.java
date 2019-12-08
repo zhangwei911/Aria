@@ -15,11 +15,7 @@
  */
 package com.arialyy.aria.core.download.target;
 
-import androidx.annotation.CheckResult;
-import androidx.annotation.NonNull;
 import com.arialyy.aria.core.common.AbsBuilderTarget;
-import com.arialyy.aria.core.inf.Suggest;
-import com.arialyy.aria.core.download.tcp.TcpDelegate;
 import com.arialyy.aria.core.wrapper.ITaskWrapper;
 
 /**
@@ -51,10 +47,8 @@ public class TcpBuilderTarget extends AbsBuilderTarget<TcpBuilderTarget> {
    *
    * @param filePath 路径必须为文件路径，不能为文件夹路径
    */
-  @CheckResult(suggest = Suggest.TASK_CONTROLLER)
-  public TcpBuilderTarget setFilePath(@NonNull String filePath) {
+  public TcpBuilderTarget setFilePath(String filePath) {
     mConfigHandler.setTempFilePath(filePath);
     return this;
   }
-
 }

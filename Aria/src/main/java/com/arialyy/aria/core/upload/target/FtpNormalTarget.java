@@ -15,10 +15,8 @@
  */
 package com.arialyy.aria.core.upload.target;
 
-import androidx.annotation.CheckResult;
 import com.arialyy.aria.core.common.AbsNormalTarget;
 import com.arialyy.aria.core.common.FtpOption;
-import com.arialyy.aria.core.inf.Suggest;
 import com.arialyy.aria.core.upload.UploadEntity;
 import com.arialyy.aria.core.wrapper.ITaskWrapper;
 import com.arialyy.aria.util.CommonUtil;
@@ -39,7 +37,6 @@ public class FtpNormalTarget extends AbsNormalTarget<FtpNormalTarget> {
   /**
    * 设置登陆、字符串编码、ftps等参数
    */
-  @CheckResult(suggest = Suggest.TASK_CONTROLLER)
   public FtpNormalTarget option(FtpOption option) {
     if (option == null) {
       throw new NullPointerException("ftp 任务配置为空");

@@ -15,10 +15,8 @@
  */
 package com.arialyy.aria.core.download.target;
 
-import androidx.annotation.CheckResult;
 import com.arialyy.aria.core.common.AbsNormalTarget;
 import com.arialyy.aria.core.common.HttpOption;
-import com.arialyy.aria.core.inf.Suggest;
 import com.arialyy.aria.core.manager.SubTaskManager;
 import com.arialyy.aria.core.wrapper.ITaskWrapper;
 import java.util.List;
@@ -39,7 +37,6 @@ public class GroupNormalTarget extends AbsNormalTarget<GroupNormalTarget> {
   /**
    * 设置http请求参数，header等信息
    */
-  @CheckResult(suggest = Suggest.TASK_CONTROLLER)
   public GroupNormalTarget option(HttpOption option) {
     if (option == null) {
       throw new NullPointerException("任务配置为空");
@@ -53,7 +50,6 @@ public class GroupNormalTarget extends AbsNormalTarget<GroupNormalTarget> {
    *
    * @return 子任务管理器
    */
-  @CheckResult(suggest = Suggest.TASK_CONTROLLER)
   public SubTaskManager getSubTaskManager() {
     return mConfigHandler.getSubTaskManager();
   }
@@ -61,7 +57,6 @@ public class GroupNormalTarget extends AbsNormalTarget<GroupNormalTarget> {
   /**
    * 设置任务组别名
    */
-  @CheckResult(suggest = Suggest.TASK_CONTROLLER)
   public GroupNormalTarget setGroupAlias(String alias) {
     mConfigHandler.setGroupAlias(alias);
     return this;
@@ -72,7 +67,6 @@ public class GroupNormalTarget extends AbsNormalTarget<GroupNormalTarget> {
    *
    * @param urls 新的组合任务下载地址列表
    */
-  @CheckResult(suggest = Suggest.TASK_CONTROLLER)
   public GroupNormalTarget updateUrls(List<String> urls) {
     return mConfigHandler.updateUrls(urls);
   }
@@ -96,7 +90,6 @@ public class GroupNormalTarget extends AbsNormalTarget<GroupNormalTarget> {
    *
    * @param dirPath 任务组保存文件夹路径
    */
-  @CheckResult(suggest = Suggest.TASK_CONTROLLER)
   public GroupNormalTarget modifyDirPath(String dirPath) {
     return mConfigHandler.setDirPath(dirPath);
   }
@@ -104,7 +97,6 @@ public class GroupNormalTarget extends AbsNormalTarget<GroupNormalTarget> {
   /**
    * 更新子任务文件名，该方法必须在{@link #modifyDirPath(String)}之后调用，否则不生效
    */
-  @CheckResult(suggest = Suggest.TASK_CONTROLLER)
   public GroupNormalTarget modifySubFileName(List<String> subTaskFileName) {
     return mConfigHandler.setSubFileName(subTaskFileName);
   }

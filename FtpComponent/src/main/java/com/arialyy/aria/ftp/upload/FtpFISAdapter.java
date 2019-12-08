@@ -15,7 +15,6 @@
  */
 package com.arialyy.aria.ftp.upload;
 
-import androidx.annotation.NonNull;
 import com.arialyy.aria.util.BufferedRandomAccessFile;
 import java.io.IOException;
 import java.io.InputStream;
@@ -34,12 +33,12 @@ final class FtpFISAdapter extends InputStream {
     void onProgressCallback(byte[] buffer, int byteOffset, int byteCount) throws IOException;
   }
 
-  FtpFISAdapter(@NonNull BufferedRandomAccessFile is, @NonNull ProgressCallback callback) {
+  FtpFISAdapter(BufferedRandomAccessFile is, ProgressCallback callback) {
     mIs = is;
     mCallback = callback;
   }
 
-  FtpFISAdapter(@NonNull BufferedRandomAccessFile is) {
+  FtpFISAdapter(BufferedRandomAccessFile is) {
     mIs = is;
   }
 
@@ -51,7 +50,7 @@ final class FtpFISAdapter extends InputStream {
     return mIs.read();
   }
 
-  @Override public int read(@NonNull byte[] buffer) throws IOException {
+  @Override public int read(byte[] buffer) throws IOException {
     count = mIs.read(buffer);
     if (mCallback != null) {
       mCallback.onProgressCallback(buffer, 0, count);
@@ -59,7 +58,7 @@ final class FtpFISAdapter extends InputStream {
     return count;
   }
 
-  @Override public int read(@NonNull byte[] buffer, int byteOffset, int byteCount)
+  @Override public int read(byte[] buffer, int byteOffset, int byteCount)
       throws IOException {
     count = mIs.read(buffer, byteOffset, byteCount);
     if (mCallback != null) {

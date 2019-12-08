@@ -33,7 +33,7 @@ public class XMLReader extends DefaultHandler {
   private UploadConfig mUploadConfig = Configuration.getInstance().uploadCfg;
   private AppConfig mAppConfig = Configuration.getInstance().appCfg;
   private DGroupConfig mDGroupConfig = Configuration.getInstance().dGroupCfg;
-  private @ConfigType int mType;
+  private int mType;
 
   @Override public void startDocument() throws SAXException {
     super.startDocument();

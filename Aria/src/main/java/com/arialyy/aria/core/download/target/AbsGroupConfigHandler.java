@@ -16,9 +16,7 @@
 package com.arialyy.aria.core.download.target;
 
 import android.text.TextUtils;
-import androidx.annotation.CheckResult;
 import com.arialyy.aria.core.common.AbsNormalTarget;
-import com.arialyy.aria.core.common.ErrorCode;
 import com.arialyy.aria.core.download.DGTaskWrapper;
 import com.arialyy.aria.core.download.DownloadGroupEntity;
 import com.arialyy.aria.core.event.ErrorEvent;
@@ -66,7 +64,6 @@ abstract class AbsGroupConfigHandler<TARGET extends AbsTarget> implements IConfi
    *
    * @return 子任务管理器
    */
-  @CheckResult
   SubTaskManager getSubTaskManager() {
     if (mSubTaskManager == null) {
       mSubTaskManager = new SubTaskManager(getTaskWrapper());
@@ -89,7 +86,6 @@ abstract class AbsGroupConfigHandler<TARGET extends AbsTarget> implements IConfi
     return task != null && task.isRunning();
   }
 
-  @CheckResult
   TARGET setDirPath(String dirPath) {
     mWrapper.setDirPathTemp(dirPath);
     return mTarget;

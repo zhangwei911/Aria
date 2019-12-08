@@ -52,7 +52,6 @@ public abstract class AbsTask<TASK_WRAPPER extends AbsTaskWrapper>
   /**
    * 该任务的调度类型
    */
-  @TaskSchedulerType
   private int mSchedulerType = TaskSchedulerType.TYPE_DEFAULT;
   protected IEventListener mListener;
 
@@ -193,7 +192,7 @@ public abstract class AbsTask<TASK_WRAPPER extends AbsTaskWrapper>
     start(TaskSchedulerType.TYPE_DEFAULT);
   }
 
-  @Override public void start(@TaskSchedulerType int type) {
+  @Override public void start(int type) {
     mSchedulerType = type;
     if (type == TaskSchedulerType.TYPE_START_AND_RESET_STATE) {
       if (getUtil().isRunning()) {
@@ -216,7 +215,7 @@ public abstract class AbsTask<TASK_WRAPPER extends AbsTaskWrapper>
     stop(TaskSchedulerType.TYPE_DEFAULT);
   }
 
-  @Override public void stop(@TaskSchedulerType int type) {
+  @Override public void stop(int type) {
     isStop = true;
     mSchedulerType = type;
     getUtil().stop();
@@ -226,7 +225,7 @@ public abstract class AbsTask<TASK_WRAPPER extends AbsTaskWrapper>
     cancel(TaskSchedulerType.TYPE_DEFAULT);
   }
 
-  @Override public void cancel(@TaskSchedulerType int type) {
+  @Override public void cancel(int type) {
     isCancel = true;
     mSchedulerType = type;
     getUtil().cancel();

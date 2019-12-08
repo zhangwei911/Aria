@@ -92,7 +92,6 @@ public class FtpUrlEntity implements Cloneable {
    * 连接协议
    * {@link ProtocolType}
    */
-  @ProtocolType
   public String protocol = ProtocolType.Default;
 
   /**

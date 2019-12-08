@@ -49,5 +49,5 @@ public interface IReceiver {
    *
    * @return {@link ReceiverType}
    */
-  @ReceiverType String getType();
+  String getType();
 }

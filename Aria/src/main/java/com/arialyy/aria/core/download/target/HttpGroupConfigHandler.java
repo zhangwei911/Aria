@@ -15,7 +15,6 @@
  */
 package com.arialyy.aria.core.download.target;
 
-import androidx.annotation.CheckResult;
 import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.inf.AbsTarget;
@@ -69,7 +68,6 @@ class HttpGroupConfigHandler<TARGET extends AbsTarget> extends AbsGroupConfigHan
   /**
    * 设置子任务文件名，该方法必须在{@link #setDirPath(String)}之后调用，否则不生效
    */
-  @CheckResult
   TARGET setSubFileName(List<String> subTaskFileName) {
     if (subTaskFileName == null || subTaskFileName.isEmpty()) {
       ALog.w(TAG, "修改子任务的文件名失败：列表为null");
@@ -90,7 +88,6 @@ class HttpGroupConfigHandler<TARGET extends AbsTarget> extends AbsGroupConfigHan
    *
    * @param urls 新的组合任务下载地址列表
    */
-  @CheckResult
   TARGET updateUrls(List<String> urls) {
     if (urls == null || urls.isEmpty()) {
       throw new NullPointerException("下载地址列表为空");

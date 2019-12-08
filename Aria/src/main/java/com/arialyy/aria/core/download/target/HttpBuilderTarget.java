@@ -15,14 +15,11 @@
  */
 package com.arialyy.aria.core.download.target;
 
-import androidx.annotation.CheckResult;
-import androidx.annotation.NonNull;
 import com.arialyy.aria.core.common.AbsBuilderTarget;
 import com.arialyy.aria.core.common.HttpOption;
 import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.download.m3u8.M3U8LiveOption;
 import com.arialyy.aria.core.download.m3u8.M3U8VodOption;
-import com.arialyy.aria.core.inf.Suggest;
 import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
 import com.arialyy.aria.core.wrapper.ITaskWrapper;
 
@@ -37,7 +34,6 @@ public class HttpBuilderTarget extends AbsBuilderTarget<HttpBuilderTarget> {
     getTaskWrapper().setNewTask(true);
   }
 
-  @CheckResult(suggest = Suggest.TASK_CONTROLLER)
   public HttpBuilderTarget m3u8VodOption(M3U8VodOption m3U8VodOption) {
     if (m3U8VodOption == null) {
       throw new NullPointerException("m3u8任务设置为空");
@@ -48,7 +44,6 @@ public class HttpBuilderTarget extends AbsBuilderTarget<HttpBuilderTarget> {
     return this;
   }
 
-  @CheckResult(suggest = Suggest.TASK_CONTROLLER)
   public HttpBuilderTarget m3u8LiveOption(M3U8LiveOption m3U8LiveOption) {
     if (m3U8LiveOption == null) {
       throw new NullPointerException("m3u8任务设置为空");
@@ -61,7 +56,6 @@ public class HttpBuilderTarget extends AbsBuilderTarget<HttpBuilderTarget> {
   /**
    * 设置http请求参数，header等信息
    */
-  @CheckResult(suggest = Suggest.TASK_CONTROLLER)
   public HttpBuilderTarget option(HttpOption option) {
     if (option == null) {
       throw new NullPointerException("任务配置为空");
@@ -77,8 +71,7 @@ public class HttpBuilderTarget extends AbsBuilderTarget<HttpBuilderTarget> {
    *
    * @param filePath 路径必须为文件路径，不能为文件夹路径
    */
-  @CheckResult(suggest = Suggest.TASK_CONTROLLER)
-  public HttpBuilderTarget setFilePath(@NonNull String filePath) {
+  public HttpBuilderTarget setFilePath(String filePath) {
     mConfigHandler.setTempFilePath(filePath);
     return this;
   }
@@ -93,8 +86,7 @@ public class HttpBuilderTarget extends AbsBuilderTarget<HttpBuilderTarget> {
    * @deprecated 使用 {@link #ignoreFilePathOccupy()}
    */
   @Deprecated
-  @CheckResult(suggest = Suggest.TASK_CONTROLLER)
-  public HttpBuilderTarget setFilePath(@NonNull String filePath, boolean forceDownload) {
+  public HttpBuilderTarget setFilePath(String filePath, boolean forceDownload) {
     mConfigHandler.setTempFilePath(filePath);
     mConfigHandler.setForceDownload(forceDownload);
     return this;

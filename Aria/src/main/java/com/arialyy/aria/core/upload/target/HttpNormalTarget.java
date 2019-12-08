@@ -15,10 +15,8 @@
  */
 package com.arialyy.aria.core.upload.target;
 
-import androidx.annotation.CheckResult;
 import com.arialyy.aria.core.common.AbsNormalTarget;
 import com.arialyy.aria.core.common.HttpOption;
-import com.arialyy.aria.core.inf.Suggest;
 import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
 import com.arialyy.aria.util.ALog;
 
@@ -41,7 +39,6 @@ public class HttpNormalTarget extends AbsNormalTarget<HttpNormalTarget> {
    *
    * @param tempUrl 上传路径
    */
-  @CheckResult(suggest = Suggest.TASK_CONTROLLER)
   public HttpNormalTarget setUploadUrl(String tempUrl) {
     mConfigHandler.setTempUrl(tempUrl);
     return this;
@@ -50,7 +47,6 @@ public class HttpNormalTarget extends AbsNormalTarget<HttpNormalTarget> {
   /**
    * 设置http请求参数，header等信息
    */
-  @CheckResult(suggest = Suggest.TASK_CONTROLLER)
   public HttpNormalTarget option(HttpOption option) {
     if (option == null) {
       throw new NullPointerException("任务配置为空");

@@ -15,17 +15,7 @@
  */
 package com.arialyy.aria.core.config;
 
-import androidx.annotation.IntDef;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-
-@IntDef({
-    ConfigType.DOWNLOAD,
-    ConfigType.UPLOAD,
-    ConfigType.APP,
-    ConfigType.D_GROUP
-})
-@Retention(RetentionPolicy.SOURCE) @interface ConfigType {
+public interface ConfigType {
   int DOWNLOAD = 1;
   int UPLOAD = 2;
   int APP = 3;

@@ -16,7 +16,6 @@
 package com.arialyy.aria.core.task;
 
 import android.os.Bundle;
-import androidx.annotation.Nullable;
 import com.arialyy.aria.core.inf.IThreadState;
 import com.arialyy.aria.exception.BaseException;
 
@@ -33,7 +32,7 @@ public interface IThreadTaskObserver {
    *
    * @param state state {@link IThreadState#STATE_STOP}..
    */
-  void updateState(int state, @Nullable Bundle bundle);
+  void updateState(int state, Bundle bundle);
 
   /**
    * 更新完成的状态
@@ -45,7 +44,7 @@ public interface IThreadTaskObserver {
    *
    * @param needRetry 是否需要重试，一般是网络错误才需要重试
    */
-  void updateFailState(@Nullable BaseException e, boolean needRetry);
+  void updateFailState(BaseException e, boolean needRetry);
 
   /**
    * 更新进度

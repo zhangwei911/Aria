@@ -16,8 +16,6 @@
 package com.arialyy.aria.core.upload;
 
 import android.text.TextUtils;
-import androidx.annotation.CheckResult;
-import androidx.annotation.NonNull;
 import com.arialyy.annotations.TaskEnum;
 import com.arialyy.aria.core.AriaConfig;
 import com.arialyy.aria.core.AriaManager;
@@ -68,8 +66,8 @@ public class UploadReceiver extends AbsReceiver {
    *
    * @param filePath 文件路径
    */
-  @CheckResult
-  public HttpBuilderTarget load(@NonNull String filePath) {
+
+  public HttpBuilderTarget load(String filePath) {
     ComponentUtil.getInstance().checkComponentExist(ComponentUtil.COMPONENT_TYPE_HTTP);
     CheckUtil.checkUploadPathIsEmpty(filePath);
     return UTargetFactory.getInstance()
@@ -82,7 +80,7 @@ public class UploadReceiver extends AbsReceiver {
    * @param taskId 任务id，可从{@link AbsBuilderTarget#create()}、{@link AbsBuilderTarget#add()}、{@link
    * AbsEntity#getId()}读取任务id
    */
-  @CheckResult
+
   public HttpNormalTarget load(long taskId) {
     ComponentUtil.getInstance().checkComponentExist(ComponentUtil.COMPONENT_TYPE_HTTP);
     return UTargetFactory.getInstance()
@@ -94,8 +92,8 @@ public class UploadReceiver extends AbsReceiver {
    *
    * @param filePath 文件路径
    */
-  @CheckResult
-  public FtpBuilderTarget loadFtp(@NonNull String filePath) {
+
+  public FtpBuilderTarget loadFtp(String filePath) {
     ComponentUtil.getInstance().checkComponentExist(ComponentUtil.COMPONENT_TYPE_FTP);
     CheckUtil.checkUploadPathIsEmpty(filePath);
     return UTargetFactory.getInstance()
@@ -108,7 +106,7 @@ public class UploadReceiver extends AbsReceiver {
    * @param taskId 任务id，可从{@link AbsBuilderTarget#create()}、{@link AbsBuilderTarget#add()}、{@link
    * AbsEntity#getId()}读取任务id
    */
-  @CheckResult
+
   public FtpNormalTarget loadFtp(long taskId) {
     ComponentUtil.getInstance().checkComponentExist(ComponentUtil.COMPONENT_TYPE_FTP);
     return UTargetFactory.getInstance()

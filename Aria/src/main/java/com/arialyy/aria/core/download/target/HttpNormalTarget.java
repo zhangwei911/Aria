@@ -15,14 +15,12 @@
  */
 package com.arialyy.aria.core.download.target;
 
-import androidx.annotation.CheckResult;
 import com.arialyy.aria.core.common.AbsNormalTarget;
 import com.arialyy.aria.core.common.HttpOption;
 import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.download.m3u8.M3U8LiveOption;
 import com.arialyy.aria.core.download.m3u8.M3U8VodOption;
-import com.arialyy.aria.core.inf.Suggest;
 import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
 
 /**
@@ -38,7 +36,6 @@ public class HttpNormalTarget extends AbsNormalTarget<HttpNormalTarget> {
     getTaskWrapper().setNewTask(false);
   }
 
-  @CheckResult(suggest = Suggest.TASK_CONTROLLER)
   public M3U8NormalTarget m3u8VodOption(M3U8VodOption m3U8VodOption) {
     if (m3U8VodOption == null) {
       throw new NullPointerException("m3u8任务设置为空");
@@ -49,12 +46,10 @@ public class HttpNormalTarget extends AbsNormalTarget<HttpNormalTarget> {
     return new M3U8NormalTarget((DTaskWrapper) getTaskWrapper());
   }
 
-  @CheckResult(suggest = Suggest.TASK_CONTROLLER)
   public M3U8NormalTarget m3u8VodOption() {
     return new M3U8NormalTarget((DTaskWrapper) getTaskWrapper());
   }
 
-  @CheckResult(suggest = Suggest.TASK_CONTROLLER)
   public HttpNormalTarget m3u8LiveOption(M3U8LiveOption m3U8LiveOption) {
     if (m3U8LiveOption == null) {
       throw new NullPointerException("m3u8任务设置为空");
@@ -67,7 +62,6 @@ public class HttpNormalTarget extends AbsNormalTarget<HttpNormalTarget> {
   /**
    * 设置http请求参数，header等信息
    */
-  @CheckResult(suggest = Suggest.TASK_CONTROLLER)
   public HttpNormalTarget option(HttpOption option) {
     if (option == null) {
       throw new NullPointerException("任务配置为空");
@@ -81,7 +75,6 @@ public class HttpNormalTarget extends AbsNormalTarget<HttpNormalTarget> {
    * 如：原文件路径 /mnt/sdcard/test.zip
    * 如果需要将test.zip改为game.zip，只需要重新设置文件路径为：/mnt/sdcard/game.zip
    */
-  @CheckResult(suggest = Suggest.TASK_CONTROLLER)
   public HttpNormalTarget modifyFilePath(String filePath) {
     mConfigHandler.setTempFilePath(filePath);
     return this;
@@ -97,7 +90,6 @@ public class HttpNormalTarget extends AbsNormalTarget<HttpNormalTarget> {
   /**
    * 更新下载地址
    */
-  @CheckResult(suggest = Suggest.TASK_CONTROLLER)
   public HttpNormalTarget updateUrl(String newUrl) {
     return mConfigHandler.updateUrl(newUrl);
   }

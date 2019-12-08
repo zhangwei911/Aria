@@ -27,9 +27,6 @@ package com.arialyy.aria.util;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.annotation.VisibleForTesting;
 import java.lang.ref.WeakReference;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -51,7 +48,7 @@ import java.util.concurrent.locks.ReentrantLock;
   // hard reference to Callback. We need to keep callback in memory
   private final ExecHandler mExec;
   private Lock mLock = new ReentrantLock();
-  @SuppressWarnings("ConstantConditions") @VisibleForTesting final ChainedRef mRunnables =
+  @SuppressWarnings("ConstantConditions") final ChainedRef mRunnables =
       new ChainedRef(mLock, null);
 
   /**
@@ -76,7 +73,7 @@ import java.util.concurrent.locks.ReentrantLock;
    *
    * @param callback The callback interface in which to handle messages, or null.
    */
-  public WeakHandler(@Nullable Handler.Callback callback) {
+  public WeakHandler(Handler.Callback callback) {
     mCallback = callback; // Hard referencing body
     mExec = new ExecHandler(new WeakReference<>(callback)); // Weak referencing inside ExecHandler
   }
@@ -86,7 +83,7 @@ import java.util.concurrent.locks.ReentrantLock;
    *
    * @param looper The looper, must not be null.
    */
-  public WeakHandler(@NonNull Looper looper) {
+  public WeakHandler(Looper looper) {
     mCallback = null;
     mExec = new ExecHandler(looper);
   }
@@ -98,7 +95,7 @@ import java.util.concurrent.locks.ReentrantLock;
    * @param looper The looper, must not be null.
    * @param callback The callback interface in which to handle messages, or null.
    */
-  public WeakHandler(@NonNull Looper looper, @NonNull Handler.Callback callback) {
+  public WeakHandler(Looper looper, Handler.Callback callback) {
     mCallback = callback;
     mExec = new ExecHandler(looper, new WeakReference<>(callback));
   }
@@ -113,7 +110,7 @@ import java.util.concurrent.locks.ReentrantLock;
    * message queue.  Returns false on failure, usually because the
    * looper processing the message queue is exiting.
    */
-  public final boolean post(@NonNull Runnable r) {
+  public final boolean post(Runnable r) {
     return mExec.post(wrapRunnable(r));
   }
 
@@ -133,7 +130,7 @@ import java.util.concurrent.locks.ReentrantLock;
    * the looper is quit before the delivery time of the message
    * occurs then the message will be dropped.
    */
-  public final boolean postAtTime(@NonNull Runnable r, long uptimeMillis) {
+  public final boolean postAtTime(Runnable r, long uptimeMillis) {
     return mExec.postAtTime(wrapRunnable(r), uptimeMillis);
   }
 
@@ -367,7 +364,7 @@ import java.util.concurrent.locks.ReentrantLock;
     return mExec.getLooper();
   }
 
-  private WeakRunnable wrapRunnable(@NonNull Runnable r) {
+  private WeakRunnable wrapRunnable(Runnable r) {
     //noinspection ConstantConditions
     if (r == null) {
       throw new NullPointerException("Runnable can't be null");
@@ -398,7 +395,7 @@ import java.util.concurrent.locks.ReentrantLock;
       mCallback = callback;
     }
 
-    @Override public void handleMessage(@NonNull Message msg) {
+    @Override public void handleMessage(Message msg) {
       if (mCallback == null) {
         return;
       }
@@ -432,14 +429,14 @@ import java.util.concurrent.locks.ReentrantLock;
   }
 
   static class ChainedRef {
-    @Nullable ChainedRef next;
-    @Nullable ChainedRef prev;
-    @NonNull final Runnable runnable;
-    @NonNull final WeakRunnable wrapper;
+    ChainedRef next;
+    ChainedRef prev;
+    final Runnable runnable;
+    final WeakRunnable wrapper;
 
-    @NonNull Lock lock;
+    Lock lock;
 
-    public ChainedRef(@NonNull Lock lock, @NonNull Runnable r) {
+    public ChainedRef(Lock lock, Runnable r) {
       this.runnable = r;
       this.lock = lock;
       this.wrapper = new WeakRunnable(new WeakReference<>(r), new WeakReference<>(this));
@@ -462,7 +459,7 @@ import java.util.concurrent.locks.ReentrantLock;
       return wrapper;
     }
 
-    public void insertAfter(@NonNull ChainedRef candidate) {
+    public void insertAfter(ChainedRef candidate) {
       lock.lock();
       try {
         if (this.next != null) {
@@ -477,7 +474,7 @@ import java.util.concurrent.locks.ReentrantLock;
       }
     }
 
-    @Nullable public WeakRunnable remove(Runnable obj) {
+    public WeakRunnable remove(Runnable obj) {
       lock.lock();
       try {
         ChainedRef curr = this.next; // Skipping head

@@ -15,8 +15,6 @@
  */
 package com.arialyy.aria.core.download;
 
-import androidx.annotation.CheckResult;
-import androidx.annotation.NonNull;
 import com.arialyy.annotations.TaskEnum;
 import com.arialyy.aria.core.AriaConfig;
 import com.arialyy.aria.core.AriaManager;
@@ -74,8 +72,7 @@ public class DownloadReceiver extends AbsReceiver {
    *
    * @param url 下载地址
    */
-  @CheckResult
-  public HttpBuilderTarget load(@NonNull String url) {
+  public HttpBuilderTarget load(String url) {
     ComponentUtil.getInstance().checkComponentExist(ComponentUtil.COMPONENT_TYPE_HTTP);
     return DTargetFactory.getInstance()
         .generateBuilderTarget(HttpBuilderTarget.class, url);
@@ -87,7 +84,6 @@ public class DownloadReceiver extends AbsReceiver {
    * @param taskId 任务id，可从{@link AbsBuilderTarget#create()}、{@link AbsBuilderTarget#add()}、{@link
    * AbsEntity#getId()}读取任务id
    */
-  @CheckResult
   public HttpNormalTarget load(long taskId) {
     ComponentUtil.getInstance().checkComponentExist(ComponentUtil.COMPONENT_TYPE_HTTP);
     return DTargetFactory.getInstance()
@@ -99,7 +95,6 @@ public class DownloadReceiver extends AbsReceiver {
    *
    * @param urls 组合任务只任务列被，如果任务组的中的下载地址改变了，则任务从新的一个任务组
    */
-  @CheckResult
   public GroupBuilderTarget loadGroup(List<String> urls) {
     ComponentUtil.getInstance().checkComponentExist(ComponentUtil.COMPONENT_TYPE_HTTP);
     return DTargetFactory.getInstance().generateGroupBuilderTarget(urls);
@@ -111,7 +106,7 @@ public class DownloadReceiver extends AbsReceiver {
    * @param taskId 任务id，可从{@link AbsBuilderTarget#create()}、{@link AbsBuilderTarget#add()}、{@link
    * * AbsEntity#getId()}读取任务id
    */
-  @CheckResult
+
   public GroupNormalTarget loadGroup(long taskId) {
     ComponentUtil.getInstance().checkComponentExist(ComponentUtil.COMPONENT_TYPE_HTTP);
     return DTargetFactory.getInstance()
@@ -121,8 +116,8 @@ public class DownloadReceiver extends AbsReceiver {
   /**
    * 加载ftp单任务下载地址，用于任务第一次下载，如果需要控制任务停止或删除等操作，请使用{@link #loadFtp(long)}
    */
-  @CheckResult
-  public FtpBuilderTarget loadFtp(@NonNull String url) {
+
+  public FtpBuilderTarget loadFtp(String url) {
     ComponentUtil.getInstance().checkComponentExist(ComponentUtil.COMPONENT_TYPE_FTP);
     return DTargetFactory.getInstance()
         .generateBuilderTarget(FtpBuilderTarget.class, url);
@@ -134,7 +129,7 @@ public class DownloadReceiver extends AbsReceiver {
    * @param taskId 任务id，可从{@link AbsBuilderTarget#create()}、{@link AbsBuilderTarget#add()}、{@link
    * AbsEntity#getId()}读取任务id
    */
-  @CheckResult
+
   public FtpNormalTarget loadFtp(long taskId) {
     ComponentUtil.getInstance().checkComponentExist(ComponentUtil.COMPONENT_TYPE_FTP);
     return DTargetFactory.getInstance()
@@ -144,8 +139,8 @@ public class DownloadReceiver extends AbsReceiver {
   /**
    * 加载ftp文件夹下载地址，用于任务第一次下载，如果需要控制任务停止或删除等操作，请使用{@link #loadFtpDir(long)}
    */
-  @CheckResult
-  public FtpDirBuilderTarget loadFtpDir(@NonNull String dirUrl) {
+
+  public FtpDirBuilderTarget loadFtpDir(String dirUrl) {
     ComponentUtil.getInstance().checkComponentExist(ComponentUtil.COMPONENT_TYPE_FTP);
     return DTargetFactory.getInstance().generateDirBuilderTarget(dirUrl);
   }
@@ -156,7 +151,7 @@ public class DownloadReceiver extends AbsReceiver {
    * @param taskId 任务id，可从{@link AbsBuilderTarget#create()}、{@link AbsBuilderTarget#add()}、{@link
    * AbsEntity#getId()}读取任务id
    */
-  @CheckResult
+
   public FtpDirNormalTarget loadFtpDir(long taskId) {
     ComponentUtil.getInstance().checkComponentExist(ComponentUtil.COMPONENT_TYPE_FTP);
     return DTargetFactory.getInstance()

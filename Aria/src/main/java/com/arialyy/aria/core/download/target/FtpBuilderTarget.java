@@ -15,12 +15,9 @@
  */
 package com.arialyy.aria.core.download.target;
 
-import androidx.annotation.CheckResult;
-import androidx.annotation.NonNull;
 import com.arialyy.aria.core.common.AbsBuilderTarget;
 import com.arialyy.aria.core.common.FtpOption;
 import com.arialyy.aria.core.download.DownloadEntity;
-import com.arialyy.aria.core.inf.Suggest;
 import com.arialyy.aria.core.wrapper.ITaskWrapper;
 import com.arialyy.aria.util.CommonUtil;
 
@@ -40,7 +37,6 @@ public class FtpBuilderTarget extends AbsBuilderTarget<FtpBuilderTarget> {
   /**
    * 设置登陆、字符串编码、ftps等参数
    */
-  @CheckResult(suggest = Suggest.TASK_CONTROLLER)
   public FtpBuilderTarget option(FtpOption option) {
     if (option == null) {
       throw new NullPointerException("ftp 任务配置为空");
@@ -56,8 +52,7 @@ public class FtpBuilderTarget extends AbsBuilderTarget<FtpBuilderTarget> {
    * 1、如果保存路径是该文件的保存路径，如：/mnt/sdcard/file.zip，则使用路径中的文件名file.zip
    * 2、如果保存路径是文件夹路径，如：/mnt/sdcard/，则使用FTP服务器该文件的文件名
    */
-  @CheckResult(suggest = Suggest.TASK_CONTROLLER)
-  public FtpBuilderTarget setFilePath(@NonNull String filePath) {
+  public FtpBuilderTarget setFilePath(String filePath) {
     int lastIndex = mConfigHandler.getUrl().lastIndexOf("/");
     getEntity().setFileName(mConfigHandler.getUrl().substring(lastIndex + 1));
     mConfigHandler.setTempFilePath(filePath);
@@ -74,8 +69,7 @@ public class FtpBuilderTarget extends AbsBuilderTarget<FtpBuilderTarget> {
    * @deprecated 使用 {@link #ignoreFilePathOccupy()}
    */
   @Deprecated
-  @CheckResult(suggest = Suggest.TASK_CONTROLLER)
-  public FtpBuilderTarget setFilePath(@NonNull String filePath, boolean forceDownload) {
+  public FtpBuilderTarget setFilePath(String filePath, boolean forceDownload) {
     mConfigHandler.setTempFilePath(filePath);
     mConfigHandler.setForceDownload(forceDownload);
     return this;

@@ -15,19 +15,10 @@
  */
 package com.arialyy.aria.core.inf;
 
-import androidx.annotation.StringDef;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-
 /**
  * {@link AbsReceiver}类型
  */
-@StringDef({
-    ReceiverType.DOWNLOAD,
-    ReceiverType.UPLOAD,
-})
-@Retention(RetentionPolicy.SOURCE)
-public @interface ReceiverType {
+public interface ReceiverType {
   String DOWNLOAD = "download";
   String UPLOAD = "upload";
 }

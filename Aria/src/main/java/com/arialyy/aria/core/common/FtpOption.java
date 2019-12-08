@@ -70,7 +70,7 @@ public class FtpOption extends BaseOption {
    *
    * @param protocol {@link ProtocolType}
    */
-  public FtpOption setProtocol(@ProtocolType String protocol) {
+  public FtpOption setProtocol(String protocol) {
     if (TextUtils.isEmpty(protocol)) {
       ALog.e(TAG, "设置协议失败，协议信息为空");
       return this;

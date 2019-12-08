@@ -15,7 +15,6 @@
  */
 package com.arialyy.aria.core.processor;
 
-import androidx.annotation.Nullable;
 import com.arialyy.aria.core.download.M3U8Entity;
 import com.arialyy.aria.core.inf.IEventHandler;
 import java.util.List;
@@ -33,5 +32,5 @@ public interface ITsMergeHandler extends IEventHandler {
    * @param tsPath ts文件列表
    * @return {@code true} 合并成功
    */
-  boolean merge(@Nullable M3U8Entity m3U8Entity, List<String> tsPath);
+  boolean merge(M3U8Entity m3U8Entity, List<String> tsPath);
 }

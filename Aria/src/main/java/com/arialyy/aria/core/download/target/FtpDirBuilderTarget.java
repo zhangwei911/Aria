@@ -15,11 +15,9 @@
  */
 package com.arialyy.aria.core.download.target;
 
-import androidx.annotation.CheckResult;
 import com.arialyy.aria.core.common.AbsBuilderTarget;
 import com.arialyy.aria.core.common.FtpOption;
 import com.arialyy.aria.core.download.DownloadGroupEntity;
-import com.arialyy.aria.core.inf.Suggest;
 import com.arialyy.aria.core.manager.SubTaskManager;
 import com.arialyy.aria.util.CommonUtil;
 
@@ -57,7 +55,6 @@ public class FtpDirBuilderTarget extends AbsBuilderTarget<FtpDirBuilderTarget> {
    *
    * @param dirPath 任务组保存文件夹路径
    */
-  @CheckResult(suggest = Suggest.TASK_CONTROLLER)
   public FtpDirBuilderTarget setDirPath(String dirPath) {
     return mConfigHandler.setDirPath(dirPath);
   }
@@ -65,7 +62,6 @@ public class FtpDirBuilderTarget extends AbsBuilderTarget<FtpDirBuilderTarget> {
   /**
    * 设置任务组别名
    */
-  @CheckResult(suggest = Suggest.TASK_CONTROLLER)
   public FtpDirBuilderTarget setGroupAlias(String alias) {
     mConfigHandler.setGroupAlias(alias);
     return this;
@@ -74,7 +70,6 @@ public class FtpDirBuilderTarget extends AbsBuilderTarget<FtpDirBuilderTarget> {
   /**
    * 设置登陆、字符串编码、ftps等参数
    */
-  @CheckResult(suggest = Suggest.TASK_CONTROLLER)
   public FtpDirBuilderTarget option(FtpOption option) {
     if (option == null) {
       throw new NullPointerException("ftp 任务配置为空");
@@ -93,7 +88,6 @@ public class FtpDirBuilderTarget extends AbsBuilderTarget<FtpDirBuilderTarget> {
    *
    * @return 子任务管理器
    */
-  @CheckResult(suggest = Suggest.TASK_CONTROLLER)
   public SubTaskManager getSubTaskManager() {
     return mConfigHandler.getSubTaskManager();
   }

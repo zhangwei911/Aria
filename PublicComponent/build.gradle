@@ -24,7 +24,6 @@ android {
 
 dependencies {
   implementation fileTree(dir: 'libs', include: ['*.jar'])
-  implementation "androidx.appcompat:appcompat:${rootProject.ext.XAppcompatVersion}"
   testImplementation 'junit:junit:4.12'
 }
 

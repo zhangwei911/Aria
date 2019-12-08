@@ -1,4 +1,7 @@
 ## 开发日志
+  + v_3.8
+    - 移除androidx和support的依赖，现在无论是哪个版本的appcompat包都可以使用本框架
+    - 修复一个在xml中使用fragment导致的内存泄漏问题
   + v_3.7.10 (2019/12/3)
     - fix bug https://github.com/AriaLyy/Aria/issues/543#issuecomment-559733124
     - fix bug https://github.com/AriaLyy/Aria/issues/542

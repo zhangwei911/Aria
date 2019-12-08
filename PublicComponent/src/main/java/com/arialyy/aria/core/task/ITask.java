@@ -91,7 +91,7 @@ public interface ITask<TASK_WRAPPER extends AbsTaskWrapper> {
    *
    * @param type {@link TaskSchedulerType}
    */
-  void start(@TaskSchedulerType int type);
+  void start(int type);
 
   /**
    * 停止任务
@@ -103,7 +103,7 @@ public interface ITask<TASK_WRAPPER extends AbsTaskWrapper> {
    *
    * @param type {@link TaskSchedulerType}
    */
-  void stop(@TaskSchedulerType int type);
+  void stop(int type);
 
   /**
    * 删除任务
@@ -115,7 +115,7 @@ public interface ITask<TASK_WRAPPER extends AbsTaskWrapper> {
    *
    * @param type {@link TaskSchedulerType}
    */
-  void cancel(@TaskSchedulerType int type);
+  void cancel(int type);
 
   /**
    * 读取扩展数据

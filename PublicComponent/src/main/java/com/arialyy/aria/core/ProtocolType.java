@@ -15,20 +15,7 @@
  */
 package com.arialyy.aria.core;
 
-import androidx.annotation.StringDef;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-
-@StringDef({
-    ProtocolType.Default,
-    ProtocolType.SSL,
-    ProtocolType.SSLv3,
-    ProtocolType.TLS,
-    ProtocolType.TLSv1,
-    ProtocolType.TLSv1_1,
-    ProtocolType.TLSv1_2
-})
-@Retention(RetentionPolicy.SOURCE) public @interface ProtocolType {
+public interface ProtocolType {
   String Default = "TLS";
   String SSL = "SSL";
   String SSLv3 = "SSLv3";

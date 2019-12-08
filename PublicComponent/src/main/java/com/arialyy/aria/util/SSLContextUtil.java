@@ -56,8 +56,7 @@ public class SSLContextUtil {
    * @param caPath 保存在assets目录下的CA证书完整路径
    * @param protocol 连接协议
    */
-  public static SSLContext getSSLContextFromAssets(String caAlias, String caPath,
-      @ProtocolType String protocol) {
+  public static SSLContext getSSLContextFromAssets(String caAlias, String caPath, String protocol) {
     if (TextUtils.isEmpty(caAlias) || TextUtils.isEmpty(caPath)) {
       return null;
     }
@@ -83,8 +82,7 @@ public class SSLContextUtil {
    * @param caPath CA证书路径
    * @param protocol 连接协议
    */
-  public static SSLContext getSSLContext(String caAlias, String caPath,
-      @ProtocolType String protocol) {
+  public static SSLContext getSSLContext(String caAlias, String caPath, String protocol) {
     if (TextUtils.isEmpty(caAlias) || TextUtils.isEmpty(caPath)) {
       return null;
     }
@@ -105,8 +103,8 @@ public class SSLContextUtil {
   /**
    * @param cacheKey 别名 + 证书路径，然后取md5
    */
-  private static SSLContext createContext(String caAlias, Certificate ca,
-      @ProtocolType String protocol, String cacheKey) {
+  private static SSLContext createContext(String caAlias, Certificate ca, String protocol,
+      String cacheKey) {
     try {
       String keyStoreType = KeyStore.getDefaultType();
       KeyStore keyStore = KeyStore.getInstance(keyStoreType);
@@ -154,7 +152,7 @@ public class SSLContextUtil {
   /**
    * 服务器证书不是由 CA 签署的，而是自签署时，获取默认的SSL
    */
-  public static SSLContext getDefaultSLLContext(@ProtocolType String protocol) {
+  public static SSLContext getDefaultSLLContext(String protocol) {
     SSLContext sslContext = null;
     try {
       sslContext =

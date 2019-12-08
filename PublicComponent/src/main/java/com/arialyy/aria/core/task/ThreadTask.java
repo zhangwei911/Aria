@@ -20,7 +20,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.os.Process;
-import androidx.annotation.Nullable;
 import com.arialyy.aria.core.AriaConfig;
 import com.arialyy.aria.core.ThreadRecord;
 import com.arialyy.aria.core.common.SubThreadConfig;
@@ -259,7 +258,7 @@ public class ThreadTask implements IThreadTask, IThreadTaskObserver {
    * @param bundle 而外数据
    */
   @Override
-  public synchronized void updateState(int state, @Nullable Bundle bundle) {
+  public synchronized void updateState(int state, Bundle bundle) {
     Message msg = mStateHandler.obtainMessage();
     msg.what = state;
     if (state != IThreadState.STATE_UPDATE_PROGRESS) {
@@ -297,7 +296,7 @@ public class ThreadTask implements IThreadTask, IThreadTaskObserver {
    *
    * @param needRetry 是否需要重试，一般是网络错误才需要重试
    */
-  @Override public synchronized void updateFailState(@Nullable BaseException e, boolean needRetry) {
+  @Override public synchronized void updateFailState(BaseException e, boolean needRetry) {
     fail(mRangeProgress, e, needRetry);
   }
 
@@ -448,7 +447,7 @@ public class ThreadTask implements IThreadTask, IThreadTaskObserver {
   /**
    * 发送失败信息
    */
-  private void sendFailMsg(@Nullable BaseException e,boolean needRetry) {
+  private void sendFailMsg(BaseException e, boolean needRetry) {
     Bundle b = new Bundle();
     b.putBoolean(IThreadState.KEY_RETRY, needRetry);
     if (e != null) {

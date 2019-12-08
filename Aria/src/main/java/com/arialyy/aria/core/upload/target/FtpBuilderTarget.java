@@ -15,11 +15,8 @@
  */
 package com.arialyy.aria.core.upload.target;
 
-import androidx.annotation.CheckResult;
 import com.arialyy.aria.core.common.AbsBuilderTarget;
 import com.arialyy.aria.core.common.FtpOption;
-import com.arialyy.aria.core.inf.Suggest;
-import com.arialyy.aria.core.upload.UTaskWrapper;
 import com.arialyy.aria.core.wrapper.ITaskWrapper;
 import com.arialyy.aria.util.CommonUtil;
 
@@ -43,7 +40,6 @@ public class FtpBuilderTarget extends AbsBuilderTarget<FtpBuilderTarget> {
    *
    * @param tempUrl 上传路径
    */
-  @CheckResult(suggest = Suggest.TASK_CONTROLLER)
   public FtpBuilderTarget setUploadUrl(String tempUrl) {
     url = tempUrl;
     mConfigHandler.setTempUrl(tempUrl);
@@ -64,7 +60,6 @@ public class FtpBuilderTarget extends AbsBuilderTarget<FtpBuilderTarget> {
   /**
    * 设置登陆、字符串编码、ftps等参数
    */
-  @CheckResult(suggest = Suggest.TASK_CONTROLLER)
   public FtpBuilderTarget option(FtpOption option) {
     if (option == null) {
       throw new NullPointerException("ftp 任务配置为空");

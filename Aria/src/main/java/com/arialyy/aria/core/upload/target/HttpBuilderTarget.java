@@ -15,10 +15,8 @@
  */
 package com.arialyy.aria.core.upload.target;
 
-import androidx.annotation.CheckResult;
 import com.arialyy.aria.core.common.AbsBuilderTarget;
 import com.arialyy.aria.core.common.HttpOption;
-import com.arialyy.aria.core.inf.Suggest;
 import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
 
 /**
@@ -42,7 +40,6 @@ public class HttpBuilderTarget extends AbsBuilderTarget<HttpBuilderTarget> {
    *
    * @param tempUrl 上传路径
    */
-  @CheckResult(suggest = Suggest.TASK_CONTROLLER)
   public HttpBuilderTarget setUploadUrl(String tempUrl) {
     mConfigHandler.setTempUrl(tempUrl);
     return this;
@@ -51,7 +48,6 @@ public class HttpBuilderTarget extends AbsBuilderTarget<HttpBuilderTarget> {
   /**
    * 设置http请求参数，header等信息
    */
-  @CheckResult(suggest = Suggest.TASK_CONTROLLER)
   public HttpBuilderTarget option(HttpOption option) {
 
     if (option == null) {

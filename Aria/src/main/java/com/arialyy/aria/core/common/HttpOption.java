@@ -16,11 +16,6 @@
 package com.arialyy.aria.core.common;
 
 import android.text.TextUtils;
-import androidx.annotation.CheckResult;
-import androidx.annotation.NonNull;
-import com.arialyy.aria.core.download.target.HttpBuilderTarget;
-import com.arialyy.aria.core.inf.IOptionConstant;
-import com.arialyy.aria.core.inf.Suggest;
 import com.arialyy.aria.core.processor.IHttpFileLenAdapter;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CheckUtil;
@@ -50,7 +45,6 @@ public class HttpOption extends BaseOption {
    *
    * @param requestEnum {@link RequestEnum}
    */
-  @CheckResult(suggest = Suggest.TO_CONTROLLER)
   public HttpOption setRequestType(RequestEnum requestEnum) {
     this.requestEnum = requestEnum;
     return this;
@@ -97,7 +91,7 @@ public class HttpOption extends BaseOption {
    * @param key header对应的key
    * @param value header对应的value
    */
-  public HttpOption addHeader(@NonNull String key, @NonNull String value) {
+  public HttpOption addHeader(String key, String value) {
     if (TextUtils.isEmpty(key)) {
       ALog.w(TAG, "设置header失败，header对应的key不能为null");
       return this;
@@ -118,7 +112,7 @@ public class HttpOption extends BaseOption {
    *
    * @param headers 一组http header数据
    */
-  public HttpOption addHeaders(@NonNull Map<String, String> headers) {
+  public HttpOption addHeaders(Map<String, String> headers) {
     if (headers.size() == 0) {
       ALog.w(TAG, "设置header失败，map没有header数据");
       return this;
