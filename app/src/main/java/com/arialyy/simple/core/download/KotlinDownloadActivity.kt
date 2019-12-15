@@ -50,7 +50,7 @@ class KotlinDownloadActivity : BaseActivity<ActivitySingleKotlinBinding>() {
   private var mUrl: String? = null
   private var mFilePath: String? = null
   private var mModule: HttpDownloadModule? = null
-  private val mTaskId: Long = -1
+  private var mTaskId: Long = -1
 
   internal var receiver: BroadcastReceiver = object : BroadcastReceiver() {
     override fun onReceive(
@@ -104,7 +104,7 @@ class KotlinDownloadActivity : BaseActivity<ActivitySingleKotlinBinding>() {
         .get(HttpDownloadModule::class.java)
     mModule!!.getHttpDownloadInfo(this)
         .observe(this, Observer { entity ->
-          if (entity == null || entity.id < 0) {
+          if (entity == null) {
             return@Observer
           }
           if (entity.state == IEntity.STATE_STOP) {
@@ -286,14 +286,21 @@ class KotlinDownloadActivity : BaseActivity<ActivitySingleKotlinBinding>() {
   }
 
   private fun startD() {
-    Aria.download(this)
-        .load(mUrl!!)
-        //.addHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3")
-        //.addHeader("Accept-Encoding", "gzip, deflate")
-        //.addHeader("DNT", "1")
-        //.addHeader("Cookie", "BAIDUID=648E5FF020CC69E8DD6F492D1068AAA9:FG=1; BIDUPSID=648E5FF020CC69E8DD6F492D1068AAA9; PSTM=1519099573; BD_UPN=12314753; locale=zh; BDSVRTM=0")
-        .setFilePath(mFilePath!!, true)
-        .create()
+    if (mTaskId == -1L) {
+
+      mTaskId = Aria.download(this)
+          .load(mUrl!!)
+          //.addHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3")
+          //.addHeader("Accept-Encoding", "gzip, deflate")
+          //.addHeader("DNT", "1")
+          //.addHeader("Cookie", "BAIDUID=648E5FF020CC69E8DD6F492D1068AAA9:FG=1; BIDUPSID=648E5FF020CC69E8DD6F492D1068AAA9; PSTM=1519099573; BD_UPN=12314753; locale=zh; BDSVRTM=0")
+          .setFilePath(mFilePath!!, true)
+          .create()
+    } else {
+      Aria.download(this)
+          .load(mTaskId)
+          .resume()
+    }
   }
 
   override fun onStop() {

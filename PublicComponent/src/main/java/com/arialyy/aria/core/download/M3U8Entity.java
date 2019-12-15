@@ -21,6 +21,7 @@ import android.text.TextUtils;
 import com.arialyy.aria.core.TaskRecord;
 import com.arialyy.aria.core.ThreadRecord;
 import com.arialyy.aria.orm.DbEntity;
+import com.arialyy.aria.orm.annotation.Default;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.DbDataHelper;
 import java.io.File;
@@ -77,6 +78,33 @@ public class M3U8Entity extends DbEntity implements Parcelable {
    * key的iv值
    */
   public String iv;
+
+  /**
+   * key的格式，可能为空
+   */
+  public String keyFormat;
+
+  /**
+   * key的格式版本，默认为1，如果是多个版本，使用"/"分隔，如："1", "1/2", or "1/2/5"
+   */
+  @Default("1")
+  public String keyFormatVersion = "1";
+
+  public String getKeyFormat() {
+    return keyFormat;
+  }
+
+  public void setKeyFormat(String keyFormat) {
+    this.keyFormat = keyFormat;
+  }
+
+  public String getKeyFormatVersion() {
+    return keyFormatVersion;
+  }
+
+  public void setKeyFormatVersion(String keyFormatVersion) {
+    this.keyFormatVersion = keyFormatVersion;
+  }
 
   public String getKeyPath() {
     return keyPath;

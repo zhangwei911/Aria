@@ -75,55 +75,44 @@ public class ProxyHelper {
       return result;
     }
     result = new HashSet<>();
-    try {
-      if (getClass().getClassLoader()
-          .loadClass(className.concat(TaskEnum.DOWNLOAD_GROUP.proxySuffix))
-          != null) {
-        result.add(PROXY_TYPE_DOWNLOAD_GROUP);
-      }
-    } catch (ClassNotFoundException e) {
-      //e.printStackTrace();
+    if (checkProxyExist(className, TaskEnum.DOWNLOAD_GROUP.proxySuffix)) {
+      result.add(PROXY_TYPE_DOWNLOAD_GROUP);
     }
-    try {
-      if (getClass().getClassLoader().loadClass(className.concat(TaskEnum.DOWNLOAD.proxySuffix))
-          != null) {
-        result.add(PROXY_TYPE_DOWNLOAD);
-      }
-    } catch (ClassNotFoundException e) {
-      //e.printStackTrace();
+    if (checkProxyExist(className, TaskEnum.DOWNLOAD.proxySuffix)) {
+      result.add(PROXY_TYPE_DOWNLOAD);
     }
 
-    try {
-      if (getClass().getClassLoader().loadClass(className.concat(TaskEnum.UPLOAD.proxySuffix))
-          != null) {
-        result.add(PROXY_TYPE_UPLOAD);
-      }
-    } catch (ClassNotFoundException e) {
-      //e.printStackTrace();
+    if (checkProxyExist(className, TaskEnum.UPLOAD.proxySuffix)) {
+      result.add(PROXY_TYPE_UPLOAD);
     }
 
-    try {
-      if (getClass().getClassLoader().loadClass(className.concat(TaskEnum.M3U8_PEER.proxySuffix))
-          != null) {
-        result.add(PROXY_TYPE_M3U8_PEER);
-      }
-    } catch (ClassNotFoundException e) {
-      //e.printStackTrace();
+    if (checkProxyExist(className, TaskEnum.M3U8_PEER.proxySuffix)) {
+      result.add(PROXY_TYPE_M3U8_PEER);
     }
 
-    try {
-      if (getClass().getClassLoader()
-          .loadClass(className.concat(TaskEnum.DOWNLOAD_GROUP_SUB.proxySuffix))
-          != null) {
-        result.add(PROXY_TYPE_DOWNLOAD_GROUP_SUB);
-      }
-    } catch (ClassNotFoundException e) {
-      //e.printStackTrace();
+    if (checkProxyExist(className, TaskEnum.DOWNLOAD_GROUP_SUB.proxySuffix)) {
+      result.add(PROXY_TYPE_DOWNLOAD_GROUP_SUB);
     }
 
     if (!result.isEmpty()) {
       mProxyCache.put(clazz.getName(), result);
     }
     return result;
+  }
+
+  private boolean checkProxyExist(String className, String proxySuffix) {
+    String clsName = className.concat(proxySuffix);
+
+    try {
+      if (getClass().getClassLoader().loadClass(clsName) != null) {
+        return true;
+      }
+      if (Class.forName(clsName) != null) {
+        return true;
+      }
+    } catch (ClassNotFoundException e) {
+      //e.printStackTrace();
+    }
+    return false;
   }
 }

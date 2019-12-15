@@ -221,9 +221,9 @@ public class M3U8VodLoader extends BaseM3U8Loader {
       }
     }
     mManager.updateStateCount();
-    if (mCompleteNum <= 0){
+    if (mCompleteNum <= 0) {
       mListener.onStart(0);
-    }else {
+    } else {
       int percent = mCompleteNum * 100 / mRecord.threadRecords.size();
       mListener.onResume(percent);
     }
@@ -570,9 +570,9 @@ public class M3U8VodLoader extends BaseM3U8Loader {
             ALog.d(TAG, String.format("vod任务【%s】完成", mTempFile.getName()));
 
             if (mM3U8Option.isGenerateIndexFile()) {
-              if (generateIndexFile(false)){
+              if (generateIndexFile(false)) {
                 listener.onComplete();
-              }else {
+              } else {
                 listener.onFail(false, new TaskException(TAG, "创建索引文件失败"));
               }
             } else if (mM3U8Option.isMergeFile()) {
@@ -621,7 +621,11 @@ public class M3U8VodLoader extends BaseM3U8Loader {
     }
 
     @Override public boolean isComplete() {
-      return mCompleteNum == taskRecord.threadRecords.size() && !isJump;
+      if (mM3U8Option.isIgnoreFailureTs()) {
+        return mCompleteNum + failNum >= taskRecord.threadRecords.size() && !isJump;
+      } else {
+        return mCompleteNum == taskRecord.threadRecords.size() && !isJump;
+      }
     }
 
     @Override public long getCurrentProgress() {

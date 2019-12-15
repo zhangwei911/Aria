@@ -255,6 +255,10 @@ final public class M3U8InfoThread implements Runnable {
                 m3U8Entity.keyUrl) + ".key";
       } else if (param.startsWith("IV")) {
         m3U8Entity.iv = param.split("=")[1];
+      }else if (param.startsWith("KEYFORMAT")){
+        m3U8Entity.keyFormat = param.split("=")[1];
+      }else if (param.startsWith("KEYFORMATVERSIONS")){
+        m3U8Entity.keyFormatVersion = param.split("=")[1];
       }
     }
     downloadKey(m3U8Entity);

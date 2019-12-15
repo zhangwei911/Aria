@@ -2,6 +2,9 @@
   + v_3.8
     - 移除androidx和support的依赖，现在无论是哪个版本的appcompat包都可以使用本框架
     - 修复一个在xml中使用fragment导致的内存泄漏问题
+    - m3u8协议的key信息增加了`keyFormat`，`keyFormatVersion`字段
+    - m3u8增加了`ignoreFailureTs`方法，忽略虾类失败的ts切片
+    - 修复在dialogFragment的`onCreateDialog()`注册导致的注解不生效问题
   + v_3.7.10 (2019/12/3)
     - fix bug https://github.com/AriaLyy/Aria/issues/543#issuecomment-559733124
     - fix bug https://github.com/AriaLyy/Aria/issues/542

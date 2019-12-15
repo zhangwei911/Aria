@@ -73,8 +73,16 @@ final class WidgetLiftManager {
 
   /**
    * 处理对话框取消或dismiss
+   *
+   * @return true 设置了dialog的销毁事件。false 没有设置dialog的销毁事件
    */
   boolean handleDialogLift(Dialog dialog) {
+    if (dialog == null) {
+      ALog.w(TAG,
+          "dialog 为空，没有设置自动销毁事件，为了防止内存泄露，请在dismiss方法中调用Aria.download(this).unRegister();来注销事件\n"
+              + "如果你使用的是DialogFragment，那么你需要在onDestroy()中进行销毁Aria事件操作");
+      return false;
+    }
     try {
       Field dismissField = CommonUtil.getField(dialog.getClass(), "mDismissMessage");
       Message dismissMsg = (Message) dismissField.get(dialog);

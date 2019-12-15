@@ -109,6 +109,20 @@ public class M3U8TaskOption implements ITaskOption {
    */
   private SoftReference<IKeyUrlConverter> keyUrlConverter;
 
+  /**
+   * 忽略下载失败的ts切片。
+   * true：即使有失败的切片，下载完成后也要合并所有切片，并进入complete回调
+   */
+  private boolean ignoreFailureTs = false;
+
+  public boolean isIgnoreFailureTs() {
+    return ignoreFailureTs;
+  }
+
+  public void setIgnoreFailureTs(boolean ignoreFailureTs) {
+    this.ignoreFailureTs = ignoreFailureTs;
+  }
+
   public IKeyUrlConverter getKeyUrlConverter() {
     return keyUrlConverter == null ? null : keyUrlConverter.get();
   }

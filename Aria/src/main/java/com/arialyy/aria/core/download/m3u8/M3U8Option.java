@@ -33,10 +33,19 @@ public class M3U8Option<OP extends M3U8Option> extends BaseOption {
   private ITsMergeHandler mergeHandler;
   private IBandWidthUrlConverter bandWidthUrlConverter;
   private IKeyUrlConverter keyUrlConverter;
+  private boolean ignoreFailureTs = false;
 
   M3U8Option() {
     super();
     ComponentUtil.getInstance().checkComponentExist(ComponentUtil.COMPONENT_TYPE_M3U8);
+  }
+
+  /**
+   * 忽略下载失败的ts切片，即使有失败的切片，下载完成后也要合并所有切片，并进入complete回调
+   */
+  public OP ignoreFailureTs() {
+    this.ignoreFailureTs = true;
+    return (OP) this;
   }
 
   /**
