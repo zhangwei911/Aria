@@ -24,6 +24,7 @@ import android.widget.Toast;
 import com.arialyy.aria.core.Aria;
 import com.arialyy.aria.core.download.m3u8.M3U8VodOption;
 import com.arialyy.aria.core.processor.IVodTsUrlConverter;
+import com.arialyy.aria.util.ALog;
 import com.arialyy.simple.R;
 import com.arialyy.simple.base.adapter.AbsHolder;
 import com.arialyy.simple.base.adapter.AbsRVAdapter;
@@ -88,6 +89,7 @@ final class FileListAdapter extends AbsRVAdapter<FileListEntity, FileListAdapter
                   .setGroupAlias(item.name)
                   .unknownSize()
                   .create();
+              ALog.d(TAG, "getGroupTaskList = " +  Aria.download(this).getGroupTaskList().size());
               break;
             case 2:
               M3U8VodOption option = new M3U8VodOption();

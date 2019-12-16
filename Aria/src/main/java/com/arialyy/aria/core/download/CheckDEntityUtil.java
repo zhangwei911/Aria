@@ -16,6 +16,7 @@
 package com.arialyy.aria.core.download;
 
 import android.text.TextUtils;
+import com.arialyy.aria.core.common.controller.FeatureController;
 import com.arialyy.aria.core.inf.ICheckEntityUtil;
 import com.arialyy.aria.core.inf.IOptionConstant;
 import com.arialyy.aria.core.inf.ITargetHandler;
@@ -34,12 +35,14 @@ public class CheckDEntityUtil implements ICheckEntityUtil {
   private final String TAG = CommonUtil.getClassName(getClass());
   private DTaskWrapper mWrapper;
   private DownloadEntity mEntity;
+  private int action;
 
-  public static CheckDEntityUtil newInstance(DTaskWrapper wrapper) {
-    return new CheckDEntityUtil(wrapper);
+  public static CheckDEntityUtil newInstance(DTaskWrapper wrapper, int action) {
+    return new CheckDEntityUtil(wrapper, action);
   }
 
-  private CheckDEntityUtil(DTaskWrapper wrapper) {
+  private CheckDEntityUtil(DTaskWrapper wrapper, int action) {
+    this.action = action;
     mWrapper = wrapper;
     mEntity = mWrapper.getEntity();
   }
@@ -80,19 +83,22 @@ public class CheckDEntityUtil implements ICheckEntityUtil {
     } else {
       m3U8Entity.update();
     }
-    if (mWrapper.getRequestType() == ITaskWrapper.M3U8_VOD) {
+    if (mWrapper.getRequestType() == ITaskWrapper.M3U8_VOD
+        && action == FeatureController.ACTION_CREATE) {
       if (mEntity.getFileSize() == 0) {
         ALog.w(TAG,
             "由于m3u8协议的特殊性质，无法有效快速获取到正确到文件长度，如果你需要显示文件中长度，你需要自行设置文件长度：.asM3U8().asVod().setFileSize(xxx)");
       }
-    } else if (mWrapper.getRequestType() == ITaskWrapper.M3U8_LIVE) {
+    } else if (mWrapper.getRequestType() == ITaskWrapper.M3U8_LIVE
+        && action != FeatureController.ACTION_CANCEL) {
       if (file.exists()) {
         ALog.w(TAG, "对于直播来说，每次下载都是一个新文件，所以你需要设置新都文件路径，否则Aria框架将会覆盖已下载的文件");
         file.delete();
       }
     }
 
-    if (mWrapper.getM3U8Params().getHandler(IOptionConstant.bandWidthUrlConverter) != null
+    if (action != FeatureController.ACTION_CANCEL
+        && mWrapper.getM3U8Params().getHandler(IOptionConstant.bandWidthUrlConverter) != null
         && bandWidth == 0) {
       ALog.w(TAG, "你已经设置了码率url转换器，但是没有设置码率，Aria框架将采用第一个获取到的码率");
     }

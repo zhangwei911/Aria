@@ -54,11 +54,12 @@ public class HttpDownloadModule extends BaseViewModule {
     //String url = "http://image.totwoo.com/totwoo-TOTWOO-v3.5.6.apk";
     //String url = "http://fdfs.speedata.cn:9989/group1/M00/00/05/rBGFrl3fdAKAVJwfMtSa9R18wLU139.zip";
     //String url = "http://9.9.9.28:8088/files/update.zip";
-    String url = "https://ss1.baidu.com/-4o3dSag_xI4khGko9WTAnF6hhy/image/h%3D300/sign=a9e671b9a551f3dedcb2bf64a4eff0ec/4610b912c8fcc3cef70d70409845d688d53f20f7.jpg";
+    //String url = "https://ss1.baidu.com/-4o3dSag_xI4khGko9WTAnF6hhy/image/h%3D300/sign=a9e671b9a551f3dedcb2bf64a4eff0ec/4610b912c8fcc3cef70d70409845d688d53f20f7.jpg";
     //String url = "https://imtt.dd.qq.com/16891/apk/70BFFDB05AB8686F2A4CF3E07588A377.apk?fsname=com.tencent.tmgp.speedmobile_1.16.0.33877_1160033877.apk&csr=1bbd";
     //String url = "https://ss1.baidu.com/-4o3dSag_xI4khGko9WTAnF6hhy/image/h%3D300/sign=a9e671b9a551f3dedcb2bf64a4eff0ec/4610b912c8fcc3cef70d70409845d688d53f20f7.jpg";
     //String filePath = AppUtil.getConfigValue(context, HTTP_PATH_KEY, defFilePath);
-    String filePath = "/mnt/sdcard/gg.png";
+    String url = "https://y.qq.com/download/import/QQMusic-import-1.2.1.zip";
+    String filePath = "/mnt/sdcard/QQMusic-import-1.2.1.zip";
     //String filePath = "/mnt/sdcard/update.zip";
 
     singDownloadInfo = Aria.download(context).getFirstDownloadEntity(url);

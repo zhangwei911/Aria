@@ -24,8 +24,8 @@ import com.arialyy.aria.core.common.CompleteInfo;
 import com.arialyy.aria.core.common.RequestEnum;
 import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.download.DownloadEntity;
-import com.arialyy.aria.core.processor.IHttpFileLenAdapter;
 import com.arialyy.aria.core.inf.OnFileInfoCallback;
+import com.arialyy.aria.core.processor.IHttpFileLenAdapter;
 import com.arialyy.aria.exception.AriaIOException;
 import com.arialyy.aria.exception.BaseException;
 import com.arialyy.aria.exception.TaskException;
@@ -214,7 +214,7 @@ public class HttpFileInfoThread implements Runnable {
     } else {
       failDownload(new AriaIOException(TAG,
           String.format("任务下载失败，errorCode：%s, errorMsg: %s, url: %s", code,
-              conn.getResponseMessage(), mEntity.getUrl())), true);
+              conn.getResponseMessage(), mEntity.getUrl())), !CheckUtil.httpIsBadRequest(code));
     }
     if (end) {
       taskOption.setChunked(isChunked);

@@ -22,6 +22,7 @@ import aria.apache.commons.net.ftp.FTPClientConfig;
 import aria.apache.commons.net.ftp.FTPReply;
 import aria.apache.commons.net.ftp.FTPSClient;
 import com.arialyy.aria.core.FtpUrlEntity;
+import com.arialyy.aria.core.common.FtpConnectionMode;
 import com.arialyy.aria.core.common.SubThreadConfig;
 import com.arialyy.aria.core.task.AbsThreadTaskAdapter;
 import com.arialyy.aria.exception.AriaIOException;
@@ -118,7 +119,17 @@ public abstract class BaseFtpThreadTaskAdapter extends AbsThreadTaskAdapter {
       client.setControlEncoding(charSet);
       client.setDataTimeout(getTaskConfig().getIOTimeOut());
       client.setConnectTimeout(getTaskConfig().getConnectTimeOut());
-      client.enterLocalPassiveMode();
+      if (mTaskOption.getConnMode() == FtpConnectionMode.DATA_CONNECTION_MODE_ACTIVITY) {
+        client.enterLocalActiveMode();
+        if (mTaskOption.getMinPort() != 0 && mTaskOption.getMaxPort() != 0) {
+          client.setActivePortRange(mTaskOption.getMinPort(), mTaskOption.getMaxPort());
+        }
+        if (!TextUtils.isEmpty(mTaskOption.getActiveExternalIPAddress())) {
+          client.setActiveExternalIPAddress(mTaskOption.getActiveExternalIPAddress());
+        }
+      } else {
+        client.enterLocalPassiveMode();
+      }
       client.setFileType(FTP.BINARY_FILE_TYPE);
       client.setControlKeepAliveTimeout(5000);
     } catch (IOException e) {

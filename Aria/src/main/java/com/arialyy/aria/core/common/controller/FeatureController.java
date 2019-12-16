@@ -43,6 +43,17 @@ import java.lang.reflect.InvocationTargetException;
  * 功能控制器
  */
 public abstract class FeatureController {
+  private static final int ACTION_DEF = 0;
+  public static final int ACTION_CREATE = 1;
+  public static final int ACTION_RESUME = 2;
+  public static final int ACTION_STOP = 3;
+  public static final int ACTION_CANCEL = 4;
+  public static final int ACTION_ADD = 5;
+  public static final int ACTION_PRIORITY = 6;
+  public static final int ACTION_RETRY = 7;
+  public static final int ACTION_RESTART = 8;
+  public static final int ACTION_SAVE = 9;
+
   private final String TAG;
 
   private AbsTaskWrapper mTaskWrapper;
@@ -50,6 +61,7 @@ public abstract class FeatureController {
    * 是否忽略权限检查 true 忽略权限检查
    */
   private boolean ignoreCheckPermissions = false;
+  private int action = ACTION_DEF;
 
   FeatureController(AbsTaskWrapper wrapper) {
     mTaskWrapper = wrapper;
@@ -89,6 +101,10 @@ public abstract class FeatureController {
       e.printStackTrace();
     }
     return null;
+  }
+
+  void setAction(int action) {
+    this.action = action;
   }
 
   /**
@@ -180,15 +196,15 @@ public abstract class FeatureController {
   private boolean checkEntity() {
     ICheckEntityUtil checkUtil = null;
     if (mTaskWrapper instanceof DTaskWrapper) {
-      checkUtil = CheckDEntityUtil.newInstance((DTaskWrapper) mTaskWrapper);
+      checkUtil = CheckDEntityUtil.newInstance((DTaskWrapper) mTaskWrapper, action);
     } else if (mTaskWrapper instanceof DGTaskWrapper) {
       if (mTaskWrapper.getRequestType() == ITaskWrapper.D_FTP_DIR) {
-        checkUtil = CheckFtpDirEntityUtil.newInstance((DGTaskWrapper) mTaskWrapper);
+        checkUtil = CheckFtpDirEntityUtil.newInstance((DGTaskWrapper) mTaskWrapper, action);
       } else if (mTaskWrapper.getRequestType() == ITaskWrapper.DG_HTTP) {
-        checkUtil = CheckDGEntityUtil.newInstance((DGTaskWrapper) mTaskWrapper);
+        checkUtil = CheckDGEntityUtil.newInstance((DGTaskWrapper) mTaskWrapper, action);
       }
     } else if (mTaskWrapper instanceof UTaskWrapper) {
-      checkUtil = CheckUEntityUtil.newInstance((UTaskWrapper) mTaskWrapper);
+      checkUtil = CheckUEntityUtil.newInstance((UTaskWrapper) mTaskWrapper, action);
     }
     return checkUtil != null && checkUtil.checkEntity();
   }

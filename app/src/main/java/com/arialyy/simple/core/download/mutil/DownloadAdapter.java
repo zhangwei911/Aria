@@ -298,7 +298,7 @@ public class DownloadAdapter extends AbsRVAdapter<AbsEntity, DownloadAdapter.Sim
         Aria.download(getContext()).load(entity.getId()).cancel(true);
         break;
       case ITaskWrapper.DG_HTTP:
-        Aria.download(getContext()).load(entity.getId()).cancel(true);
+        Aria.download(getContext()).loadGroup(entity.getId()).cancel(true);
         break;
     }
   }

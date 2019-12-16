@@ -38,6 +38,7 @@ public final class NormalController extends FeatureController implements INormal
    */
   @Override
   public void stop() {
+    setAction(ACTION_STOP);
     if (checkConfig()) {
       EventMsgUtil.getDefault()
           .post(CmdHelper.createNormalCmd(getTaskWrapper(), NormalCmdFactory.TASK_STOP,
@@ -60,6 +61,7 @@ public final class NormalController extends FeatureController implements INormal
    * @param newStart true 立即将任务恢复到执行队列中
    */
   @Override public void resume(boolean newStart) {
+    setAction(ACTION_RESUME);
     if (checkConfig()) {
       StartCmd cmd =
           (StartCmd) CmdHelper.createNormalCmd(getTaskWrapper(), NormalCmdFactory.TASK_START,
@@ -75,11 +77,7 @@ public final class NormalController extends FeatureController implements INormal
    */
   @Override
   public void cancel() {
-    if (checkConfig()) {
-      EventMsgUtil.getDefault()
-          .post(CmdHelper.createNormalCmd(getTaskWrapper(), NormalCmdFactory.TASK_CANCEL,
-              checkTaskType()));
-    }
+    cancel(false);
   }
 
   /**
@@ -87,6 +85,7 @@ public final class NormalController extends FeatureController implements INormal
    */
   @Override
   public void reTry() {
+    setAction(ACTION_RETRY);
     if (checkConfig()) {
       int taskType = checkTaskType();
       EventMsgUtil.getDefault()
@@ -105,6 +104,7 @@ public final class NormalController extends FeatureController implements INormal
    */
   @Override
   public void cancel(boolean removeFile) {
+    setAction(ACTION_CANCEL);
     if (checkConfig()) {
       CancelCmd cancelCmd =
           (CancelCmd) CmdHelper.createNormalCmd(getTaskWrapper(), NormalCmdFactory.TASK_CANCEL,
@@ -118,15 +118,19 @@ public final class NormalController extends FeatureController implements INormal
    * 重新下载
    */
   @Override
-  public void reStart() {
+  public long reStart() {
+    setAction(ACTION_RESTART);
     if (checkConfig()) {
       EventMsgUtil.getDefault()
           .post(CmdHelper.createNormalCmd(getTaskWrapper(), NormalCmdFactory.TASK_RESTART,
               checkTaskType()));
+      return getEntity().getId();
     }
+    return -1;
   }
 
   @Override public void save() {
+    setAction(ACTION_SAVE);
     if (!checkConfig()) {
       ALog.e(TAG, "保存修改失败");
     } else {

@@ -23,6 +23,7 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import com.arialyy.annotations.Download;
 import com.arialyy.aria.core.Aria;
+import com.arialyy.aria.core.common.FtpConnectionMode;
 import com.arialyy.aria.core.common.FtpOption;
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.inf.IEntity;
@@ -80,11 +81,11 @@ public class FtpDownloadActivity extends BaseActivity<ActivityFtpDownloadBinding
       }
     });
     getBinding().setViewModel(this);
-    try {
-      getBinding().codeView.setSource(AppUtil.getHelpCode(this, "FtpDownload.java"));
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
+    //try {
+    //  getBinding().codeView.setSource(AppUtil.getHelpCode(this, "FtpDownload.java"));
+    //} catch (IOException e) {
+    //  e.printStackTrace();
+    //}
   }
 
   public void onClick(View view) {
@@ -123,6 +124,7 @@ public class FtpDownloadActivity extends BaseActivity<ActivityFtpDownloadBinding
   private FtpOption getFtpOption() {
     FtpOption option = new FtpOption();
     option.login(user, passw);
+    option.setConnectionMode(FtpConnectionMode.DATA_CONNECTION_MODE_ACTIVITY);
     return option;
   }
 

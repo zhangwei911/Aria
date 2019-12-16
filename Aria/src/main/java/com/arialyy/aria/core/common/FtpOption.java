@@ -33,6 +33,9 @@ public class FtpOption extends BaseOption {
   private String protocol, keyAlias, storePass, storePath;
   private boolean isImplicit = true;
   private IFtpUploadInterceptor uploadInterceptor;
+  private int connMode = FtpConnectionMode.DATA_CONNECTION_MODE_PASV;
+  private int minPort, maxPort;
+  private String activeExternalIPAddress;
 
   public FtpOption() {
     super();
@@ -140,6 +143,63 @@ public class FtpOption extends BaseOption {
     }
     CheckUtil.checkMemberClass(uploadInterceptor.getClass());
     this.uploadInterceptor = uploadInterceptor;
+    return this;
+  }
+
+  /**
+   * 设置数据传输模式，默认为被动模式。
+   * 主动模式：传输文件时，客户端开启一个端口，ftp服务器连接到客户端的该端口，ftp服务器推送数据到客户端
+   * 被动模式：传输文件时，ftp服务器开启一个端口，客户端连接到ftp服务器的这个端口，客户端请求ftp服务器的数据
+   * 请注意：主动模式是服务器主动连接到android，如果使用住的模式，请确保ftp服务器能ping通android
+   *
+   * @param connMode {@link FtpConnectionMode#DATA_CONNECTION_MODE_PASV},
+   * {@link FtpConnectionMode#DATA_CONNECTION_MODE_ACTIVITY}
+   */
+  public FtpOption setConnectionMode(int connMode) {
+    if (connMode != FtpConnectionMode.DATA_CONNECTION_MODE_PASV
+        && connMode != FtpConnectionMode.DATA_CONNECTION_MODE_ACTIVITY) {
+      ALog.e(TAG, "连接模式设置失败，默认启用被动模式");
+      return this;
+    }
+    this.connMode = connMode;
+    return this;
+  }
+
+  /**
+   * 主动模式下的端口范围
+   */
+  public FtpOption setActivePortRange(int minPort, int maxPort) {
+
+    if (minPort > maxPort) {
+      ALog.e(TAG, "设置端口范围错误，minPort > maxPort");
+      return this;
+    }
+    if (minPort <= 0 || minPort >= 65535) {
+      ALog.e(TAG, "端口范围错误");
+      return this;
+    }
+    if (maxPort >= 65535) {
+      ALog.e(TAG, "端口范围错误");
+      return this;
+    }
+    this.minPort = minPort;
+    this.maxPort = maxPort;
+    return this;
+  }
+
+  /**
+   * 主动模式下，对外ip（可被Ftp服务器访问的ip）
+   */
+  public FtpOption setActiveExternalIPAddress(String ip) {
+    if (TextUtils.isEmpty(ip)) {
+      ALog.e(TAG, "ip为空");
+      return this;
+    }
+    if (!CheckUtil.checkIp(ip)) {
+      ALog.e(TAG, "ip地址错误：" + ip);
+      return this;
+    }
+    this.activeExternalIPAddress = ip;
     return this;
   }
 

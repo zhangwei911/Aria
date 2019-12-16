@@ -15,6 +15,7 @@
  */
 package com.arialyy.aria.ftp;
 
+import aria.apache.commons.net.ftp.FTPClient;
 import aria.apache.commons.net.ftp.FTPFile;
 import com.arialyy.aria.core.FtpUrlEntity;
 import com.arialyy.aria.core.common.CompleteInfo;
@@ -24,8 +25,6 @@ import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.download.DownloadGroupEntity;
 import com.arialyy.aria.core.inf.OnFileInfoCallback;
 import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
-import com.arialyy.aria.exception.BaseException;
-import com.arialyy.aria.util.CheckUtil;
 import com.arialyy.aria.util.CommonUtil;
 import com.arialyy.aria.util.RecordUtil;
 import java.nio.charset.Charset;
@@ -105,11 +104,11 @@ public class FtpDirInfoThread extends AbsFtpInfoThread<DownloadGroupEntity, DGTa
     subOption.setUploadInterceptor(mTaskOption.getUploadInterceptor());
 
     subWrapper.setTaskOption(subOption);
-
   }
 
-  @Override protected void failDownload(BaseException e, boolean needRetry) {
-    super.failDownload(e, needRetry);
+  @Override
+  protected void failDownload(FTPClient client, String msg, Exception e, boolean needRetry) {
+    super.failDownload(client, msg, e, needRetry);
     RecordUtil.delGroupTaskRecord(mTaskWrapper.getEntity(), true, true);
   }
 }

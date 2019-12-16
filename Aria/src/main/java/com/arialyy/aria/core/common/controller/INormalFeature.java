@@ -59,7 +59,7 @@ public interface INormalFeature {
   /**
    * 重新下载
    */
-  void reStart();
+  long reStart();
 
   /**
    * 保存数据

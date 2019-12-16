@@ -16,8 +16,13 @@
  */
 package aria.apache.commons.net.ftp;
 
+import aria.apache.commons.net.MalformedServerReplyException;
 import aria.apache.commons.net.SocketClient;
+import aria.apache.commons.net.ftp.parser.DefaultFTPFileEntryParserFactory;
+import aria.apache.commons.net.ftp.parser.FTPFileEntryParserFactory;
+import aria.apache.commons.net.ftp.parser.MLSxEntryParser;
 import aria.apache.commons.net.ftp.parser.ParserInitializationException;
+import aria.apache.commons.net.io.CRLFLineReader;
 import aria.apache.commons.net.io.CopyStreamAdapter;
 import aria.apache.commons.net.io.CopyStreamEvent;
 import aria.apache.commons.net.io.CopyStreamException;
@@ -52,12 +57,6 @@ import java.util.Locale;
 import java.util.Properties;
 import java.util.Random;
 import java.util.Set;
-
-import aria.apache.commons.net.MalformedServerReplyException;
-import aria.apache.commons.net.ftp.parser.DefaultFTPFileEntryParserFactory;
-import aria.apache.commons.net.ftp.parser.FTPFileEntryParserFactory;
-import aria.apache.commons.net.ftp.parser.MLSxEntryParser;
-import aria.apache.commons.net.io.CRLFLineReader;
 
 /**
  * FTPClient encapsulates all the functionality necessary to store and
@@ -2263,8 +2262,8 @@ public class FTPClient extends FTP implements Configurable {
   }
 
   /*
-     * Create the feature map if not already created.
-     */
+   * Create the feature map if not already created.
+   */
   private boolean initFeatureMap() throws IOException {
     if (__featuresMap == null) {
       // Don't create map here, because next line may throw exception
@@ -2375,10 +2374,10 @@ public class FTPClient extends FTP implements Configurable {
     boolean success = FTPReply.isPositiveCompletion(sendCommand(FTPCmd.MLST, pathname));
     if (success) {
       String reply = getReplyStrings()[1];
-            /* check the response makes sense.
-             * Must have space before fact(s) and between fact(s) and filename
-             * Fact(s) can be absent, so at least 3 chars are needed.
-             */
+      /* check the response makes sense.
+       * Must have space before fact(s) and between fact(s) and filename
+       * Fact(s) can be absent, so at least 3 chars are needed.
+       */
       if (reply.length() < 3 || reply.charAt(0) != ' ') {
         throw new MalformedServerReplyException("Invalid server reply (MLST): '" + reply + "'");
       }

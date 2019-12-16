@@ -17,6 +17,7 @@ package com.arialyy.aria.core.download;
 
 import android.text.TextUtils;
 import com.arialyy.aria.core.common.RequestEnum;
+import com.arialyy.aria.core.common.controller.FeatureController;
 import com.arialyy.aria.core.inf.ICheckEntityUtil;
 import com.arialyy.aria.core.inf.IOptionConstant;
 import com.arialyy.aria.orm.DbEntity;
@@ -41,12 +42,14 @@ public class CheckDGEntityUtil implements ICheckEntityUtil {
    * 是否需要修改路径
    */
   private boolean needModifyPath = false;
+  private int action;
 
-  public static CheckDGEntityUtil newInstance(DGTaskWrapper wrapper) {
-    return new CheckDGEntityUtil(wrapper);
+  public static CheckDGEntityUtil newInstance(DGTaskWrapper wrapper, int action) {
+    return new CheckDGEntityUtil(wrapper, action);
   }
 
-  private CheckDGEntityUtil(DGTaskWrapper wrapper) {
+  private CheckDGEntityUtil(DGTaskWrapper wrapper, int action) {
+    this.action = action;
     mWrapper = wrapper;
     mEntity = mWrapper.getEntity();
   }
@@ -129,7 +132,9 @@ public class CheckDGEntityUtil implements ICheckEntityUtil {
       return false;
     }
 
-    if (!mWrapper.isUnknownSize() && mEntity.getFileSize() == 0) {
+    if (action != FeatureController.ACTION_CANCEL
+        && !mWrapper.isUnknownSize()
+        && mEntity.getFileSize() == 0) {
       ALog.e(TAG, "组合任务必须设置文件文件大小，默认需要强制设置文件大小。如果无法获取到总长度，请调用#unknownSize()来标志该组合任务");
       return false;
     }

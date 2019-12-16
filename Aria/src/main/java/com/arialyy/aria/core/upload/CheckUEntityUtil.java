@@ -25,12 +25,14 @@ public class CheckUEntityUtil implements ICheckEntityUtil {
   private final String TAG = "CheckUEntityUtil";
   private UTaskWrapper mWrapper;
   private UploadEntity mEntity;
+  private int action;
 
-  public static CheckUEntityUtil newInstance(UTaskWrapper wrapper) {
-    return new CheckUEntityUtil(wrapper);
+  public static CheckUEntityUtil newInstance(UTaskWrapper wrapper, int action) {
+    return new CheckUEntityUtil(wrapper, action);
   }
 
-  private CheckUEntityUtil(UTaskWrapper wrapper) {
+  private CheckUEntityUtil(UTaskWrapper wrapper, int action) {
+    this.action = action;
     mWrapper = wrapper;
     mEntity = mWrapper.getEntity();
   }

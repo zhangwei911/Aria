@@ -17,9 +17,10 @@ package com.arialyy.aria.ftp;
 
 import aria.apache.commons.net.ftp.FTPClientConfig;
 import com.arialyy.aria.core.FtpUrlEntity;
+import com.arialyy.aria.core.common.FtpConnectionMode;
+import com.arialyy.aria.core.inf.ITaskOption;
 import com.arialyy.aria.core.processor.FtpInterceptHandler;
 import com.arialyy.aria.core.processor.IFtpUploadInterceptor;
-import com.arialyy.aria.core.inf.ITaskOption;
 import java.lang.ref.SoftReference;
 import java.net.Proxy;
 
@@ -54,6 +55,54 @@ public class FtpTaskOption implements ITaskOption {
    * client配置信息
    */
   private FTPClientConfig clientConfig;
+
+  /**
+   * 连接模式，默认为被动模式
+   * {@link FtpConnectionMode}
+   */
+  private int connMode;
+
+  /**
+   * 主动模式下的端口范围
+   */
+  private int minPort, maxPort;
+
+  /**
+   * 主动模式下，对外ip（可被Ftp服务器访问的ip）
+   */
+  private String activeExternalIPAddress;
+
+  public String getActiveExternalIPAddress() {
+    return activeExternalIPAddress;
+  }
+
+  public void setActiveExternalIPAddress(String activeExternalIPAddress) {
+    this.activeExternalIPAddress = activeExternalIPAddress;
+  }
+
+  public int getMinPort() {
+    return minPort;
+  }
+
+  public void setMinPort(int minPort) {
+    this.minPort = minPort;
+  }
+
+  public int getMaxPort() {
+    return maxPort;
+  }
+
+  public void setMaxPort(int maxPort) {
+    this.maxPort = maxPort;
+  }
+
+  public int getConnMode() {
+    return connMode;
+  }
+
+  public void setConnMode(int connMode) {
+    this.connMode = connMode;
+  }
 
   public FTPClientConfig getClientConfig() {
     return clientConfig;

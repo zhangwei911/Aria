@@ -32,6 +32,7 @@ import androidx.lifecycle.ViewModelProviders;
 import com.arialyy.annotations.Download;
 import com.arialyy.aria.core.Aria;
 import com.arialyy.aria.core.common.HttpOption;
+import com.arialyy.aria.core.common.RequestEnum;
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.inf.IEntity;
 import com.arialyy.aria.core.listener.ISchedulers;
@@ -116,11 +117,6 @@ public class SingleTaskActivity extends BaseActivity<ActivitySingleBinding> {
       }
     });
     getBinding().setViewModel(this);
-    try {
-      getBinding().codeView.setSource(AppUtil.getHelpCode(this, "HttpDownload.java"));
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
   }
 
   public void chooseUrl() {
@@ -279,10 +275,9 @@ public class SingleTaskActivity extends BaseActivity<ActivitySingleBinding> {
               .load(mTaskId)
               .stop();
         } else {
-          mUrl = "http://sdkdown.muzhiwan.com/openfile/2019/07/11/com.netease.syfz.mzw_5d26f8d9cee27.apk";
-          Aria.download(this).load(mTaskId)
+          mTaskId = Aria.download(this).load(mTaskId)
               //.updateUrl(mUrl)
-              .resume();
+              .reStart();
         }
         break;
       case R.id.cancel:
@@ -296,6 +291,7 @@ public class SingleTaskActivity extends BaseActivity<ActivitySingleBinding> {
     option.addHeader("1", "@")
         .useServerFileName(true)
         .setFileLenAdapter(new FileLenAdapter());
+    //option.setRequestType(RequestEnum.POST);
     mTaskId = Aria.download(SingleTaskActivity.this)
         .load(mUrl)
         .setFilePath(mFilePath, true)

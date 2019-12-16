@@ -16,10 +16,6 @@
 
 package com.arialyy.aria.core.queue;
 
-import com.arialyy.aria.core.task.DownloadGroupTask;
-import com.arialyy.aria.core.task.DownloadTask;
-import com.arialyy.aria.core.task.AbsTask;
-import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
 import com.arialyy.aria.core.inf.IEntity;
 import com.arialyy.aria.core.inf.TaskSchedulerType;
 import com.arialyy.aria.core.manager.TaskWrapperManager;
@@ -29,7 +25,11 @@ import com.arialyy.aria.core.queue.pool.BaseExecutePool;
 import com.arialyy.aria.core.queue.pool.DGLoadSharePool;
 import com.arialyy.aria.core.queue.pool.DLoadSharePool;
 import com.arialyy.aria.core.queue.pool.UploadSharePool;
+import com.arialyy.aria.core.task.AbsTask;
+import com.arialyy.aria.core.task.DownloadGroupTask;
+import com.arialyy.aria.core.task.DownloadTask;
 import com.arialyy.aria.core.task.UploadTask;
+import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
 import com.arialyy.aria.util.ALog;
 
 /**
@@ -213,6 +213,10 @@ public abstract class AbsTaskQueue<TASK extends AbsTask, TASK_WRAPPER extends Ab
   }
 
   @Override public void startTask(TASK task) {
+    startTask(task, TaskSchedulerType.TYPE_DEFAULT);
+  }
+
+  @Override public void startTask(TASK task, int action) {
     if (task == null) {
       ALog.w(TAG, "create fail, task is null");
     }
@@ -223,7 +227,7 @@ public abstract class AbsTaskQueue<TASK extends AbsTask, TASK_WRAPPER extends Ab
     mCachePool.removeTask(task);
     mExecutePool.putTask(task);
     task.getTaskWrapper().getEntity().setFailNum(0);
-    task.start();
+    task.start(action);
   }
 
   @Override public void stopTask(TASK task) {
@@ -312,7 +316,11 @@ public abstract class AbsTaskQueue<TASK extends AbsTask, TASK_WRAPPER extends Ab
   }
 
   @Override public void cancelTask(TASK task) {
-    task.cancel();
+    cancelTask(task, TaskSchedulerType.TYPE_DEFAULT);
+  }
+
+  @Override public void cancelTask(TASK task, int action) {
+    task.cancel(action);
   }
 
   @Override public TASK getNextTask() {

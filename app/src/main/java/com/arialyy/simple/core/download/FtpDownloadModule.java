@@ -47,7 +47,8 @@ public class FtpDownloadModule extends BaseViewModule {
    *
    */
   LiveData<DownloadEntity> getFtpDownloadInfo(Context context) {
-    String url = AppUtil.getConfigValue(context, FTP_URL_KEY, ftpDefUrl);
+    //String url = AppUtil.getConfigValue(context, FTP_URL_KEY, ftpDefUrl);
+    String url = "ftp://9.9.9.72:2121/Cyberduck-6.9.4.30164.zip";
     String filePath = AppUtil.getConfigValue(context, FTP_PATH_KEY, ftpDefPath);
 
     singDownloadInfo = Aria.download(context).getFirstDownloadEntity(url);

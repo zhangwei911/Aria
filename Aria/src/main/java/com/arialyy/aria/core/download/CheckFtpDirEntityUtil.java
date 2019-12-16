@@ -17,7 +17,6 @@ package com.arialyy.aria.core.download;
 
 import android.text.TextUtils;
 import com.arialyy.aria.core.FtpUrlEntity;
-import com.arialyy.aria.core.common.ErrorCode;
 import com.arialyy.aria.core.inf.ICheckEntityUtil;
 import com.arialyy.aria.core.inf.IOptionConstant;
 import com.arialyy.aria.orm.DbEntity;
@@ -28,12 +27,14 @@ public class CheckFtpDirEntityUtil implements ICheckEntityUtil {
   private final String TAG = "CheckFtpDirEntityUtil";
   private DGTaskWrapper mWrapper;
   private DownloadGroupEntity mEntity;
+  private int action;
 
-  public static CheckFtpDirEntityUtil newInstance(DGTaskWrapper wrapper) {
-    return new CheckFtpDirEntityUtil(wrapper);
+  public static CheckFtpDirEntityUtil newInstance(DGTaskWrapper wrapper, int action) {
+    return new CheckFtpDirEntityUtil(wrapper, action);
   }
 
-  private CheckFtpDirEntityUtil(DGTaskWrapper wrapper) {
+  private CheckFtpDirEntityUtil(DGTaskWrapper wrapper, int action) {
+    this.action = action;
     mWrapper = wrapper;
     mEntity = mWrapper.getEntity();
   }

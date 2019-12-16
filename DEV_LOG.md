@@ -5,6 +5,10 @@
     - m3u8协议的key信息增加了`keyFormat`，`keyFormatVersion`字段
     - m3u8增加了`ignoreFailureTs`方法，忽略虾类失败的ts切片
     - 修复在dialogFragment的`onCreateDialog()`注册导致的注解不生效问题
+    - 修复组合任务初始化失败时，无法删除的问题
+    - 修复`reStart()`后，无法停止的问题
+    - ftp增加主动模式，开启主动模式：https://aria.laoyuyu.me/aria_doc/api/ftp_params.html
+    - 优化提示
   + v_3.7.10 (2019/12/3)
     - fix bug https://github.com/AriaLyy/Aria/issues/543#issuecomment-559733124
     - fix bug https://github.com/AriaLyy/Aria/issues/542

@@ -73,6 +73,7 @@ public class RecordHandler implements IRecordHandler {
       mAdapter.onPre();
       mTaskRecord = DbDataHelper.getTaskRecord(getFilePath());
       if (mTaskRecord == null) {
+        FileUtil.createFile(getFilePath());
         initRecord(true);
       } else {
         File file = new File(mTaskRecord.filePath);

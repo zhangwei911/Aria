@@ -23,7 +23,10 @@ import com.arialyy.aria.core.inf.IRecordHandler;
 import com.arialyy.aria.core.upload.UploadEntity;
 import com.arialyy.aria.orm.DbEntity;
 import java.lang.reflect.Modifier;
+import java.net.HttpURLConnection;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by Lyy on 2016/9/23.
@@ -31,6 +34,44 @@ import java.util.List;
  */
 public class CheckUtil {
   private static final String TAG = "CheckUtil";
+
+  /**
+   * 检查ip是否正确
+   *
+   * @param ip ipv4 地址
+   * @return {@code true} ip 正确，{@code false} ip 错误
+   */
+  public static boolean checkIp(String ip) {
+    if (TextUtils.isEmpty(ip) || ip.length() < 7 || ip.length() > 15) {
+      return false;
+    }
+    Pattern p = Pattern.compile(Regular.REG_IP_V4);
+    Matcher m = p.matcher(ip);
+    return m.find() && m.groupCount() > 0;
+  }
+
+  /**
+   * 判断http请求是否有效
+   * {@link HttpURLConnection#HTTP_BAD_GATEWAY} or {@link HttpURLConnection#HTTP_BAD_METHOD}
+   * or {@link HttpURLConnection#HTTP_BAD_REQUEST} 无法重试
+   *
+   * @param errorCode http 返回码
+   * @return {@code true} 无效请求；{@code false} 有效请求
+   */
+  public static boolean httpIsBadRequest(int errorCode) {
+    return errorCode == HttpURLConnection.HTTP_BAD_GATEWAY
+        || errorCode == HttpURLConnection.HTTP_BAD_METHOD
+        || errorCode == HttpURLConnection.HTTP_BAD_REQUEST;
+  }
+
+  /**
+   * 判断ftp请求是否有效
+   *
+   * @return {@code true} 无效请求；{@code false} 有效请求
+   */
+  public static boolean ftpIsBadRequest(int errorCode) {
+    return errorCode >= 400 && errorCode < 600;
+  }
 
   /**
    * 检查和处理下载任务的路径冲突

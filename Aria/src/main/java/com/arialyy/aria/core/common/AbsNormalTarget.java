@@ -202,8 +202,8 @@ public abstract class AbsNormalTarget<TARGET extends AbsNormalTarget> extends Ab
    * 重新下载
    */
   @Override
-  public void reStart() {
-    getController().reStart();
+  public long reStart() {
+    return getController().reStart();
   }
 
   @Override
