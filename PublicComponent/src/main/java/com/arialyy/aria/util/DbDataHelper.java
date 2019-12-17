@@ -15,12 +15,13 @@
  */
 package com.arialyy.aria.util;
 
-import com.arialyy.aria.core.wrapper.RecordWrapper;
 import com.arialyy.aria.core.TaskRecord;
+import com.arialyy.aria.core.ThreadRecord;
 import com.arialyy.aria.core.download.DGEntityWrapper;
 import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.download.DownloadGroupEntity;
+import com.arialyy.aria.core.wrapper.ITaskWrapper;
 import com.arialyy.aria.orm.DbEntity;
 import java.io.File;
 import java.util.ArrayList;
@@ -35,15 +36,20 @@ public class DbDataHelper {
    * 获取任务记录
    *
    * @param filePath 文件地址
+   * @param taskType 任务类型{@link ITaskWrapper}
    * @return 没有记录返回null，有记录则返回任务记录
    */
-  public static TaskRecord getTaskRecord(String filePath) {
-    List<RecordWrapper> record =
-        DbEntity.findRelationData(RecordWrapper.class, "TaskRecord.filePath=?", filePath);
-    if (record == null || record.size() == 0) {
-      return null;
+  public static TaskRecord getTaskRecord(String filePath, int taskType) {
+    TaskRecord taskRecord =
+        DbEntity.findFirst(TaskRecord.class, "filePath=? AND taskType=?", filePath,
+            String.valueOf(taskType));
+    if (taskRecord != null) {
+      taskRecord.threadRecords =
+          DbEntity.findDatas(ThreadRecord.class, "taskKey=? AND threadType=?", filePath,
+              String.valueOf(taskType));
     }
-    return record.get(0).taskRecord;
+
+    return taskRecord;
   }
 
   /**

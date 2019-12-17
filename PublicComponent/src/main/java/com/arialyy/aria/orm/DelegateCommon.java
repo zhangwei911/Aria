@@ -113,7 +113,7 @@ class DelegateCommon extends AbsDelegate {
     sql = sql.replace("?", "%s");
     Object[] params = new String[expression.length - 1];
     for (int i = 0, len = params.length; i < len; i++) {
-      params[i] = String.format("'%s'", encodeStr(expression[i + 1]));
+      params[i] = String.format("'%s'", SqlUtil.encodeStr(expression[i + 1]));
     }
     sql = String.format(sql, params);
     Cursor cursor = db.rawQuery(sql, null);

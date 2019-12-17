@@ -34,6 +34,7 @@ import java.io.UnsupportedEncodingException;
  */
 class FtpUThreadTaskAdapter extends BaseFtpThreadTaskAdapter {
   private String dir, remotePath;
+  private boolean storeFail = false;
 
   FtpUThreadTaskAdapter(SubThreadConfig config) {
     super(config);
@@ -67,8 +68,7 @@ class FtpUThreadTaskAdapter extends BaseFtpThreadTaskAdapter {
       file =
           new BufferedRandomAccessFile(getThreadConfig().tempFile, "rwd",
               getTaskConfig().getBuffSize());
-      if (getThreadRecord().startLocation != 0) {
-        //file.skipBytes((int) getThreadConfig().START_LOCATION);
+      if (getThreadRecord().startLocation > 0) {
         file.seek(getThreadRecord().startLocation);
       }
       boolean complete = upload(client, file);
@@ -79,6 +79,7 @@ class FtpUThreadTaskAdapter extends BaseFtpThreadTaskAdapter {
           String.format("任务【%s】线程__%s__上传完毕", getEntity().getKey(), getThreadRecord().threadId));
       complete();
     } catch (IOException e) {
+      e.printStackTrace();
       fail(new AriaIOException(TAG,
           String.format("上传失败，filePath: %s, uploadUrl: %s", getEntity().getFilePath(),
               getThreadConfig().url)), true);
@@ -118,10 +119,11 @@ class FtpUThreadTaskAdapter extends BaseFtpThreadTaskAdapter {
    */
   private boolean upload(final FTPClient client, final BufferedRandomAccessFile bis)
       throws IOException {
-
+    final FtpFISAdapter fa = new FtpFISAdapter(bis);
+    storeFail = false;
     try {
       ALog.d(TAG, String.format("remotePath: %s", remotePath));
-      client.storeFile(remotePath, new FtpFISAdapter(bis), new OnFtpInputStreamListener() {
+      client.storeFile(remotePath, fa, new OnFtpInputStreamListener() {
         boolean isStoped = false;
 
         @Override public void onFtpInputStream(FTPClient client, long totalBytesTransferred,
@@ -137,23 +139,30 @@ class FtpUThreadTaskAdapter extends BaseFtpThreadTaskAdapter {
             progress(bytesTransferred);
           } catch (IOException e) {
             e.printStackTrace();
+            storeFail = true;
+            try {
+              fa.close();
+            } catch (IOException e1) {
+              e1.printStackTrace();
+            }
+            closeClient(client);
           }
         }
       });
     } catch (IOException e) {
       String msg = String.format("文件上传错误，错误码为：%s, msg：%s, filePath: %s", client.getReplyCode(),
           client.getReplyString(), getEntity().getFilePath());
-      if (client.isConnected()) {
-        client.disconnect();
-      }
+      closeClient(client);
       if (e.getMessage().contains("AriaIOException caught while copying")) {
         e.printStackTrace();
       } else {
-        fail(new AriaIOException(TAG, msg, e), true);
+        fail(new AriaIOException(TAG, msg, e), !storeFail);
       }
       return false;
     }
-
+    if (storeFail) {
+      return false;
+    }
     int reply = client.getReplyCode();
     if (!FTPReply.isPositiveCompletion(reply)) {
       if (reply != FTPReply.TRANSFER_ABORTED) {
@@ -161,9 +170,7 @@ class FtpUThreadTaskAdapter extends BaseFtpThreadTaskAdapter {
             String.format("文件上传错误，错误码为：%s, msg：%s, filePath: %s", reply, client.getReplyString(),
                 getEntity().getFilePath())), false);
       }
-      if (client.isConnected()) {
-        client.disconnect();
-      }
+      closeClient(client);
       return false;
     }
     return true;

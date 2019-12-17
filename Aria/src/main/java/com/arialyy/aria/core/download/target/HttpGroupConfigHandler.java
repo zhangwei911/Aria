@@ -18,6 +18,7 @@ package com.arialyy.aria.core.download.target;
 import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.inf.AbsTarget;
+import com.arialyy.aria.core.wrapper.ITaskWrapper;
 import com.arialyy.aria.orm.DbEntity;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
@@ -58,6 +59,7 @@ class HttpGroupConfigHandler<TARGET extends AbsTarget> extends AbsGroupConfigHan
     List<DownloadEntity> subEntities = DbDataHelper.createHttpSubTask(groupHash, mUrls);
     List<DTaskWrapper> wrappers = new ArrayList<>();
     for (DownloadEntity subEntity : subEntities) {
+      subEntity.setTaskType(ITaskWrapper.D_HTTP);
       wrappers.add(new DTaskWrapper(subEntity));
     }
     getEntity().setUrls(urls);

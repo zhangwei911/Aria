@@ -17,6 +17,7 @@ package com.arialyy.aria.core.common;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import com.arialyy.aria.core.wrapper.ITaskWrapper;
 import com.arialyy.aria.orm.annotation.Default;
 
 /**
@@ -43,6 +44,20 @@ public abstract class AbsNormalEntity extends AbsEntity implements Parcelable {
   @Default("false")
   private boolean isRedirect = false; //是否重定向
   private String redirectUrl; //重定向链接
+
+  /**
+   * 任务类型
+   * {@link ITaskWrapper}
+   */
+  private int taskType;
+
+  @Override public int getTaskType() {
+    return taskType;
+  }
+
+  public void setTaskType(int taskType) {
+    this.taskType = taskType;
+  }
 
   public String getUrl() {
     return url;

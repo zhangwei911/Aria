@@ -35,9 +35,12 @@ public class UploadModule extends BaseViewModule {
    * 获取Ftp上传信息
    */
   LiveData<UploadEntity> getFtpInfo(Context context) {
-    String url = AppUtil.getConfigValue(context, FTP_URL_KEY, "ftp://9.9.9.72:2121/aab/你好");
-    String filePath = AppUtil.getConfigValue(context, FTP_PATH_KEY,
-        Environment.getExternalStorageDirectory().getPath() + "/Download/AndroidAria.db");
+    //String url = AppUtil.getConfigValue(context, FTP_URL_KEY, "ftp://9.9.9.72:2121/aab/你好");
+    //String filePath = AppUtil.getConfigValue(context, FTP_PATH_KEY,
+    //    Environment.getExternalStorageDirectory().getPath() + "/Download/AndroidAria.db");
+    String url = "ftp://101.132.33.64:21/home/ftpuser/videopic/historymonitor/jobs/test";
+    //String url = "ftp://9.9.9.72:2121/aab/你好";
+    String filePath = "/mnt/sdcard/QQMusic-import-1.2.1.zip";
 
     UploadEntity entity = Aria.upload(context).getFirstUploadEntity(filePath);
     if (entity != null) {

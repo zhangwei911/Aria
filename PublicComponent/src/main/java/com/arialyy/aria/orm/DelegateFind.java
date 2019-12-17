@@ -205,7 +205,7 @@ class DelegateFind extends AbsDelegate {
           sql = sql.replace("?", "%s");
           Object[] params = new String[expression.length - 1];
           for (int i = 0, len = params.length; i < len; i++) {
-            params[i] = String.format("'%s'", encodeStr(expression[i + 1]));
+            params[i] = String.format("'%s'", SqlUtil.encodeStr(expression[i + 1]));
           }
           sql = String.format(sql, params);
         } else {
@@ -421,7 +421,7 @@ class DelegateFind extends AbsDelegate {
     String[] temp = new String[selectionArgs.length];
     int i = 0;
     for (String arg : selectionArgs) {
-      temp[i] = encodeStr(arg);
+      temp[i] = SqlUtil.encodeStr(arg);
       i++;
     }
     Cursor cursor = db.rawQuery(sql, temp);

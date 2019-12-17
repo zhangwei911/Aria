@@ -112,7 +112,9 @@ final class HttpDThreadTaskAdapter extends BaseHttpThreadTaskAdapter {
             new BufferedRandomAccessFile(getThreadConfig().tempFile, "rwd",
                 getTaskConfig().getBuffSize());
         //设置每条线程写入文件的位置
-        file.seek(getThreadRecord().startLocation);
+        if (getThreadRecord().startLocation > 0){
+          file.seek(getThreadRecord().startLocation);
+        }
         readNormal(is, file);
         handleComplete();
       }

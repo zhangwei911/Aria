@@ -17,6 +17,7 @@ package com.arialyy.aria.core.upload.target;
 
 import com.arialyy.aria.core.common.AbsBuilderTarget;
 import com.arialyy.aria.core.common.FtpOption;
+import com.arialyy.aria.core.upload.UploadEntity;
 import com.arialyy.aria.core.wrapper.ITaskWrapper;
 import com.arialyy.aria.util.CommonUtil;
 
@@ -32,6 +33,7 @@ public class FtpBuilderTarget extends AbsBuilderTarget<FtpBuilderTarget> {
     mConfigHandler = new UNormalConfigHandler<>(this, -1);
     mConfigHandler.setFilePath(filePath);
     getTaskWrapper().setRequestType(ITaskWrapper.U_FTP);
+    ((UploadEntity)getEntity()).setTaskType(ITaskWrapper.U_FTP);
     getTaskWrapper().setNewTask(true);
   }
 

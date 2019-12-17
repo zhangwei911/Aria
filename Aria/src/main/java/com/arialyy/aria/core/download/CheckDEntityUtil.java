@@ -157,11 +157,11 @@ public class CheckDEntityUtil implements ICheckEntityUtil {
         File oldFile = new File(mEntity.getFilePath());
         if (oldFile.exists()) {
           // 处理普通任务的重命名
-          RecordUtil.modifyTaskRecord(oldFile.getPath(), newFile.getPath());
+          RecordUtil.modifyTaskRecord(oldFile.getPath(), newFile.getPath(), mEntity.getTaskType());
           ALog.i(TAG, String.format("将任务重命名为：%s", newFile.getName()));
         } else if (RecordUtil.blockTaskExists(oldFile.getPath())) {
           // 处理分块任务的重命名
-          RecordUtil.modifyTaskRecord(oldFile.getPath(), newFile.getPath());
+          RecordUtil.modifyTaskRecord(oldFile.getPath(), newFile.getPath(), mEntity.getTaskType());
           ALog.i(TAG, String.format("将分块任务重命名为：%s", newFile.getName()));
         }
       }

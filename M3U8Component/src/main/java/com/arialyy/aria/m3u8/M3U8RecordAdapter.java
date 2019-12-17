@@ -106,7 +106,7 @@ public class M3U8RecordAdapter extends AbsRecordHandlerAdapter {
     tr.threadId = threadId;
     tr.isComplete = false;
     tr.startLocation = 0;
-    tr.threadType = TaskRecord.TYPE_M3U8_VOD;
+    tr.threadType = getEntity().getTaskType();
     tr.tsUrl = mOption.getUrls().get(threadId);
     return tr;
   }
@@ -118,13 +118,7 @@ public class M3U8RecordAdapter extends AbsRecordHandlerAdapter {
     record.threadRecords = new ArrayList<>();
     record.threadNum = threadNum;
     record.isBlock = true;
-
-    int requestType = getWrapper().getRequestType();
-    if (requestType == ITaskWrapper.M3U8_VOD) {
-      record.taskType = TaskRecord.TYPE_M3U8_VOD;
-    } else if (requestType == ITaskWrapper.M3U8_LIVE) {
-      record.taskType = TaskRecord.TYPE_M3U8_LIVE;
-    }
+    record.taskType = getEntity().getTaskType();
     record.bandWidth = mOption.getBandWidth();
     return record;
   }

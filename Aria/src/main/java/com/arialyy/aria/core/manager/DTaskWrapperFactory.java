@@ -20,6 +20,7 @@ import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.inf.IEntity;
 import com.arialyy.aria.core.inf.IRecordHandler;
+import com.arialyy.aria.core.wrapper.ITaskWrapper;
 import java.io.File;
 
 /**
@@ -71,7 +72,7 @@ class DTaskWrapperFactory implements INormalTEFactory<DownloadEntity, DTaskWrapp
 
     if (!entity.isComplete()) {
       TaskRecord record =
-          TaskRecord.findFirst(TaskRecord.class, "filePath=?", entity.getDownloadPath());
+          TaskRecord.findFirst(TaskRecord.class, "filePath=?", entity.getFilePath());
       if (record == null) {
         resetEntity(entity);
       } else {
@@ -87,7 +88,7 @@ class DTaskWrapperFactory implements INormalTEFactory<DownloadEntity, DTaskWrapp
             resetEntity(entity);
           }
         } else if (!file.exists()
-            && record.taskType != TaskRecord.TYPE_M3U8_VOD) { // 非分块文件需要判断文件是否存在
+            && record.taskType != ITaskWrapper.M3U8_VOD) { // 非分块文件需要判断文件是否存在
           resetEntity(entity);
         }
       }

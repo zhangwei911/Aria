@@ -28,16 +28,7 @@ import java.net.URLEncoder;
 abstract class AbsDelegate {
   static final String TAG = "AbsDelegate";
 
-  /**
-   * URL编码字符串
-   *
-   * @param str 原始字符串
-   * @return 编码后的字符串
-   */
-  String encodeStr(String str) {
-    str = str.replaceAll("\\\\+", "%2B");
-    return URLEncoder.encode(str);
-  }
+
 
   /**
    * 检查list参数是否合法，list只能是{@code List<String>}

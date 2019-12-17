@@ -58,7 +58,7 @@ public class FtpRecordAdapter extends AbsRecordHandlerAdapter {
     tr.threadId = threadId;
     tr.startLocation = startL;
     tr.isComplete = false;
-    tr.threadType = TaskRecord.TYPE_HTTP_FTP;
+    tr.threadType = getWrapper().getEntity().getTaskType();
     //最后一个线程的结束位置即为文件的总长度
     if (threadId == (record.threadNum - 1)) {
       endL = getEntity().getFileSize();
@@ -81,7 +81,7 @@ public class FtpRecordAdapter extends AbsRecordHandlerAdapter {
     } else {
       record.isBlock = false;
     }
-    record.taskType = TaskRecord.TYPE_HTTP_FTP;
+    record.taskType = getWrapper().getEntity().getTaskType();
     record.isGroupRecord = getEntity().isGroupChild();
     if (record.isGroupRecord) {
       if (getEntity() instanceof DownloadEntity) {

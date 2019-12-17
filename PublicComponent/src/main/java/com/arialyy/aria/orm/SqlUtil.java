@@ -29,6 +29,7 @@ import com.arialyy.aria.orm.annotation.Wrapper;
 import com.arialyy.aria.util.CommonUtil;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -40,6 +41,17 @@ import java.util.Set;
  * sql工具
  */
 final class SqlUtil {
+
+  /**
+   * URL编码字符串
+   *
+   * @param str 原始字符串
+   * @return 编码后的字符串
+   */
+  static String encodeStr(String str) {
+    str = str.replaceAll("\\\\+", "%2B");
+    return URLEncoder.encode(str);
+  }
 
   /**
    * 获取主键字段名

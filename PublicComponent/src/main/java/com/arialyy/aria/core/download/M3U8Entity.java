@@ -20,6 +20,7 @@ import android.os.Parcelable;
 import android.text.TextUtils;
 import com.arialyy.aria.core.TaskRecord;
 import com.arialyy.aria.core.ThreadRecord;
+import com.arialyy.aria.core.wrapper.ITaskWrapper;
 import com.arialyy.aria.orm.DbEntity;
 import com.arialyy.aria.orm.annotation.Default;
 import com.arialyy.aria.util.ALog;
@@ -153,7 +154,8 @@ public class M3U8Entity extends DbEntity implements Parcelable {
       return null;
     }
     List<PeerInfo> peers = new ArrayList<>();
-    TaskRecord taskRecord = DbDataHelper.getTaskRecord(filePath);
+    TaskRecord taskRecord = DbDataHelper.getTaskRecord(filePath,
+        isLive ? ITaskWrapper.M3U8_LIVE : ITaskWrapper.M3U8_VOD);
     File cacheDir = new File(getCacheDir());
     if ((taskRecord == null
         || taskRecord.threadRecords == null

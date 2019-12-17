@@ -180,7 +180,9 @@ final class FtpDThreadTaskAdapter extends BaseFtpThreadTaskAdapter {
     try {
       file =
           new BufferedRandomAccessFile(getThreadConfig().tempFile, "rwd", getTaskConfig().getBuffSize());
-      file.seek(getThreadRecord().startLocation);
+      if (getThreadRecord().startLocation > 0){
+        file.seek(getThreadRecord().startLocation);
+      }
       byte[] buffer = new byte[getTaskConfig().getBuffSize()];
       int len;
       while (getThreadTask().isLive() && (len = is.read(buffer)) != -1) {

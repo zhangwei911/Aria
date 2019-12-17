@@ -33,11 +33,12 @@ class FtpDirConfigHandler<TARGET extends AbsTarget> extends AbsGroupConfigHandle
   }
 
   private void init() {
-    getTaskWrapper().setRequestType(AbsTaskWrapper.D_FTP_DIR);
+    getTaskWrapper().setRequestType(ITaskWrapper.D_FTP_DIR);
     List<DTaskWrapper> wrappers = getTaskWrapper().getSubTaskWrapper();
     if (!wrappers.isEmpty()) {
       for (DTaskWrapper subWrapper : wrappers) {
         subWrapper.setRequestType(ITaskWrapper.D_FTP);
+        subWrapper.getEntity().setTaskType(ITaskWrapper.D_FTP);
       }
     }
   }

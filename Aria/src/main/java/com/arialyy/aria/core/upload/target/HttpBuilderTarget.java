@@ -17,7 +17,8 @@ package com.arialyy.aria.core.upload.target;
 
 import com.arialyy.aria.core.common.AbsBuilderTarget;
 import com.arialyy.aria.core.common.HttpOption;
-import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
+import com.arialyy.aria.core.upload.UploadEntity;
+import com.arialyy.aria.core.wrapper.ITaskWrapper;
 
 /**
  * Created by lyy on 2017/2/28.
@@ -31,7 +32,8 @@ public class HttpBuilderTarget extends AbsBuilderTarget<HttpBuilderTarget> {
     mConfigHandler.setFilePath(filePath);
     //http暂时不支持断点上传
     getTaskWrapper().setSupportBP(false);
-    getTaskWrapper().setRequestType(AbsTaskWrapper.U_HTTP);
+    getTaskWrapper().setRequestType(ITaskWrapper.U_HTTP);
+    ((UploadEntity) getEntity()).setTaskType(ITaskWrapper.U_HTTP);
     getTaskWrapper().setNewTask(true);
   }
 

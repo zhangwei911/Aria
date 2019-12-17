@@ -22,11 +22,11 @@ import com.arialyy.aria.core.TaskRecord;
 import com.arialyy.aria.core.ThreadRecord;
 import com.arialyy.aria.core.common.CompleteInfo;
 import com.arialyy.aria.core.inf.OnFileInfoCallback;
+import com.arialyy.aria.core.processor.FtpInterceptHandler;
+import com.arialyy.aria.core.processor.IFtpUploadInterceptor;
 import com.arialyy.aria.core.upload.UTaskWrapper;
 import com.arialyy.aria.core.upload.UploadEntity;
 import com.arialyy.aria.ftp.AbsFtpInfoThread;
-import com.arialyy.aria.core.processor.FtpInterceptHandler;
-import com.arialyy.aria.core.processor.IFtpUploadInterceptor;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
 import com.arialyy.aria.util.DbDataHelper;
@@ -39,7 +39,6 @@ import java.util.List;
  * 单任务上传远程服务器文件信息
  */
 class FtpUFileInfoThread extends AbsFtpInfoThread<UploadEntity, UTaskWrapper> {
-  private static final String TAG = "FtpUploadFileInfoThread";
   static final int CODE_COMPLETE = 0xab1;
   private boolean isComplete = false;
   private String remotePath;
@@ -59,10 +58,10 @@ class FtpUFileInfoThread extends AbsFtpInfoThread<UploadEntity, UTaskWrapper> {
 
   @Override protected boolean onInterceptor(FTPClient client, FTPFile[] ftpFiles) {
     // 旧任务将不做处理，否则断点续传上传将失效
-    if (!mTaskWrapper.isNewTask()) {
-      ALog.d(TAG, "任务是旧任务，忽略该拦截器");
-      return true;
-    }
+    //if (!mTaskWrapper.isNewTask()) {
+    //  ALog.d(TAG, "任务是旧任务，忽略该拦截器");
+    //  return true;
+    //}
     try {
       IFtpUploadInterceptor interceptor = mTaskOption.getUploadInterceptor();
       if (interceptor != null) {
@@ -78,7 +77,7 @@ class FtpUFileInfoThread extends AbsFtpInfoThread<UploadEntity, UTaskWrapper> {
         FtpInterceptHandler interceptHandler = interceptor.onIntercept(mEntity, files);
 
         /*
-          处理远端有同名文件的情况
+         * 处理远端有同名文件的情况
          */
         if (files.contains(mEntity.getFileName())) {
           if (interceptHandler.isCoverServerFile()) {
@@ -94,6 +93,7 @@ class FtpUFileInfoThread extends AbsFtpInfoThread<UploadEntity, UTaskWrapper> {
                 + "/"
                 + interceptHandler.getNewFileName();
             mTaskOption.setNewFileName(interceptHandler.getNewFileName());
+
             closeClient(client);
             run();
             return false;
@@ -123,6 +123,9 @@ class FtpUFileInfoThread extends AbsFtpInfoThread<UploadEntity, UTaskWrapper> {
       if (ftpFile.getSize() == mEntity.getFileSize()) {
         isComplete = true;
         ALog.d(TAG, "FTP服务器上已存在该文件【" + ftpFile.getName() + "】");
+      } else if (ftpFile.getSize() == 0) {
+        mTaskWrapper.setNewTask(true);
+        ALog.d(TAG, "FTP服务器上已存在该文件【" + ftpFile.getName() + "】，但文件长度为0，重新上传该文件");
       } else {
         ALog.w(TAG, "FTP服务器已存在未完成的文件【"
             + ftpFile.getName()
@@ -135,7 +138,8 @@ class FtpUFileInfoThread extends AbsFtpInfoThread<UploadEntity, UTaskWrapper> {
         mTaskWrapper.setNewTask(false);
 
         // 修改记录
-        TaskRecord record = DbDataHelper.getTaskRecord(mTaskWrapper.getKey());
+        TaskRecord record = DbDataHelper.getTaskRecord(mTaskWrapper.getKey(),
+            mTaskWrapper.getEntity().getTaskType());
         if (record == null) {
           record = new TaskRecord();
           record.fileName = mEntity.getFileName();

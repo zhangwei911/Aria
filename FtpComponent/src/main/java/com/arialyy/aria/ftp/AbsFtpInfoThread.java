@@ -50,7 +50,7 @@ import javax.net.ssl.SSLContext;
 public abstract class AbsFtpInfoThread<ENTITY extends AbsEntity, TASK_WRAPPER extends AbsTaskWrapper<ENTITY>>
     implements Runnable {
 
-  private final String TAG = CommonUtil.getClassName(getClass());
+  protected final String TAG = CommonUtil.getClassName(getClass());
   protected ENTITY mEntity;
   protected TASK_WRAPPER mTaskWrapper;
   protected FtpTaskOption mTaskOption;
@@ -123,7 +123,7 @@ public abstract class AbsFtpInfoThread<ENTITY extends AbsEntity, TASK_WRAPPER ex
       // 处理拦截功能
       if (!onInterceptor(client, files)) {
         closeClient(client);
-        ALog.d(TAG, "拦截器处理完成任务，任务将不再执行");
+        ALog.d(TAG, "拦截器处理完成任务");
         return;
       }
 
@@ -390,8 +390,7 @@ public abstract class AbsFtpInfoThread<ENTITY extends AbsEntity, TASK_WRAPPER ex
         needRetry = needRetry && !CheckUtil.ftpIsBadRequest(client.getReplyCode());
       }
 
-      //mCallback.onFail(mEntity, new AriaIOException(TAG, msg), needRetry);
-      mCallback.onFail(mEntity, new AriaIOException(TAG, msg, e), false);
+      mCallback.onFail(mEntity, new AriaIOException(TAG, msg), needRetry);
     }
   }
 

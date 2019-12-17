@@ -277,7 +277,7 @@ public class HttpFileInfoThread implements Runnable {
     }
     mEntity.setFileName(newName);
     mEntity.setFilePath(newPath);
-    RecordUtil.modifyTaskRecord(oldFile.getPath(), newPath);
+    RecordUtil.modifyTaskRecord(oldFile.getPath(), newPath, mEntity.getTaskType());
   }
 
   /**

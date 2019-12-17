@@ -169,7 +169,7 @@ public class M3U8LiveLoader extends BaseM3U8Loader {
     record.taskKey = mRecord.filePath;
     record.isComplete = false;
     record.tsUrl = tsUrl;
-    record.threadType = TaskRecord.TYPE_M3U8_LIVE;
+    record.threadType = getEntity().getTaskType();
     record.threadId = indexId;
     mRecord.threadRecords.add(record);
 

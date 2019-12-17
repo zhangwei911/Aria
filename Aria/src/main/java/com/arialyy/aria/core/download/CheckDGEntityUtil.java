@@ -179,7 +179,7 @@ public class CheckDGEntityUtil implements ICheckEntityUtil {
             return;
           }
 
-          RecordUtil.modifyTaskRecord(oldPath, newPath);
+          RecordUtil.modifyTaskRecord(oldPath, newPath, mEntity.getTaskType());
           entity.setFilePath(newPath);
           entity.setFileName(newName);
         }

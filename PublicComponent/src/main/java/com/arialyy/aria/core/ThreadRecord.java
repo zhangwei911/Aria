@@ -15,6 +15,7 @@
  */
 package com.arialyy.aria.core;
 
+import com.arialyy.aria.core.wrapper.ITaskWrapper;
 import com.arialyy.aria.orm.DbEntity;
 
 /**
@@ -56,7 +57,7 @@ public class ThreadRecord extends DbEntity {
 
   /**
    * 线程类型
-   * {@link TaskRecord#TYPE_HTTP_FTP}、{@link TaskRecord#TYPE_M3U8_VOD}
+   * {@link ITaskWrapper}
    */
   public int threadType = 0;
 

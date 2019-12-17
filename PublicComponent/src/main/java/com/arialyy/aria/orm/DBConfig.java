@@ -34,7 +34,7 @@ class DBConfig {
   static boolean DEBUG = false;
   static Map<String, Class<? extends DbEntity>> mapping = new LinkedHashMap<>();
   static String DB_NAME;
-  static int VERSION = 56;
+  static int VERSION = 57;
 
   /**
    * 是否将数据库保存在Sd卡，{@code true} 是

@@ -15,6 +15,7 @@
  */
 package com.arialyy.aria.core;
 
+import com.arialyy.aria.core.wrapper.ITaskWrapper;
 import com.arialyy.aria.orm.DbEntity;
 import com.arialyy.aria.orm.annotation.Ignore;
 import com.arialyy.aria.orm.annotation.NoNull;
@@ -26,9 +27,9 @@ import java.util.List;
  * 任务上传或下载的任务记录
  */
 public class TaskRecord extends DbEntity {
-  public static final int TYPE_HTTP_FTP = 0;
-  public static final int TYPE_M3U8_VOD = 1;
-  public static final int TYPE_M3U8_LIVE = 2;
+  //public static final int TYPE_HTTP_FTP = 0;
+  //public static final int TYPE_M3U8_VOD = 1;
+  //public static final int TYPE_M3U8_LIVE = 2;
 
   @Ignore
   public List<ThreadRecord> threadRecords;
@@ -41,7 +42,6 @@ public class TaskRecord extends DbEntity {
   /**
    * 任务文件路径
    */
-  @Unique
   public String filePath;
 
   /**
@@ -79,8 +79,8 @@ public class TaskRecord extends DbEntity {
   public boolean isBlock = false;
 
   /**
-   * 线程类型
-   * {@link #TYPE_HTTP_FTP}、{@link #TYPE_M3U8_VOD}
+   * 任务类型
+   * {@link ITaskWrapper}
    */
   public int taskType = 0;
 

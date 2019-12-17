@@ -31,6 +31,7 @@ public class FtpBuilderTarget extends AbsBuilderTarget<FtpBuilderTarget> {
     mConfigHandler = new DNormalConfigHandler<>(this, -1);
     mConfigHandler.setUrl(url);
     getTaskWrapper().setRequestType(ITaskWrapper.D_FTP);
+    getEntity().setTaskType(ITaskWrapper.D_FTP);
     getTaskWrapper().setNewTask(true);
   }
 

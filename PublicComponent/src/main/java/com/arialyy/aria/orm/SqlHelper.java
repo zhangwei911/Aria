@@ -21,6 +21,9 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Build;
+import android.text.TextUtils;
+import com.arialyy.aria.core.download.M3U8Entity;
+import com.arialyy.aria.core.wrapper.ITaskWrapper;
 import com.arialyy.aria.util.ALog;
 import java.io.File;
 import java.util.ArrayList;
@@ -101,6 +104,10 @@ final class SqlHelper extends SQLiteOpenHelper {
         handle366Update(db);
       } else {
         handleDbUpdate(db, null);
+      }
+      // 处理380版本TaskRecord 增加的记录类型判断
+      if (newVersion == 57) {
+        addTaskRecordType(db);
       }
     }
   }
@@ -254,6 +261,79 @@ final class SqlHelper extends SQLiteOpenHelper {
     List<String> temp = new ArrayList<>(oldTab); // 拷贝旧表字段
     temp.removeAll(newTab);
     return temp;
+  }
+
+  /**
+   * 给TaskRecord 增加任务类型
+   */
+  private void addTaskRecordType(SQLiteDatabase db) {
+    try {
+      db.beginTransaction();
+      /*
+       * 增加下载实体的类型
+       */
+      String dSql = "SELECT downloadPath, url FROM DownloadEntity";
+      Cursor c = db.rawQuery(dSql, null);
+      while (c.moveToNext()) {
+        int type;
+        String filePath = c.getString(0);
+        String url = c.getString(1);
+        if (url.startsWith("ftp") || url.startsWith("sftp")) {
+          type = ITaskWrapper.D_FTP;
+        } else {
+          if (mDelegate.tableExists(db, M3U8Entity.class)) {
+            Cursor m3u8c = db.rawQuery("SELECT isLive FROM M3U8Entity WHERE filePath=\""
+                + SqlUtil.encodeStr(filePath)
+                + "\"", null);
+            if (m3u8c.moveToNext()) {
+              String temp = m3u8c.getString(0);
+              type =
+                  (TextUtils.isEmpty(temp) ? false : Boolean.valueOf(temp)) ? ITaskWrapper.M3U8_LIVE
+                      : ITaskWrapper.M3U8_VOD;
+            } else {
+              type = ITaskWrapper.D_HTTP;
+            }
+            m3u8c.close();
+          } else {
+            type = ITaskWrapper.D_HTTP;
+          }
+        }
+        db.execSQL("UPDATE DownloadEntity SET taskType=? WHERE downloadPath=?",
+            new Object[] { type, filePath });
+        db.execSQL("UPDATE TaskRecord SET taskType=? WHERE filePath=?",
+            new Object[] { type, filePath });
+        db.execSQL("UPDATE ThreadRecord SET threadType=? WHERE taskKey=?",
+            new Object[] { type, filePath });
+      }
+      c.close();
+
+      /*
+       * 增加上传实体的类型
+       */
+      String uSql = "SELECT filePath, url FROM UploadEntity";
+      c = db.rawQuery(uSql, null);
+      while (c.moveToNext()) {
+        int type;
+        String filePath = c.getString(c.getColumnIndex("filePath"));
+        String url = c.getString(c.getColumnIndex("url"));
+        if (url.startsWith("ftp") || url.startsWith("sftp")) {
+          type = ITaskWrapper.D_FTP;
+        } else {
+          type = ITaskWrapper.D_HTTP;
+        }
+        db.execSQL("UPDATE UploadEntity SET taskType=? WHERE filePath=?",
+            new Object[] { type, filePath });
+        db.execSQL("UPDATE TaskRecord SET taskType=? WHERE filePath=?",
+            new Object[] { type, filePath });
+        db.execSQL("UPDATE ThreadRecord SET threadType=? WHERE taskKey=?",
+            new Object[] { type, filePath });
+      }
+      c.close();
+
+      db.setTransactionSuccessful();
+    } finally {
+      db.endTransaction();
+    }
   }
 
   /**

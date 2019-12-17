@@ -16,6 +16,7 @@
 package com.arialyy.aria.core.download.target;
 
 import com.arialyy.aria.core.common.AbsBuilderTarget;
+import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.wrapper.ITaskWrapper;
 
 /**
@@ -29,6 +30,7 @@ public class TcpBuilderTarget extends AbsBuilderTarget<TcpBuilderTarget> {
   TcpBuilderTarget(String ip, int port) {
     mConfigHandler = new DNormalConfigHandler<>(this, -1);
     getTaskWrapper().setRequestType(ITaskWrapper.D_TCP);
+    ((DownloadEntity) getEntity()).setTaskType(ITaskWrapper.D_TCP);
     getTaskWrapper().setNewTask(true);
   }
   //

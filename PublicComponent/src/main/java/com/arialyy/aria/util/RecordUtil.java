@@ -25,6 +25,7 @@ import com.arialyy.aria.core.download.DownloadGroupEntity;
 import com.arialyy.aria.core.download.M3U8Entity;
 import com.arialyy.aria.core.inf.IRecordHandler;
 import com.arialyy.aria.core.upload.UploadEntity;
+import com.arialyy.aria.core.wrapper.ITaskWrapper;
 import com.arialyy.aria.core.wrapper.RecordWrapper;
 import com.arialyy.aria.orm.DbEntity;
 import java.io.File;
@@ -187,7 +188,7 @@ public class RecordUtil {
    * @return true 为m3u8任务
    */
   private static boolean recordIsM3U8(int recordType) {
-    return recordType == TaskRecord.TYPE_M3U8_VOD || recordType == TaskRecord.TYPE_M3U8_LIVE;
+    return recordType == ITaskWrapper.M3U8_VOD || recordType == ITaskWrapper.M3U8_LIVE;
   }
 
   /**
@@ -361,13 +362,14 @@ public class RecordUtil {
    *
    * @param oldPath 旧的文件路径
    * @param newPath 新的文件路径
+   * @param taskType 任务类型{@link ITaskWrapper}
    */
-  public static void modifyTaskRecord(String oldPath, String newPath) {
+  public static void modifyTaskRecord(String oldPath, String newPath, int taskType) {
     if (oldPath.equals(newPath)) {
       ALog.w(TAG, "修改任务记录失败，新文件路径和旧文件路径一致");
       return;
     }
-    TaskRecord record = DbDataHelper.getTaskRecord(oldPath);
+    TaskRecord record = DbDataHelper.getTaskRecord(oldPath, taskType);
     if (record == null) {
       if (new File(oldPath).exists()) {
         ALog.w(TAG, "修改任务记录失败，文件【" + oldPath + "】对应的任务记录不存在");

@@ -141,8 +141,15 @@ public class CheckUtil {
    */
   public static void checkMemberClass(Class clazz) {
     int modifiers = clazz.getModifiers();
-    if (!clazz.isMemberClass() || !Modifier.isStatic(modifiers) || Modifier.isPrivate(modifiers)) {
-      ALog.e(TAG, "为了防止内存泄漏，请使用静态的成员类(public static class xxx)或文件类(A.java)");
+    //ALog.d(TAG, "isMemberClass = "
+    //    + clazz.isMemberClass()
+    //    + "; isStatic = "
+    //    + Modifier.isStatic(modifiers)
+    //    + "; isPrivate = "
+    //    + Modifier.isPrivate(modifiers));
+    if (!clazz.isMemberClass() || !Modifier.isStatic(modifiers)) {
+      ALog.e(TAG, String.format("为了防止内存泄漏，请使用静态的成员类(public static class %s)或文件类(%s.java)",
+          clazz.getSimpleName(), clazz.getSimpleName()));
     }
   }
 

@@ -18,6 +18,7 @@ package com.arialyy.aria.core.download.target;
 import com.arialyy.aria.core.common.AbsBuilderTarget;
 import com.arialyy.aria.core.common.HttpOption;
 import com.arialyy.aria.core.download.DTaskWrapper;
+import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.download.m3u8.M3U8LiveOption;
 import com.arialyy.aria.core.download.m3u8.M3U8VodOption;
 import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
@@ -32,6 +33,7 @@ public class HttpBuilderTarget extends AbsBuilderTarget<HttpBuilderTarget> {
     mConfigHandler.setUrl(url);
     getTaskWrapper().setRequestType(ITaskWrapper.D_HTTP);
     getTaskWrapper().setNewTask(true);
+    ((DownloadEntity)getEntity()).setTaskType(ITaskWrapper.D_HTTP);
   }
 
   public HttpBuilderTarget m3u8VodOption(M3U8VodOption m3U8VodOption) {

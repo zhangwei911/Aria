@@ -55,7 +55,8 @@ public class FtpUploadActivity extends BaseActivity<ActivityFtpUploadBinding> {
   private String mUrl;
   private UploadModule mModule;
   private long mTaskId = -1;
-  private String user = "lao", pwd = "123456";
+  private String user = "ftpuser", pwd = "ftpuser2020";
+  //private String user = "lao", pwd = "123456";
 
   @Override protected void init(Bundle savedInstanceState) {
     setTile("D_FTP 文件上传");
@@ -92,11 +93,11 @@ public class FtpUploadActivity extends BaseActivity<ActivityFtpUploadBinding> {
   }
 
   private void setHelpCode() {
-    try {
-      getBinding().codeView.setSource(AppUtil.getHelpCode(this, "FtpUpload.java"));
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
+    //try {
+    //  getBinding().codeView.setSource(AppUtil.getHelpCode(this, "FtpUpload.java"));
+    //} catch (IOException e) {
+    //  e.printStackTrace();
+    //}
   }
 
   @Override protected int setLayoutId() {
@@ -245,7 +246,7 @@ public class FtpUploadActivity extends BaseActivity<ActivityFtpUploadBinding> {
     @Override public FtpInterceptHandler onIntercept(UploadEntity entity, List<String> fileList) {
       FtpInterceptHandler.Builder builder = new FtpInterceptHandler.Builder();
       //builder.coverServerFile(); // 覆盖远端同名文件
-      builder.resetFileName("test.zip"); //修改上传到远端服务器的文件名
+      builder.resetFileName("test12.zip"); //修改上传到远端服务器的文件名
       return builder.build();
     }
   }
