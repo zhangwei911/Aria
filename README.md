@@ -1,5 +1,5 @@
 # Aria
-![图标](https://github.com/AriaLyy/DownloadUtil/blob/v_3.0/app/src/main/res/mipmap-hdpi/ic_launcher.png)</br>
+![图标](https://github.com/AriaLyy/DownloadUtil/blob/master/img/ic_launcher.png)</br>
 ## [ENGLISH DOC](https://github.com/AriaLyy/Aria/blob/master/ENGLISH_README.md)</br>
 ## [中文文档](https://aria.laoyuyu.me/aria_doc)
 Aria项目源于工作中遇到的一个文件下载管理的需求，当时被下载折磨的痛不欲生，从那时起便萌生了编写一个简单易用，稳当高效的下载框架，aria经历了1.0到3.0的开发，算是越来越接近当初所制定的目标了。
