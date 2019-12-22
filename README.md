@@ -44,16 +44,16 @@ Aria有以下特点：
 
 ## 引入库
 [![license](http://img.shields.io/badge/license-Apache2.0-brightgreen.svg?style=flat)](https://github.com/AriaLyy/Aria/blob/master/LICENSE)
-[![Core](https://img.shields.io/badge/Core-3.8-blue)](https://github.com/AriaLyy/Aria)
-[![Compiler](https://img.shields.io/badge/Compiler-3.8-blue)](https://github.com/AriaLyy/Aria)
-[![FtpComponent](https://img.shields.io/badge/FtpComponent-3.8-orange)](https://github.com/AriaLyy/Aria)
-[![M3U8Component](https://img.shields.io/badge/M3U8Component-3.8-orange)](https://github.com/AriaLyy/Aria)
+[![Core](https://img.shields.io/badge/Core-3.8.1-blue)](https://github.com/AriaLyy/Aria)
+[![Compiler](https://img.shields.io/badge/Compiler-3.8.1-blue)](https://github.com/AriaLyy/Aria)
+[![FtpComponent](https://img.shields.io/badge/FtpComponent-3.8.1-orange)](https://github.com/AriaLyy/Aria)
+[![M3U8Component](https://img.shields.io/badge/M3U8Component-3.8.1-orange)](https://github.com/AriaLyy/Aria)
 
 ```java
-implementation 'com.arialyy.aria:core:3.8'
-annotationProcessor 'com.arialyy.aria:compiler:3.8'
-implementation 'com.arialyy.aria:ftpComponent:3.8' # 如果需要使用ftp，请增加该组件
-implementation 'com.arialyy.aria:m3u8Component:3.8' # 如果需要使用m3u8下载功能，请增加该组件
+implementation 'com.arialyy.aria:core:3.8.1'
+annotationProcessor 'com.arialyy.aria:compiler:3.8.1'
+implementation 'com.arialyy.aria:ftpComponent:3.8.1' # 如果需要使用ftp，请增加该组件
+implementation 'com.arialyy.aria:m3u8Component:3.8.1' # 如果需要使用m3u8下载功能，请增加该组件
 ```
 如果出现android support依赖错误，请将 `compile 'com.arialyy.aria:core:<last-version>'`替换为
 ```
@@ -137,19 +137,12 @@ protected void onCreate(Bundle savedInstanceState) {
 
 
 ### 版本日志
-  + v_3.8 (2019/12/17)
-    - 移除androidx和support的依赖，现在无论是哪个版本的appcompat包都可以使用本框架
-    - 修复一个在xml中使用fragment导致的内存泄漏问题
-    - m3u8协议的key信息增加了`keyFormat`，`keyFormatVersion`字段
-    - m3u8增加了`ignoreFailureTs`方法，忽略下载失败的ts切片
-    - 修复在dialogFragment的`onCreateDialog()`注册导致的注解不生效问题
-    - 修复组合任务初始化失败时，无法删除的问题
-    - 修复`reStart()`后，无法停止的问题
-    - ftp增加主动模式，开启主动模式：https://aria.laoyuyu.me/aria_doc/api/ftp_params.html
-    - 修复ftp服务器无法响应`abor`命令导致的无法停止上传的问题 https://github.com/AriaLyy/Aria/issues/564
-    - 修复ftp上传时，服务器有长度为0的文件导致上传失败的问题
-    - 修复下载任务和上传任务的文件路径是同一个时，导致的记录混乱问题
-    - 优化提示
++ v_3.8.1 (2019/12/22)
+    - 修复一个表创建失败的问题 https://github.com/AriaLyy/Aria/issues/570
+    - 修复一个非分块模式下导致下载失败的问题 https://github.com/AriaLyy/Aria/issues/571
+    - 修复一个服务器端无法创建socket连接，却没有返回码导致客户端卡住的问题 https://github.com/AriaLyy/Aria/issues/569
+    - 修复文件删除后，组合任务没有重新下载的问题 https://github.com/AriaLyy/Aria/issues/574
+    - 优化缓存队列和执行队列
     
 [更多版本记录](https://github.com/AriaLyy/Aria/blob/master/DEV_LOG.md)
 

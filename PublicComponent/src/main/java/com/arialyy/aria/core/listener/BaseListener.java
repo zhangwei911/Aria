@@ -122,8 +122,9 @@ public abstract class BaseListener<ENTITY extends AbsEntity, TASK_WRAPPER extend
     mTask.putExpand(AbsTask.ERROR_INFO_KEY, e);
     sendInState2Target(ISchedulers.FAIL);
     if (e != null) {
-      e.printStackTrace();
-      ErrorHelp.saveError(e.getTag(), "", ALog.getExceptionString(e));
+      String error = ALog.getExceptionString(e);
+      ALog.w(TAG, error);
+      ErrorHelp.saveError(e.getTag(), "", error);
     }
   }
 

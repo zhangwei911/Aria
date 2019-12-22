@@ -42,10 +42,6 @@ class FtpUFileInfoThread extends AbsFtpInfoThread<UploadEntity, UTaskWrapper> {
   static final int CODE_COMPLETE = 0xab1;
   private boolean isComplete = false;
   private String remotePath;
-  /**
-   * true 使用拦截器，false 不使用拦截器
-   */
-  private boolean useInterceptor = false;
 
   FtpUFileInfoThread(UTaskWrapper taskEntity, OnFileInfoCallback callback) {
     super(taskEntity, callback);
@@ -65,7 +61,9 @@ class FtpUFileInfoThread extends AbsFtpInfoThread<UploadEntity, UTaskWrapper> {
     try {
       IFtpUploadInterceptor interceptor = mTaskOption.getUploadInterceptor();
       if (interceptor != null) {
-        useInterceptor = true;
+        /**
+         * true 使用拦截器，false 不使用拦截器
+         */
         List<String> files = new ArrayList<>();
         for (FTPFile ftpFile : ftpFiles) {
           if (ftpFile.isDirectory()) {
@@ -118,7 +116,7 @@ class FtpUFileInfoThread extends AbsFtpInfoThread<UploadEntity, UTaskWrapper> {
    */
   @Override protected void handleFile(String remotePath, FTPFile ftpFile) {
     super.handleFile(remotePath, ftpFile);
-    if (ftpFile != null && !useInterceptor) {
+    if (ftpFile != null) {
       //远程文件已完成
       if (ftpFile.getSize() == mEntity.getFileSize()) {
         isComplete = true;

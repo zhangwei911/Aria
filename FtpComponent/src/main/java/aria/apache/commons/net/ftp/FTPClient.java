@@ -3662,7 +3662,6 @@ public class FTPClient extends FTP implements Configurable {
     private long time = System.currentTimeMillis();
     private int notAcked;
     private OnFtpInputStreamListener listener;
-    private long lTime = time;
 
     CSL(FTPClient parent, long idleTime, int maxWait) throws SocketException {
       this(parent, idleTime, maxWait, null);
@@ -3696,12 +3695,9 @@ public class FTPClient extends FTP implements Configurable {
 
         time = now;
       }
-      //if (now - lTime > 100) {
       if (listener != null) {
         listener.onFtpInputStream(parent, totalBytesTransferred, bytesTransferred, streamSize);
       }
-      //lTime = now;
-      //}
     }
 
     void cleanUp() throws IOException {

@@ -27,6 +27,7 @@ import com.arialyy.aria.core.listener.IEventListener;
 import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
+import java.io.File;
 import java.util.Map;
 import java.util.WeakHashMap;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -83,13 +84,23 @@ public abstract class AbsGroupUtil implements IUtil, Runnable {
   private void initState() {
     mState = new GroupRunState(getWrapper().getKey(), mListener, mSubQueue);
     for (DTaskWrapper wrapper : mGTWrapper.getSubTaskWrapper()) {
-      if (wrapper.getEntity().getState() == IEntity.STATE_COMPLETE) {
+      File subFile = new File(wrapper.getEntity().getFilePath());
+      if (wrapper.getEntity().getState() == IEntity.STATE_COMPLETE
+          && subFile.exists()
+          && subFile.length() == wrapper.getEntity().getFileSize()) {
         mState.updateCompleteNum();
         mCurrentLocation += wrapper.getEntity().getFileSize();
       } else {
+        if (!subFile.exists()) {
+          wrapper.getEntity().setCurrentProgress(0);
+        }
+        wrapper.getEntity().setState(IEntity.STATE_POST_PRE);
         mCache.put(wrapper.getKey(), wrapper);
         mCurrentLocation += wrapper.getEntity().getCurrentProgress();
       }
+    }
+    if (getWrapper().getSubTaskWrapper().size() != mState.getCompleteNum()) {
+      getWrapper().setState(IEntity.STATE_POST_PRE);
     }
     mState.updateProgress(mCurrentLocation);
     mScheduler = new Handler(Looper.getMainLooper(), SimpleSchedulers.newInstance(mState));

@@ -32,14 +32,15 @@
   <string name="error_file_name_null">文件名为空</string>
 
   <string-array name="main_items">
-    <item>http 下载</item>
-    <item>http 上传</item>
-    <item>http 组合任务下载</item>
+    <item>HTTP 下载</item>
+    <item>HTTP 上传</item>
+    <item>HTTP 组合任务下载</item>
     <item>FTP 下载</item>
     <item>FTP 文件夹下载</item>
     <item>FTP 文件上传</item>
     <item>M3U8 点播文件下载</item>
     <item>M3U8 直播文件下载</item>
+    <item>SFTP 下载</item>
   </string-array>
 
   <string-array name="main_items_desc">
@@ -51,6 +52,7 @@
     <item>上传单个文件到服务器</item>
     <item>下载M3U8点播文件</item>
     <item>下载M3U8直播文件</item>
+    <item>SFTP单文件下载</item>
   </string-array>
 
   <string-array name="download_items">

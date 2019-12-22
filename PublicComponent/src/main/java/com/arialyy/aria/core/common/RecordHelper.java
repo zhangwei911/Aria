@@ -51,15 +51,12 @@ public class RecordHelper {
     File temp = new File(mTaskRecord.filePath);
     boolean fileExists = false;
     if (!temp.exists()) {
-      BufferedRandomAccessFile tempFile;
-      try {
-        tempFile = new BufferedRandomAccessFile(temp, "rw");
-        tempFile.setLength(mWrapper.getEntity().getFileSize());
-      } catch (IOException e) {
-        e.printStackTrace();
-      }
-
+      createPlaceHolderFile(temp);
     } else {
+      if (temp.length() != mWrapper.getEntity().getFileSize()) {
+        FileUtil.deleteFile(temp);
+        createPlaceHolderFile(temp);
+      }
       fileExists = true;
     }
     // 处理文件被删除的情况
@@ -79,6 +76,19 @@ public class RecordHelper {
       }
     }
     mWrapper.setNewTask(false);
+  }
+
+  /**
+   * 创建非分块的占位文件
+   */
+  private void createPlaceHolderFile(File temp) {
+    BufferedRandomAccessFile tempFile;
+    try {
+      tempFile = new BufferedRandomAccessFile(temp, "rw");
+      tempFile.setLength(mWrapper.getEntity().getFileSize());
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
   }
 
   /**

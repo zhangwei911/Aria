@@ -17,10 +17,6 @@ package com.arialyy.aria.orm;
 
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import com.arialyy.aria.util.ALog;
-import com.arialyy.aria.util.CommonUtil;
-import java.lang.reflect.Field;
-import java.net.URLEncoder;
 
 /**
  * Created by laoyuyu on 2018/3/22.
@@ -28,52 +24,8 @@ import java.net.URLEncoder;
 abstract class AbsDelegate {
   static final String TAG = "AbsDelegate";
 
-
-
-  /**
-   * 检查list参数是否合法，list只能是{@code List<String>}
-   *
-   * @return {@code true} 合法
-   */
-  boolean checkList(Field list) {
-    Class t = CommonUtil.getListParamType(list);
-    if (t != null && t == String.class) {
-      return true;
-    } else {
-      ALog.d(TAG, "map参数错误，支持List<String>的参数字段");
-      return false;
-    }
-  }
-
-  /**
-   * 检查map参数是否合法，map只能是{@code Map<String, String>}
-   *
-   * @return {@code true} 合法
-   */
-  boolean checkMap(Field map) {
-    Class[] ts = CommonUtil.getMapParamType(map);
-    if (ts != null
-        && ts[0] != null
-        && ts[1] != null
-        && ts[0] == String.class
-        && ts[1] == String.class) {
-      return true;
-    } else {
-      ALog.d(TAG, "map参数错误，支持Map<String,String>的参数字段");
-      return false;
-    }
-  }
-
   void closeCursor(Cursor cursor) {
-    synchronized (AbsDelegate.class) {
-      if (cursor != null && !cursor.isClosed()) {
-        try {
-          cursor.close();
-        } catch (android.database.SQLException e) {
-          e.printStackTrace();
-        }
-      }
-    }
+    SqlUtil.closeCursor(cursor);
   }
 
   /**
@@ -82,9 +34,6 @@ abstract class AbsDelegate {
    * @return 返回数据库
    */
   SQLiteDatabase checkDb(SQLiteDatabase db) {
-    if (db == null || !db.isOpen()) {
-      db = SqlHelper.getInstance().getDb();
-    }
-    return db;
+    return SqlUtil.checkDb(db);
   }
 }

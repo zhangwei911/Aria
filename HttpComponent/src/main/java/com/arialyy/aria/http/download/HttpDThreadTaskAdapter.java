@@ -143,6 +143,7 @@ final class HttpDThreadTaskAdapter extends BaseHttpThreadTaskAdapter {
           is.close();
         }
         if (conn != null) {
+          conn.getInputStream().close();
           conn.disconnect();
         }
       } catch (IOException e) {

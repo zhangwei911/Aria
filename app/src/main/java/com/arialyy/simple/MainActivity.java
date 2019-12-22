@@ -117,6 +117,8 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
                 module.startNextActivity(MainActivity.this, data.get(position),
                     M3U8LiveDLoadActivity.class);
                 break;
+              case 8: // sftp
+                break;
             }
           }
         });

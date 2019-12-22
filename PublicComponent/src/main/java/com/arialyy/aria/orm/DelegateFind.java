@@ -136,6 +136,9 @@ class DelegateFind extends AbsDelegate {
         Many m = many.getAnnotation(Many.class);
         Class parentClazz = Class.forName(one.getType().getName());
         Class childClazz = Class.forName(CommonUtil.getListParamType(many).getName());
+        // 检查表
+        SqlUtil.checkTable(db, parentClazz);
+        SqlUtil.checkTable(db, childClazz);
         final String pTableName = parentClazz.getSimpleName();
         final String cTableName = childClazz.getSimpleName();
         List<Field> pColumn = SqlUtil.getAllNotIgnoreField(parentClazz);
@@ -418,6 +421,7 @@ class DelegateFind extends AbsDelegate {
    */
   private <T extends DbEntity> List<T> exeNormalDataSql(SQLiteDatabase db, Class<T> clazz,
       String sql, String[] selectionArgs) {
+    SqlUtil.checkTable(db, clazz);
     String[] temp = new String[selectionArgs.length];
     int i = 0;
     for (String arg : selectionArgs) {

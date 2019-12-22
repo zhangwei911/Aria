@@ -41,13 +41,10 @@ final class SqlHelper extends SQLiteOpenHelper {
   private static volatile SqlHelper INSTANCE = null;
   private Context mContext;
 
-  private DelegateCommon mDelegate;
-
   synchronized static SqlHelper init(Context context) {
     if (INSTANCE == null) {
       synchronized (SqlHelper.class) {
-        DelegateCommon delegate = DelegateManager.getInstance().getDelegate(DelegateCommon.class);
-        INSTANCE = new SqlHelper(context.getApplicationContext(), delegate);
+        INSTANCE = new SqlHelper(context.getApplicationContext());
       }
     }
     return INSTANCE;
@@ -57,11 +54,10 @@ final class SqlHelper extends SQLiteOpenHelper {
     return INSTANCE;
   }
 
-  private SqlHelper(Context context, DelegateCommon delegate) {
+  private SqlHelper(Context context) {
     super(DBConfig.SAVE_IN_SDCARD ? new DatabaseContext(context) : context, DBConfig.DB_NAME, null,
         DBConfig.VERSION);
     mContext = context;
-    mDelegate = delegate;
   }
 
   @Override public void onOpen(SQLiteDatabase db) {
@@ -82,12 +78,11 @@ final class SqlHelper extends SQLiteOpenHelper {
   }
 
   @Override public void onCreate(SQLiteDatabase db) {
-    DelegateCommon delegate = DelegateManager.getInstance().getDelegate(DelegateCommon.class);
     Set<String> tables = DBConfig.mapping.keySet();
     for (String tableName : tables) {
       Class clazz = DBConfig.mapping.get(tableName);
-      if (!delegate.tableExists(db, clazz)) {
-        delegate.createTable(db, clazz);
+      if (!SqlUtil.tableExists(db, clazz)) {
+        SqlUtil.createTable(db, clazz);
       }
     }
   }
@@ -167,13 +162,13 @@ final class SqlHelper extends SQLiteOpenHelper {
       Set<String> tables = DBConfig.mapping.keySet();
       for (String tableName : tables) {
         Class<? extends DbEntity> clazz = DBConfig.mapping.get(tableName);
-        if (mDelegate.tableExists(db, clazz)) {
+        if (SqlUtil.tableExists(db, clazz)) {
           //修改表名为中介表名
           String alertSql = String.format("ALTER TABLE %s RENAME TO %s_temp", tableName, tableName);
           db.execSQL(alertSql);
 
           //创建新表
-          mDelegate.createTable(db, clazz);
+          SqlUtil.createTable(db, clazz);
 
           String sql = String.format("SELECT COUNT(*) FROM %s_temp", tableName);
           Cursor cursor = db.rawQuery(sql, null);
@@ -187,7 +182,7 @@ final class SqlHelper extends SQLiteOpenHelper {
                 db.rawQuery(String.format("PRAGMA table_info(%s_temp)", tableName), null);
 
             // 获取新表的所有字段名称
-            List<String> newTabColumns = mDelegate.getColumns(clazz);
+            List<String> newTabColumns = SqlUtil.getColumns(clazz);
             // 获取旧表的所有字段名称
             List<String> oldTabColumns = new ArrayList<>();
 
@@ -237,9 +232,9 @@ final class SqlHelper extends SQLiteOpenHelper {
             db.execSQL(insertSql);
           }
           //删除中介表
-          mDelegate.dropTable(db, tableName + "_temp");
+          SqlUtil.dropTable(db, tableName + "_temp");
         } else {
-          mDelegate.createTable(db, clazz);
+          SqlUtil.createTable(db, clazz);
         }
       }
       db.setTransactionSuccessful();
@@ -281,7 +276,7 @@ final class SqlHelper extends SQLiteOpenHelper {
         if (url.startsWith("ftp") || url.startsWith("sftp")) {
           type = ITaskWrapper.D_FTP;
         } else {
-          if (mDelegate.tableExists(db, M3U8Entity.class)) {
+          if (SqlUtil.tableExists(db, M3U8Entity.class)) {
             Cursor m3u8c = db.rawQuery("SELECT isLive FROM M3U8Entity WHERE filePath=\""
                 + SqlUtil.encodeStr(filePath)
                 + "\"", null);
@@ -386,8 +381,8 @@ final class SqlHelper extends SQLiteOpenHelper {
     String[] taskTables =
         new String[] { "UploadTaskEntity", "DownloadTaskEntity", "DownloadGroupTaskEntity" };
     for (String taskTable : taskTables) {
-      if (mDelegate.tableExists(db, taskTable)) {
-        mDelegate.dropTable(db, taskTable);
+      if (SqlUtil.tableExists(db, taskTable)) {
+        SqlUtil.dropTable(db, taskTable);
       }
     }
 
@@ -420,8 +415,8 @@ final class SqlHelper extends SQLiteOpenHelper {
     String[] taskTables =
         new String[] { "UploadTaskEntity", "DownloadTaskEntity", "DownloadGroupTaskEntity" };
     for (String taskTable : taskTables) {
-      if (mDelegate.tableExists(db, taskTable)) {
-        mDelegate.dropTable(db, taskTable);
+      if (SqlUtil.tableExists(db, taskTable)) {
+        SqlUtil.dropTable(db, taskTable);
       }
     }
 
@@ -430,7 +425,7 @@ final class SqlHelper extends SQLiteOpenHelper {
     String[] keys = new String[] { "downloadPath", "groupName" };
     int i = 0;
     for (String tableName : tables) {
-      if (!mDelegate.tableExists(db, tableName)) {
+      if (!SqlUtil.tableExists(db, tableName)) {
         continue;
       }
       String pColumn = keys[i];

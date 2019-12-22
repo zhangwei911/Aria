@@ -97,7 +97,7 @@ public class DownloadGroupActivity extends BaseActivity<ActivityDownloadGroupBin
               .setDirPath(
                   Environment.getExternalStorageDirectory().getPath() + "/Download/group_imgs")
               //.setSubFileName(getModule(GroupModule.class).getSubName2())
-              //.setSubFileName(getModule(GroupModule.class).getSubName())
+              .setSubFileName(getModule(GroupModule.class).getSubName())
               .unknownSize()
               .option(getHttpOption())
               .ignoreFilePathOccupy()

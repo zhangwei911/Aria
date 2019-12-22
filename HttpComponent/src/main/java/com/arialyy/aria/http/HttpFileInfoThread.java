@@ -89,6 +89,11 @@ public class HttpFileInfoThread implements Runnable {
           true);
     } finally {
       if (conn != null) {
+        try {
+          conn.getInputStream().close();
+        } catch (IOException e) {
+          e.printStackTrace();
+        }
         conn.disconnect();
       }
     }

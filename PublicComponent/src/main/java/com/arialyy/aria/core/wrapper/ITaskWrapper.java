@@ -80,6 +80,11 @@ public interface ITaskWrapper {
   int U_TCP_PEER = 11;
 
   /**
+   * SFTP 下载
+   */
+  int D_SFTP = 12;
+
+  /**
    * 获取任务类型
    *
    * @return {@link ITaskWrapper}

@@ -79,7 +79,7 @@ public abstract class AbsTask<TASK_WRAPPER extends AbsTaskWrapper>
       ALog.e(TAG, "key 为空");
       return;
     } else if (obj == null) {
-      ALog.w(TAG, "扩展数据为空");
+      ALog.i(TAG, "扩展数据为空");
       return;
     }
     mExpand.put(key, obj);

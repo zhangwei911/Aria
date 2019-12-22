@@ -85,15 +85,14 @@ public class DelegateWrapper {
    * @return {@code true}该字段的对应的value已存在
    */
   boolean checkDataExist(Class clazz, String... expression) {
-    return mDManager.getDelegate(DelegateCommon.class)
-        .checkDataExist(mDb, clazz, expression);
+    return SqlUtil.checkDataExist(mDb, clazz, expression);
   }
 
   /**
    * 清空表数据
    */
   <T extends DbEntity> void clean(Class<T> clazz) {
-    mDManager.getDelegate(DelegateCommon.class).clean(mDb, clazz);
+    SqlUtil.clean(mDb, clazz);
   }
 
   /**
@@ -193,7 +192,7 @@ public class DelegateWrapper {
    * 查找某张表是否存在
    */
   public boolean tableExists(Class clazz) {
-    return mDManager.getDelegate(DelegateCommon.class).tableExists(mDb, clazz);
+    return SqlUtil.tableExists(mDb, clazz);
   }
 
   /**

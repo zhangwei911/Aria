@@ -95,8 +95,7 @@ public abstract class AbsTaskQueue<TASK extends AbsTask, TASK_WRAPPER extends Ab
    * 停止所有任务
    */
   @Override public void stopAllTask() {
-    for (String key : mExecutePool.getAllTask().keySet()) {
-      TASK task = mExecutePool.getAllTask().get(key);
+    for (TASK task : mExecutePool.getAllTask()) {
       if (task != null) {
         int state = task.getState();
         if (task.isRunning() || (state != IEntity.STATE_COMPLETE
@@ -106,8 +105,13 @@ public abstract class AbsTaskQueue<TASK extends AbsTask, TASK_WRAPPER extends Ab
       }
     }
 
-    for (String key : mCachePool.getAllTask().keySet()) {
-      TASK task = mCachePool.getAllTask().get(key);
+    //for (String key : mCachePool.getAllTask().keySet()) {
+    //  TASK task = mCachePool.getAllTask().get(key);
+    //  if (task != null) {
+    //    task.stop(TaskSchedulerType.TYPE_STOP_NOT_NEXT);
+    //  }
+    //}
+    for (TASK task : mCachePool.getAllTask()) {
       if (task != null) {
         task.stop(TaskSchedulerType.TYPE_STOP_NOT_NEXT);
       }

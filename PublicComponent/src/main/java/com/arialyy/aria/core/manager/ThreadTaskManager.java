@@ -16,8 +16,8 @@
 
 package com.arialyy.aria.core.manager;
 
-import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
 import com.arialyy.aria.core.task.IThreadTask;
+import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
 import java.util.HashSet;
@@ -25,8 +25,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.SynchronousQueue;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -34,11 +35,12 @@ import java.util.concurrent.locks.ReentrantLock;
  * 线程任务管理器
  */
 public class ThreadTaskManager {
+  private final String TAG = CommonUtil.getClassName(this);
   private static volatile ThreadTaskManager INSTANCE = null;
-  private final String TAG = "ThreadTaskManager";
-  private ExecutorService mExePool;
-  private Map<String, Set<FutureContainer>> mThreadTasks = new ConcurrentHashMap<>();
+  private static final int CORE_POOL_NUM = 20;
   private static final ReentrantLock LOCK = new ReentrantLock();
+  private ThreadPoolExecutor mExePool;
+  private Map<String, Set<FutureContainer>> mThreadTasks = new ConcurrentHashMap<>();
 
   public static synchronized ThreadTaskManager getInstance() {
     if (INSTANCE == null) {
@@ -48,7 +50,10 @@ public class ThreadTaskManager {
   }
 
   private ThreadTaskManager() {
-    mExePool = Executors.newCachedThreadPool();
+    mExePool = new ThreadPoolExecutor(CORE_POOL_NUM, Integer.MAX_VALUE,
+        60L, TimeUnit.SECONDS,
+        new SynchronousQueue<Runnable>());
+    mExePool.allowsCoreThreadTimeOut();
   }
 
   /**

@@ -76,6 +76,7 @@ public class DGroupLoaderUtil extends AbsGroupUtil {
     getState().setSubSize(getWrapper().getSubTaskWrapper().size());
     if (getState().getCompleteNum() == getState().getSubSize()) {
       mListener.onComplete();
+      return false;
     } else {
       // 处理组合任务大小未知的情况
       if (getWrapper().isUnknownSize() && getWrapper().getEntity().getFileSize() < 1) {

@@ -18,13 +18,14 @@ package com.arialyy.aria.core.queue.pool;
 import com.arialyy.aria.core.AriaConfig;
 import com.arialyy.aria.core.AriaManager;
 import com.arialyy.aria.core.task.AbsTask;
+import com.arialyy.aria.util.CommonUtil;
 
 /**
  * Created by AriaL on 2017/6/29.
  * 单个下载任务的执行池
  */
 class DGLoadExecutePool<TASK extends AbsTask> extends DLoadExecutePool<TASK> {
-  private final String TAG = "DGLoadExecutePool";
+  private final String TAG = CommonUtil.getClassName(this);
 
   @Override protected int getMaxSize() {
     return AriaConfig.getInstance().getDGConfig().getMaxTaskNum();

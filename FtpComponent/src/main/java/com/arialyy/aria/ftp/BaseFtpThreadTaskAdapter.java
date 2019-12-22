@@ -117,7 +117,8 @@ public abstract class BaseFtpThreadTaskAdapter extends AbsThreadTaskAdapter {
         }
       }
       client.setControlEncoding(charSet);
-      client.setDataTimeout(getTaskConfig().getIOTimeOut());
+      //client.setDataTimeout(getTaskConfig().getIOTimeOut());
+      client.setDataTimeout(1000);
       client.setConnectTimeout(getTaskConfig().getConnectTimeOut());
       if (mTaskOption.getConnMode() == FtpConnectionMode.DATA_CONNECTION_MODE_ACTIVITY) {
         client.enterLocalActiveMode();

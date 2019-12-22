@@ -26,7 +26,7 @@ import com.arialyy.aria.core.scheduler.TaskSchedulers;
 import com.arialyy.aria.core.task.DownloadTask;
 import com.arialyy.aria.util.ALog;
 import java.util.LinkedHashSet;
-import java.util.Map;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -68,11 +68,10 @@ public class DTaskQueue extends AbsTaskQueue<DownloadTask, DTaskWrapper> {
    */
   public void setTaskHighestPriority(DownloadTask task) {
     task.setHighestPriority(true);
-    Map<String, DownloadTask> exeTasks = mExecutePool.getAllTask();
+    //Map<String, DownloadTask> exeTasks = mExecutePool.getAllTask();
+    List<DownloadTask> exeTasks = mExecutePool.getAllTask();
     if (exeTasks != null && !exeTasks.isEmpty()) {
-      Set<String> keys = exeTasks.keySet();
-      for (String key : keys) {
-        DownloadTask temp = exeTasks.get(key);
+      for (DownloadTask temp : exeTasks) {
         if (temp != null && temp.isRunning() && temp.isHighestPriorityTask() && !temp.getKey()
             .equals(task.getKey())) {
           ALog.e(TAG, "设置最高优先级任务失败，失败原因【任务中已经有最高优先级任务，请等待上一个最高优先级任务完成，或手动暂停该任务】");
@@ -80,28 +79,28 @@ public class DTaskQueue extends AbsTaskQueue<DownloadTask, DTaskWrapper> {
           return;
         }
       }
-    }
-    int maxSize = AriaConfig.getInstance().getDConfig().getMaxTaskNum();
-    int currentSize = mExecutePool.size();
-    if (currentSize == 0 || currentSize < maxSize) {
-      startTask(task);
-    } else {
-      Set<DownloadTask> tempTasks = new LinkedHashSet<>();
-      for (int i = 0; i < maxSize; i++) {
-        DownloadTask oldTsk = mExecutePool.pollTask();
-        if (oldTsk != null && oldTsk.isRunning()) {
-          if (i == maxSize - 1) {
-            oldTsk.stop(TaskSchedulerType.TYPE_STOP_AND_WAIT);
-            mCachePool.putTaskToFirst(oldTsk);
-            break;
+      int maxSize = AriaConfig.getInstance().getDConfig().getMaxTaskNum();
+      int currentSize = mExecutePool.size();
+      if (currentSize == 0 || currentSize < maxSize) {
+        startTask(task);
+      } else {
+        Set<DownloadTask> tempTasks = new LinkedHashSet<>();
+        for (int i = 0; i < maxSize; i++) {
+          DownloadTask oldTsk = mExecutePool.pollTask();
+          if (oldTsk != null && oldTsk.isRunning()) {
+            if (i == maxSize - 1) {
+              oldTsk.stop(TaskSchedulerType.TYPE_STOP_AND_WAIT);
+              mCachePool.putTaskToFirst(oldTsk);
+              break;
+            }
+            tempTasks.add(oldTsk);
           }
-          tempTasks.add(oldTsk);
         }
-      }
-      startTask(task);
+        startTask(task);
 
-      for (DownloadTask temp : tempTasks) {
-        mExecutePool.putTask(temp);
+        for (DownloadTask temp : tempTasks) {
+          mExecutePool.putTask(temp);
+        }
       }
     }
   }

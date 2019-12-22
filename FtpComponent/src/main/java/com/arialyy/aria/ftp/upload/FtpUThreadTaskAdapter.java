@@ -28,6 +28,8 @@ import com.arialyy.aria.util.BufferedRandomAccessFile;
 import com.arialyy.aria.util.CommonUtil;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by Aria.Lao on 2017/7/28. D_FTP 单线程上传任务，需要FTP 服务器给用户打开append和write的权限
@@ -35,13 +37,16 @@ import java.io.UnsupportedEncodingException;
 class FtpUThreadTaskAdapter extends BaseFtpThreadTaskAdapter {
   private String dir, remotePath;
   private boolean storeFail = false;
+  private ScheduledThreadPoolExecutor timer;
+  private FTPClient client = null;
+  private boolean isTimeOut = true;
+  private FtpFISAdapter fa;
 
   FtpUThreadTaskAdapter(SubThreadConfig config) {
     super(config);
   }
 
   @Override protected void handlerThreadTask() {
-    FTPClient client = null;
     BufferedRandomAccessFile file = null;
     try {
       ALog.d(TAG,
@@ -71,7 +76,7 @@ class FtpUThreadTaskAdapter extends BaseFtpThreadTaskAdapter {
       if (getThreadRecord().startLocation > 0) {
         file.seek(getThreadRecord().startLocation);
       }
-      boolean complete = upload(client, file);
+      boolean complete = upload(file);
       if (!complete || getThreadTask().isBreak()) {
         return;
       }
@@ -94,6 +99,7 @@ class FtpUThreadTaskAdapter extends BaseFtpThreadTaskAdapter {
         e.printStackTrace();
       }
       closeClient(client);
+      closeTimer();
     }
   }
 
@@ -113,14 +119,45 @@ class FtpUThreadTaskAdapter extends BaseFtpThreadTaskAdapter {
   }
 
   /**
+   * 启动监听定时器，当网络断开时，如果该任务的FTP服务器的传输线程没有断开，当客户端重新连接时，客户端将无法发送数据到服务端
+   * 每隔10s检查一次。
+   */
+  private void startTimer() {
+    timer = new ScheduledThreadPoolExecutor(1);
+    timer.scheduleWithFixedDelay(new Runnable() {
+      @Override public void run() {
+        try {
+          if (isTimeOut) {
+            fail(new AriaIOException(TAG, "socket连接失败，该问题一般出现于网络断开，客户端重新连接，"
+                + "但是服务器端无法创建socket缺没有返回错误码的情况。"), false);
+          }
+          if (fa != null) {
+            fa.close();
+          }
+          isTimeOut = true;
+        } catch (IOException e) {
+          e.printStackTrace();
+        }
+      }
+    }, 10, 10, TimeUnit.SECONDS);
+  }
+
+  private void closeTimer() {
+    if (timer != null && !timer.isShutdown()) {
+      timer.shutdown();
+    }
+  }
+
+  /**
    * 上传
    *
    * @return {@code true}上传成功、{@code false} 上传失败
    */
-  private boolean upload(final FTPClient client, final BufferedRandomAccessFile bis)
+  private boolean upload(final BufferedRandomAccessFile bis)
       throws IOException {
-    final FtpFISAdapter fa = new FtpFISAdapter(bis);
+    fa = new FtpFISAdapter(bis);
     storeFail = false;
+    startTimer();
     try {
       ALog.d(TAG, String.format("remotePath: %s", remotePath));
       client.storeFile(remotePath, fa, new OnFtpInputStreamListener() {
@@ -129,6 +166,7 @@ class FtpUThreadTaskAdapter extends BaseFtpThreadTaskAdapter {
         @Override public void onFtpInputStream(FTPClient client, long totalBytesTransferred,
             int bytesTransferred, long streamSize) {
           try {
+            isTimeOut = false;
             if (getThreadTask().isBreak() && !isStoped) {
               isStoped = true;
               client.abor();
@@ -150,9 +188,10 @@ class FtpUThreadTaskAdapter extends BaseFtpThreadTaskAdapter {
         }
       });
     } catch (IOException e) {
-      String msg = String.format("文件上传错误，错误码为：%s, msg：%s, filePath: %s", client.getReplyCode(),
+      String msg = String.format("文件上传错误，错误码为：%s, msg：%s, filePath: %s", client.getReply(),
           client.getReplyString(), getEntity().getFilePath());
       closeClient(client);
+      e.printStackTrace();
       if (e.getMessage().contains("AriaIOException caught while copying")) {
         e.printStackTrace();
       } else {
@@ -163,7 +202,7 @@ class FtpUThreadTaskAdapter extends BaseFtpThreadTaskAdapter {
     if (storeFail) {
       return false;
     }
-    int reply = client.getReplyCode();
+    int reply = client.getReply();
     if (!FTPReply.isPositiveCompletion(reply)) {
       if (reply != FTPReply.TRANSFER_ABORTED) {
         fail(new AriaIOException(TAG,

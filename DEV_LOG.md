@@ -1,4 +1,10 @@
 ## 开发日志
+  + v_3.8.1 (2019/12/22)
+    - 修复一个表创建失败的问题 https://github.com/AriaLyy/Aria/issues/570
+    - 修复一个非分块模式下导致下载失败的问题 https://github.com/AriaLyy/Aria/issues/571
+    - 修复一个服务器端无法创建socket连接，却没有返回码导致客户端卡住的问题 https://github.com/AriaLyy/Aria/issues/569
+    - 修复文件删除后，组合任务没有重新下载的问题 https://github.com/AriaLyy/Aria/issues/574
+    - 优化缓存队列和执行队列
   + v_3.8 (2019/12/17)
     - 移除androidx和support的依赖，现在无论是哪个版本的appcompat包都可以使用本框架
     - 修复一个在xml中使用fragment导致的内存泄漏问题
@@ -15,7 +21,7 @@
   + v_3.7.10 (2019/12/3)
     - fix bug https://github.com/AriaLyy/Aria/issues/543#issuecomment-559733124
     - fix bug https://github.com/AriaLyy/Aria/issues/542
-    - fix bug https://github.com/AriaLyy/Aria/issues/547
+    - fix bug https://github.com/AriaLyy/Azria/issues/547
     - 修复下载失败时，中断重试无效的问题
     - 增加忽略权限检查的api，`ignoreCheckPermissions()`
     - 增加通用的的忽略文件路径被占用的api，`isIgnoreFilePathOccupy()`
