@@ -53,6 +53,7 @@ public class HttpUploadActivity extends BaseActivity<ActivityUploadBinding> {
   @Override protected void init(Bundle savedInstanceState) {
     setTile("D_HTTP 上传");
     super.init(savedInstanceState);
+    Aria.upload(this).getTaskList();
 
     mEntity = Aria.upload(this).getFirstUploadEntity(FILE_PATH);
 
