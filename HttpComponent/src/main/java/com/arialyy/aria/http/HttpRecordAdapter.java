@@ -38,9 +38,6 @@ public class HttpRecordAdapter extends AbsRecordHandlerAdapter {
 
   @Override public void onPre() {
     super.onPre();
-    if (getWrapper().getRequestType() == ITaskWrapper.U_HTTP) {
-      RecordUtil.delTaskRecord(getEntity().getFilePath(), IRecordHandler.TYPE_UPLOAD);
-    }
   }
 
   @Override public void handlerTaskRecord(TaskRecord record) {

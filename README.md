@@ -135,6 +135,8 @@ protected void onCreate(Bundle savedInstanceState) {
 
 ### [文档地址](https://aria.laoyuyu.me/aria_doc/)
 
+### QQ群：524329160
+
 
 ### 版本日志
 + v_3.8.1 (2019/12/22)

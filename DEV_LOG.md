@@ -1,4 +1,6 @@
 ## 开发日志
+  + v_3.8.2
+    - fix bug https://github.com/AriaLyy/Aria/issues/573
   + v_3.8.1 (2019/12/22)
     - 修复一个表创建失败的问题 https://github.com/AriaLyy/Aria/issues/570
     - 修复一个非分块模式下导致下载失败的问题 https://github.com/AriaLyy/Aria/issues/571
