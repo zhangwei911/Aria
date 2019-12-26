@@ -30,7 +30,7 @@ public final class BuilderController extends FeatureController implements IStart
   }
 
   /**
-   * 添加任务
+   * 添加任务，只添加任务不进行下载
    *
    * @return 正常添加，返回任务id，否则返回-1
    */

@@ -375,76 +375,25 @@ public class FileUtil {
   }
 
   /**
-   * 检查SD内存空间是否充足
+   * 检查内存空间是否充足
    *
-   * @param filePath 文件保存路径
-   * @param fileSize 文件大小
-   * @return {@code false} 内存空间不足，{@code true}内存空间足够
+   * @param path 文件路径
+   * @param fileSize 下载的文件的大小
+   * @return true 空间足够
    */
-  public static boolean checkSDMemorySpace(String filePath, long fileSize) {
-    List<String> dirs = FileUtil.getSDPathList(AriaConfig.getInstance().getAPP());
-    if (dirs == null || dirs.isEmpty()) {
-      return true;
-    }
-    for (String path : dirs) {
-      if (filePath.contains(path)) {
-        if (fileSize > 0 && fileSize > getAvailableExternalMemorySize(path)) {
-          return false;
-        }
+  public static boolean checkMemorySpace(String path, long fileSize) {
+    File temp = new File(path);
+    if (!temp.exists()){
+      if (!temp.getParentFile().exists()){
+        FileUtil.createDir(temp.getParentFile().getPath());
       }
+      path = temp.getParentFile().getPath();
     }
-    return true;
-  }
 
-  /**
-   * sdcard 可用大小
-   *
-   * @param sdcardPath sdcard 根路径
-   * @return 单位为：byte
-   */
-  public static long getAvailableExternalMemorySize(String sdcardPath) {
-    StatFs stat = new StatFs(sdcardPath);
+    StatFs stat = new StatFs(path);
     long blockSize = stat.getBlockSize();
     long availableBlocks = stat.getAvailableBlocks();
-    return availableBlocks * blockSize;
-  }
-
-  /**
-   * sdcard 总大小
-   *
-   * @param sdcardPath sdcard 根路径
-   * @return 单位为：byte
-   */
-  public static long getTotalExternalMemorySize(String sdcardPath) {
-    StatFs stat = new StatFs(sdcardPath);
-    long blockSize = stat.getBlockSize();
-    long totalBlocks = stat.getBlockCount();
-    return totalBlocks * blockSize;
-  }
-
-  /**
-   * 获取SD卡目录列表
-   */
-  public static List<String> getSDPathList(Context context) {
-    List<String> paths = null;
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-      try {
-        paths = getVolumeList(context);
-      } catch (ClassNotFoundException e) {
-        e.printStackTrace();
-      } catch (NoSuchMethodException e) {
-        e.printStackTrace();
-      } catch (IllegalAccessException e) {
-        e.printStackTrace();
-      } catch (InvocationTargetException e) {
-        e.printStackTrace();
-      }
-    } else {
-      List<String> mounts = readMountsFile();
-      List<String> volds = readVoldFile();
-      paths = compareMountsWithVold(mounts, volds);
-    }
-    return paths;
+    return fileSize <= availableBlocks * blockSize;
   }
 
   /**
@@ -496,10 +445,82 @@ public class FileUtil {
   }
 
   /**
+   * 检查SD内存空间是否充足
+   *
+   * @param filePath 文件保存路径
+   * @param fileSize 文件大小
+   * @return {@code false} 内存空间不足，{@code true}内存空间足够
+   */
+  @Deprecated
+  private static boolean checkSDMemorySpace(String filePath, long fileSize) {
+    List<String> dirs = FileUtil.getSDPathList(AriaConfig.getInstance().getAPP());
+    if (dirs == null || dirs.isEmpty()) {
+      return true;
+    }
+    for (String path : dirs) {
+      if (filePath.contains(path)) {
+        if (fileSize > 0 && fileSize > getAvailableExternalMemorySize(path)) {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+
+  /**
+   * sdcard 可用大小
+   *
+   * @param sdcardPath sdcard 根路径
+   * @return 单位为：byte
+   */
+  private static long getAvailableExternalMemorySize(String sdcardPath) {
+    StatFs stat = new StatFs(sdcardPath);
+    long blockSize = stat.getBlockSize();
+    long availableBlocks = stat.getAvailableBlocks();
+    return availableBlocks * blockSize;
+  }
+
+  /**
+   * sdcard 总大小
+   *
+   * @param sdcardPath sdcard 根路径
+   * @return 单位为：byte
+   */
+  private static long getTotalExternalMemorySize(String sdcardPath) {
+    StatFs stat = new StatFs(sdcardPath);
+    long blockSize = stat.getBlockSize();
+    long totalBlocks = stat.getBlockCount();
+    return totalBlocks * blockSize;
+  }
+
+  /**
+   * 获取SD卡目录列表
+   */
+  private static List<String> getSDPathList(Context context) {
+    List<String> paths = null;
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+      try {
+        paths = getVolumeList(context);
+      } catch (NoSuchMethodException e) {
+        e.printStackTrace();
+      } catch (IllegalAccessException e) {
+        e.printStackTrace();
+      } catch (InvocationTargetException e) {
+        e.printStackTrace();
+      }
+    } else {
+      List<String> mounts = readMountsFile();
+      List<String> volds = readVoldFile();
+      paths = compareMountsWithVold(mounts, volds);
+    }
+    return paths;
+  }
+
+  /**
    * getSDPathList
    */
   private static List<String> getVolumeList(final Context context)
-      throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException,
+      throws NoSuchMethodException, InvocationTargetException,
       IllegalAccessException {
     List<String> pathList = new ArrayList<>();
 
@@ -589,7 +610,7 @@ public class FileUtil {
    *
    * @return paths to all available SD-Cards in the system (include emulated)
    */
-  public static List<String> getStorageDirectories() {
+  private static List<String> getStorageDirectories() {
     // Final set of paths
     final List<String> rv = new ArrayList<>();
     // Primary physical SD-CARD (not emulated)

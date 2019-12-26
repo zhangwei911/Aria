@@ -125,7 +125,7 @@ public class HttpFileInfoThread implements Runnable {
     }
     long len = lenAdapter.handleFileLen(conn.getHeaderFields());
 
-    if (!FileUtil.checkSDMemorySpace(mEntity.getFilePath(), len)) {
+    if (!FileUtil.checkMemorySpace(mEntity.getFilePath(), len)) {
       failDownload(new TaskException(TAG,
           String.format("下载失败，内存空间不足；filePath: %s, url: %s", mEntity.getDownloadPath(),
               mEntity.getUrl())), false);

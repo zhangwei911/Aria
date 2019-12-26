@@ -29,7 +29,6 @@ import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import com.arialyy.aria.core.AriaManager;
 import com.arialyy.frame.permission.OnPermissionCallback;
 import com.arialyy.frame.permission.PermissionManager;
 import com.arialyy.frame.util.show.T;
