@@ -13,24 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.arialyy.aria.core.inf;
+package com.arialyy.aria.core.loader;
 
-import com.arialyy.aria.core.common.CompleteInfo;
-import com.arialyy.aria.core.common.AbsEntity;
-import com.arialyy.aria.exception.BaseException;
+/**
+ * 加载器部件
+ */
+public interface ILoaderComponent {
 
-public interface OnFileInfoCallback {
-  /**
-   * 处理完成
-   *
-   * @param info 一些回调的信息
-   */
-  void onComplete(String key, CompleteInfo info);
+  void accept(ILoaderVisitor visitor);
 
-  /**
-   * 请求失败
-   *
-   * @param e 错误信息
-   */
-  void onFail(AbsEntity entity, BaseException e, boolean needRetry);
 }

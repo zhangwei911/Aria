@@ -29,19 +29,25 @@ import com.arialyy.aria.util.CommonUtil;
 public abstract class AbsNormalLoaderUtil implements IUtil {
   protected String TAG = CommonUtil.getClassName(getClass());
   private IEventListener mListener;
-  private AbsLoader mLoader;
+  protected AbsLoader mLoader;
   private AbsTaskWrapper mTaskWrapper;
   private boolean isStop = false, isCancel = false;
 
   protected AbsNormalLoaderUtil(AbsTaskWrapper wrapper, IEventListener listener) {
     mTaskWrapper = wrapper;
     mListener = listener;
-    mLoader = createLoader();
+    mLoader = getLoader();
   }
 
-  public AbsLoader getLoader() {
-    return mLoader;
-  }
+  /**
+   * 获取加载器
+   */
+  public abstract AbsLoader getLoader();
+
+  /**
+   * 获取构造器
+   */
+  public abstract LoaderStructure getLoaderStructure();
 
   @Override public String getKey() {
     return mTaskWrapper.getKey();
@@ -55,7 +61,7 @@ public abstract class AbsNormalLoaderUtil implements IUtil {
    * 获取当前下载位置
    */
   @Override public long getCurrentLocation() {
-    return mLoader.getCurrentLocation();
+    return mLoader.getCurrentProgress();
   }
 
   @Override public boolean isRunning() {
@@ -105,10 +111,10 @@ public abstract class AbsNormalLoaderUtil implements IUtil {
     //} else {
     //  mDownloader.create();
     //}
-    Runnable runnable = createInfoThread();
-    if (runnable != null) {
-      new Thread(runnable).start();
-    }
+
+    getLoaderStructure();
+    new Thread(mLoader).start();
+
     onStart();
   }
 
@@ -139,14 +145,4 @@ public abstract class AbsNormalLoaderUtil implements IUtil {
   public AbsTaskWrapper getTaskWrapper() {
     return mTaskWrapper;
   }
-
-  /**
-   * 创建加载器的适配器
-   */
-  protected abstract AbsLoader createLoader();
-
-  /**
-   * 通过链接类型创建不同的获取文件信息的线程
-   */
-  protected abstract Runnable createInfoThread();
 }

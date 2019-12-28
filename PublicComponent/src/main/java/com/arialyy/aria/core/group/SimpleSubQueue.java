@@ -26,7 +26,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * 组合任务队列，该队列生命周期和{@link AbsGroupUtil}生命周期一致
+ * 组合任务队列，该队列生命周期和{@link AbsGroupLoaderUtil}生命周期一致
  */
 class SimpleSubQueue implements ISubQueue<AbsSubDLoadUtil> {
   private static final String TAG = "SimpleSubQueue";

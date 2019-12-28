@@ -35,7 +35,7 @@ import com.arialyy.aria.core.download.DownloadGroupEntity;
 import com.arialyy.aria.core.download.DownloadReceiver;
 import com.arialyy.aria.core.inf.AbsReceiver;
 import com.arialyy.aria.core.inf.IReceiver;
-import com.arialyy.aria.core.inf.IRecordHandler;
+import com.arialyy.aria.core.loader.IRecordHandler;
 import com.arialyy.aria.core.inf.ReceiverType;
 import com.arialyy.aria.core.upload.UploadEntity;
 import com.arialyy.aria.core.upload.UploadReceiver;

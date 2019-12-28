@@ -19,7 +19,7 @@ import com.arialyy.aria.core.TaskRecord;
 import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.inf.IEntity;
-import com.arialyy.aria.core.inf.IRecordHandler;
+import com.arialyy.aria.core.loader.IRecordHandler;
 import com.arialyy.aria.core.wrapper.ITaskWrapper;
 import java.io.File;
 

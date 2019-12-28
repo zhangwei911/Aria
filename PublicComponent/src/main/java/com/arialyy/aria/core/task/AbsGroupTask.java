@@ -16,7 +16,7 @@
 package com.arialyy.aria.core.task;
 
 import com.arialyy.aria.core.download.AbsGroupTaskWrapper;
-import com.arialyy.aria.core.group.AbsGroupUtil;
+import com.arialyy.aria.core.group.AbsGroupLoaderUtil;
 
 /**
  * Created by AriaL on 2017/6/29.
@@ -36,7 +36,7 @@ public abstract class AbsGroupTask<TASK_ENTITY extends AbsGroupTaskWrapper>
    */
   public void startSubTask(String url) {
     if (getUtil() != null) {
-      ((AbsGroupUtil) getUtil()).startSubTask(url);
+      ((AbsGroupLoaderUtil) getUtil()).startSubTask(url);
     }
   }
 
@@ -47,7 +47,7 @@ public abstract class AbsGroupTask<TASK_ENTITY extends AbsGroupTaskWrapper>
    */
   public void stopSubTask(String url) {
     if (getUtil() != null) {
-      ((AbsGroupUtil) getUtil()).stopSubTask(url);
+      ((AbsGroupLoaderUtil) getUtil()).stopSubTask(url);
     }
   }
 }

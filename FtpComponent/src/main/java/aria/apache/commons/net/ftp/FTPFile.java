@@ -55,7 +55,7 @@ public class FTPFile implements Serializable {
   /** A constant indicating file/directory write permission. ***/
   public static final int WRITE_PERMISSION = 1;
   /**
-   * A constant indicating file execute permission or directory listing
+   * A constant indicating file accept permission or directory listing
    * permission.
    ***/
   public static final int EXECUTE_PERMISSION = 2;

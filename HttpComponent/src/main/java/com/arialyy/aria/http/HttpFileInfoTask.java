@@ -24,7 +24,8 @@ import com.arialyy.aria.core.common.CompleteInfo;
 import com.arialyy.aria.core.common.RequestEnum;
 import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.download.DownloadEntity;
-import com.arialyy.aria.core.inf.OnFileInfoCallback;
+import com.arialyy.aria.core.loader.IInfoTask;
+import com.arialyy.aria.core.loader.ILoaderVisitor;
 import com.arialyy.aria.core.processor.IHttpFileLenAdapter;
 import com.arialyy.aria.exception.AriaIOException;
 import com.arialyy.aria.exception.BaseException;
@@ -54,19 +55,18 @@ import java.util.UUID;
 /**
  * 下载文件信息获取
  */
-public class HttpFileInfoThread implements Runnable {
+public class HttpFileInfoTask implements IInfoTask, Runnable {
   private static final String TAG = "HttpFileInfoThread";
   private DownloadEntity mEntity;
   private DTaskWrapper mTaskWrapper;
   private int mConnectTimeOut;
-  private OnFileInfoCallback onFileInfoCallback;
+  private Callback callback;
   private HttpTaskOption taskOption;
 
-  public HttpFileInfoThread(DTaskWrapper taskWrapper, OnFileInfoCallback callback) {
+  public HttpFileInfoTask(DTaskWrapper taskWrapper) {
     this.mTaskWrapper = taskWrapper;
     mEntity = taskWrapper.getEntity();
     mConnectTimeOut = AriaConfig.getInstance().getDConfig().getConnectTimeOut();
-    onFileInfoCallback = callback;
     taskOption = (HttpTaskOption) taskWrapper.getTaskOption();
   }
 
@@ -97,6 +97,10 @@ public class HttpFileInfoThread implements Runnable {
         conn.disconnect();
       }
     }
+  }
+
+  @Override public void setCallback(Callback callback) {
+    this.callback = callback;
   }
 
   private void handleConnect(HttpURLConnection conn) throws IOException {
@@ -223,9 +227,9 @@ public class HttpFileInfoThread implements Runnable {
     }
     if (end) {
       taskOption.setChunked(isChunked);
-      if (onFileInfoCallback != null) {
+      if (callback != null) {
         CompleteInfo info = new CompleteInfo(code, mTaskWrapper);
-        onFileInfoCallback.onComplete(mEntity.getUrl(), info);
+        callback.onSucceed(mEntity.getUrl(), info);
       }
       mEntity.update();
     }
@@ -291,8 +295,8 @@ public class HttpFileInfoThread implements Runnable {
   private void handleUrlReTurn(HttpURLConnection conn, String newUrl) throws IOException {
     ALog.d(TAG, "30x跳转，新url为【" + newUrl + "】");
     if (TextUtils.isEmpty(newUrl) || newUrl.equalsIgnoreCase("null")) {
-      if (onFileInfoCallback != null) {
-        onFileInfoCallback.onFail(mEntity, new TaskException(TAG, "获取重定向链接失败"), false);
+      if (callback != null) {
+        callback.onFail(mEntity, new TaskException(TAG, "获取重定向链接失败"), false);
       }
       return;
     }
@@ -336,9 +340,13 @@ public class HttpFileInfoThread implements Runnable {
   }
 
   private void failDownload(BaseException e, boolean needRetry) {
-    if (onFileInfoCallback != null) {
-      onFileInfoCallback.onFail(mEntity, e, needRetry);
+    if (callback != null) {
+      callback.onFail(mEntity, e, needRetry);
     }
+  }
+
+  @Override public void accept(ILoaderVisitor visitor) {
+    visitor.addComponent(this);
   }
 
   private static class FileLenAdapter implements IHttpFileLenAdapter {

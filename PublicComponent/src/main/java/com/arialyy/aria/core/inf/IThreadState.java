@@ -16,11 +16,14 @@
 package com.arialyy.aria.core.inf;
 
 import android.os.Handler;
+import android.os.Looper;
+import com.arialyy.aria.core.TaskRecord;
+import com.arialyy.aria.core.loader.ILoaderComponent;
 
 /**
  * 线程任务状态
  */
-public interface IThreadState extends Handler.Callback {
+public interface IThreadState extends ILoaderComponent {
   int STATE_STOP = 0x01;
   int STATE_FAIL = 0x02;
   int STATE_CANCEL = 0x03;
@@ -50,4 +53,14 @@ public interface IThreadState extends Handler.Callback {
    * @return 任务当前进度
    */
   long getCurrentProgress();
+
+  /**
+   * 设置消息循环体
+   */
+  void setLooper(TaskRecord taskRecord, Looper looper);
+
+  /**
+   * 创建handler 回调
+   */
+  Handler.Callback getHandlerCallback();
 }

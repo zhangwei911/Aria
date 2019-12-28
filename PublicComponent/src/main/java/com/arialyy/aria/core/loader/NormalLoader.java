@@ -15,20 +15,17 @@
  */
 package com.arialyy.aria.core.loader;
 
-import android.os.Handler;
-import android.os.Looper;
-import com.arialyy.aria.core.ThreadRecord;
+import com.arialyy.aria.core.common.AbsEntity;
 import com.arialyy.aria.core.common.AbsNormalEntity;
-import com.arialyy.aria.core.common.SubThreadConfig;
+import com.arialyy.aria.core.common.CompleteInfo;
 import com.arialyy.aria.core.event.EventMsgUtil;
-import com.arialyy.aria.core.inf.IRecordHandler;
 import com.arialyy.aria.core.inf.IThreadState;
-import com.arialyy.aria.core.listener.BaseDListener;
 import com.arialyy.aria.core.listener.IDLoadListener;
 import com.arialyy.aria.core.listener.IEventListener;
 import com.arialyy.aria.core.manager.ThreadTaskManager;
 import com.arialyy.aria.core.task.IThreadTask;
 import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
+import com.arialyy.aria.exception.BaseException;
 import com.arialyy.aria.util.ALog;
 import java.io.File;
 
@@ -36,21 +33,13 @@ import java.io.File;
  * 单文件
  */
 public class NormalLoader extends AbsLoader {
-  private ThreadStateManager mStateManager;
-  private Handler mStateHandler;
-  protected int mTotalThreadNum; //总线程数
   private int mStartThreadNum; //启动的线程数
-  private ILoaderAdapter mAdapter;
 
-  public NormalLoader(IEventListener listener, AbsTaskWrapper wrapper) {
-    super(listener, wrapper);
+  public NormalLoader(AbsTaskWrapper wrapper, IEventListener listener) {
+    super(wrapper, listener);
     mTempFile = new File(getEntity().getFilePath());
     EventMsgUtil.getDefault().register(this);
     setUpdateInterval(wrapper.getConfig().getUpdateInterval());
-  }
-
-  public void setAdapter(ILoaderAdapter adapter) {
-    mAdapter = adapter;
   }
 
   public AbsNormalEntity getEntity() {
@@ -61,24 +50,15 @@ public class NormalLoader extends AbsLoader {
     return getEntity().getFileSize();
   }
 
-  @Override public long getCurrentLocation() {
-    return isRunning() ? mStateManager.getCurrentProgress() : getEntity().getCurrentProgress();
-  }
-
-  @Override protected IRecordHandler getRecordHandler(AbsTaskWrapper wrapper) {
-    return mAdapter.recordHandler(wrapper);
-  }
-
   /**
-   * 设置最大下载/上传速度
+   * 设置最大下载/上传速度AbsFtpInfoThread
    *
    * @param maxSpeed 单位为：kb
    */
   protected void setMaxSpeed(int maxSpeed) {
-    for (int i = 0; i < getTaskList().size(); i++) {
-      IThreadTask task = getTaskList().valueAt(i);
-      if (task != null && mStartThreadNum > 0) {
-        task.setMaxSpeed(maxSpeed / mStartThreadNum);
+    for (IThreadTask threadTask : getTaskList()) {
+      if (threadTask != null && mStartThreadNum > 0) {
+        threadTask.setMaxSpeed(maxSpeed / mStartThreadNum);
       }
     }
   }
@@ -90,11 +70,6 @@ public class NormalLoader extends AbsLoader {
 
   @Override protected void onPostPre() {
     super.onPostPre();
-    if (mAdapter == null) {
-      throw new NullPointerException("请使用adapter设置适配器");
-    }
-    mTotalThreadNum = mRecord.threadNum;
-
     if (mListener instanceof IDLoadListener) {
       ((IDLoadListener) mListener).onPostPre(getEntity().getFileSize());
     }
@@ -114,126 +89,63 @@ public class NormalLoader extends AbsLoader {
     }
   }
 
-  @Override protected IThreadState createStateManager(Looper looper) {
-    mStateManager = new ThreadStateManager(looper, mRecord, mListener);
-    mStateHandler = new Handler(looper, mStateManager);
-    return mStateManager;
-  }
-
-  @Override protected void handleTask() {
-    if (mTaskWrapper.isSupportBP()) {
-      handleBreakpoint();
-    } else {
-      handleNoSupportBP();
-    }
-  }
-
-  /**
-   * 启动断点任务时，创建单线程任务
-   *
-   * @param record 线程记录
-   * @param startNum 启动的线程数
-   */
-  private IThreadTask createSingThreadTask(ThreadRecord record, int startNum) {
-    SubThreadConfig config = new SubThreadConfig();
-    config.url = getEntity().isRedirect() ? getEntity().getRedirectUrl() : getEntity().getUrl();
-    config.tempFile =
-        mRecord.isBlock ? new File(
-            String.format(IRecordHandler.SUB_PATH, mTempFile.getPath(), record.threadId))
-            : mTempFile;
-    config.isBlock = mRecord.isBlock;
-    config.startThreadNum = startNum;
-    config.taskWrapper = mTaskWrapper;
-    config.record = record;
-    config.stateHandler = mStateHandler;
-    return mAdapter.createThreadTask(config);
-  }
-
-  private void handleBreakpoint() {
-    long fileLength = getEntity().getFileSize();
-    long blockSize = fileLength / mTotalThreadNum;
-    long currentProgress = 0;
-
-    mRecord.fileLength = fileLength;
-    if (mTaskWrapper.isNewTask() && !mAdapter.handleNewTask(mRecord, mTotalThreadNum)) {
-      closeTimer();
-      mListener.onFail(false, null);
-      return;
-    }
-
-    for (ThreadRecord tr : mRecord.threadRecords) {
-      if (!tr.isComplete) {
-        mStartThreadNum++;
-      }
-    }
-
-    for (int i = 0; i < mTotalThreadNum; i++) {
-      long startL = i * blockSize, endL = (i + 1) * blockSize;
-      ThreadRecord tr = mRecord.threadRecords.get(i);
-
-      if (tr.isComplete) {//该线程已经完成
-        currentProgress += endL - startL;
-        ALog.d(TAG, String.format("任务【%s】线程__%s__已完成", mTaskWrapper.getKey(), i));
-        mStateHandler.obtainMessage(IThreadState.STATE_COMPLETE).sendToTarget();
-        if (mStateManager.isComplete()) {
-          mRecord.deleteData();
-          mListener.onComplete();
-          return;
-        }
-        continue;
-      }
-
-      //如果有记录，则恢复任务
-      long r = tr.startLocation;
-      //记录的位置需要在线程区间中
-      if (startL < r && r <= (i == (mTotalThreadNum - 1) ? fileLength : endL)) {
-        currentProgress += r - startL;
-      }
-      ALog.d(TAG, String.format("任务【%s】线程__%s__恢复任务", getEntity().getFileName(), i));
-
-      IThreadTask task = createSingThreadTask(tr, mStartThreadNum);
-      if (task == null) return;
-      getTaskList().put(tr.threadId, task);
-    }
-    if (currentProgress != 0 && currentProgress != getEntity().getCurrentProgress()) {
-      ALog.d(TAG, String.format("进度修正，当前进度：%s", currentProgress));
-      getEntity().setCurrentProgress(currentProgress);
-    }
-    mStateManager.updateProgress(currentProgress);
-    startThreadTask();
-  }
-
   /**
    * 启动单线程任务
    */
-  private void startThreadTask() {
+  @Override
+  public void handleTask() {
     if (isBreak()) {
       return;
     }
+    mStateManager.setLooper(mRecord, getLooper());
+    mInfoTask.run();
+  }
+
+  private void startThreadTask() {
+    getTaskList().addAll(mTTBuilder.buildThreadTask(mRecord, getLooper(), mStateManager));
+    mStartThreadNum = mTTBuilder.getCreatedThreadNum();
     if (mStateManager.getCurrentProgress() > 0) {
       mListener.onResume(mStateManager.getCurrentProgress());
     } else {
       mListener.onStart(mStateManager.getCurrentProgress());
     }
 
-    for (int i = 0; i < getTaskList().size(); i++) {
-      ThreadTaskManager.getInstance().startThread(mTaskWrapper.getKey(), getTaskList().valueAt(i));
+    for (IThreadTask threadTask : getTaskList()) {
+      ThreadTaskManager.getInstance().startThread(mTaskWrapper.getKey(), threadTask);
     }
   }
 
-  /**
-   * 处理不支持断点的任务
-   */
-  private void handleNoSupportBP() {
-    if (mListener instanceof BaseDListener) {
-      ((BaseDListener) mListener).supportBreakpoint(false);
-    }
-    mStartThreadNum = 1;
+  @Override public long getCurrentProgress() {
+    return isRunning() ? mStateManager.getCurrentProgress() : getEntity().getCurrentProgress();
+  }
 
-    IThreadTask task = createSingThreadTask(mRecord.threadRecords.get(0), 1);
-    if (task == null) return;
-    getTaskList().put(0, task);
-    ThreadTaskManager.getInstance().startThread(mTaskWrapper.getKey(), task);
-    mListener.onStart(0);
+  @Override public void addComponent(IRecordHandler recordHandler) {
+    mRecordHandler = recordHandler;
+    mRecord = mRecordHandler.getRecord();
+    if (recordHandler.checkTaskCompleted()) {
+      mRecord.deleteData();
+      mListener.onComplete();
+    }
+  }
+
+  @Override public void addComponent(IInfoTask infoTask) {
+    mInfoTask = infoTask;
+    infoTask.setCallback(new IInfoTask.Callback() {
+      @Override public void onSucceed(String key, CompleteInfo info) {
+        startThreadTask();
+      }
+
+      @Override public void onFail(AbsEntity entity, BaseException e, boolean needRetry) {
+        mListener.onFail(needRetry, e);
+      }
+    });
+  }
+
+  @Override public void addComponent(IThreadState threadState) {
+    mStateManager = threadState;
+  }
+
+  @Override public void addComponent(IThreadTaskBuilder builder) {
+    mTTBuilder = builder;
   }
 }

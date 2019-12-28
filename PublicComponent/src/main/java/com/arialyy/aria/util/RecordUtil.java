@@ -23,7 +23,7 @@ import com.arialyy.aria.core.common.AbsNormalEntity;
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.download.DownloadGroupEntity;
 import com.arialyy.aria.core.download.M3U8Entity;
-import com.arialyy.aria.core.inf.IRecordHandler;
+import com.arialyy.aria.core.loader.IRecordHandler;
 import com.arialyy.aria.core.upload.UploadEntity;
 import com.arialyy.aria.core.wrapper.ITaskWrapper;
 import com.arialyy.aria.core.wrapper.RecordWrapper;

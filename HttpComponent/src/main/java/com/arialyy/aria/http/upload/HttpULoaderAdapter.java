@@ -18,13 +18,13 @@ package com.arialyy.aria.http.upload;
 import com.arialyy.aria.core.TaskRecord;
 import com.arialyy.aria.core.common.RecordHandler;
 import com.arialyy.aria.core.common.SubThreadConfig;
-import com.arialyy.aria.core.inf.IRecordHandler;
+import com.arialyy.aria.core.loader.IRecordHandler;
 import com.arialyy.aria.core.task.AbsNormalLoaderAdapter;
 import com.arialyy.aria.core.task.IThreadTask;
 import com.arialyy.aria.core.task.ThreadTask;
 import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
 import com.arialyy.aria.core.wrapper.ITaskWrapper;
-import com.arialyy.aria.http.HttpRecordAdapter;
+import com.arialyy.aria.http.HttpRecordHandler;
 
 /**
  * @Author lyy
@@ -48,7 +48,7 @@ final class HttpULoaderAdapter extends AbsNormalLoaderAdapter {
 
   @Override public IRecordHandler recordHandler(AbsTaskWrapper wrapper) {
     RecordHandler recordHandler = new RecordHandler(wrapper);
-    HttpRecordAdapter adapter = new HttpRecordAdapter(wrapper);
+    HttpRecordHandler adapter = new HttpRecordHandler(wrapper);
     recordHandler.setAdapter(adapter);
     return recordHandler;
   }

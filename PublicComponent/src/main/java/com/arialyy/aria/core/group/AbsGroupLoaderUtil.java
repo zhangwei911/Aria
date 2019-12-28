@@ -37,7 +37,7 @@ import java.util.concurrent.TimeUnit;
  * Created by AriaL on 2017/6/30.
  * 任务组核心逻辑
  */
-public abstract class AbsGroupUtil implements IUtil, Runnable {
+public abstract class AbsGroupLoaderUtil implements IUtil, Runnable {
   protected final String TAG = CommonUtil.getClassName(getClass());
 
   private long mCurrentLocation = 0;
@@ -52,7 +52,7 @@ public abstract class AbsGroupUtil implements IUtil, Runnable {
   private DGTaskWrapper mGTWrapper;
   private GroupRunState mState;
 
-  protected AbsGroupUtil(AbsTaskWrapper groupWrapper, IEventListener listener) {
+  protected AbsGroupLoaderUtil(AbsTaskWrapper groupWrapper, IEventListener listener) {
     mListener = (IDGroupListener) listener;
     mGTWrapper = (DGTaskWrapper) groupWrapper;
     mUpdateInterval = Configuration.getInstance().downloadCfg.getUpdateInterval();

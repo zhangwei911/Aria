@@ -17,11 +17,11 @@ package com.arialyy.aria.m3u8;
 
 import com.arialyy.aria.core.TaskRecord;
 import com.arialyy.aria.core.ThreadRecord;
-import com.arialyy.aria.core.common.AbsRecordHandlerAdapter;
+import com.arialyy.aria.core.common.RecordHandler;
 import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.download.M3U8Entity;
-import com.arialyy.aria.core.inf.IRecordHandler;
+import com.arialyy.aria.core.loader.IRecordHandler;
 import com.arialyy.aria.core.wrapper.ITaskWrapper;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.FileUtil;
@@ -33,10 +33,10 @@ import java.util.ArrayList;
  * @Author lyy
  * @Date 2019-09-24
  */
-public class M3U8RecordAdapter extends AbsRecordHandlerAdapter {
+public class M3U8RecordHandler extends RecordHandler {
   private M3U8TaskOption mOption;
 
-  M3U8RecordAdapter(DTaskWrapper wrapper) {
+  M3U8RecordHandler(DTaskWrapper wrapper) {
     super(wrapper);
     mOption = (M3U8TaskOption) wrapper.getM3u8Option();
   }

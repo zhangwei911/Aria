@@ -95,7 +95,7 @@ public class NetwareFTPEntryParser extends ConfigurableFTPFileEntryParserImpl {
    * Netware file permissions are in the following format:  RWCEAFMS, and are explained as follows:
    * <ul>
    * <li><b>S</b> - Supervisor; All rights.
-   * <li><b>R</b> - Read; Right to open and read or execute.
+   * <li><b>R</b> - Read; Right to open and read or accept.
    * <li><b>W</b> - Write; Right to open and modify.
    * <li><b>C</b> - Create; Right to create; when assigned to a file, allows a deleted file to be
    * recovered.

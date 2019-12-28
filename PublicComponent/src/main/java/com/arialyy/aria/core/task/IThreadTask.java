@@ -87,4 +87,10 @@ public interface IThreadTask extends Callable<IThreadTask> {
    * @return {@code true} 分块分大小正常，{@code false} 分块大小错误
    */
   boolean checkBlock();
+
+  /**
+   * 获取线程id
+   * @return
+   */
+  int getThreadId();
 }

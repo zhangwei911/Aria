@@ -15,33 +15,24 @@
  */
 package com.arialyy.aria.core.loader;
 
-public class LoaderIntercept implements ILoaderInterceptor, ILoader {
+import android.os.Looper;
+import com.arialyy.aria.core.TaskRecord;
+import com.arialyy.aria.core.inf.IThreadState;
+import com.arialyy.aria.core.task.IThreadTask;
+import java.util.List;
 
+/**
+ * 线程任务构造器
+ */
+public interface IThreadTaskBuilder extends ILoaderComponent {
 
+  /**
+   * 构造线程任务
+   */
+  List<IThreadTask> buildThreadTask(TaskRecord record, Looper looper, IThreadState stateManager);
 
-  @Override public ILoader intercept(Chain chain) {
-
-
-    return this;
-  }
-
-  @Override public void start() {
-
-  }
-
-  @Override public void stop() {
-
-  }
-
-  @Override public void isBreak() {
-
-  }
-
-  @Override public String getKey() {
-    return null;
-  }
-
-  @Override public long getCurrentProgress() {
-    return 0;
-  }
+  /**
+   * 获取创建的线程任务数，需要先调用{@link #buildThreadTask(TaskRecord, Looper, IThreadState)}方法才能获取创建的线程任务数
+   */
+  int getCreatedThreadNum();
 }

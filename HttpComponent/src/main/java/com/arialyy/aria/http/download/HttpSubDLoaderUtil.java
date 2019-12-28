@@ -25,7 +25,7 @@ import com.arialyy.aria.core.inf.OnFileInfoCallback;
 import com.arialyy.aria.core.listener.ISchedulers;
 import com.arialyy.aria.core.loader.NormalLoader;
 import com.arialyy.aria.exception.BaseException;
-import com.arialyy.aria.http.HttpFileInfoThread;
+import com.arialyy.aria.http.HttpFileInfoTask;
 
 /**
  * @Author lyy
@@ -49,7 +49,7 @@ class HttpSubDLoaderUtil extends AbsSubDLoadUtil {
 
   @Override public void start() {
     if (isNeedGetInfo()) {
-      new Thread(new HttpFileInfoThread(getWrapper(), new OnFileInfoCallback() {
+      new Thread(new HttpFileInfoTask(getWrapper(), new OnFileInfoCallback() {
 
         @Override public void onComplete(String url, CompleteInfo info) {
           getDownloader().start();

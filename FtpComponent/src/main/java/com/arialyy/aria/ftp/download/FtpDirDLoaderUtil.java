@@ -21,7 +21,7 @@ import com.arialyy.aria.core.FtpUrlEntity;
 import com.arialyy.aria.core.common.AbsEntity;
 import com.arialyy.aria.core.common.CompleteInfo;
 import com.arialyy.aria.core.download.DTaskWrapper;
-import com.arialyy.aria.core.group.AbsGroupUtil;
+import com.arialyy.aria.core.group.AbsGroupLoaderUtil;
 import com.arialyy.aria.core.group.AbsSubDLoadUtil;
 import com.arialyy.aria.core.inf.IEntity;
 import com.arialyy.aria.core.inf.OnFileInfoCallback;
@@ -37,7 +37,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * Created by Aria.Lao on 2017/7/27.
  * ftp文件夹下载工具
  */
-public class FtpDirDLoaderUtil extends AbsGroupUtil {
+public class FtpDirDLoaderUtil extends AbsGroupLoaderUtil {
   private ReentrantLock LOCK = new ReentrantLock();
   private Condition condition = LOCK.newCondition();
 

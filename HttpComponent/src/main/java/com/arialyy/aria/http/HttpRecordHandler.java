@@ -13,15 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.arialyy.aria.ftp;
+package com.arialyy.aria.http;
 
 import com.arialyy.aria.core.TaskRecord;
 import com.arialyy.aria.core.ThreadRecord;
-import com.arialyy.aria.core.common.AbsRecordHandlerAdapter;
+import com.arialyy.aria.core.common.RecordHandler;
 import com.arialyy.aria.core.common.RecordHelper;
 import com.arialyy.aria.core.config.Configuration;
 import com.arialyy.aria.core.download.DownloadEntity;
-import com.arialyy.aria.core.inf.IRecordHandler;
+import com.arialyy.aria.core.loader.IRecordHandler;
 import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
 import com.arialyy.aria.core.wrapper.ITaskWrapper;
 import com.arialyy.aria.util.RecordUtil;
@@ -29,12 +29,18 @@ import java.util.ArrayList;
 
 /**
  * @Author lyy
- * @Date 2019-09-19
+ * @Date 2019-09-23
  */
-public class FtpRecordAdapter extends AbsRecordHandlerAdapter {
-
-  public FtpRecordAdapter(AbsTaskWrapper wrapper) {
+public class HttpRecordHandler extends RecordHandler {
+  public HttpRecordHandler(AbsTaskWrapper wrapper) {
     super(wrapper);
+  }
+
+  @Override public void onPre() {
+    super.onPre();
+    //if (getWrapper().getRequestType() == ITaskWrapper.U_HTTP) {
+    //  RecordUtil.delTaskRecord(getEntity().getFilePath(), IRecordHandler.TYPE_UPLOAD);
+    //}
   }
 
   @Override public void handlerTaskRecord(TaskRecord record) {
@@ -45,7 +51,9 @@ public class FtpRecordAdapter extends AbsRecordHandlerAdapter {
       } else {
         helper.handleMultiRecord();
       }
-    } else if (record.threadNum == 1) {
+    } else if (!getWrapper().isSupportBP()) {
+      helper.handleNoSupportBPRecord();
+    } else {
       helper.handleSingleThreadRecord();
     }
   }
@@ -58,7 +66,8 @@ public class FtpRecordAdapter extends AbsRecordHandlerAdapter {
     tr.threadId = threadId;
     tr.startLocation = startL;
     tr.isComplete = false;
-    tr.threadType = getWrapper().getEntity().getTaskType();
+
+    tr.threadType = getEntity().getTaskType();
     //最后一个线程的结束位置即为文件的总长度
     if (threadId == (record.threadNum - 1)) {
       endL = getEntity().getFileSize();
@@ -76,12 +85,13 @@ public class FtpRecordAdapter extends AbsRecordHandlerAdapter {
     record.threadNum = threadNum;
 
     int requestType = getWrapper().getRequestType();
-    if (requestType == ITaskWrapper.D_FTP || requestType == ITaskWrapper.D_FTP_DIR) {
+    if (requestType == ITaskWrapper.D_FTP || requestType == ITaskWrapper.D_FTP_DIR
+        || requestType == ITaskWrapper.D_HTTP || requestType == ITaskWrapper.DG_HTTP) {
       record.isBlock = Configuration.getInstance().downloadCfg.isUseBlock();
     } else {
       record.isBlock = false;
     }
-    record.taskType = getWrapper().getEntity().getTaskType();
+    record.taskType = getEntity().getTaskType();
     record.isGroupRecord = getEntity().isGroupChild();
     if (record.isGroupRecord) {
       if (getEntity() instanceof DownloadEntity) {
@@ -93,16 +103,17 @@ public class FtpRecordAdapter extends AbsRecordHandlerAdapter {
   }
 
   @Override public int initTaskThreadNum() {
-    int requestType = getWrapper().getRequestType();
-    if (requestType == ITaskWrapper.D_FTP || requestType == ITaskWrapper.D_FTP_DIR) {
-      int threadNum = Configuration.getInstance().downloadCfg.getThreadNum();
-      return getEntity().getFileSize() <= IRecordHandler.SUB_LEN
-          || getEntity().isGroupChild()
-          || threadNum == 1
-          ? 1
-          : threadNum;
-    } else {
+    int requestTpe = getWrapper().getRequestType();
+    if (requestTpe == ITaskWrapper.U_HTTP
+        || (requestTpe == ITaskWrapper.D_HTTP && (!getWrapper().isSupportBP())
+        || ((HttpTaskOption) getWrapper().getTaskOption()).isChunked())) {
       return 1;
     }
+    int threadNum = Configuration.getInstance().downloadCfg.getThreadNum();
+    return getEntity().getFileSize() <= IRecordHandler.SUB_LEN
+        || getEntity().isGroupChild()
+        || threadNum == 1
+        ? 1
+        : threadNum;
   }
 }

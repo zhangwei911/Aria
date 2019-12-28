@@ -15,27 +15,31 @@
  */
 package com.arialyy.aria.core.loader;
 
-import com.arialyy.aria.core.TaskRecord;
-import com.arialyy.aria.core.listener.IEventListener;
-import com.arialyy.aria.core.wrapper.ITaskWrapper;
+import com.arialyy.aria.core.inf.IThreadState;
+import java.util.ArrayList;
+import java.util.List;
 
-/**
- * 拦截器
- */
-public interface ILoaderInterceptor {
+public class LoaderStructure {
+  private List<ILoaderComponent> parts = new ArrayList<>();
 
-  ILoader intercept(Chain chain);
+  public void accept(ILoaderVisitor visitor) {
 
-  interface Chain {
+    for (ILoaderComponent part : parts) {
+      part.accept(visitor);
+    }
+  }
 
-    void updateRecord(TaskRecord record);
-
-    TaskRecord getRecord();
-
-    IEventListener getListener();
-
-    ITaskWrapper getWrapper();
-
-    ILoader proceed();
+  /**
+   * 将组件加入到集合，必须添加以下集合：
+   * 1 {@link IRecordHandler}
+   * 2 {@link IInfoTask}
+   * 3 {@link IThreadState}
+   * 4 {@link IThreadTaskBuilder}
+   *
+   * @param component 待添加的组件
+   */
+  public LoaderStructure addComponent(ILoaderComponent component) {
+    parts.add(component);
+    return this;
   }
 }

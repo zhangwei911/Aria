@@ -16,9 +16,7 @@
 package com.arialyy.aria.core.loader;
 
 import android.os.Looper;
-import android.util.SparseArray;
 import com.arialyy.aria.core.TaskRecord;
-import com.arialyy.aria.core.inf.IRecordHandler;
 import com.arialyy.aria.core.inf.IThreadState;
 import com.arialyy.aria.core.listener.IEventListener;
 import com.arialyy.aria.core.manager.ThreadTaskManager;
@@ -27,20 +25,27 @@ import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 /**
  * Created by AriaL on 2017/7/1.
- * 控制线程任务状态，如：开始，停止，取消，重试
+ * 任务执行器，用于处理任务的开始，停止
+ * 流程：
+ * 1、获取任务记录
+ * 2、创建任务状态管理器，用于管理任务的状态
+ * 3、创建文件信息获取器，获取文件信息，根据文件信息执行任务
+ * 4、创建线程任务执行下载、上传操作
  */
-public abstract class AbsLoader implements Runnable {
+public abstract class AbsLoader implements ILoaderVisitor, ILoader {
   protected final String TAG;
   protected IEventListener mListener;
   protected AbsTaskWrapper mTaskWrapper;
   protected File mTempFile;
 
-  private SparseArray<IThreadTask> mTask = new SparseArray<>();
+  private List<IThreadTask> mTask = new ArrayList<>();
   private ScheduledThreadPoolExecutor mTimer;
 
   /**
@@ -48,20 +53,23 @@ public abstract class AbsLoader implements Runnable {
    */
   private long mUpdateInterval = 1000;
   protected TaskRecord mRecord;
-  private IThreadState mStateManager;
   private boolean isCancel = false, isStop = false;
   private boolean isRuning = false;
+  private Looper mLooper;
 
-  protected AbsLoader(IEventListener listener, AbsTaskWrapper wrapper) {
+  protected IRecordHandler mRecordHandler;
+  protected IThreadState mStateManager;
+  protected IInfoTask mInfoTask;
+  protected IThreadTaskBuilder mTTBuilder;
+
+  protected AbsLoader(AbsTaskWrapper wrapper, IEventListener listener) {
     mListener = listener;
     mTaskWrapper = wrapper;
     TAG = CommonUtil.getClassName(getClass());
   }
 
-  protected abstract IThreadState createStateManager(Looper looper);
-
   /**
-   * 处理任务
+   * 启动线程任务
    */
   protected abstract void handleTask();
 
@@ -69,11 +77,6 @@ public abstract class AbsLoader implements Runnable {
    * 获取文件长度
    */
   public abstract long getFileSize();
-
-  /**
-   * 获取当前任务位置
-   */
-  public abstract long getCurrentLocation();
 
   public IThreadState getStateManager() {
     return mStateManager;
@@ -83,7 +86,7 @@ public abstract class AbsLoader implements Runnable {
     return mTaskWrapper.getKey();
   }
 
-  public SparseArray<IThreadTask> getTaskList() {
+  public List<IThreadTask> getTaskList() {
     return mTask;
   }
 
@@ -94,16 +97,20 @@ public abstract class AbsLoader implements Runnable {
     closeTimer();
     if (mTask != null && mTask.size() != 0) {
       for (int i = 0; i < mTask.size(); i++) {
-        mTask.valueAt(i).breakTask();
+        mTask.get(i).breakTask();
       }
       mTask.clear();
     }
   }
 
-  /**
-   * 任务记录工具
-   */
-  protected abstract IRecordHandler getRecordHandler(AbsTaskWrapper wrapper);
+  @Override public void run() {
+    checkComponent();
+    if (isRunning()) {
+      ALog.d(TAG, String.format("任务【%s】正在执行，启动任务失败", mTaskWrapper.getKey()));
+      return;
+    }
+    startFlow();
+  }
 
   /**
    * 开始流程
@@ -114,21 +121,18 @@ public abstract class AbsLoader implements Runnable {
     }
     isRuning = true;
     resetState();
-    mRecord = getRecordHandler(mTaskWrapper).getRecord();
-    Looper.prepare();
-    Looper looper = Looper.myLooper();
-    mStateManager = createStateManager(looper);
     onPostPre();
     handleTask();
     startTimer();
     Looper.loop();
   }
 
-  @Override public void run() {
-    if (isRunning()) {
-      return;
+  @Override public Looper getLooper() {
+    if (mLooper == null) {
+      Looper.prepare();
+      mLooper = Looper.myLooper();
     }
-    startFlow();
+    return mLooper;
   }
 
   /**
@@ -212,7 +216,7 @@ public abstract class AbsLoader implements Runnable {
     isCancel = true;
     onCancel();
     for (int i = 0; i < mTask.size(); i++) {
-      IThreadTask task = mTask.valueAt(i);
+      IThreadTask task = mTask.get(i);
       if (task != null && !task.isThreadComplete()) {
         task.cancel();
       }
@@ -245,7 +249,7 @@ public abstract class AbsLoader implements Runnable {
     isStop = true;
     onStop();
     for (int i = 0; i < mTask.size(); i++) {
-      IThreadTask task = mTask.valueAt(i);
+      IThreadTask task = mTask.get(i);
       if (task != null && !task.isThreadComplete()) {
         task.stop();
       }
@@ -253,7 +257,7 @@ public abstract class AbsLoader implements Runnable {
     ThreadTaskManager.getInstance().removeTaskThread(mTaskWrapper.getKey());
     onPostStop();
     onDestroy();
-    mListener.onStop(getCurrentLocation());
+    mListener.onStop(getCurrentProgress());
   }
 
   /**
@@ -268,17 +272,6 @@ public abstract class AbsLoader implements Runnable {
    */
   protected void onPostStop() {
 
-  }
-
-  /**
-   * 直接调用的时候会自动启动线程执行
-   */
-  public synchronized void start() {
-    if (isRunning()) {
-      ALog.d(TAG, String.format("任务【%s】正在执行，启动任务失败", mTaskWrapper.getKey()));
-      return;
-    }
-    new Thread(this).start();
   }
 
   /**
@@ -302,5 +295,23 @@ public abstract class AbsLoader implements Runnable {
       return true;
     }
     return false;
+  }
+
+  /**
+   * 检查组件:  {@link #mRecordHandler}、{@link #mInfoTask}、{@link #mStateManager}、{@link #mTTBuilder}
+   */
+  private void checkComponent() {
+    if (mRecordHandler == null) {
+      throw new NullPointerException("任务记录组件为空");
+    }
+    if (mInfoTask == null) {
+      throw new NullPointerException(("文件信息组件为空"));
+    }
+    if (mStateManager == null) {
+      throw new NullPointerException("任务状态管理组件为空");
+    }
+    if (mTTBuilder == null) {
+      throw new NullPointerException("线程任务组件为空");
+    }
   }
 }

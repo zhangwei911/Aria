@@ -18,13 +18,13 @@ package com.arialyy.aria.ftp.download;
 import com.arialyy.aria.core.TaskRecord;
 import com.arialyy.aria.core.common.RecordHandler;
 import com.arialyy.aria.core.common.SubThreadConfig;
-import com.arialyy.aria.core.inf.IRecordHandler;
+import com.arialyy.aria.core.loader.IRecordHandler;
 import com.arialyy.aria.core.task.AbsNormalLoaderAdapter;
 import com.arialyy.aria.core.task.IThreadTask;
 import com.arialyy.aria.core.task.ThreadTask;
 import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
 import com.arialyy.aria.core.wrapper.ITaskWrapper;
-import com.arialyy.aria.ftp.FtpRecordAdapter;
+import com.arialyy.aria.ftp.FtpRecordHandler;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.FileUtil;
 import java.io.File;
@@ -66,7 +66,7 @@ public class FtpDLoaderAdapter extends AbsNormalLoaderAdapter {
   }
 
   @Override public IRecordHandler recordHandler(AbsTaskWrapper wrapper) {
-    FtpRecordAdapter adapter = new FtpRecordAdapter(wrapper);
+    FtpRecordHandler adapter = new FtpRecordHandler(wrapper);
     RecordHandler handler = new RecordHandler(wrapper);
     handler.setAdapter(adapter);
     return handler;

@@ -18,8 +18,8 @@ package com.arialyy.aria.core.common;
 import com.arialyy.aria.core.TaskRecord;
 import com.arialyy.aria.core.ThreadRecord;
 import com.arialyy.aria.core.download.DownloadEntity;
-import com.arialyy.aria.core.inf.IRecordHandler;
-import com.arialyy.aria.core.inf.IRecordHandlerAdapter;
+import com.arialyy.aria.core.loader.ILoaderVisitor;
+import com.arialyy.aria.core.loader.IRecordHandler;
 import com.arialyy.aria.core.upload.UploadEntity;
 import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
 import com.arialyy.aria.core.wrapper.ITaskWrapper;
@@ -38,22 +38,29 @@ import java.util.Set;
 /**
  * 处理任务记录，分配线程区间
  */
-public class RecordHandler implements IRecordHandler {
-  private final String TAG = "RecordHandler";
+public abstract class RecordHandler implements IRecordHandler {
+  protected final String TAG = CommonUtil.getClassName(this);
 
   @Deprecated private File mConfigFile;
   private TaskRecord mTaskRecord;
   private AbsTaskWrapper mTaskWrapper;
   private AbsNormalEntity mEntity;
-  private IRecordHandlerAdapter mAdapter;
 
   public RecordHandler(AbsTaskWrapper wrapper) {
     mTaskWrapper = wrapper;
     mEntity = (AbsNormalEntity) mTaskWrapper.getEntity();
   }
 
-  public void setAdapter(IRecordHandlerAdapter mAdapter) {
-    this.mAdapter = mAdapter;
+  public AbsTaskWrapper getWrapper() {
+    return mTaskWrapper;
+  }
+
+  public AbsNormalEntity getEntity() {
+    return mEntity;
+  }
+
+  @Override public void onPre() {
+
   }
 
   /**
@@ -70,10 +77,10 @@ public class RecordHandler implements IRecordHandler {
     if (mConfigFile.exists()) {
       convertDb();
     } else {
-      mAdapter.onPre();
+      onPre();
       mTaskRecord = DbDataHelper.getTaskRecord(getFilePath(), mEntity.getTaskType());
       if (mTaskRecord == null) {
-        if (!new File(getFilePath()).exists()){
+        if (!new File(getFilePath()).exists()) {
           FileUtil.createFile(getFilePath());
         }
         initRecord(true);
@@ -83,14 +90,14 @@ public class RecordHandler implements IRecordHandler {
           ALog.w(TAG, String.format("文件【%s】不存在，重新分配线程区间", mTaskRecord.filePath));
           DbEntity.deleteData(ThreadRecord.class, "taskKey=?", mTaskRecord.filePath);
           mTaskRecord.threadRecords.clear();
-          mTaskRecord.threadNum = mAdapter.initTaskThreadNum();
+          mTaskRecord.threadNum = initTaskThreadNum();
           initRecord(false);
         } else if (mTaskRecord.threadRecords == null || mTaskRecord.threadRecords.isEmpty()) {
-          mTaskRecord.threadNum = mAdapter.initTaskThreadNum();
+          mTaskRecord.threadNum = initTaskThreadNum();
           initRecord(false);
         }
       }
-      mAdapter.handlerTaskRecord(mTaskRecord);
+      handlerTaskRecord(mTaskRecord);
     }
     saveRecord();
     return mTaskRecord;
@@ -127,7 +134,7 @@ public class RecordHandler implements IRecordHandler {
         return;
       }
       mTaskWrapper.setNewTask(false);
-      mTaskRecord = mAdapter.createTaskRecord(threadNum);
+      mTaskRecord = createTaskRecord(threadNum);
       mTaskRecord.isBlock = false;
       File tempFile = new File(getFilePath());
       for (int i = 0; i < threadNum; i++) {
@@ -158,7 +165,7 @@ public class RecordHandler implements IRecordHandler {
    */
   private void initRecord(boolean newRecord) {
     if (newRecord) {
-      mTaskRecord = mAdapter.createTaskRecord(mAdapter.initTaskThreadNum());
+      mTaskRecord = createTaskRecord(initTaskThreadNum());
     }
     mTaskWrapper.setNewTask(true);
     int requestType = mTaskWrapper.getRequestType();
@@ -169,7 +176,7 @@ public class RecordHandler implements IRecordHandler {
     // 处理线程区间记录
     for (int i = 0; i < mTaskRecord.threadNum; i++) {
       long startL = i * blockSize, endL = (i + 1) * blockSize;
-      ThreadRecord tr = mAdapter.createThreadRecord(mTaskRecord, i, startL, endL);
+      ThreadRecord tr = createThreadRecord(mTaskRecord, i, startL, endL);
       mTaskRecord.threadRecords.add(tr);
     }
   }
@@ -197,5 +204,24 @@ public class RecordHandler implements IRecordHandler {
     } else {
       return ((UploadEntity) mTaskWrapper.getEntity()).getFilePath();
     }
+  }
+
+  @Override public void accept(ILoaderVisitor visitor) {
+    visitor.addComponent(this);
+  }
+
+  @Override public boolean checkTaskCompleted() {
+    if (mTaskRecord == null
+        || mTaskRecord.threadRecords == null
+        || mTaskRecord.threadRecords.isEmpty()) {
+      return false;
+    }
+    int completeNum = 0;
+    for (ThreadRecord tr : mTaskRecord.threadRecords) {
+      if (tr.isComplete) {
+        completeNum++;
+      }
+    }
+    return completeNum != 0 && completeNum == mTaskRecord.threadNum;
   }
 }

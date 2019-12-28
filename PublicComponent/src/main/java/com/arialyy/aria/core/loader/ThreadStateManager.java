@@ -16,10 +16,10 @@
 package com.arialyy.aria.core.loader;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import com.arialyy.aria.core.TaskRecord;
-import com.arialyy.aria.core.inf.IRecordHandler;
 import com.arialyy.aria.core.inf.IThreadState;
 import com.arialyy.aria.core.listener.IEventListener;
 import com.arialyy.aria.exception.BaseException;
@@ -49,76 +49,90 @@ public class ThreadStateManager implements IThreadState {
   private Looper mLooper;
 
   /**
-   * @param taskRecord 任务记录
    * @param listener 任务事件
    */
-  ThreadStateManager(Looper looper, TaskRecord taskRecord, IEventListener listener) {
-    mLooper = looper;
-    mTaskRecord = taskRecord;
-    mThreadNum = mTaskRecord.threadNum;
+  public ThreadStateManager(IEventListener listener) {
     mListener = listener;
   }
+
+  @Override public void setLooper(TaskRecord taskRecord, Looper looper) {
+    mTaskRecord = taskRecord;
+    mThreadNum = mTaskRecord.threadNum;
+    mLooper = looper;
+  }
+
+  private void checkLooper(){
+    if (mTaskRecord == null){
+      throw new NullPointerException("任务记录为空");
+    }
+    if (mLooper == null){
+      throw new NullPointerException("Looper为空");
+    }
+  }
+
+  private Handler.Callback callback = new Handler.Callback() {
+    @Override public boolean handleMessage(Message msg) {
+      checkLooper();
+      switch (msg.what) {
+        case STATE_STOP:
+          mStopNum++;
+          if (isStop()) {
+            quitLooper();
+          }
+          break;
+        case STATE_CANCEL:
+          mCancelNum++;
+          if (isCancel()) {
+            quitLooper();
+          }
+          break;
+        case STATE_FAIL:
+          mFailNum++;
+          if (isFail()) {
+            Bundle b = msg.getData();
+            mListener.onFail(b.getBoolean(KEY_RETRY, false),
+                (BaseException) b.getSerializable(KEY_ERROR_INFO));
+            quitLooper();
+          }
+          break;
+        case STATE_COMPLETE:
+          mCompleteNum++;
+          if (isComplete()) {
+            ALog.d(TAG, "isComplete, completeNum = " + mCompleteNum);
+            if (mTaskRecord.isBlock) {
+              if (mergeFile()) {
+                mListener.onComplete();
+              } else {
+                mListener.onFail(false, null);
+              }
+            } else {
+              mListener.onComplete();
+            }
+            quitLooper();
+          }
+          break;
+        case STATE_RUNNING:
+          if (msg.obj instanceof Long) {
+            mProgress += (long) msg.obj;
+          }
+          break;
+        case STATE_UPDATE_PROGRESS:
+          if (msg.obj == null) {
+            mProgress = updateBlockProgress();
+          } else if (msg.obj instanceof Long) {
+            mProgress = (long) msg.obj;
+          }
+          break;
+      }
+      return false;
+    }
+  };
 
   /**
    * 不要使用handle更新启动线程的进度，因为有延迟
    */
   void updateProgress(long curProgress) {
     mProgress = curProgress;
-  }
-
-  @Override public boolean handleMessage(Message msg) {
-    switch (msg.what) {
-      case STATE_STOP:
-        mStopNum++;
-        if (isStop()) {
-          quitLooper();
-        }
-        break;
-      case STATE_CANCEL:
-        mCancelNum++;
-        if (isCancel()) {
-          quitLooper();
-        }
-        break;
-      case STATE_FAIL:
-        mFailNum++;
-        if (isFail()) {
-          Bundle b = msg.getData();
-          mListener.onFail(b.getBoolean(KEY_RETRY, false),
-              (BaseException) b.getSerializable(KEY_ERROR_INFO));
-          quitLooper();
-        }
-        break;
-      case STATE_COMPLETE:
-        mCompleteNum++;
-        if (isComplete()) {
-          ALog.d(TAG, "isComplete, completeNum = " + mCompleteNum);
-          if (mTaskRecord.isBlock) {
-            if (mergeFile()) {
-              mListener.onComplete();
-            } else {
-              mListener.onFail(false, null);
-            }
-          } else {
-            mListener.onComplete();
-          }
-          quitLooper();
-        }
-        break;
-      case STATE_RUNNING:
-        if (msg.obj instanceof Long) {
-          mProgress += (long) msg.obj;
-        }
-        break;
-      case STATE_UPDATE_PROGRESS:
-        if (msg.obj == null) {
-          mProgress = updateBlockProgress();
-        } else if (msg.obj instanceof Long) {
-          mProgress = (long) msg.obj;
-        }
-        break;
-    }
-    return false;
   }
 
   /**
@@ -136,6 +150,10 @@ public class ThreadStateManager implements IThreadState {
   @Override
   public long getCurrentProgress() {
     return mProgress;
+  }
+
+  @Override public Handler.Callback getHandlerCallback() {
+    return callback;
   }
 
   /**
@@ -225,5 +243,9 @@ public class ThreadStateManager implements IThreadState {
       ALog.e(TAG, "合并失败");
       return false;
     }
+  }
+
+  @Override public void accept(ILoaderVisitor visitor) {
+    visitor.addComponent(this);
   }
 }

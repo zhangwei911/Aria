@@ -30,7 +30,7 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * 组合任务子任务调度器，用于调度任务的开始、停止、失败、完成等情况
- * 该调度器生命周期和{@link AbsGroupUtil}生命周期一致
+ * 该调度器生命周期和{@link AbsGroupLoaderUtil}生命周期一致
  */
 class SimpleSchedulers implements ISchedulers {
   private static final String TAG = "SimpleSchedulers";

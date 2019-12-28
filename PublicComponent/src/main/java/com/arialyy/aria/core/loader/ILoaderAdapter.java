@@ -16,7 +16,6 @@
 package com.arialyy.aria.core.loader;
 
 import com.arialyy.aria.core.TaskRecord;
-import com.arialyy.aria.core.inf.IRecordHandler;
 import com.arialyy.aria.core.task.IThreadTask;
 import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
 import com.arialyy.aria.core.common.SubThreadConfig;

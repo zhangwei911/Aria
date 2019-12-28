@@ -164,7 +164,7 @@ public class VMSFTPEntryParser extends ConfigurableFTPFileEntryParserImpl {
 
       //Set file permission.
       //VMS has (SYSTEM,OWNER,GROUP,WORLD) users that can contain
-      //R (read) W (write) E (execute) D (delete)
+      //R (read) W (write) E (accept) D (delete)
 
       //iterate for OWNER GROUP WORLD permissions
       for (int access = 0; access < 3; access++) {

@@ -15,24 +15,30 @@
  */
 package com.arialyy.aria.core.loader;
 
-import android.os.Looper;
+import com.arialyy.aria.core.inf.IThreadState;
 
-public interface ILoader extends Runnable{
-
-  //void start();
-
-  void stop();
+/**
+ * 加载器访问者
+ */
+public interface ILoaderVisitor {
 
   /**
-   * 任务是否被中断（停止，取消）
-   *
-   * @return true 任务中断，false 任务没有中断
+   * 处理任务记录
    */
-  boolean isBreak();
+  void addComponent(IRecordHandler recordHandler);
 
-  String getKey();
+  /**
+   * 处理任务的文件信息
+   */
+  void addComponent(IInfoTask infoTask);
 
-  long getCurrentProgress();
+  /**
+   * 线程状态
+   */
+  void addComponent(IThreadState threadState);
 
-  Looper getLooper();
+  /**
+   * 构造线程任务
+   */
+  void addComponent(IThreadTaskBuilder builder);
 }

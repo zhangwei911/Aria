@@ -13,35 +13,40 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.arialyy.aria.core.inf;
+package com.arialyy.aria.core.loader;
 
-import com.arialyy.aria.core.TaskRecord;
+import com.arialyy.aria.core.common.AbsEntity;
+import com.arialyy.aria.core.common.CompleteInfo;
+import com.arialyy.aria.exception.BaseException;
 
 /**
- * @Author lyy
- * @Date 2019-09-18
+ * 任务信息采集
  */
-public interface IRecordHandler {
-
-  int TYPE_DOWNLOAD = 1;
-  int TYPE_UPLOAD = 2;
-  int TYPE_M3U8_VOD = 3;
-  int TYPE_M3U8_LIVE = 4;
-
-  String STATE = "_state_";
-  String RECORD = "_record_";
-  /**
-   * 小于1m的文件不启用多线程
-   */
-  long SUB_LEN = 1024 * 1024;
+public interface IInfoTask extends ILoaderComponent {
 
   /**
-   * 分块文件路径
+   * 执行任务
    */
-  String SUB_PATH = "%s.%s.part";
+  void run();
 
   /**
-   * 获取任务记录
+   * 设置回调
    */
-  TaskRecord getRecord();
+  void setCallback(Callback callback);
+
+  interface Callback {
+    /**
+     * 处理完成
+     *
+     * @param info 一些回调的信息
+     */
+    void onSucceed(String key, CompleteInfo info);
+
+    /**
+     * 请求失败
+     *
+     * @param e 错误信息
+     */
+    void onFail(AbsEntity entity, BaseException e, boolean needRetry);
+  }
 }

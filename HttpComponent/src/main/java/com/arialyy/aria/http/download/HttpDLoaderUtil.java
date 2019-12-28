@@ -15,17 +15,16 @@
  */
 package com.arialyy.aria.http.download;
 
-import com.arialyy.aria.core.common.AbsEntity;
-import com.arialyy.aria.core.common.CompleteInfo;
 import com.arialyy.aria.core.download.DTaskWrapper;
-import com.arialyy.aria.core.inf.OnFileInfoCallback;
 import com.arialyy.aria.core.listener.IEventListener;
 import com.arialyy.aria.core.loader.AbsLoader;
 import com.arialyy.aria.core.loader.AbsNormalLoaderUtil;
+import com.arialyy.aria.core.loader.LoaderStructure;
 import com.arialyy.aria.core.loader.NormalLoader;
+import com.arialyy.aria.core.loader.ThreadStateManager;
 import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
-import com.arialyy.aria.exception.BaseException;
-import com.arialyy.aria.http.HttpFileInfoThread;
+import com.arialyy.aria.http.HttpFileInfoTask;
+import com.arialyy.aria.http.HttpRecordHandler;
 import com.arialyy.aria.http.HttpTaskOption;
 
 /**
@@ -38,24 +37,17 @@ public class HttpDLoaderUtil extends AbsNormalLoaderUtil {
     wrapper.generateTaskOption(HttpTaskOption.class);
   }
 
-  @Override protected AbsLoader createLoader() {
-    NormalLoader loader = new NormalLoader(getListener(), getTaskWrapper());
-    HttpDLoaderAdapter adapter = new HttpDLoaderAdapter(getTaskWrapper());
-    loader.setAdapter(adapter);
-    return loader;
+  @Override public AbsLoader getLoader() {
+    return mLoader == null ? new NormalLoader(getTaskWrapper(), getListener()) : mLoader;
   }
 
-  @Override protected Runnable createInfoThread() {
-    return new HttpFileInfoThread((DTaskWrapper) getTaskWrapper(), new OnFileInfoCallback() {
-      @Override public void onComplete(String url, CompleteInfo info) {
-        ((NormalLoader) getLoader()).updateTempFile();
-        getLoader().start();
-      }
-
-      @Override public void onFail(AbsEntity entity, BaseException e, boolean needRetry) {
-        fail(e, needRetry);
-        getLoader().closeTimer();
-      }
-    });
+  public LoaderStructure getLoaderStructure() {
+    LoaderStructure structure = new LoaderStructure();
+    structure.addComponent(new HttpRecordHandler(getTaskWrapper()))
+        .addComponent(new ThreadStateManager(getListener()))
+        .addComponent(new HttpFileInfoTask((DTaskWrapper) getTaskWrapper()))
+        .addComponent(new HttpDTTBuilder(getTaskWrapper()));
+    structure.accept(getLoader());
+    return structure;
   }
 }

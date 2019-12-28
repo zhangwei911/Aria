@@ -13,18 +13,38 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.arialyy.aria.core.inf;
+package com.arialyy.aria.core.loader;
 
 import com.arialyy.aria.core.TaskRecord;
 import com.arialyy.aria.core.ThreadRecord;
 
 /**
- * 任务记录处理适配器
- *
  * @Author lyy
- * @Date 2019-09-19
+ * @Date 2019-09-18
  */
-public interface IRecordHandlerAdapter {
+public interface IRecordHandler extends ILoaderComponent {
+
+  int TYPE_DOWNLOAD = 1;
+  int TYPE_UPLOAD = 2;
+  int TYPE_M3U8_VOD = 3;
+  int TYPE_M3U8_LIVE = 4;
+
+  String STATE = "_state_";
+  String RECORD = "_record_";
+  /**
+   * 小于1m的文件不启用多线程
+   */
+  long SUB_LEN = 1024 * 1024;
+
+  /**
+   * 分块文件路径
+   */
+  String SUB_PATH = "%s.%s.part";
+
+  /**
+   * 获取任务记录
+   */
+  TaskRecord getRecord();
 
   /**
    * 记录处理前的操作，可用来删除任务记录
@@ -57,4 +77,11 @@ public interface IRecordHandlerAdapter {
    * @return 新任务的线程数
    */
   int initTaskThreadNum();
+
+  /**
+   * 检查任务是否已完成
+   *
+   * @return true 任务已完成
+   */
+  boolean checkTaskCompleted();
 }

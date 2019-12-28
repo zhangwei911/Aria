@@ -62,13 +62,13 @@ public class XMLReader extends DefaultHandler {
 
       String value = attributes.getValue("value");
       switch (qName) {
-        case "threadNum": // 线程数
+        case "getCreatedThreadNum": // 线程数
           int threadNum = checkInt(value) ? Integer.parseInt(value) : 3;
           if (threadNum < 1) {
             ALog.w(TAG, "下载线程数不能小于 1");
             threadNum = 1;
           }
-          setField("threadNum", threadNum, ConfigType.DOWNLOAD);
+          setField("getCreatedThreadNum", threadNum, ConfigType.DOWNLOAD);
           break;
         case "maxTaskNum":  //最大任务书
           int maxTaskNum = checkInt(value) ? Integer.parseInt(value) : 2;

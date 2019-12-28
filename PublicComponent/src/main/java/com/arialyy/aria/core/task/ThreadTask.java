@@ -228,6 +228,10 @@ public class ThreadTask implements IThreadTask, IThreadTaskObserver {
     return true;
   }
 
+  @Override public int getThreadId() {
+    return mRecord.threadId;
+  }
+
   /**
    * 停止任务
    */

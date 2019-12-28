@@ -25,9 +25,9 @@ import com.arialyy.aria.core.listener.IEventListener;
 import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
 import com.arialyy.aria.exception.AriaIOException;
 import com.arialyy.aria.exception.BaseException;
-import com.arialyy.aria.core.group.AbsGroupUtil;
+import com.arialyy.aria.core.group.AbsGroupLoaderUtil;
 import com.arialyy.aria.core.group.AbsSubDLoadUtil;
-import com.arialyy.aria.http.HttpFileInfoThread;
+import com.arialyy.aria.http.HttpFileInfoTask;
 import com.arialyy.aria.http.HttpTaskOption;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
@@ -40,7 +40,7 @@ import java.util.concurrent.Executors;
  * Created by AriaL on 2017/6/30.
  * 任务组下载工具
  */
-public class DGroupLoaderUtil extends AbsGroupUtil {
+public class DGroupLoaderUtil extends AbsGroupLoaderUtil {
   private final Object LOCK = new Object();
   private ExecutorService mPool = null;
   private boolean getLenComplete = false;
@@ -113,7 +113,7 @@ public class DGroupLoaderUtil extends AbsGroupUtil {
       @Override public void run() {
         for (DTaskWrapper dTaskWrapper : getWrapper().getSubTaskWrapper()) {
           cloneHeader(dTaskWrapper);
-          mPool.submit(new HttpFileInfoThread(dTaskWrapper, new OnFileInfoCallback() {
+          mPool.submit(new HttpFileInfoTask(dTaskWrapper, new OnFileInfoCallback() {
             @Override public void onComplete(String url, CompleteInfo info) {
               if (!getWrapper().isUnknownSize()) {
                 startSubLoader(createSubLoader((DTaskWrapper) info.wrapper, false));

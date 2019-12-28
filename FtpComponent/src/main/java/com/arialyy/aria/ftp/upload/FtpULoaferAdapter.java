@@ -21,10 +21,10 @@ import com.arialyy.aria.core.common.RecordHandler;
 import com.arialyy.aria.core.common.SubThreadConfig;
 import com.arialyy.aria.core.task.ThreadTask;
 import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
-import com.arialyy.aria.core.inf.IRecordHandler;
+import com.arialyy.aria.core.loader.IRecordHandler;
 import com.arialyy.aria.core.task.IThreadTask;
 import com.arialyy.aria.core.wrapper.ITaskWrapper;
-import com.arialyy.aria.ftp.FtpRecordAdapter;
+import com.arialyy.aria.ftp.FtpRecordHandler;
 
 /**
  * @Author lyy
@@ -48,7 +48,7 @@ class FtpULoaferAdapter extends AbsNormalLoaderAdapter {
   }
 
   @Override public IRecordHandler recordHandler(AbsTaskWrapper wrapper) {
-    FtpRecordAdapter adapter = new FtpRecordAdapter(wrapper);
+    FtpRecordHandler adapter = new FtpRecordHandler(wrapper);
     RecordHandler handler = new RecordHandler(wrapper);
     handler.setAdapter(adapter);
     return handler;
