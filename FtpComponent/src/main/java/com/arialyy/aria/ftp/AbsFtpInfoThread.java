@@ -91,7 +91,7 @@ public abstract class AbsFtpInfoThread<ENTITY extends AbsEntity, TASK_WRAPPER ex
       }
       String remotePath = CommonUtil.convertFtpChar(charSet, getRemotePath());
 
-      FTPFile[] files = client.listFiles(remotePath);
+      FTPFile[] files = client.listFiles(getRemotePath());
       boolean isExist = files.length != 0;
       if (!isExist && !isUpload) {
         int i = remotePath.lastIndexOf(File.separator);

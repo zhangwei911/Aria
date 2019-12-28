@@ -42,7 +42,7 @@ public class HttpRecordAdapter extends AbsRecordHandlerAdapter {
 
   @Override public void handlerTaskRecord(TaskRecord record) {
     RecordHelper helper = new RecordHelper(getWrapper(), record);
-    if (getWrapper().isSupportBP()) {
+    if (getWrapper().isSupportBP() && record.threadNum > 1) {
       if (record.isBlock) {
         helper.handleBlockRecord();
       } else {

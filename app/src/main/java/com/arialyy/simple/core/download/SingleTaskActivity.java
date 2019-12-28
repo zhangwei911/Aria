@@ -272,9 +272,9 @@ public class SingleTaskActivity extends BaseActivity<ActivitySingleBinding> {
               .load(mTaskId)
               .stop();
         } else {
-          mTaskId = Aria.download(this).load(mTaskId)
+          Aria.download(this).load(mTaskId)
               //.updateUrl(mUrl)
-              .reStart();
+              .resume();
         }
         break;
       case R.id.cancel:

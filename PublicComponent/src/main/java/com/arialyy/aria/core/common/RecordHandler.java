@@ -73,22 +73,7 @@ public class RecordHandler implements IRecordHandler {
       mAdapter.onPre();
       mTaskRecord = DbDataHelper.getTaskRecord(getFilePath(), mEntity.getTaskType());
       if (mTaskRecord == null) {
-        if (!new File(getFilePath()).exists()){
-          FileUtil.createFile(getFilePath());
-        }
         initRecord(true);
-      } else {
-        File file = new File(mTaskRecord.filePath);
-        if (!file.exists()) {
-          ALog.w(TAG, String.format("文件【%s】不存在，重新分配线程区间", mTaskRecord.filePath));
-          DbEntity.deleteData(ThreadRecord.class, "taskKey=?", mTaskRecord.filePath);
-          mTaskRecord.threadRecords.clear();
-          mTaskRecord.threadNum = mAdapter.initTaskThreadNum();
-          initRecord(false);
-        } else if (mTaskRecord.threadRecords == null || mTaskRecord.threadRecords.isEmpty()) {
-          mTaskRecord.threadNum = mAdapter.initTaskThreadNum();
-          initRecord(false);
-        }
       }
       mAdapter.handlerTaskRecord(mTaskRecord);
     }

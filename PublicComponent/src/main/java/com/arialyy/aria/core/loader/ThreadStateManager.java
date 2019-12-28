@@ -202,6 +202,11 @@ public class ThreadStateManager implements IThreadState {
    * @return {@code true} 合并成功，{@code false}合并失败
    */
   private boolean mergeFile() {
+    if (mTaskRecord.threadNum == 1) {
+      File partFile = new File(String.format(IRecordHandler.SUB_PATH, mTaskRecord.filePath, 0));
+      return partFile.renameTo(new File(mTaskRecord.filePath));
+    }
+
     List<String> partPath = new ArrayList<>();
     for (int i = 0, len = mTaskRecord.threadNum; i < len; i++) {
       partPath.add(String.format(IRecordHandler.SUB_PATH, mTaskRecord.filePath, i));

@@ -72,6 +72,15 @@ public class FtpTaskOption implements ITaskOption {
    */
   private String activeExternalIPAddress;
 
+  //---------------- ftp client 配置信息 start
+  private String defaultDateFormatStr = null;
+  private String recentDateFormatStr = null;
+  private String serverLanguageCode = null;
+  private String shortMonthNames = null;
+  private String serverTimeZoneId = null;
+  private String systemKey = FTPClientConfig.SYST_UNIX;
+  //---------------- ftp client 配置信息 end
+
   public String getActiveExternalIPAddress() {
     return activeExternalIPAddress;
   }
@@ -105,6 +114,24 @@ public class FtpTaskOption implements ITaskOption {
   }
 
   public FTPClientConfig getClientConfig() {
+    if (clientConfig == null) {
+      clientConfig = new FTPClientConfig(systemKey);
+      if (defaultDateFormatStr != null) {
+        clientConfig.setDefaultDateFormatStr(defaultDateFormatStr);
+      }
+      if (recentDateFormatStr != null) {
+        clientConfig.setRecentDateFormatStr(recentDateFormatStr);
+      }
+      if (serverLanguageCode != null) {
+        clientConfig.setServerLanguageCode(serverLanguageCode);
+      }
+      if (shortMonthNames != null) {
+        clientConfig.setShortMonthNames(shortMonthNames);
+      }
+      if (serverTimeZoneId != null) {
+        clientConfig.setServerTimeZoneId(serverTimeZoneId);
+      }
+    }
     return clientConfig;
   }
 

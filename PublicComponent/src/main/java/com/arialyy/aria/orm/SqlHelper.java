@@ -28,6 +28,7 @@ import com.arialyy.aria.util.ALog;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -163,7 +164,49 @@ final class SqlHelper extends SQLiteOpenHelper {
       for (String tableName : tables) {
         Class<? extends DbEntity> clazz = DBConfig.mapping.get(tableName);
         if (SqlUtil.tableExists(db, clazz)) {
-          //修改表名为中介表名
+          // ----------- 1、获取旧表字段、新表字段
+          Cursor columnC =
+              db.rawQuery(String.format("PRAGMA table_info(%s)", tableName), null);
+
+          // 获取新表的所有字段名称
+          List<String> newTabColumns = SqlUtil.getColumns(clazz);
+          // 获取旧表的所有字段名称
+          List<String> oldTabColumns = new ArrayList<>();
+
+          while (columnC.moveToNext()) {
+            String columnName = columnC.getString(columnC.getColumnIndex("name"));
+            oldTabColumns.add(columnName);
+          }
+          columnC.close();
+
+          // ----------- 2、为防止字段增加失败的情况，先给旧表增加字段
+          List<String> newAddColum = getNewColumn(newTabColumns, oldTabColumns);
+          // 删除重命名的字段
+          Map<String, String > modifyMap = null;
+          if (modifyColumns != null){
+            modifyMap = modifyColumns.get(tableName);
+            if (modifyMap != null){
+              Iterator<String> it = newAddColum.iterator();
+              while (it.hasNext()){
+                String s = it.next();
+                if (modifyMap.get(s) != null){
+                  it.remove();
+                }
+              }
+            }
+          }
+
+          // 给旧表增加字段，防止新增字段失败
+          if (newAddColum.size() > 0){
+            String sql = "ALTER TABLE %s ADD COLUMN %s %s";
+            for (String nc : newAddColum){
+              String temp = String.format(sql, tableName, nc, SqlUtil.getColumnTypeByFieldName(clazz, nc));
+              ALog.d(TAG, "添加表字段的sql：" + temp);
+              db.execSQL(temp);
+            }
+          }
+
+          // ----------- 3、将旧表备份下，并创建新表
           String alertSql = String.format("ALTER TABLE %s RENAME TO %s_temp", tableName, tableName);
           db.execSQL(alertSql);
 
@@ -176,28 +219,15 @@ final class SqlHelper extends SQLiteOpenHelper {
           long count = cursor.getLong(0);
           cursor.close();
 
-          // 复制数据
+          // ----------- 4、将旧表数据复制到新表
           if (count > 0) {
-            Cursor columnC =
-                db.rawQuery(String.format("PRAGMA table_info(%s_temp)", tableName), null);
-
-            // 获取新表的所有字段名称
-            List<String> newTabColumns = SqlUtil.getColumns(clazz);
-            // 获取旧表的所有字段名称
-            List<String> oldTabColumns = new ArrayList<>();
-
-            while (columnC.moveToNext()) {
-              String columnName = columnC.getString(columnC.getColumnIndex("name"));
-              oldTabColumns.add(columnName);
-            }
-            columnC.close();
 
             // 旧表需要删除的字段，删除旧表有而新表没的字段
             List<String> diffTab = getDiffColumn(newTabColumns, oldTabColumns);
             StringBuilder params = new StringBuilder();
 
             // 需要修改的列名映射表
-            Map<String, String> modifyMap = null;
+            //Map<String, String> modifyMap = null;
             if (modifyColumns != null) {
               modifyMap = modifyColumns.get(tableName);
             }
@@ -227,11 +257,11 @@ final class SqlHelper extends SQLiteOpenHelper {
             String insertSql =
                 String.format("INSERT INTO %s (%s) SELECT %s FROM %s_temp", tableName, newParamStr,
                     oldParamStr, tableName);
-            ALog.d(TAG, "insertSql = " + insertSql);
+            ALog.d(TAG, "恢复数据的sql：" + insertSql);
 
             db.execSQL(insertSql);
           }
-          //删除中介表
+          // ----------- 5、删除备份的表
           SqlUtil.dropTable(db, tableName + "_temp");
         } else {
           SqlUtil.createTable(db, clazz);
@@ -255,6 +285,19 @@ final class SqlHelper extends SQLiteOpenHelper {
   private List<String> getDiffColumn(List<String> newTab, List<String> oldTab) {
     List<String> temp = new ArrayList<>(oldTab); // 拷贝旧表字段
     temp.removeAll(newTab);
+    return temp;
+  }
+
+  /**
+   * 获取新增字段
+   *
+   * @param newTab 新表字段
+   * @param oldTab 就表字段
+   * @return 新表有而旧表没的字段
+   */
+  private List<String> getNewColumn(List<String> newTab, List<String> oldTab) {
+    List<String> temp = new ArrayList<>(newTab);
+    temp.removeAll(oldTab);
     return temp;
   }
 
