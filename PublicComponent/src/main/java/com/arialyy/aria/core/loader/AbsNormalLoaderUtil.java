@@ -20,6 +20,7 @@ import com.arialyy.aria.core.inf.IUtil;
 import com.arialyy.aria.core.listener.IEventListener;
 import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
 import com.arialyy.aria.exception.BaseException;
+import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
 
 /**
@@ -29,7 +30,7 @@ import com.arialyy.aria.util.CommonUtil;
 public abstract class AbsNormalLoaderUtil implements IUtil {
   protected String TAG = CommonUtil.getClassName(getClass());
   private IEventListener mListener;
-  protected AbsLoader mLoader;
+  protected AbsNormalLoader mLoader;
   private AbsTaskWrapper mTaskWrapper;
   private boolean isStop = false, isCancel = false;
 
@@ -42,12 +43,12 @@ public abstract class AbsNormalLoaderUtil implements IUtil {
   /**
    * 获取加载器
    */
-  public abstract AbsLoader getLoader();
+  public abstract AbsNormalLoader getLoader();
 
   /**
    * 获取构造器
    */
-  public abstract LoaderStructure getLoaderStructure();
+  public abstract LoaderStructure BuildLoaderStructure();
 
   @Override public String getKey() {
     return mTaskWrapper.getKey();
@@ -99,6 +100,7 @@ public abstract class AbsNormalLoaderUtil implements IUtil {
    */
   @Override public void start() {
     if (isStop || isCancel) {
+      ALog.w(TAG, "启动任务失败，任务已停止或已取消");
       return;
     }
     mListener.onPre();
@@ -112,7 +114,7 @@ public abstract class AbsNormalLoaderUtil implements IUtil {
     //  mDownloader.create();
     //}
 
-    getLoaderStructure();
+    BuildLoaderStructure();
     new Thread(mLoader).start();
 
     onStart();

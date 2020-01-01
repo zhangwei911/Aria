@@ -27,7 +27,7 @@ import java.util.List;
 /**
  * m3u8任务配信息
  */
-public class M3U8TaskOption implements ITaskOption {
+public final class M3U8TaskOption implements ITaskOption {
 
   /**
    * 所有ts文件的下载地址

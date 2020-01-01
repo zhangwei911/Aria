@@ -18,30 +18,37 @@ package com.arialyy.aria.ftp.download;
 import android.os.Handler;
 import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.group.AbsSubDLoadUtil;
-import com.arialyy.aria.core.group.ChildDLoadListener;
-import com.arialyy.aria.core.loader.NormalLoader;
+import com.arialyy.aria.core.loader.LoaderStructure;
+import com.arialyy.aria.core.loader.SubLoader;
+import com.arialyy.aria.ftp.FtpRecordHandler;
 
 /**
  * @Author lyy
  * @Date 2019-09-28
  */
-class FtpSubDLoaderUtil extends AbsSubDLoadUtil {
+final class FtpSubDLoaderUtil extends AbsSubDLoadUtil {
   /**
    * @param schedulers 调度器
    * @param needGetInfo {@code true} 需要获取文件信息。{@code false} 不需要获取文件信息
    */
-  FtpSubDLoaderUtil(Handler schedulers, DTaskWrapper taskWrapper, boolean needGetInfo) {
-    super(schedulers, taskWrapper, needGetInfo);
+  FtpSubDLoaderUtil(DTaskWrapper taskWrapper, Handler schedulers, boolean needGetInfo) {
+    super(taskWrapper, schedulers, needGetInfo);
   }
 
-  @Override protected NormalLoader createLoader(ChildDLoadListener listener, DTaskWrapper wrapper) {
-    NormalLoader loader = new NormalLoader(listener, wrapper);
-    FtpDLoaderAdapter adapter = new FtpDLoaderAdapter(wrapper);
-    loader.setAdapter(adapter);
-    return loader;
+  @Override protected SubLoader getLoader() {
+    if (mDLoader == null) {
+      mDLoader = new SubLoader(getWrapper(), getSchedulers());
+      mDLoader.setNeedGetInfo(isNeedGetInfo());
+    }
+    return mDLoader;
   }
 
-  @Override public void start() {
-    getDownloader().start();
+  @Override protected LoaderStructure buildLoaderStructure() {
+    LoaderStructure structure = new LoaderStructure();
+    structure.addComponent(new FtpRecordHandler(getWrapper()))
+        .addComponent(new FtpDTTBuilder(getWrapper()))
+        .addComponent(new FtpDFileInfoTask(getWrapper()));
+    structure.accept(getLoader());
+    return structure;
   }
 }

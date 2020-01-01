@@ -48,7 +48,7 @@ public class FtpDownloadActivity extends BaseActivity<ActivityFtpDownloadBinding
   private String mUrl, mFilePath;
   private FtpDownloadModule mModule;
   private long mTaskId;
-  private String user = "lao", passw = "123456";
+  private String user = "boamax\\update", passw = "2020&suzhou";
 
   @Override protected void init(Bundle savedInstanceState) {
     super.init(savedInstanceState);
@@ -124,7 +124,8 @@ public class FtpDownloadActivity extends BaseActivity<ActivityFtpDownloadBinding
   private FtpOption getFtpOption() {
     FtpOption option = new FtpOption();
     option.login(user, passw);
-    option.setConnectionMode(FtpConnectionMode.DATA_CONNECTION_MODE_ACTIVITY);
+    option.setServerIdentifier(FtpOption.FTPServerIdentifier.SYST_NT);
+    //option.setConnectionMode(FtpConnectionMode.DATA_CONNECTION_MODE_ACTIVITY);
     return option;
   }
 

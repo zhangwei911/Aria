@@ -15,14 +15,14 @@
  */
 package com.arialyy.aria.core.group;
 
-import com.arialyy.aria.core.loader.AbsLoader;
+import com.arialyy.aria.core.loader.AbsNormalLoader;
 import com.arialyy.aria.core.inf.IUtil;
 import com.arialyy.aria.core.config.DGroupConfig;
 
 /**
  * 组合任务子任务队列
  *
- * @param <Fileer> {@link AbsLoader}下载器
+ * @param <Fileer> {@link AbsNormalLoader}下载器
  */
 interface ISubQueue<Fileer extends IUtil> {
 

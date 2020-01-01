@@ -34,7 +34,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Created by Aria.Lao on 2017/7/28. D_FTP 单线程上传任务，需要FTP 服务器给用户打开append和write的权限
  */
-class FtpUThreadTaskAdapter extends BaseFtpThreadTaskAdapter {
+final class FtpUThreadTaskAdapter extends BaseFtpThreadTaskAdapter {
   private String dir, remotePath;
   private boolean storeFail = false;
   private ScheduledThreadPoolExecutor timer;

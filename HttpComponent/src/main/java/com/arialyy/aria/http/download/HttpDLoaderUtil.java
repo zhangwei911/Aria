@@ -17,11 +17,11 @@ package com.arialyy.aria.http.download;
 
 import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.listener.IEventListener;
-import com.arialyy.aria.core.loader.AbsLoader;
+import com.arialyy.aria.core.loader.AbsNormalLoader;
 import com.arialyy.aria.core.loader.AbsNormalLoaderUtil;
 import com.arialyy.aria.core.loader.LoaderStructure;
 import com.arialyy.aria.core.loader.NormalLoader;
-import com.arialyy.aria.core.loader.ThreadStateManager;
+import com.arialyy.aria.core.loader.NormalThreadStateManager;
 import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
 import com.arialyy.aria.http.HttpFileInfoTask;
 import com.arialyy.aria.http.HttpRecordHandler;
@@ -31,20 +31,20 @@ import com.arialyy.aria.http.HttpTaskOption;
  * @Author lyy
  * @Date 2019-09-21
  */
-public class HttpDLoaderUtil extends AbsNormalLoaderUtil {
+public final class HttpDLoaderUtil extends AbsNormalLoaderUtil {
   public HttpDLoaderUtil(AbsTaskWrapper wrapper, IEventListener listener) {
     super(wrapper, listener);
     wrapper.generateTaskOption(HttpTaskOption.class);
   }
 
-  @Override public AbsLoader getLoader() {
+  @Override public AbsNormalLoader getLoader() {
     return mLoader == null ? new NormalLoader(getTaskWrapper(), getListener()) : mLoader;
   }
 
-  public LoaderStructure getLoaderStructure() {
+  public LoaderStructure BuildLoaderStructure() {
     LoaderStructure structure = new LoaderStructure();
     structure.addComponent(new HttpRecordHandler(getTaskWrapper()))
-        .addComponent(new ThreadStateManager(getListener()))
+        .addComponent(new NormalThreadStateManager(getListener()))
         .addComponent(new HttpFileInfoTask((DTaskWrapper) getTaskWrapper()))
         .addComponent(new HttpDTTBuilder(getTaskWrapper()));
     structure.accept(getLoader());

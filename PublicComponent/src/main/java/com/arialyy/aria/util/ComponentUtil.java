@@ -121,10 +121,10 @@ public class ComponentUtil {
         className = "com.arialyy.aria.http.upload.HttpULoaderUtil";
         break;
       case ITaskWrapper.D_FTP_DIR:
-        className = "com.arialyy.aria.ftp.download.FtpDirDLoaderUtil";
+        className = "com.arialyy.aria.ftp.download.FtpDGLoaderUtil";
         break;
       case ITaskWrapper.DG_HTTP:
-        className = "com.arialyy.aria.http.download.DGroupLoaderUtil";
+        className = "com.arialyy.aria.http.download.HttpDGLoaderUtil";
         break;
     }
     if (className == null) {

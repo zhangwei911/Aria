@@ -15,25 +15,17 @@
  */
 package com.arialyy.aria.m3u8.vod;
 
-import android.text.TextUtils;
-import com.arialyy.aria.core.common.AbsEntity;
-import com.arialyy.aria.core.common.CompleteInfo;
 import com.arialyy.aria.core.download.DTaskWrapper;
-import com.arialyy.aria.core.inf.OnFileInfoCallback;
 import com.arialyy.aria.core.listener.IEventListener;
-import com.arialyy.aria.core.loader.AbsLoader;
+import com.arialyy.aria.core.loader.AbsNormalLoader;
 import com.arialyy.aria.core.loader.AbsNormalLoaderUtil;
-import com.arialyy.aria.core.processor.IVodTsUrlConverter;
+import com.arialyy.aria.core.loader.LoaderStructure;
 import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
-import com.arialyy.aria.exception.BaseException;
-import com.arialyy.aria.exception.M3U8Exception;
 import com.arialyy.aria.http.HttpTaskOption;
-import com.arialyy.aria.m3u8.M3U8InfoThread;
+import com.arialyy.aria.m3u8.M3U8InfoTask;
 import com.arialyy.aria.m3u8.M3U8Listener;
+import com.arialyy.aria.m3u8.M3U8RecordHandler;
 import com.arialyy.aria.m3u8.M3U8TaskOption;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 
 /**
  * M3U8点播文件下载工具
@@ -43,10 +35,7 @@ import java.util.List;
  * 3、完成所有分片下载后，合并ts文件
  * 4、删除该隐藏文件夹
  */
-public class M3U8VodUtil extends AbsNormalLoaderUtil {
-
-  private List<String> mUrls = new ArrayList<>();
-  private M3U8TaskOption mM3U8Option;
+public final class M3U8VodUtil extends AbsNormalLoaderUtil {
 
   public M3U8VodUtil(AbsTaskWrapper wrapper, IEventListener listener) {
     super(wrapper, listener);
@@ -56,48 +45,19 @@ public class M3U8VodUtil extends AbsNormalLoaderUtil {
     return (DTaskWrapper) super.getTaskWrapper();
   }
 
-  @Override protected AbsLoader createLoader() {
+  @Override public AbsNormalLoader getLoader() {
     getTaskWrapper().generateM3u8Option(M3U8TaskOption.class);
     getTaskWrapper().generateTaskOption(HttpTaskOption.class);
-    mM3U8Option = (M3U8TaskOption) getTaskWrapper().getM3u8Option();
-    return new M3U8VodLoader((M3U8Listener) getListener(), getTaskWrapper());
+    return mLoader == null ? new M3U8VodLoader(getTaskWrapper(), (M3U8Listener) getListener())
+        : mLoader;
   }
 
-  @Override protected Runnable createInfoThread() {
-    return new M3U8InfoThread(getTaskWrapper(), new OnFileInfoCallback() {
-      @Override public void onComplete(String key, CompleteInfo info) {
-        IVodTsUrlConverter converter = mM3U8Option.getVodUrlConverter();
-        if (converter != null) {
-          if (TextUtils.isEmpty(mM3U8Option.getBandWidthUrl())) {
-            mUrls.addAll(
-                converter.convert(getTaskWrapper().getEntity().getUrl(), (List<String>) info.obj));
-          } else {
-            mUrls.addAll(
-                converter.convert(mM3U8Option.getBandWidthUrl(), (List<String>) info.obj));
-          }
-        } else {
-          mUrls.addAll((Collection<? extends String>) info.obj);
-        }
-        if (mUrls.isEmpty()) {
-          fail(new M3U8Exception(TAG, "获取地址失败"), false);
-          return;
-        } else if (!mUrls.get(0).startsWith("http")) {
-          fail(new M3U8Exception(TAG, "地址错误，请使用IVodTsUrlConverter处理你的url信息"), false);
-          return;
-        }
-        mM3U8Option.setUrls(mUrls);
-        if (isStop()) {
-          getListener().onStop(getTaskWrapper().getEntity().getCurrentProgress());
-        } else if (isCancel()) {
-          getListener().onCancel();
-        } else {
-          getLoader().start();
-        }
-      }
-
-      @Override public void onFail(AbsEntity entity, BaseException e, boolean needRetry) {
-        fail(e, needRetry);
-      }
-    });
+  @Override public LoaderStructure BuildLoaderStructure() {
+    LoaderStructure structure = new LoaderStructure();
+    structure.addComponent(new M3U8RecordHandler(getTaskWrapper()))
+        .addComponent(new M3U8InfoTask(getTaskWrapper()))
+        .addComponent(new VodStateManager(getTaskWrapper(), (M3U8Listener) getListener()));
+    structure.accept(getLoader());
+    return structure;
   }
 }

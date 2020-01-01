@@ -16,14 +16,11 @@
 package com.arialyy.aria.m3u8;
 
 import android.text.TextUtils;
-import com.arialyy.aria.core.common.RecordHandler;
 import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.download.M3U8Entity;
-import com.arialyy.aria.core.loader.IRecordHandler;
 import com.arialyy.aria.core.listener.IEventListener;
-import com.arialyy.aria.core.loader.AbsLoader;
-import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
+import com.arialyy.aria.core.loader.AbsNormalLoader;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.FileUtil;
 import java.io.BufferedReader;
@@ -35,11 +32,11 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 
-public abstract class BaseM3U8Loader extends AbsLoader {
+public abstract class BaseM3U8Loader extends AbsNormalLoader {
   protected M3U8TaskOption mM3U8Option;
 
-  public BaseM3U8Loader(IEventListener listener, DTaskWrapper wrapper) {
-    super(listener, wrapper);
+  public BaseM3U8Loader(DTaskWrapper wrapper, IEventListener listener) {
+    super(wrapper, listener);
     mM3U8Option = (M3U8TaskOption) wrapper.getM3u8Option();
     mTempFile = new File(wrapper.getEntity().getFilePath());
   }
@@ -58,7 +55,7 @@ public abstract class BaseM3U8Loader extends AbsLoader {
     return String.format("%s/%s.ts", dirCache, threadId);
   }
 
-  protected String getCacheDir() {
+  public String getCacheDir() {
     String cacheDir = mM3U8Option.getCacheDir();
     if (TextUtils.isEmpty(cacheDir)) {
       cacheDir = FileUtil.getTsCacheDir(getEntity().getFilePath(), mM3U8Option.getBandWidth());
@@ -74,7 +71,7 @@ public abstract class BaseM3U8Loader extends AbsLoader {
    */
   public boolean generateIndexFile(boolean isLive) {
     File tempFile =
-        new File(String.format(M3U8InfoThread.M3U8_INDEX_FORMAT, getEntity().getFilePath()));
+        new File(String.format(M3U8InfoTask.M3U8_INDEX_FORMAT, getEntity().getFilePath()));
     if (!tempFile.exists()) {
       ALog.e(TAG, "源索引文件不存在");
       return false;
@@ -136,15 +133,8 @@ public abstract class BaseM3U8Loader extends AbsLoader {
     return false;
   }
 
-  @Override public long getCurrentLocation() {
+  @Override public long getCurrentProgress() {
     return isRunning() ? getStateManager().getCurrentProgress() : getEntity().getCurrentProgress();
-  }
-
-  @Override protected IRecordHandler getRecordHandler(AbsTaskWrapper wrapper) {
-    RecordHandler handler = new RecordHandler(wrapper);
-    M3U8RecordHandler adapter = new M3U8RecordHandler((DTaskWrapper) wrapper);
-    handler.setAdapter(adapter);
-    return handler;
   }
 
   protected DownloadEntity getEntity() {

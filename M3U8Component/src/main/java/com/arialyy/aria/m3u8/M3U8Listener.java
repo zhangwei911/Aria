@@ -29,7 +29,7 @@ import com.arialyy.aria.util.CommonUtil;
 /**
  * 下载监听类
  */
-public class M3U8Listener extends BaseDListener implements IDLoadListener {
+public final class M3U8Listener extends BaseDListener implements IDLoadListener {
 
   public M3U8Listener(AbsTask<DTaskWrapper> task, Handler outHandler) {
     super(task, outHandler);

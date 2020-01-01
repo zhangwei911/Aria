@@ -16,11 +16,12 @@
 
 package com.arialyy.aria.core.group;
 
+import android.os.Handler;
 import android.os.Message;
 import com.arialyy.aria.core.AriaConfig;
 import com.arialyy.aria.core.common.AbsEntity;
 import com.arialyy.aria.core.config.Configuration;
-import com.arialyy.aria.core.listener.ISchedulers;
+import com.arialyy.aria.core.inf.IThreadStateManager;
 import com.arialyy.aria.core.manager.ThreadTaskManager;
 import com.arialyy.aria.exception.TaskException;
 import com.arialyy.aria.util.ALog;
@@ -32,7 +33,7 @@ import java.util.concurrent.TimeUnit;
  * 组合任务子任务调度器，用于调度任务的开始、停止、失败、完成等情况
  * 该调度器生命周期和{@link AbsGroupLoaderUtil}生命周期一致
  */
-class SimpleSchedulers implements ISchedulers {
+class SimpleSchedulers implements Handler.Callback {
   private static final String TAG = "SimpleSchedulers";
   private SimpleSubQueue mQueue;
   private GroupRunState mGState;
@@ -48,9 +49,16 @@ class SimpleSchedulers implements ISchedulers {
   }
 
   @Override public boolean handleMessage(Message msg) {
-    AbsSubDLoadUtil loader = (AbsSubDLoadUtil) msg.obj;
+    // todo key 应该从bundle中获取
+    String key = (String) msg.obj;
+    AbsSubDLoadUtil loader = mQueue.getLoaderUtil(key);
+    if (loader == null) {
+      ALog.e(TAG, "子任务loder不存在，key：" + key);
+      return true;
+    }
+    // todo 处理的是子任务的线程，需要删除 ThreadTaskManager.removeSingleTaskThread 删除线程任务
     switch (msg.what) {
-      case RUNNING:
+      case IThreadStateManager.STATE_RUNNING:
         mGState.listener.onSubRunning(loader.getEntity());
         break;
       case PRE:
@@ -60,13 +68,13 @@ class SimpleSchedulers implements ISchedulers {
       case START:
         mGState.listener.onSubStart(loader.getEntity());
         break;
-      case STOP:
+      case IThreadStateManager.STATE_STOP:
         handleStop(loader);
         break;
-      case COMPLETE:
+      case IThreadStateManager.STATE_COMPLETE:
         handleComplete(loader);
         break;
-      case FAIL:
+      case IThreadStateManager.STATE_FAIL:
         handleFail(loader);
         break;
     }
@@ -128,9 +136,9 @@ class SimpleSchedulers implements ISchedulers {
    * 1、所有的子任务已经停止，则认为组合任务停止
    * 2、completeNum + failNum + stopNum = subSize，则认为组合任务停止
    */
-  private synchronized void handleStop(AbsSubDLoadUtil loader) {
-    mGState.listener.onSubStop(loader.getEntity());
-    mGState.countStopNum(loader.getKey());
+  private synchronized void handleStop(AbsSubDLoadUtil loadUtil) {
+    mGState.listener.onSubStop(loadUtil.getEntity());
+    mGState.countStopNum(loadUtil.getKey());
     if (mGState.getStopNum() == mGState.getSubSize()
         || mGState.getStopNum()
         + mGState.getCompleteNum()

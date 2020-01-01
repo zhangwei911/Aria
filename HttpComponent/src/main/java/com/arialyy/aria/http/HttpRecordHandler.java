@@ -31,7 +31,7 @@ import java.util.ArrayList;
  * @Author lyy
  * @Date 2019-09-23
  */
-public class HttpRecordHandler extends RecordHandler {
+public final class HttpRecordHandler extends RecordHandler {
   public HttpRecordHandler(AbsTaskWrapper wrapper) {
     super(wrapper);
   }
@@ -45,7 +45,7 @@ public class HttpRecordHandler extends RecordHandler {
 
   @Override public void handlerTaskRecord(TaskRecord record) {
     RecordHelper helper = new RecordHelper(getWrapper(), record);
-    if (getWrapper().isSupportBP()) {
+    if (getWrapper().isSupportBP() && record.threadNum > 1) {
       if (record.isBlock) {
         helper.handleBlockRecord();
       } else {
@@ -70,10 +70,10 @@ public class HttpRecordHandler extends RecordHandler {
     tr.threadType = getEntity().getTaskType();
     //最后一个线程的结束位置即为文件的总长度
     if (threadId == (record.threadNum - 1)) {
-      endL = getEntity().getFileSize();
+      endL = getFileSize();
     }
     tr.endLocation = endL;
-    tr.blockLen = RecordUtil.getBlockLen(getEntity().getFileSize(), threadId, record.threadNum);
+    tr.blockLen = RecordUtil.getBlockLen(getFileSize(), threadId, record.threadNum);
     return tr;
   }
 
@@ -110,7 +110,7 @@ public class HttpRecordHandler extends RecordHandler {
       return 1;
     }
     int threadNum = Configuration.getInstance().downloadCfg.getThreadNum();
-    return getEntity().getFileSize() <= IRecordHandler.SUB_LEN
+    return getFileSize() <= IRecordHandler.SUB_LEN
         || getEntity().isGroupChild()
         || threadNum == 1
         ? 1

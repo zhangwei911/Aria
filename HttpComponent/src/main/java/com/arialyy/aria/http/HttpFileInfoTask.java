@@ -55,7 +55,7 @@ import java.util.UUID;
 /**
  * 下载文件信息获取
  */
-public class HttpFileInfoTask implements IInfoTask, Runnable {
+public final class HttpFileInfoTask implements IInfoTask, Runnable {
   private static final String TAG = "HttpFileInfoThread";
   private DownloadEntity mEntity;
   private DTaskWrapper mTaskWrapper;
@@ -129,7 +129,7 @@ public class HttpFileInfoTask implements IInfoTask, Runnable {
     }
     long len = lenAdapter.handleFileLen(conn.getHeaderFields());
 
-    if (!FileUtil.checkSDMemorySpace(mEntity.getFilePath(), len)) {
+    if (!FileUtil.checkMemorySpace(mEntity.getFilePath(), len)) {
       failDownload(new TaskException(TAG,
           String.format("下载失败，内存空间不足；filePath: %s, url: %s", mEntity.getDownloadPath(),
               mEntity.getUrl())), false);

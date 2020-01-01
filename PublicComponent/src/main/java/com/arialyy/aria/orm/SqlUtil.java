@@ -240,28 +240,13 @@ final class SqlUtil {
           continue;
         }
         Class<?> type = field.getType();
-        sb.append(field.getName());
-        if (type == String.class || type.isEnum()) {
-          sb.append(" VARCHAR");
-        } else if (type == int.class || type == Integer.class) {
-          sb.append(" INTEGER");
-        } else if (type == float.class || type == Float.class) {
-          sb.append(" FLOAT");
-        } else if (type == double.class || type == Double.class) {
-          sb.append(" DOUBLE");
-        } else if (type == long.class || type == Long.class) {
-          sb.append(" BIGINT");
-        } else if (type == boolean.class || type == Boolean.class) {
-          sb.append(" BOOLEAN");
-        } else if (type == java.util.Date.class || type == java.sql.Date.class) {
-          sb.append(" DATA");
-        } else if (type == byte.class || type == Byte.class) {
-          sb.append(" BLOB");
-        } else if (type == Map.class || type == List.class) {
-          sb.append(" TEXT");
-        } else {
+        String columnType = getColumnType(type);
+        if (columnType == null) {
           continue;
         }
+        sb.append(field.getName());
+        sb.append(" ").append(columnType);
+
         if (SqlUtil.isPrimary(field)) {
           Primary pk = field.getAnnotation(Primary.class);
           sb.append(" PRIMARY KEY");
@@ -315,7 +300,48 @@ final class SqlUtil {
 
       String str = sb.toString();
       str = str.substring(0, str.length() - 1) + ");";
+      ALog.d(TAG, "创建表的sql：" + str);
       db.execSQL(str);
+    }
+  }
+
+  /**
+   * 根据字段名获取字段类型
+   */
+  static String getColumnTypeByFieldName(Class tabClass, String fieldName) {
+    List<Field> fields = CommonUtil.getAllFields(tabClass);
+    for (Field field : fields) {
+      if (field.getName().equals(fieldName)) {
+        return getColumnType(field.getType());
+      }
+    }
+    return null;
+  }
+
+  /**
+   * 获取字段类型
+   */
+  static String getColumnType(Class fieldtype) {
+    if (fieldtype == String.class || fieldtype.isEnum()) {
+      return "VARCHAR";
+    } else if (fieldtype == int.class || fieldtype == Integer.class) {
+      return "INTEGER";
+    } else if (fieldtype == float.class || fieldtype == Float.class) {
+      return "FLOAT";
+    } else if (fieldtype == double.class || fieldtype == Double.class) {
+      return "DOUBLE";
+    } else if (fieldtype == long.class || fieldtype == Long.class) {
+      return "BIGINT";
+    } else if (fieldtype == boolean.class || fieldtype == Boolean.class) {
+      return "BOOLEAN";
+    } else if (fieldtype == java.util.Date.class || fieldtype == java.sql.Date.class) {
+      return "DATA";
+    } else if (fieldtype == byte.class || fieldtype == Byte.class) {
+      return "BLOB";
+    } else if (fieldtype == Map.class || fieldtype == List.class) {
+      return "TEXT";
+    } else {
+      return null;
     }
   }
 

@@ -267,7 +267,7 @@ public class UploadReceiver extends AbsReceiver {
         }
       }
     } else {
-      ALog.e(TAG, "没有Aria的注解方法");
+      ALog.e(TAG, "没有Aria的注解方法，详情见：https://aria.laoyuyu.me/aria_doc/other/annotaion_invalid.html");
     }
   }
 

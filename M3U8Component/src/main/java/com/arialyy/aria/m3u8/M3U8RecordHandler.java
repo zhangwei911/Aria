@@ -33,10 +33,10 @@ import java.util.ArrayList;
  * @Author lyy
  * @Date 2019-09-24
  */
-public class M3U8RecordHandler extends RecordHandler {
+public final class M3U8RecordHandler extends RecordHandler {
   private M3U8TaskOption mOption;
 
-  M3U8RecordHandler(DTaskWrapper wrapper) {
+  public M3U8RecordHandler(DTaskWrapper wrapper) {
     super(wrapper);
     mOption = (M3U8TaskOption) wrapper.getM3u8Option();
   }
@@ -64,7 +64,7 @@ public class M3U8RecordHandler extends RecordHandler {
     // 重新下载所有切片
     boolean reDownload =
         (m3U8Entity.getPeerNum() <= 0 || (mOption.isGenerateIndexFile() && !new File(
-            String.format(M3U8InfoThread.M3U8_INDEX_FORMAT, getEntity().getFilePath())).exists()));
+            String.format(M3U8InfoTask.M3U8_INDEX_FORMAT, getEntity().getFilePath())).exists()));
 
     for (ThreadRecord record : mTaskRecord.threadRecords) {
       File temp = new File(BaseM3U8Loader.getTsFilePath(cacheDir, record.threadId));

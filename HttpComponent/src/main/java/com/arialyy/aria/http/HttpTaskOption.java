@@ -29,7 +29,7 @@ import java.util.Map;
 /**
  * Http任务设置的信息，如：cookie、请求参数
  */
-public class HttpTaskOption implements ITaskOption {
+public final class HttpTaskOption implements ITaskOption {
 
   private CookieManager cookieManager;
 

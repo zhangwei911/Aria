@@ -43,7 +43,7 @@ import java.util.Set;
 /**
  * Created by lyy on 2017/1/18. 下载线程
  */
-public class M3U8ThreadTaskAdapter extends AbsThreadTaskAdapter {
+public final class M3U8ThreadTaskAdapter extends AbsThreadTaskAdapter {
   private final String TAG = "M3U8ThreadTask";
   private HttpTaskOption mHttpTaskOption;
 

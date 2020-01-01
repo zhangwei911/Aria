@@ -54,6 +54,13 @@ public class GroupModule extends BaseModule {
     return names;
   }
 
+  List<String> getSubName1() {
+    List<String> names = new ArrayList<>();
+    String[] str = getContext().getResources().getStringArray(R.array.group_names);
+    Collections.addAll(names, str);
+    return names;
+  }
+
   List<String> getSubName2() {
     List<String> taskSubFile;
     taskSubFile = new ArrayList<>();

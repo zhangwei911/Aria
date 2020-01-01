@@ -61,6 +61,14 @@ class SimpleSubQueue implements ISubQueue<AbsSubDLoadUtil> {
     return mExec;
   }
 
+  AbsSubDLoadUtil getLoaderUtil(String key) {
+    AbsSubDLoadUtil sub = mExec.get(key);
+    if (sub != null) {
+      return sub;
+    }
+    return mCache.get(key);
+  }
+
   /**
    * 获取缓存队列大小
    */
@@ -81,7 +89,7 @@ class SimpleSubQueue implements ISubQueue<AbsSubDLoadUtil> {
       mCache.remove(fileer.getKey());
       mExec.put(fileer.getKey(), fileer);
       ALog.d(TAG, String.format("开始执行子任务：%s", fileer.getEntity().getFileName()));
-      fileer.start();
+      fileer.run();
     } else {
       ALog.d(TAG, String.format("执行队列已满，任务进入缓存器中，key: %s", fileer.getKey()));
       addTask(fileer);

@@ -20,37 +20,42 @@ import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.inf.IUtil;
 import com.arialyy.aria.core.listener.ISchedulers;
-import com.arialyy.aria.core.loader.NormalLoader;
+import com.arialyy.aria.core.loader.LoaderStructure;
+import com.arialyy.aria.core.loader.SubLoader;
+import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
 
 /**
- * 子任务下载器，负责创建
+ * 子任务下载器工具，需要在线程池中执行
  */
-public abstract class AbsSubDLoadUtil implements IUtil {
+public abstract class AbsSubDLoadUtil implements IUtil, Runnable {
   protected final String TAG = CommonUtil.getClassName(getClass());
 
-  private NormalLoader mDLoader;
+  protected SubLoader mDLoader;
   private DTaskWrapper mWrapper;
   private Handler mSchedulers;
   private ChildDLoadListener mListener;
   private boolean needGetInfo;
+  private boolean isStop = false, isCancel = false;
 
   /**
    * @param schedulers 调度器
    * @param needGetInfo {@code true} 需要获取文件信息。{@code false} 不需要获取文件信息
    */
-  protected AbsSubDLoadUtil(Handler schedulers, DTaskWrapper taskWrapper, boolean needGetInfo) {
+  protected AbsSubDLoadUtil(DTaskWrapper taskWrapper, Handler schedulers, boolean needGetInfo) {
     mWrapper = taskWrapper;
     mSchedulers = schedulers;
     this.needGetInfo = needGetInfo;
     mListener = new ChildDLoadListener(mSchedulers, AbsSubDLoadUtil.this);
-    mDLoader = createLoader(mListener, taskWrapper);
+    mDLoader = getLoader();
   }
 
   /**
    * 创建加载器
    */
-  protected abstract NormalLoader createLoader(ChildDLoadListener listener, DTaskWrapper wrapper);
+  protected abstract SubLoader getLoader();
+
+  protected abstract LoaderStructure buildLoaderStructure();
 
   protected boolean isNeedGetInfo() {
     return needGetInfo;
@@ -72,6 +77,27 @@ public abstract class AbsSubDLoadUtil implements IUtil {
     return mWrapper.getEntity();
   }
 
+  public ChildDLoadListener getListener() {
+    return mListener;
+  }
+
+  @Override public void run() {
+    if (isStop || isCancel) {
+      return;
+    }
+    mListener.onPre();
+    buildLoaderStructure();
+    mDLoader.run();
+  }
+
+  /**
+   * 请在线程池中使用
+   */
+  @Deprecated
+  @Override public void start() {
+    throw new AssertionError("请在线程池中使用");
+  }
+
   /**
    * 重新开始任务
    */
@@ -81,16 +107,24 @@ public abstract class AbsSubDLoadUtil implements IUtil {
     }
   }
 
-  public NormalLoader getDownloader() {
+  public SubLoader getDownloader() {
     return mDLoader;
   }
 
+  /**
+   * @deprecated 子任务不实现这个
+   */
+  @Deprecated
   @Override public long getFileSize() {
-    return mDLoader == null ? -1 : mDLoader.getFileSize();
+    return -1;
   }
 
+  /**
+   * 子任务不实现这个
+   */
+  @Deprecated
   @Override public long getCurrentLocation() {
-    return mDLoader == null ? -1 : mDLoader.getCurrentLocation();
+    return -1;
   }
 
   @Override public boolean isRunning() {
@@ -98,6 +132,11 @@ public abstract class AbsSubDLoadUtil implements IUtil {
   }
 
   @Override public void cancel() {
+    if (isCancel) {
+      ALog.w(TAG, "子任务已取消");
+      return;
+    }
+    isCancel = true;
     if (mDLoader != null && isRunning()) {
       mDLoader.cancel();
     } else {
@@ -106,6 +145,11 @@ public abstract class AbsSubDLoadUtil implements IUtil {
   }
 
   @Override public void stop() {
+    if (isStop) {
+      ALog.w(TAG, "任务已停止");
+      return;
+    }
+    isStop = true;
     if (mDLoader != null && isRunning()) {
       mDLoader.stop();
     } else {

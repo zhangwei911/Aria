@@ -115,7 +115,6 @@ import java.util.concurrent.ConcurrentHashMap;
     initDb(APP);
     regAppLifeCallback(APP);
     initAria();
-    amendTaskState();
   }
 
   public Context getAPP() {
@@ -137,6 +136,7 @@ import java.util.concurrent.ConcurrentHashMap;
       }
     }
     mDbWrapper = DelegateWrapper.init(context.getApplicationContext());
+    amendTaskState();
   }
 
   private void initAria() {

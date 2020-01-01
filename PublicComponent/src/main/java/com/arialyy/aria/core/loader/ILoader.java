@@ -15,11 +15,18 @@
  */
 package com.arialyy.aria.core.loader;
 
-import android.os.Looper;
-
-public interface ILoader extends Runnable{
+public interface ILoader extends Runnable {
 
   //void start();
+
+  /**
+   * 任务是否在执行
+   *
+   * @return true 任务执行中
+   */
+  boolean isRunning();
+
+  void cancel();
 
   void stop();
 
@@ -33,6 +40,4 @@ public interface ILoader extends Runnable{
   String getKey();
 
   long getCurrentProgress();
-
-  Looper getLooper();
 }

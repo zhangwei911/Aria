@@ -31,7 +31,7 @@ import java.util.ArrayList;
  * @Author lyy
  * @Date 2019-09-19
  */
-public class FtpRecordHandler extends RecordHandler {
+public final class FtpRecordHandler extends RecordHandler {
 
   public FtpRecordHandler(AbsTaskWrapper wrapper) {
     super(wrapper);
@@ -61,10 +61,10 @@ public class FtpRecordHandler extends RecordHandler {
     tr.threadType = getWrapper().getEntity().getTaskType();
     //最后一个线程的结束位置即为文件的总长度
     if (threadId == (record.threadNum - 1)) {
-      endL = getEntity().getFileSize();
+      endL = getFileSize();
     }
     tr.endLocation = endL;
-    tr.blockLen = RecordUtil.getBlockLen(getEntity().getFileSize(), threadId, record.threadNum);
+    tr.blockLen = RecordUtil.getBlockLen(getFileSize(), threadId, record.threadNum);
     return tr;
   }
 
@@ -96,7 +96,7 @@ public class FtpRecordHandler extends RecordHandler {
     int requestType = getWrapper().getRequestType();
     if (requestType == ITaskWrapper.D_FTP || requestType == ITaskWrapper.D_FTP_DIR) {
       int threadNum = Configuration.getInstance().downloadCfg.getThreadNum();
-      return getEntity().getFileSize() <= IRecordHandler.SUB_LEN
+      return getFileSize() <= IRecordHandler.SUB_LEN
           || getEntity().isGroupChild()
           || threadNum == 1
           ? 1

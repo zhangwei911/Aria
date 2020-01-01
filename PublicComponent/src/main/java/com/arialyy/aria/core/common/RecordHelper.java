@@ -149,28 +149,29 @@ public class RecordHelper {
    * 处理单线程的任务的记录
    */
   public void handleSingleThreadRecord() {
-    File file = new File(mTaskRecord.filePath);
+    // mTaskRecord.isBlock是为了兼容以前的文件格式
+    File file = new File(
+        mTaskRecord.isBlock ? String.format(IRecordHandler.SUB_PATH, mTaskRecord.filePath, 0)
+            : mTaskRecord.filePath);
     ThreadRecord tr = mTaskRecord.threadRecords.get(0);
     if (!file.exists()) {
       ALog.w(TAG, String.format("文件【%s】不存在，任务将重新开始", file.getPath()));
       tr.startLocation = 0;
       tr.isComplete = false;
       tr.endLocation = mWrapper.getEntity().getFileSize();
-    } else if (mTaskRecord.isBlock) {
-      if (file.length() > mWrapper.getEntity().getFileSize()) {
-        ALog.i(TAG, String.format("文件【%s】错误，任务重新开始", file.getPath()));
-        FileUtil.deleteFile(file);
-        tr.startLocation = 0;
+    } else if (file.length() > mWrapper.getEntity().getFileSize()) {
+      ALog.i(TAG, String.format("文件【%s】错误，任务重新开始", file.getPath()));
+      FileUtil.deleteFile(file);
+      tr.startLocation = 0;
+      tr.isComplete = false;
+      tr.endLocation = mWrapper.getEntity().getFileSize();
+    } else if (file.length() == mWrapper.getEntity().getFileSize()) {
+      tr.isComplete = true;
+    } else {
+      if (file.length() != tr.startLocation) {
+        ALog.i(TAG, String.format("修正【%s】的进度记录为：%s", file.getPath(), file.length()));
+        tr.startLocation = file.length();
         tr.isComplete = false;
-        tr.endLocation = mWrapper.getEntity().getFileSize();
-      } else if (file.length() == mWrapper.getEntity().getFileSize()) {
-        tr.isComplete = true;
-      } else {
-        if (file.length() != tr.startLocation) {
-          ALog.i(TAG, String.format("修正【%s】的进度记录为：%s", file.getPath(), file.length()));
-          tr.startLocation = file.length();
-          tr.isComplete = false;
-        }
       }
     }
     mWrapper.setNewTask(false);

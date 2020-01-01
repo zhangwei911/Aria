@@ -1,13 +1,12 @@
 package com.arialyy.aria.core.loader;
 
 import android.os.Handler;
-import android.os.Looper;
 import com.arialyy.aria.core.TaskRecord;
 import com.arialyy.aria.core.ThreadRecord;
 import com.arialyy.aria.core.common.AbsNormalEntity;
 import com.arialyy.aria.core.common.SubThreadConfig;
 import com.arialyy.aria.core.download.DGTaskWrapper;
-import com.arialyy.aria.core.inf.IThreadState;
+import com.arialyy.aria.core.inf.IThreadStateManager;
 import com.arialyy.aria.core.task.IThreadTask;
 import com.arialyy.aria.core.task.IThreadTaskAdapter;
 import com.arialyy.aria.core.task.ThreadTask;
@@ -36,7 +35,7 @@ public abstract class AbsNormalTTBuilder implements IThreadTaskBuilder {
     mTempFile = new File(((AbsNormalEntity) wrapper.getEntity()).getFilePath());
   }
 
-  protected File getTempFile(){
+  protected File getTempFile() {
     return mTempFile;
   }
 
@@ -111,7 +110,7 @@ public abstract class AbsNormalTTBuilder implements IThreadTaskBuilder {
     long fileLength = getEntity().getFileSize();
     long blockSize = fileLength / mTotalThreadNum;
     long currentProgress = 0;
-    List<IThreadTask> threadTasks = new ArrayList<>();
+    List<IThreadTask> threadTasks = new ArrayList<>(mTotalThreadNum);
 
     mRecord.fileLength = fileLength;
     if (mWrapper.isNewTask() && !handleNewTask(mRecord, mTotalThreadNum)) {
@@ -132,7 +131,7 @@ public abstract class AbsNormalTTBuilder implements IThreadTaskBuilder {
       if (tr.isComplete) {//该线程已经完成
         currentProgress += endL - startL;
         ALog.d(TAG, String.format("任务【%s】线程__%s__已完成", mWrapper.getKey(), i));
-        mStateHandler.obtainMessage(IThreadState.STATE_COMPLETE).sendToTarget();
+        mStateHandler.obtainMessage(IThreadStateManager.STATE_COMPLETE).sendToTarget();
         continue;
       }
 
@@ -162,15 +161,14 @@ public abstract class AbsNormalTTBuilder implements IThreadTaskBuilder {
   private List<IThreadTask> handleTask() {
     if (mWrapper.isSupportBP()) {
       return handleBreakpoint();
-    }else {
+    } else {
       return handleNoSupportBP();
     }
   }
 
-  @Override public List<IThreadTask> buildThreadTask(TaskRecord record, Looper looper,
-      IThreadState stateManager) {
+  @Override public List<IThreadTask> buildThreadTask(TaskRecord record, Handler stateHandler) {
     mRecord = record;
-    mStateHandler = new Handler(looper, stateManager.getHandlerCallback());
+    mStateHandler = stateHandler;
     mTotalThreadNum = mRecord.threadNum;
     return handleTask();
   }

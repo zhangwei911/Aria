@@ -20,6 +20,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.StatFs;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -32,7 +33,6 @@ import androidx.lifecycle.ViewModelProviders;
 import com.arialyy.annotations.Download;
 import com.arialyy.aria.core.Aria;
 import com.arialyy.aria.core.common.HttpOption;
-import com.arialyy.aria.core.common.RequestEnum;
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.inf.IEntity;
 import com.arialyy.aria.core.listener.ISchedulers;
@@ -40,16 +40,13 @@ import com.arialyy.aria.core.processor.IHttpFileLenAdapter;
 import com.arialyy.aria.core.task.DownloadTask;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
-import com.arialyy.aria.util.FileUtil;
 import com.arialyy.frame.util.show.T;
 import com.arialyy.simple.R;
 import com.arialyy.simple.base.BaseActivity;
 import com.arialyy.simple.common.ModifyPathDialog;
 import com.arialyy.simple.common.ModifyUrlDialog;
 import com.arialyy.simple.databinding.ActivitySingleBinding;
-import com.arialyy.simple.util.AppUtil;
 import java.io.File;
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -275,9 +272,9 @@ public class SingleTaskActivity extends BaseActivity<ActivitySingleBinding> {
               .load(mTaskId)
               .stop();
         } else {
-          mTaskId = Aria.download(this).load(mTaskId)
+          Aria.download(this).load(mTaskId)
               //.updateUrl(mUrl)
-              .reStart();
+              .resume();
         }
         break;
       case R.id.cancel:

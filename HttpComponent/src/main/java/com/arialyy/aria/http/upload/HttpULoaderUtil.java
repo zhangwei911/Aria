@@ -15,35 +15,39 @@
  */
 package com.arialyy.aria.http.upload;
 
+import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.listener.IEventListener;
-import com.arialyy.aria.core.loader.AbsLoader;
+import com.arialyy.aria.core.loader.AbsNormalLoader;
 import com.arialyy.aria.core.loader.AbsNormalLoaderUtil;
+import com.arialyy.aria.core.loader.LoaderStructure;
 import com.arialyy.aria.core.loader.NormalLoader;
+import com.arialyy.aria.core.loader.NormalThreadStateManager;
 import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
+import com.arialyy.aria.http.HttpFileInfoTask;
+import com.arialyy.aria.http.HttpRecordHandler;
 import com.arialyy.aria.http.HttpTaskOption;
 
 /**
  * @Author lyy
  * @Date 2019-09-19
  */
-public class HttpULoaderUtil extends AbsNormalLoaderUtil {
+public final class HttpULoaderUtil extends AbsNormalLoaderUtil {
   public HttpULoaderUtil(AbsTaskWrapper wrapper, IEventListener listener) {
     super(wrapper, listener);
     wrapper.generateTaskOption(HttpTaskOption.class);
   }
 
-  @Override protected AbsLoader createLoader() {
-    NormalLoader loader = new NormalLoader(getListener(), getTaskWrapper());
-    HttpULoaderAdapter adapter = new HttpULoaderAdapter(getTaskWrapper());
-    loader.setAdapter(adapter);
-    return loader;
+  @Override public AbsNormalLoader getLoader() {
+    return mLoader == null ? new NormalLoader(getTaskWrapper(), getListener()) : mLoader;
   }
 
-  @Override protected Runnable createInfoThread() {
-    return new Runnable() {
-      @Override public void run() {
-        getLoader().start();
-      }
-    };
+  @Override public LoaderStructure BuildLoaderStructure() {
+    LoaderStructure structure = new LoaderStructure();
+    structure.addComponent(new HttpRecordHandler(getTaskWrapper()))
+        .addComponent(new NormalThreadStateManager(getListener()))
+        .addComponent(new HttpFileInfoTask((DTaskWrapper) getTaskWrapper()))
+        .addComponent(new HttpUTTBuilder(getTaskWrapper()));
+    structure.accept(getLoader());
+    return structure;
   }
 }

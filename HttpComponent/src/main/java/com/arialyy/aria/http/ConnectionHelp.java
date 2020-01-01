@@ -43,7 +43,7 @@ import javax.net.ssl.SSLSocketFactory;
 /**
  * Created by lyy on 2017/1/18. 链接帮助类
  */
-public class ConnectionHelp {
+public final class ConnectionHelp {
   private static final String TAG = "ConnectionHelp";
 
   /**

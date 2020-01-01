@@ -44,7 +44,7 @@ public interface IRecordHandler extends ILoaderComponent {
   /**
    * 获取任务记录
    */
-  TaskRecord getRecord();
+  TaskRecord getRecord(long fileSize);
 
   /**
    * 记录处理前的操作，可用来删除任务记录

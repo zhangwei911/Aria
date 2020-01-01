@@ -24,7 +24,7 @@ import com.arialyy.aria.core.AriaConfig;
 import com.arialyy.aria.core.ThreadRecord;
 import com.arialyy.aria.core.common.SubThreadConfig;
 import com.arialyy.aria.core.inf.IEntity;
-import com.arialyy.aria.core.inf.IThreadState;
+import com.arialyy.aria.core.inf.IThreadStateManager;
 import com.arialyy.aria.core.listener.ISchedulers;
 import com.arialyy.aria.core.manager.ThreadTaskManager;
 import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
@@ -168,7 +168,7 @@ public class ThreadTask implements IThreadTask, IThreadTaskObserver {
     taskBreak = true;
     if (mTaskWrapper.isSupportBP()) {
       final long currentTemp = mRangeProgress;
-      updateState(IThreadState.STATE_STOP, null);
+      updateState(IThreadStateManager.STATE_STOP, null);
       ALog.d(TAG, String.format("任务【%s】thread__%s__中断【停止位置：%s】", getFileName(),
           mRecord.threadId, currentTemp));
       writeConfig(false, currentTemp);
@@ -238,7 +238,7 @@ public class ThreadTask implements IThreadTask, IThreadTaskObserver {
   @Override
   public void stop() {
     isStop = true;
-    updateState(IThreadState.STATE_STOP, null);
+    updateState(IThreadStateManager.STATE_STOP, null);
     if (mTaskWrapper.getRequestType() == ITaskWrapper.M3U8_VOD) {
       writeConfig(false, getConfig().tempFile.length());
       ALog.i(TAG, String.format("任务【%s】已停止", getFileName()));
@@ -258,30 +258,22 @@ public class ThreadTask implements IThreadTask, IThreadTaskObserver {
   /**
    * 发送状态给状态处理器
    *
-   * @param state {@link IThreadState#STATE_STOP}..
+   * @param state {@link IThreadStateManager#STATE_STOP}..
    * @param bundle 而外数据
    */
   @Override
   public synchronized void updateState(int state, Bundle bundle) {
     Message msg = mStateHandler.obtainMessage();
-    msg.what = state;
-    if (state != IThreadState.STATE_UPDATE_PROGRESS) {
-      msg.obj = this;
-    }
 
-    if ((state == IThreadState.STATE_COMPLETE || state == IThreadState.STATE_FAIL)
-        && (mTaskWrapper.getRequestType() == AbsTaskWrapper.M3U8_VOD
-        || mTaskWrapper.getRequestType() == AbsTaskWrapper.M3U8_LIVE)) {
-      if (bundle == null) {
-        bundle = new Bundle();
-      }
-      bundle.putString(ISchedulers.DATA_M3U8_URL, getConfig().url);
-      bundle.putString(ISchedulers.DATA_M3U8_PEER_PATH, getConfig().tempFile.getPath());
-      bundle.putInt(ISchedulers.DATA_M3U8_PEER_INDEX, getConfig().peerIndex);
-    }
+    msg.what = state;
     if (bundle != null) {
       msg.setData(bundle);
     }
+    int reqType = mTaskWrapper.getRequestType();
+    if (reqType == ITaskWrapper.M3U8_VOD || reqType == ITaskWrapper.M3U8_LIVE) {
+      sendM3U8Info(state, msg);
+    }
+
     Thread loopThread = mStateHandler.getLooper().getThread();
     if (!loopThread.isAlive() || loopThread.isInterrupted()) {
       return;
@@ -289,10 +281,25 @@ public class ThreadTask implements IThreadTask, IThreadTaskObserver {
     msg.sendToTarget();
   }
 
+  private void sendM3U8Info(int state, Message msg) {
+    if (state != IThreadStateManager.STATE_UPDATE_PROGRESS) {
+      msg.obj = this;
+    }
+    Bundle bundle = msg.getData();
+    if ((state == IThreadStateManager.STATE_COMPLETE || state == IThreadStateManager.STATE_FAIL)) {
+      if (bundle == null) {
+        bundle = new Bundle();
+      }
+      bundle.putString(ISchedulers.DATA_M3U8_URL, getConfig().url);
+      bundle.putString(ISchedulers.DATA_M3U8_PEER_PATH, getConfig().tempFile.getPath());
+      bundle.putInt(ISchedulers.DATA_M3U8_PEER_INDEX, getConfig().peerIndex);
+    }
+  }
+
   @Override public synchronized void updateCompleteState() {
     ALog.i(TAG, String.format("任务【%s】线程__%s__下载完毕", getTaskWrapper().getKey(), mRecord.threadId));
     writeConfig(true, mRecord.endLocation);
-    updateState(IThreadState.STATE_COMPLETE, null);
+    updateState(IThreadStateManager.STATE_COMPLETE, null);
   }
 
   /**
@@ -311,7 +318,7 @@ public class ThreadTask implements IThreadTask, IThreadTaskObserver {
     if (!loopThread.isAlive() || loopThread.isInterrupted()) {
       return;
     }
-    mStateHandler.obtainMessage(IThreadState.STATE_RUNNING, len).sendToTarget();
+    mStateHandler.obtainMessage(IThreadStateManager.STATE_RUNNING, len).sendToTarget();
     if (System.currentTimeMillis() - mLastSaveTime > 5000
         && mRangeProgress < mRecord.endLocation) {
       mLastSaveTime = System.currentTimeMillis();
@@ -332,7 +339,7 @@ public class ThreadTask implements IThreadTask, IThreadTaskObserver {
   @Override
   public void cancel() {
     isCancel = true;
-    updateState(IThreadState.STATE_CANCEL, null);
+    updateState(IThreadStateManager.STATE_CANCEL, null);
     ALog.d(TAG,
         String.format("任务【%s】thread__%s__取消", getFileName(), mRecord.threadId));
   }
@@ -396,8 +403,7 @@ public class ThreadTask implements IThreadTask, IThreadTaskObserver {
       return;
     }
     if (mFailTimes < RETRY_NUM && needRetry && (NetUtils.isConnected(
-        AriaConfig.getInstance().getAPP())
-        || isNotNetRetry) && !isBreak()) {
+        AriaConfig.getInstance().getAPP()) || isNotNetRetry) && !isBreak()) {
       ALog.w(TAG, String.format("分块【%s】正在重试", getFileName()));
       mFailTimes++;
       handleBlockRecord();
@@ -435,7 +441,7 @@ public class ThreadTask implements IThreadTask, IThreadTaskObserver {
         } else if (blockFileLen < mRecord.blockLen) {
           mRecord.startLocation = mRecord.endLocation - mRecord.blockLen + blockFileLen;
           mRecord.isComplete = false;
-          updateState(IThreadState.STATE_UPDATE_PROGRESS, null);
+          updateState(IThreadStateManager.STATE_UPDATE_PROGRESS, null);
           ALog.i(TAG,
               String.format("修正分块【%s】记录，开始位置：%s，结束位置：%s", temp.getName(), mRecord.startLocation,
                   mRecord.endLocation));
@@ -453,12 +459,12 @@ public class ThreadTask implements IThreadTask, IThreadTaskObserver {
    */
   private void sendFailMsg(BaseException e, boolean needRetry) {
     Bundle b = new Bundle();
-    b.putBoolean(IThreadState.KEY_RETRY, needRetry);
+    b.putBoolean(IThreadStateManager.KEY_RETRY, needRetry);
     if (e != null) {
-      b.putSerializable(IThreadState.KEY_ERROR_INFO, e);
-      updateState(IThreadState.STATE_FAIL, b);
+      b.putSerializable(IThreadStateManager.KEY_ERROR_INFO, e);
+      updateState(IThreadStateManager.STATE_FAIL, b);
     } else {
-      updateState(IThreadState.STATE_FAIL, b);
+      updateState(IThreadStateManager.STATE_FAIL, b);
     }
   }
 

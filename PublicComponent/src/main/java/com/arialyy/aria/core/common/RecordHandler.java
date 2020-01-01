@@ -45,6 +45,8 @@ public abstract class RecordHandler implements IRecordHandler {
   private TaskRecord mTaskRecord;
   private AbsTaskWrapper mTaskWrapper;
   private AbsNormalEntity mEntity;
+  protected String mFilePath;
+  protected long mFileSize;
 
   public RecordHandler(AbsTaskWrapper wrapper) {
     mTaskWrapper = wrapper;
@@ -72,7 +74,8 @@ public abstract class RecordHandler implements IRecordHandler {
    * @return 任务记录
    */
   @Override
-  public TaskRecord getRecord() {
+  public TaskRecord getRecord(long fileSize) {
+    mFileSize = fileSize;
     mConfigFile = new File(CommonUtil.getFileConfigPath(false, mEntity.getFileName()));
     if (mConfigFile.exists()) {
       convertDb();
@@ -80,22 +83,7 @@ public abstract class RecordHandler implements IRecordHandler {
       onPre();
       mTaskRecord = DbDataHelper.getTaskRecord(getFilePath(), mEntity.getTaskType());
       if (mTaskRecord == null) {
-        if (!new File(getFilePath()).exists()) {
-          FileUtil.createFile(getFilePath());
-        }
         initRecord(true);
-      } else {
-        File file = new File(mTaskRecord.filePath);
-        if (!file.exists()) {
-          ALog.w(TAG, String.format("文件【%s】不存在，重新分配线程区间", mTaskRecord.filePath));
-          DbEntity.deleteData(ThreadRecord.class, "taskKey=?", mTaskRecord.filePath);
-          mTaskRecord.threadRecords.clear();
-          mTaskRecord.threadNum = initTaskThreadNum();
-          initRecord(false);
-        } else if (mTaskRecord.threadRecords == null || mTaskRecord.threadRecords.isEmpty()) {
-          mTaskRecord.threadNum = initTaskThreadNum();
-          initRecord(false);
-        }
       }
       handlerTaskRecord(mTaskRecord);
     }
@@ -172,7 +160,7 @@ public abstract class RecordHandler implements IRecordHandler {
     if (requestType == ITaskWrapper.M3U8_LIVE) {
       return;
     }
-    long blockSize = mEntity.getFileSize() / mTaskRecord.threadNum;
+    long blockSize = getFileSize() / mTaskRecord.threadNum;
     // 处理线程区间记录
     for (int i = 0; i < mTaskRecord.threadNum; i++) {
       long startL = i * blockSize, endL = (i + 1) * blockSize;
@@ -191,6 +179,10 @@ public abstract class RecordHandler implements IRecordHandler {
       DbEntity.saveAll(mTaskRecord.threadRecords);
     }
     ALog.d(TAG, String.format("保存记录，线程记录数：%s", mTaskRecord.threadRecords.size()));
+  }
+
+  protected long getFileSize() {
+    return mFileSize;
   }
 
   /**

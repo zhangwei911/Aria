@@ -15,35 +15,36 @@
  */
 package com.arialyy.aria.m3u8.vod;
 
-import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.os.Message;
+import android.text.TextUtils;
 import android.util.SparseArray;
-import com.arialyy.aria.core.TaskRecord;
 import com.arialyy.aria.core.ThreadRecord;
+import com.arialyy.aria.core.common.AbsEntity;
+import com.arialyy.aria.core.common.CompleteInfo;
 import com.arialyy.aria.core.common.SubThreadConfig;
 import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.event.Event;
 import com.arialyy.aria.core.event.EventMsgUtil;
 import com.arialyy.aria.core.event.PeerIndexEvent;
-import com.arialyy.aria.core.inf.IThreadState;
-import com.arialyy.aria.core.listener.IEventListener;
-import com.arialyy.aria.core.listener.ISchedulers;
+import com.arialyy.aria.core.inf.IThreadStateManager;
+import com.arialyy.aria.core.loader.IInfoTask;
+import com.arialyy.aria.core.loader.IRecordHandler;
+import com.arialyy.aria.core.loader.IThreadTaskBuilder;
 import com.arialyy.aria.core.manager.ThreadTaskManager;
-import com.arialyy.aria.core.processor.ITsMergeHandler;
+import com.arialyy.aria.core.processor.IVodTsUrlConverter;
 import com.arialyy.aria.core.task.ThreadTask;
 import com.arialyy.aria.exception.BaseException;
-import com.arialyy.aria.exception.TaskException;
+import com.arialyy.aria.exception.M3U8Exception;
 import com.arialyy.aria.m3u8.BaseM3U8Loader;
 import com.arialyy.aria.m3u8.M3U8Listener;
 import com.arialyy.aria.m3u8.M3U8TaskOption;
 import com.arialyy.aria.m3u8.M3U8ThreadTaskAdapter;
 import com.arialyy.aria.util.ALog;
-import com.arialyy.aria.util.CommonUtil;
 import com.arialyy.aria.util.FileUtil;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ExecutorService;
@@ -55,7 +56,7 @@ import java.util.concurrent.locks.ReentrantLock;
 /**
  * M3U8点播文件下载器
  */
-public class M3U8VodLoader extends BaseM3U8Loader {
+final class M3U8VodLoader extends BaseM3U8Loader {
   /**
    * 最大执行数
    */
@@ -81,9 +82,10 @@ public class M3U8VodLoader extends BaseM3U8Loader {
   private ExecutorService mJumpThreadPool;
   private Thread jumpThread = null;
   private M3U8TaskOption mM3U8Option;
+  private Looper mLooper;
 
-  M3U8VodLoader(M3U8Listener listener, DTaskWrapper wrapper) {
-    super(listener, wrapper);
+  M3U8VodLoader(DTaskWrapper wrapper, M3U8Listener listener) {
+    super(wrapper, listener);
     mM3U8Option = (M3U8TaskOption) wrapper.getM3u8Option();
     mFlagQueue = new ArrayBlockingQueue<>(mM3U8Option.getMaxTsQueueNum());
     EXEC_MAX_NUM = mM3U8Option.getMaxTsQueueNum();
@@ -91,10 +93,37 @@ public class M3U8VodLoader extends BaseM3U8Loader {
     EventMsgUtil.getDefault().register(this);
   }
 
-  @Override protected IThreadState createStateManager(Looper looper) {
-    mManager = new VodStateManager(looper, mRecord, mListener);
-    mStateHandler = new Handler(looper, mManager);
-    return mManager;
+  @Override protected M3U8Listener getListener() {
+    return (M3U8Listener) super.getListener();
+  }
+
+  SparseArray<ThreadRecord> getBeforePeer() {
+    return mBeforePeer;
+  }
+
+  int getCompleteNum() {
+    return mCompleteNum;
+  }
+
+  void setCompleteNum(int mCompleteNum) {
+    this.mCompleteNum = mCompleteNum;
+  }
+
+  int getCurrentFlagSize() {
+    mCurrentFlagSize = mFlagQueue.size();
+    return mCurrentFlagSize;
+  }
+
+  void setCurrentFlagSize(int currentFlagSize) {
+    mCurrentFlagSize = currentFlagSize;
+  }
+
+  boolean isJump() {
+    return isJump;
+  }
+
+  File getTempFile() {
+    return mTempFile;
   }
 
   @Override public void onDestroy() {
@@ -115,7 +144,15 @@ public class M3U8VodLoader extends BaseM3U8Loader {
     return super.isBreak() || isDestroy;
   }
 
-  @Override protected void handleTask() {
+  @Override protected void handleTask(Looper looper) {
+    if (isBreak()) {
+      return;
+    }
+    mLooper = looper;
+    mInfoTask.run();
+  }
+
+  private void startThreadTask() {
     Thread th = new Thread(new Runnable() {
       @Override public void run() {
         while (!isBreak()) {
@@ -193,7 +230,7 @@ public class M3U8VodLoader extends BaseM3U8Loader {
    */
   private void addTaskToQueue(ThreadRecord tr) throws InterruptedException {
     ThreadTask task = createThreadTask(mCacheDir, tr, tr.threadId);
-    getTaskList().put(tr.threadId, task);
+    getTaskList().add(task);
     getEntity().getM3U8Entity().setPeerIndex(tr.threadId);
     TempFlag flag = startThreadTask(task, tr.threadId);
     if (flag != null) {
@@ -222,10 +259,10 @@ public class M3U8VodLoader extends BaseM3U8Loader {
     }
     mManager.updateStateCount();
     if (mCompleteNum <= 0) {
-      mListener.onStart(0);
+      getListener().onStart(0);
     } else {
       int percent = mCompleteNum * 100 / mRecord.threadRecords.size();
-      mListener.onResume(percent);
+      getListener().onResume(percent);
     }
   }
 
@@ -344,7 +381,7 @@ public class M3U8VodLoader extends BaseM3U8Loader {
   /**
    * 从指定位置恢复任务
    */
-  private synchronized void resumeTask() {
+  synchronized void resumeTask() {
     if (isBreak()) {
       ALog.e(TAG, "任务已停止，恢复任务失败");
       return;
@@ -388,11 +425,7 @@ public class M3U8VodLoader extends BaseM3U8Loader {
     }
   }
 
-  private M3U8Listener getListener() {
-    return (M3U8Listener) mListener;
-  }
-
-  private void notifyWaitLock(boolean isComplete) {
+  void notifyWaitLock(boolean isComplete) {
     try {
       LOCK.lock();
       if (isComplete) {
@@ -449,236 +482,87 @@ public class M3U8VodLoader extends BaseM3U8Loader {
     return threadTask;
   }
 
+  @Override public void addComponent(IRecordHandler recordHandler) {
+    mRecordHandler = recordHandler;
+    mRecord = mRecordHandler.getRecord(0);
+  }
+
+  @Override public void addComponent(IInfoTask infoTask) {
+    mInfoTask = infoTask;
+    final List<String> urls = new ArrayList<>();
+    mInfoTask.setCallback(new IInfoTask.Callback() {
+      @Override public void onSucceed(String key, CompleteInfo info) {
+        IVodTsUrlConverter converter = mM3U8Option.getVodUrlConverter();
+        if (converter != null) {
+          if (TextUtils.isEmpty(mM3U8Option.getBandWidthUrl())) {
+            urls.addAll(
+                converter.convert(getEntity().getUrl(), (List<String>) info.obj));
+          } else {
+            urls.addAll(
+                converter.convert(mM3U8Option.getBandWidthUrl(), (List<String>) info.obj));
+          }
+        } else {
+          urls.addAll((Collection<? extends String>) info.obj);
+        }
+        if (urls.isEmpty()) {
+          fail(new M3U8Exception(TAG, "获取地址失败"), false);
+          return;
+        } else if (!urls.get(0).startsWith("http")) {
+          fail(new M3U8Exception(TAG, "地址错误，请使用IVodTsUrlConverter处理你的url信息"), false);
+          return;
+        }
+        mM3U8Option.setUrls(urls);
+
+        if (isStop) {
+          getListener().onStop(getEntity().getCurrentProgress());
+        } else if (isCancel) {
+          getListener().onCancel();
+        } else {
+          startThreadTask();
+        }
+      }
+
+      @Override public void onFail(AbsEntity entity, BaseException e, boolean needRetry) {
+        fail(e, needRetry);
+      }
+    });
+  }
+
+  protected void fail(BaseException e, boolean needRetry) {
+    if (isBreak()) {
+      return;
+    }
+    getListener().onFail(needRetry, e);
+    onDestroy();
+  }
+
   /**
-   * M3U8线程状态管理
+   * 需要在 {@link #addComponent(IRecordHandler)}后调用
    */
-  private class VodStateManager implements IThreadState {
-    private final String TAG = CommonUtil.getClassName(VodStateManager.class);
+  @Override public void addComponent(IThreadStateManager threadState) {
+    mManager = (VodStateManager) threadState;
+    mStateHandler = new Handler(mLooper, mManager.getHandlerCallback());
+    mManager.setVodLoader(this);
+    mManager.setLooper(mRecord, mLooper);
+  }
 
-    /**
-     * 任务状态回调
-     */
-    private IEventListener listener;
-    private int startThreadNum;    // 启动的线程总数
-    private int cancelNum = 0; // 已经取消的线程的数
-    private int stopNum = 0;  // 已经停止的线程数
-    private int failNum = 0;  // 失败的线程数
-    private long percent; //当前总进度，百分比进度
-    private long progress;
-    private TaskRecord taskRecord; // 任务记录
-    private Looper looper;
+  /**
+   * m3u8 不需要实现这个
+   */
+  @Deprecated
+  @Override public void addComponent(IThreadTaskBuilder builder) {
 
-    /**
-     * @param taskRecord 任务记录
-     * @param listener 任务事件
-     */
-    VodStateManager(Looper looper, TaskRecord taskRecord, IEventListener listener) {
-      this.looper = looper;
-      this.taskRecord = taskRecord;
-      for (ThreadRecord record : taskRecord.threadRecords) {
-        if (!record.isComplete) {
-          startThreadNum++;
-        }
-      }
-      this.listener = listener;
-      progress = getEntity().getCurrentProgress();
+  }
+
+  @Override protected void checkComponent() {
+    if (mRecordHandler == null) {
+      throw new NullPointerException("任务记录组件为空");
     }
-
-    private void updateStateCount() {
-      cancelNum = 0;
-      stopNum = 0;
-      failNum = 0;
+    if (mInfoTask == null) {
+      throw new NullPointerException(("文件信息组件为空"));
     }
-
-    /**
-     * 退出looper循环
-     */
-    private void quitLooper() {
-      ALog.d(TAG, "quitLooper");
-      looper.quit();
-    }
-
-    @Override public boolean handleMessage(Message msg) {
-      int peerIndex = msg.getData().getInt(ISchedulers.DATA_M3U8_PEER_INDEX);
-      switch (msg.what) {
-        case STATE_STOP:
-          stopNum++;
-          removeSignThread((ThreadTask) msg.obj);
-          // 处理跳转位置后，恢复任务
-          if (isJump && (stopNum == mCurrentFlagSize || mCurrentFlagSize == 0) && !isBreak()) {
-            resumeTask();
-            return true;
-          }
-
-          if (isBreak()) {
-            ALog.d(TAG, String.format("vod任务【%s】停止", mTempFile.getName()));
-            quitLooper();
-          }
-          break;
-        case STATE_CANCEL:
-          cancelNum++;
-          removeSignThread((ThreadTask) msg.obj);
-
-          if (isBreak()) {
-            ALog.d(TAG, String.format("vod任务【%s】取消", mTempFile.getName()));
-            quitLooper();
-          }
-          break;
-        case STATE_FAIL:
-          failNum++;
-          for (ThreadRecord tr : mRecord.threadRecords) {
-            if (tr.threadId == peerIndex) {
-              mBeforePeer.put(peerIndex, tr);
-              break;
-            }
-          }
-
-          getListener().onPeerFail(mTaskWrapper.getKey(),
-              msg.getData().getString(ISchedulers.DATA_M3U8_PEER_PATH), peerIndex);
-          if (isFail()) {
-            ALog.d(TAG, String.format("vod任务【%s】失败", mTempFile.getName()));
-            Bundle b = msg.getData();
-            listener.onFail(b.getBoolean(KEY_RETRY, true),
-                (BaseException) b.getSerializable(KEY_ERROR_INFO));
-            quitLooper();
-          }
-          break;
-        case STATE_COMPLETE:
-          if (isBreak()) {
-            quitLooper();
-          }
-          mCompleteNum++;
-          // 正在切换位置时，切片完成，队列减小
-          if (isJump) {
-            mCurrentFlagSize--;
-            if (mCurrentFlagSize < 0) {
-              mCurrentFlagSize = 0;
-            }
-          }
-
-          removeSignThread((ThreadTask) msg.obj);
-          getListener().onPeerComplete(mTaskWrapper.getKey(),
-              msg.getData().getString(ISchedulers.DATA_M3U8_PEER_PATH), peerIndex);
-          handlerPercent();
-          if (!isJump) {
-            notifyWaitLock(true);
-          }
-          if (isComplete()) {
-            ALog.d(TAG, String.format(
-                "startThreadNum = %s, stopNum = %s, cancelNum = %s, failNum = %s, completeNum = %s, flagQueueSize = %s",
-                startThreadNum, stopNum, cancelNum, failNum, mCompleteNum, mFlagQueue.size()));
-            ALog.d(TAG, String.format("vod任务【%s】完成", mTempFile.getName()));
-
-            if (mM3U8Option.isGenerateIndexFile()) {
-              if (generateIndexFile(false)) {
-                listener.onComplete();
-              } else {
-                listener.onFail(false, new TaskException(TAG, "创建索引文件失败"));
-              }
-            } else if (mM3U8Option.isMergeFile()) {
-              if (mergeFile()) {
-                listener.onComplete();
-              } else {
-                listener.onFail(false, null);
-              }
-            } else {
-              listener.onComplete();
-            }
-            quitLooper();
-          }
-          break;
-        case STATE_RUNNING:
-          progress += (long) msg.obj;
-          break;
-      }
-      return true;
-    }
-
-    private void removeSignThread(ThreadTask threadTask) {
-      int index = getTaskList().indexOfValue(threadTask);
-      if (index != -1) {
-        getTaskList().removeAt(index);
-      }
-      ThreadTaskManager.getInstance().removeSingleTaskThread(mTaskWrapper.getKey(), threadTask);
-    }
-
-    /**
-     * 设置进度
-     */
-    private void handlerPercent() {
-      int completeNum = mM3U8Option.getCompleteNum();
-      completeNum++;
-      mM3U8Option.setCompleteNum(completeNum);
-      int percent = completeNum * 100 / taskRecord.threadRecords.size();
-      getEntity().setPercent(percent);
-      getEntity().update();
-      this.percent = percent;
-    }
-
-    @Override public boolean isFail() {
-      printInfo("isFail");
-      return failNum != 0 && failNum == mFlagQueue.size() && !isJump;
-    }
-
-    @Override public boolean isComplete() {
-      if (mM3U8Option.isIgnoreFailureTs()) {
-        return mCompleteNum + failNum >= taskRecord.threadRecords.size() && !isJump;
-      } else {
-        return mCompleteNum == taskRecord.threadRecords.size() && !isJump;
-      }
-    }
-
-    @Override public long getCurrentProgress() {
-      return progress;
-    }
-
-    private void printInfo(String tag) {
-      if (false) {
-        ALog.d(tag, String.format(
-            "startThreadNum = %s, stopNum = %s, cancelNum = %s, failNum = %s, completeNum = %s, flagQueueSize = %s",
-            startThreadNum, stopNum, cancelNum, failNum, mCompleteNum, mFlagQueue.size()));
-      }
-    }
-
-    /**
-     * 合并文件
-     *
-     * @return {@code true} 合并成功，{@code false}合并失败
-     */
-    private boolean mergeFile() {
-      ITsMergeHandler mergeHandler = mM3U8Option.getMergeHandler();
-      String cacheDir = getCacheDir();
-      List<String> partPath = new ArrayList<>();
-      for (ThreadRecord tr : taskRecord.threadRecords) {
-        partPath.add(BaseM3U8Loader.getTsFilePath(cacheDir, tr.threadId));
-      }
-      boolean isSuccess;
-      if (mergeHandler != null) {
-        isSuccess = mergeHandler.merge(getEntity().getM3U8Entity(), partPath);
-
-        if (mergeHandler.getClass().isAnonymousClass()) {
-          mM3U8Option.setMergeHandler(null);
-        }
-      } else {
-        isSuccess = FileUtil.mergeFile(taskRecord.filePath, partPath);
-      }
-      if (isSuccess) {
-        // 合并成功，删除缓存文件
-        File[] files = new File(cacheDir).listFiles();
-        for (File f : files) {
-          if (f.exists()) {
-            f.delete();
-          }
-        }
-        File cDir = new File(cacheDir);
-        if (cDir.exists()) {
-          cDir.delete();
-        }
-        return true;
-      } else {
-        ALog.e(TAG, "合并失败");
-        return false;
-      }
+    if (mManager == null) {
+      throw new NullPointerException("任务状态管理组件为空");
     }
   }
 

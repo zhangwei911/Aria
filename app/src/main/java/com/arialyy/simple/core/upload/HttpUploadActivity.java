@@ -43,7 +43,7 @@ public class HttpUploadActivity extends BaseActivity<ActivityUploadBinding> {
 
   //private final String FILE_PATH = "/mnt/sdcard/ggsg14.apk";
   private final String FILE_PATH =
-      Environment.getExternalStorageDirectory().getPath() + "/Download/PaNTFS15562.zip";
+      Environment.getExternalStorageDirectory().getPath() + "/Download/QQMusic-import-1.2.1.zip";
   private UploadEntity mEntity;
 
   @Override protected int setLayoutId() {
@@ -82,7 +82,7 @@ public class HttpUploadActivity extends BaseActivity<ActivityUploadBinding> {
         .setParam("params", "bbbbbbbb");
     Aria.upload(HttpUploadActivity.this).load(FILE_PATH)
         //.setUploadUrl("http://lib-test.xzxyun.com:8042/Api/upload?data={\"type\":\"1\",\"fileType\":\".apk\"}")
-        .setUploadUrl("http://9.9.9.205:5000/upload/")
+        .setUploadUrl("http://9.9.12.210:5000/upload/")
         //.setTempUrl("http://192.168.1.6:8080/upload/sign_file/").setAttachment("file")
         //.addHeader("iplanetdirectorypro", "11a09102fb934ad0bc206f9c611d7933")
         .option(option)
