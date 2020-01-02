@@ -34,19 +34,19 @@ public abstract class AbsSubDLoadUtil implements IUtil, Runnable {
   protected SubLoader mDLoader;
   private DTaskWrapper mWrapper;
   private Handler mSchedulers;
-  private ChildDLoadListener mListener;
   private boolean needGetInfo;
   private boolean isStop = false, isCancel = false;
+  private String parentKey;
 
   /**
    * @param schedulers 调度器
    * @param needGetInfo {@code true} 需要获取文件信息。{@code false} 不需要获取文件信息
    */
-  protected AbsSubDLoadUtil(DTaskWrapper taskWrapper, Handler schedulers, boolean needGetInfo) {
+  protected AbsSubDLoadUtil(DTaskWrapper taskWrapper, Handler schedulers, boolean needGetInfo, String parentKey) {
     mWrapper = taskWrapper;
     mSchedulers = schedulers;
+    this.parentKey = parentKey;
     this.needGetInfo = needGetInfo;
-    mListener = new ChildDLoadListener(mSchedulers, AbsSubDLoadUtil.this);
     mDLoader = getLoader();
   }
 
@@ -57,6 +57,10 @@ public abstract class AbsSubDLoadUtil implements IUtil, Runnable {
 
   protected abstract LoaderStructure buildLoaderStructure();
 
+  public String getParentKey() {
+    return parentKey;
+  }
+
   protected boolean isNeedGetInfo() {
     return needGetInfo;
   }
@@ -66,7 +70,7 @@ public abstract class AbsSubDLoadUtil implements IUtil, Runnable {
   }
 
   @Override public String getKey() {
-    return mWrapper.getKey();
+    return mDLoader.getKey();
   }
 
   public DTaskWrapper getWrapper() {
@@ -77,15 +81,10 @@ public abstract class AbsSubDLoadUtil implements IUtil, Runnable {
     return mWrapper.getEntity();
   }
 
-  public ChildDLoadListener getListener() {
-    return mListener;
-  }
-
   @Override public void run() {
     if (isStop || isCancel) {
       return;
     }
-    mListener.onPre();
     buildLoaderStructure();
     mDLoader.run();
   }
@@ -105,10 +104,6 @@ public abstract class AbsSubDLoadUtil implements IUtil, Runnable {
     if (mDLoader != null) {
       mDLoader.retryTask();
     }
-  }
-
-  public SubLoader getDownloader() {
-    return mDLoader;
   }
 
   /**

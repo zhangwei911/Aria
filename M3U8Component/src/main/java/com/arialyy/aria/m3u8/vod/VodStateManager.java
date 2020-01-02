@@ -113,8 +113,8 @@ public final class VodStateManager implements IThreadStateManager {
           if (isFail()) {
             ALog.d(TAG, String.format("vod任务【%s】失败", loader.getTempFile().getName()));
             Bundle b = msg.getData();
-            listener.onFail(b.getBoolean(KEY_RETRY, true),
-                (BaseException) b.getSerializable(KEY_ERROR_INFO));
+            listener.onFail(b.getBoolean(DATA_RETRY, true),
+                (BaseException) b.getSerializable(DATA_ERROR_INFO));
             quitLooper();
           }
           break;

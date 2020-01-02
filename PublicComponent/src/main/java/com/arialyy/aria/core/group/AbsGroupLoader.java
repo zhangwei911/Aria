@@ -45,7 +45,7 @@ public abstract class AbsGroupLoader implements ILoaderVisitor, ILoader {
   protected final String TAG = CommonUtil.getClassName(getClass());
 
   private long mCurrentLocation = 0;
-  protected IDGroupListener mListener;
+  private IDGroupListener mListener;
   private ScheduledThreadPoolExecutor mTimer;
   private long mUpdateInterval;
   private boolean isStop = false, isCancel = false;
@@ -75,6 +75,10 @@ public abstract class AbsGroupLoader implements ILoaderVisitor, ILoader {
    * @param needGetFileInfo {@code true} 需要获取文件信息。{@code false} 不需要获取文件信息
    */
   protected abstract AbsSubDLoadUtil createSubLoader(DTaskWrapper wrapper, boolean needGetFileInfo);
+
+  protected IDGroupListener getListener() {
+    return mListener;
+  }
 
   protected DGTaskWrapper getWrapper() {
     return mGTWrapper;
@@ -113,7 +117,7 @@ public abstract class AbsGroupLoader implements ILoaderVisitor, ILoader {
       getWrapper().setState(IEntity.STATE_POST_PRE);
     }
     mState.updateProgress(mCurrentLocation);
-    mScheduler = new Handler(looper, SimpleSchedulers.newInstance(mState));
+    mScheduler = new Handler(looper, SimpleSchedulers.newInstance(mState, mGTWrapper.getKey()));
   }
 
   @Override public String getKey() {
@@ -248,16 +252,24 @@ public abstract class AbsGroupLoader implements ILoaderVisitor, ILoader {
       mListener.onComplete();
       return;
     }
-
-    mListener.onPostPre(mGTWrapper.getEntity().getFileSize());
-    if (mCurrentLocation > 0) {
-      mListener.onResume(mCurrentLocation);
-    } else {
-      mListener.onStart(mCurrentLocation);
-    }
     startTimer();
     handlerTask(looper);
     Looper.loop();
+  }
+
+  /**
+   * 组合任务获取完成子任务的信息后调用
+   */
+  protected void onPostStart() {
+    if (isBreak()) {
+      return;
+    }
+    getListener().onPostPre(getWrapper().getEntity().getFileSize());
+    if (getWrapper().getEntity().getFileSize() > 0) {
+      getListener().onResume(getWrapper().getEntity().getCurrentProgress());
+    } else {
+      getListener().onStart(getWrapper().getEntity().getCurrentProgress());
+    }
   }
 
   private synchronized void startTimer() {

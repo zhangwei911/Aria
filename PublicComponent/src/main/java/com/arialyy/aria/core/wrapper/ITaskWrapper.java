@@ -97,7 +97,10 @@ public interface ITaskWrapper {
   IEntity getEntity();
 
   /**
-   * 获取任务唯一标志
+   * 获取任务唯一标志：
+   * 下载任务，对应文件的下载地址
+   * 上传任务，对应需要上传的文件路径
+   * 组合任务，对应组合任务的groupHash
    */
   String getKey();
 }

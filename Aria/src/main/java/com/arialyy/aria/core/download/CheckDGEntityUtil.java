@@ -116,7 +116,7 @@ public class CheckDGEntityUtil implements ICheckEntityUtil {
   @Override
   public boolean checkEntity() {
     if (mWrapper.getErrorEvent() != null) {
-      ALog.e(TAG, String.format("下载失败，%s", mWrapper.getErrorEvent().errorMsg));
+      ALog.e(TAG, String.format("操作失败，%s", mWrapper.getErrorEvent().errorMsg));
       return false;
     }
 
@@ -195,7 +195,7 @@ public class CheckDGEntityUtil implements ICheckEntityUtil {
    */
   private boolean checkUrls() {
     if (mEntity.getUrls().isEmpty()) {
-      ALog.e(TAG, "下载失败，子任务下载列表为null");
+      ALog.e(TAG, "操作失败，子任务下载列表为null");
       return false;
     }
 

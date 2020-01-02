@@ -84,6 +84,8 @@ public abstract class AbsNormalTTBuilder implements IThreadTaskBuilder {
     config.taskWrapper = mWrapper;
     config.record = record;
     config.stateHandler = mStateHandler;
+    config.threadType = SubThreadConfig.getThreadType(mWrapper.getRequestType());
+    config.updateInterval = SubThreadConfig.getUpdateInterval(mWrapper.getRequestType());
     return createThreadTask(config);
   }
 

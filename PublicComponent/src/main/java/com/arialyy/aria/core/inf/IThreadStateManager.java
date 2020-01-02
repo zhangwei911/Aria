@@ -32,8 +32,10 @@ public interface IThreadStateManager extends ILoaderComponent {
   int STATE_UPDATE_PROGRESS = 0x06;
   int STATE_PRE = 0x07;
   int STATE_START = 0x08;
-  String KEY_RETRY = "KEY_RETRY";
-  String KEY_ERROR_INFO = "KEY_ERROR_INFO";
+  String DATA_RETRY = "DATA_RETRY";
+  String DATA_ERROR_INFO = "DATA_ERROR_INFO";
+  String DATA_THREAD_NAME = "DATA_THREAD_NAME";
+  String DATA_THREAD_LOCATION = "DATA_THREAD_LOCATION";
 
   /**
    * 任务是否已经失败

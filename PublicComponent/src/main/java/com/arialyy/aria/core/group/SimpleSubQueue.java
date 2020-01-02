@@ -17,6 +17,7 @@ package com.arialyy.aria.core.group;
 
 import com.arialyy.aria.core.config.Configuration;
 import com.arialyy.aria.util.ALog;
+import com.arialyy.aria.util.CommonUtil;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -29,7 +30,7 @@ import java.util.Set;
  * 组合任务队列，该队列生命周期和{@link AbsGroupLoaderUtil}生命周期一致
  */
 class SimpleSubQueue implements ISubQueue<AbsSubDLoadUtil> {
-  private static final String TAG = "SimpleSubQueue";
+  private final String TAG = CommonUtil.getClassName(getClass());
   /**
    * 缓存下载器
    */
@@ -162,12 +163,7 @@ class SimpleSubQueue implements ISubQueue<AbsSubDLoadUtil> {
   }
 
   @Override public void removeTaskFromExecQ(AbsSubDLoadUtil fileer) {
-    if (mExec.containsKey(fileer.getKey())) {
-      if (fileer.isRunning()) {
-        fileer.stop();
-      }
-      mExec.remove(fileer.getKey());
-    }
+    mExec.remove(fileer.getKey());
   }
 
   @Override public void removeTask(AbsSubDLoadUtil fileer) {

@@ -16,7 +16,6 @@
 package com.arialyy.aria.core.listener;
 
 import com.arialyy.aria.core.download.DownloadEntity;
-import com.arialyy.aria.core.listener.IDLoadListener;
 import com.arialyy.aria.exception.BaseException;
 
 /**
@@ -45,7 +44,7 @@ public interface IDGroupListener extends IDLoadListener {
   /**
    * 子任务停止下载
    */
-  void onSubStop(DownloadEntity subEntity);
+  void onSubStop(DownloadEntity subEntity, long stopLocation);
 
   /**
    * 子任务下载完成
@@ -64,6 +63,8 @@ public interface IDGroupListener extends IDLoadListener {
 
   /**
    * 子任务执行中
+   *
+   * @param currentProgress 当前进度
    */
-  void onSubRunning(DownloadEntity subEntity);
+  void onSubRunning(DownloadEntity subEntity, long currentProgress);
 }

@@ -62,6 +62,16 @@ public class CommonUtil {
   private static long lastClickTime;
 
   /**
+   * 获取线程名称，命名规则：md5(任务地址 + 线程id)
+   *
+   * @param url 任务地址
+   * @param threadId 线程id
+   */
+  public static String getThreadName(String url, int threadId) {
+    return getStrMd5(url.concat(String.valueOf(threadId)));
+  }
+
+  /**
    * 检查sql的expression是否合法
    *
    * @return false 不合法
@@ -436,7 +446,7 @@ public class CommonUtil {
       md.update(str.getBytes());
       return new BigInteger(1, md.digest()).toString(16);
     } catch (NoSuchAlgorithmException e) {
-      ALog.e(TAG, e.getMessage());
+      e.printStackTrace();
     }
     return "";
   }
@@ -633,7 +643,7 @@ public class CommonUtil {
         ignore.add(field);
       }
     }
-    if (!ignore.isEmpty()){
+    if (!ignore.isEmpty()) {
       fields.removeAll(ignore);
     }
     return fields;

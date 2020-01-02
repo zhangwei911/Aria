@@ -45,13 +45,18 @@ final class FtpDGLoader extends AbsGroupLoader {
 
   @Override
   protected AbsSubDLoadUtil createSubLoader(DTaskWrapper wrapper, boolean needGetFileInfo) {
-    return new FtpSubDLoaderUtil(wrapper, getScheduler(), needGetFileInfo);
+    return new FtpSubDLoaderUtil(wrapper, getScheduler(), needGetFileInfo, getKey());
   }
 
   /**
    * 启动子任务下载
    */
   private void startSub() {
+    if (isBreak()) {
+      return;
+    }
+    onPostStart();
+
     // ftp需要获取完成只任务信息才更新只任务数量
     getState().setSubSize(getWrapper().getSubTaskWrapper().size());
 
@@ -70,12 +75,12 @@ final class FtpDGLoader extends AbsGroupLoader {
           startSub();
         } else {
           ALog.e(TAG, "获取任务信息失败，code：" + info.code);
-          mListener.onFail(false, null);
+          getListener().onFail(false, null);
         }
       }
 
       @Override public void onFail(AbsEntity entity, BaseException e, boolean needRetry) {
-        mListener.onFail(needRetry, e);
+        getListener().onFail(needRetry, e);
       }
     });
   }

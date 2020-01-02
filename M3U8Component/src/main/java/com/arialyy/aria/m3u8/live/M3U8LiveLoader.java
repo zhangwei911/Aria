@@ -31,6 +31,7 @@ import com.arialyy.aria.core.manager.ThreadTaskManager;
 import com.arialyy.aria.core.processor.ILiveTsUrlConverter;
 import com.arialyy.aria.core.processor.ITsMergeHandler;
 import com.arialyy.aria.core.task.ThreadTask;
+import com.arialyy.aria.core.wrapper.ITaskWrapper;
 import com.arialyy.aria.exception.BaseException;
 import com.arialyy.aria.exception.M3U8Exception;
 import com.arialyy.aria.exception.TaskException;
@@ -180,7 +181,8 @@ final class M3U8LiveLoader extends BaseM3U8Loader {
     config.record = record;
     config.stateHandler = mStateHandler;
     config.peerIndex = indexId;
-
+    config.threadType = SubThreadConfig.getThreadType(ITaskWrapper.M3U8_LIVE);
+    config.updateInterval = SubThreadConfig.getUpdateInterval(ITaskWrapper.M3U8_LIVE);
     if (!config.tempFile.exists()) {
       FileUtil.createFile(config.tempFile);
     }

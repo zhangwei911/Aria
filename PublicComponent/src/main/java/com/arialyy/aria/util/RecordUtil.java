@@ -85,7 +85,7 @@ public class RecordUtil {
         DbEntity.findRelationData(RecordWrapper.class, "dGroupHash=?", groupEntity.getGroupHash());
 
     if (records == null || records.isEmpty()) {
-      ALog.w(TAG, "组任务记录删除失败，记录为null");
+      ALog.w(TAG, "组任务记录已删除");
     } else {
       for (RecordWrapper record : records) {
         if (record == null || record.taskRecord == null) {

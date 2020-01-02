@@ -67,6 +67,7 @@ public class DownloadGroupActivity extends BaseActivity<ActivityDownloadGroupBin
         getBinding().setProgress(entity.isComplete() ? 100
             : (int) (entity.getCurrentProgress() * 100 / entity.getFileSize()));
       }
+      ALog.d(TAG, "progress = " + getBinding().getProgress());
       ALog.d(TAG,
           "size = " + entity.getSubEntities().size() + "; len = " + entity.getConvertFileSize());
     }
@@ -133,11 +134,11 @@ public class DownloadGroupActivity extends BaseActivity<ActivityDownloadGroupBin
   }
 
   @DownloadGroup.onPre() protected void onPre(DownloadGroupTask task) {
-    L.d(TAG, "group pre");
+    L.d(TAG, "group pre, p = " + task.getPercent());
   }
 
   @DownloadGroup.onTaskPre() protected void onTaskPre(DownloadGroupTask task) {
-    L.d(TAG, "group task pre");
+    L.d(TAG, "group task pre, p = " + task.getPercent());
     getBinding().setFileSize(task.getConvertFileSize());
     if (mChildList.getSubData().size() <= 0) {
       mChildList.addData(task.getEntity().getSubEntities());
@@ -146,7 +147,7 @@ public class DownloadGroupActivity extends BaseActivity<ActivityDownloadGroupBin
 
   @DownloadGroup.onTaskStart() void taskStart(DownloadGroupTask task) {
     getBinding().setFileSize(task.getConvertFileSize());
-    L.d(TAG, "group task create");
+    L.d(TAG, "group task create, p = " + task.getPercent());
   }
 
   @DownloadGroup.onTaskRunning() protected void running(DownloadGroupTask task) {
@@ -163,7 +164,7 @@ public class DownloadGroupActivity extends BaseActivity<ActivityDownloadGroupBin
   }
 
   @DownloadGroup.onTaskResume() void taskResume(DownloadGroupTask task) {
-    L.d(TAG, "group task resume");
+    L.d(TAG, "group task resume, p = " + task.getPercent());
   }
 
   @DownloadGroup.onTaskStop() void taskStop(DownloadGroupTask task) {

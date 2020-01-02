@@ -90,7 +90,11 @@ public interface IThreadTask extends Callable<IThreadTask> {
 
   /**
    * 获取线程id
-   * @return
    */
   int getThreadId();
+
+  /**
+   * 线程名字，命名规则：md5(任务地址 + 线程id)
+   */
+  String getThreadName();
 }

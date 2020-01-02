@@ -36,7 +36,8 @@ public final class HttpDGLoaderUtil extends AbsGroupLoaderUtil {
   }
 
   @Override protected AbsGroupLoader getLoader() {
-    return mLoader == null ? new HttpDGLoader(getTaskWrapper(), getListener()) : mLoader;
+    return mLoader == null ? new HttpDGLoader(getTaskWrapper(),
+        (DownloadGroupListener) getListener()) : mLoader;
   }
 
   @Override protected LoaderStructure buildLoaderStructure() {

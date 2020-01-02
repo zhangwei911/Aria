@@ -22,7 +22,7 @@ import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.group.AbsGroupLoader;
 import com.arialyy.aria.core.group.AbsSubDLoadUtil;
-import com.arialyy.aria.core.listener.IEventListener;
+import com.arialyy.aria.core.listener.DownloadGroupListener;
 import com.arialyy.aria.core.loader.IInfoTask;
 import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
 import com.arialyy.aria.exception.BaseException;
@@ -31,7 +31,7 @@ import com.arialyy.aria.exception.BaseException;
  * http 组合任务加载器
  */
 final class HttpDGLoader extends AbsGroupLoader {
-  HttpDGLoader(AbsTaskWrapper groupWrapper, IEventListener listener) {
+  HttpDGLoader(AbsTaskWrapper groupWrapper, DownloadGroupListener listener) {
     super(groupWrapper, listener);
   }
 
@@ -44,13 +44,14 @@ final class HttpDGLoader extends AbsGroupLoader {
 
   @Override
   protected AbsSubDLoadUtil createSubLoader(DTaskWrapper wrapper, boolean needGetFileInfo) {
-    return new HttpSubDLoaderUtil(wrapper, getScheduler(), needGetFileInfo);
+    return new HttpSubDLoaderUtil(wrapper, getScheduler(), needGetFileInfo, getKey());
   }
 
   private void startSub() {
     if (isBreak()) {
       return;
     }
+    onPostStart();
     for (DTaskWrapper wrapper : getWrapper().getSubTaskWrapper()) {
       DownloadEntity dEntity = wrapper.getEntity();
       startSubLoader(createSubLoader(wrapper, dEntity.getFileSize() < 0));
@@ -65,7 +66,7 @@ final class HttpDGLoader extends AbsGroupLoader {
       }
 
       @Override public void onFail(AbsEntity entity, BaseException e, boolean needRetry) {
-        mListener.onFail(needRetry, e);
+        getListener().onFail(needRetry, e);
       }
     });
   }

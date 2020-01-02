@@ -34,6 +34,7 @@ import com.arialyy.aria.core.loader.IThreadTaskBuilder;
 import com.arialyy.aria.core.manager.ThreadTaskManager;
 import com.arialyy.aria.core.processor.IVodTsUrlConverter;
 import com.arialyy.aria.core.task.ThreadTask;
+import com.arialyy.aria.core.wrapper.ITaskWrapper;
 import com.arialyy.aria.exception.BaseException;
 import com.arialyy.aria.exception.M3U8Exception;
 import com.arialyy.aria.m3u8.BaseM3U8Loader;
@@ -473,6 +474,8 @@ final class M3U8VodLoader extends BaseM3U8Loader {
     config.record = record;
     config.stateHandler = mStateHandler;
     config.peerIndex = index;
+    config.threadType = SubThreadConfig.getThreadType(ITaskWrapper.M3U8_LIVE);
+    config.updateInterval = SubThreadConfig.getUpdateInterval(ITaskWrapper.M3U8_LIVE);
     if (!config.tempFile.exists()) {
       FileUtil.createFile(config.tempFile);
     }

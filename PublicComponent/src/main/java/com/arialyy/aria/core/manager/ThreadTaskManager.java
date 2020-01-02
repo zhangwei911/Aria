@@ -16,6 +16,7 @@
 
 package com.arialyy.aria.core.manager;
 
+import android.text.TextUtils;
 import com.arialyy.aria.core.task.IThreadTask;
 import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
 import com.arialyy.aria.util.ALog;
@@ -24,7 +25,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -151,6 +151,49 @@ public class ThreadTaskManager {
     } finally {
       LOCK.unlock();
     }
+  }
+
+  /**
+   * 根据线程名删除任务的中的线程
+   *
+   * @param key 任务的key，如果是组合任务，则为组合任务的key
+   * @param threadName 线程名
+   * @return true 删除线程成功；false 删除线程失败
+   */
+  public boolean removeSingleTaskThread(String key, String threadName) {
+    try {
+      LOCK.tryLock(2, TimeUnit.SECONDS);
+      if (mExePool.isShutdown()) {
+        ALog.e(TAG, "线程池已经关闭");
+        return false;
+      }
+      if (TextUtils.isEmpty(threadName)) {
+        ALog.e(TAG, "线程名为空");
+        return false;
+      }
+
+      key = getKey(key);
+      Set<FutureContainer> temp = mThreadTasks.get(key);
+      if (temp != null && temp.size() > 0) {
+        FutureContainer tempC = null;
+        for (FutureContainer container : temp) {
+          if (container.threadTask.getThreadName().equals(threadName)) {
+            tempC = container;
+            break;
+          }
+        }
+        if (tempC != null) {
+          tempC.threadTask.destroy();
+          temp.remove(tempC);
+          return true;
+        }
+      }
+    } catch (Exception e) {
+      e.printStackTrace();
+    } finally {
+      LOCK.unlock();
+    }
+    return false;
   }
 
   /**

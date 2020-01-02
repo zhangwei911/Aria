@@ -21,8 +21,8 @@ import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.download.DownloadGroupEntity;
 import com.arialyy.aria.core.group.GroupSendParams;
 import com.arialyy.aria.core.inf.IEntity;
-import com.arialyy.aria.core.loader.IRecordHandler;
 import com.arialyy.aria.core.inf.TaskSchedulerType;
+import com.arialyy.aria.core.loader.IRecordHandler;
 import com.arialyy.aria.core.task.AbsTask;
 import com.arialyy.aria.core.task.DownloadGroupTask;
 import com.arialyy.aria.exception.BaseException;
@@ -47,6 +47,7 @@ public class DownloadGroupListener
 
   @Override
   public void onSubPre(DownloadEntity subEntity) {
+    handleSpeed(subEntity, 0);
     saveSubState(IEntity.STATE_PRE, subEntity);
     sendInState2Target(ISchedulers.SUB_PRE, subEntity);
   }
@@ -58,12 +59,15 @@ public class DownloadGroupListener
 
   @Override
   public void onSubStart(DownloadEntity subEntity) {
+    handleSpeed(subEntity, 0);
     saveSubState(IEntity.STATE_RUNNING, subEntity);
     sendInState2Target(ISchedulers.SUB_START, subEntity);
   }
 
   @Override
-  public void onSubStop(DownloadEntity subEntity) {
+  public void onSubStop(DownloadEntity subEntity, long stopLocation) {
+    subEntity.setCurrentProgress(stopLocation);
+    handleSpeed(subEntity, 0);
     saveSubState(IEntity.STATE_STOP, subEntity);
     saveCurrentLocation();
     sendInState2Target(ISchedulers.SUB_STOP, subEntity);
@@ -71,6 +75,7 @@ public class DownloadGroupListener
 
   @Override
   public void onSubComplete(DownloadEntity subEntity) {
+    handleSpeed(subEntity, 0);
     saveSubState(IEntity.STATE_COMPLETE, subEntity);
     saveCurrentLocation();
     sendInState2Target(ISchedulers.SUB_COMPLETE, subEntity);
@@ -78,6 +83,7 @@ public class DownloadGroupListener
 
   @Override
   public void onSubFail(DownloadEntity subEntity, BaseException e) {
+    handleSpeed(subEntity, 0);
     saveSubState(IEntity.STATE_FAIL, subEntity);
     saveCurrentLocation();
     sendInState2Target(ISchedulers.SUB_FAIL, subEntity);
@@ -89,18 +95,36 @@ public class DownloadGroupListener
 
   @Override
   public void onSubCancel(DownloadEntity subEntity) {
+    handleSpeed(subEntity, 0);
     saveSubState(IEntity.STATE_CANCEL, subEntity);
     saveCurrentLocation();
     sendInState2Target(ISchedulers.SUB_CANCEL, subEntity);
   }
 
   @Override
-  public void onSubRunning(DownloadEntity subEntity) {
+  public void onSubRunning(DownloadEntity subEntity, long currentProgress) {
+
+    handleSpeed(subEntity, currentProgress);
     if (System.currentTimeMillis() - mLastSaveTime >= RUN_SAVE_INTERVAL) {
       saveSubState(IEntity.STATE_RUNNING, subEntity);
       mLastSaveTime = System.currentTimeMillis();
     }
     sendInState2Target(ISchedulers.SUB_RUNNING, subEntity);
+  }
+
+  private void handleSpeed(DownloadEntity subEntity, long currentProgress) {
+    if (currentProgress == 0){
+      subEntity.setSpeed(0);
+      subEntity.setConvertSpeed("0kb/s");
+      return;
+    }
+    long range = currentProgress - subEntity.getCurrentProgress() ;
+    subEntity.setSpeed(range);
+    subEntity.setConvertSpeed(
+        range <= 0 ? "" : String.format("%s/s", CommonUtil.formatFileSize(range)));
+    subEntity.setPercent((int) (subEntity.getFileSize() <= 0 ? 0
+        : subEntity.getCurrentProgress() * 100 / subEntity.getFileSize()));
+    subEntity.setCurrentProgress(currentProgress);
   }
 
   /**

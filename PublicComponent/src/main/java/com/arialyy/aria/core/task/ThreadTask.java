@@ -53,7 +53,7 @@ public class ThreadTask implements IThreadTask, IThreadTaskObserver {
   private IEntity mEntity;
   protected AbsTaskWrapper mTaskWrapper;
   private int mFailTimes = 0;
-  private long mLastSaveTime;
+  private long mLastSaveTime, mLastSendProgressTime;
   private boolean isNotNetRetry;  //断网情况是否重试
   private boolean taskBreak = false;  //任务跳出
   private boolean isDestroy = false;
@@ -67,6 +67,8 @@ public class ThreadTask implements IThreadTask, IThreadTaskObserver {
   private long mRangeProgress;
   private IThreadTaskAdapter mAdapter;
   private ThreadRecord mRecord;
+  private String mThreadNmae;
+  private long updateInterval = 1000; // 更新间隔
 
   private Thread mConfigThread = new Thread(new Runnable() {
     @Override public void run() {
@@ -87,6 +89,7 @@ public class ThreadTask implements IThreadTask, IThreadTaskObserver {
 
     isNotNetRetry = AriaConfig.getInstance().getAConfig().isNotNetRetry();
     mRangeProgress = mRecord.startLocation;
+    updateInterval = config.updateInterval;
   }
 
   /**
@@ -219,7 +222,7 @@ public class ThreadTask implements IThreadTask, IThreadTaskObserver {
               blockFile.getName(), blockFile.length(), mRecord.blockLen, mRecord.startLocation,
               mRecord.endLocation));
       if (blockFile.exists()) {
-        blockFile.delete();
+        FileUtil.deleteFile(blockFile);
         ALog.i(TAG, String.format("删除分块【%s】成功", blockFile.getName()));
       }
       retryBlockTask(isBreak());
@@ -232,19 +235,24 @@ public class ThreadTask implements IThreadTask, IThreadTaskObserver {
     return mRecord.threadId;
   }
 
+  @Override public String getThreadName() {
+    return mThreadNmae == null ? CommonUtil.getThreadName(getConfig().url, getThreadId())
+        : mThreadNmae;
+  }
+
   /**
    * 停止任务
    */
   @Override
   public void stop() {
     isStop = true;
+    final long stopLocation = mRangeProgress;
     updateState(IThreadStateManager.STATE_STOP, null);
     if (mTaskWrapper.getRequestType() == ITaskWrapper.M3U8_VOD) {
       writeConfig(false, getConfig().tempFile.length());
       ALog.i(TAG, String.format("任务【%s】已停止", getFileName()));
     } else {
       if (mTaskWrapper.isSupportBP()) {
-        final long stopLocation = mRangeProgress;
         ALog.d(TAG,
             String.format("任务【%s】thread__%s__停止【当前线程停止位置：%s】", getFileName(),
                 mRecord.threadId, stopLocation));
@@ -264,12 +272,14 @@ public class ThreadTask implements IThreadTask, IThreadTaskObserver {
   @Override
   public synchronized void updateState(int state, Bundle bundle) {
     Message msg = mStateHandler.obtainMessage();
-
-    msg.what = state;
-    if (bundle != null) {
-      msg.setData(bundle);
+    if (bundle == null) {
+      bundle = new Bundle();
     }
-    int reqType = mTaskWrapper.getRequestType();
+    msg.setData(bundle);
+    bundle.putString(IThreadStateManager.DATA_THREAD_NAME, getThreadName());
+    bundle.putLong(IThreadStateManager.DATA_THREAD_LOCATION, mRangeProgress);
+    msg.what = state;
+    int reqType = getConfig().threadType;
     if (reqType == ITaskWrapper.M3U8_VOD || reqType == ITaskWrapper.M3U8_LIVE) {
       sendM3U8Info(state, msg);
     }
@@ -287,9 +297,6 @@ public class ThreadTask implements IThreadTask, IThreadTaskObserver {
     }
     Bundle bundle = msg.getData();
     if ((state == IThreadStateManager.STATE_COMPLETE || state == IThreadStateManager.STATE_FAIL)) {
-      if (bundle == null) {
-        bundle = new Bundle();
-      }
       bundle.putString(ISchedulers.DATA_M3U8_URL, getConfig().url);
       bundle.putString(ISchedulers.DATA_M3U8_PEER_PATH, getConfig().tempFile.getPath());
       bundle.putInt(ISchedulers.DATA_M3U8_PEER_INDEX, getConfig().peerIndex);
@@ -318,7 +325,21 @@ public class ThreadTask implements IThreadTask, IThreadTaskObserver {
     if (!loopThread.isAlive() || loopThread.isInterrupted()) {
       return;
     }
-    mStateHandler.obtainMessage(IThreadStateManager.STATE_RUNNING, len).sendToTarget();
+    // 不需要太频繁发送，以减少消息队列的压力
+    if (System.currentTimeMillis() - mLastSendProgressTime > updateInterval) {
+      Message msg = mStateHandler.obtainMessage();
+      Bundle b = msg.getData();
+      if (b == null) {
+        b = new Bundle();
+        msg.setData(b);
+      }
+      b.putString(IThreadStateManager.DATA_THREAD_NAME, getThreadName());
+      msg.what = IThreadStateManager.STATE_RUNNING;
+      msg.obj = mRangeProgress;
+      msg.sendToTarget();
+      mLastSendProgressTime = System.currentTimeMillis();
+    }
+
     if (System.currentTimeMillis() - mLastSaveTime > 5000
         && mRangeProgress < mRecord.endLocation) {
       mLastSaveTime = System.currentTimeMillis();
@@ -435,7 +456,7 @@ public class ThreadTask implements IThreadTask, IThreadTaskObserver {
          */
         if (blockFileLen > threadRect) {
           ALog.i(TAG, String.format("分块【%s】错误，将重新下载该分块", temp.getName()));
-          temp.delete();
+          FileUtil.deleteFile(temp);
           mRecord.startLocation = mRecord.endLocation - mRecord.blockLen;
           mRecord.isComplete = false;
         } else if (blockFileLen < mRecord.blockLen) {
@@ -459,9 +480,9 @@ public class ThreadTask implements IThreadTask, IThreadTaskObserver {
    */
   private void sendFailMsg(BaseException e, boolean needRetry) {
     Bundle b = new Bundle();
-    b.putBoolean(IThreadStateManager.KEY_RETRY, needRetry);
+    b.putBoolean(IThreadStateManager.DATA_RETRY, needRetry);
     if (e != null) {
-      b.putSerializable(IThreadStateManager.KEY_ERROR_INFO, e);
+      b.putSerializable(IThreadStateManager.DATA_ERROR_INFO, e);
       updateState(IThreadStateManager.STATE_FAIL, b);
     } else {
       updateState(IThreadStateManager.STATE_FAIL, b);

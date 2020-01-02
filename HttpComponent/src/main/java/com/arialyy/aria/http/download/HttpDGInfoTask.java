@@ -66,7 +66,7 @@ public final class HttpDGInfoTask implements IInfoTask {
     }
   };
 
-  public HttpDGInfoTask(DGTaskWrapper wrapper, DownloadGroupListener listener) {
+  HttpDGInfoTask(DGTaskWrapper wrapper, DownloadGroupListener listener) {
     this.wrapper = wrapper;
     this.listener = listener;
   }
@@ -76,7 +76,7 @@ public final class HttpDGInfoTask implements IInfoTask {
     if (mPool != null && !getLenComplete) {
       ALog.d(TAG, "获取长度未完成的情况下，停止组合任务");
       mPool.shutdown();
-      //mListener.onStop(0);
+      listener.onStop(0);
       return;
     }
     // 处理组合任务大小未知的情况

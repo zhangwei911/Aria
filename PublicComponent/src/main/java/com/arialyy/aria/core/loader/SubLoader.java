@@ -15,13 +15,17 @@
  */
 package com.arialyy.aria.core.loader;
 
+import android.os.Bundle;
 import android.os.Handler;
+import android.os.Message;
+import android.text.TextUtils;
+import com.arialyy.aria.core.TaskRecord;
 import com.arialyy.aria.core.common.AbsEntity;
 import com.arialyy.aria.core.common.CompleteInfo;
 import com.arialyy.aria.core.inf.IThreadStateManager;
-import com.arialyy.aria.core.listener.ISchedulers;
 import com.arialyy.aria.core.manager.ThreadTaskManager;
 import com.arialyy.aria.core.task.IThreadTask;
+import com.arialyy.aria.core.task.ThreadTask;
 import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
 import com.arialyy.aria.exception.BaseException;
 import com.arialyy.aria.util.ALog;
@@ -42,27 +46,82 @@ public final class SubLoader implements ILoader, ILoaderVisitor {
   private IThreadTaskBuilder ttBuild;
   private IRecordHandler recordHandler;
   private IThreadTask threadTask;
+  private String parentKey;
 
   public SubLoader(AbsTaskWrapper wrapper, Handler schedulers) {
     this.wrapper = wrapper;
     this.schedulers = schedulers;
   }
 
+  public AbsTaskWrapper getWrapper() {
+    return wrapper;
+  }
+
+  /**
+   * 发送状态到调度器
+   *
+   * @param state {@link IThreadStateManager}
+   */
+  private void sendNormalState(int state) {
+    Message msg = schedulers.obtainMessage();
+    Bundle b = msg.getData();
+    if (b == null) {
+      b = new Bundle();
+    }
+    b.putString(IThreadStateManager.DATA_THREAD_NAME, getKey());
+    msg.what = state;
+    msg.setData(b);
+    msg.sendToTarget();
+  }
+
+  /**
+   * 发送失败的状态
+   */
+  private void sendFailState(boolean needRetry) {
+    Message msg = schedulers.obtainMessage();
+    Bundle b = msg.getData();
+    if (b == null) {
+      b = new Bundle();
+    }
+    b.putString(IThreadStateManager.DATA_THREAD_NAME, getKey());
+    b.putBoolean(IThreadStateManager.DATA_RETRY, needRetry);
+    msg.what = IThreadStateManager.STATE_FAIL;
+    msg.setData(b);
+    msg.sendToTarget();
+  }
+
   private void handlerTask() {
-    List<IThreadTask> task =
-        ttBuild.buildThreadTask(recordHandler.getRecord(wrapper.getEntity().getFileSize()),
-            schedulers);
-    if (task == null || task.isEmpty()) {
-      ALog.e(TAG, "创建子任务的线程任务失败，key：" + getKey());
-      //schedulers.obtainMessage(ISchedulers.FAIL, SubLoader.this).sendToTarget();
+    TaskRecord record = recordHandler.getRecord(wrapper.getEntity().getFileSize());
+    if (record.threadRecords != null
+        && !record.threadRecords.isEmpty()
+        && record.threadRecords.get(0).isComplete) {
+      ALog.d(TAG, "子任务已完成，key：" + wrapper.getKey());
+      sendNormalState(IThreadStateManager.STATE_COMPLETE);
       return;
     }
+    List<IThreadTask> task = ttBuild.buildThreadTask(record, schedulers);
+    if (task == null || task.isEmpty()) {
+      ALog.e(TAG, "创建子任务的线程任务失败，key：" + wrapper.getKey());
+      sendFailState(false);
+      return;
+    }
+    if (TextUtils.isEmpty(parentKey)) {
+      ALog.e(TAG, "parentKey为空");
+      sendFailState(false);
+      return;
+    }
+    sendNormalState(IThreadStateManager.STATE_PRE);
     threadTask = task.get(0);
     try {
-      ThreadTaskManager.getInstance().startThread(getKey(), threadTask);
+      ThreadTaskManager.getInstance().startThread(parentKey, threadTask);
+      sendNormalState(IThreadStateManager.STATE_START);
     } catch (Exception e) {
       e.printStackTrace();
     }
+  }
+
+  public void setParentKey(String parentKey) {
+    this.parentKey = parentKey;
   }
 
   public void setNeedGetInfo(boolean needGetInfo) {
@@ -91,7 +150,7 @@ public final class SubLoader implements ILoader, ILoaderVisitor {
   }
 
   @Override public boolean isRunning() {
-    return !threadTask.isBreak();
+    return threadTask != null && !threadTask.isBreak();
   }
 
   @Override public void cancel() {
@@ -112,8 +171,13 @@ public final class SubLoader implements ILoader, ILoaderVisitor {
     return false;
   }
 
+  /**
+   * 线程名，一个子任务的loader只有一个线程，使用线程名标示key
+   *
+   * @return {@link ThreadTask#getThreadName()}
+   */
   @Override public String getKey() {
-    return wrapper.getKey();
+    return CommonUtil.getThreadName(wrapper.getKey(), 0);
   }
 
   /**
@@ -136,7 +200,7 @@ public final class SubLoader implements ILoader, ILoaderVisitor {
       }
 
       @Override public void onFail(AbsEntity entity, BaseException e, boolean needRetry) {
-        schedulers.obtainMessage(ISchedulers.FAIL, SubLoader.this).sendToTarget();
+        sendFailState(needRetry);
       }
     });
   }

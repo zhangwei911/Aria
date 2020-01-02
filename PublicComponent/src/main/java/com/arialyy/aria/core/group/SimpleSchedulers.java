@@ -16,6 +16,7 @@
 
 package com.arialyy.aria.core.group;
 
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import com.arialyy.aria.core.AriaConfig;
@@ -37,45 +38,56 @@ class SimpleSchedulers implements Handler.Callback {
   private static final String TAG = "SimpleSchedulers";
   private SimpleSubQueue mQueue;
   private GroupRunState mGState;
+  private String mKey; // 组合任务的key
 
-  private SimpleSchedulers(GroupRunState state) {
+  private SimpleSchedulers(GroupRunState state, String key) {
     mQueue = state.queue;
     mGState = state;
+    mKey = key;
   }
 
-  static SimpleSchedulers newInstance(GroupRunState state) {
-
-    return new SimpleSchedulers(state);
+  static SimpleSchedulers newInstance(GroupRunState state, String key) {
+    return new SimpleSchedulers(state, key);
   }
 
   @Override public boolean handleMessage(Message msg) {
-    // todo key 应该从bundle中获取
-    String key = (String) msg.obj;
-    AbsSubDLoadUtil loader = mQueue.getLoaderUtil(key);
-    if (loader == null) {
-      ALog.e(TAG, "子任务loder不存在，key：" + key);
+    Bundle b = msg.getData();
+    if (b == null) {
+      ALog.w(TAG, "组合任务子任务调度数据为空");
       return true;
     }
-    // todo 处理的是子任务的线程，需要删除 ThreadTaskManager.removeSingleTaskThread 删除线程任务
+    String threadName = b.getString(IThreadStateManager.DATA_THREAD_NAME);
+    AbsSubDLoadUtil loaderUtil = mQueue.getLoaderUtil(threadName);
+    if (loaderUtil == null) {
+      ALog.e(TAG, String.format("子任务loader不存在，state：%s，key：%s", msg.what, threadName));
+      return true;
+    }
+    long curLocation = b.getLong(IThreadStateManager.DATA_THREAD_LOCATION,
+        loaderUtil.getLoader().getWrapper().getEntity().getCurrentProgress());
+    // 处理状态
     switch (msg.what) {
       case IThreadStateManager.STATE_RUNNING:
-        mGState.listener.onSubRunning(loader.getEntity());
+        long range = (long) msg.obj;
+        mGState.listener.onSubRunning(loaderUtil.getEntity(), range);
         break;
-      case PRE:
-        mGState.listener.onSubPre(loader.getEntity());
-        mGState.updateCount(loader.getKey());
+      case IThreadStateManager.STATE_PRE:
+        mGState.listener.onSubPre(loaderUtil.getEntity());
+        mGState.updateCount(loaderUtil.getKey());
         break;
-      case START:
-        mGState.listener.onSubStart(loader.getEntity());
+      case IThreadStateManager.STATE_START:
+        mGState.listener.onSubStart(loaderUtil.getEntity());
         break;
       case IThreadStateManager.STATE_STOP:
-        handleStop(loader);
+        handleStop(loaderUtil, curLocation);
+        ThreadTaskManager.getInstance().removeSingleTaskThread(mKey, threadName);
         break;
       case IThreadStateManager.STATE_COMPLETE:
-        handleComplete(loader);
+        handleComplete(loaderUtil);
+        ThreadTaskManager.getInstance().removeSingleTaskThread(mKey, threadName);
         break;
       case IThreadStateManager.STATE_FAIL:
-        handleFail(loader);
+        handleFail(loaderUtil);
+        ThreadTaskManager.getInstance().removeSingleTaskThread(mKey, threadName);
         break;
     }
     return true;
@@ -96,7 +108,7 @@ class SimpleSchedulers implements Handler.Callback {
 
     final int reTryNum = num;
     if ((!NetUtils.isConnected(AriaConfig.getInstance().getAPP()) && !isNotNetRetry)
-        || loaderUtil.getDownloader() == null // 如果获取不到文件信息，loader为空
+        || loaderUtil.getLoader() == null // 如果获取不到文件信息，loader为空
         || loaderUtil.getEntity().getFailNum() > reTryNum) {
       mQueue.removeTaskFromExecQ(loaderUtil);
       mGState.listener.onSubFail(loaderUtil.getEntity(), new TaskException(TAG,
@@ -136,8 +148,8 @@ class SimpleSchedulers implements Handler.Callback {
    * 1、所有的子任务已经停止，则认为组合任务停止
    * 2、completeNum + failNum + stopNum = subSize，则认为组合任务停止
    */
-  private synchronized void handleStop(AbsSubDLoadUtil loadUtil) {
-    mGState.listener.onSubStop(loadUtil.getEntity());
+  private synchronized void handleStop(AbsSubDLoadUtil loadUtil, long curLocation) {
+    mGState.listener.onSubStop(loadUtil.getEntity(), curLocation);
     mGState.countStopNum(loadUtil.getKey());
     if (mGState.getStopNum() == mGState.getSubSize()
         || mGState.getStopNum()

@@ -90,8 +90,8 @@ public class NormalThreadStateManager implements IThreadStateManager {
           mFailNum++;
           if (isFail()) {
             Bundle b = msg.getData();
-            mListener.onFail(b.getBoolean(KEY_RETRY, false),
-                (BaseException) b.getSerializable(KEY_ERROR_INFO));
+            mListener.onFail(b.getBoolean(DATA_RETRY, false),
+                (BaseException) b.getSerializable(DATA_ERROR_INFO));
             quitLooper();
           }
           break;
