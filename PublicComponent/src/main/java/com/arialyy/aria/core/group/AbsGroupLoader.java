@@ -98,14 +98,14 @@ public abstract class AbsGroupLoader implements ILoaderVisitor, ILoader {
   private void initState(Looper looper) {
     mState = new GroupRunState(getWrapper().getKey(), mListener, mSubQueue);
     for (DTaskWrapper wrapper : mGTWrapper.getSubTaskWrapper()) {
-      File subFile = new File(wrapper.getEntity().getFilePath());
+      long fileLen = checkFileExists(wrapper.getEntity().getFilePath());
       if (wrapper.getEntity().getState() == IEntity.STATE_COMPLETE
-          && subFile.exists()
-          && subFile.length() == wrapper.getEntity().getFileSize()) {
+          && fileLen != -1
+          && fileLen == wrapper.getEntity().getFileSize()) {
         mState.updateCompleteNum();
         mCurrentLocation += wrapper.getEntity().getFileSize();
       } else {
-        if (!subFile.exists()) {
+        if (fileLen == -1) {
           wrapper.getEntity().setCurrentProgress(0);
         }
         wrapper.getEntity().setState(IEntity.STATE_POST_PRE);
@@ -118,6 +118,25 @@ public abstract class AbsGroupLoader implements ILoaderVisitor, ILoader {
     }
     mState.updateProgress(mCurrentLocation);
     mScheduler = new Handler(looper, SimpleSchedulers.newInstance(mState, mGTWrapper.getKey()));
+  }
+
+  /**
+   * 检查文件是否存在，需要检查普通任务和分块任务的
+   *
+   * @param filePath 文件路径
+   * @return 文件存在返回文件长度，不存在返回-1
+   */
+  private long checkFileExists(String filePath) {
+    File temp = new File(filePath);
+    if (temp.exists()) {
+      return temp.length();
+    }
+    File block = new File(String.format(IRecordHandler.SUB_PATH, filePath, 0));
+    if (block.exists()) {
+      return block.length();
+    } else {
+      return -1;
+    }
   }
 
   @Override public String getKey() {

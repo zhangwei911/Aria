@@ -129,7 +129,7 @@ public class DownloadModule extends BaseModule {
     DownloadEntity entity = new DownloadEntity();
     entity.setFileName(name);
     entity.setUrl(downloadUrl);
-    entity.setDownloadPath(path);
+    entity.setFilePath(path);
     return entity;
   }
 }

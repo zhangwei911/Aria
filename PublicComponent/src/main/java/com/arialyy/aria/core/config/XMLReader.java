@@ -27,7 +27,7 @@ import org.xml.sax.helpers.DefaultHandler;
  * Created by lyy on 2017/5/22. 读取配置文件
  */
 public class XMLReader extends DefaultHandler {
-  private final String TAG = "XMLReader";
+  private final String TAG = CommonUtil.getClassName(this);
 
   private DownloadConfig mDownloadConfig = Configuration.getInstance().downloadCfg;
   private UploadConfig mUploadConfig = Configuration.getInstance().uploadCfg;
@@ -62,13 +62,13 @@ public class XMLReader extends DefaultHandler {
 
       String value = attributes.getValue("value");
       switch (qName) {
-        case "getCreatedThreadNum": // 线程数
+        case "threadNum": // 线程数
           int threadNum = checkInt(value) ? Integer.parseInt(value) : 3;
           if (threadNum < 1) {
             ALog.w(TAG, "下载线程数不能小于 1");
             threadNum = 1;
           }
-          setField("getCreatedThreadNum", threadNum, ConfigType.DOWNLOAD);
+          setField("threadNum", threadNum, ConfigType.DOWNLOAD);
           break;
         case "maxTaskNum":  //最大任务书
           int maxTaskNum = checkInt(value) ? Integer.parseInt(value) : 2;

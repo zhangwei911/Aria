@@ -247,6 +247,10 @@ public final class VodStateManager implements IThreadStateManager {
     return progress;
   }
 
+  @Override public void updateCurrentProgress(long currentProgress) {
+    progress = currentProgress;
+  }
+
   private void printInfo(String tag) {
     if (false) {
       ALog.d(tag, String.format(

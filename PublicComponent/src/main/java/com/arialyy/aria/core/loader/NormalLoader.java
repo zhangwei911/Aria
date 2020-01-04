@@ -28,6 +28,7 @@ import com.arialyy.aria.core.manager.ThreadTaskManager;
 import com.arialyy.aria.core.task.IThreadTask;
 import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
 import com.arialyy.aria.exception.BaseException;
+import com.arialyy.aria.util.FileUtil;
 import java.io.File;
 
 /**
@@ -71,17 +72,6 @@ public class NormalLoader extends AbsNormalLoader {
     EventMsgUtil.getDefault().unRegister(this);
   }
 
-  @Override protected void onPostPre() {
-    super.onPostPre();
-    if (getListener() instanceof IDLoadListener) {
-      ((IDLoadListener) getListener()).onPostPre(getEntity().getFileSize());
-    }
-    File file = new File(getEntity().getFilePath());
-    if (file.getParentFile() != null && !file.getParentFile().exists()) {
-      file.getParentFile().mkdirs();
-    }
-  }
-
   ///**
   // * 如果使用"Content-Disposition"中的文件名，需要更新{@link #mTempFile}的路径
   // */
@@ -105,11 +95,21 @@ public class NormalLoader extends AbsNormalLoader {
   }
 
   protected void startThreadTask() {
+
+    if (getListener() instanceof IDLoadListener) {
+      ((IDLoadListener) getListener()).onPostPre(getEntity().getFileSize());
+    }
+    File file = new File(getEntity().getFilePath());
+    if (file.getParentFile() != null && !file.getParentFile().exists()) {
+      FileUtil.createDir(file.getPath());
+    }
     mRecord = mRecordHandler.getRecord(getFileSize());
     mStateManager.setLooper(mRecord, looper);
     getTaskList().addAll(mTTBuilder.buildThreadTask(mRecord,
         new Handler(looper, mStateManager.getHandlerCallback())));
     startThreadNum = mTTBuilder.getCreatedThreadNum();
+
+    mStateManager.updateCurrentProgress(getEntity().getCurrentProgress());
     if (mStateManager.getCurrentProgress() > 0) {
       getListener().onResume(mStateManager.getCurrentProgress());
     } else {

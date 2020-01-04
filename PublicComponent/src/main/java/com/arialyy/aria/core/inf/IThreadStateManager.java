@@ -36,6 +36,7 @@ public interface IThreadStateManager extends ILoaderComponent {
   String DATA_ERROR_INFO = "DATA_ERROR_INFO";
   String DATA_THREAD_NAME = "DATA_THREAD_NAME";
   String DATA_THREAD_LOCATION = "DATA_THREAD_LOCATION";
+  String DATA_ADD_LEN = "DATA_ADD_LEN"; // 增加的长度
 
   /**
    * 任务是否已经失败
@@ -57,6 +58,12 @@ public interface IThreadStateManager extends ILoaderComponent {
    * @return 任务当前进度
    */
   long getCurrentProgress();
+
+  /**
+   * 更新当前进度
+   * @param currentProgress 当前进度
+   */
+  void updateCurrentProgress(long currentProgress);
 
   /**
    * 设置消息循环体

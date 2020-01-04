@@ -132,7 +132,7 @@ public final class HttpDGInfoTask implements IInfoTask {
       wrapper.getEntity().setFileSize(size);
       wrapper.getEntity().update();
       getLenComplete = true;
-      ALog.d(TAG, String.format("获取组合任务长度完成，组合任务总长度：%s，失败的只任务数：%s", size, failCount));
+      ALog.d(TAG, String.format("获取组合任务长度完成，组合任务总长度：%s，失败的子任务数：%s", size, failCount));
       callback.onSucceed(wrapper.getKey(), new CompleteInfo());
       notifyLock();
     }

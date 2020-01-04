@@ -64,7 +64,7 @@ public class ThreadTask implements IThreadTask, IThreadTaskObserver {
   /**
    * 当前线程的下去区间的进度
    */
-  private long mRangeProgress;
+  private long mRangeProgress, mLastRangeProgress;
   private IThreadTaskAdapter mAdapter;
   private ThreadRecord mRecord;
   private String mThreadNmae;
@@ -89,6 +89,7 @@ public class ThreadTask implements IThreadTask, IThreadTaskObserver {
 
     isNotNetRetry = AriaConfig.getInstance().getAConfig().isNotNetRetry();
     mRangeProgress = mRecord.startLocation;
+    mLastRangeProgress = mRangeProgress;
     updateInterval = config.updateInterval;
   }
 
@@ -304,7 +305,7 @@ public class ThreadTask implements IThreadTask, IThreadTaskObserver {
   }
 
   @Override public synchronized void updateCompleteState() {
-    ALog.i(TAG, String.format("任务【%s】线程__%s__下载完毕", getTaskWrapper().getKey(), mRecord.threadId));
+    ALog.i(TAG, String.format("任务【%s】线程__%s__完成", getTaskWrapper().getKey(), mRecord.threadId));
     writeConfig(true, mRecord.endLocation);
     updateState(IThreadStateManager.STATE_COMPLETE, null);
   }
@@ -334,9 +335,11 @@ public class ThreadTask implements IThreadTask, IThreadTaskObserver {
         msg.setData(b);
       }
       b.putString(IThreadStateManager.DATA_THREAD_NAME, getThreadName());
+      b.putLong(IThreadStateManager.DATA_ADD_LEN, mRangeProgress - mLastRangeProgress);
       msg.what = IThreadStateManager.STATE_RUNNING;
       msg.obj = mRangeProgress;
       msg.sendToTarget();
+      mLastRangeProgress = mRangeProgress;
       mLastSendProgressTime = System.currentTimeMillis();
     }
 
@@ -402,13 +405,13 @@ public class ThreadTask implements IThreadTask, IThreadTaskObserver {
     if (mFailTimes < RETRY_NUM && needRetry && (NetUtils.isConnected(
         AriaConfig.getInstance().getAPP())
         || isNotNetRetry) && !isBreak()) {
-      ALog.w(TAG, String.format("ts切片【%s】正在重试", getFileName()));
+      ALog.w(TAG, String.format("ts切片【%s】第%s重试", getFileName(), String.valueOf(mFailTimes)));
       mFailTimes++;
       FileUtil.deleteFile(mConfig.tempFile);
       FileUtil.createFile(mConfig.tempFile);
       ThreadTaskManager.getInstance().retryThread(this);
     } else {
-      sendFailMsg(null, needRetry);
+      sendFailMsg(null, false);
     }
   }
 
@@ -425,12 +428,12 @@ public class ThreadTask implements IThreadTask, IThreadTaskObserver {
     }
     if (mFailTimes < RETRY_NUM && needRetry && (NetUtils.isConnected(
         AriaConfig.getInstance().getAPP()) || isNotNetRetry) && !isBreak()) {
-      ALog.w(TAG, String.format("分块【%s】正在重试", getFileName()));
+      ALog.w(TAG, String.format("分块【%s】第%s次重试", getFileName(), String.valueOf(mFailTimes)));
       mFailTimes++;
       handleBlockRecord();
       ThreadTaskManager.getInstance().retryThread(this);
     } else {
-      sendFailMsg(null, needRetry);
+      sendFailMsg(null, false);
     }
   }
 
@@ -493,7 +496,7 @@ public class ThreadTask implements IThreadTask, IThreadTaskObserver {
    * 将记录写入到配置文件
    *
    * @param isComplete 当前线程是否完成 {@code true}完成
-   * @param record 当前下载进度
+   * @param record 当前进度
    */
   private void writeConfig(boolean isComplete, final long record) {
     if (mRecord != null) {

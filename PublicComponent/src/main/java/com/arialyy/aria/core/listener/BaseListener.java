@@ -136,7 +136,6 @@ public abstract class BaseListener<ENTITY extends AbsEntity, TASK_WRAPPER extend
       mEntity.setConvertSpeed(CommonUtil.formatFileSize(speed < 0 ? 0 : speed) + "/s");
     }
     mEntity.setSpeed(speed < 0 ? 0 : speed);
-
     if (mTaskWrapper.getRequestType() != ITaskWrapper.M3U8_VOD) {
       mEntity.setPercent((int) (mEntity.getFileSize() <= 0 ? 0
           : mEntity.getCurrentProgress() * 100 / mEntity.getFileSize()));

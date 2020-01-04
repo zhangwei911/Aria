@@ -47,7 +47,7 @@ public class DownloadGroupListener
 
   @Override
   public void onSubPre(DownloadEntity subEntity) {
-    handleSpeed(subEntity, 0);
+    handleSubSpeed(subEntity, 0);
     saveSubState(IEntity.STATE_PRE, subEntity);
     sendInState2Target(ISchedulers.SUB_PRE, subEntity);
   }
@@ -59,7 +59,7 @@ public class DownloadGroupListener
 
   @Override
   public void onSubStart(DownloadEntity subEntity) {
-    handleSpeed(subEntity, 0);
+    handleSubSpeed(subEntity, 0);
     saveSubState(IEntity.STATE_RUNNING, subEntity);
     sendInState2Target(ISchedulers.SUB_START, subEntity);
   }
@@ -67,7 +67,7 @@ public class DownloadGroupListener
   @Override
   public void onSubStop(DownloadEntity subEntity, long stopLocation) {
     subEntity.setCurrentProgress(stopLocation);
-    handleSpeed(subEntity, 0);
+    handleSubSpeed(subEntity, 0);
     saveSubState(IEntity.STATE_STOP, subEntity);
     saveCurrentLocation();
     sendInState2Target(ISchedulers.SUB_STOP, subEntity);
@@ -75,7 +75,7 @@ public class DownloadGroupListener
 
   @Override
   public void onSubComplete(DownloadEntity subEntity) {
-    handleSpeed(subEntity, 0);
+    handleSubSpeed(subEntity, 0);
     saveSubState(IEntity.STATE_COMPLETE, subEntity);
     saveCurrentLocation();
     sendInState2Target(ISchedulers.SUB_COMPLETE, subEntity);
@@ -83,7 +83,7 @@ public class DownloadGroupListener
 
   @Override
   public void onSubFail(DownloadEntity subEntity, BaseException e) {
-    handleSpeed(subEntity, 0);
+    handleSubSpeed(subEntity, 0);
     saveSubState(IEntity.STATE_FAIL, subEntity);
     saveCurrentLocation();
     sendInState2Target(ISchedulers.SUB_FAIL, subEntity);
@@ -95,7 +95,7 @@ public class DownloadGroupListener
 
   @Override
   public void onSubCancel(DownloadEntity subEntity) {
-    handleSpeed(subEntity, 0);
+    handleSubSpeed(subEntity, 0);
     saveSubState(IEntity.STATE_CANCEL, subEntity);
     saveCurrentLocation();
     sendInState2Target(ISchedulers.SUB_CANCEL, subEntity);
@@ -104,7 +104,7 @@ public class DownloadGroupListener
   @Override
   public void onSubRunning(DownloadEntity subEntity, long currentProgress) {
 
-    handleSpeed(subEntity, currentProgress);
+    handleSubSpeed(subEntity, currentProgress);
     if (System.currentTimeMillis() - mLastSaveTime >= RUN_SAVE_INTERVAL) {
       saveSubState(IEntity.STATE_RUNNING, subEntity);
       mLastSaveTime = System.currentTimeMillis();
@@ -112,7 +112,7 @@ public class DownloadGroupListener
     sendInState2Target(ISchedulers.SUB_RUNNING, subEntity);
   }
 
-  private void handleSpeed(DownloadEntity subEntity, long currentProgress) {
+  private void handleSubSpeed(DownloadEntity subEntity, long currentProgress) {
     if (currentProgress == 0){
       subEntity.setSpeed(0);
       subEntity.setConvertSpeed("0kb/s");

@@ -28,6 +28,7 @@ import com.arialyy.aria.core.common.FtpOption;
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.inf.IEntity;
 import com.arialyy.aria.core.task.DownloadTask;
+import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
 import com.arialyy.frame.util.show.L;
 import com.arialyy.frame.util.show.T;
@@ -48,7 +49,7 @@ public class FtpDownloadActivity extends BaseActivity<ActivityFtpDownloadBinding
   private String mUrl, mFilePath;
   private FtpDownloadModule mModule;
   private long mTaskId;
-  private String user = "boamax\\update", passw = "2020&suzhou";
+  private String user = "lao", passw = "123456";
 
   @Override protected void init(Bundle savedInstanceState) {
     super.init(savedInstanceState);
@@ -124,7 +125,7 @@ public class FtpDownloadActivity extends BaseActivity<ActivityFtpDownloadBinding
   private FtpOption getFtpOption() {
     FtpOption option = new FtpOption();
     option.login(user, passw);
-    option.setServerIdentifier(FtpOption.FTPServerIdentifier.SYST_NT);
+    //option.setServerIdentifier(FtpOption.FTPServerIdentifier.SYST_NT);
     //option.setConnectionMode(FtpConnectionMode.DATA_CONNECTION_MODE_ACTIVITY);
     return option;
   }
@@ -145,7 +146,7 @@ public class FtpDownloadActivity extends BaseActivity<ActivityFtpDownloadBinding
   }
 
   @Download.onTaskPre() protected void onTaskPre(DownloadTask task) {
-    L.d(TAG, "ftp task pre");
+    L.d(TAG, "ftp task pre, fileSize = " + task.getConvertFileSize());
     getBinding().setFileSize(task.getConvertFileSize());
   }
 
@@ -154,6 +155,7 @@ public class FtpDownloadActivity extends BaseActivity<ActivityFtpDownloadBinding
   }
 
   @Download.onTaskRunning() protected void running(DownloadTask task) {
+    ALog.d(TAG, "running, p = " + task.getPercent() + ", speed = " + task.getConvertSpeed());
     getBinding().setProgress(task.getPercent());
     getBinding().setSpeed(task.getConvertSpeed());
   }
@@ -165,6 +167,7 @@ public class FtpDownloadActivity extends BaseActivity<ActivityFtpDownloadBinding
   @Download.onTaskStop() void taskStop(DownloadTask task) {
     L.d(TAG, "ftp task stop");
     getBinding().setSpeed("");
+    getBinding().setStateStr(getString(R.string.resume));
   }
 
   @Download.onTaskCancel() void taskCancel(DownloadTask task) {
@@ -174,12 +177,14 @@ public class FtpDownloadActivity extends BaseActivity<ActivityFtpDownloadBinding
 
   @Download.onTaskFail() void taskFail(DownloadTask task) {
     L.d(TAG, "ftp task fail");
+    getBinding().setSpeed("");
     getBinding().setStateStr(getString(R.string.resume));
   }
 
   @Download.onTaskComplete() void taskComplete(DownloadTask task) {
     getBinding().setSpeed("");
     getBinding().setProgress(100);
+    getBinding().setStateStr(getString(R.string.re_start));
     Log.d(TAG, "md5 ==> " + CommonUtil.getFileMD5(new File(task.getFilePath())));
     T.showShort(this, "文件：" + task.getEntity().getFileName() + "，下载完成");
   }

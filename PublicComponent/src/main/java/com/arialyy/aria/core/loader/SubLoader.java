@@ -30,6 +30,7 @@ import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
 import com.arialyy.aria.exception.BaseException;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
+import java.io.File;
 import java.util.List;
 
 /**
@@ -93,6 +94,8 @@ public final class SubLoader implements ILoader, ILoaderVisitor {
   private void handlerTask() {
     TaskRecord record = recordHandler.getRecord(wrapper.getEntity().getFileSize());
     if (record.threadRecords != null
+        && !TextUtils.isEmpty(record.filePath)
+        && new File(record.filePath).exists()
         && !record.threadRecords.isEmpty()
         && record.threadRecords.get(0).isComplete) {
       ALog.d(TAG, "子任务已完成，key：" + wrapper.getKey());

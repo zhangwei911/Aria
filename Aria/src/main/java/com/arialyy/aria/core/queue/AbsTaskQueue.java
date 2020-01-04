@@ -311,7 +311,7 @@ public abstract class AbsTaskQueue<TASK extends AbsTask, TASK_WRAPPER extends Ab
         task.start();
         break;
       case IEntity.STATE_CANCEL:
-        ALog.e(TAG, String.format("任务【%s】重试失败，原因：任务没已删除", task.getTaskName()));
+        ALog.e(TAG, String.format("任务【%s】重试失败，原因：任务已删除", task.getTaskName()));
         break;
       case IEntity.STATE_COMPLETE:
         ALog.e(TAG, String.format("任务【%s】重试失败，原因：已完成", task.getTaskName()));

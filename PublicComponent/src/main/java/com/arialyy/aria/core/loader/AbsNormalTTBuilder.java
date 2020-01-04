@@ -152,7 +152,7 @@ public abstract class AbsNormalTTBuilder implements IThreadTaskBuilder {
       }
       threadTasks.add(task);
     }
-    if (currentProgress != 0 && currentProgress != getEntity().getCurrentProgress()) {
+    if (currentProgress != getEntity().getCurrentProgress()) {
       ALog.d(TAG, String.format("进度修正，当前进度：%s", currentProgress));
       getEntity().setCurrentProgress(currentProgress);
     }

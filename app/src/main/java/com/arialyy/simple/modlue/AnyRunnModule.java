@@ -76,7 +76,7 @@ public class AnyRunnModule {
   }
 
   @Download.onTaskComplete void taskComplete(DownloadTask task) {
-    L.d(TAG, "path ==> " + task.getDownloadEntity().getDownloadPath());
+    L.d(TAG, "path ==> " + task.getDownloadEntity().getFilePath());
     L.d(TAG, "md5Code ==> " + CommonUtil.getFileMD5(new File(task.getFilePath())));
   }
 

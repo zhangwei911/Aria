@@ -144,6 +144,10 @@ final class LiveStateManager implements IThreadStateManager {
     return mProgress;
   }
 
+  @Override public void updateCurrentProgress(long currentProgress) {
+    mProgress = currentProgress;
+  }
+
   @Override public void setLooper(TaskRecord taskRecord, Looper looper) {
     mLooper = looper;
   }

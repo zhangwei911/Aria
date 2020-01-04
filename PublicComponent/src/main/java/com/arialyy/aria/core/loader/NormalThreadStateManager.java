@@ -61,11 +61,11 @@ public class NormalThreadStateManager implements IThreadStateManager {
     mLooper = looper;
   }
 
-  private void checkLooper(){
-    if (mTaskRecord == null){
+  private void checkLooper() {
+    if (mTaskRecord == null) {
       throw new NullPointerException("任务记录为空");
     }
-    if (mLooper == null){
+    if (mLooper == null) {
       throw new NullPointerException("Looper为空");
     }
   }
@@ -112,9 +112,12 @@ public class NormalThreadStateManager implements IThreadStateManager {
           }
           break;
         case STATE_RUNNING:
-          if (msg.obj instanceof Long) {
-            mProgress += (long) msg.obj;
+          Bundle b = msg.getData();
+          if (b != null) {
+            long len = b.getLong(IThreadStateManager.DATA_ADD_LEN, 0);
+            mProgress += len;
           }
+
           break;
         case STATE_UPDATE_PROGRESS:
           if (msg.obj == null) {
@@ -128,11 +131,8 @@ public class NormalThreadStateManager implements IThreadStateManager {
     }
   };
 
-  /**
-   * 不要使用handle更新启动线程的进度，因为有延迟
-   */
-  void updateProgress(long curProgress) {
-    mProgress = curProgress;
+  @Override public void updateCurrentProgress(long currentProgress) {
+    mProgress = currentProgress;
   }
 
   /**

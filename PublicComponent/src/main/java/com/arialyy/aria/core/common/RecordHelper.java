@@ -21,6 +21,7 @@ import com.arialyy.aria.core.loader.IRecordHandler;
 import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.BufferedRandomAccessFile;
+import com.arialyy.aria.util.CommonUtil;
 import com.arialyy.aria.util.FileUtil;
 import java.io.File;
 import java.io.IOException;
@@ -32,7 +33,7 @@ import java.io.IOException;
  * @Date 2019-09-19
  */
 public class RecordHelper {
-  private String TAG = "RecordHelper";
+  private String TAG = CommonUtil.getClassName(getClass());
 
   private AbsTaskWrapper mWrapper;
   protected TaskRecord mTaskRecord;
@@ -166,6 +167,7 @@ public class RecordHelper {
       tr.isComplete = false;
       tr.endLocation = mWrapper.getEntity().getFileSize();
     } else if (file.length() == mWrapper.getEntity().getFileSize()) {
+      ALog.d(TAG, "文件长度一致，线程完成");
       tr.isComplete = true;
     } else {
       if (file.length() != tr.startLocation) {

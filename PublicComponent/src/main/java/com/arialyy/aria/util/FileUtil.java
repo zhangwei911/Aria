@@ -191,6 +191,27 @@ public class FileUtil {
   }
 
   /**
+   * 删除文件夹
+   */
+  public static boolean deleteDir(File dirFile) {
+    // 如果dir对应的文件不存在，则退出
+    if (!dirFile.exists()) {
+      return false;
+    }
+
+    if (dirFile.isFile()) {
+      return dirFile.delete();
+    } else {
+
+      for (File file : dirFile.listFiles()) {
+        deleteDir(file);
+      }
+    }
+
+    return dirFile.delete();
+  }
+
+  /**
    * 将对象写入文件
    *
    * @param filePath 文件路径
@@ -275,9 +296,14 @@ public class FileUtil {
     FileOutputStream fos = null;
     FileChannel foc = null;
     try {
-      if (!file.exists()) {
-        file.createNewFile();
+      if (file.exists() && file.isDirectory()) {
+        ALog.w(TAG, String.format("路径【%s】是文件夹，将删除该文件夹", targetPath));
+        FileUtil.deleteDir(file);
       }
+      if (!file.exists()) {
+        FileUtil.createFile(file);
+      }
+
       fos = new FileOutputStream(targetPath);
       foc = fos.getChannel();
       List<FileInputStream> streams = new LinkedList<>();
@@ -383,8 +409,8 @@ public class FileUtil {
    */
   public static boolean checkMemorySpace(String path, long fileSize) {
     File temp = new File(path);
-    if (!temp.exists()){
-      if (!temp.getParentFile().exists()){
+    if (!temp.exists()) {
+      if (!temp.getParentFile().exists()) {
         FileUtil.createDir(temp.getParentFile().getPath());
       }
       path = temp.getParentFile().getPath();

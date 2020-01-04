@@ -37,7 +37,7 @@ public interface IRecordHandler extends ILoaderComponent {
   long SUB_LEN = 1024 * 1024;
 
   /**
-   * 分块文件路径
+   * 分块文件路径，文件路径.线程id.part
    */
   String SUB_PATH = "%s.%s.part";
 

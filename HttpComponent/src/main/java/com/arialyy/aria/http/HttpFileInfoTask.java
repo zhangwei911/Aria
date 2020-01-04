@@ -85,7 +85,7 @@ public final class HttpFileInfoTask implements IInfoTask, Runnable {
     } catch (IOException e) {
       e.printStackTrace();
       failDownload(new AriaIOException(TAG,
-              String.format("下载失败，filePath: %s, url: %s", mEntity.getDownloadPath(), mEntity.getUrl())),
+              String.format("下载失败，filePath: %s, url: %s", mEntity.getFilePath(), mEntity.getUrl())),
           true);
     } finally {
       if (conn != null) {
@@ -131,7 +131,7 @@ public final class HttpFileInfoTask implements IInfoTask, Runnable {
 
     if (!FileUtil.checkMemorySpace(mEntity.getFilePath(), len)) {
       failDownload(new TaskException(TAG,
-          String.format("下载失败，内存空间不足；filePath: %s, url: %s", mEntity.getDownloadPath(),
+          String.format("下载失败，内存空间不足；filePath: %s, url: %s", mEntity.getFilePath(),
               mEntity.getUrl())), false);
       return;
     }

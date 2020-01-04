@@ -37,6 +37,7 @@ import com.arialyy.aria.core.task.DownloadTask;
 import com.arialyy.aria.core.task.ITask;
 import com.arialyy.aria.core.task.UploadTask;
 import com.arialyy.aria.util.ALog;
+import com.arialyy.aria.util.CommonUtil;
 import com.arialyy.aria.util.NetUtils;
 import java.util.Iterator;
 import java.util.Map;
@@ -47,7 +48,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * Created by lyy on 2017/6/4. 事件调度器，用于处理任务状态的调度
  */
 public class TaskSchedulers<TASK extends ITask> implements ISchedulers {
-  private final String TAG = "AbsSchedulers";
+  private final String TAG = CommonUtil.getClassName(getClass());
 
   private static volatile TaskSchedulers INSTANCE;
   private static FailureTaskHandler mFailureTaskHandler;

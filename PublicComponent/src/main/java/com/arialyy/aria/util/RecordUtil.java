@@ -142,7 +142,7 @@ public class RecordUtil {
     int type;
     if (entity instanceof DownloadEntity) {
       type = IRecordHandler.TYPE_DOWNLOAD;
-      filePath = ((DownloadEntity) entity).getDownloadPath();
+      filePath = entity.getFilePath();
     } else if (entity instanceof UploadEntity) {
       type = IRecordHandler.TYPE_UPLOAD;
       filePath = entity.getFilePath();
