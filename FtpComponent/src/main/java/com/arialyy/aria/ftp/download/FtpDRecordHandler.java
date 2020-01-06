@@ -13,16 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.arialyy.aria.ftp;
+package com.arialyy.aria.ftp.download;
 
 import com.arialyy.aria.core.TaskRecord;
 import com.arialyy.aria.core.ThreadRecord;
 import com.arialyy.aria.core.common.RecordHandler;
 import com.arialyy.aria.core.common.RecordHelper;
 import com.arialyy.aria.core.config.Configuration;
+import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.loader.IRecordHandler;
-import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
 import com.arialyy.aria.core.wrapper.ITaskWrapper;
 import com.arialyy.aria.util.RecordUtil;
 import java.util.ArrayList;
@@ -31,17 +31,13 @@ import java.util.ArrayList;
  * @Author lyy
  * @Date 2019-09-19
  */
-public final class FtpRecordHandler extends RecordHandler {
+final class FtpDRecordHandler extends RecordHandler {
 
-  public FtpRecordHandler(AbsTaskWrapper wrapper) {
+  FtpDRecordHandler(DTaskWrapper wrapper) {
     super(wrapper);
   }
 
   @Override public void handlerTaskRecord(TaskRecord record) {
-    if (getWrapper().getRequestType() == ITaskWrapper.U_FTP) {
-      // 上传任务记录的处理交由FtpUFileInfoTask 完成
-      return;
-    }
     RecordHelper helper = new RecordHelper(getWrapper(), record);
     if (record.threadNum == 1) {
       helper.handleSingleThreadRecord();

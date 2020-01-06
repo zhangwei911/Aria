@@ -18,19 +18,15 @@ package com.arialyy.aria.ftp.upload;
 import android.text.TextUtils;
 import aria.apache.commons.net.ftp.FTPClient;
 import aria.apache.commons.net.ftp.FTPFile;
-import com.arialyy.aria.core.TaskRecord;
-import com.arialyy.aria.core.ThreadRecord;
+import aria.apache.commons.net.ftp.FTPReply;
 import com.arialyy.aria.core.common.CompleteInfo;
 import com.arialyy.aria.core.processor.FtpInterceptHandler;
 import com.arialyy.aria.core.processor.IFtpUploadInterceptor;
 import com.arialyy.aria.core.upload.UTaskWrapper;
 import com.arialyy.aria.core.upload.UploadEntity;
 import com.arialyy.aria.ftp.AbsFtpInfoTask;
-import com.arialyy.aria.orm.DbEntity;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
-import com.arialyy.aria.util.DbDataHelper;
-import com.arialyy.aria.util.RecordUtil;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -43,15 +39,39 @@ final class FtpUFileInfoTask extends AbsFtpInfoTask<UploadEntity, UTaskWrapper> 
   static final int CODE_COMPLETE = 0xab1;
   private boolean isComplete = false;
   private String remotePath;
+  private FTPFile ftpFile;
 
   FtpUFileInfoTask(UTaskWrapper taskEntity) {
     super(taskEntity);
-    isUpload = true;
   }
 
   @Override protected String getRemotePath() {
     return remotePath == null ?
         mTaskOption.getUrlEntity().remotePath + "/" + mEntity.getFileName() : remotePath;
+  }
+
+  @Override
+  protected void handelFileInfo(FTPClient client, FTPFile[] files, String convertedRemotePath)
+      throws IOException {
+    // 处理拦截功能
+    if (!onInterceptor(client, files)) {
+      closeClient(client);
+      ALog.d(TAG, "拦截器处理完成任务");
+      return;
+    }
+
+    //为了防止编码错乱，需要使用原始字符串
+    if (files.length == 0) {
+      handleFile(getRemotePath(), null);
+    }
+    int reply = client.getReplyCode();
+    if (!FTPReply.isPositiveCompletion(reply)) {
+      //服务器上没有该文件路径，表示该任务为新的上传任务
+      mTaskWrapper.setNewTask(true);
+    }
+    mTaskWrapper.setCode(reply);
+    onPreComplete(reply);
+    mEntity.update();
   }
 
   @Override protected boolean onInterceptor(FTPClient client, FTPFile[] ftpFiles) {
@@ -86,7 +106,6 @@ final class FtpUFileInfoTask extends AbsFtpInfoTask<UploadEntity, UTaskWrapper> 
             ALog.d(TAG,
                 String.format("删除文件%s，code: %s， msg: %s", b ? "成功" : "失败", client.getReplyCode(),
                     client.getReplyString()));
-            mTaskOption.setServeFileIsExist(false);
           } else if (!TextUtils.isEmpty(interceptHandler.getNewFileName())) {
             ALog.i(TAG, String.format("远端已拥有同名文件，将修改remotePath，原文件名：%s，新文件名：%s",
                 mEntity.getFileName(), interceptHandler.getNewFileName()));
@@ -95,7 +114,6 @@ final class FtpUFileInfoTask extends AbsFtpInfoTask<UploadEntity, UTaskWrapper> 
                 + interceptHandler.getNewFileName();
             mTaskOption.setNewFileName(interceptHandler.getNewFileName());
 
-            mTaskOption.setServeFileIsExist(false);
             closeClient(client);
             run();
             return false;
@@ -120,84 +138,16 @@ final class FtpUFileInfoTask extends AbsFtpInfoTask<UploadEntity, UTaskWrapper> 
    */
   @Override protected void handleFile(String remotePath, FTPFile ftpFile) {
     super.handleFile(remotePath, ftpFile);
-    if (ftpFile != null) {
-      //远程文件已完成
-      if (ftpFile.getSize() == mEntity.getFileSize()) {
-        isComplete = true;
-        ALog.d(TAG, "FTP服务器上已存在该文件【" + ftpFile.getName() + "】");
-      } else if (ftpFile.getSize() == 0) {
-        mTaskWrapper.setNewTask(true);
-        ALog.d(TAG, "FTP服务器上已存在该文件【" + ftpFile.getName() + "】，但文件长度为0，重新上传该文件");
-      } else {
-        ALog.w(TAG, "FTP服务器已存在未完成的文件【"
-            + ftpFile.getName()
-            + "，size: "
-            + ftpFile.getSize()
-            + "】"
-            + "尝试从位置："
-            + (ftpFile.getSize() - 1)
-            + "开始上传");
-        mTaskWrapper.setNewTask(false);
-
-        // 修改记录
-        TaskRecord record = DbDataHelper.getTaskRecord(mTaskWrapper.getKey(),
-            mTaskWrapper.getEntity().getTaskType());
-        if (record == null) {
-          record = new TaskRecord();
-          record.fileName = mEntity.getFileName();
-          record.filePath = mTaskWrapper.getKey();
-          record.threadRecords = new ArrayList<>();
-        }
-        ThreadRecord threadRecord;
-        if (record.threadRecords == null || record.threadRecords.isEmpty()) {
-          threadRecord = new ThreadRecord();
-          threadRecord.taskKey = record.filePath;
-        } else {
-          threadRecord = record.threadRecords.get(0);
-        }
-        //修改本地保存的停止地址为服务器上对应文件的大小
-        threadRecord.startLocation = ftpFile.getSize() - 1;
-        record.save();
-        threadRecord.save();
-      }
-    }else {
-      ALog.d(TAG, "FTP服务器上不存在该文件");
-      mTaskWrapper.setNewTask(false);
-      TaskRecord record = DbDataHelper.getTaskRecord(mTaskWrapper.getKey(),
-          mTaskWrapper.getEntity().getTaskType());
-      if (record != null){
-        ALog.w(TAG, String.format("任务记录【%s】已存在，将删除该记录", mTaskWrapper.getKey()));
-        delTaskRecord(record);
-      }
-      mTaskWrapper.setNewTask(true);
-      record = new TaskRecord();
-      record.fileName = mEntity.getFileName();
-      record.filePath = mTaskWrapper.getKey();
-      record.threadRecords = new ArrayList<>();
-      ThreadRecord threadRecord = new ThreadRecord();
-      threadRecord.taskKey = record.filePath;
-      threadRecord.startLocation = 0;
-      threadRecord.endLocation = mEntity.getFileSize();
-      threadRecord.isComplete = false;
-
-      record.save();
-      threadRecord.save();
+    this.ftpFile = ftpFile;
+    if (ftpFile != null && ftpFile.getSize() == mEntity.getFileSize()) {
+      isComplete = true;
     }
-  }
-
-  private void delTaskRecord(TaskRecord record){
-    List<ThreadRecord> threadRecords = record.threadRecords;
-    if (threadRecords != null && !threadRecords.isEmpty()){
-      for (ThreadRecord tr : threadRecords){
-        tr.deleteData();
-      }
-    }
-    record.deleteData();
   }
 
   @Override protected void onPreComplete(int code) {
     super.onPreComplete(code);
-    callback.onSucceed(mEntity.getKey(),
-        new CompleteInfo(isComplete ? CODE_COMPLETE : code, mTaskWrapper));
+    CompleteInfo info = new CompleteInfo(isComplete ? CODE_COMPLETE : code, mTaskWrapper);
+    info.obj = ftpFile;
+    callback.onSucceed(mEntity.getKey(), info);
   }
 }

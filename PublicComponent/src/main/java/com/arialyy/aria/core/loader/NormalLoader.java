@@ -36,7 +36,7 @@ import java.io.File;
  */
 public class NormalLoader extends AbsNormalLoader {
   private int startThreadNum; //启动的线程数
-  private boolean isComplete = false;
+  protected boolean isComplete = false;
   private Looper looper;
 
   public NormalLoader(AbsTaskWrapper wrapper, IEventListener listener) {
@@ -82,6 +82,10 @@ public class NormalLoader extends AbsNormalLoader {
   //  }
   //}
 
+  protected Looper getLooper() {
+    return looper;
+  }
+
   /**
    * 启动单线程任务
    */
@@ -103,6 +107,7 @@ public class NormalLoader extends AbsNormalLoader {
     if (file.getParentFile() != null && !file.getParentFile().exists()) {
       FileUtil.createDir(file.getPath());
     }
+    // 处理记录、初始化状态管理器
     mRecord = mRecordHandler.getRecord(getFileSize());
     mStateManager.setLooper(mRecord, looper);
     getTaskList().addAll(mTTBuilder.buildThreadTask(mRecord,
@@ -116,6 +121,7 @@ public class NormalLoader extends AbsNormalLoader {
       getListener().onStart(mStateManager.getCurrentProgress());
     }
 
+    // 启动线程任务
     for (IThreadTask threadTask : getTaskList()) {
       ThreadTaskManager.getInstance().startThread(mTaskWrapper.getKey(), threadTask);
     }

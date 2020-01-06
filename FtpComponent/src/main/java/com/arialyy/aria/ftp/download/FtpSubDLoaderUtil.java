@@ -20,7 +20,6 @@ import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.group.AbsSubDLoadUtil;
 import com.arialyy.aria.core.loader.LoaderStructure;
 import com.arialyy.aria.core.loader.SubLoader;
-import com.arialyy.aria.ftp.FtpRecordHandler;
 
 /**
  * @Author lyy
@@ -47,7 +46,7 @@ final class FtpSubDLoaderUtil extends AbsSubDLoadUtil {
 
   @Override protected LoaderStructure buildLoaderStructure() {
     LoaderStructure structure = new LoaderStructure();
-    structure.addComponent(new FtpRecordHandler(getWrapper()))
+    structure.addComponent(new FtpDRecordHandler(getWrapper()))
         .addComponent(new FtpDTTBuilder(getWrapper()))
         .addComponent(new FtpDFileInfoTask(getWrapper()));
     structure.accept(getLoader());

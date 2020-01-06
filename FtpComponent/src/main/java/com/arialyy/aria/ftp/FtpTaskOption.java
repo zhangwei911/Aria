@@ -72,11 +72,6 @@ public final class FtpTaskOption implements ITaskOption {
    */
   private String activeExternalIPAddress;
 
-  /**
-   * 服务器文件是否存在，true 文件存在，用于ftp上传
-   */
-  private boolean serveFileIsExist = true;
-
   //---------------- ftp client 配置信息 start
   private String defaultDateFormatStr = null;
   private String recentDateFormatStr = null;
@@ -85,14 +80,6 @@ public final class FtpTaskOption implements ITaskOption {
   private String serverTimeZoneId = null;
   private String systemKey = FTPClientConfig.SYST_UNIX;
   //---------------- ftp client 配置信息 end
-
-  public boolean isServeFileIsExist() {
-    return serveFileIsExist;
-  }
-
-  public void setServeFileIsExist(boolean serveFileIsExist) {
-    this.serveFileIsExist = serveFileIsExist;
-  }
 
   public String getActiveExternalIPAddress() {
     return activeExternalIPAddress;

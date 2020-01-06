@@ -19,6 +19,7 @@ import android.net.Uri;
 import android.text.TextUtils;
 import aria.apache.commons.net.ftp.FTPClient;
 import aria.apache.commons.net.ftp.FTPFile;
+import aria.apache.commons.net.ftp.FTPReply;
 import com.arialyy.aria.core.FtpUrlEntity;
 import com.arialyy.aria.core.common.CompleteInfo;
 import com.arialyy.aria.core.download.DGTaskWrapper;
@@ -32,6 +33,8 @@ import com.arialyy.aria.orm.DbEntity;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
 import com.arialyy.aria.util.RecordUtil;
+import java.io.File;
+import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 
@@ -50,6 +53,60 @@ final class FtpDGInfoTask extends AbsFtpInfoTask<DownloadGroupEntity, DGTaskWrap
     } else {
       super.run();
     }
+  }
+
+  @Override
+  protected void handelFileInfo(FTPClient client, FTPFile[] files, String convertedRemotePath)
+      throws IOException {
+    boolean isExist = files.length != 0;
+    if (!isExist) {
+      int i = convertedRemotePath.lastIndexOf(File.separator);
+      FTPFile[] files1;
+      if (i == -1) {
+        files1 = client.listFiles();
+      } else {
+        files1 = client.listFiles(convertedRemotePath.substring(0, i + 1));
+      }
+      if (files1.length > 0) {
+        ALog.i(TAG,
+            String.format("路径【%s】下的文件列表 ===================================", getRemotePath()));
+        for (FTPFile file : files1) {
+          ALog.d(TAG, file.toString());
+        }
+        ALog.i(TAG,
+            "================================= --end-- ===================================");
+      } else {
+        ALog.w(TAG, String.format("获取文件列表失败，msg：%s", client.getReplyString()));
+      }
+      closeClient(client);
+
+      failDownload(client,
+          String.format("文件不存在，url: %s, remotePath：%s", mTaskOption.getUrlEntity().url,
+              getRemotePath()), null, false);
+      return;
+    }
+
+    // 处理拦截功能
+    if (!onInterceptor(client, files)) {
+      closeClient(client);
+      ALog.d(TAG, "拦截器处理完成任务");
+      return;
+    }
+
+    //为了防止编码错乱，需要使用原始字符串
+    mSize = getFileSize(files, client, getRemotePath());
+    int reply = client.getReplyCode();
+    if (!FTPReply.isPositiveCompletion(reply)) {
+      closeClient(client);
+      failDownload(client, "获取文件信息错误，url: " + mTaskOption.getUrlEntity().url, null, true);
+      return;
+    }
+    mTaskWrapper.setCode(reply);
+    if (mSize != 0) {
+      mEntity.setFileSize(mSize);
+    }
+    onPreComplete(reply);
+    mEntity.update();
   }
 
   /**
@@ -110,7 +167,7 @@ final class FtpDGInfoTask extends AbsFtpInfoTask<DownloadGroupEntity, DGTaskWrap
     final FtpUrlEntity urlEntity = mTaskOption.getUrlEntity().clone();
     String url =
         urlEntity.scheme + "://" + urlEntity.hostName + ":" + urlEntity.port + "/" + remotePath;
-    if (checkEntityExist(url)){
+    if (checkEntityExist(url)) {
       ALog.w(TAG, "子任务已存在，取消子任务的添加，url = " + url);
       return;
     }

@@ -37,7 +37,6 @@ import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CheckUtil;
 import com.arialyy.aria.util.CommonUtil;
 import com.arialyy.aria.util.SSLContextUtil;
-import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -57,7 +56,6 @@ public abstract class AbsFtpInfoTask<ENTITY extends AbsEntity, TASK_WRAPPER exte
   private int mConnectTimeOut;
   protected long mSize = 0;
   protected String charSet = "UTF-8";
-  protected boolean isUpload = false;
   protected Callback callback;
 
   public AbsFtpInfoTask(TASK_WRAPPER taskWrapper) {
@@ -74,6 +72,16 @@ public abstract class AbsFtpInfoTask<ENTITY extends AbsEntity, TASK_WRAPPER exte
    */
   protected abstract String getRemotePath();
 
+  /**
+   * 处理ftp列表信息
+   *
+   * @param client ftp 客户端对象
+   * @param files remotePath 对应的文件列表
+   * @param convertedRemotePath 已转换的可被服务器识别的remotePath
+   */
+  protected abstract void handelFileInfo(FTPClient client, FTPFile[] files,
+      String convertedRemotePath) throws IOException;
+
   @Override public void setCallback(Callback callback) {
     this.callback = callback;
   }
@@ -89,67 +97,9 @@ public abstract class AbsFtpInfoTask<ENTITY extends AbsEntity, TASK_WRAPPER exte
         ALog.e(TAG, String.format("任务【%s】失败", mTaskOption.getUrlEntity().url));
         return;
       }
-      String remotePath = CommonUtil.convertFtpChar(charSet, getRemotePath());
-
-      FTPFile[] files = client.listFiles(remotePath);
-      boolean isExist = files.length != 0;
-      if (!isExist && !isUpload) {
-        int i = remotePath.lastIndexOf(File.separator);
-        FTPFile[] files1;
-        if (i == -1) {
-          files1 = client.listFiles();
-        } else {
-          files1 = client.listFiles(remotePath.substring(0, i + 1));
-        }
-        if (files1.length > 0) {
-          ALog.i(TAG,
-              String.format("路径【%s】下的文件列表 ===================================", getRemotePath()));
-          for (FTPFile file : files1) {
-            ALog.d(TAG, file.toString());
-          }
-          ALog.i(TAG,
-              "================================= --end-- ===================================");
-        } else {
-          ALog.w(TAG, String.format("获取文件列表失败，msg：%s", client.getReplyString()));
-        }
-        closeClient(client);
-
-        failDownload(client,
-            String.format("文件不存在，url: %s, remotePath：%s", mTaskOption.getUrlEntity().url,
-                remotePath), null, false);
-        return;
-      }
-
-      // 处理拦截功能
-      if (!onInterceptor(client, files)) {
-        closeClient(client);
-        ALog.d(TAG, "拦截器处理完成任务");
-        return;
-      }
-
-      //为了防止编码错乱，需要使用原始字符串
-      if (isUpload && files.length == 0){
-        handleFile(getRemotePath(), null);
-      }else {
-        mSize = getFileSize(files, client, getRemotePath());
-      }
-      int reply = client.getReplyCode();
-      if (!FTPReply.isPositiveCompletion(reply)) {
-        if (isUpload) {
-          //服务器上没有该文件路径，表示该任务为新的上传任务
-          mTaskWrapper.setNewTask(true);
-        } else {
-          closeClient(client);
-          failDownload(client, "获取文件信息错误，url: " + mTaskOption.getUrlEntity().url, null, true);
-          return;
-        }
-      }
-      mTaskWrapper.setCode(reply);
-      if (mSize != 0 && !isUpload) {
-        mEntity.setFileSize(mSize);
-      }
-      onPreComplete(reply);
-      mEntity.update();
+      String convertedRemotePath = CommonUtil.convertFtpChar(charSet, getRemotePath());
+      FTPFile[] files = client.listFiles(convertedRemotePath);
+      handelFileInfo(client, files, convertedRemotePath);
     } catch (IOException e) {
       e.printStackTrace();
       failDownload(client, "FTP错误信息", e, true);
@@ -169,20 +119,6 @@ public abstract class AbsFtpInfoTask<ENTITY extends AbsEntity, TASK_WRAPPER exte
    */
   protected boolean onInterceptor(FTPClient client, FTPFile[] ftpFiles) {
     return true;
-  }
-
-  /**
-   * 检查文件是否存在
-   *
-   * @return {@code true}存在
-   */
-  private boolean checkFileExist(FTPFile[] ftpFiles, String fileName) {
-    for (FTPFile ff : ftpFiles) {
-      if (ff.getName().equals(fileName)) {
-        return true;
-      }
-    }
-    return false;
   }
 
   protected void onPreComplete(int code) {
@@ -358,7 +294,7 @@ public abstract class AbsFtpInfoTask<ENTITY extends AbsEntity, TASK_WRAPPER exte
    *
    * @throws IOException 字符串编码转换错误
    */
-  private long getFileSize(FTPFile[] files, FTPClient client, String dirName) throws IOException {
+  protected long getFileSize(FTPFile[] files, FTPClient client, String dirName) throws IOException {
     long size = 0;
     String path = dirName + "/";
     for (FTPFile file : files) {

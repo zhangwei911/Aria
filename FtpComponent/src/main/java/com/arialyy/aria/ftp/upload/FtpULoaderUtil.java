@@ -22,7 +22,6 @@ import com.arialyy.aria.core.loader.LoaderStructure;
 import com.arialyy.aria.core.loader.NormalThreadStateManager;
 import com.arialyy.aria.core.upload.UTaskWrapper;
 import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
-import com.arialyy.aria.ftp.FtpRecordHandler;
 import com.arialyy.aria.ftp.FtpTaskOption;
 
 /**
@@ -42,7 +41,7 @@ public final class FtpULoaderUtil extends AbsNormalLoaderUtil {
 
   @Override public LoaderStructure BuildLoaderStructure() {
     LoaderStructure structure = new LoaderStructure();
-    structure.addComponent(new FtpRecordHandler(getTaskWrapper()))
+    structure.addComponent(new FtpURecordHandler((UTaskWrapper) getTaskWrapper()))
         .addComponent(new NormalThreadStateManager(getListener()))
         .addComponent(new FtpUFileInfoTask((UTaskWrapper) getTaskWrapper()))
         .addComponent(new FtpUTTBuilder(getTaskWrapper()));
