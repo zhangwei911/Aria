@@ -23,7 +23,7 @@ import java.util.Set;
 /**
  * 组合任务执行中的状态信息
  */
-public class GroupRunState {
+public final class GroupRunState {
   /**
    * 子任务数
    */

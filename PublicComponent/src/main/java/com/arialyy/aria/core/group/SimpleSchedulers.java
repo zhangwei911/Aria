@@ -20,21 +20,20 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import com.arialyy.aria.core.AriaConfig;
-import com.arialyy.aria.core.common.AbsEntity;
 import com.arialyy.aria.core.config.Configuration;
 import com.arialyy.aria.core.inf.IThreadStateManager;
+import com.arialyy.aria.core.loader.IRecordHandler;
 import com.arialyy.aria.core.manager.ThreadTaskManager;
 import com.arialyy.aria.exception.TaskException;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.NetUtils;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.io.File;
 
 /**
  * 组合任务子任务调度器，用于调度任务的开始、停止、失败、完成等情况
  * 该调度器生命周期和{@link AbsGroupLoaderUtil}生命周期一致
  */
-class SimpleSchedulers implements Handler.Callback {
+final class SimpleSchedulers implements Handler.Callback {
   private static final String TAG = "SimpleSchedulers";
   private SimpleSubQueue mQueue;
   private GroupRunState mGState;
@@ -86,7 +85,8 @@ class SimpleSchedulers implements Handler.Callback {
         ThreadTaskManager.getInstance().removeSingleTaskThread(mKey, threadName);
         break;
       case IThreadStateManager.STATE_FAIL:
-        handleFail(loaderUtil);
+        boolean needRetry = b.getBoolean(IThreadStateManager.DATA_RETRY, false);
+        handleFail(loaderUtil, needRetry);
         ThreadTaskManager.getInstance().removeSingleTaskThread(mKey, threadName);
         break;
     }
@@ -98,18 +98,19 @@ class SimpleSchedulers implements Handler.Callback {
    * 1、子任务失败次数大于等于配置的重试次数，才能认为子任务停止
    * 2、stopNum + failNum + completeNum + cacheNum == subSize，则认为组合任务停止
    * 3、failNum == subSize，只有全部的子任务都失败了，才能任务组合任务失败
+   *
+   * @param needRetry true 需要重试，false 不需要重试
    */
-  private synchronized void handleFail(final AbsSubDLoadUtil loaderUtil) {
+  private synchronized void handleFail(final AbsSubDLoadUtil loaderUtil, boolean needRetry) {
     Configuration config = Configuration.getInstance();
 
-    long interval = config.dGroupCfg.getSubReTryInterval();
     int num = config.dGroupCfg.getSubReTryNum();
     boolean isNotNetRetry = config.appCfg.isNotNetRetry();
 
-    final int reTryNum = num;
-    if ((!NetUtils.isConnected(AriaConfig.getInstance().getAPP()) && !isNotNetRetry)
+    if (!needRetry
+        || (!NetUtils.isConnected(AriaConfig.getInstance().getAPP()) && !isNotNetRetry)
         || loaderUtil.getLoader() == null // 如果获取不到文件信息，loader为空
-        || loaderUtil.getEntity().getFailNum() > reTryNum) {
+        || loaderUtil.getEntity().getFailNum() > num) {
       mQueue.removeTaskFromExecQ(loaderUtil);
       mGState.listener.onSubFail(loaderUtil.getEntity(), new TaskException(TAG,
           String.format("任务组子任务【%s】下载失败，下载地址【%s】", loaderUtil.getEntity().getFileName(),
@@ -127,20 +128,7 @@ class SimpleSchedulers implements Handler.Callback {
       }
       return;
     }
-
-    // 如果获取不到文件信息，loader为空
-    final ScheduledThreadPoolExecutor timer = new ScheduledThreadPoolExecutor(1);
-    timer.schedule(new Runnable() {
-      @Override public void run() {
-        AbsEntity entity = loaderUtil.getEntity();
-        if (entity.getFailNum() <= reTryNum) {
-          ALog.d(TAG, String.format("任务【%s】开始重试", loaderUtil.getEntity().getFileName()));
-          loaderUtil.reStart();
-        } else {
-          startNext();
-        }
-      }
-    }, interval, TimeUnit.MILLISECONDS);
+    SimpleSubRetryQueue.getInstance().offer(loaderUtil);
   }
 
   /**
@@ -175,6 +163,11 @@ class SimpleSchedulers implements Handler.Callback {
    */
   private synchronized void handleComplete(AbsSubDLoadUtil loader) {
     ALog.d(TAG, String.format("子任务【%s】完成", loader.getEntity().getFileName()));
+    if (loader.getRecord().isBlock) {
+      File partFile =
+          new File(String.format(IRecordHandler.SUB_PATH, loader.getRecord().filePath, 0));
+      partFile.renameTo(new File(loader.getRecord().filePath));
+    }
     ThreadTaskManager.getInstance().removeTaskThread(loader.getKey());
     mGState.listener.onSubComplete(loader.getEntity());
     mQueue.removeTaskFromExecQ(loader);

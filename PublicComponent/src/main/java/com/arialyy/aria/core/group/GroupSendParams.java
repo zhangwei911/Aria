@@ -22,7 +22,7 @@ import com.arialyy.aria.core.task.AbsGroupTask;
  * Created by lyy on 2017/9/8.
  * 任务组参数传递
  */
-public class GroupSendParams<GROUP_TASK extends AbsGroupTask, ENTITY extends AbsNormalEntity> {
+public final class GroupSendParams<GROUP_TASK extends AbsGroupTask, ENTITY extends AbsNormalEntity> {
 
   public GROUP_TASK groupTask;
   public ENTITY entity;

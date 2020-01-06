@@ -27,6 +27,13 @@ public abstract class AbsBuilderTarget<TARGET extends AbsBuilderTarget> extends 
 
   private BuilderController mStartController;
 
+  /**
+   * 任务操作前调用
+   */
+  protected void onPre() {
+
+  }
+
   private synchronized BuilderController getController() {
     if (mStartController == null) {
       mStartController = new BuilderController(getTaskWrapper());
@@ -58,6 +65,7 @@ public abstract class AbsBuilderTarget<TARGET extends AbsBuilderTarget> extends 
    */
   @Override
   public long add() {
+    onPre();
     return getController().add();
   }
 
@@ -68,6 +76,7 @@ public abstract class AbsBuilderTarget<TARGET extends AbsBuilderTarget> extends 
    */
   @Override
   public long create() {
+    onPre();
     return getController().create();
   }
 
@@ -82,6 +91,7 @@ public abstract class AbsBuilderTarget<TARGET extends AbsBuilderTarget> extends 
    */
   @Override
   public long setHighestPriority() {
+    onPre();
     return getController().setHighestPriority();
   }
 }

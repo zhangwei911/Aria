@@ -267,7 +267,8 @@ public abstract class AbsGroupLoader implements ILoaderVisitor, ILoader {
     Looper looper = Looper.myLooper();
     initState(looper);
     getState().setSubSize(getWrapper().getSubTaskWrapper().size());
-    if (getState().getCompleteNum() == getState().getSubSize()) {
+    if (getState().getCompleteNum() != 0
+        && getState().getCompleteNum() == getState().getSubSize()) {
       mListener.onComplete();
       return;
     }

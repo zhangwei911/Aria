@@ -55,8 +55,7 @@ public class FtpUploadActivity extends BaseActivity<ActivityFtpUploadBinding> {
   private String mUrl;
   private UploadModule mModule;
   private long mTaskId = -1;
-  private String user = "ftpuser", pwd = "ftpuser2020";
-  //private String user = "lao", pwd = "123456";
+  private String user = "lao", pwd = "123456";
 
   @Override protected void init(Bundle savedInstanceState) {
     setTile("D_FTP 文件上传");

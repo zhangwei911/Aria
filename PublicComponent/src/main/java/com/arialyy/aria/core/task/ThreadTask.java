@@ -86,11 +86,17 @@ public class ThreadTask implements IThreadTask, IThreadTaskObserver {
     mEntity = mTaskWrapper.getEntity();
     mLastSaveTime = System.currentTimeMillis();
     mConfigThreadPool = Executors.newCachedThreadPool();
-
     isNotNetRetry = AriaConfig.getInstance().getAConfig().isNotNetRetry();
     mRangeProgress = mRecord.startLocation;
     mLastRangeProgress = mRangeProgress;
     updateInterval = config.updateInterval;
+    checkFileExist();
+  }
+
+  private void checkFileExist() {
+    if (!getConfig().tempFile.exists()) {
+      FileUtil.createFile(getConfig().tempFile);
+    }
   }
 
   /**

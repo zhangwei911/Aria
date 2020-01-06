@@ -29,7 +29,7 @@ import java.util.Set;
 /**
  * 组合任务队列，该队列生命周期和{@link AbsGroupLoaderUtil}生命周期一致
  */
-class SimpleSubQueue implements ISubQueue<AbsSubDLoadUtil> {
+final class SimpleSubQueue implements ISubQueue<AbsSubDLoadUtil> {
   private final String TAG = CommonUtil.getClassName(getClass());
   /**
    * 缓存下载器

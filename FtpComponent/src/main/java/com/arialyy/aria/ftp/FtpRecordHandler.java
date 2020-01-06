@@ -38,15 +38,21 @@ public final class FtpRecordHandler extends RecordHandler {
   }
 
   @Override public void handlerTaskRecord(TaskRecord record) {
+    if (getWrapper().getRequestType() == ITaskWrapper.U_FTP) {
+      // 上传任务记录的处理交由FtpUFileInfoTask 完成
+      return;
+    }
     RecordHelper helper = new RecordHelper(getWrapper(), record);
-    if (getWrapper().isSupportBP()) {
-      if (record.isBlock) {
-        helper.handleBlockRecord();
-      } else {
-        helper.handleMultiRecord();
-      }
-    } else if (record.threadNum == 1) {
+    if (record.threadNum == 1) {
       helper.handleSingleThreadRecord();
+    } else {
+      if (getWrapper().isSupportBP()) {
+        if (record.isBlock) {
+          helper.handleBlockRecord();
+        } else {
+          helper.handleMultiRecord();
+        }
+      }
     }
   }
 

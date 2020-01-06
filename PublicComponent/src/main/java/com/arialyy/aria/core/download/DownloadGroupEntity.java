@@ -53,7 +53,7 @@ public class DownloadGroupEntity extends AbsGroupEntity {
         getSubEntities().get(0).getUrl())) {
       return ITaskWrapper.ERROR;
     }
-    return getSubEntities().get(0).getUrl().startsWith("ftp") ? ITaskWrapper.D_FTP_DIR
+    return (groupHash.startsWith("ftp") || groupHash.startsWith("sftp")) ? ITaskWrapper.D_FTP_DIR
         : ITaskWrapper.DG_HTTP;
   }
 

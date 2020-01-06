@@ -18,6 +18,7 @@ package com.arialyy.aria.core.download.target;
 import com.arialyy.aria.core.common.AbsNormalTarget;
 import com.arialyy.aria.core.common.FtpOption;
 import com.arialyy.aria.core.download.DownloadGroupEntity;
+import com.arialyy.aria.core.inf.IOptionConstant;
 import com.arialyy.aria.core.manager.SubTaskManager;
 import com.arialyy.aria.util.CommonUtil;
 
@@ -27,6 +28,7 @@ import com.arialyy.aria.util.CommonUtil;
  */
 public class FtpDirNormalTarget extends AbsNormalTarget<FtpDirNormalTarget> {
   private FtpDirConfigHandler<FtpDirNormalTarget> mConfigHandler;
+  private FtpOption option;
 
   FtpDirNormalTarget(long taskId) {
     mConfigHandler = new FtpDirConfigHandler<>(this, taskId);
@@ -71,8 +73,7 @@ public class FtpDirNormalTarget extends AbsNormalTarget<FtpDirNormalTarget> {
     if (option == null) {
       throw new NullPointerException("ftp 任务配置为空");
     }
-    option.setUrlEntity(CommonUtil.getFtpUrlInfo(getEntity().getKey()));
-    getTaskWrapper().getOptionParams().setParams(option);
+    this.option = option;
     return this;
   }
 
@@ -87,5 +88,14 @@ public class FtpDirNormalTarget extends AbsNormalTarget<FtpDirNormalTarget> {
    */
   public SubTaskManager getSubTaskManager() {
     return mConfigHandler.getSubTaskManager();
+  }
+
+  @Override protected void onPre() {
+    super.onPre();
+    if (option == null) {
+      option = new FtpOption();
+    }
+    option.setUrlEntity(CommonUtil.getFtpUrlInfo(getEntity().getKey()));
+    getTaskWrapper().getOptionParams().setParams(option);
   }
 }

@@ -91,7 +91,7 @@ public abstract class AbsFtpInfoTask<ENTITY extends AbsEntity, TASK_WRAPPER exte
       }
       String remotePath = CommonUtil.convertFtpChar(charSet, getRemotePath());
 
-      FTPFile[] files = client.listFiles(getRemotePath());
+      FTPFile[] files = client.listFiles(remotePath);
       boolean isExist = files.length != 0;
       if (!isExist && !isUpload) {
         int i = remotePath.lastIndexOf(File.separator);
@@ -128,7 +128,11 @@ public abstract class AbsFtpInfoTask<ENTITY extends AbsEntity, TASK_WRAPPER exte
       }
 
       //为了防止编码错乱，需要使用原始字符串
-      mSize = getFileSize(files, client, getRemotePath());
+      if (isUpload && files.length == 0){
+        handleFile(getRemotePath(), null);
+      }else {
+        mSize = getFileSize(files, client, getRemotePath());
+      }
       int reply = client.getReplyCode();
       if (!FTPReply.isPositiveCompletion(reply)) {
         if (isUpload) {

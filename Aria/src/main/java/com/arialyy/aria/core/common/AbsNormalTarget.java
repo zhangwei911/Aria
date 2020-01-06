@@ -32,6 +32,13 @@ public abstract class AbsNormalTarget<TARGET extends AbsNormalTarget> extends Ab
     implements INormalFeature {
 
   /**
+   * 任务操作前调用
+   */
+  protected void onPre() {
+
+  }
+
+  /**
    * 是否忽略权限检查
    */
   public TARGET ignoreCheckPermissions() {
@@ -150,6 +157,7 @@ public abstract class AbsNormalTarget<TARGET extends AbsNormalTarget> extends Ab
    */
   @Override
   public void stop() {
+    onPre();
     getController().stop();
   }
 
@@ -168,6 +176,7 @@ public abstract class AbsNormalTarget<TARGET extends AbsNormalTarget> extends Ab
    * @param newStart true 立即将任务恢复到执行队列中
    */
   @Override public void resume(boolean newStart) {
+    onPre();
     getController().resume(newStart);
   }
 
@@ -176,7 +185,7 @@ public abstract class AbsNormalTarget<TARGET extends AbsNormalTarget> extends Ab
    */
   @Override
   public void cancel() {
-    getController().cancel();
+    cancel(false);
   }
 
   /**
@@ -184,17 +193,19 @@ public abstract class AbsNormalTarget<TARGET extends AbsNormalTarget> extends Ab
    */
   @Override
   public void reTry() {
+    onPre();
     getController().reTry();
   }
 
   /**
    * 删除任务
    *
-   * @param removeFile {@code true} 不仅删除任务数据库记录，还会删除已经删除完成的文件
+   * @param removeFile {@code true} 不仅删除任务数据库记录，还会删除已经完成的文件
    * {@code false}如果任务已经完成，只删除任务数据库记录，
    */
   @Override
   public void cancel(boolean removeFile) {
+    onPre();
     getController().cancel(removeFile);
   }
 
@@ -203,11 +214,13 @@ public abstract class AbsNormalTarget<TARGET extends AbsNormalTarget> extends Ab
    */
   @Override
   public long reStart() {
+    onPre();
     return getController().reStart();
   }
 
   @Override
   public void save() {
+    onPre();
     getController().save();
   }
 }

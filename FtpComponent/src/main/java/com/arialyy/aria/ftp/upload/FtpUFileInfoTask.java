@@ -26,9 +26,11 @@ import com.arialyy.aria.core.processor.IFtpUploadInterceptor;
 import com.arialyy.aria.core.upload.UTaskWrapper;
 import com.arialyy.aria.core.upload.UploadEntity;
 import com.arialyy.aria.ftp.AbsFtpInfoTask;
+import com.arialyy.aria.orm.DbEntity;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
 import com.arialyy.aria.util.DbDataHelper;
+import com.arialyy.aria.util.RecordUtil;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -61,7 +63,7 @@ final class FtpUFileInfoTask extends AbsFtpInfoTask<UploadEntity, UTaskWrapper> 
     try {
       IFtpUploadInterceptor interceptor = mTaskOption.getUploadInterceptor();
       if (interceptor != null) {
-        /**
+        /*
          * true 使用拦截器，false 不使用拦截器
          */
         List<String> files = new ArrayList<>();
@@ -84,6 +86,7 @@ final class FtpUFileInfoTask extends AbsFtpInfoTask<UploadEntity, UTaskWrapper> 
             ALog.d(TAG,
                 String.format("删除文件%s，code: %s， msg: %s", b ? "成功" : "失败", client.getReplyCode(),
                     client.getReplyString()));
+            mTaskOption.setServeFileIsExist(false);
           } else if (!TextUtils.isEmpty(interceptHandler.getNewFileName())) {
             ALog.i(TAG, String.format("远端已拥有同名文件，将修改remotePath，原文件名：%s，新文件名：%s",
                 mEntity.getFileName(), interceptHandler.getNewFileName()));
@@ -92,6 +95,7 @@ final class FtpUFileInfoTask extends AbsFtpInfoTask<UploadEntity, UTaskWrapper> 
                 + interceptHandler.getNewFileName();
             mTaskOption.setNewFileName(interceptHandler.getNewFileName());
 
+            mTaskOption.setServeFileIsExist(false);
             closeClient(client);
             run();
             return false;
@@ -156,7 +160,39 @@ final class FtpUFileInfoTask extends AbsFtpInfoTask<UploadEntity, UTaskWrapper> 
         record.save();
         threadRecord.save();
       }
+    }else {
+      ALog.d(TAG, "FTP服务器上不存在该文件");
+      mTaskWrapper.setNewTask(false);
+      TaskRecord record = DbDataHelper.getTaskRecord(mTaskWrapper.getKey(),
+          mTaskWrapper.getEntity().getTaskType());
+      if (record != null){
+        ALog.w(TAG, String.format("任务记录【%s】已存在，将删除该记录", mTaskWrapper.getKey()));
+        delTaskRecord(record);
+      }
+      mTaskWrapper.setNewTask(true);
+      record = new TaskRecord();
+      record.fileName = mEntity.getFileName();
+      record.filePath = mTaskWrapper.getKey();
+      record.threadRecords = new ArrayList<>();
+      ThreadRecord threadRecord = new ThreadRecord();
+      threadRecord.taskKey = record.filePath;
+      threadRecord.startLocation = 0;
+      threadRecord.endLocation = mEntity.getFileSize();
+      threadRecord.isComplete = false;
+
+      record.save();
+      threadRecord.save();
     }
+  }
+
+  private void delTaskRecord(TaskRecord record){
+    List<ThreadRecord> threadRecords = record.threadRecords;
+    if (threadRecords != null && !threadRecords.isEmpty()){
+      for (ThreadRecord tr : threadRecords){
+        tr.deleteData();
+      }
+    }
+    record.deleteData();
   }
 
   @Override protected void onPreComplete(int code) {

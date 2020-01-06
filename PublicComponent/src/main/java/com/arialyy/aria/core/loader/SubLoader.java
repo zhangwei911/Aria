@@ -48,6 +48,7 @@ public final class SubLoader implements ILoader, ILoaderVisitor {
   private IRecordHandler recordHandler;
   private IThreadTask threadTask;
   private String parentKey;
+  private TaskRecord record;
 
   public SubLoader(AbsTaskWrapper wrapper, Handler schedulers) {
     this.wrapper = wrapper;
@@ -92,7 +93,7 @@ public final class SubLoader implements ILoader, ILoaderVisitor {
   }
 
   private void handlerTask() {
-    TaskRecord record = recordHandler.getRecord(wrapper.getEntity().getFileSize());
+    record = recordHandler.getRecord(wrapper.getEntity().getFileSize());
     if (record.threadRecords != null
         && !TextUtils.isEmpty(record.filePath)
         && new File(record.filePath).exists()
@@ -121,6 +122,10 @@ public final class SubLoader implements ILoader, ILoaderVisitor {
     } catch (Exception e) {
       e.printStackTrace();
     }
+  }
+
+  public TaskRecord getRecord(){
+    return record;
   }
 
   public void setParentKey(String parentKey) {

@@ -16,6 +16,7 @@
 package com.arialyy.aria.core.group;
 
 import android.os.Handler;
+import com.arialyy.aria.core.TaskRecord;
 import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.inf.IUtil;
@@ -79,6 +80,10 @@ public abstract class AbsSubDLoadUtil implements IUtil, Runnable {
 
   public DownloadEntity getEntity() {
     return mWrapper.getEntity();
+  }
+
+  public TaskRecord getRecord(){
+    return getLoader().getRecord();
   }
 
   @Override public void run() {

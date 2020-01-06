@@ -1,6 +1,8 @@
 package com.arialyy.aria.core.loader;
 
+import android.os.Bundle;
 import android.os.Handler;
+import android.os.Message;
 import com.arialyy.aria.core.TaskRecord;
 import com.arialyy.aria.core.ThreadRecord;
 import com.arialyy.aria.core.common.AbsNormalEntity;
@@ -133,7 +135,16 @@ public abstract class AbsNormalTTBuilder implements IThreadTaskBuilder {
       if (tr.isComplete) {//该线程已经完成
         currentProgress += endL - startL;
         ALog.d(TAG, String.format("任务【%s】线程__%s__已完成", mWrapper.getKey(), i));
-        mStateHandler.obtainMessage(IThreadStateManager.STATE_COMPLETE).sendToTarget();
+        Message msg = mStateHandler.obtainMessage();
+        msg.what = IThreadStateManager.STATE_COMPLETE;
+        Bundle b = msg.getData();
+        if (b == null){
+          b = new Bundle();
+        }
+        b.putString(IThreadStateManager.DATA_THREAD_NAME,
+            CommonUtil.getThreadName(getEntity().getUrl(), tr.threadId));
+        msg.setData(b);
+        msg.sendToTarget();
         continue;
       }
 

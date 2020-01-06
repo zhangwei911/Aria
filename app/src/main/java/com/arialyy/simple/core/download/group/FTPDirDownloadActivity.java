@@ -37,7 +37,7 @@ import java.security.AlgorithmConstraints;
  * Created by lyy on 2017/7/6.
  */
 public class FTPDirDownloadActivity extends BaseActivity<ActivityDownloadGroupBinding> {
-  private static final String dir = "ftp://9.9.9.50:2121/upload/测试";
+  private static final String dir = "ftp://9.9.9.72:2121/upload/测试";
 
   private SubStateLinearLayout mChildList;
   private long mTaskId = -1;
@@ -81,6 +81,7 @@ public class FTPDirDownloadActivity extends BaseActivity<ActivityDownloadGroupBi
                   Environment.getExternalStorageDirectory().getPath() + "/Download/ftp_dir")
               .setGroupAlias("ftp文件夹下载")
               .option(getFtpOption())
+              .ignoreFilePathOccupy()
               .create();
           getBinding().setStateStr(getString(R.string.stop));
           break;
@@ -124,6 +125,7 @@ public class FTPDirDownloadActivity extends BaseActivity<ActivityDownloadGroupBi
   }
 
   @DownloadGroup.onTaskRunning() protected void running(DownloadGroupTask task) {
+    ALog.d(TAG, "ftp dir running, p = " + task.getPercent());
     getBinding().setProgress(task.getPercent());
     getBinding().setSpeed(task.getConvertSpeed());
     mChildList.updateChildProgress(task.getEntity().getSubEntities());
@@ -135,6 +137,7 @@ public class FTPDirDownloadActivity extends BaseActivity<ActivityDownloadGroupBi
 
   @DownloadGroup.onTaskStop() void taskStop(DownloadGroupTask task) {
     getBinding().setSpeed("");
+    getBinding().setStateStr(getString(R.string.start));
   }
 
   @DownloadGroup.onTaskCancel() void taskCancel(DownloadGroupTask task) {

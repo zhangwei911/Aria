@@ -98,7 +98,7 @@ class DelegateFind extends AbsDelegate {
    */
   <T extends AbsDbWrapper> List<T> findRelationData(SQLiteDatabase db, Class<T> clazz,
       String... expression) {
-    return exeRelationSql(db, clazz, -1, -1, expression);
+    return exeRelationSql(db, clazz, 1, 10, expression);
   }
 
   /**
@@ -111,6 +111,7 @@ class DelegateFind extends AbsDelegate {
   <T extends AbsDbWrapper> List<T> findRelationData(SQLiteDatabase db, Class<T> clazz,
       int page, int num, String... expression) {
     if (page < 1 || num < 1) {
+      ALog.w(TAG, "page，num 小于1");
       return null;
     }
     return exeRelationSql(db, clazz, page, num, expression);
@@ -345,6 +346,7 @@ class DelegateFind extends AbsDelegate {
   <T extends DbEntity> List<T> findData(SQLiteDatabase db, Class<T> clazz, int page, int num,
       String... expression) {
     if (page < 1 || num < 1) {
+      ALog.w(TAG, "page, bum 小于1");
       return null;
     }
     db = checkDb(db);
@@ -390,6 +392,7 @@ class DelegateFind extends AbsDelegate {
   <T extends DbEntity> List<T> findDataByFuzzy(SQLiteDatabase db, Class<T> clazz,
       int page, int num, String conditions) {
     if (page < 1 || num < 1) {
+      ALog.w(TAG, "page, bum 小于1");
       return null;
     }
     db = checkDb(db);

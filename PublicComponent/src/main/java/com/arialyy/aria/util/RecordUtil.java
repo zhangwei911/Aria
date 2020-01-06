@@ -65,6 +65,15 @@ public class RecordUtil {
       return;
     }
     DownloadGroupEntity groupEntity = DbDataHelper.getDGEntityByPath(dirPath);
+    // 处理组任务存在，而子任务为空的情况
+    if (groupEntity == null) {
+      groupEntity = DbEntity.findFirst(DownloadGroupEntity.class, "dirPath=?", dirPath);
+      if (groupEntity != null) {
+        groupEntity.deleteData();
+        DbEntity.deleteData(DownloadEntity.class, "groupHash=?", groupEntity.getGroupHash());
+      }
+      return;
+    }
 
     delGroupTaskRecord(groupEntity, removeFile, true);
   }

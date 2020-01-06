@@ -28,6 +28,8 @@ import com.arialyy.aria.core.download.DownloadGroupEntity;
 import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
 import com.arialyy.aria.ftp.AbsFtpInfoTask;
 import com.arialyy.aria.ftp.FtpTaskOption;
+import com.arialyy.aria.orm.DbEntity;
+import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
 import com.arialyy.aria.util.RecordUtil;
 import java.nio.charset.Charset;
@@ -43,11 +45,25 @@ final class FtpDGInfoTask extends AbsFtpInfoTask<DownloadGroupEntity, DGTaskWrap
   }
 
   @Override public void run() {
-    if (mTaskWrapper.getEntity().getFileSize() > 1) {
+    if (mTaskWrapper.getEntity().getFileSize() > 1 && checkSubOption()) {
       callback.onSucceed(mEntity.getKey(), new CompleteInfo(200, mTaskWrapper));
     } else {
       super.run();
     }
+  }
+
+  /**
+   * 检查子任务的任务设置
+   *
+   * @return true 子任务任务设置成功，false 子任务任务设置失败
+   */
+  private boolean checkSubOption() {
+    for (DTaskWrapper wrapper : mTaskWrapper.getSubTaskWrapper()) {
+      if (wrapper.getTaskOption() == null) {
+        return false;
+      }
+    }
+    return true;
   }
 
   @Override protected String getRemotePath() {
@@ -92,9 +108,14 @@ final class FtpDGInfoTask extends AbsFtpInfoTask<DownloadGroupEntity, DGTaskWrap
    */
   private void addEntity(String remotePath, FTPFile ftpFile) {
     final FtpUrlEntity urlEntity = mTaskOption.getUrlEntity().clone();
+    String url =
+        urlEntity.scheme + "://" + urlEntity.hostName + ":" + urlEntity.port + "/" + remotePath;
+    if (checkEntityExist(url)){
+      ALog.w(TAG, "子任务已存在，取消子任务的添加，url = " + url);
+      return;
+    }
     DownloadEntity entity = new DownloadEntity();
-    entity.setUrl(
-        urlEntity.scheme + "://" + urlEntity.hostName + ":" + urlEntity.port + "/" + remotePath);
+    entity.setUrl(url);
     entity.setFilePath(mEntity.getDirPath() + "/" + remotePath);
     int lastIndex = remotePath.lastIndexOf("/");
     String fileName = lastIndex < 0 ? CommonUtil.keyToHashKey(remotePath)
@@ -106,8 +127,9 @@ final class FtpDGInfoTask extends AbsFtpInfoTask<DownloadGroupEntity, DGTaskWrap
     entity.setConvertFileSize(CommonUtil.formatFileSize(ftpFile.getSize()));
     entity.setFileSize(ftpFile.getSize());
 
-    //if(CheckUtil.checkDPathConflicts(mTaskWrapper.is))
-
+    if (DbEntity.checkDataExist(DownloadEntity.class, "downloadPath=?", entity.getFilePath())) {
+      DbEntity.deleteData(DownloadEntity.class, "downloadPath=?", entity.getFilePath());
+    }
     entity.insert();
 
     DTaskWrapper subWrapper = new DTaskWrapper(entity);
@@ -137,6 +159,21 @@ final class FtpDGInfoTask extends AbsFtpInfoTask<DownloadGroupEntity, DGTaskWrap
     subOption.setUploadInterceptor(mTaskOption.getUploadInterceptor());
 
     subWrapper.setTaskOption(subOption);
+  }
+
+  /**
+   * 检查子任务是否已经存在，如果子任务存在，取消添加操作
+   *
+   * @param key url
+   * @return true 子任务已存在，false 子任务不存在
+   */
+  private boolean checkEntityExist(String key) {
+    for (DTaskWrapper wrapper : mTaskWrapper.getSubTaskWrapper()) {
+      if (wrapper.getKey().equals(key)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   @Override

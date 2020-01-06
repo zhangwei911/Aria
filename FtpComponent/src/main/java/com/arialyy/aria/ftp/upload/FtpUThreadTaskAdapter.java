@@ -130,9 +130,10 @@ final class FtpUThreadTaskAdapter extends BaseFtpThreadTaskAdapter {
           if (isTimeOut) {
             fail(new AriaIOException(TAG, "socket连接失败，该问题一般出现于网络断开，客户端重新连接，"
                 + "但是服务器端无法创建socket缺没有返回错误码的情况。"), false);
-          }
-          if (fa != null) {
-            fa.close();
+            if (fa != null) {
+              fa.close();
+            }
+            closeTimer();
           }
           isTimeOut = true;
         } catch (IOException e) {
@@ -143,6 +144,7 @@ final class FtpUThreadTaskAdapter extends BaseFtpThreadTaskAdapter {
   }
 
   private void closeTimer() {
+    ALog.d(TAG, "closeTimer");
     if (timer != null && !timer.isShutdown()) {
       timer.shutdown();
     }
@@ -158,6 +160,7 @@ final class FtpUThreadTaskAdapter extends BaseFtpThreadTaskAdapter {
     fa = new FtpFISAdapter(bis);
     storeFail = false;
     startTimer();
+    final long fileSize = getThreadConfig().tempFile.length();
     try {
       ALog.d(TAG, String.format("remotePath: %s", remotePath));
       client.storeFile(remotePath, fa, new OnFtpInputStreamListener() {
@@ -170,6 +173,7 @@ final class FtpUThreadTaskAdapter extends BaseFtpThreadTaskAdapter {
             if (getThreadTask().isBreak() && !isStoped) {
               isStoped = true;
               client.abor();
+              return;
             }
             if (mSpeedBandUtil != null) {
               mSpeedBandUtil.limitNextBytes(bytesTransferred);
@@ -178,19 +182,12 @@ final class FtpUThreadTaskAdapter extends BaseFtpThreadTaskAdapter {
           } catch (IOException e) {
             e.printStackTrace();
             storeFail = true;
-            try {
-              fa.close();
-            } catch (IOException e1) {
-              e1.printStackTrace();
-            }
-            closeClient(client);
           }
         }
       });
     } catch (IOException e) {
       String msg = String.format("文件上传错误，错误码为：%s, msg：%s, filePath: %s", client.getReply(),
           client.getReplyString(), getEntity().getFilePath());
-      closeClient(client);
       e.printStackTrace();
       if (e.getMessage().contains("AriaIOException caught while copying")) {
         e.printStackTrace();
@@ -198,11 +195,14 @@ final class FtpUThreadTaskAdapter extends BaseFtpThreadTaskAdapter {
         fail(new AriaIOException(TAG, msg, e), !storeFail);
       }
       return false;
+    } finally {
+      fa.close();
+      closeClient(client);
     }
     if (storeFail) {
       return false;
     }
-    int reply = client.getReply();
+    int reply = client.getReplyCode();
     if (!FTPReply.isPositiveCompletion(reply)) {
       if (reply != FTPReply.TRANSFER_ABORTED) {
         fail(new AriaIOException(TAG,

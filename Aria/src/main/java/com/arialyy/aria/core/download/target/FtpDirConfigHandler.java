@@ -15,10 +15,12 @@
  */
 package com.arialyy.aria.core.download.target;
 
+import com.arialyy.aria.core.common.FtpOption;
 import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.inf.AbsTarget;
 import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
 import com.arialyy.aria.core.wrapper.ITaskWrapper;
+import com.arialyy.aria.util.CommonUtil;
 import java.util.List;
 
 /**
