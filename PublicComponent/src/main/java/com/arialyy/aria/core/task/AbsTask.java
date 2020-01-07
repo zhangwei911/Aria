@@ -18,6 +18,7 @@ package com.arialyy.aria.core.task;
 import android.content.Context;
 import android.os.Handler;
 import android.text.TextUtils;
+import com.arialyy.aria.core.common.AbsEntity;
 import com.arialyy.aria.core.inf.IEntity;
 import com.arialyy.aria.core.inf.IUtil;
 import com.arialyy.aria.core.inf.TaskSchedulerType;
@@ -69,6 +70,25 @@ public abstract class AbsTask<TASK_WRAPPER extends AbsTaskWrapper>
       mUtil = createUtil();
     }
     return mUtil;
+  }
+
+  /**
+   * 获取剩余时间，单位：s
+   * 如果是m3u8任务，无法获取剩余时间；m2u8任务如果需要获取剩余时间，请设置文件长度{@link AbsEntity#setFileSize(long)}
+   */
+  public int getTimeLeft() {
+    return getTaskWrapper().getEntity().getTimeLeft();
+  }
+
+  /**
+   * 转换时间
+   * 时间＜1 小时，显示分秒，显示样式 00:20
+   * 时间 ≥1 小时，显示时分秒，显示样式 01:11:12
+   * 时间 ≥1 天，显示天时分，显示样式 1d 01:11
+   * 时间 ≥7 天，显示样式 ∞
+   */
+  public String getConvertTimeLeft() {
+    return CommonUtil.formatTime(getTaskWrapper().getEntity().getTimeLeft());
   }
 
   /**
@@ -194,12 +214,16 @@ public abstract class AbsTask<TASK_WRAPPER extends AbsTaskWrapper>
 
   @Override public void start(int type) {
     mSchedulerType = type;
+    mUtil = createUtil();
+    if (mUtil == null){
+      ALog.e(TAG, "任务工具创建失败");
+      return;
+    }
     if (type == TaskSchedulerType.TYPE_START_AND_RESET_STATE) {
       if (getUtil().isRunning()) {
         ALog.e(TAG, String.format("任务【%s】重启失败", getTaskName()));
         return;
       }
-      mUtil = createUtil();
       mUtil.start();
       ALog.d(TAG, String.format("任务【%s】重启成功", getTaskName()));
       return;
@@ -216,6 +240,11 @@ public abstract class AbsTask<TASK_WRAPPER extends AbsTaskWrapper>
   }
 
   @Override public void stop(int type) {
+    mUtil = createUtil();
+    if (mUtil == null){
+      ALog.e(TAG, "任务工具创建失败");
+      return;
+    }
     isStop = true;
     mSchedulerType = type;
     getUtil().stop();
@@ -226,6 +255,11 @@ public abstract class AbsTask<TASK_WRAPPER extends AbsTaskWrapper>
   }
 
   @Override public void cancel(int type) {
+    mUtil = createUtil();
+    if (mUtil == null){
+      ALog.e(TAG, "任务工具创建失败");
+      return;
+    }
     isCancel = true;
     mSchedulerType = type;
     getUtil().cancel();

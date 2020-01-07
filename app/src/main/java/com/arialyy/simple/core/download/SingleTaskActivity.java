@@ -204,6 +204,7 @@ public class SingleTaskActivity extends BaseActivity<ActivitySingleBinding> {
         getBinding().setProgress(task.getPercent());
       }
       getBinding().setSpeed(task.getConvertSpeed());
+      getBinding().setTimeLeft(task.getConvertTimeLeft());
     }
   }
 

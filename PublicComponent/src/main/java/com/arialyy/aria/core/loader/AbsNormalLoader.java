@@ -41,7 +41,6 @@ import java.util.concurrent.TimeUnit;
  */
 public abstract class AbsNormalLoader implements ILoaderVisitor, ILoader {
   protected final String TAG = CommonUtil.getClassName(getClass());
-  ;
   private IEventListener mListener;
   protected AbsTaskWrapper mTaskWrapper;
   protected File mTempFile;
@@ -127,7 +126,6 @@ public abstract class AbsNormalLoader implements ILoaderVisitor, ILoader {
     isRuning = true;
     resetState();
     onPostPre();
-    startTimer();
     handleTask(looper);
     Looper.loop();
   }
@@ -149,7 +147,7 @@ public abstract class AbsNormalLoader implements ILoaderVisitor, ILoader {
   /**
    * 启动进度获取定时器
    */
-  private synchronized void startTimer() {
+  protected synchronized void startTimer() {
     if (isBreak()) {
       return;
     }
@@ -157,25 +155,32 @@ public abstract class AbsNormalLoader implements ILoaderVisitor, ILoader {
     mTimer = new ScheduledThreadPoolExecutor(1);
     mTimer.scheduleWithFixedDelay(new Runnable() {
       @Override public void run() {
-        if (mStateManager.isComplete()
-            || mStateManager.isFail()
-            || !isRunning()
-            || isBreak()) {
-          //ALog.d(TAG, "isComplete = " + mStateManager.isComplete()
-          //    + "; isFail = " + mStateManager.isFail()
-          //    + "; isRunning = " + isRunning()
-          //    + "; isBreak = " + isBreak());
-          ThreadTaskManager.getInstance().removeTaskThread(mTaskWrapper.getKey());
-          closeTimer();
-          onDestroy();
-        } else if (mStateManager.getCurrentProgress() >= 0) {
-          mListener.onProgress(mStateManager.getCurrentProgress());
+        // 线程池中是不抛异常的，没有日志，很难定位问题，需要手动try-catch
+        try {
+          if (mStateManager == null) {
+            ALog.e(TAG, "stateManager is null");
+          } else if (mStateManager.isComplete()
+              || mStateManager.isFail()
+              || !isRunning()
+              || isBreak()) {
+            //ALog.d(TAG, "isComplete = " + mStateManager.isComplete()
+            //    + "; isFail = " + mStateManager.isFail()
+            //    + "; isRunning = " + isRunning()
+            //    + "; isBreak = " + isBreak());
+            ThreadTaskManager.getInstance().removeTaskThread(mTaskWrapper.getKey());
+            closeTimer();
+            onDestroy();
+          } else if (mStateManager.getCurrentProgress() >= 0) {
+            mListener.onProgress(mStateManager.getCurrentProgress());
+          }
+        } catch (Exception e) {
+          e.printStackTrace();
         }
       }
     }, delayTimer(), mUpdateInterval, TimeUnit.MILLISECONDS);
   }
 
-  public synchronized void closeTimer() {
+  private synchronized void closeTimer() {
     if (mTimer != null && !mTimer.isShutdown()) {
       mTimer.shutdown();
     }

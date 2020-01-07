@@ -42,6 +42,11 @@ public abstract class AbsEntity extends DbEntity implements IEntity, Parcelable,
   @Ignore private int failNum = 0;
 
   /**
+   * 剩余时间，单位：s
+   */
+  @Ignore private int timeLeft = Integer.MAX_VALUE;
+
+  /**
    * 扩展字段
    */
   private String str;
@@ -80,6 +85,18 @@ public abstract class AbsEntity extends DbEntity implements IEntity, Parcelable,
    * 上一次停止时间
    */
   private long stopTime = 0;
+
+  /**
+   * 获取剩余时间，单位：s
+   * 如果是m3u8任务，无法获取剩余时间；m2u8任务如果需要获取剩余时间，请设置文件长度{@link #setFileSize(long)}
+   */
+  public int getTimeLeft() {
+    return timeLeft;
+  }
+
+  public void setTimeLeft(int timeLeft) {
+    this.timeLeft = timeLeft;
+  }
 
   public boolean isComplete() {
     return isComplete;

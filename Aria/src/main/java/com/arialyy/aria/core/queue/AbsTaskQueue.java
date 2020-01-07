@@ -16,6 +16,8 @@
 
 package com.arialyy.aria.core.queue;
 
+import android.text.TextUtils;
+import com.arialyy.aria.core.common.AbsEntity;
 import com.arialyy.aria.core.inf.IEntity;
 import com.arialyy.aria.core.inf.TaskSchedulerType;
 import com.arialyy.aria.core.manager.TaskWrapperManager;
@@ -31,6 +33,8 @@ import com.arialyy.aria.core.task.DownloadTask;
 import com.arialyy.aria.core.task.UploadTask;
 import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
 import com.arialyy.aria.util.ALog;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by lyy on 2017/2/23. 任务队列
@@ -64,7 +68,33 @@ public abstract class AbsTaskQueue<TASK extends AbsTask, TASK_WRAPPER extends Ab
 
   abstract int getQueueType();
 
+  /**
+   * 获取执行中的任务
+   *
+   * @return 没有执行中的任务，返回null
+   */
+  public <T extends AbsEntity> List<T> getRunningTask(Class<T> type) {
+    List<TASK> exeTask = mExecutePool.getAllTask();
+    List<TASK> cacheTask = mCachePool.getAllTask();
+    List<T> entities = new ArrayList<>();
+    if (exeTask != null && !exeTask.isEmpty()) {
+      for (TASK task : exeTask) {
+        entities.add((T) task.getTaskWrapper().getEntity());
+      }
+    }
+    if (cacheTask != null && !cacheTask.isEmpty()) {
+      for (TASK task : cacheTask) {
+        entities.add((T) task.getTaskWrapper().getEntity());
+      }
+    }
+    return entities.isEmpty() ? null : entities;
+  }
+
   @Override public boolean taskIsRunning(String key) {
+    if (TextUtils.isEmpty(key)) {
+      ALog.w(TAG, "key为空，无法确认任务是否执行");
+      return false;
+    }
     TASK task = mExecutePool.getTask(key);
     if (task == null && ThreadTaskManager.getInstance().taskIsRunning(key)) {
       ThreadTaskManager.getInstance().removeTaskThread(key);

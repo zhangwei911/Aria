@@ -22,7 +22,6 @@ import com.arialyy.aria.core.download.DownloadGroupEntity;
 import com.arialyy.aria.core.group.GroupSendParams;
 import com.arialyy.aria.core.inf.IEntity;
 import com.arialyy.aria.core.inf.TaskSchedulerType;
-import com.arialyy.aria.core.loader.IRecordHandler;
 import com.arialyy.aria.core.task.AbsTask;
 import com.arialyy.aria.core.task.DownloadGroupTask;
 import com.arialyy.aria.exception.BaseException;
@@ -113,18 +112,25 @@ public class DownloadGroupListener
   }
 
   private void handleSubSpeed(DownloadEntity subEntity, long currentProgress) {
-    if (currentProgress == 0){
+    if (currentProgress == 0) {
       subEntity.setSpeed(0);
       subEntity.setConvertSpeed("0kb/s");
       return;
     }
-    long range = currentProgress - subEntity.getCurrentProgress() ;
-    subEntity.setSpeed(range);
+    long speed = currentProgress - subEntity.getCurrentProgress();
+    subEntity.setSpeed(speed);
     subEntity.setConvertSpeed(
-        range <= 0 ? "" : String.format("%s/s", CommonUtil.formatFileSize(range)));
+        speed <= 0 ? "" : String.format("%s/s", CommonUtil.formatFileSize(speed)));
     subEntity.setPercent((int) (subEntity.getFileSize() <= 0 ? 0
         : subEntity.getCurrentProgress() * 100 / subEntity.getFileSize()));
     subEntity.setCurrentProgress(currentProgress);
+
+    if (speed == 0) {
+      subEntity.setTimeLeft(Integer.MAX_VALUE);
+    } else {
+      subEntity.setTimeLeft(
+          (int) ((subEntity.getFileSize() - subEntity.getCurrentProgress()) / speed));
+    }
   }
 
   /**
@@ -150,8 +156,6 @@ public class DownloadGroupListener
       subEntity.setPercent(100);
       subEntity.setConvertSpeed("0kb/s");
       subEntity.setSpeed(0);
-      ALog.i(TAG, String.format("任务【%s】完成，将删除线程任务记录", mEntity.getKey()));
-      RecordUtil.delTaskRecord(subEntity.getFilePath(), IRecordHandler.TYPE_DOWNLOAD, false, false);
     }
     subEntity.update();
   }

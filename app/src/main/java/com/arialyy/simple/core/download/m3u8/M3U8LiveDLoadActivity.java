@@ -187,7 +187,7 @@ public class M3U8LiveDLoadActivity extends BaseActivity<ActivityM3u8LiveBinding>
 
   @Download.onTaskFail
   void taskFail(DownloadTask task, Exception e) {
-    if (task.getKey().equals(mUrl)) {
+    if (task != null && task.getKey().equals(mUrl)) {
       Toast.makeText(M3U8LiveDLoadActivity.this, getString(R.string.download_fail),
           Toast.LENGTH_SHORT)
           .show();
@@ -216,14 +216,14 @@ public class M3U8LiveDLoadActivity extends BaseActivity<ActivityM3u8LiveBinding>
     switch (view.getId()) {
       case R.id.start:
         if (Aria.download(this).load(mTaskId).isRunning()) {
-          Aria.download(this).load(mEntity.getId()).stop();
+          Aria.download(this).load(mTaskId).stop();
         } else {
           startD();
         }
         break;
       case R.id.cancel:
         if (mTaskId != -1){
-          Aria.download(this).load(mEntity.getId()).cancel(true);
+          Aria.download(this).load(mTaskId).cancel(true);
           mTaskId = -1;
         }
         break;

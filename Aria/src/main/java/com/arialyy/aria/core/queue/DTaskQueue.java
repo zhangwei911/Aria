@@ -18,6 +18,7 @@ package com.arialyy.aria.core.queue;
 
 import com.arialyy.aria.core.AriaConfig;
 import com.arialyy.aria.core.download.DTaskWrapper;
+import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.event.DMaxNumEvent;
 import com.arialyy.aria.core.event.Event;
 import com.arialyy.aria.core.event.EventMsgUtil;

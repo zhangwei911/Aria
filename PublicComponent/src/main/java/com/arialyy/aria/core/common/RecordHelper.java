@@ -156,10 +156,18 @@ public class RecordHelper {
             : mTaskRecord.filePath);
     ThreadRecord tr = mTaskRecord.threadRecords.get(0);
     if (!file.exists()) {
-      ALog.w(TAG, String.format("文件【%s】不存在，任务将重新开始", file.getPath()));
-      tr.startLocation = 0;
-      tr.isComplete = false;
-      tr.endLocation = mWrapper.getEntity().getFileSize();
+      // 目标文件
+      File targetFile = new File(mTaskRecord.filePath);
+      // 处理组合任务其中一个子任务完成的情况
+      if (tr.isComplete && targetFile.exists() && targetFile.length() == mWrapper.getEntity()
+          .getFileSize()) {
+        tr.isComplete = true;
+      } else {
+        ALog.w(TAG, String.format("文件【%s】不存在，任务将重新开始", file.getPath()));
+        tr.startLocation = 0;
+        tr.isComplete = false;
+        tr.endLocation = mWrapper.getEntity().getFileSize();
+      }
     } else if (file.length() > mWrapper.getEntity().getFileSize()) {
       ALog.i(TAG, String.format("文件【%s】错误，任务重新开始", file.getPath()));
       FileUtil.deleteFile(file);

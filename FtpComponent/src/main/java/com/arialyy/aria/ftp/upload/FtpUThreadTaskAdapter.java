@@ -36,7 +36,7 @@ import java.util.concurrent.TimeUnit;
  */
 final class FtpUThreadTaskAdapter extends BaseFtpThreadTaskAdapter {
   private String dir, remotePath;
-  private boolean storeFail = false;
+  private boolean storeSuccess = false;
   private ScheduledThreadPoolExecutor timer;
   private FTPClient client = null;
   private boolean isTimeOut = true;
@@ -77,7 +77,11 @@ final class FtpUThreadTaskAdapter extends BaseFtpThreadTaskAdapter {
         file.seek(getThreadRecord().startLocation);
       }
       boolean complete = upload(file);
-      if (!complete || getThreadTask().isBreak()) {
+      if (getThreadTask().isBreak()) {
+        return;
+      }
+      if (!complete){
+        fail(new AriaIOException(TAG, "ftp文件上传失败"), false);
         return;
       }
       ALog.i(TAG,
@@ -158,12 +162,11 @@ final class FtpUThreadTaskAdapter extends BaseFtpThreadTaskAdapter {
   private boolean upload(final BufferedRandomAccessFile bis)
       throws IOException {
     fa = new FtpFISAdapter(bis);
-    storeFail = false;
+    storeSuccess = false;
     startTimer();
-    final long fileSize = getThreadConfig().tempFile.length();
     try {
       ALog.d(TAG, String.format("remotePath: %s", remotePath));
-      client.storeFile(remotePath, fa, new OnFtpInputStreamListener() {
+      storeSuccess = client.storeFile(remotePath, fa, new OnFtpInputStreamListener() {
         boolean isStoped = false;
 
         @Override public void onFtpInputStream(FTPClient client, long totalBytesTransferred,
@@ -181,7 +184,7 @@ final class FtpUThreadTaskAdapter extends BaseFtpThreadTaskAdapter {
             progress(bytesTransferred);
           } catch (IOException e) {
             e.printStackTrace();
-            storeFail = true;
+            storeSuccess = false;
           }
         }
       });
@@ -192,15 +195,11 @@ final class FtpUThreadTaskAdapter extends BaseFtpThreadTaskAdapter {
       if (e.getMessage().contains("AriaIOException caught while copying")) {
         e.printStackTrace();
       } else {
-        fail(new AriaIOException(TAG, msg, e), !storeFail);
+        fail(new AriaIOException(TAG, msg, e), !storeSuccess);
       }
       return false;
     } finally {
       fa.close();
-      closeClient(client);
-    }
-    if (storeFail) {
-      return false;
     }
     int reply = client.getReplyCode();
     if (!FTPReply.isPositiveCompletion(reply)) {
@@ -212,6 +211,6 @@ final class FtpUThreadTaskAdapter extends BaseFtpThreadTaskAdapter {
       closeClient(client);
       return false;
     }
-    return true;
+    return storeSuccess;
   }
 }

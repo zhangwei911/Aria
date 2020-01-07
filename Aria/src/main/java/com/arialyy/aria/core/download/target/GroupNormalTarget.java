@@ -17,8 +17,10 @@ package com.arialyy.aria.core.download.target;
 
 import com.arialyy.aria.core.common.AbsNormalTarget;
 import com.arialyy.aria.core.common.HttpOption;
+import com.arialyy.aria.core.download.DGTaskWrapper;
 import com.arialyy.aria.core.manager.SubTaskManager;
 import com.arialyy.aria.core.wrapper.ITaskWrapper;
+import com.arialyy.aria.util.ALog;
 import java.util.List;
 
 /**
@@ -99,6 +101,37 @@ public class GroupNormalTarget extends AbsNormalTarget<GroupNormalTarget> {
    */
   public GroupNormalTarget modifySubFileName(List<String> subTaskFileName) {
     return mConfigHandler.setSubFileName(subTaskFileName);
+  }
+
+  /**
+   * 如果无法获取到组合任务到总长度，请调用该方法，
+   * 请注意：
+   * 1、如果组合任务到子任务数过多，请不要使用该标志位，否则Aria将需要消耗大量的时间获取组合任务的总长度，直到获取完成组合任务总长度后才会执行下载。
+   * 2、如果你的知道组合任务的总长度，请使用{@link #setFileSize(long)}设置组合任务的长度。
+   * 3、由于网络或其它原因的存在，这种方式获取的组合任务大小有可能是不准确的。
+   */
+  public GroupNormalTarget unknownSize() {
+    ((DGTaskWrapper) getTaskWrapper()).setUnknownSize(true);
+    return this;
+  }
+
+  /**
+   * 任务组总任务大小，任务组是一个抽象的概念，没有真实的数据实体，任务组的大小是Aria动态获取子任务大小相加而得到的，
+   * 如果你知道当前任务组总大小，你也可以调用该方法给任务组设置大小
+   *
+   * 为了更好的用户体验，组合任务最好设置文件大小，默认需要强制设置文件大小。如果无法获取到总长度，请调用{@link #unknownSize()}
+   *
+   * @param fileSize 任务组总大小
+   */
+  public GroupNormalTarget setFileSize(long fileSize) {
+    if (fileSize <= 0) {
+      ALog.e(TAG, "文件大小不能小于 0");
+      return this;
+    }
+    if (getEntity().getFileSize() <= 1 || getEntity().getFileSize() != fileSize) {
+      getEntity().setFileSize(fileSize);
+    }
+    return this;
   }
 
   @Override public boolean isRunning() {

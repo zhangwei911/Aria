@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.arialyy.aria.m3u8;
+package com.arialyy.aria.m3u8.vod;
 
 import com.arialyy.aria.core.TaskRecord;
 import com.arialyy.aria.core.ThreadRecord;
@@ -21,11 +21,12 @@ import com.arialyy.aria.core.common.RecordHandler;
 import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.download.M3U8Entity;
-import com.arialyy.aria.core.loader.IRecordHandler;
 import com.arialyy.aria.core.wrapper.ITaskWrapper;
+import com.arialyy.aria.m3u8.BaseM3U8Loader;
+import com.arialyy.aria.m3u8.M3U8InfoTask;
+import com.arialyy.aria.m3u8.M3U8TaskOption;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.FileUtil;
-import com.arialyy.aria.util.RecordUtil;
 import java.io.File;
 import java.util.ArrayList;
 
@@ -33,19 +34,15 @@ import java.util.ArrayList;
  * @Author lyy
  * @Date 2019-09-24
  */
-public final class M3U8RecordHandler extends RecordHandler {
+final class VodRecordHandler extends RecordHandler {
   private M3U8TaskOption mOption;
 
-  public M3U8RecordHandler(DTaskWrapper wrapper) {
+  VodRecordHandler(DTaskWrapper wrapper) {
     super(wrapper);
-    mOption = (M3U8TaskOption) wrapper.getM3u8Option();
   }
 
-  @Override public void onPre() {
-    super.onPre();
-    if (getWrapper().getRequestType() == ITaskWrapper.M3U8_LIVE) {
-      RecordUtil.delTaskRecord(getEntity().getFilePath(), IRecordHandler.TYPE_DOWNLOAD);
-    }
+  public void setOption(M3U8TaskOption option) {
+    mOption = option;
   }
 
   /**

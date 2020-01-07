@@ -140,6 +140,13 @@ public abstract class BaseListener<ENTITY extends AbsEntity, TASK_WRAPPER extend
       mEntity.setPercent((int) (mEntity.getFileSize() <= 0 ? 0
           : mEntity.getCurrentProgress() * 100 / mEntity.getFileSize()));
     }
+    if (mEntity.getFileSize() != 0) {
+      if (speed == 0) {
+        mEntity.setTimeLeft(Integer.MAX_VALUE);
+      } else {
+        mEntity.setTimeLeft((int) ((mEntity.getFileSize() - mEntity.getCurrentProgress()) / speed));
+      }
+    }
   }
 
   /**

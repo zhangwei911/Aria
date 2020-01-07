@@ -155,10 +155,11 @@ public class DownloadGroupActivity extends BaseActivity<ActivityDownloadGroupBin
         + task.getPercent()
         + ", speed = "
         + task.getConvertSpeed()
-        + "current_p = "
+        + ", current_p = "
         + task.getCurrentProgress());
     getBinding().setProgress(task.getPercent());
     getBinding().setSpeed(task.getConvertSpeed());
+    getBinding().setTimeLeft(task.getConvertTimeLeft());
     //Log.d(TAG, "sub_len = " + task.getEntity().getSubEntities().size());
     mChildList.updateChildProgress(task.getEntity().getSubEntities());
   }

@@ -23,9 +23,7 @@ import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
 import com.arialyy.aria.http.HttpTaskOption;
 import com.arialyy.aria.m3u8.M3U8InfoTask;
 import com.arialyy.aria.m3u8.M3U8Listener;
-import com.arialyy.aria.m3u8.M3U8RecordHandler;
 import com.arialyy.aria.m3u8.M3U8TaskOption;
-import com.arialyy.aria.util.CommonUtil;
 
 /**
  * M3U8直播文件下载工具，对于直播来说，需要定时更新m3u8文件
@@ -37,7 +35,6 @@ import com.arialyy.aria.util.CommonUtil;
  * 5、不处理直播切片下载失败的状态
  */
 public class M3U8LiveUtil extends AbsNormalLoaderUtil {
-  private final String TAG = CommonUtil.getClassName(getClass());
 
   public M3U8LiveUtil(AbsTaskWrapper wrapper, IEventListener listener) {
     super(wrapper, listener);
@@ -57,7 +54,7 @@ public class M3U8LiveUtil extends AbsNormalLoaderUtil {
 
   @Override public LoaderStructure BuildLoaderStructure() {
     LoaderStructure structure = new LoaderStructure();
-    structure.addComponent(new M3U8RecordHandler(getTaskWrapper()))
+    structure.addComponent(new LiveRecordHandler(getTaskWrapper()))
         .addComponent(new M3U8InfoTask(getTaskWrapper()))
         .addComponent(new LiveStateManager(getTaskWrapper(), getListener()));
     structure.accept(getLoader());

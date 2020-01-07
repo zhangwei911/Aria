@@ -48,6 +48,7 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -792,6 +793,39 @@ public class CommonUtil {
     }
     BigDecimal result4 = new BigDecimal(teraBytes);
     return result4.setScale(2, BigDecimal.ROUND_HALF_UP).toPlainString() + "tb";
+  }
+
+  /**
+   * 转换时间
+   * 时间＜1 小时，显示分秒，显示样式 00:20
+   * 时间 ≥1 小时，显示时分秒，显示样式 01:11:12
+   * 时间 ≥1 天，显示天时分，显示样式 1d 01:11
+   * 时间 ≥7 天，显示样式 ∞
+   *
+   * @param seconds 单位为s的时间
+   */
+  public static String formatTime(int seconds) {
+    String standardTime;
+    if (seconds <= 0) {
+      standardTime = "00:00";
+    } else if (seconds < 60) {
+      standardTime = String.format(Locale.getDefault(), "00:%02d", seconds % 60);
+    } else if (seconds < 3600) {
+      standardTime = String.format(Locale.getDefault(), "%02d:%02d", seconds / 60, seconds % 60);
+    } else if (seconds < 86400) {
+      standardTime =
+          String.format(Locale.getDefault(), "%02d:%02d:%02d", seconds / 3600, seconds % 3600 / 60,
+              seconds % 60);
+    } else if (seconds < 604800) {
+      standardTime =
+          String.format(Locale.getDefault(), "%dd %02d:%02d", seconds / 86400,
+              seconds % 86400 / 3600,
+              seconds % 3600);
+    } else {
+      standardTime = "∞";
+    }
+
+    return standardTime;
   }
 
   /**

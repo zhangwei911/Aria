@@ -272,8 +272,8 @@ public abstract class AbsGroupLoader implements ILoaderVisitor, ILoader {
       mListener.onComplete();
       return;
     }
-    startTimer();
     handlerTask(looper);
+    startTimer();
     Looper.loop();
   }
 

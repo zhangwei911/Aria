@@ -19,6 +19,10 @@
         name="stateStr"
         type="String"
         />
+    <variable
+        name="timeLeft"
+        type="String"
+        />
 
   </data>
 
@@ -40,6 +44,7 @@
         bind:progress="@{progress}"
         bind:speed="@{speed}"
         bind:stateStr="@{stateStr}"
+        bind:timeLeft="@{timeLeft}"
         />
 
     <com.arialyy.simple.widget.SubStateLinearLayout

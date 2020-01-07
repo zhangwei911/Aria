@@ -67,8 +67,8 @@ public class ThreadTask implements IThreadTask, IThreadTaskObserver {
   private long mRangeProgress, mLastRangeProgress;
   private IThreadTaskAdapter mAdapter;
   private ThreadRecord mRecord;
-  private String mThreadNmae;
-  private long updateInterval = 1000; // 更新间隔
+  private String mThreadName;
+  private long updateInterval; // 更新间隔
 
   private Thread mConfigThread = new Thread(new Runnable() {
     @Override public void run() {
@@ -243,8 +243,8 @@ public class ThreadTask implements IThreadTask, IThreadTaskObserver {
   }
 
   @Override public String getThreadName() {
-    return mThreadNmae == null ? CommonUtil.getThreadName(getConfig().url, getThreadId())
-        : mThreadNmae;
+    return mThreadName == null ? (mThreadName =
+        CommonUtil.getThreadName(getConfig().url, getThreadId())) : mThreadName;
   }
 
   /**
@@ -287,7 +287,7 @@ public class ThreadTask implements IThreadTask, IThreadTaskObserver {
     bundle.putLong(IThreadStateManager.DATA_THREAD_LOCATION, mRangeProgress);
     msg.what = state;
     int reqType = getConfig().threadType;
-    if (reqType == ITaskWrapper.M3U8_VOD || reqType == ITaskWrapper.M3U8_LIVE) {
+    if (reqType == SubThreadConfig.TYPE_M3U8_PEER) {
       sendM3U8Info(state, msg);
     }
 
@@ -299,10 +299,10 @@ public class ThreadTask implements IThreadTask, IThreadTaskObserver {
   }
 
   private void sendM3U8Info(int state, Message msg) {
+    Bundle bundle = msg.getData();
     if (state != IThreadStateManager.STATE_UPDATE_PROGRESS) {
       msg.obj = this;
     }
-    Bundle bundle = msg.getData();
     if ((state == IThreadStateManager.STATE_COMPLETE || state == IThreadStateManager.STATE_FAIL)) {
       bundle.putString(ISchedulers.DATA_M3U8_URL, getConfig().url);
       bundle.putString(ISchedulers.DATA_M3U8_PEER_PATH, getConfig().tempFile.getPath());
@@ -313,6 +313,8 @@ public class ThreadTask implements IThreadTask, IThreadTaskObserver {
   @Override public synchronized void updateCompleteState() {
     ALog.i(TAG, String.format("任务【%s】线程__%s__完成", getTaskWrapper().getKey(), mRecord.threadId));
     writeConfig(true, mRecord.endLocation);
+    // 进度发送不是实时的，发送完成任务前，需要更新一次进度
+    sendRunningState();
     updateState(IThreadStateManager.STATE_COMPLETE, null);
   }
 
@@ -334,17 +336,7 @@ public class ThreadTask implements IThreadTask, IThreadTaskObserver {
     }
     // 不需要太频繁发送，以减少消息队列的压力
     if (System.currentTimeMillis() - mLastSendProgressTime > updateInterval) {
-      Message msg = mStateHandler.obtainMessage();
-      Bundle b = msg.getData();
-      if (b == null) {
-        b = new Bundle();
-        msg.setData(b);
-      }
-      b.putString(IThreadStateManager.DATA_THREAD_NAME, getThreadName());
-      b.putLong(IThreadStateManager.DATA_ADD_LEN, mRangeProgress - mLastRangeProgress);
-      msg.what = IThreadStateManager.STATE_RUNNING;
-      msg.obj = mRangeProgress;
-      msg.sendToTarget();
+      sendRunningState();
       mLastRangeProgress = mRangeProgress;
       mLastSendProgressTime = System.currentTimeMillis();
     }
@@ -356,6 +348,23 @@ public class ThreadTask implements IThreadTask, IThreadTaskObserver {
         mConfigThreadPool.execute(mConfigThread);
       }
     }
+  }
+
+  /**
+   * 发送执行中的数据
+   */
+  private void sendRunningState() {
+    Message msg = mStateHandler.obtainMessage();
+    Bundle b = msg.getData();
+    if (b == null) {
+      b = new Bundle();
+      msg.setData(b);
+    }
+    b.putString(IThreadStateManager.DATA_THREAD_NAME, getThreadName());
+    b.putLong(IThreadStateManager.DATA_ADD_LEN, mRangeProgress - mLastRangeProgress);
+    msg.what = IThreadStateManager.STATE_RUNNING;
+    msg.obj = mRangeProgress;
+    msg.sendToTarget();
   }
 
   @Override

@@ -73,7 +73,6 @@ final class M3U8VodLoader extends BaseM3U8Loader {
   private Condition mJumpCondition = JUMP_LOCK.newCondition();
   private SparseArray<ThreadRecord> mBeforePeer = new SparseArray<>();
   private SparseArray<ThreadRecord> mAfterPeer = new SparseArray<>();
-  private VodStateManager mManager;
   private PeerIndexEvent mCurrentEvent;
   private String mCacheDir;
   private int aIndex = 0, bIndex = 0;
@@ -136,11 +135,6 @@ final class M3U8VodLoader extends BaseM3U8Loader {
     }
   }
 
-  @Override protected void onPostPre() {
-    super.onPostPre();
-    initData();
-  }
-
   @Override public boolean isBreak() {
     return super.isBreak() || isDestroy;
   }
@@ -154,6 +148,22 @@ final class M3U8VodLoader extends BaseM3U8Loader {
   }
 
   private void startThreadTask() {
+    // 处理任务记录
+    ((VodRecordHandler) mRecordHandler).setOption(mM3U8Option);
+    mRecord = mRecordHandler.getRecord(0);
+
+    // 处理任务管理器
+    mStateHandler = new Handler(mLooper, getStateManager().getHandlerCallback());
+    getStateManager().setVodLoader(this);
+    getStateManager().setLooper(mRecord, mLooper);
+
+    // 初始化ts数据
+    initData();
+
+    // 启动定时器
+    startTimer();
+
+    // 启动线程开始下载ts切片
     Thread th = new Thread(new Runnable() {
       @Override public void run() {
         while (!isBreak()) {
@@ -258,7 +268,7 @@ final class M3U8VodLoader extends BaseM3U8Loader {
         mCompleteNum++;
       }
     }
-    mManager.updateStateCount();
+    getStateManager().updateStateCount();
     if (mCompleteNum <= 0) {
       getListener().onStart(0);
     } else {
@@ -416,7 +426,7 @@ final class M3U8VodLoader extends BaseM3U8Loader {
         String.format("beforeSize = %s, afterSize = %s, mCompleteNum = %s", mBeforePeer.size(),
             mAfterPeer.size(), mCompleteNum));
     ALog.i(TAG, String.format("完成处理数据的操作，将优先下载【%s】之后的切片", mCurrentEvent.peerIndex));
-    mManager.updateStateCount();
+    getStateManager().updateStateCount();
 
     try {
       JUMP_LOCK.lock();
@@ -487,7 +497,6 @@ final class M3U8VodLoader extends BaseM3U8Loader {
 
   @Override public void addComponent(IRecordHandler recordHandler) {
     mRecordHandler = recordHandler;
-    mRecord = mRecordHandler.getRecord(0);
   }
 
   @Override public void addComponent(IInfoTask infoTask) {
@@ -543,10 +552,7 @@ final class M3U8VodLoader extends BaseM3U8Loader {
    * 需要在 {@link #addComponent(IRecordHandler)}后调用
    */
   @Override public void addComponent(IThreadStateManager threadState) {
-    mManager = (VodStateManager) threadState;
-    mStateHandler = new Handler(mLooper, mManager.getHandlerCallback());
-    mManager.setVodLoader(this);
-    mManager.setLooper(mRecord, mLooper);
+    mStateManager = threadState;
   }
 
   /**
@@ -557,6 +563,11 @@ final class M3U8VodLoader extends BaseM3U8Loader {
 
   }
 
+  @Override
+  protected VodStateManager getStateManager() {
+    return (VodStateManager) mStateManager;
+  }
+
   @Override protected void checkComponent() {
     if (mRecordHandler == null) {
       throw new NullPointerException("任务记录组件为空");
@@ -564,7 +575,7 @@ final class M3U8VodLoader extends BaseM3U8Loader {
     if (mInfoTask == null) {
       throw new NullPointerException(("文件信息组件为空"));
     }
-    if (mManager == null) {
+    if (getStateManager() == null) {
       throw new NullPointerException("任务状态管理组件为空");
     }
   }

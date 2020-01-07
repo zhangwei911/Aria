@@ -36,6 +36,8 @@ import com.arialyy.aria.core.download.target.HttpNormalTarget;
 import com.arialyy.aria.core.event.EventMsgUtil;
 import com.arialyy.aria.core.inf.AbsReceiver;
 import com.arialyy.aria.core.inf.ReceiverType;
+import com.arialyy.aria.core.queue.DGroupTaskQueue;
+import com.arialyy.aria.core.queue.DTaskQueue;
 import com.arialyy.aria.core.scheduler.TaskSchedulers;
 import com.arialyy.aria.core.task.ITask;
 import com.arialyy.aria.orm.DbEntity;
@@ -300,6 +302,24 @@ public class DownloadReceiver extends AbsReceiver {
       return null;
     }
     return DbDataHelper.getDGEntityByHash(url);
+  }
+
+  /**
+   * 获取执行中的任务
+   *
+   * @return 没有执行中的任务，返回null
+   */
+  public List<DownloadEntity> getDRunningTask() {
+    return DTaskQueue.getInstance().getRunningTask(DownloadEntity.class);
+  }
+
+  /**
+   * 获取执行中的任务
+   *
+   * @return 没有执行中的任务，返回null
+   */
+  public List<DownloadGroupEntity> getDGRunningTask() {
+    return DGroupTaskQueue.getInstance().getRunningTask(DownloadGroupEntity.class);
   }
 
   /**

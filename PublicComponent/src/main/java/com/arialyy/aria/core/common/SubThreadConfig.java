@@ -46,7 +46,7 @@ public class SubThreadConfig {
   public int peerIndex;
   // 线程任务类型
   public int threadType = TYPE_HTTP;
-  // 更新间隔，单位：毫秒
+  // 进度更新间隔，单位：毫秒
   public long updateInterval = 1000;
 
   /**

@@ -125,6 +125,9 @@ public class NormalLoader extends AbsNormalLoader {
     for (IThreadTask threadTask : getTaskList()) {
       ThreadTaskManager.getInstance().startThread(mTaskWrapper.getKey(), threadTask);
     }
+
+    // 启动定时器
+    startTimer();
   }
 
   @Override public long getCurrentProgress() {

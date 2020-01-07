@@ -24,7 +24,6 @@ import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
 import com.arialyy.aria.http.HttpTaskOption;
 import com.arialyy.aria.m3u8.M3U8InfoTask;
 import com.arialyy.aria.m3u8.M3U8Listener;
-import com.arialyy.aria.m3u8.M3U8RecordHandler;
 import com.arialyy.aria.m3u8.M3U8TaskOption;
 
 /**
@@ -54,7 +53,7 @@ public final class M3U8VodUtil extends AbsNormalLoaderUtil {
 
   @Override public LoaderStructure BuildLoaderStructure() {
     LoaderStructure structure = new LoaderStructure();
-    structure.addComponent(new M3U8RecordHandler(getTaskWrapper()))
+    structure.addComponent(new VodRecordHandler(getTaskWrapper()))
         .addComponent(new M3U8InfoTask(getTaskWrapper()))
         .addComponent(new VodStateManager(getTaskWrapper(), (M3U8Listener) getListener()));
     structure.accept(getLoader());

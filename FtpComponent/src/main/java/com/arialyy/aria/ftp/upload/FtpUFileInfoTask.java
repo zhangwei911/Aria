@@ -60,10 +60,7 @@ final class FtpUFileInfoTask extends AbsFtpInfoTask<UploadEntity, UTaskWrapper> 
       return;
     }
 
-    //为了防止编码错乱，需要使用原始字符串
-    if (files.length == 0) {
-      handleFile(getRemotePath(), null);
-    }
+    handleFile(getRemotePath(), files.length == 0 ? null : files[0]);
     int reply = client.getReplyCode();
     if (!FTPReply.isPositiveCompletion(reply)) {
       //服务器上没有该文件路径，表示该任务为新的上传任务

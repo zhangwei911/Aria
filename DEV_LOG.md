@@ -5,6 +5,8 @@
     - 添加ftp服务器标志 https://github.com/AriaLyy/Aria/issues/580
     - 重构loader模块，让loader模块的代码更加清晰，去除一些不必要的线程创建
     - 修复ftp上传完成后，删除服务器端的文件，无法重新下载的问题
+    - 增加获取执行中的任务api，详情见：https://aria.laoyuyu.me/aria_doc/api/task_list.html
+    - 增加获取剩余时间的api，详情见：https://aria.laoyuyu.me/aria_doc/start/task_explain.html
   + v_3.8.1 (2019/12/22)
     - 修复一个表创建失败的问题 https://github.com/AriaLyy/Aria/issues/570
     - 修复一个非分块模式下导致下载失败的问题 https://github.com/AriaLyy/Aria/issues/571

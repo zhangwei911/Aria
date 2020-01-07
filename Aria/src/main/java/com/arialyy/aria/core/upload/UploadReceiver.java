@@ -28,6 +28,7 @@ import com.arialyy.aria.core.common.ProxyHelper;
 import com.arialyy.aria.core.event.EventMsgUtil;
 import com.arialyy.aria.core.inf.AbsReceiver;
 import com.arialyy.aria.core.inf.ReceiverType;
+import com.arialyy.aria.core.queue.UTaskQueue;
 import com.arialyy.aria.core.scheduler.TaskSchedulers;
 import com.arialyy.aria.core.task.ITask;
 import com.arialyy.aria.core.upload.target.FtpBuilderTarget;
@@ -228,6 +229,15 @@ public class UploadReceiver extends AbsReceiver {
     EventMsgUtil.getDefault().post(NormalCmdFactory.getInstance()
         .createCmd(new UTaskWrapper(null), NormalCmdFactory.TASK_STOP_ALL,
             ITask.UPLOAD));
+  }
+
+  /**
+   * 获取执行中的任务
+   *
+   * @return 没有执行中的任务，返回null
+   */
+  public List<UploadEntity> getURunningTask() {
+    return UTaskQueue.getInstance().getRunningTask(UploadEntity.class);
   }
 
   /**

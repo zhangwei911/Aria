@@ -15,6 +15,7 @@
  */
 package com.arialyy.aria.m3u8.live;
 
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
@@ -80,7 +81,11 @@ final class LiveStateManager implements IThreadStateManager {
               msg.getData().getString(ISchedulers.DATA_M3U8_PEER_PATH), peerIndex);
           break;
         case STATE_RUNNING:
-          mProgress += (long) msg.obj;
+          Bundle b = msg.getData();
+          if (b != null) {
+            long len = b.getLong(IThreadStateManager.DATA_ADD_LEN, 0);
+            mProgress += len;
+          }
           break;
         case STATE_FAIL:
           mLoader.notifyLock(false, peerIndex);

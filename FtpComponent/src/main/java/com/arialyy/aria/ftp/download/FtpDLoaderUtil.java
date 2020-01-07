@@ -42,7 +42,7 @@ public final class FtpDLoaderUtil extends AbsNormalLoaderUtil {
 
   public LoaderStructure BuildLoaderStructure() {
     LoaderStructure structure = new LoaderStructure();
-    structure.addComponent(new FtpDRecordHandler(getTaskWrapper()))
+    structure.addComponent(new FtpDRecordHandler((DTaskWrapper) getTaskWrapper()))
         .addComponent(new NormalThreadStateManager(getListener()))
         .addComponent(new FtpDFileInfoTask((DTaskWrapper) getTaskWrapper()))
         .addComponent(new FtpDTTBuilder(getTaskWrapper()));

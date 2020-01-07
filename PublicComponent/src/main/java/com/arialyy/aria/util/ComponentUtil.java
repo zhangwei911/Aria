@@ -128,6 +128,7 @@ public class ComponentUtil {
         break;
     }
     if (className == null) {
+      ALog.e(TAG, "不识别的类名：" + className);
       return null;
     }
     T util = null;

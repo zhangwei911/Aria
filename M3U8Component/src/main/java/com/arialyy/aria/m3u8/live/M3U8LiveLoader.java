@@ -68,11 +68,9 @@ final class M3U8LiveLoader extends BaseM3U8Loader {
   private Condition mCondition = LOCK.newCondition();
   private LinkedBlockingQueue<ExtInfo> mPeerQueue = new LinkedBlockingQueue<>();
   private ExtInfo mCurExtInfo;
-  private LiveStateManager mManager;
   private M3U8InfoTask mInfoTask;
   private ScheduledThreadPoolExecutor mTimer;
   private List<String> mPeerUrls = new ArrayList<>();
-  private Looper mLooper;
 
   M3U8LiveLoader(DTaskWrapper wrapper, M3U8Listener listener) {
     super(wrapper, listener);
@@ -94,8 +92,22 @@ final class M3U8LiveLoader extends BaseM3U8Loader {
     if (isBreak()) {
       return;
     }
-    mLooper = looper;
+
+    // 处理记录
+    getRecordHandler().setOption(mM3U8Option);
+    mRecord = getRecordHandler().getRecord(0);
+
+    // 初始化状态管理器
+    getStateManager().setLooper(mRecord, looper);
+    getStateManager().setLoader(this);
+    mStateHandler = new Handler(looper, getStateManager().getHandlerCallback());
+
+    // 循环获取直播文件列表
     startLoaderLiveInfo();
+
+    // 启动定时器
+    startTimer();
+
     new Thread(new Runnable() {
       @Override public void run() {
         String cacheDir = getCacheDir();
@@ -125,6 +137,14 @@ final class M3U8LiveLoader extends BaseM3U8Loader {
         }
       }
     }).start();
+  }
+
+  @Override protected LiveStateManager getStateManager() {
+    return (LiveStateManager) super.getStateManager();
+  }
+
+  private LiveRecordHandler getRecordHandler() {
+    return (LiveRecordHandler) mRecordHandler;
   }
 
   @Override public long getFileSize() {
@@ -165,20 +185,14 @@ final class M3U8LiveLoader extends BaseM3U8Loader {
    * 配置config
    */
   private ThreadTask createThreadTask(String cacheDir, int indexId, String tsUrl) {
-    ThreadRecord record = new ThreadRecord();
-    record.taskKey = mRecord.filePath;
-    record.isComplete = false;
-    record.tsUrl = tsUrl;
-    record.threadType = getEntity().getTaskType();
-    record.threadId = indexId;
-    mRecord.threadRecords.add(record);
+    ThreadRecord tr = getRecordHandler().createThreadRecord(mRecord, tsUrl, indexId);
 
     SubThreadConfig config = new SubThreadConfig();
     config.url = tsUrl;
     config.tempFile = new File(getTsFilePath(cacheDir, indexId));
     config.isBlock = mRecord.isBlock;
     config.taskWrapper = mTaskWrapper;
-    config.record = record;
+    config.record = tr;
     config.stateHandler = mStateHandler;
     config.peerIndex = indexId;
     config.threadType = SubThreadConfig.getThreadType(ITaskWrapper.M3U8_LIVE);
@@ -219,15 +233,10 @@ final class M3U8LiveLoader extends BaseM3U8Loader {
     if (isSuccess) {
       // 合并成功，删除缓存文件
       for (String pp : partPath) {
-        File f = new File(pp);
-        if (f.exists()) {
-          f.delete();
-        }
+        FileUtil.deleteFile(pp);
       }
       File cDir = new File(cacheDir);
-      if (cDir.exists()) {
-        cDir.delete();
-      }
+      FileUtil.deleteDir(cDir);
       return true;
     } else {
       ALog.e(TAG, "合并失败");
@@ -323,10 +332,7 @@ final class M3U8LiveLoader extends BaseM3U8Loader {
    * 需要在{@link #addComponent(IRecordHandler)} 后调用
    */
   @Override public void addComponent(IThreadStateManager threadState) {
-    mManager = (LiveStateManager) threadState;
-    mManager.setLooper(mRecordHandler.getRecord(0), mLooper);
-    mManager.setLoader(this);
-    mStateHandler = new Handler(mLooper, mManager.getHandlerCallback());
+    mStateManager = threadState;
   }
 
   /**
@@ -344,7 +350,7 @@ final class M3U8LiveLoader extends BaseM3U8Loader {
     if (mInfoTask == null) {
       throw new NullPointerException(("文件信息组件为空"));
     }
-    if (mManager == null) {
+    if (mStateManager == null) {
       throw new NullPointerException("任务状态管理组件为空");
     }
   }

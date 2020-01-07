@@ -52,7 +52,6 @@ public final class VodStateManager implements IThreadStateManager {
   private int cancelNum = 0; // 已经取消的线程的数
   private int stopNum = 0;  // 已经停止的线程数
   private int failNum = 0;  // 失败的线程数
-  private long percent; //当前总进度，百分比进度
   private long progress;
   private TaskRecord taskRecord; // 任务记录
   private Looper looper;
@@ -164,7 +163,11 @@ public final class VodStateManager implements IThreadStateManager {
           }
           break;
         case STATE_RUNNING:
-          progress += (long) msg.obj;
+          Bundle b = msg.getData();
+          if (b != null) {
+            long len = b.getLong(IThreadStateManager.DATA_ADD_LEN, 0);
+            progress += len;
+          }
           break;
       }
       return true;
@@ -226,7 +229,6 @@ public final class VodStateManager implements IThreadStateManager {
     int percent = completeNum * 100 / taskRecord.threadRecords.size();
     getEntity().setPercent(percent);
     getEntity().update();
-    this.percent = percent;
   }
 
   @Override public boolean isFail() {

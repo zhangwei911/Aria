@@ -210,7 +210,7 @@ public class M3U8VodDLoadActivity extends BaseActivity<ActivityM3u8VodBinding> {
   @Download.onTaskRunning
   protected void running(DownloadTask task) {
     if (task.getKey().equals(mUrl)) {
-      //ALog.d(TAG, "isRunning");
+      ALog.d(TAG, "m3u8 void running, p = " + task.getPercent() + ", speed  = " + task.getConvertSpeed());
       getBinding().setProgress(task.getPercent());
       getBinding().setSpeed(task.getConvertSpeed());
     }
