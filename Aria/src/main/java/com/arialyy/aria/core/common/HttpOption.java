@@ -35,6 +35,7 @@ public class HttpOption extends BaseOption {
   private Proxy proxy;
   private boolean useServerFileName = false;
   private IHttpFileLenAdapter fileLenAdapter;
+  private String attachment;
 
   public HttpOption() {
     super();
@@ -81,6 +82,19 @@ public class HttpOption extends BaseOption {
    */
   public HttpOption setFormFields(Map<String, String> formFields) {
     this.formFields = formFields;
+    return this;
+  }
+
+  /**
+   * 设置文件上传需要的key
+   *
+   * @param attachment 如果为空，默认为"file"
+   */
+  public HttpOption setAttachment(String attachment) {
+    if (TextUtils.isEmpty(attachment)) {
+      attachment = "file";
+    }
+    this.attachment = attachment;
     return this;
   }
 

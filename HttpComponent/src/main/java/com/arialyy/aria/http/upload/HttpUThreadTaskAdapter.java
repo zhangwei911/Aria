@@ -18,6 +18,7 @@ package com.arialyy.aria.http.upload;
 import android.text.TextUtils;
 import com.arialyy.aria.core.common.SubThreadConfig;
 import com.arialyy.aria.core.upload.UploadEntity;
+import com.arialyy.aria.exception.AriaIOException;
 import com.arialyy.aria.exception.BaseException;
 import com.arialyy.aria.exception.TaskException;
 import com.arialyy.aria.http.BaseHttpThreadTaskAdapter;
@@ -102,7 +103,7 @@ final class HttpUThreadTaskAdapter extends BaseHttpThreadTaskAdapter {
       }
 
       uploadFile(writer, mTaskOption.getAttachment(), uploadFile);
-      complete();
+      getEntity().setResponseStr(finish(writer));
     } catch (Exception e) {
       e.printStackTrace();
       fail(new TaskException(TAG,
@@ -193,11 +194,6 @@ final class HttpUThreadTaskAdapter extends BaseHttpThreadTaskAdapter {
     inputStream.close();
     writer.append(LINE_END);
     writer.flush();
-    //if (getState().isCancel) {
-    //  getState().isRunning = false;
-    //  return;
-    //}
-    //getState().isRunning = false;
   }
 
   /**
@@ -210,7 +206,7 @@ final class HttpUThreadTaskAdapter extends BaseHttpThreadTaskAdapter {
 
     writer.append(LINE_END).flush();
     writer.append(PREFIX).append(BOUNDARY).append(PREFIX).append(LINE_END);
-    writer.close();
+    writer.flush();
 
     int status = mHttpConn.getResponseCode();
 
@@ -222,9 +218,11 @@ final class HttpUThreadTaskAdapter extends BaseHttpThreadTaskAdapter {
       }
       reader.close();
       mHttpConn.disconnect();
+      complete();
     } else {
-      ALog.e(TAG, "response msg: " + mHttpConn.getResponseMessage() + "，code: " + status);
-      //  fail();
+      String msg = "response msg: " + mHttpConn.getResponseMessage() + "，code: " + status;
+      ALog.e(TAG, msg);
+      fail(new AriaIOException(TAG, msg), false);
     }
     writer.flush();
     writer.close();

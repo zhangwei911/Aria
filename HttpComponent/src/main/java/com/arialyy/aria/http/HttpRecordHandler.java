@@ -85,8 +85,7 @@ public final class HttpRecordHandler extends RecordHandler {
     record.threadNum = threadNum;
 
     int requestType = getWrapper().getRequestType();
-    if (requestType == ITaskWrapper.D_FTP || requestType == ITaskWrapper.D_FTP_DIR
-        || requestType == ITaskWrapper.D_HTTP || requestType == ITaskWrapper.DG_HTTP) {
+    if (requestType == ITaskWrapper.D_HTTP || requestType == ITaskWrapper.DG_HTTP) {
       record.isBlock = Configuration.getInstance().downloadCfg.isUseBlock();
     } else {
       record.isBlock = false;

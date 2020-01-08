@@ -26,6 +26,7 @@ import com.arialyy.aria.core.listener.IEventListener;
 import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
+import com.arialyy.aria.util.ComponentUtil;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -63,11 +64,9 @@ public abstract class AbsTask<TASK_WRAPPER extends AbsTaskWrapper>
     return mOutHandler;
   }
 
-  protected abstract IUtil createUtil();
-
   protected synchronized IUtil getUtil() {
     if (mUtil == null) {
-      mUtil = createUtil();
+      mUtil = ComponentUtil.getInstance().buildUtil(mTaskWrapper, mListener);
     }
     return mUtil;
   }
@@ -214,8 +213,8 @@ public abstract class AbsTask<TASK_WRAPPER extends AbsTaskWrapper>
 
   @Override public void start(int type) {
     mSchedulerType = type;
-    mUtil = createUtil();
-    if (mUtil == null){
+    mUtil = getUtil();
+    if (mUtil == null) {
       ALog.e(TAG, "任务工具创建失败");
       return;
     }
@@ -240,8 +239,8 @@ public abstract class AbsTask<TASK_WRAPPER extends AbsTaskWrapper>
   }
 
   @Override public void stop(int type) {
-    mUtil = createUtil();
-    if (mUtil == null){
+    mUtil = getUtil();
+    if (mUtil == null) {
       ALog.e(TAG, "任务工具创建失败");
       return;
     }
@@ -255,8 +254,8 @@ public abstract class AbsTask<TASK_WRAPPER extends AbsTaskWrapper>
   }
 
   @Override public void cancel(int type) {
-    mUtil = createUtil();
-    if (mUtil == null){
+    mUtil = getUtil();
+    if (mUtil == null) {
       ALog.e(TAG, "任务工具创建失败");
       return;
     }

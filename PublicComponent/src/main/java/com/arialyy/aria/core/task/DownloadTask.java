@@ -21,7 +21,6 @@ import android.os.Looper;
 import com.arialyy.aria.core.AriaConfig;
 import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.download.DownloadEntity;
-import com.arialyy.aria.core.inf.IUtil;
 import com.arialyy.aria.core.listener.ISchedulers;
 import com.arialyy.aria.util.ComponentUtil;
 
@@ -73,10 +72,6 @@ public class DownloadTask extends AbsTask<DTaskWrapper> {
 
   @Override public String getTaskName() {
     return mTaskWrapper.getEntity().getFileName();
-  }
-
-  @Override protected synchronized IUtil createUtil() {
-    return ComponentUtil.getInstance().buildUtil(mTaskWrapper, mListener);
   }
 
   public static class Builder {

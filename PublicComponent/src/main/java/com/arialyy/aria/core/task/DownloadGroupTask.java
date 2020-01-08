@@ -21,9 +21,7 @@ import android.text.TextUtils;
 import com.arialyy.aria.core.AriaConfig;
 import com.arialyy.aria.core.download.DGTaskWrapper;
 import com.arialyy.aria.core.download.DownloadGroupEntity;
-import com.arialyy.aria.core.inf.IUtil;
 import com.arialyy.aria.core.listener.ISchedulers;
-import com.arialyy.aria.util.CheckUtil;
 import com.arialyy.aria.util.ComponentUtil;
 
 /**
@@ -51,10 +49,6 @@ public class DownloadGroupTask extends AbsGroupTask<DGTaskWrapper> {
 
   @Override public int getTaskType() {
     return DOWNLOAD_GROUP;
-  }
-
-  @Override protected synchronized IUtil createUtil() {
-    return ComponentUtil.getInstance().buildUtil(mTaskWrapper, mListener);
   }
 
   public static class Builder {

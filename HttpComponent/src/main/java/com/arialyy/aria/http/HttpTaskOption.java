@@ -101,7 +101,7 @@ public final class HttpTaskOption implements ITaskOption {
   }
 
   public String getAttachment() {
-    return attachment;
+    return TextUtils.isEmpty(attachment) ? "file" : attachment;
   }
 
   public void setAttachment(String attachment) {

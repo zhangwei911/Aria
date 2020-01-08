@@ -217,36 +217,14 @@ public abstract class AbsGroupLoader implements ILoaderVisitor, ILoader {
   @Override public void cancel() {
     isCancel = true;
     closeTimer();
-    onPreCancel();
-
     mSubQueue.removeAllTask();
     mListener.onCancel();
   }
 
-  /**
-   * onCancel前的操作
-   */
-  protected void onPreCancel() {
-
-  }
-
   @Override public void stop() {
     isStop = true;
-    closeTimer();
-    if (onPreStop()) {
-      return;
-    }
     mSubQueue.stopAllTask();
-  }
-
-  /**
-   * onStop前的操作
-   *
-   * @return 返回{@code true}，直接回调{@link IDGroupListener#onStop(long)}
-   */
-  protected boolean onPreStop() {
-
-    return false;
+    closeTimer();
   }
 
   @Override public void run() {
@@ -265,6 +243,9 @@ public abstract class AbsGroupLoader implements ILoaderVisitor, ILoader {
     closeTimer();
     Looper.prepare();
     Looper looper = Looper.myLooper();
+    if (looper == Looper.getMainLooper()) {
+      throw new IllegalThreadStateException("不能在主线程程序中调用Loader");
+    }
     initState(looper);
     getState().setSubSize(getWrapper().getSubTaskWrapper().size());
     if (getState().getCompleteNum() != 0

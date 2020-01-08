@@ -17,7 +17,6 @@ package com.arialyy.aria.core.task;
 
 import android.os.Handler;
 import android.os.Looper;
-import com.arialyy.aria.core.inf.IUtil;
 import com.arialyy.aria.core.listener.ISchedulers;
 import com.arialyy.aria.core.upload.UTaskWrapper;
 import com.arialyy.aria.core.upload.UploadEntity;
@@ -49,10 +48,6 @@ public class UploadTask extends AbsTask<UTaskWrapper> {
 
   @Override public String getTaskName() {
     return mTaskWrapper.getEntity().getFileName();
-  }
-
-  @Override protected synchronized IUtil createUtil() {
-    return ComponentUtil.getInstance().buildUtil(mTaskWrapper, mListener);
   }
 
   public static class Builder {

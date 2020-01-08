@@ -26,6 +26,7 @@ import com.arialyy.aria.core.loader.IRecordHandler;
 import com.arialyy.aria.core.manager.ThreadTaskManager;
 import com.arialyy.aria.exception.TaskException;
 import com.arialyy.aria.util.ALog;
+import com.arialyy.aria.util.CommonUtil;
 import com.arialyy.aria.util.NetUtils;
 import java.io.File;
 
@@ -34,7 +35,7 @@ import java.io.File;
  * 该调度器生命周期和{@link AbsGroupLoaderUtil}生命周期一致
  */
 final class SimpleSchedulers implements Handler.Callback {
-  private static final String TAG = "SimpleSchedulers";
+  private final String TAG = CommonUtil.getClassName(this);
   private SimpleSubQueue mQueue;
   private GroupRunState mGState;
   private String mKey; // 组合任务的key

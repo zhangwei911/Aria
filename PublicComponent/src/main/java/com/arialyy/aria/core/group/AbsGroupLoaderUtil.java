@@ -99,6 +99,8 @@ public abstract class AbsGroupLoaderUtil implements IUtil {
     }
 
     buildLoaderStructure();
-    new Thread(mLoader).start();
+    // MsgEvent 已经是在线程中使用了，不需要重开线程
+    mLoader.run();
+    //new Thread(mLoader).start();
   }
 }

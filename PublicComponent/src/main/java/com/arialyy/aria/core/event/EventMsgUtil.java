@@ -38,7 +38,7 @@ public class EventMsgUtil {
   private Map<Object, List<EventMethodInfo>> mEventMethods =
       new ConcurrentHashMap<>();
   private ArrayBlockingQueue<Object> mEventQueue = new ArrayBlockingQueue<>(10);
-  private ExecutorService mPool = Executors.newFixedThreadPool(10);
+  private ExecutorService mPool = Executors.newFixedThreadPool(5);
 
   private EventMsgUtil() {
     ExecutorService pool = Executors.newSingleThreadExecutor();

@@ -25,7 +25,6 @@ import com.arialyy.aria.core.loader.IInfoTask;
 import com.arialyy.aria.core.loader.ILoaderVisitor;
 import com.arialyy.aria.exception.AriaIOException;
 import com.arialyy.aria.exception.BaseException;
-import com.arialyy.aria.http.HttpFileInfoTask;
 import com.arialyy.aria.http.HttpTaskOption;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
@@ -98,7 +97,7 @@ public final class HttpDGInfoTask implements IInfoTask {
     }
   }
 
-  /*z
+  /*
    * 获取组合任务大小，使用该方式获取到的组合任务大小，子任务不需要再重新获取文件大小
    */
   private void getGroupSize() {
@@ -106,7 +105,7 @@ public final class HttpDGInfoTask implements IInfoTask {
       @Override public void run() {
         for (DTaskWrapper dTaskWrapper : wrapper.getSubTaskWrapper()) {
           cloneHeader(dTaskWrapper);
-          HttpFileInfoTask infoTask = new HttpFileInfoTask(dTaskWrapper);
+          HttpDFileInfoTask infoTask = new HttpDFileInfoTask(dTaskWrapper);
           infoTask.setCallback(subCallback);
           mPool.execute(infoTask);
         }

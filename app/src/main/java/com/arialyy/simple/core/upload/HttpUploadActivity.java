@@ -41,9 +41,9 @@ public class HttpUploadActivity extends BaseActivity<ActivityUploadBinding> {
   private static final String TAG = "HttpUploadActivity";
   HorizontalProgressBarWithNumber mPb;
 
-  //private final String FILE_PATH = "/mnt/sdcard/ggsg14.apk";
-  private final String FILE_PATH =
-      Environment.getExternalStorageDirectory().getPath() + "/Download/QQMusic-import-1.2.1.zip";
+  private final String FILE_PATH = "/mnt/sdcard/QQMusic-import-1.2.1.zip";
+  //private final String FILE_PATH =
+  //    Environment.getExternalStorageDirectory().getPath() + "/Download/QQMusic-import-1.2.1.zip";
   private UploadEntity mEntity;
 
   @Override protected int setLayoutId() {
@@ -78,11 +78,13 @@ public class HttpUploadActivity extends BaseActivity<ActivityUploadBinding> {
 
   void upload() {
     HttpOption option = new HttpOption();
-    option.setRequestType(RequestEnum.POST)
-        .setParam("params", "bbbbbbbb");
+    option.setRequestType(RequestEnum.POST);
+    option.setParam("params", "bbbbbbbb");
+    option.setAttachment("file");
     Aria.upload(HttpUploadActivity.this).load(FILE_PATH)
         //.setUploadUrl("http://lib-test.xzxyun.com:8042/Api/upload?data={\"type\":\"1\",\"fileType\":\".apk\"}")
-        .setUploadUrl("http://9.9.12.210:5000/upload/")
+        .setUploadUrl("http://9.9.9.28:5000/upload/")
+        .ignoreFilePathOccupy()
         //.setTempUrl("http://192.168.1.6:8080/upload/sign_file/").setAttachment("file")
         //.addHeader("iplanetdirectorypro", "11a09102fb934ad0bc206f9c611d7933")
         .option(option)
@@ -124,7 +126,7 @@ public class HttpUploadActivity extends BaseActivity<ActivityUploadBinding> {
   @Upload.onTaskRunning public void taskRunning(UploadTask task) {
     getBinding().setSpeed(task.getConvertSpeed());
     getBinding().setProgress(task.getPercent());
-    L.d(TAG, "P => " + task.getPercent());
+    L.d(TAG, "running, P = " + task.getPercent());
   }
 
   @Upload.onTaskComplete public void taskComplete(UploadTask task) {

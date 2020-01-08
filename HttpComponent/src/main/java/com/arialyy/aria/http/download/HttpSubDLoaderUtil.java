@@ -18,10 +18,9 @@ package com.arialyy.aria.http.download;
 import android.os.Handler;
 import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.group.AbsSubDLoadUtil;
+import com.arialyy.aria.core.group.SubRecordHandler;
 import com.arialyy.aria.core.loader.LoaderStructure;
 import com.arialyy.aria.core.loader.SubLoader;
-import com.arialyy.aria.http.HttpFileInfoTask;
-import com.arialyy.aria.http.HttpRecordHandler;
 
 /**
  * @Author lyy
@@ -48,9 +47,9 @@ final class HttpSubDLoaderUtil extends AbsSubDLoadUtil {
 
   @Override protected LoaderStructure buildLoaderStructure() {
     LoaderStructure structure = new LoaderStructure();
-    structure.addComponent(new HttpRecordHandler(getWrapper()))
+    structure.addComponent(new SubRecordHandler(getWrapper()))
         .addComponent(new HttpDTTBuilder(getWrapper()))
-        .addComponent(new HttpFileInfoTask(getWrapper()));
+        .addComponent(new HttpDFileInfoTask(getWrapper()));
     structure.accept(getLoader());
     return structure;
   }

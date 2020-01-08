@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.arialyy.aria.http;
+package com.arialyy.aria.http.download;
 
 import android.net.TrafficStats;
 import android.net.Uri;
@@ -30,6 +30,8 @@ import com.arialyy.aria.core.processor.IHttpFileLenAdapter;
 import com.arialyy.aria.exception.AriaIOException;
 import com.arialyy.aria.exception.BaseException;
 import com.arialyy.aria.exception.TaskException;
+import com.arialyy.aria.http.ConnectionHelp;
+import com.arialyy.aria.http.HttpTaskOption;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CheckUtil;
 import com.arialyy.aria.util.CommonUtil;
@@ -55,7 +57,7 @@ import java.util.UUID;
 /**
  * 下载文件信息获取
  */
-public final class HttpFileInfoTask implements IInfoTask, Runnable {
+final class HttpDFileInfoTask implements IInfoTask, Runnable {
   private static final String TAG = "HttpFileInfoThread";
   private DownloadEntity mEntity;
   private DTaskWrapper mTaskWrapper;
@@ -63,7 +65,7 @@ public final class HttpFileInfoTask implements IInfoTask, Runnable {
   private Callback callback;
   private HttpTaskOption taskOption;
 
-  public HttpFileInfoTask(DTaskWrapper taskWrapper) {
+  HttpDFileInfoTask(DTaskWrapper taskWrapper) {
     this.mTaskWrapper = taskWrapper;
     mEntity = taskWrapper.getEntity();
     mConnectTimeOut = AriaConfig.getInstance().getDConfig().getConnectTimeOut();

@@ -59,8 +59,9 @@ public class HttpDownloadModule extends BaseViewModule {
     //String url = "https://ss1.baidu.com/-4o3dSag_xI4khGko9WTAnF6hhy/image/h%3D300/sign=a9e671b9a551f3dedcb2bf64a4eff0ec/4610b912c8fcc3cef70d70409845d688d53f20f7.jpg";
     //String filePath = AppUtil.getConfigValue(context, HTTP_PATH_KEY, defFilePath);
     String url = "https://y.qq.com/download/import/QQMusic-import-1.2.1.zip";
-    String filePath = "/mnt/sdcard/QQMusic-import-1.2.1.zip";
-    //String filePath = "/mnt/sdcard/update.zip";
+    String filePath = "/mnt/sdcard/update.zip";
+    //String url = "https://dhfspace.360drm.com/1_12809_1543904946_VID_20180808_212829.vep?e=1578554567&token=gUBmfZgZS5wy4wdQIDZG8UVxlNCyVSjvksIb13K5:WYSZRgmLbH1_9hjgqOAGmqR27JM=";
+    //String filePath = "/mnt/sdcard/sssss.zip";
 
     singDownloadInfo = Aria.download(context).getFirstDownloadEntity(url);
     if (singDownloadInfo == null) {

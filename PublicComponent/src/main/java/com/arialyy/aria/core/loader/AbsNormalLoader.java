@@ -123,6 +123,9 @@ public abstract class AbsNormalLoader implements ILoaderVisitor, ILoader {
     }
     Looper.prepare();
     Looper looper = Looper.myLooper();
+    if (looper == Looper.getMainLooper()){
+      throw new IllegalThreadStateException("不能在主线程程序中调用Loader");
+    }
     isRuning = true;
     resetState();
     onPostPre();

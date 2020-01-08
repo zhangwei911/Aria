@@ -58,11 +58,7 @@ final class SimpleSubQueue implements ISubQueue<AbsSubDLoadUtil> {
     return new SimpleSubQueue();
   }
 
-  Map<String, AbsSubDLoadUtil> getExec() {
-    return mExec;
-  }
-
-  AbsSubDLoadUtil getLoaderUtil(String key) {
+  synchronized AbsSubDLoadUtil getLoaderUtil(String key) {
     AbsSubDLoadUtil sub = mExec.get(key);
     if (sub != null) {
       return sub;

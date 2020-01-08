@@ -98,7 +98,8 @@ public class ComponentUtil {
    *
    * @return 返回下载工具，创建失败返回null
    */
-  public <T extends IUtil> T buildUtil(AbsTaskWrapper wrapper, IEventListener listener) {
+  public synchronized <T extends IUtil> T buildUtil(AbsTaskWrapper wrapper,
+      IEventListener listener) {
     int requestType = wrapper.getRequestType();
     String className = null;
     switch (requestType) {
@@ -158,7 +159,7 @@ public class ComponentUtil {
    * @param wrapperType 任务类型{@link ITaskWrapper}
    * @return 返回事件监听，如果创建失败返回null
    */
-  public <T extends IEventListener> T buildListener(int wrapperType, AbsTask task,
+  public synchronized <T extends IEventListener> T buildListener(int wrapperType, AbsTask task,
       Handler outHandler) {
     String className = null, errorStr = "请添加FTP插件";
     switch (wrapperType) {
@@ -211,7 +212,8 @@ public class ComponentUtil {
    * @param params 任务配置信息参数
    * @return 构建失败，返回null
    */
-  public <T extends ITaskOption> T buildTaskOption(Class<T> clazz, TaskOptionParams params) {
+  public synchronized <T extends ITaskOption> T buildTaskOption(Class<T> clazz,
+      TaskOptionParams params) {
     List<Field> fields = CommonUtil.getAllFields(clazz);
     T taskOption = null;
     try {
