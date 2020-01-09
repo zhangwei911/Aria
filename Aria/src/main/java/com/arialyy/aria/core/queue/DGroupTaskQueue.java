@@ -24,6 +24,7 @@ import com.arialyy.aria.core.event.EventMsgUtil;
 import com.arialyy.aria.core.scheduler.TaskSchedulers;
 import com.arialyy.aria.core.task.DownloadGroupTask;
 import com.arialyy.aria.util.ALog;
+import com.arialyy.aria.util.CommonUtil;
 
 /**
  * Created by AriaL on 2017/6/29. 任务组下载队列
@@ -32,7 +33,7 @@ public class DGroupTaskQueue
     extends AbsTaskQueue<DownloadGroupTask, DGTaskWrapper> {
   private static volatile DGroupTaskQueue INSTANCE = null;
 
-  private final String TAG = "DownloadGroupTaskQueue";
+  private final String TAG = CommonUtil.getClassName(this);
 
   public static DGroupTaskQueue getInstance() {
     if (INSTANCE == null) {
@@ -57,7 +58,7 @@ public class DGroupTaskQueue
   }
 
   @Override public int getMaxTaskNum() {
-    return AriaConfig.getInstance().getDConfig().getMaxTaskNum();
+    return AriaConfig.getInstance().getDGConfig().getMaxTaskNum();
   }
 
   @Override public DownloadGroupTask createTask(DGTaskWrapper wrapper) {

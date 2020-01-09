@@ -30,6 +30,7 @@ import com.arialyy.aria.core.loader.ILoaderVisitor;
 import com.arialyy.aria.core.loader.IRecordHandler;
 import com.arialyy.aria.core.loader.IThreadTaskBuilder;
 import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
+import com.arialyy.aria.exception.BaseException;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
 import java.io.File;
@@ -253,8 +254,8 @@ public abstract class AbsGroupLoader implements ILoaderVisitor, ILoader {
       mListener.onComplete();
       return;
     }
-    handlerTask(looper);
     startTimer();
+    handlerTask(looper);
     Looper.loop();
   }
 
@@ -318,6 +319,11 @@ public abstract class AbsGroupLoader implements ILoaderVisitor, ILoader {
     if (mTimer != null && !mTimer.isShutdown()) {
       mTimer.shutdown();
     }
+  }
+
+  protected void fail(BaseException e, boolean needRetry){
+    closeTimer();
+    getListener().onFail(needRetry, e);
   }
 
   @Override public long getCurrentProgress() {

@@ -33,6 +33,7 @@ import com.arialyy.aria.core.task.DownloadTask;
 import com.arialyy.aria.core.task.UploadTask;
 import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
 import com.arialyy.aria.util.ALog;
+import com.arialyy.aria.util.CommonUtil;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,7 +46,7 @@ public abstract class AbsTaskQueue<TASK extends AbsTask, TASK_WRAPPER extends Ab
   final int TYPE_DG_QUEUE = 2;
   final int TYPE_U_QUEUE = 3;
 
-  private final String TAG = "AbsTaskQueue";
+  private final String TAG = CommonUtil.getClassName(this);
   BaseCachePool<TASK> mCachePool;
   BaseExecutePool<TASK> mExecutePool;
 

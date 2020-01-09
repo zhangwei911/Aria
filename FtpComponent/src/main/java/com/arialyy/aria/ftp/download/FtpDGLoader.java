@@ -80,7 +80,8 @@ final class FtpDGLoader extends AbsGroupLoader {
       }
 
       @Override public void onFail(AbsEntity entity, BaseException e, boolean needRetry) {
-        getListener().onFail(needRetry, e);
+        //getListener().onFail(needRetry, e);
+        fail(e, needRetry);
       }
     });
   }

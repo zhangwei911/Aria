@@ -115,6 +115,15 @@ public final class M3U8TaskOption implements ITaskOption {
    */
   private boolean ignoreFailureTs = false;
 
+  /**
+   * 密钥文件保存路径
+   */
+  private String keyPath;
+
+  public String getKeyPath() {
+    return keyPath;
+  }
+
   public boolean isIgnoreFailureTs() {
     return ignoreFailureTs;
   }

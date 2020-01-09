@@ -115,10 +115,7 @@ public abstract class AbsNormalLoaderUtil implements IUtil {
     //}
 
     BuildLoaderStructure();
-    // MsgEvent 已经是在线程中使用了，不需要重开线程
-    mLoader.run();
-    //new Thread(mLoader).start();
-
+    new Thread(mLoader).start();
     onStart();
   }
 

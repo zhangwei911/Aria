@@ -24,7 +24,6 @@ import com.arialyy.aria.http.BaseHttpThreadTaskAdapter;
 import com.arialyy.aria.http.ConnectionHelp;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.BufferedRandomAccessFile;
-import com.arialyy.aria.util.FileUtil;
 import java.io.BufferedInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -112,7 +111,7 @@ final class HttpDThreadTaskAdapter extends BaseHttpThreadTaskAdapter {
             new BufferedRandomAccessFile(getThreadConfig().tempFile, "rwd",
                 getTaskConfig().getBuffSize());
         //设置每条线程写入文件的位置
-        if (getThreadRecord().startLocation > 0){
+        if (getThreadRecord().startLocation > 0) {
           file.seek(getThreadRecord().startLocation);
         }
         readNormal(is, file);
@@ -199,6 +198,7 @@ final class HttpDThreadTaskAdapter extends BaseHttpThreadTaskAdapter {
       fos = new FileOutputStream(getThreadConfig().tempFile, true);
       foc = fos.getChannel();
       fic = Channels.newChannel(is);
+
       ByteBuffer bf = ByteBuffer.allocate(getTaskConfig().getBuffSize());
       //如果要通过 Future 的 cancel 方法取消正在运行的任务，那么该任务必定是可以 对线程中断做出响应 的任务。
 

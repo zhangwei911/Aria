@@ -15,6 +15,8 @@
  */
 package com.arialyy.aria.m3u8;
 
+import android.net.Uri;
+import android.text.TextUtils;
 import com.arialyy.aria.core.common.RequestEnum;
 import com.arialyy.aria.core.common.SubThreadConfig;
 import com.arialyy.aria.core.download.DownloadEntity;
@@ -24,6 +26,7 @@ import com.arialyy.aria.exception.TaskException;
 import com.arialyy.aria.http.ConnectionHelp;
 import com.arialyy.aria.http.HttpTaskOption;
 import com.arialyy.aria.util.ALog;
+import com.arialyy.aria.util.CheckUtil;
 import java.io.BufferedInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -46,6 +49,7 @@ import java.util.Set;
 public final class M3U8ThreadTaskAdapter extends AbsThreadTaskAdapter {
   private final String TAG = "M3U8ThreadTask";
   private HttpTaskOption mHttpTaskOption;
+  private BufferedInputStream is = null;
 
   public M3U8ThreadTaskAdapter(SubThreadConfig config) {
     super(config);
@@ -58,19 +62,15 @@ public final class M3U8ThreadTaskAdapter extends AbsThreadTaskAdapter {
       return;
     }
     HttpURLConnection conn = null;
-    BufferedInputStream is = null;
     try {
       URL url = ConnectionHelp.handleUrl(getThreadConfig().url, mHttpTaskOption);
       conn = ConnectionHelp.handleConnection(url, mHttpTaskOption);
       ALog.d(TAG, String.format("分片【%s】开始下载", getThreadRecord().threadId));
-      ConnectionHelp.setConnectParam(mHttpTaskOption, conn);
-      conn.setConnectTimeout(getTaskConfig().getConnectTimeOut());
-      conn.setReadTimeout(getTaskConfig().getIOTimeOut());  //设置读取流的等待时间,必须设置该参数
+
       if (mHttpTaskOption.isChunked()) {
         conn.setDoInput(true);
         conn.setChunkedStreamingMode(0);
       }
-      conn.connect();
       // 传递参数
       if (mHttpTaskOption.getRequestEnum() == RequestEnum.POST) {
         Map<String, String> params = mHttpTaskOption.getParams();
@@ -89,20 +89,7 @@ public final class M3U8ThreadTaskAdapter extends AbsThreadTaskAdapter {
         }
       }
 
-      int code = conn.getResponseCode();
-      if (code != HttpURLConnection.HTTP_OK) {
-        fail(new TaskException(TAG,
-                String.format("连接错误，http错误码：%s，url：%s", code, getThreadConfig().url)),
-            false);
-        return;
-      }
-
-      is = new BufferedInputStream(ConnectionHelp.convertInputStream(conn));
-      if (mHttpTaskOption.isChunked()) {
-        readChunked(is);
-      } else if (getThreadConfig().isBlock) {
-        readDynamicFile(is);
-      }
+      handleConn(conn);
     } catch (MalformedURLException e) {
       fail(new TaskException(TAG,
           String.format("分片【%s】下载失败，filePath: %s, url: %s", getThreadRecord().threadId,
@@ -127,6 +114,65 @@ public final class M3U8ThreadTaskAdapter extends AbsThreadTaskAdapter {
         e.printStackTrace();
       }
     }
+  }
+
+  private void handleConn(HttpURLConnection conn) throws IOException {
+    ConnectionHelp.setConnectParam(mHttpTaskOption, conn);
+    conn.setConnectTimeout(getTaskConfig().getConnectTimeOut());
+    conn.setReadTimeout(getTaskConfig().getIOTimeOut());  //设置读取流的等待时间,必须设置该参数
+
+    conn.connect();
+    int code = conn.getResponseCode();
+    if (code == HttpURLConnection.HTTP_OK) {
+      is = new BufferedInputStream(ConnectionHelp.convertInputStream(conn));
+      if (mHttpTaskOption.isChunked()) {
+        readChunked(is);
+      } else if (getThreadConfig().isBlock) {
+        readDynamicFile(is);
+      }
+    } else if (code == HttpURLConnection.HTTP_MOVED_TEMP
+        || code == HttpURLConnection.HTTP_MOVED_PERM
+        || code == HttpURLConnection.HTTP_SEE_OTHER
+        || code == HttpURLConnection.HTTP_CREATED // 201 跳转
+        || code == 307) {
+      handleUrlReTurn(conn, conn.getHeaderField("Location"));
+    } else {
+      fail(new TaskException(TAG,
+              String.format("连接错误，http错误码：%s，url：%s", code, getThreadConfig().url)),
+          false);
+    }
+    conn.disconnect();
+  }
+
+  /**
+   * 处理30x跳转
+   */
+  private void handleUrlReTurn(HttpURLConnection conn, String newUrl) throws IOException {
+    ALog.d(TAG, "30x跳转，新url为【" + newUrl + "】");
+    if (TextUtils.isEmpty(newUrl) || newUrl.equalsIgnoreCase("null")) {
+      fail(new AriaIOException(TAG, "下载失败，重定向url为空"), false);
+      return;
+    }
+
+    if (newUrl.startsWith("/")) {
+      Uri uri = Uri.parse(getThreadConfig().url);
+      newUrl = uri.getHost() + newUrl;
+    }
+
+    if (!CheckUtil.checkUrl(newUrl)) {
+      fail(new AriaIOException(TAG, "下载失败，重定向url错误"), false);
+      return;
+    }
+    String cookies = conn.getHeaderField("Set-Cookie");
+    conn.disconnect(); // 关闭上一个连接
+    URL url = ConnectionHelp.handleUrl(newUrl, mHttpTaskOption);
+    conn = ConnectionHelp.handleConnection(url, mHttpTaskOption);
+    conn.setRequestProperty("Cookie", cookies);
+    if (mHttpTaskOption.isChunked()) {
+      conn.setDoInput(true);
+      conn.setChunkedStreamingMode(0);
+    }
+    handleConn(conn);
   }
 
   /**

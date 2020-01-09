@@ -61,6 +61,7 @@ public interface IThreadStateManager extends ILoaderComponent {
 
   /**
    * 更新当前进度
+   *
    * @param currentProgress 当前进度
    */
   void updateCurrentProgress(long currentProgress);

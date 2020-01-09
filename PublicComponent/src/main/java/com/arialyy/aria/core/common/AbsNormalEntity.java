@@ -51,9 +51,6 @@ public abstract class AbsNormalEntity extends AbsEntity implements Parcelable {
    */
   private int taskType;
 
-  @Override public int getTaskType() {
-    return taskType;
-  }
 
   public void setTaskType(int taskType) {
     this.taskType = taskType;

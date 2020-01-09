@@ -258,9 +258,14 @@ final public class M3U8InfoTask implements IInfoTask {
         m3U8Entity.method = param.split("=")[1];
       } else if (param.startsWith("URI")) {
         m3U8Entity.keyUrl = param.split("=")[1].replaceAll("\"", "");
-        m3U8Entity.keyPath =
-            new File(mEntity.getFilePath()).getParent() + "/" + CommonUtil.getStrMd5(
-                m3U8Entity.keyUrl) + ".key";
+        String keyPath;
+        if (((M3U8TaskOption) mTaskWrapper.getM3u8Option()).getKeyPath() == null) {
+          keyPath = new File(mEntity.getFilePath()).getParent() + "/"
+              + CommonUtil.getStrMd5(m3U8Entity.keyUrl) + ".key";
+        } else {
+          keyPath = ((M3U8TaskOption) mTaskWrapper.getM3u8Option()).getKeyPath();
+        }
+        m3U8Entity.keyPath = keyPath;
       } else if (param.startsWith("IV")) {
         m3U8Entity.iv = param.split("=")[1];
       } else if (param.startsWith("KEYFORMAT")) {

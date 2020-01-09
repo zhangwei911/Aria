@@ -26,6 +26,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.arialyy.annotations.Download;
 import com.arialyy.annotations.DownloadGroup;
 import com.arialyy.aria.core.Aria;
+import com.arialyy.aria.core.common.AbsEntity;
 import com.arialyy.aria.core.task.DownloadGroupTask;
 import com.arialyy.aria.core.task.DownloadTask;
 import com.arialyy.aria.util.ALog;
@@ -72,7 +73,11 @@ public class MultiTaskActivity extends BaseActivity<ActivityMultiBinding> {
         dialog.show(getSupportFragmentManager(), "download_num");
         break;
       case R.id.stop_all:
-        Aria.download(this).stopAllTask();
+        //Aria.download(this).stopAllTask();
+        List<AbsEntity> list = Aria.download(this).getTotalTaskList();
+        for (AbsEntity entity : list){
+          Aria.download(this).load(entity.getId()).cancel(true);
+        }
         //Aria.download(this).removeAllTask(false);
         break;
       case R.id.turn:

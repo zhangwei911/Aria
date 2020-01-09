@@ -15,10 +15,12 @@
  */
 package com.arialyy.aria.core.download.m3u8;
 
+import android.text.TextUtils;
 import com.arialyy.aria.core.common.BaseOption;
 import com.arialyy.aria.core.processor.IBandWidthUrlConverter;
 import com.arialyy.aria.core.processor.IKeyUrlConverter;
 import com.arialyy.aria.core.processor.ITsMergeHandler;
+import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CheckUtil;
 import com.arialyy.aria.util.ComponentUtil;
 
@@ -34,10 +36,25 @@ public class M3U8Option<OP extends M3U8Option> extends BaseOption {
   private IBandWidthUrlConverter bandWidthUrlConverter;
   private IKeyUrlConverter keyUrlConverter;
   private boolean ignoreFailureTs = false;
+  private String keyPath;
 
   M3U8Option() {
     super();
     ComponentUtil.getInstance().checkComponentExist(ComponentUtil.COMPONENT_TYPE_M3U8);
+  }
+
+  /**
+   * 设置密钥文件的保存路径
+   *
+   * @param keyPath 密钥文件的保存路径
+   */
+  public OP setKeyPath(String keyPath) {
+    if (TextUtils.isEmpty(keyPath)) {
+      ALog.e(TAG, "密钥文件保存路径为空");
+      return (OP) this;
+    }
+    this.keyPath = keyPath;
+    return (OP) this;
   }
 
   /**

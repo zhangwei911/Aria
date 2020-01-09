@@ -292,6 +292,7 @@ public class DownloadAdapter extends AbsRVAdapter<AbsEntity, DownloadAdapter.Sim
             .cancel(true);
         break;
       case ITaskWrapper.D_FTP_DIR:
+        Aria.download(getContext()).loadFtpDir(entity.getId()).cancel(true);
         break;
       case ITaskWrapper.D_HTTP:
       case ITaskWrapper.M3U8_VOD:

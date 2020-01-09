@@ -89,6 +89,9 @@ public final class HttpDGInfoTask implements IInfoTask {
       } catch (InterruptedException e) {
         e.printStackTrace();
       }
+      if (!mPool.isShutdown()){
+        mPool.shutdown();
+      }
     } else {
       for (DTaskWrapper wrapper : wrapper.getSubTaskWrapper()) {
         cloneHeader(wrapper);

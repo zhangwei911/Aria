@@ -182,14 +182,14 @@ final class SqlHelper extends SQLiteOpenHelper {
           // ----------- 2、为防止字段增加失败的情况，先给旧表增加字段
           List<String> newAddColum = getNewColumn(newTabColumns, oldTabColumns);
           // 删除重命名的字段
-          Map<String, String > modifyMap = null;
-          if (modifyColumns != null){
+          Map<String, String> modifyMap = null;
+          if (modifyColumns != null) {
             modifyMap = modifyColumns.get(tableName);
-            if (modifyMap != null){
+            if (modifyMap != null) {
               Iterator<String> it = newAddColum.iterator();
-              while (it.hasNext()){
+              while (it.hasNext()) {
                 String s = it.next();
-                if (modifyMap.get(s) != null){
+                if (modifyMap.get(s) != null) {
                   it.remove();
                 }
               }
@@ -197,10 +197,11 @@ final class SqlHelper extends SQLiteOpenHelper {
           }
 
           // 给旧表增加字段，防止新增字段失败
-          if (newAddColum.size() > 0){
+          if (newAddColum.size() > 0) {
             String sql = "ALTER TABLE %s ADD COLUMN %s %s";
-            for (String nc : newAddColum){
-              String temp = String.format(sql, tableName, nc, SqlUtil.getColumnTypeByFieldName(clazz, nc));
+            for (String nc : newAddColum) {
+              String temp =
+                  String.format(sql, tableName, nc, SqlUtil.getColumnTypeByFieldName(clazz, nc));
               ALog.d(TAG, "添加表字段的sql：" + temp);
               db.execSQL(temp);
             }
@@ -234,7 +235,8 @@ final class SqlHelper extends SQLiteOpenHelper {
 
             for (String column : oldTabColumns) {
               if (!diffTab.isEmpty() && diffTab.contains(column)
-                  && (modifyMap != null && !modifyMap.containsKey(column))) { // 如果旧表字段有修改，忽略这个删除
+                  // 如果旧表字段有修改，忽略这个删除
+                  && !(modifyMap != null && modifyMap.containsKey(column))) {
                 continue;
               }
               params.append(column).append(",");

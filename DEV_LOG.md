@@ -1,5 +1,5 @@
 ## 开发日志
-  + v_3.8.3
+  + v_3.8.3 (2020/1/9)
     - fix bug https://github.com/AriaLyy/Aria/issues/573
     - android P适配 https://github.com/AriaLyy/Aria/issues/581
     - 添加ftp服务器标志 https://github.com/AriaLyy/Aria/issues/580
@@ -7,6 +7,7 @@
     - 修复ftp上传完成后，删除服务器端的文件，无法重新下载的问题
     - 增加获取执行中的任务api，详情见：https://aria.laoyuyu.me/aria_doc/api/task_list.html
     - 增加获取剩余时间的api，详情见：https://aria.laoyuyu.me/aria_doc/start/task_explain.html
+    - fix bug https://github.com/AriaLyy/Aria/issues/595
   + v_3.8.1 (2019/12/22)
     - 修复一个表创建失败的问题 https://github.com/AriaLyy/Aria/issues/570
     - 修复一个非分块模式下导致下载失败的问题 https://github.com/AriaLyy/Aria/issues/571
