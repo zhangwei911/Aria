@@ -43,8 +43,6 @@ public class FtpDownloadModule extends BaseViewModule {
   /**
    * xx
    * 单任务下载的信息
-   *
-   *
    */
   LiveData<DownloadEntity> getFtpDownloadInfo(Context context) {
     //String url = AppUtil.getConfigValue(context, FTP_URL_KEY, ftpDefUrl);
