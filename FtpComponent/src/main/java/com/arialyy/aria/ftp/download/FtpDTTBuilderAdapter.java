@@ -13,29 +13,39 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.arialyy.aria.ftp.upload;
+package com.arialyy.aria.ftp.download;
 
 import com.arialyy.aria.core.TaskRecord;
 import com.arialyy.aria.core.common.SubThreadConfig;
-import com.arialyy.aria.core.loader.AbsNormalTTBuilder;
+import com.arialyy.aria.core.loader.AbsNormalTTBuilderAdapter;
+import com.arialyy.aria.core.loader.IRecordHandler;
 import com.arialyy.aria.core.task.IThreadTaskAdapter;
-import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
+import com.arialyy.aria.util.ALog;
+import com.arialyy.aria.util.FileUtil;
+import java.io.File;
 
-/**
- * @Author lyy
- * @Date 2019-09-19
- */
-final class FtpUTTBuilder extends AbsNormalTTBuilder {
-
-  FtpUTTBuilder(AbsTaskWrapper wrapper) {
-    super(wrapper);
-  }
+final class FtpDTTBuilderAdapter extends AbsNormalTTBuilderAdapter {
 
   @Override public IThreadTaskAdapter getAdapter(SubThreadConfig config) {
-    return new FtpUThreadTaskAdapter(config);
+    return new FtpDThreadTaskAdapter(config);
   }
 
   @Override public boolean handleNewTask(TaskRecord record, int totalThreadNum) {
+    if (!record.isBlock) {
+      if (getTempFile().exists()) {
+        FileUtil.deleteFile(getTempFile());
+      }
+      //CommonUtil.createFile(mTempFile.getPath());
+    } else {
+      for (int i = 0; i < totalThreadNum; i++) {
+        File blockFile =
+            new File(String.format(IRecordHandler.SUB_PATH, getTempFile().getPath(), i));
+        if (blockFile.exists()) {
+          ALog.d(TAG, String.format("分块【%s】已经存在，将删除该分块", i));
+          FileUtil.deleteFile(blockFile);
+        }
+      }
+    }
     return true;
   }
 }

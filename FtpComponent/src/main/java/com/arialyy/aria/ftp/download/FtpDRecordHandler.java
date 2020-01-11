@@ -21,9 +21,7 @@ import com.arialyy.aria.core.common.RecordHandler;
 import com.arialyy.aria.core.common.RecordHelper;
 import com.arialyy.aria.core.config.Configuration;
 import com.arialyy.aria.core.download.DTaskWrapper;
-import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.loader.IRecordHandler;
-import com.arialyy.aria.core.wrapper.ITaskWrapper;
 import com.arialyy.aria.util.RecordUtil;
 import java.util.ArrayList;
 
@@ -31,9 +29,9 @@ import java.util.ArrayList;
  * @Author lyy
  * @Date 2019-09-19
  */
-final class FtpDRecordHandler extends RecordHandler {
+public final class FtpDRecordHandler extends RecordHandler {
 
-  FtpDRecordHandler(DTaskWrapper wrapper) {
+  public FtpDRecordHandler(DTaskWrapper wrapper) {
     super(wrapper);
   }
 
@@ -76,35 +74,18 @@ final class FtpDRecordHandler extends RecordHandler {
     record.filePath = getEntity().getFilePath();
     record.threadRecords = new ArrayList<>();
     record.threadNum = threadNum;
-
-    int requestType = getWrapper().getRequestType();
-    if (requestType == ITaskWrapper.D_FTP || requestType == ITaskWrapper.D_FTP_DIR) {
-      record.isBlock = Configuration.getInstance().downloadCfg.isUseBlock();
-    } else {
-      record.isBlock = false;
-    }
+    record.isBlock = Configuration.getInstance().downloadCfg.isUseBlock();
     record.taskType = getWrapper().getEntity().getTaskType();
-    record.isGroupRecord = getEntity().isGroupChild();
-    if (record.isGroupRecord) {
-      if (getEntity() instanceof DownloadEntity) {
-        record.dGroupHash = ((DownloadEntity) getEntity()).getGroupHash();
-      }
-    }
+    record.isGroupRecord = false;
 
     return record;
   }
 
   @Override public int initTaskThreadNum() {
-    int requestType = getWrapper().getRequestType();
-    if (requestType == ITaskWrapper.D_FTP || requestType == ITaskWrapper.D_FTP_DIR) {
-      int threadNum = Configuration.getInstance().downloadCfg.getThreadNum();
-      return getFileSize() <= IRecordHandler.SUB_LEN
-          || getEntity().isGroupChild()
-          || threadNum == 1
-          ? 1
-          : threadNum;
-    } else {
-      return 1;
-    }
+    int threadNum = Configuration.getInstance().downloadCfg.getThreadNum();
+    return getFileSize() <= IRecordHandler.SUB_LEN
+        || threadNum == 1
+        ? 1
+        : threadNum;
   }
 }

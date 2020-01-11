@@ -13,30 +13,42 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.arialyy.aria.ftp.download;
+package com.arialyy.aria.sftp.download;
 
+import android.os.Handler;
 import com.arialyy.aria.core.TaskRecord;
+import com.arialyy.aria.core.ThreadRecord;
 import com.arialyy.aria.core.common.SubThreadConfig;
-import com.arialyy.aria.core.loader.AbsNormalTTBuilder;
+import com.arialyy.aria.core.loader.AbsNormalTTBuilderAdapter;
 import com.arialyy.aria.core.loader.IRecordHandler;
 import com.arialyy.aria.core.task.IThreadTaskAdapter;
-import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.FileUtil;
+import com.jcraft.jsch.ChannelSftp;
 import java.io.File;
 
-/**
- * @Author lyy
- * @Date 2019-09-19
- */
-final class FtpDTTBuilder extends AbsNormalTTBuilder {
+class SFtpDTTBuilderAdapter extends AbsNormalTTBuilderAdapter {
+  private ChannelSftp channel;
 
-  FtpDTTBuilder(AbsTaskWrapper wrapper) {
-    super(wrapper);
+  SFtpDTTBuilderAdapter() {
+  }
+
+  void setChannel(ChannelSftp channel) {
+    this.channel = channel;
   }
 
   @Override public IThreadTaskAdapter getAdapter(SubThreadConfig config) {
-    return new FtpDThreadTaskAdapter(config);
+    return new SFtpDThreadTaskAdapter(config);
+  }
+
+  @Override
+  protected SubThreadConfig getSubThreadConfig(Handler stateHandler, ThreadRecord threadRecord,
+      boolean isBlock, int startNum) {
+    SubThreadConfig config =
+        super.getSubThreadConfig(stateHandler, threadRecord, isBlock, startNum);
+    config.obj = channel;
+
+    return config;
   }
 
   @Override public boolean handleNewTask(TaskRecord record, int totalThreadNum) {

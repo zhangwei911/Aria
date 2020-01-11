@@ -48,6 +48,8 @@ public class SubThreadConfig {
   public int threadType = TYPE_HTTP;
   // 进度更新间隔，单位：毫秒
   public long updateInterval = 1000;
+  // 扩展数据
+  public Object obj;
 
   /**
    * 转换线程任务类型

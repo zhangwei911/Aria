@@ -13,30 +13,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.arialyy.aria.sftp;
-
-import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
-import java.util.Vector;
+package com.arialyy.aria.core;
 
 /**
- * sftp文件信息适配器
+ * 证书信息
  */
-public abstract class BaseInfoThreadAdapter<WRAPPER extends AbsTaskWrapper> {
-
-  private WRAPPER mWrapper;
-
-  public BaseInfoThreadAdapter(WRAPPER taskWrapper) {
-    mWrapper = taskWrapper;
-  }
-
-  public WRAPPER getWrapper() {
-    return mWrapper;
-  }
+public class IdEntity {
 
   /**
-   * 处理文件
-   *
-   * @return true 处理文件成功，false 处理文件失败，结束任务
+   * 私钥证书内容（非路径）
    */
-  protected abstract boolean handlerFile(Vector vector);
+  public String prvKey;
+
+  /**
+   * 私钥证书密码
+   */
+  public String prvPass;
+
+  /**
+   * 公钥证书内容（非路径）
+   */
+  public String pubKey;
+
+  /**
+   * 私钥证书路径
+   */
+  public String storePath;
+
+  /**
+   * 私钥别名
+   */
+  public String keyAlias;
 }

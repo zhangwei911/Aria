@@ -179,6 +179,7 @@ public class RecordUtil {
       } else if (record.isBlock) { // 删除分块文件
         removeBlockFile(record);
       }
+      removeTargetFile(targetFile);
     } else if (removeFile) { // 处理任务完成情况
       if (recordIsM3U8(record.taskType)) {
         removeTsCache(targetFile, record.bandWidth);
@@ -249,6 +250,7 @@ public class RecordUtil {
       } else if (record.isBlock) { // 删除分块文件
         removeBlockFile(record);
       }
+      removeTargetFile(targetFile);
     } else if (removeFile) { // 处理任务完成情况
       if (recordIsM3U8(record.taskType)) {
         removeTsCache(targetFile, record.bandWidth);

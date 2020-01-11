@@ -10,61 +10,46 @@ import com.arialyy.aria.core.common.SubThreadConfig;
 import com.arialyy.aria.core.download.DGTaskWrapper;
 import com.arialyy.aria.core.inf.IThreadStateManager;
 import com.arialyy.aria.core.task.IThreadTask;
-import com.arialyy.aria.core.task.IThreadTaskAdapter;
 import com.arialyy.aria.core.task.ThreadTask;
 import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class AbsNormalTTBuilder implements IThreadTaskBuilder {
+public final class NormalTTBuilder implements IThreadTaskBuilder {
   protected String TAG = CommonUtil.getClassName(this);
 
   private Handler mStateHandler;
   private AbsTaskWrapper mWrapper;
   private TaskRecord mRecord;
   private int mTotalThreadNum;
-  private File mTempFile;
   private int mStartThreadNum;
+  private AbsNormalTTBuilderAdapter mAdapter;
 
-  public AbsNormalTTBuilder(AbsTaskWrapper wrapper) {
+  public NormalTTBuilder(AbsTaskWrapper wrapper, AbsNormalTTBuilderAdapter adapter) {
     if (wrapper instanceof DGTaskWrapper) {
       throw new AssertionError("NormalTTBuilder 不适用于组合任务");
     }
     mWrapper = wrapper;
-    mTempFile = new File(((AbsNormalEntity) wrapper.getEntity()).getFilePath());
-  }
-
-  protected File getTempFile() {
-    return mTempFile;
+    mAdapter = adapter;
+    mAdapter.setWrapper(wrapper);
   }
 
   protected AbsNormalEntity getEntity() {
     return (AbsNormalEntity) mWrapper.getEntity();
   }
 
-  /**
-   * 创建线程任务适配器
-   */
-  public abstract IThreadTaskAdapter getAdapter(SubThreadConfig config);
-
-  /**
-   * 处理新任务
-   *
-   * @param record 任务记录
-   * @param totalThreadNum 任务的线程总数
-   * @return {@code true}创建新任务成功
-   */
-  public abstract boolean handleNewTask(TaskRecord record, int totalThreadNum);
+  public AbsNormalTTBuilderAdapter getAdapter() {
+    return mAdapter;
+  }
 
   /**
    * 创建线程任务
    */
   private IThreadTask createThreadTask(SubThreadConfig config) {
     ThreadTask task = new ThreadTask(config);
-    task.setAdapter(getAdapter(config));
+    task.setAdapter(mAdapter.getAdapter(config));
     return task;
   }
 
@@ -75,20 +60,8 @@ public abstract class AbsNormalTTBuilder implements IThreadTaskBuilder {
    * @param startNum 启动的线程数
    */
   private IThreadTask createSingThreadTask(ThreadRecord record, int startNum) {
-    SubThreadConfig config = new SubThreadConfig();
-    config.url = getEntity().isRedirect() ? getEntity().getRedirectUrl() : getEntity().getUrl();
-    config.tempFile =
-        mRecord.isBlock ? new File(
-            String.format(IRecordHandler.SUB_PATH, mTempFile.getPath(), record.threadId))
-            : mTempFile;
-    config.isBlock = mRecord.isBlock;
-    config.startThreadNum = startNum;
-    config.taskWrapper = mWrapper;
-    config.record = record;
-    config.stateHandler = mStateHandler;
-    config.threadType = SubThreadConfig.getThreadType(mWrapper.getRequestType());
-    config.updateInterval = SubThreadConfig.getUpdateInterval(mWrapper.getRequestType());
-    return createThreadTask(config);
+    return createThreadTask(
+        mAdapter.getSubThreadConfig(mStateHandler, record, mRecord.isBlock, startNum));
   }
 
   /**
@@ -117,7 +90,7 @@ public abstract class AbsNormalTTBuilder implements IThreadTaskBuilder {
     List<IThreadTask> threadTasks = new ArrayList<>(mTotalThreadNum);
 
     mRecord.fileLength = fileLength;
-    if (mWrapper.isNewTask() && !handleNewTask(mRecord, mTotalThreadNum)) {
+    if (mWrapper.isNewTask() && !mAdapter.handleNewTask(mRecord, mTotalThreadNum)) {
       ALog.e(TAG, "初始化线程任务失败");
       return null;
     }
@@ -138,7 +111,7 @@ public abstract class AbsNormalTTBuilder implements IThreadTaskBuilder {
         Message msg = mStateHandler.obtainMessage();
         msg.what = IThreadStateManager.STATE_COMPLETE;
         Bundle b = msg.getData();
-        if (b == null){
+        if (b == null) {
           b = new Bundle();
         }
         b.putString(IThreadStateManager.DATA_THREAD_NAME,

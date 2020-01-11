@@ -2,20 +2,16 @@ package com.arialyy.aria.http.download;
 
 import com.arialyy.aria.core.TaskRecord;
 import com.arialyy.aria.core.common.SubThreadConfig;
-import com.arialyy.aria.core.loader.AbsNormalTTBuilder;
+import com.arialyy.aria.core.loader.AbsNormalTTBuilderAdapter;
 import com.arialyy.aria.core.loader.IRecordHandler;
 import com.arialyy.aria.core.task.IThreadTaskAdapter;
-import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.BufferedRandomAccessFile;
 import com.arialyy.aria.util.FileUtil;
 import java.io.File;
 import java.io.IOException;
 
-final class HttpDTTBuilder extends AbsNormalTTBuilder {
-  HttpDTTBuilder(AbsTaskWrapper wrapper) {
-    super(wrapper);
-  }
+final class HttpDTTBuilderAdapter extends AbsNormalTTBuilderAdapter {
 
   @Override public IThreadTaskAdapter getAdapter(SubThreadConfig config) {
     return new HttpDThreadTaskAdapter(config);

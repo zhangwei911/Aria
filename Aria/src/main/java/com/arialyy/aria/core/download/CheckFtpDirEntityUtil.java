@@ -90,11 +90,11 @@ public class CheckFtpDirEntityUtil implements ICheckEntityUtil {
         (FtpUrlEntity) mWrapper.getOptionParams().getParam(IOptionConstant.ftpUrlEntity);
     assert urlEntity != null;
     if (urlEntity.isFtps) {
-      if (TextUtils.isEmpty(urlEntity.storePath)) {
+      if (TextUtils.isEmpty(urlEntity.idEntity.storePath)) {
         ALog.e(TAG, "证书路径为空");
         return false;
       }
-      if (TextUtils.isEmpty(urlEntity.keyAlias)) {
+      if (TextUtils.isEmpty(urlEntity.idEntity.keyAlias)) {
         ALog.e(TAG, "证书别名为空");
         return false;
       }

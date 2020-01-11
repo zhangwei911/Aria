@@ -1,4 +1,6 @@
 ## 开发日志
+  + v_3.8.4
+    - fix bug https://github.com/AriaLyy/Aria/issues/599
   + v_3.8.3 (2020/1/9)
     - fix bug https://github.com/AriaLyy/Aria/issues/573
     - android P适配 https://github.com/AriaLyy/Aria/issues/581

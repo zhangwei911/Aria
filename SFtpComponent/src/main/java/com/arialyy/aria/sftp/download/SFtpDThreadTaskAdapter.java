@@ -23,7 +23,7 @@ import com.arialyy.aria.core.task.AbsThreadTaskAdapter;
  *
  * @author lyy
  */
-public class SFtpDThreadTaskAdapter extends AbsThreadTaskAdapter {
+final class SFtpDThreadTaskAdapter extends AbsThreadTaskAdapter {
 
   SFtpDThreadTaskAdapter(SubThreadConfig config) {
     super(config);

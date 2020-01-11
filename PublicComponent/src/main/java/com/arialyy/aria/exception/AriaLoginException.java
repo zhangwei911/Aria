@@ -13,19 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.arialyy.aria.sftp.download;
+package com.arialyy.aria.exception;
 
-import com.arialyy.aria.core.download.DTaskWrapper;
-import com.arialyy.aria.sftp.BaseInfoThreadAdapter;
-import java.util.Vector;
+public class AriaLoginException extends BaseException{
+  private static final String ARIA_NET_EXCEPTION = "Aria Login Exception:";
 
-final class DSFtpInfoThreadAdapter extends BaseInfoThreadAdapter<DTaskWrapper> {
-
-  DSFtpInfoThreadAdapter(DTaskWrapper taskWrapper) {
-    super(taskWrapper);
+  public AriaLoginException(String tag, String message) {
+    super(tag, String.format("%s%s", ARIA_NET_EXCEPTION, message));
   }
 
-  @Override protected boolean handlerFile(Vector vector) {
-    return false;
+  public AriaLoginException(String tag, String message, Exception e){
+    super(tag, message, e);
   }
 }

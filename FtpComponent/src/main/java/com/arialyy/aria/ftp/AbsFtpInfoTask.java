@@ -226,8 +226,8 @@ public abstract class AbsFtpInfoTask<ENTITY extends AbsEntity, TASK_WRAPPER exte
     FTPClient temp;
     if (urlEntity.isFtps) {
       FTPSClient sClient;
-      SSLContext sslContext = SSLContextUtil.getSSLContext(urlEntity.keyAlias, urlEntity.storePath,
-          urlEntity.protocol);
+      SSLContext sslContext = SSLContextUtil.getSSLContext(
+          urlEntity.idEntity.keyAlias, urlEntity.idEntity.storePath, urlEntity.protocol);
       if (sslContext == null) {
         sClient = new FTPSClient(urlEntity.protocol, urlEntity.isImplicit);
       } else {

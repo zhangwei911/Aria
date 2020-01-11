@@ -79,16 +79,6 @@ public class FtpUrlEntity implements Cloneable {
   public InetAddress validAddr;
 
   /**
-   * 证书路径
-   */
-  public String storePath;
-
-  /**
-   * 证书密码
-   */
-  public String storePass;
-
-  /**
    * 连接协议
    * {@link ProtocolType}
    */
@@ -99,10 +89,7 @@ public class FtpUrlEntity implements Cloneable {
    */
   public boolean isImplicit = true;
 
-  /**
-   * 私钥别名
-   */
-  public String keyAlias;
+  public IdEntity idEntity;
 
   @Override public FtpUrlEntity clone() {
     FtpUrlEntity entity = null;

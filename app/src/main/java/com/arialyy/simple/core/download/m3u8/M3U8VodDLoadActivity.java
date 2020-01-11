@@ -288,7 +288,7 @@ public class M3U8VodDLoadActivity extends BaseActivity<ActivityM3u8VodBinding> {
         }
         break;
       case R.id.cancel:
-        Aria.download(this).load(mTaskId).cancel(true);
+        Aria.download(this).load(mTaskId).cancel();
         mTaskId = -1;
         break;
     }

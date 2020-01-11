@@ -17,6 +17,7 @@ package com.arialyy.aria.core.common;
 
 import android.text.TextUtils;
 import com.arialyy.aria.core.FtpUrlEntity;
+import com.arialyy.aria.core.IdEntity;
 import com.arialyy.aria.core.ProtocolType;
 import com.arialyy.aria.core.processor.IFtpUploadInterceptor;
 import com.arialyy.aria.util.ALog;
@@ -36,7 +37,7 @@ public class FtpOption extends BaseOption {
   private String charSet, userName, password, account;
   private boolean isNeedLogin = false;
   private FtpUrlEntity urlEntity;
-  private String protocol, keyAlias, storePass, storePath;
+  private String protocol;
   private boolean isImplicit = true;
   private IFtpUploadInterceptor uploadInterceptor;
   private int connMode = FtpConnectionMode.DATA_CONNECTION_MODE_PASV;
@@ -51,6 +52,7 @@ public class FtpOption extends BaseOption {
   private String serverTimeZoneId = null;
   private String systemKey = FTPServerIdentifier.SYST_UNIX;
   //---------------- ftp client 配置信息 end
+  private IdEntity idEntity = new IdEntity();
 
   public FtpOption() {
     super();
@@ -98,7 +100,7 @@ public class FtpOption extends BaseOption {
   }
 
   /**
-   * 设置证书别名
+   * 设置私钥证书别名
    *
    * @param keyAlias 别名
    */
@@ -107,12 +109,12 @@ public class FtpOption extends BaseOption {
       ALog.e(TAG, "设置证书别名失败，证书别名为空");
       return this;
     }
-    this.keyAlias = keyAlias;
+    idEntity.keyAlias = keyAlias;
     return this;
   }
 
   /**
-   * 设置证书密码
+   * 设置私钥证书密码
    *
    * @param storePass 私钥密码
    */
@@ -121,12 +123,12 @@ public class FtpOption extends BaseOption {
       ALog.e(TAG, "设置证书密码失败，证书密码为空");
       return this;
     }
-    this.storePass = storePass;
+    idEntity.prvPass = storePass;
     return this;
   }
 
   /**
-   * 设置证书路径
+   * 设置私钥证书路径
    *
    * @param storePath 证书路径
    */
@@ -135,7 +137,35 @@ public class FtpOption extends BaseOption {
       ALog.e(TAG, "设置证书路径失败，证书路径为空");
       return this;
     }
-    this.storePath = storePath;
+    idEntity.storePath = storePath;
+    return this;
+  }
+
+  /**
+   * 设置私钥证书
+   *
+   * @param prvKey 证书内容
+   */
+  public FtpOption setPrvKey(String prvKey) {
+    if (TextUtils.isEmpty(prvKey)) {
+      ALog.e(TAG, "设置私钥证书失败，证书内容为空");
+      return this;
+    }
+    idEntity.prvKey = prvKey;
+    return this;
+  }
+
+  /**
+   * 设置公钥证书
+   *
+   * @param pubKey 公钥证书内容
+   */
+  public FtpOption setPubKey(String pubKey) {
+    if (TextUtils.isEmpty(pubKey)) {
+      ALog.e(TAG, "设置公钥失败，证书内容为空");
+      return this;
+    }
+    idEntity.pubKey = pubKey;
     return this;
   }
 
@@ -296,12 +326,10 @@ public class FtpOption extends BaseOption {
     urlEntity.user = userName;
     urlEntity.password = password;
     urlEntity.account = account;
-    if (!TextUtils.isEmpty(storePath)) {
+    if (!TextUtils.isEmpty(idEntity.storePath) || !TextUtils.isEmpty(idEntity.prvKey)) {
       urlEntity.isFtps = true;
       urlEntity.protocol = protocol;
-      urlEntity.keyAlias = keyAlias;
-      urlEntity.storePass = storePass;
-      urlEntity.storePath = storePath;
+      urlEntity.idEntity = idEntity;
       urlEntity.isImplicit = isImplicit;
     }
   }

@@ -13,29 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.arialyy.aria.http.upload;
+package com.arialyy.aria.sftp;
 
-import com.arialyy.aria.core.TaskRecord;
 import com.arialyy.aria.core.common.SubThreadConfig;
-import com.arialyy.aria.core.loader.AbsNormalTTBuilder;
-import com.arialyy.aria.core.task.IThreadTaskAdapter;
-import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
 
-/**
- * @Author lyy
- * @Date 2019-09-19
- */
-final class HttpUTTBuilder extends AbsNormalTTBuilder {
-
-  HttpUTTBuilder(AbsTaskWrapper wrapper) {
-    super(wrapper);
-  }
-
-  @Override public IThreadTaskAdapter getAdapter(SubThreadConfig config) {
-    return new HttpUThreadTaskAdapter(config);
-  }
-
-  @Override public boolean handleNewTask(TaskRecord record, int totalThreadNum) {
-    return true;
-  }
+public class SFtpSubThreadCOnfig extends SubThreadConfig {
 }
