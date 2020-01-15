@@ -114,21 +114,21 @@ public class FtpOption extends BaseOption {
   }
 
   /**
-   * 设置私钥证书密码
+   * 设置ca证书密码
    *
-   * @param storePass 私钥密码
+   * @param storePass ca证书密码
    */
   public FtpOption setStorePass(String storePass) {
     if (TextUtils.isEmpty(storePass)) {
       ALog.e(TAG, "设置证书密码失败，证书密码为空");
       return this;
     }
-    idEntity.prvPass = storePass;
+    idEntity.storePass = storePass;
     return this;
   }
 
   /**
-   * 设置私钥证书路径
+   * 设置cer证书路径
    *
    * @param storePath 证书路径
    */
@@ -142,9 +142,9 @@ public class FtpOption extends BaseOption {
   }
 
   /**
-   * 设置私钥证书
+   * 设置私钥证书路径
    *
-   * @param prvKey 证书内容
+   * @param prvKey 证书路径
    */
   public FtpOption setPrvKey(String prvKey) {
     if (TextUtils.isEmpty(prvKey)) {
@@ -152,6 +152,20 @@ public class FtpOption extends BaseOption {
       return this;
     }
     idEntity.prvKey = prvKey;
+    return this;
+  }
+
+  /**
+   * 设置私钥密码
+   *
+   * @param prvKeyPass 私钥密码
+   */
+  public FtpOption setPrvKeyPass(String prvKeyPass) {
+    if (TextUtils.isEmpty(prvKeyPass)) {
+      ALog.e(TAG, "设置证书密码失败，证书密码为空");
+      return this;
+    }
+    idEntity.prvPass = prvKeyPass;
     return this;
   }
 
@@ -166,6 +180,15 @@ public class FtpOption extends BaseOption {
       return this;
     }
     idEntity.pubKey = pubKey;
+    return this;
+  }
+
+  public FtpOption setKnowHostPath(String knowHostPath){
+    if (TextUtils.isEmpty(knowHostPath)){
+      ALog.e(TAG, "knowhost 文件路径为空");
+      return this;
+    }
+    idEntity.knowHost = knowHostPath;
     return this;
   }
 
@@ -326,10 +349,10 @@ public class FtpOption extends BaseOption {
     urlEntity.user = userName;
     urlEntity.password = password;
     urlEntity.account = account;
+    urlEntity.idEntity = idEntity;
     if (!TextUtils.isEmpty(idEntity.storePath) || !TextUtils.isEmpty(idEntity.prvKey)) {
       urlEntity.isFtps = true;
       urlEntity.protocol = protocol;
-      urlEntity.idEntity = idEntity;
       urlEntity.isImplicit = isImplicit;
     }
   }

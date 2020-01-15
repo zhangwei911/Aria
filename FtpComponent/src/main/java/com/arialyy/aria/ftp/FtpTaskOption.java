@@ -15,6 +15,7 @@
  */
 package com.arialyy.aria.ftp;
 
+import android.text.TextUtils;
 import aria.apache.commons.net.ftp.FTPClientConfig;
 import com.arialyy.aria.core.FtpUrlEntity;
 import com.arialyy.aria.core.common.FtpConnectionMode;
@@ -172,7 +173,7 @@ public final class FtpTaskOption implements ITaskOption {
   }
 
   public String getCharSet() {
-    return charSet;
+    return TextUtils.isEmpty(charSet) ? "UTF-8" : charSet;
   }
 
   public void setCharSet(String charSet) {

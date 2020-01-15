@@ -20,6 +20,7 @@ import com.arialyy.aria.core.TaskRecord;
 import com.arialyy.aria.core.ThreadRecord;
 import com.arialyy.aria.core.common.RecordHandler;
 import com.arialyy.aria.core.upload.UTaskWrapper;
+import com.arialyy.aria.core.wrapper.ITaskWrapper;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.RecordUtil;
 import java.util.ArrayList;
@@ -87,7 +88,7 @@ final class FtpURecordHandler extends RecordHandler {
     tr.threadId = threadId;
     tr.startLocation = startL;
     tr.isComplete = false;
-    tr.threadType = getWrapper().getEntity().getTaskType();
+    tr.threadType = record.taskType;
     tr.endLocation = getFileSize();
     tr.blockLen = RecordUtil.getBlockLen(getFileSize(), threadId, record.threadNum);
     return tr;
@@ -100,7 +101,7 @@ final class FtpURecordHandler extends RecordHandler {
     record.threadRecords = new ArrayList<>();
     record.threadNum = threadNum;
     record.isBlock = false;
-    record.taskType = getWrapper().getEntity().getTaskType();
+    record.taskType = getWrapper().getRequestType();
     record.isGroupRecord = getEntity().isGroupChild();
 
     return record;

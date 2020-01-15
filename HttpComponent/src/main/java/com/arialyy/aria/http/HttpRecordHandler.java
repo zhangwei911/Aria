@@ -67,7 +67,7 @@ public final class HttpRecordHandler extends RecordHandler {
     tr.startLocation = startL;
     tr.isComplete = false;
 
-    tr.threadType = getEntity().getTaskType();
+    tr.threadType = record.taskType;
     //最后一个线程的结束位置即为文件的总长度
     if (threadId == (record.threadNum - 1)) {
       endL = getFileSize();
@@ -90,7 +90,7 @@ public final class HttpRecordHandler extends RecordHandler {
     } else {
       record.isBlock = false;
     }
-    record.taskType = getEntity().getTaskType();
+    record.taskType = requestType;
     record.isGroupRecord = getEntity().isGroupChild();
     if (record.isGroupRecord) {
       if (getEntity() instanceof DownloadEntity) {

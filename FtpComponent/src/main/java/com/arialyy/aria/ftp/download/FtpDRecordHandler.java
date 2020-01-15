@@ -22,6 +22,7 @@ import com.arialyy.aria.core.common.RecordHelper;
 import com.arialyy.aria.core.config.Configuration;
 import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.loader.IRecordHandler;
+import com.arialyy.aria.core.wrapper.ITaskWrapper;
 import com.arialyy.aria.util.RecordUtil;
 import java.util.ArrayList;
 
@@ -58,7 +59,7 @@ public final class FtpDRecordHandler extends RecordHandler {
     tr.threadId = threadId;
     tr.startLocation = startL;
     tr.isComplete = false;
-    tr.threadType = getWrapper().getEntity().getTaskType();
+    tr.threadType = record.taskType;
     //最后一个线程的结束位置即为文件的总长度
     if (threadId == (record.threadNum - 1)) {
       endL = getFileSize();
@@ -75,7 +76,7 @@ public final class FtpDRecordHandler extends RecordHandler {
     record.threadRecords = new ArrayList<>();
     record.threadNum = threadNum;
     record.isBlock = Configuration.getInstance().downloadCfg.isUseBlock();
-    record.taskType = getWrapper().getEntity().getTaskType();
+    record.taskType = getWrapper().getRequestType();
     record.isGroupRecord = false;
 
     return record;

@@ -13,45 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.arialyy.aria.core;
+package com.arialyy.aria.exception;
 
-/**
- * 证书信息
- */
-public class IdEntity {
+public class AriaException extends BaseException {
+  private static final String ARIA_NET_EXCEPTION = "Aria Exception:";
 
-  /**
-   * 私钥证书路径
-   */
-  public String prvKey;
+  public AriaException(String tag, String message) {
+    super(tag, String.format("%s%s", ARIA_NET_EXCEPTION, message));
+  }
 
-  /**
-   * 私钥证书密码
-   */
-  public String prvPass;
-
-  /**
-   * 公钥证书路径
-   */
-  public String pubKey;
-
-  /**
-   * knowhost文件路径
-   */
-  public String knowHost;
-
-  /**
-   * ca 证书密码
-   */
-  public String storePass;
-
-  /**
-   * ca证书路径
-   */
-  public String storePath;
-
-  /**
-   * ca证书别名
-   */
-  public String keyAlias;
+  public AriaException(String tag, String message, Exception e) {
+    super(tag, message, e);
+  }
 }

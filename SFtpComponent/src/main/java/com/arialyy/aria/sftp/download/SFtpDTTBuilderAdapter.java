@@ -16,25 +16,30 @@
 package com.arialyy.aria.sftp.download;
 
 import android.os.Handler;
+import com.arialyy.aria.core.FtpUrlEntity;
 import com.arialyy.aria.core.TaskRecord;
 import com.arialyy.aria.core.ThreadRecord;
 import com.arialyy.aria.core.common.SubThreadConfig;
+import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.loader.AbsNormalTTBuilderAdapter;
 import com.arialyy.aria.core.loader.IRecordHandler;
 import com.arialyy.aria.core.task.IThreadTaskAdapter;
+import com.arialyy.aria.ftp.FtpTaskOption;
+import com.arialyy.aria.sftp.SFtpSessionManager;
+import com.arialyy.aria.sftp.SFtpUtil;
 import com.arialyy.aria.util.ALog;
+import com.arialyy.aria.util.CommonUtil;
 import com.arialyy.aria.util.FileUtil;
-import com.jcraft.jsch.ChannelSftp;
+import com.jcraft.jsch.JSchException;
+import com.jcraft.jsch.Session;
 import java.io.File;
+import java.io.UnsupportedEncodingException;
 
 class SFtpDTTBuilderAdapter extends AbsNormalTTBuilderAdapter {
-  private ChannelSftp channel;
+  private FtpTaskOption option;
 
-  SFtpDTTBuilderAdapter() {
-  }
-
-  void setChannel(ChannelSftp channel) {
-    this.channel = channel;
+  SFtpDTTBuilderAdapter(DTaskWrapper wrapper) {
+    option = (FtpTaskOption) wrapper.getTaskOption();
   }
 
   @Override public IThreadTaskAdapter getAdapter(SubThreadConfig config) {
@@ -46,7 +51,21 @@ class SFtpDTTBuilderAdapter extends AbsNormalTTBuilderAdapter {
       boolean isBlock, int startNum) {
     SubThreadConfig config =
         super.getSubThreadConfig(stateHandler, threadRecord, isBlock, startNum);
-    config.obj = channel;
+
+    FtpUrlEntity entity = option.getUrlEntity();
+    String key =
+        CommonUtil.getStrMd5(entity.hostName + entity.port + entity.user + threadRecord.threadId);
+    Session session = SFtpSessionManager.getInstance().getSession(key);
+    if (session == null) {
+      try {
+        session = SFtpUtil.getInstance().getSession(entity, threadRecord.threadId);
+      } catch (JSchException e) {
+        e.printStackTrace();
+      } catch (UnsupportedEncodingException e) {
+        e.printStackTrace();
+      }
+    }
+    config.obj = session;
 
     return config;
   }

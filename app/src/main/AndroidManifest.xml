@@ -32,6 +32,7 @@
       </intent-filter>
     </activity>
 
+    <activity android:name=".core.download.SFtpDownloadActivity"/>
     <activity android:name=".core.download.DownloadActivity"/>
     <activity android:name=".core.download.SingleTaskActivity"/>
     <activity android:name=".core.download.mutil.MultiTaskActivity"/>

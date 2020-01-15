@@ -481,24 +481,6 @@ public class CommonUtil {
     }
   }
 
-  /**
-   * 通过流创建文件
-   */
-  public static void createFileFormInputStream(InputStream is, String path) {
-    try {
-      FileOutputStream fos = new FileOutputStream(path);
-      byte[] buf = new byte[1024];
-      int len;
-      while ((len = is.read(buf)) > 0) {
-        fos.write(buf, 0, len);
-      }
-      is.close();
-      fos.flush();
-      fos.close();
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-  }
 
   /**
    * 校验文件MD5码

@@ -47,6 +47,20 @@ public class FtpNormalTarget extends AbsNormalTarget<FtpNormalTarget> {
   }
 
   /**
+   * 设置登陆、字符串编码、sftp等参数
+   */
+  public FtpNormalTarget sftpOption(FtpOption option) {
+    if (option == null) {
+      throw new NullPointerException("ftp 任务配置为空");
+    }
+    option.setUrlEntity(CommonUtil.getFtpUrlInfo(mConfigHandler.getUrl()));
+    getTaskWrapper().getOptionParams().setParams(option);
+    getEntity().setTaskType(ITaskWrapper.D_SFTP);
+    getTaskWrapper().setRequestType(ITaskWrapper.D_SFTP);
+    return this;
+  }
+
+  /**
    * 设置文件保存文件夹路径
    * 关于文件名：
    * 1、如果保存路径是该文件的保存路径，如：/mnt/sdcard/file.zip，则使用路径中的文件名file.zip

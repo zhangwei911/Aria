@@ -72,6 +72,7 @@ dependencies {
   implementation project(':M3U8Component')
   implementation project(':FtpComponent')
   implementation project(path: ':AriaAnnotations')
+  implementation project(path: ':SFtpComponent')
 
   debugImplementation 'com.amitshekhar.android:debug-db:1.0.6'
 }

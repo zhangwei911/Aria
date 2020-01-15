@@ -17,6 +17,7 @@ package com.arialyy.aria.sftp.download;
 
 import com.arialyy.aria.core.common.CompleteInfo;
 import com.arialyy.aria.core.download.DTaskWrapper;
+import com.arialyy.aria.ftp.FtpTaskOption;
 import com.arialyy.aria.sftp.AbsSFtpInfoTask;
 import com.arialyy.aria.util.CommonUtil;
 import com.jcraft.jsch.ChannelSftp;
@@ -37,13 +38,20 @@ final class SFtpDInfoTask extends AbsSFtpInfoTask<DTaskWrapper> {
 
   @Override protected void getFileInfo(Session session) throws JSchException,
       UnsupportedEncodingException, SftpException {
+    FtpTaskOption option = (FtpTaskOption) getWrapper().getTaskOption();
     ChannelSftp channel = (ChannelSftp) session.openChannel("sftp");
-    SftpATTRS attr = channel.stat(
-        CommonUtil.convertFtpChar(getOption().getCharSet(), getWrapper().getEntity().getUrl()));
+    channel.connect(1000);
+
+    //channel.setFilenameEncoding(option.getCharSet());
+    //channel.setFilenameEncoding("gbk");
+
+    String remotePath = option.getUrlEntity().remotePath;
+    String temp = CommonUtil.convertFtpChar(getOption().getCharSet(), remotePath);
+    SftpATTRS attr = channel.stat(temp);
     getWrapper().getEntity().setFileSize(attr.getSize());
     CompleteInfo info = new CompleteInfo();
     info.code = 200;
-    info.obj = channel;
+    channel.disconnect();
     callback.onSucceed(getWrapper().getKey(), info);
   }
 }

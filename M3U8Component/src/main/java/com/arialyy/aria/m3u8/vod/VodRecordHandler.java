@@ -103,7 +103,7 @@ final class VodRecordHandler extends RecordHandler {
     tr.threadId = threadId;
     tr.isComplete = false;
     tr.startLocation = 0;
-    tr.threadType = getEntity().getTaskType();
+    tr.threadType = record.taskType;
     tr.tsUrl = mOption.getUrls().get(threadId);
     return tr;
   }
@@ -115,7 +115,7 @@ final class VodRecordHandler extends RecordHandler {
     record.threadRecords = new ArrayList<>();
     record.threadNum = threadNum;
     record.isBlock = true;
-    record.taskType = getEntity().getTaskType();
+    record.taskType = ITaskWrapper.M3U8_VOD;
     record.bandWidth = mOption.getBandWidth();
     return record;
   }

@@ -33,7 +33,7 @@ import com.arialyy.aria.ftp.download.FtpDRecordHandler;
  */
 public class SFtpDLoaderUtil extends AbsNormalLoaderUtil {
 
-  protected SFtpDLoaderUtil(AbsTaskWrapper wrapper, IEventListener listener) {
+  public SFtpDLoaderUtil(AbsTaskWrapper wrapper, IEventListener listener) {
     super(wrapper, listener);
     wrapper.generateTaskOption(FtpTaskOption.class);
   }
@@ -47,7 +47,8 @@ public class SFtpDLoaderUtil extends AbsNormalLoaderUtil {
     structure.addComponent(new FtpDRecordHandler((DTaskWrapper) getTaskWrapper()))
         .addComponent(new NormalThreadStateManager(getListener()))
         .addComponent(new SFtpDInfoTask((DTaskWrapper) getTaskWrapper()))
-        .addComponent(new NormalTTBuilder(getTaskWrapper(), new SFtpDTTBuilderAdapter()git));
+        .addComponent(new NormalTTBuilder(getTaskWrapper(), new SFtpDTTBuilderAdapter(
+            (DTaskWrapper) getTaskWrapper())));
     structure.accept(getLoader());
     return structure;
   }

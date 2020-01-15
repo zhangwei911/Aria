@@ -20,6 +20,7 @@ import com.arialyy.aria.core.ThreadRecord;
 import com.arialyy.aria.core.common.RecordHandler;
 import com.arialyy.aria.core.loader.IRecordHandler;
 import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
+import com.arialyy.aria.core.wrapper.ITaskWrapper;
 import com.arialyy.aria.m3u8.M3U8TaskOption;
 import com.arialyy.aria.util.RecordUtil;
 import java.util.ArrayList;
@@ -74,7 +75,7 @@ final class LiveRecordHandler extends RecordHandler {
     tr.taskKey = taskRecord.filePath;
     tr.isComplete = false;
     tr.tsUrl = tsUrl;
-    tr.threadType = getEntity().getTaskType();
+    tr.threadType = taskRecord.taskType;
     tr.threadId = threadId;
     tr.startLocation = 0;
     taskRecord.threadRecords.add(tr);
@@ -88,7 +89,7 @@ final class LiveRecordHandler extends RecordHandler {
     record.threadRecords = new ArrayList<>();
     record.threadNum = threadNum;
     record.isBlock = true;
-    record.taskType = getEntity().getTaskType();
+    record.taskType = ITaskWrapper.M3U8_LIVE;
     record.bandWidth = mOption.getBandWidth();
     return record;
   }

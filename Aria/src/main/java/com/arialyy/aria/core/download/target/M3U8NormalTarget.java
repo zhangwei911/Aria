@@ -21,6 +21,7 @@ import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.event.EventMsgUtil;
 import com.arialyy.aria.core.event.PeerIndexEvent;
 import com.arialyy.aria.core.queue.DTaskQueue;
+import com.arialyy.aria.core.wrapper.ITaskWrapper;
 import com.arialyy.aria.util.ALog;
 
 public class M3U8NormalTarget extends AbsNormalTarget<M3U8NormalTarget> {
@@ -28,6 +29,7 @@ public class M3U8NormalTarget extends AbsNormalTarget<M3U8NormalTarget> {
   M3U8NormalTarget(DTaskWrapper wrapper) {
     setTaskWrapper(wrapper);
     getTaskWrapper().setNewTask(false);
+    getTaskWrapper().setRequestType(ITaskWrapper.M3U8_VOD);
   }
 
   /**

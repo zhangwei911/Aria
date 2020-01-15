@@ -34,6 +34,7 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.SequenceInputStream;
@@ -62,6 +63,27 @@ public class FileUtil {
   private static final Pattern DIR_SEPORATOR = Pattern.compile("/");
   private static final String EXTERNAL_STORAGE_PATH =
       Environment.getExternalStorageDirectory().getPath();
+
+  /**
+   * 通过流创建文件
+   *
+   * @param dest 输出路径
+   */
+  public static void createFileFormInputStream(InputStream is, String dest) {
+    try {
+      FileOutputStream fos = new FileOutputStream(dest);
+      byte[] buf = new byte[1024];
+      int len;
+      while ((len = is.read(buf)) > 0) {
+        fos.write(buf, 0, len);
+      }
+      is.close();
+      fos.flush();
+      fos.close();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
 
   /**
    * 获取m3u8 ts文件的缓存目录。
@@ -295,6 +317,7 @@ public class FileUtil {
     File file = new File(targetPath);
     FileOutputStream fos = null;
     FileChannel foc = null;
+    long startTime = System.currentTimeMillis();
     try {
       if (file.exists() && file.isDirectory()) {
         ALog.w(TAG, String.format("路径【%s】是文件夹，将删除该文件夹", targetPath));
@@ -307,6 +330,7 @@ public class FileUtil {
       fos = new FileOutputStream(targetPath);
       foc = fos.getChannel();
       List<FileInputStream> streams = new LinkedList<>();
+      long fileLen = 0;
       for (String subPath : subPaths) {
         File f = new File(subPath);
         if (!f.exists()) {
@@ -319,18 +343,92 @@ public class FileUtil {
           return false;
         }
         streams.add(new FileInputStream(subPath));
+        fileLen += f.length();
       }
       Enumeration<FileInputStream> en = Collections.enumeration(streams);
       SequenceInputStream sis = new SequenceInputStream(en);
       ReadableByteChannel fic = Channels.newChannel(sis);
-      ByteBuffer bf = ByteBuffer.allocate(8196);
-      while (fic.read(bf) != -1) {
-        bf.flip();
-        foc.write(bf);
-        bf.compact();
-      }
+      //ByteBuffer bf = ByteBuffer.allocate(8196);
+      //while (fic.read(bf) != -1) {
+      //  bf.flip();
+      //  foc.write(bf);
+      //  bf.compact();
+      //}
+      foc.transferFrom(fic, 0, fileLen);
       fic.close();
       sis.close();
+      ALog.d(TAG, String.format("合并文件耗时：%sms", (System.currentTimeMillis() - startTime)));
+      return true;
+    } catch (IOException e) {
+      e.printStackTrace();
+    } finally {
+      try {
+        if (foc != null) {
+          foc.close();
+        }
+        if (fos != null) {
+          fos.close();
+        }
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+    }
+    return false;
+  }
+
+  /**
+   * 合并sftp的分块文件，sftp的分块可能会超出规定的长度，因此需要使用本方法
+   *
+   * @param targetPath 目标文件
+   * @param subPaths 碎片文件路径
+   * @param targetFileSize 文件长度
+   * @return {@code true} 合并成功，{@code false}合并失败
+   */
+  public static boolean mergeSFtpFile(String targetPath, List<String> subPaths,
+      long targetFileSize) {
+    File file = new File(targetPath);
+    FileOutputStream fos = null;
+    FileChannel foc = null;
+    long startTime = System.currentTimeMillis();
+    try {
+      if (file.exists() && file.isDirectory()) {
+        ALog.w(TAG, String.format("路径【%s】是文件夹，将删除该文件夹", targetPath));
+        FileUtil.deleteDir(file);
+      }
+      if (!file.exists()) {
+        FileUtil.createFile(file);
+      }
+
+      fos = new FileOutputStream(targetPath);
+      foc = fos.getChannel();
+      List<FileInputStream> streams = new LinkedList<>();
+      int i = 0;
+      int threadNum = subPaths.size();
+      long tempLen = targetFileSize / threadNum;
+      ALog.d(TAG, "fileSize = " + targetFileSize);
+      for (String subPath : subPaths) {
+        File f = new File(subPath);
+        if (!f.exists()) {
+          ALog.d(TAG, String.format("合并文件失败，文件【%s】不存在", subPath));
+          for (FileInputStream fis : streams) {
+            fis.close();
+          }
+          streams.clear();
+
+          return false;
+        }
+
+        long blockLen = i == (threadNum - 1) ? targetFileSize - tempLen * i : tempLen;
+        FileInputStream fis = new FileInputStream(subPath);
+        FileChannel fic = fis.getChannel();
+        ALog.d(TAG, "blcokLen = " + blockLen);
+        long rLen = foc.transferFrom(fic, 0, blockLen);
+        ALog.d(TAG, "writeLen = " + rLen);
+        fis.close();
+        i ++;
+      }
+
+      ALog.d(TAG, String.format("合并文件耗时：%sms", (System.currentTimeMillis() - startTime)));
       return true;
     } catch (IOException e) {
       e.printStackTrace();

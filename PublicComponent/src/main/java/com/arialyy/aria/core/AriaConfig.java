@@ -33,6 +33,7 @@ import com.arialyy.aria.core.config.UploadConfig;
 import com.arialyy.aria.core.config.XMLReader;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
+import com.arialyy.aria.util.FileUtil;
 import java.io.File;
 import java.io.IOException;
 import javax.xml.parsers.ParserConfigurationException;
@@ -136,7 +137,7 @@ public class AriaConfig {
         .addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
         .addTransportType(NetworkCapabilities.TRANSPORT_CELLULAR)
         .build();
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
       cm.registerNetworkCallback(request, new ConnectivityManager.NetworkCallback() {
 
         @Override public void onLost(Network network) {
@@ -152,7 +153,6 @@ public class AriaConfig {
         }
       });
     }
-
   }
 
   public boolean isConnectedNet() {
@@ -179,7 +179,7 @@ public class AriaConfig {
         if (file.exists()) {
           file.delete();
         }
-        CommonUtil.createFileFormInputStream(APP.getAssets().open("aria_config.xml"),
+        FileUtil.createFileFormInputStream(APP.getAssets().open("aria_config.xml"),
             file.getPath());
         if (!CommonUtil.checkMD5(md5Code, file) || !Configuration.getInstance().configExists()) {
           loadConfig();
@@ -204,7 +204,7 @@ public class AriaConfig {
       SAXParserFactory factory = SAXParserFactory.newInstance();
       SAXParser parser = factory.newSAXParser();
       parser.parse(APP.getAssets().open("aria_config.xml"), helper);
-      CommonUtil.createFileFormInputStream(APP.getAssets().open("aria_config.xml"),
+      FileUtil.createFileFormInputStream(APP.getAssets().open("aria_config.xml"),
           APP.getFilesDir().getPath() + Configuration.XML_FILE);
     } catch (ParserConfigurationException | IOException | SAXException e) {
       ALog.e(TAG, e.toString());

@@ -127,6 +127,9 @@ public class ComponentUtil {
       case ITaskWrapper.DG_HTTP:
         className = "com.arialyy.aria.http.download.HttpDGLoaderUtil";
         break;
+      case ITaskWrapper.D_SFTP:
+        className = "com.arialyy.aria.sftp.download.SFtpDLoaderUtil";
+        break;
     }
     if (className == null) {
       ALog.e(TAG, "不识别的类名：" + className);
@@ -170,6 +173,7 @@ public class ComponentUtil {
         break;
       case ITaskWrapper.D_FTP:
       case ITaskWrapper.D_HTTP:
+      case ITaskWrapper.D_SFTP:
         className = "com.arialyy.aria.core.listener.BaseDListener";
         break;
       case ITaskWrapper.U_FTP:

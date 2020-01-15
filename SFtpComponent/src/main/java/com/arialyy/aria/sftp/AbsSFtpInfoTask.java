@@ -15,21 +15,17 @@
  */
 package com.arialyy.aria.sftp;
 
-import android.text.TextUtils;
 import com.arialyy.aria.core.FtpUrlEntity;
-import com.arialyy.aria.core.IdEntity;
 import com.arialyy.aria.core.loader.IInfoTask;
 import com.arialyy.aria.core.loader.ILoaderVisitor;
 import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
 import com.arialyy.aria.exception.BaseException;
 import com.arialyy.aria.ftp.FtpTaskOption;
 import com.arialyy.aria.util.CommonUtil;
-import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 import com.jcraft.jsch.SftpException;
 import java.io.UnsupportedEncodingException;
-import java.util.Properties;
 
 /**
  * 进行登录，获取session，获取文件信息
@@ -51,10 +47,10 @@ public abstract class AbsSFtpInfoTask<WP extends AbsTaskWrapper> implements IInf
   @Override public void run() {
     try {
       FtpUrlEntity entity = option.getUrlEntity();
-      String key = CommonUtil.getStrMd5(entity.hostName + entity.port + entity.user);
+      String key = CommonUtil.getStrMd5(entity.hostName + entity.port + entity.user + 0);
       Session session = SFtpSessionManager.getInstance().getSession(key);
       if (session == null) {
-        session = login(entity);
+        session = SFtpUtil.getInstance().getSession(entity, 0);
       }
       getFileInfo(session);
     } catch (JSchException e) {
@@ -67,39 +63,6 @@ public abstract class AbsSFtpInfoTask<WP extends AbsTaskWrapper> implements IInf
       e.printStackTrace();
       fail(false, null);
     }
-  }
-
-  private Session login(FtpUrlEntity entity) throws JSchException, UnsupportedEncodingException {
-    JSch jSch = new JSch();
-
-    IdEntity idEntity = entity.idEntity;
-
-    if (idEntity.prvKey != null) {
-      if (idEntity.pubKey == null) {
-        jSch.addIdentity(idEntity.prvKey,
-            entity.password == null ? null : entity.password.getBytes("UTF-8"));
-      } else {
-        jSch.addIdentity(idEntity.prvKey, idEntity.pubKey,
-            entity.password == null ? null : entity.password.getBytes("UTF-8"));
-      }
-    }
-
-    Session session;
-    if (TextUtils.isEmpty(entity.user)) {
-      session = jSch.getSession(entity.url, entity.hostName, Integer.parseInt(entity.port));
-    } else {
-      session = jSch.getSession(entity.hostName);
-    }
-    if (!TextUtils.isEmpty(entity.password)) {
-      session.setPassword(entity.password);
-    }
-    Properties config = new Properties();
-    config.put("StrictHostKeyChecking", "no");
-    session.setConfig(config);// 为Session对象设置properties
-    session.setTimeout(3000);// 设置超时
-    session.setIdentityRepository(jSch.getIdentityRepository());
-    session.connect();
-    return session;
   }
 
   protected FtpTaskOption getOption() {

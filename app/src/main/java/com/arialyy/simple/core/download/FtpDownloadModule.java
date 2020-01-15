@@ -41,13 +41,36 @@ public class FtpDownloadModule extends BaseViewModule {
   private DownloadEntity singDownloadInfo;
 
   /**
-   * xx
    * 单任务下载的信息
    */
   LiveData<DownloadEntity> getFtpDownloadInfo(Context context) {
     //String url = AppUtil.getConfigValue(context, FTP_URL_KEY, ftpDefUrl);
     //String filePath = AppUtil.getConfigValue(context, FTP_PATH_KEY, ftpDefPath);
     String url = "ftp://9.9.9.72:2121/Cyberduck-6.9.4.30164.zip";
+
+    singDownloadInfo = Aria.download(context).getFirstDownloadEntity(url);
+    if (singDownloadInfo == null) {
+      singDownloadInfo = new DownloadEntity();
+      singDownloadInfo.setUrl(url);
+      String name = getFileName(ftpDefUrl);
+      singDownloadInfo.setFileName(name);
+      singDownloadInfo.setFilePath(ftpDefPath + name);
+    } else {
+      AppUtil.setConfigValue(context, FTP_PATH_KEY, singDownloadInfo.getFilePath());
+      AppUtil.setConfigValue(context, FTP_URL_KEY, singDownloadInfo.getUrl());
+    }
+    liveData.postValue(singDownloadInfo);
+
+    return liveData;
+  }
+
+  /**
+   * 单任务下载的信息
+   */
+  LiveData<DownloadEntity> getSftpDownloadInfo(Context context) {
+    //String url = AppUtil.getConfigValue(context, FTP_URL_KEY, ftpDefUrl);
+    //String filePath = AppUtil.getConfigValue(context, FTP_PATH_KEY, ftpDefPath);
+    String url = "ftp://9.9.9.72:22/Cyberduck-6.9.4.30164.zip";
 
     singDownloadInfo = Aria.download(context).getFirstDownloadEntity(url);
     if (singDownloadInfo == null) {

@@ -22,6 +22,7 @@ import android.os.Message;
 import com.arialyy.aria.core.TaskRecord;
 import com.arialyy.aria.core.inf.IThreadStateManager;
 import com.arialyy.aria.core.listener.IEventListener;
+import com.arialyy.aria.core.wrapper.ITaskWrapper;
 import com.arialyy.aria.exception.BaseException;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.FileUtil;
@@ -229,7 +230,9 @@ public class NormalThreadStateManager implements IThreadStateManager {
     for (int i = 0, len = mTaskRecord.threadNum; i < len; i++) {
       partPath.add(String.format(IRecordHandler.SUB_PATH, mTaskRecord.filePath, i));
     }
-    boolean isSuccess = FileUtil.mergeFile(mTaskRecord.filePath, partPath);
+    boolean isSuccess = mTaskRecord.taskType == ITaskWrapper.D_SFTP ?
+        FileUtil.mergeSFtpFile(mTaskRecord.filePath, partPath, mTaskRecord.fileLength)
+        : FileUtil.mergeFile(mTaskRecord.filePath, partPath);
     if (isSuccess) {
       for (String pp : partPath) {
         File f = new File(pp);

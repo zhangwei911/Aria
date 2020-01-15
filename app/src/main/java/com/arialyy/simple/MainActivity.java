@@ -38,6 +38,7 @@ import com.arialyy.simple.base.adapter.AbsRVAdapter;
 import com.arialyy.simple.base.adapter.RvItemClickSupport;
 import com.arialyy.simple.core.download.DownloadActivity;
 import com.arialyy.simple.core.download.FtpDownloadActivity;
+import com.arialyy.simple.core.download.SFtpDownloadActivity;
 import com.arialyy.simple.core.download.group.DownloadGroupActivity;
 import com.arialyy.simple.core.download.group.FTPDirDownloadActivity;
 import com.arialyy.simple.core.download.m3u8.M3U8LiveDLoadActivity;
@@ -117,6 +118,8 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
                     M3U8LiveDLoadActivity.class);
                 break;
               case 8: // sftp
+                module.startNextActivity(MainActivity.this, data.get(position),
+                    SFtpDownloadActivity.class);
                 break;
             }
           }

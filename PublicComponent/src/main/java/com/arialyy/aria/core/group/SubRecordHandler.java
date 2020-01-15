@@ -58,7 +58,7 @@ public class SubRecordHandler extends RecordHandler {
     record.threadRecords = new ArrayList<>();
     record.threadNum = threadNum;
     record.isBlock = false;
-    record.taskType = getEntity().getTaskType();
+    record.taskType = getWrapper().getRequestType();
     record.isGroupRecord = true;
     if (getEntity() instanceof DownloadEntity) {
       record.dGroupHash = ((DownloadEntity) getEntity()).getGroupHash();

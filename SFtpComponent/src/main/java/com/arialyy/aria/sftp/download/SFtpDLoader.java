@@ -34,7 +34,6 @@ import com.arialyy.aria.core.task.IThreadTask;
 import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
 import com.arialyy.aria.exception.BaseException;
 import com.arialyy.aria.util.FileUtil;
-import com.jcraft.jsch.ChannelSftp;
 import java.io.File;
 
 final class SFtpDLoader extends AbsNormalLoader {
@@ -42,7 +41,6 @@ final class SFtpDLoader extends AbsNormalLoader {
   private int startThreadNum; //启动的线程数
   private boolean isComplete = false;
   private Looper looper;
-  private ChannelSftp channelSftp;
 
   SFtpDLoader(AbsTaskWrapper wrapper, IEventListener listener) {
     super(wrapper, listener);
@@ -103,9 +101,6 @@ final class SFtpDLoader extends AbsNormalLoader {
     mStateManager.setLooper(mRecord, looper);
 
     // 创建线程任务
-    SFtpDTTBuilderAdapter ttBuild =
-        (SFtpDTTBuilderAdapter) ((NormalTTBuilder) mTTBuilder).getAdapter();
-    ttBuild.setChannel(channelSftp);
     getTaskList().addAll(mTTBuilder.buildThreadTask(mRecord,
         new Handler(looper, mStateManager.getHandlerCallback())));
     startThreadNum = mTTBuilder.getCreatedThreadNum();
@@ -143,7 +138,6 @@ final class SFtpDLoader extends AbsNormalLoader {
     mInfoTask = infoTask;
     infoTask.setCallback(new IInfoTask.Callback() {
       @Override public void onSucceed(String key, CompleteInfo info) {
-        channelSftp = (ChannelSftp) info.obj;
         startThreadTask();
       }
 

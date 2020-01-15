@@ -327,6 +327,9 @@ public class ThreadTask implements IThreadTask, IThreadTaskObserver {
     fail(mRangeProgress, e, needRetry);
   }
 
+  /**
+   * @param len 新增的长度
+   */
   @Override
   public synchronized void updateProgress(long len) {
     mRangeProgress += len;
