@@ -27,6 +27,7 @@ import com.arialyy.aria.http.ConnectionHelp;
 import com.arialyy.aria.http.HttpTaskOption;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CheckUtil;
+import com.arialyy.aria.util.CommonUtil;
 import java.io.BufferedInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -47,7 +48,7 @@ import java.util.Set;
  * Created by lyy on 2017/1/18. 下载线程
  */
 public final class M3U8ThreadTaskAdapter extends AbsThreadTaskAdapter {
-  private final String TAG = "M3U8ThreadTask";
+  private final String TAG = CommonUtil.getClassName(this);
   private HttpTaskOption mHttpTaskOption;
   private BufferedInputStream is = null;
 
@@ -167,7 +168,9 @@ public final class M3U8ThreadTaskAdapter extends AbsThreadTaskAdapter {
     conn.disconnect(); // 关闭上一个连接
     URL url = ConnectionHelp.handleUrl(newUrl, mHttpTaskOption);
     conn = ConnectionHelp.handleConnection(url, mHttpTaskOption);
-    conn.setRequestProperty("Cookie", cookies);
+    if (!TextUtils.isEmpty(cookies)){
+      conn.setRequestProperty("Cookie", cookies);
+    }
     if (mHttpTaskOption.isChunked()) {
       conn.setDoInput(true);
       conn.setChunkedStreamingMode(0);

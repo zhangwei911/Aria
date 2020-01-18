@@ -23,7 +23,7 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import com.arialyy.annotations.Download;
 import com.arialyy.aria.core.Aria;
-import com.arialyy.aria.core.common.FtpOption;
+import com.arialyy.aria.core.common.SFtpOption;
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.inf.IEntity;
 import com.arialyy.aria.core.task.DownloadTask;
@@ -105,7 +105,6 @@ public class SFtpDownloadActivity extends BaseActivity<ActivitySftpDownloadBindi
       if (!pubKey.exists()) {
         FileUtil.createFileFormInputStream(getAssets().open("id_rsa.pub"), pubKeyPath);
       }
-
     } catch (IOException e) {
       e.printStackTrace();
     }
@@ -144,8 +143,8 @@ public class SFtpDownloadActivity extends BaseActivity<ActivitySftpDownloadBindi
     }
   }
 
-  private FtpOption getFtpOption() {
-    FtpOption option = new FtpOption();
+  private SFtpOption getFtpOption() {
+    SFtpOption option = new SFtpOption();
     option.login(user, passw); // 账号密码登录
     // 证书登录
     option.setPrvKey(prvKeyPath); // 设置私钥

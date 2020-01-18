@@ -30,7 +30,6 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -134,6 +133,18 @@ public class CommonUtil {
   public static String convertFtpChar(String charSet, String str)
       throws UnsupportedEncodingException {
     return new String(str.getBytes(charSet), SERVER_CHARSET);
+  }
+
+  /**
+   * 将字符串转换为Ftp服务器默认的ISO-8859-1编码
+   *
+   * @param charSet 字符串编码
+   * @param str 需要转换的字符串
+   * @return 转换后的字符串
+   */
+  public static String convertSFtpChar(String charSet, String str)
+      throws UnsupportedEncodingException {
+    return new String(str.getBytes(), charSet);
   }
 
   /**
@@ -480,7 +491,6 @@ public class CommonUtil {
       return 1;
     }
   }
-
 
   /**
    * 校验文件MD5码

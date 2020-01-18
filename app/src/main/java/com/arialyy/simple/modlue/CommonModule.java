@@ -104,6 +104,7 @@ public class CommonModule extends BaseViewModule {
         R.drawable.ic_ftp,
         R.drawable.ic_ts,
         R.drawable.ic_live,
+        R.drawable.ic_sftp,
         R.drawable.ic_sftp
     };
     int i = 0;

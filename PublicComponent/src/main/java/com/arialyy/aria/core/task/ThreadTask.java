@@ -367,6 +367,11 @@ public class ThreadTask implements IThreadTask, IThreadTaskObserver {
     b.putLong(IThreadStateManager.DATA_ADD_LEN, mRangeProgress - mLastRangeProgress);
     msg.what = IThreadStateManager.STATE_RUNNING;
     msg.obj = mRangeProgress;
+
+    Thread loopThread = mStateHandler.getLooper().getThread();
+    if (!loopThread.isAlive() || loopThread.isInterrupted()) {
+      return;
+    }
     msg.sendToTarget();
   }
 
@@ -451,6 +456,7 @@ public class ThreadTask implements IThreadTask, IThreadTaskObserver {
       handleBlockRecord();
       ThreadTaskManager.getInstance().retryThread(this);
     } else {
+      ALog.e(TAG, String.format("任务【%s】执行失败", getFileName()));
       sendFailMsg(null, false);
     }
   }

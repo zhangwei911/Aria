@@ -39,10 +39,10 @@ import java.util.concurrent.TimeUnit;
  * 3、创建文件信息获取器，获取文件信息，根据文件信息执行任务
  * 4、创建线程任务执行下载、上传操作
  */
-public abstract class AbsNormalLoader implements ILoaderVisitor, ILoader {
+public abstract class AbsNormalLoader<T extends AbsTaskWrapper> implements ILoaderVisitor, ILoader {
   protected final String TAG = CommonUtil.getClassName(getClass());
   private IEventListener mListener;
-  protected AbsTaskWrapper mTaskWrapper;
+  protected T mTaskWrapper;
   protected File mTempFile;
 
   private List<IThreadTask> mTask = new ArrayList<>();
@@ -61,7 +61,7 @@ public abstract class AbsNormalLoader implements ILoaderVisitor, ILoader {
   protected IInfoTask mInfoTask;
   protected IThreadTaskBuilder mTTBuilder;
 
-  protected AbsNormalLoader(AbsTaskWrapper wrapper, IEventListener listener) {
+  protected AbsNormalLoader(T wrapper, IEventListener listener) {
     mListener = listener;
     mTaskWrapper = wrapper;
   }
@@ -123,7 +123,7 @@ public abstract class AbsNormalLoader implements ILoaderVisitor, ILoader {
     }
     Looper.prepare();
     Looper looper = Looper.myLooper();
-    if (looper == Looper.getMainLooper()){
+    if (looper == Looper.getMainLooper()) {
       throw new IllegalThreadStateException("不能在主线程程序中调用Loader");
     }
     isRuning = true;

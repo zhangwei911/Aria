@@ -1,6 +1,9 @@
 ## 开发日志
-  + v_3.8.4
+  + v_3.8.5 (2020/1/18)
     - fix bug https://github.com/AriaLyy/Aria/issues/599
+    - 增加密钥url转换器的参数 https://github.com/AriaLyy/Aria/issues/603
+    - 增加sftp，文件上传、下载功能，[sftp下载](https://aria.laoyuyu.me/aria_doc/download/sftp_normal.html)，[sftp上传](https://aria.laoyuyu.me/aria_doc/upload/sftp_normal.html)
+    - 使用零拷贝技术，优化了合并分块的效率
   + v_3.8.3 (2020/1/9)
     - fix bug https://github.com/AriaLyy/Aria/issues/573
     - android P适配 https://github.com/AriaLyy/Aria/issues/581

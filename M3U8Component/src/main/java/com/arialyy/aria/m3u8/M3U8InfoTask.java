@@ -375,7 +375,7 @@ final public class M3U8InfoTask implements IInfoTask {
       IKeyUrlConverter keyUrlConverter = mM3U8Option.getKeyUrlConverter();
       String keyUrl = info.keyUrl;
       if (keyUrlConverter != null) {
-        keyUrl = keyUrlConverter.convert(keyUrl);
+        keyUrl = keyUrlConverter.convert(mEntity.getUrl(), keyUrl);
       }
       if (TextUtils.isEmpty(keyUrl)) {
         ALog.e(TAG, "m3u8密钥key url 为空");

@@ -26,10 +26,8 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import com.arialyy.annotations.Upload;
 import com.arialyy.aria.core.Aria;
-import com.arialyy.aria.core.common.FtpOption;
+import com.arialyy.aria.core.common.SFtpOption;
 import com.arialyy.aria.core.inf.IEntity;
-import com.arialyy.aria.core.processor.FtpInterceptHandler;
-import com.arialyy.aria.core.processor.IFtpUploadInterceptor;
 import com.arialyy.aria.core.task.UploadTask;
 import com.arialyy.aria.core.upload.UploadEntity;
 import com.arialyy.aria.util.ALog;
@@ -39,23 +37,22 @@ import com.arialyy.frame.util.show.T;
 import com.arialyy.simple.R;
 import com.arialyy.simple.base.BaseActivity;
 import com.arialyy.simple.common.ModifyUrlDialog;
-import com.arialyy.simple.databinding.ActivityFtpUploadBinding;
+import com.arialyy.simple.databinding.ActivitySftpUploadBinding;
 import com.arialyy.simple.util.AppUtil;
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created by lyy on 2017/7/28. Ftp 文件上传demo
  */
-public class FtpUploadActivity extends BaseActivity<ActivityFtpUploadBinding> {
+public class SFtpUploadActivity extends BaseActivity<ActivitySftpUploadBinding> {
   private final int OPEN_FILE_MANAGER_CODE = 0xB1;
   private String mFilePath;
   private String mUrl;
   private UploadModule mModule;
   private long mTaskId = -1;
-  private String user = "lao", pwd = "123456";
+  private String user = "tester", pwd = "password";
 
   @Override protected void init(Bundle savedInstanceState) {
     setTile("D_FTP 文件上传");
@@ -68,7 +65,7 @@ public class FtpUploadActivity extends BaseActivity<ActivityFtpUploadBinding> {
 
   private void setUI() {
     mModule = ViewModelProviders.of(this).get(UploadModule.class);
-    mModule.getFtpInfo(this).observe(this, new Observer<UploadEntity>() {
+    mModule.getSFtpInfo(this).observe(this, new Observer<UploadEntity>() {
       @Override public void onChanged(@Nullable UploadEntity entity) {
         if (entity != null) {
           mTaskId = entity.getId();
@@ -100,7 +97,7 @@ public class FtpUploadActivity extends BaseActivity<ActivityFtpUploadBinding> {
   }
 
   @Override protected int setLayoutId() {
-    return R.layout.activity_ftp_upload;
+    return R.layout.activity_sftp_upload;
   }
 
   public void chooseUrl() {
@@ -120,8 +117,8 @@ public class FtpUploadActivity extends BaseActivity<ActivityFtpUploadBinding> {
           mTaskId = Aria.upload(this)
               .loadFtp(mFilePath)
               .setUploadUrl(mUrl)
-              .option(getOption())
-              .forceUpload()
+              .sftpOption(getOption())
+              .ignoreFilePathOccupy()
               .create();
           getBinding().setStateStr(getString(R.string.stop));
           break;
@@ -132,7 +129,7 @@ public class FtpUploadActivity extends BaseActivity<ActivityFtpUploadBinding> {
         } else {
           Aria.upload(this)
               .loadFtp(mTaskId)
-              .option(getOption())
+              .sftpOption(getOption())
               .resume();
           getBinding().setStateStr(getString(R.string.stop));
         }
@@ -162,16 +159,15 @@ public class FtpUploadActivity extends BaseActivity<ActivityFtpUploadBinding> {
       Aria.upload(this)
           .loadFtp(path)
           .setUploadUrl(mUrl)
-          .option(getOption())
-          .forceUpload()
+          .sftpOption(getOption())
+          .ignoreFilePathOccupy()
           .create();
     }
   }
 
-  private FtpOption getOption() {
-    FtpOption option = new FtpOption();
+  private SFtpOption getOption() {
+    SFtpOption option = new SFtpOption();
     option.login(user, pwd);
-    option.setUploadInterceptor(new FtpUploadInterceptor());
     return option;
   }
 
@@ -238,15 +234,6 @@ public class FtpUploadActivity extends BaseActivity<ActivityFtpUploadBinding> {
       } else {
         ALog.d(TAG, "没有选择文件");
       }
-    }
-  }
-
-  private static class FtpUploadInterceptor implements IFtpUploadInterceptor {
-    @Override public FtpInterceptHandler onIntercept(UploadEntity entity, List<String> fileList) {
-      FtpInterceptHandler.Builder builder = new FtpInterceptHandler.Builder();
-      //builder.coverServerFile(); // 覆盖远端同名文件
-      builder.resetFileName("test12.zip"); //修改上传到远端服务器的文件名
-      return builder.build();
     }
   }
 }

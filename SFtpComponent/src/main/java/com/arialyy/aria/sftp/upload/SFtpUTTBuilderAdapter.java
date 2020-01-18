@@ -13,37 +13,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.arialyy.aria.sftp.download;
+package com.arialyy.aria.sftp.upload;
 
 import android.os.Handler;
 import com.arialyy.aria.core.FtpUrlEntity;
 import com.arialyy.aria.core.TaskRecord;
 import com.arialyy.aria.core.ThreadRecord;
 import com.arialyy.aria.core.common.SubThreadConfig;
-import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.loader.AbsNormalTTBuilderAdapter;
-import com.arialyy.aria.core.loader.IRecordHandler;
 import com.arialyy.aria.core.task.IThreadTaskAdapter;
+import com.arialyy.aria.core.upload.UTaskWrapper;
 import com.arialyy.aria.sftp.SFtpSessionManager;
 import com.arialyy.aria.sftp.SFtpTaskOption;
 import com.arialyy.aria.sftp.SFtpUtil;
-import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
-import com.arialyy.aria.util.FileUtil;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
-import java.io.File;
 import java.io.UnsupportedEncodingException;
 
-final class SFtpDTTBuilderAdapter extends AbsNormalTTBuilderAdapter {
+final class SFtpUTTBuilderAdapter extends AbsNormalTTBuilderAdapter {
   private SFtpTaskOption option;
 
-  SFtpDTTBuilderAdapter(DTaskWrapper wrapper) {
+  SFtpUTTBuilderAdapter(UTaskWrapper wrapper) {
     option = (SFtpTaskOption) wrapper.getTaskOption();
   }
 
   @Override public IThreadTaskAdapter getAdapter(SubThreadConfig config) {
-    return new SFtpDThreadTaskAdapter(config);
+    return new SFtpUThreadTaskAdapter(config);
   }
 
   @Override
@@ -72,21 +68,6 @@ final class SFtpDTTBuilderAdapter extends AbsNormalTTBuilderAdapter {
 
   @Override public boolean handleNewTask(TaskRecord record, int totalThreadNum) {
 
-    if (!record.isBlock) {
-      if (getTempFile().exists()) {
-        FileUtil.deleteFile(getTempFile());
-      }
-      //CommonUtil.createFile(mTempFile.getPath());
-    } else {
-      for (int i = 0; i < totalThreadNum; i++) {
-        File blockFile =
-            new File(String.format(IRecordHandler.SUB_PATH, getTempFile().getPath(), i));
-        if (blockFile.exists()) {
-          ALog.d(TAG, String.format("分块【%s】已经存在，将删除该分块", i));
-          FileUtil.deleteFile(blockFile);
-        }
-      }
-    }
     return true;
   }
 }

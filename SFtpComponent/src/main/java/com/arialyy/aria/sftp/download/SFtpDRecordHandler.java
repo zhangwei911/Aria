@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.arialyy.aria.ftp.download;
+package com.arialyy.aria.sftp.download;
 
 import com.arialyy.aria.core.TaskRecord;
 import com.arialyy.aria.core.ThreadRecord;
@@ -30,9 +30,9 @@ import java.util.ArrayList;
  * @Author lyy
  * @Date 2019-09-19
  */
-final class FtpDRecordHandler extends RecordHandler {
+final class SFtpDRecordHandler extends RecordHandler {
 
-  FtpDRecordHandler(DTaskWrapper wrapper) {
+  SFtpDRecordHandler(DTaskWrapper wrapper) {
     super(wrapper);
   }
 
@@ -75,8 +75,8 @@ final class FtpDRecordHandler extends RecordHandler {
     record.filePath = getEntity().getFilePath();
     record.threadRecords = new ArrayList<>();
     record.threadNum = threadNum;
-    record.isBlock = Configuration.getInstance().downloadCfg.isUseBlock();
-    record.taskType = ITaskWrapper.D_FTP;
+    record.isBlock = threadNum > 1;
+    record.taskType = ITaskWrapper.D_SFTP;
     record.isGroupRecord = false;
 
     return record;

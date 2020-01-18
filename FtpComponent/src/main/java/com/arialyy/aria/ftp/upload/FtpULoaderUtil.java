@@ -41,7 +41,8 @@ public final class FtpULoaderUtil extends AbsNormalLoaderUtil {
   }
 
   @Override public AbsNormalLoader getLoader() {
-    return mLoader == null ? new FtpULoader(getTaskWrapper(), getListener()) : mLoader;
+    return mLoader == null ? new FtpULoader((UTaskWrapper) getTaskWrapper(), getListener())
+        : mLoader;
   }
 
   @Override public LoaderStructure BuildLoaderStructure() {

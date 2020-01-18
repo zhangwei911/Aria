@@ -17,6 +17,7 @@ package com.arialyy.aria.core.upload.target;
 
 import com.arialyy.aria.core.common.AbsBuilderTarget;
 import com.arialyy.aria.core.common.FtpOption;
+import com.arialyy.aria.core.common.SFtpOption;
 import com.arialyy.aria.core.upload.UploadEntity;
 import com.arialyy.aria.core.wrapper.ITaskWrapper;
 import com.arialyy.aria.util.CommonUtil;
@@ -68,6 +69,20 @@ public class FtpBuilderTarget extends AbsBuilderTarget<FtpBuilderTarget> {
     }
     option.setUrlEntity(CommonUtil.getFtpUrlInfo(url));
     getTaskWrapper().getOptionParams().setParams(option);
+    return this;
+  }
+
+  /**
+   * 设置登陆、字符串编码、sftp等参数
+   */
+  public FtpBuilderTarget sftpOption(SFtpOption option) {
+    if (option == null) {
+      throw new NullPointerException("ftp 任务配置为空");
+    }
+    option.setUrlEntity(CommonUtil.getFtpUrlInfo(url));
+    getTaskWrapper().getOptionParams().setParams(option);
+    ((UploadEntity)getEntity()).setTaskType(ITaskWrapper.U_SFTP);
+    getTaskWrapper().setRequestType(ITaskWrapper.U_SFTP);
     return this;
   }
 }

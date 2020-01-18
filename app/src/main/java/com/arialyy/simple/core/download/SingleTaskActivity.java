@@ -237,6 +237,7 @@ public class SingleTaskActivity extends BaseActivity<ActivitySingleBinding> {
 
   @Download.onTaskFail
   void taskFail(DownloadTask task, Exception e) {
+    ALog.d(TAG, "下载失败");
     Toast.makeText(SingleTaskActivity.this, getString(R.string.download_fail), Toast.LENGTH_SHORT)
         .show();
     if (task != null && task.getKey().equals(mUrl)) {

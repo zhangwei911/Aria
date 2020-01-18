@@ -17,6 +17,7 @@ package com.arialyy.aria.core.download.target;
 
 import com.arialyy.aria.core.common.AbsBuilderTarget;
 import com.arialyy.aria.core.common.FtpOption;
+import com.arialyy.aria.core.common.SFtpOption;
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.wrapper.ITaskWrapper;
 import com.arialyy.aria.util.CommonUtil;
@@ -50,7 +51,7 @@ public class FtpBuilderTarget extends AbsBuilderTarget<FtpBuilderTarget> {
   /**
    * 设置登陆、字符串编码、sftp等参数
    */
-  public FtpBuilderTarget sftpOption(FtpOption option) {
+  public FtpBuilderTarget sftpOption(SFtpOption option) {
     if (option == null) {
       throw new NullPointerException("ftp 任务配置为空");
     }

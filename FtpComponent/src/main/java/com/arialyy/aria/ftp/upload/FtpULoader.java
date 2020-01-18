@@ -25,13 +25,13 @@ import com.arialyy.aria.core.loader.IRecordHandler;
 import com.arialyy.aria.core.loader.NormalLoader;
 import com.arialyy.aria.core.manager.ThreadTaskManager;
 import com.arialyy.aria.core.task.IThreadTask;
-import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
+import com.arialyy.aria.core.upload.UTaskWrapper;
 import com.arialyy.aria.exception.BaseException;
 
-final class FtpULoader extends NormalLoader {
+final class FtpULoader extends NormalLoader<UTaskWrapper> {
   private FTPFile ftpFile;
 
-  FtpULoader(AbsTaskWrapper wrapper, IEventListener listener) {
+  FtpULoader(UTaskWrapper wrapper, IEventListener listener) {
     super(wrapper, listener);
   }
 
@@ -58,6 +58,8 @@ final class FtpULoader extends NormalLoader {
     } else {
       getListener().onStart(mStateManager.getCurrentProgress());
     }
+
+    startTimer();
 
     // 启动线程任务
     for (IThreadTask threadTask : getTaskList()) {

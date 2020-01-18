@@ -45,6 +45,7 @@ import com.arialyy.simple.core.download.m3u8.M3U8LiveDLoadActivity;
 import com.arialyy.simple.core.download.m3u8.M3U8VodDLoadActivity;
 import com.arialyy.simple.core.upload.FtpUploadActivity;
 import com.arialyy.simple.core.upload.HttpUploadActivity;
+import com.arialyy.simple.core.upload.SFtpUploadActivity;
 import com.arialyy.simple.databinding.ActivityMainBinding;
 import com.arialyy.simple.modlue.CommonModule;
 import com.arialyy.simple.to.NormalTo;
@@ -117,9 +118,13 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
                 module.startNextActivity(MainActivity.this, data.get(position),
                     M3U8LiveDLoadActivity.class);
                 break;
-              case 8: // sftp
+              case 8: // d_sftp
                 module.startNextActivity(MainActivity.this, data.get(position),
                     SFtpDownloadActivity.class);
+                break;
+              case 9: // u_sftp
+                module.startNextActivity(MainActivity.this, data.get(position),
+                    SFtpUploadActivity.class);
                 break;
             }
           }

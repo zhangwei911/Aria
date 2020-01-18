@@ -44,16 +44,19 @@ Aria有以下特点：
 
 ## 引入库
 [![license](http://img.shields.io/badge/license-Apache2.0-brightgreen.svg?style=flat)](https://github.com/AriaLyy/Aria/blob/master/LICENSE)
-[![Core](https://img.shields.io/badge/Core-3.8.3-blue)](https://github.com/AriaLyy/Aria)
-[![Compiler](https://img.shields.io/badge/Compiler-3.8.3-blue)](https://github.com/AriaLyy/Aria)
-[![FtpComponent](https://img.shields.io/badge/FtpComponent-3.8.3-orange)](https://github.com/AriaLyy/Aria)
-[![M3U8Component](https://img.shields.io/badge/M3U8Component-3.8.3-orange)](https://github.com/AriaLyy/Aria)
+[![Core](https://img.shields.io/badge/Core-3.8.5-blue)](https://github.com/AriaLyy/Aria)
+[![Compiler](https://img.shields.io/badge/Compiler-3.8.5-blue)](https://github.com/AriaLyy/Aria)
+[![FtpComponent](https://img.shields.io/badge/FtpComponent-3.8.5-orange)](https://github.com/AriaLyy/Aria)
+[![FtpComponent](https://img.shields.io/badge/SFtpComponent-3.8.5-orange)](https://github.com/AriaLyy/Aria)
+[![M3U8Component](https://img.shields.io/badge/M3U8Component-3.8.5-orange)](https://github.com/AriaLyy/Aria)
+
 
 ```java
-implementation 'com.arialyy.aria:core:3.8.3'
-annotationProcessor 'com.arialyy.aria:compiler:3.8.3'
-implementation 'com.arialyy.aria:ftpComponent:3.8.3' # 如果需要使用ftp，请增加该组件
-implementation 'com.arialyy.aria:m3u8Component:3.8.3' # 如果需要使用m3u8下载功能，请增加该组件
+implementation 'com.arialyy.aria:core:3.8.5'
+annotationProcessor 'com.arialyy.aria:compiler:3.8.5'
+implementation 'com.arialyy.aria:ftpComponent:3.8.5' # 如果需要使用ftp，请增加该组件
+implementation 'com.arialyy.aria:sftpComponent:3.8.5' # 如果需要使用ftp，请增加该组件
+implementation 'com.arialyy.aria:m3u8Component:3.8.5' # 如果需要使用m3u8下载功能，请增加该组件
 ```
 如果出现android support依赖错误，请将 `compile 'com.arialyy.aria:core:<last-version>'`替换为
 ```
@@ -139,14 +142,11 @@ protected void onCreate(Bundle savedInstanceState) {
 
 
 ### 版本日志
-+ v_3.8.3 (2020/1/9)
-    - fix bug https://github.com/AriaLyy/Aria/issues/573
-    - android P适配 https://github.com/AriaLyy/Aria/issues/581
-    - 添加ftp服务器标志 https://github.com/AriaLyy/Aria/issues/580
-    - 重构loader模块，让loader模块的代码更加清晰，去除一些不必要的线程创建
-    - 修复ftp上传完成后，删除服务器端的文件，无法重新下载的问题
-    - 增加获取执行中的任务api，详情见：https://aria.laoyuyu.me/aria_doc/api/task_list.html
-    - 增加获取剩余时间的api，详情见：https://aria.laoyuyu.me/aria_doc/start/task_explain.html
++ v_3.8.5 (2020/1/18)
+    - fix bug https://github.com/AriaLyy/Aria/issues/599
+    - 增加密钥url转换器的参数 https://github.com/AriaLyy/Aria/issues/603
+    - 增加sftp，文件上传、下载功能，[sftp下载](https://aria.laoyuyu.me/aria_doc/download/sftp_normal.html)，[sftp上传](https://aria.laoyuyu.me/aria_doc/upload/sftp_normal.html)
+    - 使用零拷贝技术，优化了合并分块的效率
     
 [更多版本记录](https://github.com/AriaLyy/Aria/blob/master/DEV_LOG.md)
 

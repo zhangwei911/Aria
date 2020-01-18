@@ -40,6 +40,7 @@ public class ComponentUtil {
   public static final int COMPONENT_TYPE_HTTP = 1;
   public static final int COMPONENT_TYPE_FTP = 2;
   public static final int COMPONENT_TYPE_M3U8 = 3;
+  public static final int COMPONENT_TYPE_SFTP = 4;
 
   private String TAG = CommonUtil.getClassName(getClass());
   private static volatile ComponentUtil INSTANCE = null;
@@ -81,6 +82,10 @@ public class ComponentUtil {
       case COMPONENT_TYPE_HTTP:
         className = "com.arialyy.aria.http.HttpTaskOption";
         errorStr = "http插件不存在，请添加http插件";
+        break;
+      case COMPONENT_TYPE_SFTP:
+        className = "com.arialyy.aria.sftp.SFtpTaskOption";
+        errorStr = "sftp插件不存在，请添加sftp插件";
         break;
     }
 
@@ -130,6 +135,9 @@ public class ComponentUtil {
       case ITaskWrapper.D_SFTP:
         className = "com.arialyy.aria.sftp.download.SFtpDLoaderUtil";
         break;
+      case ITaskWrapper.U_SFTP:
+        className = "com.arialyy.aria.sftp.upload.SFtpULoaderUtil";
+        break;
     }
     if (className == null) {
       ALog.e(TAG, "不识别的类名：" + className);
@@ -178,6 +186,7 @@ public class ComponentUtil {
         break;
       case ITaskWrapper.U_FTP:
       case ITaskWrapper.U_HTTP:
+      case ITaskWrapper.U_SFTP:
         className = "com.arialyy.aria.core.listener.BaseUListener";
         break;
       case ITaskWrapper.DG_HTTP:

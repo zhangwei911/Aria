@@ -41,6 +41,7 @@
     <item>M3U8 点播文件下载</item>
     <item>M3U8 直播文件下载</item>
     <item>SFTP 下载</item>
+    <item>SFTP 上传</item>
   </string-array>
 
   <string-array name="main_items_desc">
@@ -53,6 +54,7 @@
     <item>下载M3U8点播文件</item>
     <item>下载M3U8直播文件</item>
     <item>SFTP单文件下载</item>
+    <item>SFTP单文件上传</item>
   </string-array>
 
   <string-array name="download_items">

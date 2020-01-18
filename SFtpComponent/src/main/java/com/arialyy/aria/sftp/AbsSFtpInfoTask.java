@@ -20,7 +20,6 @@ import com.arialyy.aria.core.loader.IInfoTask;
 import com.arialyy.aria.core.loader.ILoaderVisitor;
 import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
 import com.arialyy.aria.exception.BaseException;
-import com.arialyy.aria.ftp.FtpTaskOption;
 import com.arialyy.aria.util.CommonUtil;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
@@ -34,11 +33,11 @@ public abstract class AbsSFtpInfoTask<WP extends AbsTaskWrapper> implements IInf
   protected String TAG = CommonUtil.getClassName(this);
   protected Callback callback;
   private WP wrapper;
-  private FtpTaskOption option;
+  private SFtpTaskOption option;
 
   public AbsSFtpInfoTask(WP wp) {
     this.wrapper = wp;
-    this.option = (FtpTaskOption) wrapper.getTaskOption();
+    this.option = (SFtpTaskOption) wrapper.getTaskOption();
   }
 
   protected abstract void getFileInfo(Session session)
@@ -65,7 +64,7 @@ public abstract class AbsSFtpInfoTask<WP extends AbsTaskWrapper> implements IInf
     }
   }
 
-  protected FtpTaskOption getOption() {
+  protected SFtpTaskOption getOption() {
     return option;
   }
 

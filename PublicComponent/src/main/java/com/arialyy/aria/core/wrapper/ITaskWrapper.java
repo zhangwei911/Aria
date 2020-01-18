@@ -85,6 +85,11 @@ public interface ITaskWrapper {
   int D_SFTP = 12;
 
   /**
+   * SFTP 上传
+   */
+  int U_SFTP = 13;
+
+  /**
    * 获取任务类型
    *
    * @return {@link ITaskWrapper}

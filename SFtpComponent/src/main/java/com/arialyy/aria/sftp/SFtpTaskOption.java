@@ -15,7 +15,26 @@
  */
 package com.arialyy.aria.sftp;
 
-import com.arialyy.aria.core.common.SubThreadConfig;
+import com.arialyy.aria.core.FtpUrlEntity;
+import com.arialyy.aria.core.inf.ITaskOption;
 
-public class SFtpSubThreadCOnfig extends SubThreadConfig {
+public class SFtpTaskOption implements ITaskOption {
+
+  /**
+   * 账号和密码
+   */
+  private FtpUrlEntity urlEntity;
+
+  /**
+   * 字符编码，默认为"utf-8"
+   */
+  private String charSet = "utf-8";
+
+  public FtpUrlEntity getUrlEntity() {
+    return urlEntity;
+  }
+
+  public String getCharSet() {
+    return charSet;
+  }
 }

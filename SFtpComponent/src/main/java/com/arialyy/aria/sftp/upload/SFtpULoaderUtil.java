@@ -13,15 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.arialyy.aria.sftp.download;
+package com.arialyy.aria.sftp.upload;
 
-import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.listener.IEventListener;
 import com.arialyy.aria.core.loader.AbsNormalLoader;
 import com.arialyy.aria.core.loader.AbsNormalLoaderUtil;
 import com.arialyy.aria.core.loader.LoaderStructure;
 import com.arialyy.aria.core.loader.NormalTTBuilder;
 import com.arialyy.aria.core.loader.NormalThreadStateManager;
+import com.arialyy.aria.core.upload.UTaskWrapper;
 import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
 import com.arialyy.aria.sftp.SFtpTaskOption;
 
@@ -30,25 +30,25 @@ import com.arialyy.aria.sftp.SFtpTaskOption;
  *
  * @author lyy
  */
-public class SFtpDLoaderUtil extends AbsNormalLoaderUtil {
+public class SFtpULoaderUtil extends AbsNormalLoaderUtil {
 
-  public SFtpDLoaderUtil(AbsTaskWrapper wrapper, IEventListener listener) {
+  public SFtpULoaderUtil(AbsTaskWrapper wrapper, IEventListener listener) {
     super(wrapper, listener);
     wrapper.generateTaskOption(SFtpTaskOption.class);
   }
 
   @Override public AbsNormalLoader getLoader() {
-    return mLoader == null ? new SFtpDLoader((DTaskWrapper) getTaskWrapper(), getListener())
+    return mLoader == null ? new SFtpULoader((UTaskWrapper) getTaskWrapper(), getListener())
         : mLoader;
   }
 
   @Override public LoaderStructure BuildLoaderStructure() {
     LoaderStructure structure = new LoaderStructure();
-    structure.addComponent(new SFtpDRecordHandler((DTaskWrapper) getTaskWrapper()))
+    structure.addComponent(new SFtpURecordHandler((UTaskWrapper) getTaskWrapper()))
         .addComponent(new NormalThreadStateManager(getListener()))
-        .addComponent(new SFtpDInfoTask((DTaskWrapper) getTaskWrapper()))
-        .addComponent(new NormalTTBuilder(getTaskWrapper(), new SFtpDTTBuilderAdapter(
-            (DTaskWrapper) getTaskWrapper())));
+        .addComponent(new SFtpUInfoTask((UTaskWrapper) getTaskWrapper()))
+        .addComponent(new NormalTTBuilder(getTaskWrapper(), new SFtpUTTBuilderAdapter(
+            (UTaskWrapper) getTaskWrapper())));
     structure.accept(getLoader());
     return structure;
   }

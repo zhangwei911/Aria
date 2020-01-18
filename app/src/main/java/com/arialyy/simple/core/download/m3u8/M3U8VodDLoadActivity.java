@@ -22,6 +22,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.SeekBar;
 import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.FragmentTransaction;
@@ -76,6 +77,9 @@ public class M3U8VodDLoadActivity extends BaseActivity<ActivityM3u8VodBinding> {
         if (entity == null) {
           return;
         }
+        if (entity.getM3U8Entity() != null){
+          getBinding().pb.setMax(entity.getM3U8Entity().getPeerNum());
+        }
         mTaskId = entity.getId();
         if (entity.getState() == IEntity.STATE_STOP) {
           getBinding().setStateStr(getString(R.string.resume));
@@ -98,6 +102,19 @@ public class M3U8VodDLoadActivity extends BaseActivity<ActivityM3u8VodBinding> {
       }
     });
     getBinding().setViewModel(this);
+    getBinding().pb.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+      @Override public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+
+      }
+
+      @Override public void onStartTrackingTouch(SeekBar seekBar) {
+
+      }
+
+      @Override public void onStopTrackingTouch(SeekBar seekBar) {
+        Aria.download(this).load(mTaskId).m3u8VodOption().jumPeerIndex(seekBar.getProgress());
+      }
+    });
   }
 
   public void chooseUrl() {
@@ -202,7 +219,7 @@ public class M3U8VodDLoadActivity extends BaseActivity<ActivityM3u8VodBinding> {
   @Download.onTaskStart
   void taskStart(DownloadTask task) {
     if (task.getKey().equals(mUrl)) {
-      getBinding().setFileSize(task.getConvertFileSize());
+      getBinding().pb.setMax(task.getEntity().getM3U8Entity().getPeerNum());
       ALog.d(TAG, "isComplete = " + task.isComplete() + ", state = " + task.getState());
     }
   }
@@ -364,7 +381,7 @@ public class M3U8VodDLoadActivity extends BaseActivity<ActivityM3u8VodBinding> {
 
   static  class KeyUrlConverter implements IKeyUrlConverter{
 
-    @Override public String convert(String keyUrl) {
+    @Override public String convert(String m3u8Url, String keyUrl) {
       ALog.d("TAG", "convertUrl....");
       return null;
     }

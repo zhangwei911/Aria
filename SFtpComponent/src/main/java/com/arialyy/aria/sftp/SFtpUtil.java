@@ -78,7 +78,7 @@ public class SFtpUtil {
       }
     }
 
-    setknowHost(jSch, entity);
+    setKnowHost(jSch, entity);
 
     Session session;
     if (TextUtils.isEmpty(entity.user)) {
@@ -94,14 +94,14 @@ public class SFtpUtil {
     // 不检查公钥，需要在connect之前配置，但是不安全，no 模式会自动将配对信息写入know_host文件
     config.put("StrictHostKeyChecking", "no");
     session.setConfig(config);// 为Session对象设置properties
-    session.setTimeout(3000);// 设置超时
+    session.setTimeout(5000);// 设置超时
     session.setIdentityRepository(jSch.getIdentityRepository());
     session.connect();
     SFtpSessionManager.getInstance().addSession(session, threadId);
     return session;
   }
 
-  private void setknowHost(JSch jSch, FtpUrlEntity entity) throws JSchException {
+  private void setKnowHost(JSch jSch, FtpUrlEntity entity) throws JSchException {
     IdEntity idEntity = entity.idEntity;
     if (idEntity.knowHost != null) {
       File knowFile = new File(idEntity.knowHost);

@@ -61,7 +61,7 @@ public class SFtpSessionManager {
     if (session == null) {
       ALog.w(TAG, "从缓存获取session失败，key：" + key);
     }
-    //cleanIdleSession();
+    cleanIdleSession();
     return session;
   }
 

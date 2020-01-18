@@ -142,57 +142,6 @@ public class FtpOption extends BaseOption {
   }
 
   /**
-   * 设置私钥证书路径
-   *
-   * @param prvKey 证书路径
-   */
-  public FtpOption setPrvKey(String prvKey) {
-    if (TextUtils.isEmpty(prvKey)) {
-      ALog.e(TAG, "设置私钥证书失败，证书内容为空");
-      return this;
-    }
-    idEntity.prvKey = prvKey;
-    return this;
-  }
-
-  /**
-   * 设置私钥密码
-   *
-   * @param prvKeyPass 私钥密码
-   */
-  public FtpOption setPrvKeyPass(String prvKeyPass) {
-    if (TextUtils.isEmpty(prvKeyPass)) {
-      ALog.e(TAG, "设置证书密码失败，证书密码为空");
-      return this;
-    }
-    idEntity.prvPass = prvKeyPass;
-    return this;
-  }
-
-  /**
-   * 设置公钥证书
-   *
-   * @param pubKey 公钥证书内容
-   */
-  public FtpOption setPubKey(String pubKey) {
-    if (TextUtils.isEmpty(pubKey)) {
-      ALog.e(TAG, "设置公钥失败，证书内容为空");
-      return this;
-    }
-    idEntity.pubKey = pubKey;
-    return this;
-  }
-
-  public FtpOption setKnowHostPath(String knowHostPath){
-    if (TextUtils.isEmpty(knowHostPath)){
-      ALog.e(TAG, "knowhost 文件路径为空");
-      return this;
-    }
-    idEntity.knowHost = knowHostPath;
-    return this;
-  }
-
-  /**
    * 设置安全模式，默认true
    *
    * @param isImplicit true 隐式，false 显式

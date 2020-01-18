@@ -32,7 +32,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 
-public abstract class BaseM3U8Loader extends AbsNormalLoader {
+public abstract class BaseM3U8Loader extends AbsNormalLoader<DTaskWrapper> {
   protected M3U8TaskOption mM3U8Option;
 
   public BaseM3U8Loader(DTaskWrapper wrapper, IEventListener listener) {
@@ -138,6 +138,6 @@ public abstract class BaseM3U8Loader extends AbsNormalLoader {
   }
 
   protected DownloadEntity getEntity() {
-    return (DownloadEntity) mTaskWrapper.getEntity();
+    return mTaskWrapper.getEntity();
   }
 }

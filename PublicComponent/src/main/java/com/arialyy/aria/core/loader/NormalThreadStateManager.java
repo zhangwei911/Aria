@@ -22,7 +22,6 @@ import android.os.Message;
 import com.arialyy.aria.core.TaskRecord;
 import com.arialyy.aria.core.inf.IThreadStateManager;
 import com.arialyy.aria.core.listener.IEventListener;
-import com.arialyy.aria.core.wrapper.ITaskWrapper;
 import com.arialyy.aria.exception.BaseException;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.FileUtil;
@@ -100,6 +99,11 @@ public class NormalThreadStateManager implements IThreadStateManager {
           mCompleteNum++;
           if (isComplete()) {
             ALog.d(TAG, "isComplete, completeNum = " + mCompleteNum);
+            //if (mTaskRecord.taskType == ITaskWrapper.D_SFTP) {
+            //  mergerSFtp();
+            //  mListener.onComplete();
+            //} else
+
             if (mTaskRecord.isBlock) {
               if (mergeFile()) {
                 mListener.onComplete();
@@ -216,6 +220,26 @@ public class NormalThreadStateManager implements IThreadStateManager {
   }
 
   /**
+   * 合并sftp的分块
+   */
+  private boolean mergerSFtp() {
+    if (mTaskRecord.threadNum == 1) {
+      File partFile = new File(String.format(IRecordHandler.SUB_PATH, mTaskRecord.filePath, 0));
+      return partFile.renameTo(new File(mTaskRecord.filePath));
+    }
+
+    List<String> partPath = new ArrayList<>();
+    for (int i = 0, len = mTaskRecord.threadNum; i < len; i++) {
+      partPath.add(String.format(IRecordHandler.SUB_PATH, mTaskRecord.filePath, i));
+    }
+    FileUtil.mergeSFtpFile(mTaskRecord.filePath, partPath, mTaskRecord.fileLength);
+    for (String pp : partPath) {
+      FileUtil.deleteFile(pp);
+    }
+    return true;
+  }
+
+  /**
    * 合并文件
    *
    * @return {@code true} 合并成功，{@code false}合并失败
@@ -230,15 +254,10 @@ public class NormalThreadStateManager implements IThreadStateManager {
     for (int i = 0, len = mTaskRecord.threadNum; i < len; i++) {
       partPath.add(String.format(IRecordHandler.SUB_PATH, mTaskRecord.filePath, i));
     }
-    boolean isSuccess = mTaskRecord.taskType == ITaskWrapper.D_SFTP ?
-        FileUtil.mergeSFtpFile(mTaskRecord.filePath, partPath, mTaskRecord.fileLength)
-        : FileUtil.mergeFile(mTaskRecord.filePath, partPath);
+    boolean isSuccess = FileUtil.mergeFile(mTaskRecord.filePath, partPath);
     if (isSuccess) {
       for (String pp : partPath) {
-        File f = new File(pp);
-        if (f.exists()) {
-          f.delete();
-        }
+        FileUtil.deleteFile(pp);
       }
       File targetFile = new File(mTaskRecord.filePath);
       if (targetFile.exists() && targetFile.length() > mTaskRecord.fileLength) {

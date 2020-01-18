@@ -18,8 +18,9 @@ package com.arialyy.aria.sftp.download;
 import android.os.Handler;
 import android.os.Looper;
 import com.arialyy.aria.core.common.AbsEntity;
-import com.arialyy.aria.core.common.AbsNormalEntity;
 import com.arialyy.aria.core.common.CompleteInfo;
+import com.arialyy.aria.core.download.DTaskWrapper;
+import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.event.EventMsgUtil;
 import com.arialyy.aria.core.inf.IThreadStateManager;
 import com.arialyy.aria.core.listener.IDLoadListener;
@@ -28,29 +29,27 @@ import com.arialyy.aria.core.loader.AbsNormalLoader;
 import com.arialyy.aria.core.loader.IInfoTask;
 import com.arialyy.aria.core.loader.IRecordHandler;
 import com.arialyy.aria.core.loader.IThreadTaskBuilder;
-import com.arialyy.aria.core.loader.NormalTTBuilder;
 import com.arialyy.aria.core.manager.ThreadTaskManager;
 import com.arialyy.aria.core.task.IThreadTask;
-import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
 import com.arialyy.aria.exception.BaseException;
 import com.arialyy.aria.util.FileUtil;
 import java.io.File;
 
-final class SFtpDLoader extends AbsNormalLoader {
+final class SFtpDLoader extends AbsNormalLoader<DTaskWrapper> {
 
   private int startThreadNum; //启动的线程数
   private boolean isComplete = false;
   private Looper looper;
 
-  SFtpDLoader(AbsTaskWrapper wrapper, IEventListener listener) {
+  SFtpDLoader(DTaskWrapper wrapper, IEventListener listener) {
     super(wrapper, listener);
     mTempFile = new File(getEntity().getFilePath());
     EventMsgUtil.getDefault().register(this);
     setUpdateInterval(wrapper.getConfig().getUpdateInterval());
   }
 
-  private AbsNormalEntity getEntity() {
-    return (AbsNormalEntity) mTaskWrapper.getEntity();
+  private DownloadEntity getEntity() {
+    return mTaskWrapper.getEntity();
   }
 
   @Override public long getFileSize() {

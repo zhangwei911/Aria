@@ -37,17 +37,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.SequenceInputStream;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
-import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
-import java.nio.channels.ReadableByteChannel;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Enumeration;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -342,21 +338,12 @@ public class FileUtil {
 
           return false;
         }
-        streams.add(new FileInputStream(subPath));
+        FileInputStream fis = new FileInputStream(subPath);
+        FileChannel fic = fis.getChannel();
+        foc.transferFrom(fic, fileLen, f.length());
         fileLen += f.length();
+        fis.close();
       }
-      Enumeration<FileInputStream> en = Collections.enumeration(streams);
-      SequenceInputStream sis = new SequenceInputStream(en);
-      ReadableByteChannel fic = Channels.newChannel(sis);
-      //ByteBuffer bf = ByteBuffer.allocate(8196);
-      //while (fic.read(bf) != -1) {
-      //  bf.flip();
-      //  foc.write(bf);
-      //  bf.compact();
-      //}
-      foc.transferFrom(fic, 0, fileLen);
-      fic.close();
-      sis.close();
       ALog.d(TAG, String.format("合并文件耗时：%sms", (System.currentTimeMillis() - startTime)));
       return true;
     } catch (IOException e) {
@@ -405,7 +392,6 @@ public class FileUtil {
       int i = 0;
       int threadNum = subPaths.size();
       long tempLen = targetFileSize / threadNum;
-      ALog.d(TAG, "fileSize = " + targetFileSize);
       for (String subPath : subPaths) {
         File f = new File(subPath);
         if (!f.exists()) {
@@ -421,14 +407,13 @@ public class FileUtil {
         long blockLen = i == (threadNum - 1) ? targetFileSize - tempLen * i : tempLen;
         FileInputStream fis = new FileInputStream(subPath);
         FileChannel fic = fis.getChannel();
-        ALog.d(TAG, "blcokLen = " + blockLen);
-        long rLen = foc.transferFrom(fic, 0, blockLen);
-        ALog.d(TAG, "writeLen = " + rLen);
+        foc.transferFrom(fic, blockLen * i, blockLen);
         fis.close();
-        i ++;
+        i++;
       }
 
-      ALog.d(TAG, String.format("合并文件耗时：%sms", (System.currentTimeMillis() - startTime)));
+      ALog.d(TAG, String.format("合并文件耗时：%sms，合并后的文件长度：%s", (System.currentTimeMillis() - startTime),
+          file.length()));
       return true;
     } catch (IOException e) {
       e.printStackTrace();
