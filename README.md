@@ -12,12 +12,13 @@ Aria有以下特点：
    - 支持下载FTP文件夹
    - 支持HTTP表单上传
    - 支持文件FTP断点续传上传
-   - 支持FTPS断点续传，[see](https://aria.laoyuyu.me/aria_doc/download/ftps.html)
+   - 支持FTPS断点续传，[see](https://aria.laoyuyu.me/aria_doc/api/ftp_params.html#%E4%BA%8C%E3%80%81ftps)
+   - 支持SFTP断点续传，[sftp下载](https://aria.laoyuyu.me/aria_doc/download/sftp_normal.html)，[sftp上传](https://aria.laoyuyu.me/aria_doc/upload/sftp_normal.html)
  + 支持https地址下载
    - 在配置文件中很容易就可以设置CA证书的信息
  + 支持[多线程分块下载](https://aria.laoyuyu.me/aria_doc/start/config.html)，能更有效的发挥机器IO性能
  + 支持300、301、302重定向下载链接下载
- + 支持m3u8协议的文件下载[m3u8下载](https://aria.laoyuyu.me/aria_doc/download/m3u8.html)
+ + 支持m3u8、hls协议的文件下载[m3u8下载](https://aria.laoyuyu.me/aria_doc/download/m3u8.html)
  + 支持m3u8边下边看的下载支持，[点击查看详情](https://aria.laoyuyu.me/aria_doc/download/m3u8_vod.html)
  + 下载支持文件长度动态增加，文件下载初始化时将不再占用过多的内存空间，见[动态长度配置](https://aria.laoyuyu.me/aria_doc/start/config.html#%E4%B8%8B%E8%BD%BD%E5%8A%A8%E6%80%81%E6%96%87%E4%BB%B6%E8%AF%B4%E6%98%8E)
 
@@ -58,12 +59,7 @@ implementation 'com.arialyy.aria:ftpComponent:3.8.5' # 如果需要使用ftp，�
 implementation 'com.arialyy.aria:sftpComponent:3.8.5' # 如果需要使用ftp，请增加该组件
 implementation 'com.arialyy.aria:m3u8Component:3.8.5' # 如果需要使用m3u8下载功能，请增加该组件
 ```
-如果出现android support依赖错误，请将 `compile 'com.arialyy.aria:core:<last-version>'`替换为
-```
-api('com.arialyy.aria:core:<last-version>'){
-   exclude group: 'androidx.appcompat.app'
-}
-```
+
 如果你使用的是kotlin，请使用kotlin官方提供的方法配置apt，[kotlin kapt官方配置传送门](https://www.kotlincn.net/docs/reference/kapt.html)
 
 __⚠️注意：3.5.4以下版本升级时，需要更新[配置文件](https://aria.laoyuyu.me/aria_doc/start/config.html)！！__
