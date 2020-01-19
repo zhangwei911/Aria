@@ -25,17 +25,15 @@ import android.view.View;
 import android.widget.SeekBar;
 import android.widget.Toast;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import com.arialyy.annotations.Download;
 import com.arialyy.annotations.M3U8;
 import com.arialyy.aria.core.Aria;
-import com.arialyy.aria.core.common.controller.BuilderController;
+import com.arialyy.aria.core.common.AbsEntity;
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.download.M3U8Entity;
 import com.arialyy.aria.core.download.m3u8.M3U8VodOption;
-import com.arialyy.aria.core.inf.IEntity;
 import com.arialyy.aria.core.processor.IBandWidthUrlConverter;
 import com.arialyy.aria.core.processor.IKeyUrlConverter;
 import com.arialyy.aria.core.processor.ITsMergeHandler;
@@ -50,6 +48,7 @@ import com.arialyy.simple.common.ModifyPathDialog;
 import com.arialyy.simple.common.ModifyUrlDialog;
 import com.arialyy.simple.databinding.ActivityM3u8VodBinding;
 import com.arialyy.simple.to.PeerIndex;
+import com.arialyy.simple.widget.ProgressLayout;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -77,32 +76,20 @@ public class M3U8VodDLoadActivity extends BaseActivity<ActivityM3u8VodBinding> {
         if (entity == null) {
           return;
         }
-        if (entity.getM3U8Entity() != null){
-          getBinding().pb.setMax(entity.getM3U8Entity().getPeerNum());
+        if (entity.getM3U8Entity() != null) {
+          getBinding().seekBar.setMax(entity.getM3U8Entity().getPeerNum());
         }
         mTaskId = entity.getId();
-        if (entity.getState() == IEntity.STATE_STOP) {
-          getBinding().setStateStr(getString(R.string.resume));
-        } else if (entity.getState() == IEntity.STATE_RUNNING) {
-          getBinding().setStateStr(getString(R.string.stop));
-        }
-
-        if (entity.getFileSize() != 0) {
-          getBinding().setFileSize(CommonUtil.formatFileSize(entity.getFileSize()));
-        }
-        getBinding().setProgress(entity.getPercent());
-        getBinding().setUrl(entity.getUrl());
-        getBinding().setFilePath(entity.getFilePath());
         mUrl = entity.getUrl();
         mFilePath = entity.getFilePath();
+        getBinding().pl.setInfo(entity);
         //mVideoFragment = new VideoPlayerFragment(0, entity);
         //FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         //ft.add(R.id.video_content, mVideoFragment);
         //ft.commit();
       }
     });
-    getBinding().setViewModel(this);
-    getBinding().pb.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+    getBinding().seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
       @Override public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
 
       }
@@ -113,6 +100,27 @@ public class M3U8VodDLoadActivity extends BaseActivity<ActivityM3u8VodBinding> {
 
       @Override public void onStopTrackingTouch(SeekBar seekBar) {
         Aria.download(this).load(mTaskId).m3u8VodOption().jumPeerIndex(seekBar.getProgress());
+      }
+    });
+    getBinding().pl.setBtListener(new ProgressLayout.OnProgressLayoutBtListener() {
+      @Override public void create(View v, AbsEntity entity) {
+        startD();
+      }
+
+      @Override public void stop(View v, AbsEntity entity) {
+        Aria.download(this).load(mTaskId).stop();
+      }
+
+      @Override public void resume(View v, AbsEntity entity) {
+        Aria.download(this)
+            .load(mTaskId)
+            .m3u8VodOption(getM3U8Option())
+            .resume();
+      }
+
+      @Override public void cancel(View v, AbsEntity entity) {
+        Aria.download(this).load(mTaskId).cancel();
+        mTaskId = -1;
       }
     });
   }
@@ -212,50 +220,50 @@ public class M3U8VodDLoadActivity extends BaseActivity<ActivityM3u8VodBinding> {
   @Download.onPre
   protected void onPre(DownloadTask task) {
     if (task.getKey().equals(mUrl)) {
-      getBinding().setStateStr(getString(R.string.stop));
+      ALog.d(TAG, "pre");
+      getBinding().pl.setInfo(task.getEntity());
     }
   }
 
   @Download.onTaskStart
   void taskStart(DownloadTask task) {
     if (task.getKey().equals(mUrl)) {
-      getBinding().pb.setMax(task.getEntity().getM3U8Entity().getPeerNum());
       ALog.d(TAG, "isComplete = " + task.isComplete() + ", state = " + task.getState());
+      getBinding().seekBar.setMax(task.getEntity().getM3U8Entity().getPeerNum());
+      getBinding().pl.setInfo(task.getEntity());
     }
   }
 
   @Download.onTaskRunning
   protected void running(DownloadTask task) {
     if (task.getKey().equals(mUrl)) {
-      ALog.d(TAG, "m3u8 void running, p = " + task.getPercent() + ", speed  = " + task.getConvertSpeed());
-      getBinding().setProgress(task.getPercent());
-      getBinding().setSpeed(task.getConvertSpeed());
+      ALog.d(TAG,
+          "m3u8 void running, p = " + task.getPercent() + ", speed  = " + task.getConvertSpeed());
+      getBinding().pl.setInfo(task.getEntity());
     }
   }
 
   @Download.onTaskResume
   void taskResume(DownloadTask task) {
-    ALog.d(TAG, "m3u8 vod resume");
     if (task.getKey().equals(mUrl)) {
-      getBinding().setStateStr(getString(R.string.stop));
+      ALog.d(TAG, "m3u8 vod resume");
+      getBinding().pl.setInfo(task.getEntity());
     }
   }
 
   @Download.onTaskStop
   void taskStop(DownloadTask task) {
     if (task.getKey().equals(mUrl)) {
-      getBinding().setStateStr(getString(R.string.resume));
-      getBinding().setSpeed("");
+      ALog.d(TAG, "stop");
+      getBinding().pl.setInfo(task.getEntity());
     }
   }
 
   @Download.onTaskCancel
   void taskCancel(DownloadTask task) {
     if (task.getKey().equals(mUrl)) {
-      getBinding().setProgress(0);
-      getBinding().setStateStr(getString(R.string.start));
-      getBinding().setSpeed("");
       Log.d(TAG, "cancel");
+      getBinding().pl.setInfo(task.getEntity());
     }
   }
 
@@ -265,21 +273,18 @@ public class M3U8VodDLoadActivity extends BaseActivity<ActivityM3u8VodBinding> {
       Toast.makeText(M3U8VodDLoadActivity.this, getString(R.string.download_fail),
           Toast.LENGTH_SHORT)
           .show();
-      getBinding().setStateStr(getString(R.string.start));
-      getBinding().setSpeed("");
       Log.d(TAG, "fail");
+      getBinding().pl.setInfo(task.getEntity());
     }
   }
 
   @Download.onTaskComplete
   void taskComplete(DownloadTask task) {
     if (task.getKey().equals(mUrl)) {
-      getBinding().setProgress(100);
       Toast.makeText(M3U8VodDLoadActivity.this, getString(R.string.download_success),
           Toast.LENGTH_SHORT).show();
-      getBinding().setStateStr(getString(R.string.re_start));
-      getBinding().setSpeed("");
       ALog.d(TAG, "md5: " + CommonUtil.getFileMD5(new File(task.getFilePath())));
+      getBinding().pl.setInfo(task.getEntity());
     }
   }
 
@@ -288,33 +293,11 @@ public class M3U8VodDLoadActivity extends BaseActivity<ActivityM3u8VodBinding> {
     return R.layout.activity_m3u8_vod;
   }
 
-  public void onClick(View view) {
-    switch (view.getId()) {
-      case R.id.start:
-        if (mTaskId == -1) {
-          startD();
-          break;
-        }
-        if (Aria.download(this).load(mTaskId).isRunning()) {
-          Aria.download(this).load(mTaskId).stop();
-        } else {
-          Aria.download(this)
-              .load(mTaskId)
-              .m3u8VodOption(getM3U8Option())
-              .resume();
-        }
-        break;
-      case R.id.cancel:
-        Aria.download(this).load(mTaskId).cancel();
-        mTaskId = -1;
-        break;
-    }
-  }
-
   private void startD() {
     mTaskId = Aria.download(M3U8VodDLoadActivity.this)
         .load(mUrl)
-        .setFilePath(mFilePath, true)
+        .setFilePath(mFilePath)
+        .ignoreFilePathOccupy()
         .m3u8VodOption(getM3U8Option())
         .create();
   }
@@ -326,7 +309,7 @@ public class M3U8VodDLoadActivity extends BaseActivity<ActivityM3u8VodBinding> {
         //.generateIndexFile()
         //.merge(true)
         .setVodTsUrlConvert(new VodTsUrlConverter());
-        //.setMergeHandler(new TsMergeHandler());
+    //.setMergeHandler(new TsMergeHandler());
     option.setKeyUrlConverter(new KeyUrlConverter());
     //option.setBandWidthUrlConverter(new BandWidthUrlConverter(mUrl));
     return option;
@@ -379,7 +362,7 @@ public class M3U8VodDLoadActivity extends BaseActivity<ActivityM3u8VodBinding> {
     }
   }
 
-  static  class KeyUrlConverter implements IKeyUrlConverter{
+  static class KeyUrlConverter implements IKeyUrlConverter {
 
     @Override public String convert(String m3u8Url, String keyUrl) {
       ALog.d("TAG", "convertUrl....");

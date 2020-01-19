@@ -9,10 +9,14 @@
   <string name="cancel">取消</string>
   <string name="modify_url_dialog_title">修改URL</string>
   <string name="stop">停止</string>
+  <string name="stopped">已停止</string>
   <string name="start">开始</string>
+  <string name="waiting">等待中</string>
+  <string name="state_error">任务已失败</string>
   <string name="resume">恢复</string>
   <string name="delete">删除</string>
   <string name="complete">完成</string>
+  <string name="completed">已完成</string>
   <string name="code_simple">代码示例：</string>
   <string name="download_success">下载完成</string>
   <string name="download_fail">下载失败</string>

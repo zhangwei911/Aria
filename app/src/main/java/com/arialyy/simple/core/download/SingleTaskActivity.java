@@ -20,7 +20,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.StatFs;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -32,6 +31,7 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import com.arialyy.annotations.Download;
 import com.arialyy.aria.core.Aria;
+import com.arialyy.aria.core.common.AbsEntity;
 import com.arialyy.aria.core.common.HttpOption;
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.inf.IEntity;
@@ -43,9 +43,8 @@ import com.arialyy.aria.util.CommonUtil;
 import com.arialyy.frame.util.show.T;
 import com.arialyy.simple.R;
 import com.arialyy.simple.base.BaseActivity;
-import com.arialyy.simple.common.ModifyPathDialog;
-import com.arialyy.simple.common.ModifyUrlDialog;
 import com.arialyy.simple.databinding.ActivitySingleBinding;
+import com.arialyy.simple.widget.ProgressLayout;
 import java.io.File;
 import java.util.List;
 import java.util.Map;
@@ -96,36 +95,32 @@ public class SingleTaskActivity extends BaseActivity<ActivitySingleBinding> {
           return;
         }
         mTaskId = entity.getId();
-        if (entity.getState() == IEntity.STATE_STOP) {
-          getBinding().setStateStr(getString(R.string.resume));
-        } else if (entity.getState() == IEntity.STATE_RUNNING) {
-          getBinding().setStateStr(getString(R.string.stop));
-        }
-
-        if (entity.getFileSize() != 0) {
-          getBinding().setFileSize(CommonUtil.formatFileSize(entity.getFileSize()));
-          getBinding().setProgress(entity.isComplete() ? 100
-              : (int) (entity.getCurrentProgress() * 100 / entity.getFileSize()));
-        }
-        getBinding().setUrl(entity.getUrl());
-        getBinding().setFilePath(entity.getFilePath());
         mUrl = entity.getUrl();
         mFilePath = entity.getFilePath();
+        getBinding().pl.setInfo(entity);
       }
     });
-    getBinding().setViewModel(this);
-  }
+    getBinding().pl.setBtListener(new ProgressLayout.OnProgressLayoutBtListener() {
+      @Override public void create(View v, AbsEntity entity) {
+        startD();
+      }
 
-  public void chooseUrl() {
-    ModifyUrlDialog dialog =
-        new ModifyUrlDialog(this, getString(R.string.modify_url_dialog_title), mUrl);
-    dialog.show(getSupportFragmentManager(), "ModifyUrlDialog");
-  }
+      @Override public void stop(View v, AbsEntity entity) {
+        Aria.download(this)
+            .load(mTaskId)
+            .stop();
+      }
 
-  public void chooseFilePath() {
-    ModifyPathDialog dialog =
-        new ModifyPathDialog(this, getString(R.string.modify_file_path), mFilePath);
-    dialog.show(getSupportFragmentManager(), "ModifyPathDialog");
+      @Override public void resume(View v, AbsEntity entity) {
+        Aria.download(this).load(mTaskId)
+            //.updateUrl(mUrl)
+            .resume();
+      }
+
+      @Override public void cancel(View v, AbsEntity entity) {
+        Aria.download(this).load(mTaskId).cancel();
+      }
+    });
   }
 
   @Override
@@ -174,20 +169,21 @@ public class SingleTaskActivity extends BaseActivity<ActivitySingleBinding> {
   void onWait(DownloadTask task) {
     if (task.getKey().equals(mUrl)) {
       Log.d(TAG, "wait ==> " + task.getDownloadEntity().getFileName());
+      getBinding().pl.setInfo(task.getEntity());
     }
   }
 
   @Download.onPre
   protected void onPre(DownloadTask task) {
     if (task.getKey().equals(mUrl)) {
-      getBinding().setStateStr(getString(R.string.stop));
+      getBinding().pl.setInfo(task.getEntity());
     }
   }
 
   @Download.onTaskStart
   void taskStart(DownloadTask task) {
     if (task.getKey().equals(mUrl)) {
-      getBinding().setFileSize(task.getConvertFileSize());
+      getBinding().pl.setInfo(task.getEntity());
       ALog.d(TAG, "isComplete = " + task.isComplete() + ", state = " + task.getState());
     }
   }
@@ -195,32 +191,24 @@ public class SingleTaskActivity extends BaseActivity<ActivitySingleBinding> {
   @Download.onTaskRunning
   protected void running(DownloadTask task) {
     if (task.getKey().equals(mUrl)) {
-      ALog.d(TAG, "isRunning");
-      //Log.d(TAG, task.getKey());
-      long len = task.getFileSize();
-      if (len == 0) {
-        getBinding().setProgress(0);
-      } else {
-        getBinding().setProgress(task.getPercent());
-      }
-      getBinding().setSpeed(task.getConvertSpeed());
-      getBinding().setTimeLeft(task.getConvertTimeLeft());
+      ALog.d(TAG, "isRunning" + "; state = " + task.getEntity().getState());
+      getBinding().pl.setInfo(task.getEntity());
     }
   }
 
   @Download.onTaskResume
   void taskResume(DownloadTask task) {
-    ALog.d(TAG, "resume");
     if (task.getKey().equals(mUrl)) {
-      getBinding().setStateStr(getString(R.string.stop));
+      ALog.d(TAG, "resume");
+      getBinding().pl.setInfo(task.getEntity());
     }
   }
 
   @Download.onTaskStop
   void taskStop(DownloadTask task) {
     if (task.getKey().equals(mUrl)) {
-      getBinding().setStateStr(getString(R.string.resume));
-      getBinding().setSpeed("");
+      ALog.d(TAG, "stop");
+      getBinding().pl.setInfo(task.getEntity());
     }
   }
 
@@ -228,10 +216,8 @@ public class SingleTaskActivity extends BaseActivity<ActivitySingleBinding> {
   void taskCancel(DownloadTask task) {
     if (task.getKey().equals(mUrl)) {
       mTaskId = -1;
-      getBinding().setProgress(0);
-      getBinding().setStateStr(getString(R.string.start));
-      getBinding().setSpeed("");
       Log.d(TAG, "cancel");
+      getBinding().pl.setInfo(task.getEntity());
     }
   }
 
@@ -241,48 +227,23 @@ public class SingleTaskActivity extends BaseActivity<ActivitySingleBinding> {
     Toast.makeText(SingleTaskActivity.this, getString(R.string.download_fail), Toast.LENGTH_SHORT)
         .show();
     if (task != null && task.getKey().equals(mUrl)) {
-      getBinding().setStateStr(getString(R.string.start));
+      getBinding().pl.setInfo(task.getEntity());
     }
   }
 
   @Download.onTaskComplete
   void taskComplete(DownloadTask task) {
     if (task.getKey().equals(mUrl)) {
-      getBinding().setProgress(100);
       Toast.makeText(SingleTaskActivity.this, getString(R.string.download_success),
           Toast.LENGTH_SHORT).show();
-      getBinding().setStateStr(getString(R.string.re_start));
-      getBinding().setSpeed("");
       ALog.d(TAG, "md5: " + CommonUtil.getFileMD5(new File(task.getFilePath())));
+      getBinding().pl.setInfo(task.getEntity());
     }
   }
 
   @Override
   protected int setLayoutId() {
     return R.layout.activity_single;
-  }
-
-  public void onClick(View view) {
-    switch (view.getId()) {
-      case R.id.start:
-        if (mTaskId == -1) {
-          startD();
-          break;
-        }
-        if (Aria.download(this).load(mTaskId).isRunning()) {
-          Aria.download(this)
-              .load(mTaskId)
-              .stop();
-        } else {
-          Aria.download(this).load(mTaskId)
-              //.updateUrl(mUrl)
-              .resume();
-        }
-        break;
-      case R.id.cancel:
-        Aria.download(this).load(mTaskId).cancel();
-        break;
-    }
   }
 
   private void startD() {
@@ -307,15 +268,6 @@ public class SingleTaskActivity extends BaseActivity<ActivitySingleBinding> {
 
   @Override public boolean dispatchTouchEvent(MotionEvent ev) {
     return super.dispatchTouchEvent(ev);
-  }
-
-  @Override protected void dataCallback(int result, Object data) {
-    super.dataCallback(result, data);
-    if (result == ModifyUrlDialog.MODIFY_URL_DIALOG_RESULT) {
-      mModule.uploadUrl(this, String.valueOf(data));
-    } else if (result == ModifyPathDialog.MODIFY_PATH_RESULT) {
-      mModule.updateFilePath(this, String.valueOf(data));
-    }
   }
 
   static class FileLenAdapter implements IHttpFileLenAdapter {

@@ -18,25 +18,25 @@ package com.arialyy.simple.core.download;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import com.arialyy.annotations.Download;
 import com.arialyy.aria.core.Aria;
+import com.arialyy.aria.core.common.AbsEntity;
 import com.arialyy.aria.core.common.SFtpOption;
 import com.arialyy.aria.core.download.DownloadEntity;
-import com.arialyy.aria.core.inf.IEntity;
 import com.arialyy.aria.core.task.DownloadTask;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
 import com.arialyy.aria.util.FileUtil;
-import com.arialyy.frame.util.show.L;
-import com.arialyy.frame.util.show.T;
 import com.arialyy.simple.R;
 import com.arialyy.simple.base.BaseActivity;
 import com.arialyy.simple.common.DirChooseDialog;
 import com.arialyy.simple.common.ModifyUrlDialog;
-import com.arialyy.simple.databinding.ActivitySftpDownloadBinding;
+import com.arialyy.simple.databinding.ActivitySingleBinding;
+import com.arialyy.simple.widget.ProgressLayout;
 import java.io.File;
 import java.io.IOException;
 
@@ -44,7 +44,7 @@ import java.io.IOException;
  * Created by lyy on 2017/7/25.
  * Ftp下载
  */
-public class SFtpDownloadActivity extends BaseActivity<ActivitySftpDownloadBinding> {
+public class SFtpDownloadActivity extends BaseActivity<ActivitySingleBinding> {
   private String mUrl, mFilePath;
   private FtpDownloadModule mModule;
   private long mTaskId;
@@ -67,29 +67,36 @@ public class SFtpDownloadActivity extends BaseActivity<ActivitySftpDownloadBindi
           return;
         }
         mTaskId = entity.getId();
-        if (entity.getState() == IEntity.STATE_STOP) {
-          getBinding().setStateStr(getString(R.string.resume));
-        } else if (entity.getState() == IEntity.STATE_RUNNING) {
-          getBinding().setStateStr(getString(R.string.stop));
-        }
-
-        if (entity.getFileSize() != 0) {
-          getBinding().setFileSize(CommonUtil.formatFileSize(entity.getFileSize()));
-          getBinding().setProgress(entity.isComplete() ? 100
-              : (int) (entity.getCurrentProgress() * 100 / entity.getFileSize()));
-        }
-        getBinding().setUrl(entity.getUrl());
-        getBinding().setFilePath(entity.getFilePath());
         mUrl = entity.getUrl();
         mFilePath = entity.getFilePath();
+        getBinding().pl.setInfo(entity);
       }
     });
-    getBinding().setViewModel(this);
-    //try {
-    //  getBinding().codeView.setSource(AppUtil.getHelpCode(this, "FtpDownload.java"));
-    //} catch (IOException e) {
-    //  e.printStackTrace();
-    //}
+    getBinding().pl.setBtListener(new ProgressLayout.OnProgressLayoutBtListener() {
+      @Override public void create(View v, AbsEntity entity) {
+        mTaskId = Aria.download(this).loadFtp(mUrl)
+            .setFilePath(mFilePath)
+            .ignoreFilePathOccupy()
+            .sftpOption(getFtpOption())
+            .create();
+      }
+
+      @Override public void stop(View v, AbsEntity entity) {
+        Aria.download(this).loadFtp(mTaskId).stop();
+      }
+
+      @Override public void resume(View v, AbsEntity entity) {
+        Aria.download(this)
+            .loadFtp(mTaskId)
+            .sftpOption(getFtpOption())
+            .resume();
+      }
+
+      @Override public void cancel(View v, AbsEntity entity) {
+        Aria.download(this).loadFtp(mTaskId).cancel(true);
+        mTaskId = -1;
+      }
+    });
   }
 
   private void copyKey() {
@@ -107,39 +114,6 @@ public class SFtpDownloadActivity extends BaseActivity<ActivitySftpDownloadBindi
       }
     } catch (IOException e) {
       e.printStackTrace();
-    }
-  }
-
-  public void onClick(View view) {
-
-    switch (view.getId()) {
-      case R.id.start:
-
-        if (mTaskId == -1) {
-          mTaskId = Aria.download(this).loadFtp(mUrl)
-              .setFilePath(mFilePath, true)
-              .sftpOption(getFtpOption())
-              .create();
-          getBinding().setStateStr(getString(R.string.stop));
-          break;
-        }
-        if (Aria.download(this).load(mTaskId).isRunning()) {
-          getBinding().setStateStr(getString(R.string.resume));
-          Aria.download(this).loadFtp(mTaskId).stop();
-        } else {
-          Aria.download(this)
-              .loadFtp(mTaskId)
-              .sftpOption(getFtpOption())
-              .resume();
-          getBinding().setStateStr(getString(R.string.stop));
-        }
-        break;
-
-      case R.id.cancel:
-        Aria.download(this).loadFtp(mTaskId).cancel(true);
-        getBinding().setStateStr(getString(R.string.start));
-        mTaskId = -1;
-        break;
     }
   }
 
@@ -168,56 +142,84 @@ public class SFtpDownloadActivity extends BaseActivity<ActivitySftpDownloadBindi
     dirChooseDialog.show(getSupportFragmentManager(), "DirChooseDialog");
   }
 
-  @Download.onPre() protected void onPre(DownloadTask task) {
-    L.d(TAG, "ftp pre");
+  @Download.onWait
+  void onWait(DownloadTask task) {
+    if (task.getKey().equals(mUrl)) {
+      Log.d(TAG, "wait ==> " + task.getDownloadEntity().getFileName());
+      getBinding().pl.setInfo(task.getEntity());
+    }
   }
 
-  @Download.onTaskPre() protected void onTaskPre(DownloadTask task) {
-    L.d(TAG, "ftp task pre, fileSize = " + task.getConvertFileSize());
-    getBinding().setFileSize(task.getConvertFileSize());
+  @Download.onPre
+  protected void onPre(DownloadTask task) {
+    if (task.getKey().equals(mUrl)) {
+      getBinding().pl.setInfo(task.getEntity());
+    }
   }
 
-  @Download.onTaskStart() void taskStart(DownloadTask task) {
-    L.d(TAG, "ftp task create");
+  @Download.onTaskStart
+  void taskStart(DownloadTask task) {
+    if (task.getKey().equals(mUrl)) {
+      getBinding().pl.setInfo(task.getEntity());
+      ALog.d(TAG, "isComplete = " + task.isComplete() + ", state = " + task.getState());
+    }
   }
 
-  @Download.onTaskRunning() protected void running(DownloadTask task) {
-    ALog.d(TAG, "running, p = " + task.getPercent() + ", speed = " + task.getConvertSpeed());
-    getBinding().setProgress(task.getPercent());
-    getBinding().setSpeed(task.getConvertSpeed());
+  @Download.onTaskRunning
+  protected void running(DownloadTask task) {
+    if (task.getKey().equals(mUrl)) {
+      ALog.d(TAG, "isRunning" + "; state = " + task.getEntity().getState());
+      getBinding().pl.setInfo(task.getEntity());
+    }
   }
 
-  @Download.onTaskResume() void taskResume(DownloadTask task) {
-    L.d(TAG, "ftp task resume");
+  @Download.onTaskResume
+  void taskResume(DownloadTask task) {
+    if (task.getKey().equals(mUrl)) {
+      ALog.d(TAG, "resume");
+      getBinding().pl.setInfo(task.getEntity());
+    }
   }
 
-  @Download.onTaskStop() void taskStop(DownloadTask task) {
-    L.d(TAG, "ftp task stop");
-    getBinding().setSpeed("");
-    getBinding().setStateStr(getString(R.string.resume));
+  @Download.onTaskStop
+  void taskStop(DownloadTask task) {
+    if (task.getKey().equals(mUrl)) {
+      ALog.d(TAG, "stop");
+      getBinding().pl.setInfo(task.getEntity());
+    }
   }
 
-  @Download.onTaskCancel() void taskCancel(DownloadTask task) {
-    getBinding().setSpeed("");
-    getBinding().setProgress(0);
+  @Download.onTaskCancel
+  void taskCancel(DownloadTask task) {
+    if (task.getKey().equals(mUrl)) {
+      mTaskId = -1;
+      Log.d(TAG, "cancel");
+      getBinding().pl.setInfo(task.getEntity());
+    }
   }
 
-  @Download.onTaskFail() void taskFail(DownloadTask task) {
-    L.d(TAG, "ftp task fail");
-    getBinding().setSpeed("");
-    getBinding().setStateStr(getString(R.string.resume));
+  @Download.onTaskFail
+  void taskFail(DownloadTask task, Exception e) {
+    ALog.d(TAG, "下载失败");
+    Toast.makeText(this, getString(R.string.download_fail), Toast.LENGTH_SHORT)
+        .show();
+    if (task != null && task.getKey().equals(mUrl)) {
+      getBinding().pl.setInfo(task.getEntity());
+    }
   }
 
-  @Download.onTaskComplete() void taskComplete(DownloadTask task) {
-    getBinding().setSpeed("");
-    getBinding().setProgress(100);
-    getBinding().setStateStr(getString(R.string.re_start));
-    Log.d(TAG, "md5 ==> " + CommonUtil.getFileMD5(new File(task.getFilePath())));
-    T.showShort(this, "文件：" + task.getEntity().getFileName() + "，下载完成");
+  @Download.onTaskComplete
+  void taskComplete(DownloadTask task) {
+    if (task.getKey().equals(mUrl)) {
+      Toast.makeText(this, getString(R.string.download_success),
+          Toast.LENGTH_SHORT).show();
+      ALog.d(TAG, "md5: " + CommonUtil.getFileMD5(new File(task.getFilePath())));
+      getBinding().pl.setInfo(task.getEntity());
+    }
   }
 
   @Override protected int setLayoutId() {
-    return R.layout.activity_sftp_download;
+    return R.layout.activity_single;
   }
 
   @Override protected void dataCallback(int result, Object data) {

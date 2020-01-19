@@ -60,10 +60,6 @@ final class HttpDThreadTaskAdapter extends BaseHttpThreadTaskAdapter {
     HttpURLConnection conn = null;
     BufferedInputStream is = null;
     BufferedRandomAccessFile file = null;
-    if (getThreadRecord().threadId == 1){
-      fail(null, false);
-      return;
-    }
     try {
       URL url = ConnectionHelp.handleUrl(getThreadConfig().url, mTaskOption);
       conn = ConnectionHelp.handleConnection(url, mTaskOption);

@@ -15,38 +15,31 @@
  */
 package com.arialyy.simple.core.upload;
 
-import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import com.arialyy.annotations.Upload;
 import com.arialyy.aria.core.Aria;
+import com.arialyy.aria.core.common.AbsEntity;
 import com.arialyy.aria.core.common.SFtpOption;
-import com.arialyy.aria.core.inf.IEntity;
 import com.arialyy.aria.core.task.UploadTask;
 import com.arialyy.aria.core.upload.UploadEntity;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
-import com.arialyy.frame.util.FileUtil;
-import com.arialyy.frame.util.show.T;
 import com.arialyy.simple.R;
 import com.arialyy.simple.base.BaseActivity;
-import com.arialyy.simple.common.ModifyUrlDialog;
-import com.arialyy.simple.databinding.ActivitySftpUploadBinding;
-import com.arialyy.simple.util.AppUtil;
+import com.arialyy.simple.databinding.ActivitySingleBinding;
+import com.arialyy.simple.widget.ProgressLayout;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by lyy on 2017/7/28. Ftp 文件上传demo
  */
-public class SFtpUploadActivity extends BaseActivity<ActivitySftpUploadBinding> {
+public class SFtpUploadActivity extends BaseActivity<ActivitySingleBinding> {
   private final int OPEN_FILE_MANAGER_CODE = 0xB1;
   private String mFilePath;
   private String mUrl;
@@ -59,7 +52,6 @@ public class SFtpUploadActivity extends BaseActivity<ActivitySftpUploadBinding> 
     super.init(savedInstanceState);
     Aria.upload(this).register();
 
-    getBinding().setViewModel(this);
     setUI();
   }
 
@@ -69,100 +61,42 @@ public class SFtpUploadActivity extends BaseActivity<ActivitySftpUploadBinding> 
       @Override public void onChanged(@Nullable UploadEntity entity) {
         if (entity != null) {
           mTaskId = entity.getId();
-          if (entity.getFileSize() != 0) {
-            getBinding().setFileSize(CommonUtil.formatFileSize(entity.getFileSize()));
-            getBinding().setProgress(entity.isComplete() ? 100
-                : (int) (entity.getCurrentProgress() * 100 / entity.getFileSize()));
-          }
-          getBinding().setUrl(entity.getUrl());
-          getBinding().setFilePath(entity.getFilePath());
           mUrl = entity.getUrl();
           mFilePath = entity.getFilePath();
-          getBinding().setStateStr(getString(
-              entity.getState() == IEntity.STATE_RUNNING ? R.string.stop : R.string.start));
-        } else {
-          getBinding().setStateStr(getString(R.string.resume));
+          getBinding().pl.setInfo(entity);
         }
       }
     });
-    setHelpCode();
-  }
+    getBinding().pl.setBtListener(new ProgressLayout.OnProgressLayoutBtListener() {
+      @Override public void create(View v, AbsEntity entity) {
+        mTaskId = Aria.upload(this)
+            .loadFtp(mFilePath)
+            .setUploadUrl(mUrl)
+            .sftpOption(getOption())
+            .ignoreFilePathOccupy()
+            .create();
+      }
 
-  private void setHelpCode() {
-    //try {
-    //  getBinding().codeView.setSource(AppUtil.getHelpCode(this, "FtpUpload.java"));
-    //} catch (IOException e) {
-    //  e.printStackTrace();
-    //}
+      @Override public void stop(View v, AbsEntity entity) {
+        Aria.upload(this).loadFtp(mTaskId).stop();
+      }
+
+      @Override public void resume(View v, AbsEntity entity) {
+        Aria.upload(this)
+            .loadFtp(mTaskId)
+            .sftpOption(getOption())
+            .resume();
+      }
+
+      @Override public void cancel(View v, AbsEntity entity) {
+        Aria.upload(this).loadFtp(mTaskId).cancel(false);
+        mTaskId = -1;
+      }
+    });
   }
 
   @Override protected int setLayoutId() {
-    return R.layout.activity_sftp_upload;
-  }
-
-  public void chooseUrl() {
-    ModifyUrlDialog dialog =
-        new ModifyUrlDialog(this, getString(R.string.modify_url_dialog_title), mUrl);
-    dialog.show(getSupportFragmentManager(), "ModifyUrlDialog");
-  }
-
-  public void chooseFilePath() {
-    AppUtil.chooseFile(this, new File(mFilePath), null, OPEN_FILE_MANAGER_CODE);
-  }
-
-  public void onClick(View view) {
-    switch (view.getId()) {
-      case R.id.start:
-        if (mTaskId == -1) {
-          mTaskId = Aria.upload(this)
-              .loadFtp(mFilePath)
-              .setUploadUrl(mUrl)
-              .sftpOption(getOption())
-              .ignoreFilePathOccupy()
-              .create();
-          getBinding().setStateStr(getString(R.string.stop));
-          break;
-        }
-        if (Aria.upload(this).loadFtp(mTaskId).isRunning()) {
-          Aria.upload(this).loadFtp(mTaskId).stop();
-          getBinding().setStateStr(getString(R.string.resume));
-        } else {
-          Aria.upload(this)
-              .loadFtp(mTaskId)
-              .sftpOption(getOption())
-              .resume();
-          getBinding().setStateStr(getString(R.string.stop));
-        }
-        //upload();
-        break;
-      case R.id.cancel:
-        Aria.upload(this).loadFtp(mTaskId).cancel(false);
-        mTaskId = -1;
-        getBinding().setStateStr(getString(R.string.start));
-        break;
-    }
-  }
-
-  private void upload() {
-    List<String> paths = new ArrayList<>();
-    paths.add(Environment.getExternalStorageDirectory().getPath() + "/Download/img/img/1.jpg");
-    paths.add(Environment.getExternalStorageDirectory().getPath() + "/Download/img/img/2.jpg");
-    paths.add(Environment.getExternalStorageDirectory().getPath() + "/Download/img/img/3.jpg");
-    paths.add(Environment.getExternalStorageDirectory().getPath() + "/Download/img/img/4.jpg");
-    paths.add(Environment.getExternalStorageDirectory().getPath() + "/Download/img/img/5.jpg");
-    paths.add(Environment.getExternalStorageDirectory().getPath() + "/Download/img/img/6.jpg");
-    paths.add(Environment.getExternalStorageDirectory().getPath() + "/Download/img/img/7.jpg");
-    paths.add(Environment.getExternalStorageDirectory().getPath() + "/Download/img/img/8.jpg");
-    paths.add(Environment.getExternalStorageDirectory().getPath() + "/Download/img/img/9.jpg");
-    paths.add(Environment.getExternalStorageDirectory().getPath() + "/Download/img/img/10.jpg");
-    for (String path : paths) {
-      Aria.upload(this)
-          .loadFtp(path)
-          .setUploadUrl(mUrl)
-          .sftpOption(getOption())
-          .ignoreFilePathOccupy()
-          .create();
-    }
+    return R.layout.activity_single;
   }
 
   private SFtpOption getOption() {
@@ -171,69 +105,79 @@ public class SFtpUploadActivity extends BaseActivity<ActivitySftpUploadBinding> 
     return option;
   }
 
-  @Upload.onWait void onWait(UploadTask task) {
-    Log.d(TAG, task.getTaskName() + "_wait");
-  }
-
-  @Upload.onPre public void onPre(UploadTask task) {
-    getBinding().setFileSize(task.getConvertFileSize());
-  }
-
-  @Upload.onTaskStart public void taskStart(UploadTask task) {
-    Log.d(TAG, "开始上传，md5：" + FileUtil.getFileMD5(new File(task.getEntity().getFilePath())));
-  }
-
-  @Upload.onTaskResume public void taskResume(UploadTask task) {
-    Log.d(TAG, "恢复上传");
-  }
-
-  @Upload.onTaskStop public void taskStop(UploadTask task) {
-    getBinding().setSpeed("");
-    Log.d(TAG, "停止上传");
-  }
-
-  @Upload.onTaskCancel public void taskCancel(UploadTask task) {
-    getBinding().setSpeed("");
-    getBinding().setFileSize("");
-    getBinding().setProgress(0);
-    Log.d(TAG, "删除任务");
-  }
-
-  @Upload.onTaskFail public void taskFail(UploadTask task) {
-    Log.d(TAG, "上传失败");
-    getBinding().setStateStr(getString(R.string.resume));
-  }
-
-  @Upload.onTaskRunning public void taskRunning(UploadTask task) {
-    Log.d(TAG, "PP = " + task.getPercent());
-    getBinding().setProgress(task.getPercent());
-    getBinding().setSpeed(task.getConvertSpeed());
-  }
-
-  @Upload.onTaskComplete public void taskComplete(UploadTask task) {
-    getBinding().setProgress(100);
-    getBinding().setSpeed("");
-    T.showShort(this, "文件：" + task.getEntity().getFileName() + "，上传完成");
-    getBinding().setStateStr(getString(R.string.re_start));
-  }
-
-  @Override protected void dataCallback(int result, Object data) {
-    super.dataCallback(result, data);
-    if (result == ModifyUrlDialog.MODIFY_URL_DIALOG_RESULT) {
-      mModule.updateFtpUrl(this, String.valueOf(data));
+  @Upload.onWait
+  void onWait(UploadTask task) {
+    if (task.getKey().equals(mUrl)) {
+      Log.d(TAG, "wait ==> " + task.getEntity().getFileName());
+      getBinding().pl.setInfo(task.getEntity());
     }
   }
 
-  @Override protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-    super.onActivityResult(requestCode, resultCode, data);
-    if (requestCode == OPEN_FILE_MANAGER_CODE && resultCode == RESULT_OK) {
-      Uri uri = data.getData();
-      if (uri != null) {
-        mModule.updateFtpFilePath(this, uri.getPath());
-        ALog.d(TAG, String.format("选择的文件路径：%s", uri.getPath()));
-      } else {
-        ALog.d(TAG, "没有选择文件");
-      }
+  @Upload.onPre
+  protected void onPre(UploadTask task) {
+    if (task.getKey().equals(mUrl)) {
+      getBinding().pl.setInfo(task.getEntity());
+    }
+  }
+
+  @Upload.onTaskStart
+  void taskStart(UploadTask task) {
+    if (task.getKey().equals(mUrl)) {
+      getBinding().pl.setInfo(task.getEntity());
+      ALog.d(TAG, "isComplete = " + task.isComplete() + ", state = " + task.getState());
+    }
+  }
+
+  @Upload.onTaskRunning
+  protected void running(UploadTask task) {
+    if (task.getKey().equals(mUrl)) {
+      ALog.d(TAG, "isRunning" + "; state = " + task.getEntity().getState());
+      getBinding().pl.setInfo(task.getEntity());
+    }
+  }
+
+  @Upload.onTaskResume
+  void taskResume(UploadTask task) {
+    if (task.getKey().equals(mUrl)) {
+      ALog.d(TAG, "resume");
+      getBinding().pl.setInfo(task.getEntity());
+    }
+  }
+
+  @Upload.onTaskStop
+  void taskStop(UploadTask task) {
+    if (task.getKey().equals(mUrl)) {
+      ALog.d(TAG, "stop");
+      getBinding().pl.setInfo(task.getEntity());
+    }
+  }
+
+  @Upload.onTaskCancel
+  void taskCancel(UploadTask task) {
+    if (task.getKey().equals(mUrl)) {
+      mTaskId = -1;
+      Log.d(TAG, "cancel");
+      getBinding().pl.setInfo(task.getEntity());
+    }
+  }
+
+  @Upload.onTaskFail
+  void taskFail(UploadTask task, Exception e) {
+    ALog.d(TAG, "fail");
+    Toast.makeText(this, getString(R.string.download_fail), Toast.LENGTH_SHORT)
+        .show();
+    if (task != null && task.getKey().equals(mUrl)) {
+      getBinding().pl.setInfo(task.getEntity());
+    }
+  }
+
+  @Upload.onTaskComplete
+  void taskComplete(UploadTask task) {
+    if (task.getKey().equals(mUrl)) {
+      Toast.makeText(this, getString(R.string.download_success),
+          Toast.LENGTH_SHORT).show();
+      ALog.d(TAG, "md5: " + CommonUtil.getFileMD5(new File(task.getEntity().getFilePath())));
+      getBinding().pl.setInfo(task.getEntity());
     }
   }
 }

@@ -116,7 +116,7 @@ public class CheckDGEntityUtil implements ICheckEntityUtil {
   @Override
   public boolean checkEntity() {
     if (mWrapper.getErrorEvent() != null) {
-      ALog.e(TAG, String.format("操作失败，%s", mWrapper.getErrorEvent().errorMsg));
+      ALog.e(TAG, String.format("任务操作失败，%s", mWrapper.getErrorEvent().errorMsg));
       return false;
     }
 
