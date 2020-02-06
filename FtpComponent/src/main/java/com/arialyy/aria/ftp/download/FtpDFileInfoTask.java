@@ -21,7 +21,7 @@ import aria.apache.commons.net.ftp.FTPReply;
 import com.arialyy.aria.core.common.CompleteInfo;
 import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.download.DownloadEntity;
-import com.arialyy.aria.exception.AriaIOException;
+import com.arialyy.aria.exception.AriaFTPException;
 import com.arialyy.aria.ftp.AbsFtpInfoTask;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.FileUtil;
@@ -41,7 +41,7 @@ final class FtpDFileInfoTask extends AbsFtpInfoTask<DownloadEntity, DTaskWrapper
   @Override protected void handleFile(String remotePath, FTPFile ftpFile) {
     super.handleFile(remotePath, ftpFile);
     if (!FileUtil.checkMemorySpace(mEntity.getFilePath(), ftpFile.getSize())) {
-      callback.onFail(mEntity, new AriaIOException(TAG,
+      callback.onFail(mEntity, new AriaFTPException(TAG,
               String.format("获取ftp文件信息失败，内存空间不足, filePath: %s", mEntity.getFilePath())),
           false);
     }

@@ -31,8 +31,7 @@ import com.arialyy.aria.core.common.FtpConnectionMode;
 import com.arialyy.aria.core.loader.IInfoTask;
 import com.arialyy.aria.core.loader.ILoaderVisitor;
 import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
-import com.arialyy.aria.exception.AriaIOException;
-import com.arialyy.aria.exception.TaskException;
+import com.arialyy.aria.exception.AriaFTPException;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CheckUtil;
 import com.arialyy.aria.util.CommonUtil;
@@ -161,9 +160,9 @@ public abstract class AbsFtpInfoTask<ENTITY extends AbsEntity, TASK_WRAPPER exte
           loginSuccess = client.login(urlEntity.user, urlEntity.password, urlEntity.account);
         }
       } catch (IOException e) {
-        ALog.e(TAG,
-            new TaskException(TAG, String.format("登录失败，错误码为：%s， msg：%s", client.getReplyCode(),
-                client.getReplyString()), e));
+        e.printStackTrace();
+        ALog.e(TAG, String.format("登录失败，错误码为：%s， msg：%s", client.getReplyCode(),
+            client.getReplyString()));
         return null;
       }
     }
@@ -329,7 +328,7 @@ public abstract class AbsFtpInfoTask<ENTITY extends AbsEntity, TASK_WRAPPER exte
         needRetry = needRetry && !CheckUtil.ftpIsBadRequest(client.getReplyCode());
       }
 
-      callback.onFail(mEntity, new AriaIOException(TAG, msg), needRetry);
+      callback.onFail(mEntity, new AriaFTPException(TAG, msg), needRetry);
     }
   }
 

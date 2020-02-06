@@ -29,7 +29,7 @@ import com.arialyy.aria.core.listener.ISchedulers;
 import com.arialyy.aria.core.manager.ThreadTaskManager;
 import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
 import com.arialyy.aria.core.wrapper.ITaskWrapper;
-import com.arialyy.aria.exception.BaseException;
+import com.arialyy.aria.exception.AriaException;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.BufferedRandomAccessFile;
 import com.arialyy.aria.util.CommonUtil;
@@ -323,7 +323,7 @@ public class ThreadTask implements IThreadTask, IThreadTaskObserver {
    *
    * @param needRetry 是否需要重试，一般是网络错误才需要重试
    */
-  @Override public synchronized void updateFailState(BaseException e, boolean needRetry) {
+  @Override public synchronized void updateFailState(AriaException e, boolean needRetry) {
     fail(mRangeProgress, e, needRetry);
   }
 
@@ -396,7 +396,7 @@ public class ThreadTask implements IThreadTask, IThreadTaskObserver {
    *
    * @param subCurrentLocation 当前子线程进度
    */
-  protected void fail(final long subCurrentLocation, BaseException ex, boolean needRetry) {
+  protected void fail(final long subCurrentLocation, AriaException ex, boolean needRetry) {
     if (ex != null) {
       ex.printStackTrace();
     }
@@ -505,7 +505,7 @@ public class ThreadTask implements IThreadTask, IThreadTaskObserver {
   /**
    * 发送失败信息
    */
-  private void sendFailMsg(BaseException e, boolean needRetry) {
+  private void sendFailMsg(AriaException e, boolean needRetry) {
     Bundle b = new Bundle();
     b.putBoolean(IThreadStateManager.DATA_RETRY, needRetry);
     if (e != null) {

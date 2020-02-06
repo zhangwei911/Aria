@@ -27,7 +27,7 @@ import com.arialyy.aria.core.manager.ThreadTaskManager;
 import com.arialyy.aria.core.task.IThreadTask;
 import com.arialyy.aria.core.task.ThreadTask;
 import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
-import com.arialyy.aria.exception.BaseException;
+import com.arialyy.aria.exception.AriaException;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
 import java.io.File;
@@ -207,7 +207,7 @@ public final class SubLoader implements ILoader, ILoaderVisitor {
         handlerTask();
       }
 
-      @Override public void onFail(AbsEntity entity, BaseException e, boolean needRetry) {
+      @Override public void onFail(AbsEntity entity, AriaException e, boolean needRetry) {
         sendFailState(needRetry);
       }
     });

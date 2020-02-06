@@ -23,8 +23,8 @@ import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.listener.DownloadGroupListener;
 import com.arialyy.aria.core.loader.IInfoTask;
 import com.arialyy.aria.core.loader.ILoaderVisitor;
-import com.arialyy.aria.exception.AriaIOException;
-import com.arialyy.aria.exception.BaseException;
+import com.arialyy.aria.exception.AriaException;
+import com.arialyy.aria.exception.AriaHTTPException;
 import com.arialyy.aria.http.HttpTaskOption;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
@@ -55,11 +55,11 @@ public final class HttpDGInfoTask implements IInfoTask {
       ALog.d(TAG, "获取子任务信息完成");
     }
 
-    @Override public void onFail(AbsEntity entity, BaseException e, boolean needRetry) {
+    @Override public void onFail(AbsEntity entity, AriaException e, boolean needRetry) {
       ALog.e(TAG, String.format("获取文件信息失败，url：%s", ((DownloadEntity) entity).getUrl()));
       count++;
       failCount++;
-      listener.onSubFail((DownloadEntity) entity, new AriaIOException(TAG,
+      listener.onSubFail((DownloadEntity) entity, new AriaHTTPException(TAG,
           String.format("子任务获取文件长度失败，url：%s", ((DownloadEntity) entity).getUrl())));
       checkGetSizeComplete(count, failCount);
     }
@@ -121,7 +121,7 @@ public final class HttpDGInfoTask implements IInfoTask {
    */
   private void checkGetSizeComplete(int count, int failCount) {
     if (failCount == wrapper.getSubTaskWrapper().size()) {
-      callback.onFail(wrapper.getEntity(), new AriaIOException(TAG, "获取子任务长度失败"), false);
+      callback.onFail(wrapper.getEntity(), new AriaHTTPException(TAG, "获取子任务长度失败"), false);
       notifyLock();
       return;
     }

@@ -17,7 +17,7 @@ package com.arialyy.aria.sftp.download;
 
 import com.arialyy.aria.core.common.CompleteInfo;
 import com.arialyy.aria.core.download.DTaskWrapper;
-import com.arialyy.aria.exception.AriaException;
+import com.arialyy.aria.exception.AriaSFTPException;
 import com.arialyy.aria.sftp.AbsSFtpInfoTask;
 import com.arialyy.aria.sftp.SFtpTaskOption;
 import com.arialyy.aria.util.ALog;
@@ -63,7 +63,7 @@ final class SFtpDInfoTask extends AbsSFtpInfoTask<DTaskWrapper> {
       callback.onSucceed(getWrapper().getKey(), info);
     } else {
       callback.onFail(getWrapper().getEntity(),
-          new AriaException(TAG, String.format("文件不存在，remotePath：%s", remotePath)), false);
+          new AriaSFTPException(TAG, String.format("文件不存在，remotePath：%s", remotePath)), false);
     }
     channel.disconnect();
   }

@@ -17,7 +17,7 @@ package com.arialyy.aria.core.task;
 
 import android.os.Bundle;
 import com.arialyy.aria.core.inf.IThreadStateManager;
-import com.arialyy.aria.exception.BaseException;
+import com.arialyy.aria.exception.AriaException;
 
 /**
  * 线程任务观察者
@@ -44,7 +44,7 @@ public interface IThreadTaskObserver {
    *
    * @param needRetry 是否需要重试，一般是网络错误才需要重试
    */
-  void updateFailState(BaseException e, boolean needRetry);
+  void updateFailState(AriaException e, boolean needRetry);
 
   /**
    * 更新进度

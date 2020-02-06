@@ -15,18 +15,14 @@
  */
 package com.arialyy.aria.exception;
 
-/**
- * Created by lyy on 2017/1/18.
- * Aria 文件异常
- */
-public class FileNotFoundException extends BaseException {
-  private static final String ARIA_FILE_EXCEPTION = "Aria File not found Exception:";
+public class AriaM3U8Exception extends AriaException {
+  private static final String M3U8_EXCEPTION = "Aria M3U8 Exception:";
 
-  public FileNotFoundException(String tag, String detailMessage) {
-    super(tag, String.format("%s%s", ARIA_FILE_EXCEPTION, detailMessage));
+  public AriaM3U8Exception(String tag, String message) {
+    super(tag, String.format("%s\n%s", M3U8_EXCEPTION, message));
   }
 
-  public FileNotFoundException(String tag, String message, Exception e) {
+  public AriaM3U8Exception(String tag, String message, Exception e){
     super(tag, message, e);
   }
 }

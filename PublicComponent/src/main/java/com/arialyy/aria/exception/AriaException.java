@@ -15,14 +15,22 @@
  */
 package com.arialyy.aria.exception;
 
-public class AriaException extends BaseException {
-  private static final String ARIA_NET_EXCEPTION = "Aria Exception:";
+public class AriaException extends Exception {
+
+  private String tag;
 
   public AriaException(String tag, String message) {
-    super(tag, String.format("%s%s", ARIA_NET_EXCEPTION, message));
+    super(message);
+    this.tag = tag;
   }
 
   public AriaException(String tag, String message, Exception e) {
-    super(tag, message, e);
+    super(String.format("%s, %s\n%s", tag, message == null ? "" : message,
+        e == null ? "" : e.getMessage()));
+    this.tag = tag;
+  }
+
+  public String getTag() {
+    return tag;
   }
 }

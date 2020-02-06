@@ -21,7 +21,7 @@ import aria.apache.commons.net.ftp.FTPReply;
 import aria.apache.commons.net.ftp.OnFtpInputStreamListener;
 import com.arialyy.aria.core.common.SubThreadConfig;
 import com.arialyy.aria.core.upload.UploadEntity;
-import com.arialyy.aria.exception.AriaIOException;
+import com.arialyy.aria.exception.AriaFTPException;
 import com.arialyy.aria.ftp.BaseFtpThreadTaskAdapter;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.BufferedRandomAccessFile;
@@ -63,7 +63,7 @@ final class FtpUThreadTaskAdapter extends BaseFtpThreadTaskAdapter {
       client.setRestartOffset(getThreadRecord().startLocation);
       int reply = client.getReplyCode();
       if (!FTPReply.isPositivePreliminary(reply) && reply != FTPReply.FILE_ACTION_OK) {
-        fail(new AriaIOException(TAG,
+        fail(new AriaFTPException(TAG,
             String.format("文件上传错误，错误码为：%s, msg：%s, filePath: %s", reply,
                 client.getReplyString(), getEntity().getFilePath())), false);
         client.disconnect();
@@ -80,8 +80,8 @@ final class FtpUThreadTaskAdapter extends BaseFtpThreadTaskAdapter {
       if (getThreadTask().isBreak()) {
         return;
       }
-      if (!complete){
-        fail(new AriaIOException(TAG, "ftp文件上传失败"), false);
+      if (!complete) {
+        fail(new AriaFTPException(TAG, "ftp文件上传失败"), false);
         return;
       }
       ALog.i(TAG,
@@ -89,11 +89,11 @@ final class FtpUThreadTaskAdapter extends BaseFtpThreadTaskAdapter {
       complete();
     } catch (IOException e) {
       e.printStackTrace();
-      fail(new AriaIOException(TAG,
+      fail(new AriaFTPException(TAG,
           String.format("上传失败，filePath: %s, uploadUrl: %s", getEntity().getFilePath(),
               getThreadConfig().url)), true);
     } catch (Exception e) {
-      fail(new AriaIOException(TAG, null, e), false);
+      fail(new AriaFTPException(TAG, null, e), false);
     } finally {
       try {
         if (file != null) {
@@ -132,7 +132,7 @@ final class FtpUThreadTaskAdapter extends BaseFtpThreadTaskAdapter {
       @Override public void run() {
         try {
           if (isTimeOut) {
-            fail(new AriaIOException(TAG, "socket连接失败，该问题一般出现于网络断开，客户端重新连接，"
+            fail(new AriaFTPException(TAG, "socket连接失败，该问题一般出现于网络断开，客户端重新连接，"
                 + "但是服务器端无法创建socket缺没有返回错误码的情况。"), false);
             if (fa != null) {
               fa.close();
@@ -195,7 +195,7 @@ final class FtpUThreadTaskAdapter extends BaseFtpThreadTaskAdapter {
       if (e.getMessage().contains("AriaIOException caught while copying")) {
         e.printStackTrace();
       } else {
-        fail(new AriaIOException(TAG, msg, e), !storeSuccess);
+        fail(new AriaFTPException(TAG, msg, e), !storeSuccess);
       }
       return false;
     } finally {
@@ -204,7 +204,7 @@ final class FtpUThreadTaskAdapter extends BaseFtpThreadTaskAdapter {
     int reply = client.getReplyCode();
     if (!FTPReply.isPositiveCompletion(reply)) {
       if (reply != FTPReply.TRANSFER_ABORTED) {
-        fail(new AriaIOException(TAG,
+        fail(new AriaFTPException(TAG,
             String.format("文件上传错误，错误码为：%s, msg：%s, filePath: %s", reply, client.getReplyString(),
                 getEntity().getFilePath())), false);
       }

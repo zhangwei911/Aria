@@ -18,9 +18,7 @@ package com.arialyy.aria.http.upload;
 import android.text.TextUtils;
 import com.arialyy.aria.core.common.SubThreadConfig;
 import com.arialyy.aria.core.upload.UploadEntity;
-import com.arialyy.aria.exception.AriaIOException;
-import com.arialyy.aria.exception.BaseException;
-import com.arialyy.aria.exception.TaskException;
+import com.arialyy.aria.exception.AriaHTTPException;
 import com.arialyy.aria.http.BaseHttpThreadTaskAdapter;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
@@ -56,7 +54,7 @@ final class HttpUThreadTaskAdapter extends BaseHttpThreadTaskAdapter {
   @Override protected void handlerThreadTask() {
     File uploadFile = new File(getEntity().getFilePath());
     if (!uploadFile.exists()) {
-      fail(new TaskException(TAG,
+      fail(new AriaHTTPException(TAG,
           String.format("上传失败，文件不存在；filePath: %s, url: %s", getEntity().getFilePath(),
               getEntity().getUrl())));
       return;
@@ -106,13 +104,13 @@ final class HttpUThreadTaskAdapter extends BaseHttpThreadTaskAdapter {
       getEntity().setResponseStr(finish(writer));
     } catch (Exception e) {
       e.printStackTrace();
-      fail(new TaskException(TAG,
+      fail(new AriaHTTPException(TAG,
           String.format("上传失败，filePath: %s, url: %s", getEntity().getFilePath(),
               getEntity().getUrl()), e));
     }
   }
 
-  private void fail(BaseException e1) {
+  private void fail(AriaHTTPException e1) {
     try {
       fail(e1, false);
       if (mOutputStream != null) {
@@ -222,7 +220,7 @@ final class HttpUThreadTaskAdapter extends BaseHttpThreadTaskAdapter {
     } else {
       String msg = "response msg: " + mHttpConn.getResponseMessage() + "，code: " + status;
       ALog.e(TAG, msg);
-      fail(new AriaIOException(TAG, msg), false);
+      fail(new AriaHTTPException(TAG, msg), false);
     }
     writer.flush();
     writer.close();

@@ -25,7 +25,7 @@ import com.arialyy.aria.core.inf.IEntity;
 import com.arialyy.aria.core.listener.IEventListener;
 import com.arialyy.aria.core.loader.IInfoTask;
 import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
-import com.arialyy.aria.exception.BaseException;
+import com.arialyy.aria.exception.AriaException;
 import com.arialyy.aria.util.ALog;
 
 /**
@@ -79,7 +79,7 @@ final class FtpDGLoader extends AbsGroupLoader {
         }
       }
 
-      @Override public void onFail(AbsEntity entity, BaseException e, boolean needRetry) {
+      @Override public void onFail(AbsEntity entity, AriaException e, boolean needRetry) {
         //getListener().onFail(needRetry, e);
         fail(e, needRetry);
       }

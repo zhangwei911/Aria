@@ -31,7 +31,7 @@ import com.arialyy.aria.core.loader.IRecordHandler;
 import com.arialyy.aria.core.loader.IThreadTaskBuilder;
 import com.arialyy.aria.core.manager.ThreadTaskManager;
 import com.arialyy.aria.core.task.IThreadTask;
-import com.arialyy.aria.exception.BaseException;
+import com.arialyy.aria.exception.AriaException;
 import com.arialyy.aria.util.FileUtil;
 import java.io.File;
 
@@ -140,7 +140,7 @@ final class SFtpDLoader extends AbsNormalLoader<DTaskWrapper> {
         startThreadTask();
       }
 
-      @Override public void onFail(AbsEntity entity, BaseException e, boolean needRetry) {
+      @Override public void onFail(AbsEntity entity, AriaException e, boolean needRetry) {
         getListener().onFail(needRetry, e);
       }
     });

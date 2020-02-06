@@ -534,7 +534,7 @@ public class CommonUtil {
     try {
       is = new FileInputStream(updateFile);
     } catch (FileNotFoundException e) {
-      ALog.e(TAG, e);
+      e.printStackTrace();
       return null;
     }
 
@@ -549,7 +549,7 @@ public class CommonUtil {
     try {
       digest = MessageDigest.getInstance("MD5");
     } catch (NoSuchAlgorithmException e) {
-      ALog.e(TAG, e);
+      e.printStackTrace();
       return null;
     }
 
@@ -571,7 +571,7 @@ public class CommonUtil {
       try {
         is.close();
       } catch (IOException e) {
-        ALog.e(TAG, e);
+        e.printStackTrace();
       }
     }
   }

@@ -19,7 +19,7 @@ package com.arialyy.aria.core.loader;
 import com.arialyy.aria.core.inf.IUtil;
 import com.arialyy.aria.core.listener.IEventListener;
 import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
-import com.arialyy.aria.exception.BaseException;
+import com.arialyy.aria.exception.AriaException;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
 
@@ -135,7 +135,7 @@ public abstract class AbsNormalLoaderUtil implements IUtil {
     return mListener;
   }
 
-  protected void fail(BaseException e, boolean needRetry) {
+  protected void fail(AriaException e, boolean needRetry) {
     if (isStop || isCancel) {
       return;
     }

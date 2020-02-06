@@ -25,7 +25,7 @@ import com.arialyy.aria.core.group.AbsSubDLoadUtil;
 import com.arialyy.aria.core.listener.DownloadGroupListener;
 import com.arialyy.aria.core.loader.IInfoTask;
 import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
-import com.arialyy.aria.exception.BaseException;
+import com.arialyy.aria.exception.AriaException;
 
 /**
  * http 组合任务加载器
@@ -65,7 +65,7 @@ final class HttpDGLoader extends AbsGroupLoader {
         startSub();
       }
 
-      @Override public void onFail(AbsEntity entity, BaseException e, boolean needRetry) {
+      @Override public void onFail(AbsEntity entity, AriaException e, boolean needRetry) {
         fail(e, needRetry);
       }
     });

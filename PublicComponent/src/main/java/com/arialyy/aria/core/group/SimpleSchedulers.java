@@ -24,7 +24,7 @@ import com.arialyy.aria.core.config.Configuration;
 import com.arialyy.aria.core.inf.IThreadStateManager;
 import com.arialyy.aria.core.loader.IRecordHandler;
 import com.arialyy.aria.core.manager.ThreadTaskManager;
-import com.arialyy.aria.exception.TaskException;
+import com.arialyy.aria.exception.AriaException;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
 import com.arialyy.aria.util.NetUtils;
@@ -113,7 +113,7 @@ final class SimpleSchedulers implements Handler.Callback {
         || loaderUtil.getLoader() == null // 如果获取不到文件信息，loader为空
         || loaderUtil.getEntity().getFailNum() > num) {
       mQueue.removeTaskFromExecQ(loaderUtil);
-      mGState.listener.onSubFail(loaderUtil.getEntity(), new TaskException(TAG,
+      mGState.listener.onSubFail(loaderUtil.getEntity(), new AriaException(TAG,
           String.format("任务组子任务【%s】下载失败，下载地址【%s】", loaderUtil.getEntity().getFileName(),
               loaderUtil.getEntity().getUrl())));
       mGState.countFailNum(loaderUtil.getKey());
@@ -122,7 +122,7 @@ final class SimpleSchedulers implements Handler.Callback {
           == mGState.getSubSize()) {
         mQueue.clear();
         mGState.isRunning = false;
-        mGState.listener.onFail(false, new TaskException(TAG,
+        mGState.listener.onFail(false, new AriaException(TAG,
             String.format("任务组【%s】下载失败", mGState.getGroupHash())));
       } else {
         startNext();

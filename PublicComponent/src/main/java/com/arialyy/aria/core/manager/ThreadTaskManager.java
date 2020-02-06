@@ -255,7 +255,7 @@ public class ThreadTaskManager {
           return;
         }
       } catch (Exception e) {
-        ALog.e(TAG, e);
+        ALog.e(TAG, "", e);
         return;
       }
       mExePool.submit(task);

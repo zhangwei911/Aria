@@ -17,7 +17,7 @@ package com.arialyy.aria.sftp.download;
 
 import com.arialyy.aria.core.common.SubThreadConfig;
 import com.arialyy.aria.core.task.AbsThreadTaskAdapter;
-import com.arialyy.aria.exception.AriaException;
+import com.arialyy.aria.exception.AriaSFTPException;
 import com.arialyy.aria.sftp.SFtpTaskOption;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
@@ -53,7 +53,7 @@ final class SFtpDThreadTaskAdapter extends AbsThreadTaskAdapter {
 
   @Override protected void handlerThreadTask() {
     if (session == null) {
-      fail(new AriaException(TAG, "session 为空"), false);
+      fail(new AriaSFTPException(TAG, "session 为空"), false);
       return;
     }
     try {
@@ -74,18 +74,13 @@ final class SFtpDThreadTaskAdapter extends AbsThreadTaskAdapter {
           CommonUtil.convertSFtpChar(charSet, option.getUrlEntity().remotePath);
       download(remotePath);
     } catch (SftpException e) {
-      e.printStackTrace();
-      ALog.e(TAG, "错误类型：" + e.id);
-      fail(null, false);
+      fail(new AriaSFTPException(TAG, "sftp错误，错误类型：" + e.id, e), false);
     } catch (UnsupportedEncodingException e) {
-      e.printStackTrace();
-      fail(null, false);
+      fail(new AriaSFTPException(TAG, "字符编码错误", e), false);
     } catch (IOException e) {
-      e.printStackTrace();
-      fail(null, true);
+      fail(new AriaSFTPException(TAG, "", e), true);
     } catch (JSchException e) {
-      e.printStackTrace();
-      fail(null, false);
+      fail(new AriaSFTPException(TAG, "jsch 错误", e), false);
     } finally {
       channelSftp.disconnect();
     }

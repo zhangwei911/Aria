@@ -17,7 +17,7 @@ package com.arialyy.aria.core.loader;
 
 import com.arialyy.aria.core.common.AbsEntity;
 import com.arialyy.aria.core.common.CompleteInfo;
-import com.arialyy.aria.exception.BaseException;
+import com.arialyy.aria.exception.AriaException;
 
 /**
  * 任务信息采集
@@ -47,6 +47,6 @@ public interface IInfoTask extends ILoaderComponent {
      *
      * @param e 错误信息
      */
-    void onFail(AbsEntity entity, BaseException e, boolean needRetry);
+    void onFail(AbsEntity entity, AriaException e, boolean needRetry);
   }
 }

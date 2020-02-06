@@ -22,7 +22,7 @@ import android.os.Message;
 import com.arialyy.aria.core.TaskRecord;
 import com.arialyy.aria.core.inf.IThreadStateManager;
 import com.arialyy.aria.core.listener.IEventListener;
-import com.arialyy.aria.exception.BaseException;
+import com.arialyy.aria.exception.AriaException;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.FileUtil;
 import java.io.File;
@@ -91,7 +91,7 @@ public class NormalThreadStateManager implements IThreadStateManager {
           if (isFail()) {
             Bundle b = msg.getData();
             mListener.onFail(b.getBoolean(DATA_RETRY, false),
-                (BaseException) b.getSerializable(DATA_ERROR_INFO));
+                (AriaException) b.getSerializable(DATA_ERROR_INFO));
             quitLooper();
           }
           break;

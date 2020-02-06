@@ -32,9 +32,8 @@ import com.arialyy.aria.core.processor.ILiveTsUrlConverter;
 import com.arialyy.aria.core.processor.ITsMergeHandler;
 import com.arialyy.aria.core.task.ThreadTask;
 import com.arialyy.aria.core.wrapper.ITaskWrapper;
-import com.arialyy.aria.exception.BaseException;
-import com.arialyy.aria.exception.M3U8Exception;
-import com.arialyy.aria.exception.TaskException;
+import com.arialyy.aria.exception.AriaM3U8Exception;
+import com.arialyy.aria.exception.AriaException;
 import com.arialyy.aria.m3u8.BaseM3U8Loader;
 import com.arialyy.aria.m3u8.IdGenerator;
 import com.arialyy.aria.m3u8.M3U8InfoTask;
@@ -255,7 +254,7 @@ final class M3U8LiveLoader extends BaseM3U8Loader {
         ALog.d(TAG, "更新直播的m3u8文件");
       }
 
-      @Override public void onFail(AbsEntity entity, BaseException e, boolean needRetry) {
+      @Override public void onFail(AbsEntity entity, AriaException e, boolean needRetry) {
 
       }
     });
@@ -275,7 +274,7 @@ final class M3U8LiveLoader extends BaseM3U8Loader {
           }
         }
         if (TextUtils.isEmpty(url) || !url.startsWith("http")) {
-          fail(new M3U8Exception(TAG, String.format("ts地址错误，url：%s", url)), false);
+          fail(new AriaM3U8Exception(TAG, String.format("ts地址错误，url：%s", url)), false);
           return;
         }
         offerPeer(new M3U8LiveLoader.ExtInfo(url, extInf));
@@ -283,7 +282,7 @@ final class M3U8LiveLoader extends BaseM3U8Loader {
     });
   }
 
-  private void fail(BaseException e, boolean needRetry) {
+  private void fail(AriaM3U8Exception e, boolean needRetry) {
     getListener().onFail(needRetry, e);
     handleComplete();
   }
@@ -296,13 +295,13 @@ final class M3U8LiveLoader extends BaseM3U8Loader {
         if (generateIndexFile(true)) {
           getListener().onComplete();
         } else {
-          getListener().onFail(false, new TaskException(TAG, "创建索引文件失败"));
+          getListener().onFail(false, new AriaM3U8Exception(TAG, "创建索引文件失败"));
         }
       } else if (mM3U8Option.isMergeFile()) {
         if (mergeFile()) {
           getListener().onComplete();
         } else {
-          getListener().onFail(false, new M3U8Exception(TAG, "合并文件失败"));
+          getListener().onFail(false, new AriaM3U8Exception(TAG, "合并文件失败"));
         }
       } else {
         getListener().onComplete();

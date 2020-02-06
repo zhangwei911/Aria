@@ -19,7 +19,7 @@ import com.arialyy.aria.core.ThreadRecord;
 import com.arialyy.aria.core.common.SubThreadConfig;
 import com.arialyy.aria.core.config.BaseTaskConfig;
 import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
-import com.arialyy.aria.exception.BaseException;
+import com.arialyy.aria.exception.AriaException;
 import com.arialyy.aria.util.BandwidthLimiter;
 import com.arialyy.aria.util.CommonUtil;
 
@@ -110,7 +110,7 @@ public abstract class AbsThreadTaskAdapter implements IThreadTaskAdapter {
     }
   }
 
-  protected void fail(BaseException ex, boolean needRetry) {
+  protected void fail(AriaException ex, boolean needRetry) {
     if (mObserver != null) {
       mObserver.updateFailState(ex, needRetry);
     }

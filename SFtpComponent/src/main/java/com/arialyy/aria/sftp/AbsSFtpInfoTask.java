@@ -19,7 +19,8 @@ import com.arialyy.aria.core.FtpUrlEntity;
 import com.arialyy.aria.core.loader.IInfoTask;
 import com.arialyy.aria.core.loader.ILoaderVisitor;
 import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
-import com.arialyy.aria.exception.BaseException;
+import com.arialyy.aria.exception.AriaException;
+import com.arialyy.aria.exception.AriaSFTPException;
 import com.arialyy.aria.util.CommonUtil;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
@@ -53,14 +54,11 @@ public abstract class AbsSFtpInfoTask<WP extends AbsTaskWrapper> implements IInf
       }
       getFileInfo(session);
     } catch (JSchException e) {
-      e.printStackTrace();
-      fail(false, null);
+      fail(new AriaSFTPException(TAG, "jsch错误", e), false);
     } catch (UnsupportedEncodingException e) {
-      e.printStackTrace();
-      fail(false, null);
+      fail(new AriaSFTPException(TAG, "字符编码错误", e), false);
     } catch (SftpException e) {
-      e.printStackTrace();
-      fail(false, null);
+      fail(new AriaSFTPException(TAG, "sftp错误，错误类型：" + e.id, e), false);
     }
   }
 
@@ -72,7 +70,7 @@ public abstract class AbsSFtpInfoTask<WP extends AbsTaskWrapper> implements IInf
     return wrapper;
   }
 
-  protected void fail(boolean needRetry, BaseException e) {
+  protected void fail(AriaException e, boolean needRetry) {
     callback.onFail(getWrapper().getEntity(), e, needRetry);
   }
 

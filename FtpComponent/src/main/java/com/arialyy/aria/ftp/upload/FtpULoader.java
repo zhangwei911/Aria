@@ -26,7 +26,7 @@ import com.arialyy.aria.core.loader.NormalLoader;
 import com.arialyy.aria.core.manager.ThreadTaskManager;
 import com.arialyy.aria.core.task.IThreadTask;
 import com.arialyy.aria.core.upload.UTaskWrapper;
-import com.arialyy.aria.exception.BaseException;
+import com.arialyy.aria.exception.AriaException;
 
 final class FtpULoader extends NormalLoader<UTaskWrapper> {
   private FTPFile ftpFile;
@@ -79,7 +79,7 @@ final class FtpULoader extends NormalLoader<UTaskWrapper> {
         }
       }
 
-      @Override public void onFail(AbsEntity entity, BaseException e, boolean needRetry) {
+      @Override public void onFail(AbsEntity entity, AriaException e, boolean needRetry) {
         getListener().onFail(needRetry, e);
       }
     });

@@ -15,7 +15,7 @@
  */
 package com.arialyy.aria.core.listener;
 
-import com.arialyy.aria.exception.BaseException;
+import com.arialyy.aria.exception.AriaException;
 
 /**
  * Created by Aria.Lao on 2017/7/18.
@@ -64,5 +64,5 @@ public interface IEventListener {
    * @param needRetry 是否需要重试{@code true} 需要
    * @param e 失败信息
    */
-  void onFail(boolean needRetry, BaseException e);
+  void onFail(boolean needRetry, AriaException e);
 }

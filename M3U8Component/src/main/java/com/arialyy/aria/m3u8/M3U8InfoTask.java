@@ -30,8 +30,7 @@ import com.arialyy.aria.core.processor.IBandWidthUrlConverter;
 import com.arialyy.aria.core.processor.IKeyUrlConverter;
 import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
 import com.arialyy.aria.core.wrapper.ITaskWrapper;
-import com.arialyy.aria.exception.M3U8Exception;
-import com.arialyy.aria.exception.TaskException;
+import com.arialyy.aria.exception.AriaM3U8Exception;
 import com.arialyy.aria.http.ConnectionHelp;
 import com.arialyy.aria.http.HttpTaskOption;
 import com.arialyy.aria.util.ALog;
@@ -296,7 +295,7 @@ final public class M3U8InfoTask implements IInfoTask {
     ALog.d(TAG, "30x跳转，新url为【" + newUrl + "】");
     if (TextUtils.isEmpty(newUrl) || newUrl.equalsIgnoreCase("null")) {
       if (mCallback != null) {
-        mCallback.onFail(mEntity, new TaskException(TAG, "获取重定向链接失败"), false);
+        mCallback.onFail(mEntity, new AriaM3U8Exception(TAG, "获取重定向链接失败"), false);
       }
       return;
     }
@@ -354,7 +353,7 @@ final public class M3U8InfoTask implements IInfoTask {
   }
 
   private void failDownload(String errorInfo, boolean needRetry) {
-    mCallback.onFail(mEntity, new M3U8Exception(TAG, errorInfo), needRetry);
+    mCallback.onFail(mEntity, new AriaM3U8Exception(TAG, errorInfo), needRetry);
   }
 
   /**

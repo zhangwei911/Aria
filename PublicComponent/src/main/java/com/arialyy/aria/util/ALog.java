@@ -63,10 +63,8 @@ public class ALog {
     return println(Log.ERROR, tag, msg);
   }
 
-  public static int e(String tag, Throwable e) {
-    String msg = getExceptionString(e);
-    ErrorHelp.saveError(tag, "", msg);
-    return println(Log.ERROR, tag, msg);
+  public static void e(String tag, String msg, Throwable e) {
+    Log.e(tag, msg, e);
   }
 
   /**

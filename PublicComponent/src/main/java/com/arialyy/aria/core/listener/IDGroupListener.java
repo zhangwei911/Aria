@@ -16,7 +16,7 @@
 package com.arialyy.aria.core.listener;
 
 import com.arialyy.aria.core.download.DownloadEntity;
-import com.arialyy.aria.exception.BaseException;
+import com.arialyy.aria.exception.AriaException;
 
 /**
  * Created by Aria.Lao on 2017/7/20.
@@ -54,7 +54,7 @@ public interface IDGroupListener extends IDLoadListener {
   /**
    * 子任务下载失败
    */
-  void onSubFail(DownloadEntity subEntity, BaseException e);
+  void onSubFail(DownloadEntity subEntity, AriaException e);
 
   /**
    * 子任务取消下载

@@ -24,7 +24,7 @@ import com.arialyy.aria.core.inf.IEntity;
 import com.arialyy.aria.core.inf.TaskSchedulerType;
 import com.arialyy.aria.core.task.AbsTask;
 import com.arialyy.aria.core.task.DownloadGroupTask;
-import com.arialyy.aria.exception.BaseException;
+import com.arialyy.aria.exception.AriaException;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
 import com.arialyy.aria.util.ErrorHelp;
@@ -81,7 +81,7 @@ public class DownloadGroupListener
   }
 
   @Override
-  public void onSubFail(DownloadEntity subEntity, BaseException e) {
+  public void onSubFail(DownloadEntity subEntity, AriaException e) {
     handleSubSpeed(subEntity, 0);
     saveSubState(IEntity.STATE_FAIL, subEntity);
     saveCurrentLocation();

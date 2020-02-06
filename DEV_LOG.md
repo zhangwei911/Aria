@@ -1,4 +1,7 @@
 ## 开发日志
+  + v_3.8.6
+    - fix bug https://github.com/AriaLyy/Aria/issues/608
+    - 优化异常提示
   + v_3.8.5 (2020/1/18)
     - fix bug https://github.com/AriaLyy/Aria/issues/599
     - 增加密钥url转换器的参数 https://github.com/AriaLyy/Aria/issues/603

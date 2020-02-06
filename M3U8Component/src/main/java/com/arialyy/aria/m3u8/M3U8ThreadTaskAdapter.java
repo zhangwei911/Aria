@@ -21,8 +21,7 @@ import com.arialyy.aria.core.common.RequestEnum;
 import com.arialyy.aria.core.common.SubThreadConfig;
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.task.AbsThreadTaskAdapter;
-import com.arialyy.aria.exception.AriaIOException;
-import com.arialyy.aria.exception.TaskException;
+import com.arialyy.aria.exception.AriaM3U8Exception;
 import com.arialyy.aria.http.ConnectionHelp;
 import com.arialyy.aria.http.HttpTaskOption;
 import com.arialyy.aria.util.ALog;
@@ -92,15 +91,15 @@ public final class M3U8ThreadTaskAdapter extends AbsThreadTaskAdapter {
 
       handleConn(conn);
     } catch (MalformedURLException e) {
-      fail(new TaskException(TAG,
+      fail(new AriaM3U8Exception(TAG,
           String.format("分片【%s】下载失败，filePath: %s, url: %s", getThreadRecord().threadId,
               getThreadConfig().tempFile.getPath(), getEntity().getUrl()), e), false);
     } catch (IOException e) {
-      fail(new TaskException(TAG,
+      fail(new AriaM3U8Exception(TAG,
           String.format("分片【%s】下载失败，filePath: %s, url: %s", getThreadRecord().threadId,
               getThreadConfig().tempFile.getPath(), getEntity().getUrl()), e), true);
     } catch (Exception e) {
-      fail(new TaskException(TAG,
+      fail(new AriaM3U8Exception(TAG,
           String.format("分片【%s】下载失败，filePath: %s, url: %s", getThreadRecord().threadId,
               getThreadConfig().tempFile.getPath(), getEntity().getUrl()), e), false);
     } finally {
@@ -138,7 +137,7 @@ public final class M3U8ThreadTaskAdapter extends AbsThreadTaskAdapter {
         || code == 307) {
       handleUrlReTurn(conn, conn.getHeaderField("Location"));
     } else {
-      fail(new TaskException(TAG,
+      fail(new AriaM3U8Exception(TAG,
               String.format("连接错误，http错误码：%s，url：%s", code, getThreadConfig().url)),
           false);
     }
@@ -151,7 +150,7 @@ public final class M3U8ThreadTaskAdapter extends AbsThreadTaskAdapter {
   private void handleUrlReTurn(HttpURLConnection conn, String newUrl) throws IOException {
     ALog.d(TAG, "30x跳转，新url为【" + newUrl + "】");
     if (TextUtils.isEmpty(newUrl) || newUrl.equalsIgnoreCase("null")) {
-      fail(new AriaIOException(TAG, "下载失败，重定向url为空"), false);
+      fail(new AriaM3U8Exception(TAG, "下载失败，重定向url为空"), false);
       return;
     }
 
@@ -161,14 +160,14 @@ public final class M3U8ThreadTaskAdapter extends AbsThreadTaskAdapter {
     }
 
     if (!CheckUtil.checkUrl(newUrl)) {
-      fail(new AriaIOException(TAG, "下载失败，重定向url错误"), false);
+      fail(new AriaM3U8Exception(TAG, "下载失败，重定向url错误"), false);
       return;
     }
     String cookies = conn.getHeaderField("Set-Cookie");
     conn.disconnect(); // 关闭上一个连接
     URL url = ConnectionHelp.handleUrl(newUrl, mHttpTaskOption);
     conn = ConnectionHelp.handleConnection(url, mHttpTaskOption);
-    if (!TextUtils.isEmpty(cookies)){
+    if (!TextUtils.isEmpty(cookies)) {
       conn.setRequestProperty("Cookie", cookies);
     }
     if (mHttpTaskOption.isChunked()) {
@@ -199,7 +198,7 @@ public final class M3U8ThreadTaskAdapter extends AbsThreadTaskAdapter {
       }
       handleComplete();
     } catch (IOException e) {
-      fail(new AriaIOException(TAG,
+      fail(new AriaM3U8Exception(TAG,
           String.format("文件下载失败，savePath: %s, url: %s", getThreadConfig().tempFile.getPath(),
               getThreadConfig().url), e), true);
     } finally {
@@ -242,7 +241,7 @@ public final class M3U8ThreadTaskAdapter extends AbsThreadTaskAdapter {
       }
       handleComplete();
     } catch (IOException e) {
-      fail(new AriaIOException(TAG,
+      fail(new AriaM3U8Exception(TAG,
           String.format("文件下载失败，savePath: %s, url: %s", getThreadConfig().tempFile.getPath(),
               getThreadConfig().url), e), true);
     } finally {

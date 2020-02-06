@@ -25,7 +25,7 @@ import com.arialyy.aria.core.FtpUrlEntity;
 import com.arialyy.aria.core.common.FtpConnectionMode;
 import com.arialyy.aria.core.common.SubThreadConfig;
 import com.arialyy.aria.core.task.AbsThreadTaskAdapter;
-import com.arialyy.aria.exception.AriaIOException;
+import com.arialyy.aria.exception.AriaFTPException;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.SSLContextUtil;
 import java.io.IOException;
@@ -105,7 +105,7 @@ public abstract class BaseFtpThreadTaskAdapter extends AbsThreadTaskAdapter {
       int reply = client.getReplyCode();
       if (!FTPReply.isPositiveCompletion(reply)) {
         client.disconnect();
-        fail(new AriaIOException(TAG,
+        fail(new AriaFTPException(TAG,
             String.format("无法连接到ftp服务器，错误码为：%s，msg:%s", reply, client.getReplyString())), false);
         return null;
       }

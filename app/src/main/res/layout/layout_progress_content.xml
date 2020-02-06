@@ -53,6 +53,7 @@
         android:layout_alignTop="@+id/speed_or_state"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
+        android:text="-/-"
         android:textSize="@dimen/text_size_smallest"
         tools:ignore="RelativeOverlap"
         />

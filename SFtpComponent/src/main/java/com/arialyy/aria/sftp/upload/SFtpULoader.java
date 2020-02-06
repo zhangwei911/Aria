@@ -31,7 +31,7 @@ import com.arialyy.aria.core.manager.ThreadTaskManager;
 import com.arialyy.aria.core.task.IThreadTask;
 import com.arialyy.aria.core.upload.UTaskWrapper;
 import com.arialyy.aria.core.upload.UploadEntity;
-import com.arialyy.aria.exception.BaseException;
+import com.arialyy.aria.exception.AriaException;
 import com.arialyy.aria.util.FileUtil;
 import com.jcraft.jsch.SftpATTRS;
 import java.io.File;
@@ -139,7 +139,7 @@ final class SFtpULoader extends AbsNormalLoader<UTaskWrapper> {
         }
       }
 
-      @Override public void onFail(AbsEntity entity, BaseException e, boolean needRetry) {
+      @Override public void onFail(AbsEntity entity, AriaException e, boolean needRetry) {
         getListener().onFail(needRetry, e);
       }
     });

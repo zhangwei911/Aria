@@ -15,21 +15,14 @@
  */
 package com.arialyy.aria.exception;
 
-public abstract class BaseException extends Exception {
+public class AriaFTPException extends AriaException {
+  private static final String FTP_EXCEPTION = "Aria SFTP Exception:";
 
-  private String tag;
-
-  public BaseException(String tag, String message) {
-    super(message);
-    this.tag = tag;
+  public AriaFTPException(String tag, String message) {
+    super(tag, String.format("%s\n%s", FTP_EXCEPTION, message));
   }
 
-  public BaseException(String tag, String message, Exception e) {
-    super(String.format("%s\n%s", message == null ? "" : message, e == null ? "" : e.getMessage()));
-    this.tag = tag;
-  }
-
-  public String getTag() {
-    return tag;
+  public AriaFTPException(String tag, String message, Exception e) {
+    super(tag, message, e);
   }
 }

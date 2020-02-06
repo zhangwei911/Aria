@@ -35,8 +35,8 @@ import com.arialyy.aria.core.manager.ThreadTaskManager;
 import com.arialyy.aria.core.processor.IVodTsUrlConverter;
 import com.arialyy.aria.core.task.ThreadTask;
 import com.arialyy.aria.core.wrapper.ITaskWrapper;
-import com.arialyy.aria.exception.BaseException;
-import com.arialyy.aria.exception.M3U8Exception;
+import com.arialyy.aria.exception.AriaException;
+import com.arialyy.aria.exception.AriaM3U8Exception;
 import com.arialyy.aria.m3u8.BaseM3U8Loader;
 import com.arialyy.aria.m3u8.M3U8Listener;
 import com.arialyy.aria.m3u8.M3U8TaskOption;
@@ -517,10 +517,10 @@ final class M3U8VodLoader extends BaseM3U8Loader {
           urls.addAll((Collection<? extends String>) info.obj);
         }
         if (urls.isEmpty()) {
-          fail(new M3U8Exception(TAG, "获取地址失败"), false);
+          fail(new AriaM3U8Exception(TAG, "获取地址失败"), false);
           return;
         } else if (!urls.get(0).startsWith("http")) {
-          fail(new M3U8Exception(TAG, "地址错误，请使用IVodTsUrlConverter处理你的url信息"), false);
+          fail(new AriaM3U8Exception(TAG, "地址错误，请使用IVodTsUrlConverter处理你的url信息"), false);
           return;
         }
         mM3U8Option.setUrls(urls);
@@ -534,13 +534,13 @@ final class M3U8VodLoader extends BaseM3U8Loader {
         }
       }
 
-      @Override public void onFail(AbsEntity entity, BaseException e, boolean needRetry) {
+      @Override public void onFail(AbsEntity entity, AriaException e, boolean needRetry) {
         fail(e, needRetry);
       }
     });
   }
 
-  protected void fail(BaseException e, boolean needRetry) {
+  protected void fail(AriaException e, boolean needRetry) {
     if (isBreak()) {
       return;
     }

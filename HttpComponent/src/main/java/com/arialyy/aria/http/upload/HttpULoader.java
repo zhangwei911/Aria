@@ -26,7 +26,7 @@ import com.arialyy.aria.core.loader.IThreadTaskBuilder;
 import com.arialyy.aria.core.manager.ThreadTaskManager;
 import com.arialyy.aria.core.task.IThreadTask;
 import com.arialyy.aria.core.upload.UTaskWrapper;
-import com.arialyy.aria.exception.AriaIOException;
+import com.arialyy.aria.exception.AriaHTTPException;
 import com.arialyy.aria.util.ALog;
 import java.util.List;
 
@@ -62,7 +62,7 @@ final class HttpULoader extends AbsNormalLoader<UTaskWrapper> {
         new Handler(looper, mStateManager.getHandlerCallback()));
     if (tt == null || tt.isEmpty()) {
       ALog.e(TAG, "创建线程任务失败");
-      getListener().onFail(false, new AriaIOException(TAG, "创建线程任务失败"));
+      getListener().onFail(false, new AriaHTTPException(TAG, "创建线程任务失败"));
       return;
     }
 

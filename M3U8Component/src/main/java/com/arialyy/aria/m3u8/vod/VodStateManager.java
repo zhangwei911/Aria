@@ -29,8 +29,8 @@ import com.arialyy.aria.core.loader.ILoaderVisitor;
 import com.arialyy.aria.core.manager.ThreadTaskManager;
 import com.arialyy.aria.core.processor.ITsMergeHandler;
 import com.arialyy.aria.core.task.ThreadTask;
-import com.arialyy.aria.exception.BaseException;
-import com.arialyy.aria.exception.TaskException;
+import com.arialyy.aria.exception.AriaM3U8Exception;
+import com.arialyy.aria.exception.AriaException;
 import com.arialyy.aria.m3u8.BaseM3U8Loader;
 import com.arialyy.aria.m3u8.M3U8Listener;
 import com.arialyy.aria.m3u8.M3U8TaskOption;
@@ -113,7 +113,7 @@ public final class VodStateManager implements IThreadStateManager {
             ALog.d(TAG, String.format("vod任务【%s】失败", loader.getTempFile().getName()));
             Bundle b = msg.getData();
             listener.onFail(b.getBoolean(DATA_RETRY, true),
-                (BaseException) b.getSerializable(DATA_ERROR_INFO));
+                (AriaException) b.getSerializable(DATA_ERROR_INFO));
             quitLooper();
           }
           break;
@@ -148,7 +148,7 @@ public final class VodStateManager implements IThreadStateManager {
               if (loader.generateIndexFile(false)) {
                 listener.onComplete();
               } else {
-                listener.onFail(false, new TaskException(TAG, "创建索引文件失败"));
+                listener.onFail(false, new AriaM3U8Exception(TAG, "创建索引文件失败"));
               }
             } else if (m3U8Option.isMergeFile()) {
               if (mergeFile()) {

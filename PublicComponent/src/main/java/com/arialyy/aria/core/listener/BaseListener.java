@@ -16,13 +16,14 @@
 package com.arialyy.aria.core.listener;
 
 import android.os.Handler;
+import android.util.Log;
 import com.arialyy.aria.core.common.AbsEntity;
 import com.arialyy.aria.core.inf.IEntity;
 import com.arialyy.aria.core.inf.TaskSchedulerType;
 import com.arialyy.aria.core.task.AbsTask;
 import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
 import com.arialyy.aria.core.wrapper.ITaskWrapper;
-import com.arialyy.aria.exception.BaseException;
+import com.arialyy.aria.exception.AriaException;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
 import com.arialyy.aria.util.ErrorHelp;
@@ -114,7 +115,7 @@ public abstract class BaseListener<ENTITY extends AbsEntity, TASK_WRAPPER extend
     }
   }
 
-  @Override public void onFail(boolean needRetry, BaseException e) {
+  @Override public void onFail(boolean needRetry, AriaException e) {
     mEntity.setFailNum(mEntity.getFailNum() + 1);
     saveData(IEntity.STATE_FAIL, mEntity.getCurrentProgress());
     handleSpeed(0);
@@ -123,8 +124,8 @@ public abstract class BaseListener<ENTITY extends AbsEntity, TASK_WRAPPER extend
     sendInState2Target(ISchedulers.FAIL);
     if (e != null) {
       String error = ALog.getExceptionString(e);
-      ALog.w(TAG, error);
-      ErrorHelp.saveError(e.getTag(), "", error);
+      ALog.e(TAG, error);
+      ErrorHelp.saveError(e.getTag(), e.getMessage(), error);
     }
   }
 
