@@ -1,3 +1,5 @@
+dev分支支持回调获取任务状态
+
 # Aria
 ![图标](https://github.com/AriaLyy/DownloadUtil/blob/master/img/ic_launcher.png)</br>
 ## [ENGLISH DOC](https://github.com/AriaLyy/Aria/blob/master/ENGLISH_README.md)</br>
