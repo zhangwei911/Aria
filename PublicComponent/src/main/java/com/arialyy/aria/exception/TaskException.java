@@ -19,13 +19,13 @@ package com.arialyy.aria.exception;
  * 任务异常
  */
 public class TaskException extends BaseException {
-  private static final String ARIA_TASK_EXCEPTION = "Aria Task Exception:";
+    private static final String ARIA_TASK_EXCEPTION = "Aria Task Exception:";
 
-  public TaskException(String tag, String detailMessage) {
-    super(tag, String.format("%s, %s", ARIA_TASK_EXCEPTION, detailMessage));
-  }
+    public TaskException(String tag, String detailMessage) {
+        super(tag, String.format("%s, %s", ARIA_TASK_EXCEPTION, detailMessage));
+    }
 
-  public TaskException(String tag, String message, Exception e){
-    super(tag, message, e);
-  }
+    public TaskException(String tag, String message, Exception e) {
+        super(tag, message, e);
+    }
 }

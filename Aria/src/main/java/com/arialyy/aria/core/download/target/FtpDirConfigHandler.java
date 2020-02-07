@@ -21,6 +21,7 @@ import com.arialyy.aria.core.inf.AbsTarget;
 import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
 import com.arialyy.aria.core.wrapper.ITaskWrapper;
 import com.arialyy.aria.util.CommonUtil;
+
 import java.util.List;
 
 /**
@@ -29,19 +30,19 @@ import java.util.List;
  */
 class FtpDirConfigHandler<TARGET extends AbsTarget> extends AbsGroupConfigHandler<TARGET> {
 
-  FtpDirConfigHandler(TARGET target, long taskId) {
-    super(target, taskId);
-    init();
-  }
-
-  private void init() {
-    getTaskWrapper().setRequestType(ITaskWrapper.D_FTP_DIR);
-    List<DTaskWrapper> wrappers = getTaskWrapper().getSubTaskWrapper();
-    if (!wrappers.isEmpty()) {
-      for (DTaskWrapper subWrapper : wrappers) {
-        subWrapper.setRequestType(ITaskWrapper.D_FTP);
-        subWrapper.getEntity().setTaskType(ITaskWrapper.D_FTP);
-      }
+    FtpDirConfigHandler(TARGET target, long taskId) {
+        super(target, taskId);
+        init();
     }
-  }
+
+    private void init() {
+        getTaskWrapper().setRequestType(ITaskWrapper.D_FTP_DIR);
+        List<DTaskWrapper> wrappers = getTaskWrapper().getSubTaskWrapper();
+        if (!wrappers.isEmpty()) {
+            for (DTaskWrapper subWrapper : wrappers) {
+                subWrapper.setRequestType(ITaskWrapper.D_FTP);
+                subWrapper.getEntity().setTaskType(ITaskWrapper.D_FTP);
+            }
+        }
+    }
 }

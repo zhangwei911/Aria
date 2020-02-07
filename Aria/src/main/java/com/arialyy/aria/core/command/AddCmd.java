@@ -27,19 +27,20 @@ import com.arialyy.aria.util.ALog;
  */
 final class AddCmd<T extends AbsTaskWrapper> extends AbsNormalCmd<T> {
 
-  AddCmd(T entity, int taskType) {
-    super(entity, taskType);
-  }
-
-  @Override public void executeCmd() {
-    if (!canExeCmd) return;
-    AbsTask task = getTask();
-    if (task == null) {
-      mTaskWrapper.getEntity().setState(IEntity.STATE_WAIT);
-      createTask();
-      sendWaitState();
-    } else {
-      ALog.w(TAG, "添加命令执行失败，【该任务已经存在】");
+    AddCmd(T entity, int taskType) {
+        super(entity, taskType);
     }
-  }
+
+    @Override
+    public void executeCmd() {
+        if (!canExeCmd) return;
+        AbsTask task = getTask();
+        if (task == null) {
+            mTaskWrapper.getEntity().setState(IEntity.STATE_WAIT);
+            createTask();
+            sendWaitState();
+        } else {
+            ALog.w(TAG, "添加命令执行失败，【该任务已经存在】");
+        }
+    }
 }

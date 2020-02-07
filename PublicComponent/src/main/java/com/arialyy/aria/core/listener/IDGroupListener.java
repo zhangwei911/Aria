@@ -24,47 +24,47 @@ import com.arialyy.aria.exception.BaseException;
  */
 public interface IDGroupListener extends IDLoadListener {
 
-  /**
-   * 子任务预处理
-   */
-  void onSubPre(DownloadEntity subEntity);
+    /**
+     * 子任务预处理
+     */
+    void onSubPre(DownloadEntity subEntity);
 
-  /**
-   * 子任务支持断点回调
-   *
-   * @param support true,支持；false 不支持
-   */
-  void supportBreakpoint(boolean support, DownloadEntity subEntity);
+    /**
+     * 子任务支持断点回调
+     *
+     * @param support true,支持；false 不支持
+     */
+    void supportBreakpoint(boolean support, DownloadEntity subEntity);
 
-  /**
-   * 子任务开始下载\恢复下载
-   */
-  void onSubStart(DownloadEntity subEntity);
+    /**
+     * 子任务开始下载\恢复下载
+     */
+    void onSubStart(DownloadEntity subEntity);
 
-  /**
-   * 子任务停止下载
-   */
-  void onSubStop(DownloadEntity subEntity, long stopLocation);
+    /**
+     * 子任务停止下载
+     */
+    void onSubStop(DownloadEntity subEntity, long stopLocation);
 
-  /**
-   * 子任务下载完成
-   */
-  void onSubComplete(DownloadEntity subEntity);
+    /**
+     * 子任务下载完成
+     */
+    void onSubComplete(DownloadEntity subEntity);
 
-  /**
-   * 子任务下载失败
-   */
-  void onSubFail(DownloadEntity subEntity, BaseException e);
+    /**
+     * 子任务下载失败
+     */
+    void onSubFail(DownloadEntity subEntity, BaseException e);
 
-  /**
-   * 子任务取消下载
-   */
-  void onSubCancel(DownloadEntity subEntity);
+    /**
+     * 子任务取消下载
+     */
+    void onSubCancel(DownloadEntity subEntity);
 
-  /**
-   * 子任务执行中
-   *
-   * @param currentProgress 当前进度
-   */
-  void onSubRunning(DownloadEntity subEntity, long currentProgress);
+    /**
+     * 子任务执行中
+     *
+     * @param currentProgress 当前进度
+     */
+    void onSubRunning(DownloadEntity subEntity, long currentProgress);
 }

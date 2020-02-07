@@ -16,6 +16,7 @@
 package com.arialyy.aria.ftp.upload;
 
 import com.arialyy.aria.util.BufferedRandomAccessFile;
+
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -25,49 +26,54 @@ import java.io.InputStream;
  */
 final class FtpFISAdapter extends InputStream {
 
-  private BufferedRandomAccessFile mIs;
-  private ProgressCallback mCallback;
-  private int count;
+    private BufferedRandomAccessFile mIs;
+    private ProgressCallback mCallback;
+    private int count;
 
-  interface ProgressCallback {
-    void onProgressCallback(byte[] buffer, int byteOffset, int byteCount) throws IOException;
-  }
-
-  FtpFISAdapter(BufferedRandomAccessFile is, ProgressCallback callback) {
-    mIs = is;
-    mCallback = callback;
-  }
-
-  FtpFISAdapter(BufferedRandomAccessFile is) {
-    mIs = is;
-  }
-
-  @Override public void close() throws IOException {
-    mIs.close();
-  }
-
-  @Override public int read() throws IOException {
-    return mIs.read();
-  }
-
-  @Override public int read(byte[] buffer) throws IOException {
-    count = mIs.read(buffer);
-    if (mCallback != null) {
-      mCallback.onProgressCallback(buffer, 0, count);
+    interface ProgressCallback {
+        void onProgressCallback(byte[] buffer, int byteOffset, int byteCount) throws IOException;
     }
-    return count;
-  }
 
-  @Override public int read(byte[] buffer, int byteOffset, int byteCount)
-      throws IOException {
-    count = mIs.read(buffer, byteOffset, byteCount);
-    if (mCallback != null) {
-      mCallback.onProgressCallback(buffer, byteOffset, byteCount);
+    FtpFISAdapter(BufferedRandomAccessFile is, ProgressCallback callback) {
+        mIs = is;
+        mCallback = callback;
     }
-    return count;
-  }
 
-  @Override public long skip(long byteCount) throws IOException {
-    return mIs.skipBytes((int) byteCount);
-  }
+    FtpFISAdapter(BufferedRandomAccessFile is) {
+        mIs = is;
+    }
+
+    @Override
+    public void close() throws IOException {
+        mIs.close();
+    }
+
+    @Override
+    public int read() throws IOException {
+        return mIs.read();
+    }
+
+    @Override
+    public int read(byte[] buffer) throws IOException {
+        count = mIs.read(buffer);
+        if (mCallback != null) {
+            mCallback.onProgressCallback(buffer, 0, count);
+        }
+        return count;
+    }
+
+    @Override
+    public int read(byte[] buffer, int byteOffset, int byteCount)
+            throws IOException {
+        count = mIs.read(buffer, byteOffset, byteCount);
+        if (mCallback != null) {
+            mCallback.onProgressCallback(buffer, byteOffset, byteCount);
+        }
+        return count;
+    }
+
+    @Override
+    public long skip(long byteCount) throws IOException {
+        return mIs.skipBytes((int) byteCount);
+    }
 }

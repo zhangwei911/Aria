@@ -32,22 +32,23 @@ import com.arialyy.aria.ftp.FtpTaskOption;
  */
 public final class FtpDLoaderUtil extends AbsNormalLoaderUtil {
 
-  public FtpDLoaderUtil(AbsTaskWrapper wrapper, IEventListener listener) {
-    super(wrapper, listener);
-    wrapper.generateTaskOption(FtpTaskOption.class);
-  }
+    public FtpDLoaderUtil(AbsTaskWrapper wrapper, IEventListener listener) {
+        super(wrapper, listener);
+        wrapper.generateTaskOption(FtpTaskOption.class);
+    }
 
-  @Override public AbsNormalLoader getLoader() {
-    return mLoader == null ? new NormalLoader(getTaskWrapper(), getListener()) : mLoader;
-  }
+    @Override
+    public AbsNormalLoader getLoader() {
+        return mLoader == null ? new NormalLoader(getTaskWrapper(), getListener()) : mLoader;
+    }
 
-  public LoaderStructure BuildLoaderStructure() {
-    LoaderStructure structure = new LoaderStructure();
-    structure.addComponent(new FtpDRecordHandler((DTaskWrapper) getTaskWrapper()))
-        .addComponent(new NormalThreadStateManager(getListener()))
-        .addComponent(new FtpDFileInfoTask((DTaskWrapper) getTaskWrapper()))
-        .addComponent(new NormalTTBuilder(getTaskWrapper(), new FtpDTTBuilderAdapter()));
-    structure.accept(getLoader());
-    return structure;
-  }
+    public LoaderStructure BuildLoaderStructure() {
+        LoaderStructure structure = new LoaderStructure();
+        structure.addComponent(new FtpDRecordHandler((DTaskWrapper) getTaskWrapper()))
+                .addComponent(new NormalThreadStateManager(getListener()))
+                .addComponent(new FtpDFileInfoTask((DTaskWrapper) getTaskWrapper()))
+                .addComponent(new NormalTTBuilder(getTaskWrapper(), new FtpDTTBuilderAdapter()));
+        structure.accept(getLoader());
+        return structure;
+    }
 }

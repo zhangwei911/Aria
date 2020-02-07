@@ -27,114 +27,116 @@ import com.arialyy.aria.util.ALog;
  * 启动控制器
  */
 public final class NormalController extends FeatureController implements INormalFeature {
-  private String TAG = "NormalController";
+    private String TAG = "NormalController";
 
-  public NormalController(AbsTaskWrapper wrapper) {
-    super(wrapper);
-  }
-
-  /**
-   * 停止任务
-   */
-  @Override
-  public void stop() {
-    setAction(ACTION_STOP);
-    if (checkConfig()) {
-      EventMsgUtil.getDefault()
-          .post(CmdHelper.createNormalCmd(getTaskWrapper(), NormalCmdFactory.TASK_STOP,
-              checkTaskType()));
+    public NormalController(AbsTaskWrapper wrapper) {
+        super(wrapper);
     }
-  }
 
-  /**
-   * 恢复任务
-   */
-  @Override
-  public void resume() {
-    resume(false);
-  }
-
-  /**
-   * 正常来说，当执行队列满时，调用恢复任务接口，只能将任务放到缓存队列中。
-   * 如果希望调用恢复接口，马上进入执行队列，需要使用该方法
-   *
-   * @param newStart true 立即将任务恢复到执行队列中
-   */
-  @Override public void resume(boolean newStart) {
-    setAction(ACTION_RESUME);
-    if (checkConfig()) {
-      StartCmd cmd =
-          (StartCmd) CmdHelper.createNormalCmd(getTaskWrapper(), NormalCmdFactory.TASK_START,
-              checkTaskType());
-      cmd.setNewStart(newStart);
-      EventMsgUtil.getDefault()
-          .post(cmd);
+    /**
+     * 停止任务
+     */
+    @Override
+    public void stop() {
+        setAction(ACTION_STOP);
+        if (checkConfig()) {
+            EventMsgUtil.getDefault()
+                    .post(CmdHelper.createNormalCmd(getTaskWrapper(), NormalCmdFactory.TASK_STOP,
+                            checkTaskType()));
+        }
     }
-  }
 
-  /**
-   * 删除任务
-   */
-  @Override
-  public void cancel() {
-    cancel(false);
-  }
-
-  /**
-   * 任务重试
-   */
-  @Override
-  public void reTry() {
-    setAction(ACTION_RETRY);
-    if (checkConfig()) {
-      int taskType = checkTaskType();
-      EventMsgUtil.getDefault()
-          .post(CmdHelper.createNormalCmd(getTaskWrapper(), NormalCmdFactory.TASK_STOP, taskType));
-      EventMsgUtil.getDefault()
-          .post(
-              CmdHelper.createNormalCmd(getTaskWrapper(), NormalCmdFactory.TASK_START, taskType));
+    /**
+     * 恢复任务
+     */
+    @Override
+    public void resume() {
+        resume(false);
     }
-  }
 
-  /**
-   * 删除任务
-   *
-   * @param removeFile {@code true} 不仅删除任务数据库记录，还会删除已经删除完成的文件
-   * {@code false}如果任务已经完成，只删除任务数据库记录，
-   */
-  @Override
-  public void cancel(boolean removeFile) {
-    setAction(ACTION_CANCEL);
-    if (checkConfig()) {
-      CancelCmd cancelCmd =
-          (CancelCmd) CmdHelper.createNormalCmd(getTaskWrapper(), NormalCmdFactory.TASK_CANCEL,
-              checkTaskType());
-      cancelCmd.removeFile = removeFile;
-      EventMsgUtil.getDefault().post(cancelCmd);
+    /**
+     * 正常来说，当执行队列满时，调用恢复任务接口，只能将任务放到缓存队列中。
+     * 如果希望调用恢复接口，马上进入执行队列，需要使用该方法
+     *
+     * @param newStart true 立即将任务恢复到执行队列中
+     */
+    @Override
+    public void resume(boolean newStart) {
+        setAction(ACTION_RESUME);
+        if (checkConfig()) {
+            StartCmd cmd =
+                    (StartCmd) CmdHelper.createNormalCmd(getTaskWrapper(), NormalCmdFactory.TASK_START,
+                            checkTaskType());
+            cmd.setNewStart(newStart);
+            EventMsgUtil.getDefault()
+                    .post(cmd);
+        }
     }
-  }
 
-  /**
-   * 重新下载
-   */
-  @Override
-  public long reStart() {
-    setAction(ACTION_RESTART);
-    if (checkConfig()) {
-      EventMsgUtil.getDefault()
-          .post(CmdHelper.createNormalCmd(getTaskWrapper(), NormalCmdFactory.TASK_RESTART,
-              checkTaskType()));
-      return getEntity().getId();
+    /**
+     * 删除任务
+     */
+    @Override
+    public void cancel() {
+        cancel(false);
     }
-    return -1;
-  }
 
-  @Override public void save() {
-    setAction(ACTION_SAVE);
-    if (!checkConfig()) {
-      ALog.e(TAG, "保存修改失败");
-    } else {
-      ALog.i(TAG, "保存成功");
+    /**
+     * 任务重试
+     */
+    @Override
+    public void reTry() {
+        setAction(ACTION_RETRY);
+        if (checkConfig()) {
+            int taskType = checkTaskType();
+            EventMsgUtil.getDefault()
+                    .post(CmdHelper.createNormalCmd(getTaskWrapper(), NormalCmdFactory.TASK_STOP, taskType));
+            EventMsgUtil.getDefault()
+                    .post(
+                            CmdHelper.createNormalCmd(getTaskWrapper(), NormalCmdFactory.TASK_START, taskType));
+        }
     }
-  }
+
+    /**
+     * 删除任务
+     *
+     * @param removeFile {@code true} 不仅删除任务数据库记录，还会删除已经删除完成的文件
+     *                   {@code false}如果任务已经完成，只删除任务数据库记录，
+     */
+    @Override
+    public void cancel(boolean removeFile) {
+        setAction(ACTION_CANCEL);
+        if (checkConfig()) {
+            CancelCmd cancelCmd =
+                    (CancelCmd) CmdHelper.createNormalCmd(getTaskWrapper(), NormalCmdFactory.TASK_CANCEL,
+                            checkTaskType());
+            cancelCmd.removeFile = removeFile;
+            EventMsgUtil.getDefault().post(cancelCmd);
+        }
+    }
+
+    /**
+     * 重新下载
+     */
+    @Override
+    public long reStart() {
+        setAction(ACTION_RESTART);
+        if (checkConfig()) {
+            EventMsgUtil.getDefault()
+                    .post(CmdHelper.createNormalCmd(getTaskWrapper(), NormalCmdFactory.TASK_RESTART,
+                            checkTaskType()));
+            return getEntity().getId();
+        }
+        return -1;
+    }
+
+    @Override
+    public void save() {
+        setAction(ACTION_SAVE);
+        if (!checkConfig()) {
+            ALog.e(TAG, "保存修改失败");
+        } else {
+            ALog.i(TAG, "保存成功");
+        }
+    }
 }

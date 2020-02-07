@@ -22,23 +22,23 @@ import com.arialyy.aria.core.inf.IThreadStateManager;
  */
 public interface ILoaderVisitor {
 
-  /**
-   * 处理任务记录
-   */
-  void addComponent(IRecordHandler recordHandler);
+    /**
+     * 处理任务记录
+     */
+    void addComponent(IRecordHandler recordHandler);
 
-  /**
-   * 处理任务的文件信息
-   */
-  void addComponent(IInfoTask infoTask);
+    /**
+     * 处理任务的文件信息
+     */
+    void addComponent(IInfoTask infoTask);
 
-  /**
-   * 线程状态
-   */
-  void addComponent(IThreadStateManager threadState);
+    /**
+     * 线程状态
+     */
+    void addComponent(IThreadStateManager threadState);
 
-  /**
-   * 构造线程任务
-   */
-  void addComponent(IThreadTaskBuilder builder);
+    /**
+     * 构造线程任务
+     */
+    void addComponent(IThreadTaskBuilder builder);
 }

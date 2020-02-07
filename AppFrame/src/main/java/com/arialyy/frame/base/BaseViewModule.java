@@ -1,6 +1,7 @@
 package com.arialyy.frame.base;
 
 import androidx.lifecycle.ViewModel;
+
 import com.arialyy.frame.base.net.NetManager;
 import com.arialyy.frame.util.StringUtil;
 
@@ -10,11 +11,11 @@ import com.arialyy.frame.util.StringUtil;
  */
 
 public class BaseViewModule extends ViewModel {
-  protected NetManager mNetManager;
-  protected String TAG = "";
+    protected NetManager mNetManager;
+    protected String TAG = "";
 
-  public BaseViewModule() {
-    mNetManager = NetManager.getInstance();
-    TAG = StringUtil.getClassName(this);
-  }
+    public BaseViewModule() {
+        mNetManager = NetManager.getInstance();
+        TAG = StringUtil.getClassName(this);
+    }
 }

@@ -16,14 +16,15 @@
 package com.arialyy.simple.core.download.mutil;
 
 import android.content.Context;
+
 import com.arialyy.simple.base.BaseModule;
 
 /**
  * Created by lyy on 2017/7/14.
  */
-public class MultiModule extends BaseModule{
-  public MultiModule(Context context) {
-    super(context);
-  }
+public class MultiModule extends BaseModule {
+    public MultiModule(Context context) {
+        super(context);
+    }
 
 }

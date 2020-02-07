@@ -19,6 +19,7 @@ import com.arialyy.aria.core.event.DGMaxNumEvent;
 import com.arialyy.aria.core.event.DSpeedEvent;
 import com.arialyy.aria.core.event.EventMsgUtil;
 import com.arialyy.aria.util.ALog;
+
 import java.io.Serializable;
 
 /**
@@ -26,96 +27,98 @@ import java.io.Serializable;
  */
 public class DGroupConfig extends BaseTaskConfig implements Serializable {
 
-  /**
-   * 能同时下载的子任务最大任务数，默认3
-   */
-  int subMaxTaskNum = 3;
+    /**
+     * 能同时下载的子任务最大任务数，默认3
+     */
+    int subMaxTaskNum = 3;
 
-  /**
-   * 子任务重试次数，默认为5
-   */
-  int subReTryNum = 5;
+    /**
+     * 子任务重试次数，默认为5
+     */
+    int subReTryNum = 5;
 
-  /**
-   * 子任务下载失败时的重试间隔，单位为毫秒，默认2000毫秒-
-   */
-  int subReTryInterval = 2000;
+    /**
+     * 子任务下载失败时的重试间隔，单位为毫秒，默认2000毫秒-
+     */
+    int subReTryInterval = 2000;
 
-  private DownloadConfig subConfig;
+    private DownloadConfig subConfig;
 
-  DGroupConfig() {
-    getSubConfig();
-  }
-
-  @Override int getType() {
-    return TYPE_DGROUP;
-  }
-
-  @Override public DGroupConfig setMaxSpeed(int maxSpeed) {
-    super.setMaxSpeed(maxSpeed);
-    EventMsgUtil.getDefault().post(new DSpeedEvent(maxSpeed));
-    return this;
-  }
-
-  public DownloadConfig getSubConfig() {
-    if (subConfig == null) {
-      subConfig = new DownloadConfig();
-      subConfig.threadNum = 1;
-      subConfig.useBlock = false;
-      subConfig.buffSize = buffSize;
-      subConfig.caName = caName;
-      subConfig.caPath = caPath;
-      subConfig.connectTimeOut = connectTimeOut;
-      subConfig.iOTimeOut = iOTimeOut;
-      subConfig.isConvertSpeed = isConvertSpeed;
-      subConfig.maxSpeed = maxSpeed;
-      subConfig.queueMod = "now";
-      subConfig.reTryInterval = subReTryInterval;
-      subConfig.reTryNum = subReTryNum;
-      subConfig.updateInterval = updateInterval;
+    DGroupConfig() {
+        getSubConfig();
     }
-    return subConfig;
-  }
 
-  public DGroupConfig setMaxTaskNum(int maxTaskNum) {
-    if (maxTaskNum <= 0) {
-      ALog.e(TAG, "组合任务最大任务数不能小于0");
-      return this;
+    @Override
+    int getType() {
+        return TYPE_DGROUP;
     }
-    super.setMaxTaskNum(maxTaskNum);
-    EventMsgUtil.getDefault().post(new DGMaxNumEvent(maxTaskNum));
-    return this;
-  }
 
-  public int getSubMaxTaskNum() {
-    return subMaxTaskNum;
-  }
+    @Override
+    public DGroupConfig setMaxSpeed(int maxSpeed) {
+        super.setMaxSpeed(maxSpeed);
+        EventMsgUtil.getDefault().post(new DSpeedEvent(maxSpeed));
+        return this;
+    }
 
-  public DGroupConfig setSubMaxTaskNum(int subMaxTaskNum) {
-    this.subMaxTaskNum = subMaxTaskNum;
-    save();
-    return this;
-  }
+    public DownloadConfig getSubConfig() {
+        if (subConfig == null) {
+            subConfig = new DownloadConfig();
+            subConfig.threadNum = 1;
+            subConfig.useBlock = false;
+            subConfig.buffSize = buffSize;
+            subConfig.caName = caName;
+            subConfig.caPath = caPath;
+            subConfig.connectTimeOut = connectTimeOut;
+            subConfig.iOTimeOut = iOTimeOut;
+            subConfig.isConvertSpeed = isConvertSpeed;
+            subConfig.maxSpeed = maxSpeed;
+            subConfig.queueMod = "now";
+            subConfig.reTryInterval = subReTryInterval;
+            subConfig.reTryNum = subReTryNum;
+            subConfig.updateInterval = updateInterval;
+        }
+        return subConfig;
+    }
 
-  public int getSubReTryNum() {
-    return subReTryNum;
-  }
+    public DGroupConfig setMaxTaskNum(int maxTaskNum) {
+        if (maxTaskNum <= 0) {
+            ALog.e(TAG, "组合任务最大任务数不能小于0");
+            return this;
+        }
+        super.setMaxTaskNum(maxTaskNum);
+        EventMsgUtil.getDefault().post(new DGMaxNumEvent(maxTaskNum));
+        return this;
+    }
 
-  public DGroupConfig setSubReTryNum(int subReTryNum) {
-    this.subReTryNum = subReTryNum;
-    subConfig.reTryNum = subReTryNum;
-    save();
-    return this;
-  }
+    public int getSubMaxTaskNum() {
+        return subMaxTaskNum;
+    }
 
-  public int getSubReTryInterval() {
-    return subReTryInterval;
-  }
+    public DGroupConfig setSubMaxTaskNum(int subMaxTaskNum) {
+        this.subMaxTaskNum = subMaxTaskNum;
+        save();
+        return this;
+    }
 
-  public DGroupConfig setSubReTryInterval(int subReTryInterval) {
-    this.subReTryInterval = subReTryInterval;
-    subConfig.reTryInterval = subReTryInterval;
-    save();
-    return this;
-  }
+    public int getSubReTryNum() {
+        return subReTryNum;
+    }
+
+    public DGroupConfig setSubReTryNum(int subReTryNum) {
+        this.subReTryNum = subReTryNum;
+        subConfig.reTryNum = subReTryNum;
+        save();
+        return this;
+    }
+
+    public int getSubReTryInterval() {
+        return subReTryInterval;
+    }
+
+    public DGroupConfig setSubReTryInterval(int subReTryInterval) {
+        this.subReTryInterval = subReTryInterval;
+        subConfig.reTryInterval = subReTryInterval;
+        save();
+        return this;
+    }
 }

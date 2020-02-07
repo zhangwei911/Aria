@@ -20,25 +20,25 @@ package com.arialyy.compiler;
  * 实体信息
  */
 enum EntityInfo {
-  NORMAL("com.arialyy.aria.core.common", "AbsNormalEntity"),
-  DOWNLOAD("com.arialyy.aria.core.download", "DownloadEntity"),
-  UPLOAD("com.arialyy.aria.core.upload", "UploadEntity");
-  String pkg, className;
+    NORMAL("com.arialyy.aria.core.common", "AbsNormalEntity"),
+    DOWNLOAD("com.arialyy.aria.core.download", "DownloadEntity"),
+    UPLOAD("com.arialyy.aria.core.upload", "UploadEntity");
+    String pkg, className;
 
-  public String getClassName() {
-    return className;
-  }
+    public String getClassName() {
+        return className;
+    }
 
-  public String getPkg() {
-    return pkg;
-  }
+    public String getPkg() {
+        return pkg;
+    }
 
-  /**
-   * @param pkg 包名
-   * @param className 对应到任务类名
-   */
-  EntityInfo(String pkg, String className) {
-    this.pkg = pkg;
-    this.className = className;
-  }
+    /**
+     * @param pkg       包名
+     * @param className 对应到任务类名
+     */
+    EntityInfo(String pkg, String className) {
+        this.pkg = pkg;
+        this.className = className;
+    }
 }

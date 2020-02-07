@@ -20,22 +20,22 @@ package com.arialyy.aria.core.queue.pool;
  * 下载任务池，该池子为简单任务和任务组共用
  */
 public class UploadSharePool {
-  private static volatile UploadSharePool INSTANCE;
+    private static volatile UploadSharePool INSTANCE;
 
-  public UploadExecutePool executePool;
-  public BaseCachePool cachePool;
+    public UploadExecutePool executePool;
+    public BaseCachePool cachePool;
 
-  private UploadSharePool() {
-    executePool = new UploadExecutePool();
-    cachePool = new BaseCachePool<>();
-  }
-
-  public static UploadSharePool getInstance() {
-    if (INSTANCE == null) {
-      synchronized (UploadSharePool.class) {
-        INSTANCE = new UploadSharePool();
-      }
+    private UploadSharePool() {
+        executePool = new UploadExecutePool();
+        cachePool = new BaseCachePool<>();
     }
-    return INSTANCE;
-  }
+
+    public static UploadSharePool getInstance() {
+        if (INSTANCE == null) {
+            synchronized (UploadSharePool.class) {
+                INSTANCE = new UploadSharePool();
+            }
+        }
+        return INSTANCE;
+    }
 }

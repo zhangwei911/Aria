@@ -25,6 +25,8 @@ import java.lang.annotation.Target;
  * Created by lyy on 2015/11/2.
  * 默认数据
  */
-@Target(ElementType.FIELD) @Retention(RetentionPolicy.RUNTIME) public @interface Default {
-  String value() default "";
+@Target(ElementType.FIELD)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface Default {
+    String value() default "";
 }

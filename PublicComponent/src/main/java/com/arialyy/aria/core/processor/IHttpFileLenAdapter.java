@@ -16,6 +16,7 @@
 package com.arialyy.aria.core.processor;
 
 import com.arialyy.aria.core.inf.IEventHandler;
+
 import java.net.URLConnection;
 import java.util.List;
 import java.util.Map;
@@ -25,11 +26,11 @@ import java.util.Map;
  */
 public interface IHttpFileLenAdapter extends IEventHandler {
 
-  /**
-   * 同伙header中的数据获取文件长度
-   *
-   * @param headers header参数{@link URLConnection#getHeaderFields()}
-   * @return 文件长度
-   */
-  long handleFileLen(Map<String, List<String>> headers);
+    /**
+     * 同伙header中的数据获取文件长度
+     *
+     * @param headers header参数{@link URLConnection#getHeaderFields()}
+     * @return 文件长度
+     */
+    long handleFileLen(Map<String, List<String>> headers);
 }

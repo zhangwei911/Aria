@@ -22,12 +22,12 @@ import aria.apache.commons.net.io.CopyStreamListener;
  * ftp 上传文件流事件监听
  */
 public interface OnFtpInputStreamListener {
-  /**
-   * {@link CopyStreamListener#bytesTransferred(long, int, long)}
-   *
-   * @param totalBytesTransferred 已经上传的文件长度
-   * @param bytesTransferred 上传byte长度
-   */
-  void onFtpInputStream(FTPClient client, long totalBytesTransferred, int bytesTransferred,
-      long streamSize);
+    /**
+     * {@link CopyStreamListener#bytesTransferred(long, int, long)}
+     *
+     * @param totalBytesTransferred 已经上传的文件长度
+     * @param bytesTransferred      上传byte长度
+     */
+    void onFtpInputStream(FTPClient client, long totalBytesTransferred, int bytesTransferred,
+                          long streamSize);
 }

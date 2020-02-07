@@ -22,12 +22,12 @@ import com.arialyy.aria.core.download.DownloadGroupEntity;
  * Created by lyy on 2017/7/14.
  */
 public class MultiEntity {
-  public static final int SIMPLE_DOWNLOAD = 0xa1;
-  public static final int GROUP_DOWNLOAD = 0xa2;
+    public static final int SIMPLE_DOWNLOAD = 0xa1;
+    public static final int GROUP_DOWNLOAD = 0xa2;
 
-  DownloadEntity simpleEntity;
-  DownloadGroupEntity groupEntity;
-  String key;
+    DownloadEntity simpleEntity;
+    DownloadGroupEntity groupEntity;
+    String key;
 
-  int type = -1;
+    int type = -1;
 }

@@ -18,9 +18,9 @@ package com.arialyy.aria.core.common;
 import com.arialyy.aria.util.CommonUtil;
 
 public abstract class BaseOption {
-  protected final String TAG;
+    protected final String TAG;
 
-  public BaseOption() {
-    TAG = CommonUtil.getClassName(getClass());
-  }
+    public BaseOption() {
+        TAG = CommonUtil.getClassName(getClass());
+    }
 }

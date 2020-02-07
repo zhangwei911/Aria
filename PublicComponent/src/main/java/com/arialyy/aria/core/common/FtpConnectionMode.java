@@ -19,12 +19,12 @@ package com.arialyy.aria.core.common;
  * FTP 连接模式
  */
 public interface FtpConnectionMode {
-  /**
-   * 被动模式
-   */
-  int DATA_CONNECTION_MODE_PASV = 0;
-  /**
-   * 主动模式
-   */
-  int DATA_CONNECTION_MODE_ACTIVITY = 1;
+    /**
+     * 被动模式
+     */
+    int DATA_CONNECTION_MODE_PASV = 0;
+    /**
+     * 主动模式
+     */
+    int DATA_CONNECTION_MODE_ACTIVITY = 1;
 }

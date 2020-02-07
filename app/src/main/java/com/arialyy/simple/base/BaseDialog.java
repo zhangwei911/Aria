@@ -17,7 +17,9 @@
 package com.arialyy.simple.base;
 
 import androidx.databinding.ViewDataBinding;
+
 import android.os.Bundle;
+
 import com.arialyy.frame.core.AbsDialogFragment;
 
 /**
@@ -25,15 +27,17 @@ import com.arialyy.frame.core.AbsDialogFragment;
  */
 public abstract class BaseDialog<VB extends ViewDataBinding> extends AbsDialogFragment<VB> {
 
-  protected BaseDialog(Object obj) {
-    super(obj);
-  }
+    protected BaseDialog(Object obj) {
+        super(obj);
+    }
 
-  @Override protected void init(Bundle savedInstanceState) {
+    @Override
+    protected void init(Bundle savedInstanceState) {
 
-  }
+    }
 
-  @Override protected void dataCallback(int result, Object data) {
+    @Override
+    protected void dataCallback(int result, Object data) {
 
-  }
+    }
 }

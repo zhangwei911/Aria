@@ -16,9 +16,9 @@
 package com.arialyy.aria.exception;
 
 public class ParamException extends RuntimeException {
-  private static final String ARIA_NET_EXCEPTION = "Aria Params Exception:";
+    private static final String ARIA_NET_EXCEPTION = "Aria Params Exception:";
 
-  public ParamException(String message) {
-    super(String.format("%s%s", ARIA_NET_EXCEPTION, message));
-  }
+    public ParamException(String message) {
+        super(String.format("%s%s", ARIA_NET_EXCEPTION, message));
+    }
 }

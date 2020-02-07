@@ -35,30 +35,31 @@ import java.net.Socket;
  ***/
 
 public class SocketInputStream extends FilterInputStream {
-  private final Socket __socket;
+    private final Socket __socket;
 
-  /***
-   * Creates a SocketInputStream instance wrapping an input stream and
-   * storing a reference to a socket that should be closed on closing
-   * the stream.
-   *
-   * @param socket  The socket to close on closing the stream.
-   * @param stream  The input stream to wrap.
-   ***/
-  public SocketInputStream(Socket socket, InputStream stream) {
-    super(stream);
-    __socket = socket;
-  }
+    /***
+     * Creates a SocketInputStream instance wrapping an input stream and
+     * storing a reference to a socket that should be closed on closing
+     * the stream.
+     *
+     * @param socket  The socket to close on closing the stream.
+     * @param stream  The input stream to wrap.
+     ***/
+    public SocketInputStream(Socket socket, InputStream stream) {
+        super(stream);
+        __socket = socket;
+    }
 
-  /***
-   * Closes the stream and immediately afterward closes the referenced
-   * socket.
-   *
-   * @throws IOException  If there is an error in closing the stream
-   *                         or socket.
-   ***/
-  @Override public void close() throws IOException {
-    super.close();
-    __socket.close();
-  }
+    /***
+     * Closes the stream and immediately afterward closes the referenced
+     * socket.
+     *
+     * @throws IOException  If there is an error in closing the stream
+     *                         or socket.
+     ***/
+    @Override
+    public void close() throws IOException {
+        super.close();
+        __socket.close();
+    }
 }

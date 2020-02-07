@@ -28,77 +28,84 @@ import com.arialyy.aria.util.CommonUtil;
  */
 public abstract class AbsGroupLoaderUtil implements IUtil {
 
-  protected String TAG = CommonUtil.getClassName(getClass());
-  private IEventListener mListener;
-  protected AbsGroupLoader mLoader;
-  private AbsTaskWrapper mTaskWrapper;
-  private boolean isStop = false, isCancel = false;
+    protected String TAG = CommonUtil.getClassName(getClass());
+    private IEventListener mListener;
+    protected AbsGroupLoader mLoader;
+    private AbsTaskWrapper mTaskWrapper;
+    private boolean isStop = false, isCancel = false;
 
-  protected AbsGroupLoaderUtil(AbsTaskWrapper wrapper, IEventListener listener) {
-    mTaskWrapper = wrapper;
-    mListener = listener;
-    mLoader = getLoader();
-  }
-
-  protected abstract AbsGroupLoader getLoader();
-
-  protected abstract LoaderStructure buildLoaderStructure();
-
-  public IEventListener getListener() {
-    return mListener;
-  }
-
-  public AbsTaskWrapper getTaskWrapper() {
-    return mTaskWrapper;
-  }
-
-  @Override public String getKey() {
-    return mTaskWrapper.getKey();
-  }
-
-  @Override public long getFileSize() {
-    return mTaskWrapper.getEntity().getFileSize();
-  }
-
-  @Override public long getCurrentLocation() {
-    return mLoader.getCurrentProgress();
-  }
-
-  @Override public boolean isRunning() {
-    return mLoader.isRunning();
-  }
-
-  public void startSubTask(String url) {
-    getLoader().startSubTask(url);
-  }
-
-  public void stopSubTask(String url) {
-    getLoader().stopSubTask(url);
-  }
-
-  /**
-   * 取消下载
-   */
-  @Override public void cancel() {
-    isCancel = true;
-    mLoader.cancel();
-  }
-
-  /**
-   * 停止下载
-   */
-  @Override public void stop() {
-    isStop = true;
-    mLoader.stop();
-  }
-
-  @Override public void start() {
-    if (isStop || isCancel) {
-      ALog.w(TAG, "启动组合任务失败，任务已停止或已取消");
-      return;
+    protected AbsGroupLoaderUtil(AbsTaskWrapper wrapper, IEventListener listener) {
+        mTaskWrapper = wrapper;
+        mListener = listener;
+        mLoader = getLoader();
     }
 
-    buildLoaderStructure();
-    new Thread(mLoader).start();
-  }
+    protected abstract AbsGroupLoader getLoader();
+
+    protected abstract LoaderStructure buildLoaderStructure();
+
+    public IEventListener getListener() {
+        return mListener;
+    }
+
+    public AbsTaskWrapper getTaskWrapper() {
+        return mTaskWrapper;
+    }
+
+    @Override
+    public String getKey() {
+        return mTaskWrapper.getKey();
+    }
+
+    @Override
+    public long getFileSize() {
+        return mTaskWrapper.getEntity().getFileSize();
+    }
+
+    @Override
+    public long getCurrentLocation() {
+        return mLoader.getCurrentProgress();
+    }
+
+    @Override
+    public boolean isRunning() {
+        return mLoader.isRunning();
+    }
+
+    public void startSubTask(String url) {
+        getLoader().startSubTask(url);
+    }
+
+    public void stopSubTask(String url) {
+        getLoader().stopSubTask(url);
+    }
+
+    /**
+     * 取消下载
+     */
+    @Override
+    public void cancel() {
+        isCancel = true;
+        mLoader.cancel();
+    }
+
+    /**
+     * 停止下载
+     */
+    @Override
+    public void stop() {
+        isStop = true;
+        mLoader.stop();
+    }
+
+    @Override
+    public void start() {
+        if (isStop || isCancel) {
+            ALog.w(TAG, "启动组合任务失败，任务已停止或已取消");
+            return;
+        }
+
+        buildLoaderStructure();
+        new Thread(mLoader).start();
+    }
 }

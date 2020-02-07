@@ -23,8 +23,8 @@ import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
  */
 interface INormalTEFactory<ENTITY extends AbsEntity, TASK_ENTITY extends AbsTaskWrapper<ENTITY>> {
 
-  /**
-   * 通过key创建任务，只适应于单任务
-   */
-  TASK_ENTITY create(long taskId);
+    /**
+     * 通过key创建任务，只适应于单任务
+     */
+    TASK_ENTITY create(long taskId);
 }

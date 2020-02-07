@@ -23,6 +23,7 @@ import android.os.Environment;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+
 import com.arialyy.annotations.Download;
 import com.arialyy.aria.core.Aria;
 import com.arialyy.aria.core.download.DownloadEntity;
@@ -37,107 +38,113 @@ import com.arialyy.simple.widget.HorizontalProgressBarWithNumber;
  * Created by AriaL on 2017/1/2.
  */
 public class DownloadPopupWindow extends AbsPopupWindow implements View.OnClickListener {
-  private HorizontalProgressBarWithNumber mPb;
-  private Button mStart;
-  private Button mCancel;
-  private TextView mSize;
-  private TextView mSpeed;
-  private long mTaskId = -1;
+    private HorizontalProgressBarWithNumber mPb;
+    private Button mStart;
+    private Button mCancel;
+    private TextView mSize;
+    private TextView mSpeed;
+    private long mTaskId = -1;
 
-  private static final String DOWNLOAD_URL =
-      "http://static.gaoshouyou.com/d/25/57/2e25bd9d4557ba31e9beebacfaf9e804.apk";
+    private static final String DOWNLOAD_URL =
+            "http://static.gaoshouyou.com/d/25/57/2e25bd9d4557ba31e9beebacfaf9e804.apk";
 
-  public DownloadPopupWindow(Context context) {
-    super(context, new ColorDrawable(Color.WHITE));
-    initWidget();
-  }
-
-  @Override protected int setLayoutId() {
-    return R.layout.dialog_download;
-  }
-
-  private void initWidget() {
-    mPb = mView.findViewById(R.id.progressBar);
-    mStart = mView.findViewById(R.id.start);
-    mCancel = mView.findViewById(R.id.cancel);
-    mSize = mView.findViewById(R.id.size);
-    mSpeed = mView.findViewById(R.id.speed);
-
-    mStart.setOnClickListener(this);
-    mCancel.setOnClickListener(this);
-
-    DownloadEntity entity = Aria.download(this).getFirstDownloadEntity(DOWNLOAD_URL);
-    if (entity != null) {
-      mPb.setProgress(entity.getPercent());
-      mSize.setText(CommonUtil.formatFileSize(entity.getFileSize()));
-      if (entity.getState() == IEntity.STATE_RUNNING) {
-        mStart.setText(getContext().getString(R.string.stop));
-      } else {
-        mStart.setText(getContext().getString(R.string.resume));
-      }
-      mTaskId = entity.getId();
-    } else {
-      mStart.setText(getContext().getString(R.string.start));
+    public DownloadPopupWindow(Context context) {
+        super(context, new ColorDrawable(Color.WHITE));
+        initWidget();
     }
-    Aria.download(this).register();
-  }
 
-  @Override
-  public void onClick(View view) {
-    switch (view.getId()) {
-      case R.id.start:
-        if (mTaskId != -1) {
-          Aria.download(this)
-              .load(DOWNLOAD_URL)
-              .setFilePath(Environment.getExternalStorageDirectory().getPath() + "/消消乐.apk")
-              .create();
-          mStart.setText(getContext().getString(R.string.stop));
-          break;
-        }
-        if (Aria.download(this).load(mTaskId).isRunning()) {
-          Aria.download(this).load(mTaskId).stop();
-          mStart.setText(getContext().getString(R.string.resume));
+    @Override
+    protected int setLayoutId() {
+        return R.layout.dialog_download;
+    }
+
+    private void initWidget() {
+        mPb = mView.findViewById(R.id.progressBar);
+        mStart = mView.findViewById(R.id.start);
+        mCancel = mView.findViewById(R.id.cancel);
+        mSize = mView.findViewById(R.id.size);
+        mSpeed = mView.findViewById(R.id.speed);
+
+        mStart.setOnClickListener(this);
+        mCancel.setOnClickListener(this);
+
+        DownloadEntity entity = Aria.download(this).getFirstDownloadEntity(DOWNLOAD_URL);
+        if (entity != null) {
+            mPb.setProgress(entity.getPercent());
+            mSize.setText(CommonUtil.formatFileSize(entity.getFileSize()));
+            if (entity.getState() == IEntity.STATE_RUNNING) {
+                mStart.setText(getContext().getString(R.string.stop));
+            } else {
+                mStart.setText(getContext().getString(R.string.resume));
+            }
+            mTaskId = entity.getId();
         } else {
-          Aria.download(this).load(mTaskId).resume();
-          mStart.setText(getContext().getString(R.string.stop));
+            mStart.setText(getContext().getString(R.string.start));
         }
-        break;
-
-      case R.id.cancel:
-
-        Aria.download(this).load(mTaskId).cancel();
-        mStart.setText(getContext().getResources().getString(R.string.start));
-        mTaskId = -1;
-        break;
+        Aria.download(this).register();
     }
-  }
 
-  @Override protected void dataCallback(int result, Object obj) {
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.start:
+                if (mTaskId != -1) {
+                    Aria.download(this)
+                            .load(DOWNLOAD_URL)
+                            .setFilePath(Environment.getExternalStorageDirectory().getPath() + "/消消乐.apk")
+                            .create();
+                    mStart.setText(getContext().getString(R.string.stop));
+                    break;
+                }
+                if (Aria.download(this).load(mTaskId).isRunning()) {
+                    Aria.download(this).load(mTaskId).stop();
+                    mStart.setText(getContext().getString(R.string.resume));
+                } else {
+                    Aria.download(this).load(mTaskId).resume();
+                    mStart.setText(getContext().getString(R.string.stop));
+                }
+                break;
 
-  }
+            case R.id.cancel:
 
-  @Download.onTaskPre public void onTaskPre(DownloadTask task) {
-    mSize.setText(CommonUtil.formatFileSize(task.getFileSize()));
-  }
-
-  @Download.onTaskStop public void onTaskStop(DownloadTask task) {
-    mSpeed.setText("0.0kb/s");
-    mStart.setText(getContext().getString(R.string.resume));
-  }
-
-  @Download.onTaskCancel public void onTaskCancel(DownloadTask task) {
-    mPb.setProgress(0);
-    mSpeed.setText("0.0kb/s");
-  }
-
-  @Download.onTaskRunning public void onTaskRunning(DownloadTask task) {
-    long current = task.getCurrentProgress();
-    long len = task.getFileSize();
-    if (len == 0) {
-      mPb.setProgress(0);
-    } else {
-      mPb.setProgress((int) ((current * 100) / len));
+                Aria.download(this).load(mTaskId).cancel();
+                mStart.setText(getContext().getResources().getString(R.string.start));
+                mTaskId = -1;
+                break;
+        }
     }
-    mSpeed.setText(task.getConvertSpeed());
-  }
+
+    @Override
+    protected void dataCallback(int result, Object obj) {
+
+    }
+
+    @Download.onTaskPre
+    public void onTaskPre(DownloadTask task) {
+        mSize.setText(CommonUtil.formatFileSize(task.getFileSize()));
+    }
+
+    @Download.onTaskStop
+    public void onTaskStop(DownloadTask task) {
+        mSpeed.setText("0.0kb/s");
+        mStart.setText(getContext().getString(R.string.resume));
+    }
+
+    @Download.onTaskCancel
+    public void onTaskCancel(DownloadTask task) {
+        mPb.setProgress(0);
+        mSpeed.setText("0.0kb/s");
+    }
+
+    @Download.onTaskRunning
+    public void onTaskRunning(DownloadTask task) {
+        long current = task.getCurrentProgress();
+        long len = task.getFileSize();
+        if (len == 0) {
+            mPb.setProgress(0);
+        } else {
+            mPb.setProgress((int) ((current * 100) / len));
+        }
+        mSpeed.setText(task.getConvertSpeed());
+    }
 }

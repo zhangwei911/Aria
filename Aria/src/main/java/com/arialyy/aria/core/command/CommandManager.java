@@ -24,95 +24,95 @@ import com.arialyy.aria.util.CommonUtil;
  */
 public class CommandManager {
 
-  private static CommandManager instance;
+    private static CommandManager instance;
 
-  private CommandManager() {
-    EventMsgUtil.getDefault().register(this);
-  }
+    private CommandManager() {
+        EventMsgUtil.getDefault().register(this);
+    }
 
-  public static void init() {
-    if (instance == null) {
-      synchronized (CommandManager.class) {
+    public static void init() {
         if (instance == null) {
-          instance = new CommandManager();
+            synchronized (CommandManager.class) {
+                if (instance == null) {
+                    instance = new CommandManager();
+                }
+            }
         }
-      }
     }
-  }
 
-  @Event
-  public void add(AddCmd cmd) {
-    if (CommonUtil.isFastDoubleClick()) {
-      return;
+    @Event
+    public void add(AddCmd cmd) {
+        if (CommonUtil.isFastDoubleClick()) {
+            return;
+        }
+        cmd.executeCmd();
     }
-    cmd.executeCmd();
-  }
 
-  @Event
-  public void start(StartCmd cmd) {
-    cmd.executeCmd();
-  }
-
-  @Event
-  public void stop(StopCmd cmd) {
-    cmd.executeCmd();
-  }
-
-  @Event
-  public void cancel(CancelCmd cmd) {
-    cmd.executeCmd();
-  }
-
-  @Event
-  public void stopAll(StopAllCmd cmd) {
-    if (CommonUtil.isFastDoubleClick()) {
-      return;
+    @Event
+    public void start(StartCmd cmd) {
+        cmd.executeCmd();
     }
-    cmd.executeCmd();
-  }
 
-  @Event
-  public void cancelAll(CancelAllCmd cmd) {
-    if (CommonUtil.isFastDoubleClick()) {
-      return;
+    @Event
+    public void stop(StopCmd cmd) {
+        cmd.executeCmd();
     }
-    cmd.executeCmd();
-  }
 
-  @Event
-  public void reStart(ReStartCmd cmd) {
-    if (CommonUtil.isFastDoubleClick()) {
-      return;
+    @Event
+    public void cancel(CancelCmd cmd) {
+        cmd.executeCmd();
     }
-    cmd.executeCmd();
-  }
 
-  @Event
-  public void highestPriority(HighestPriorityCmd cmd) {
-    if (CommonUtil.isFastDoubleClick()) {
-      return;
+    @Event
+    public void stopAll(StopAllCmd cmd) {
+        if (CommonUtil.isFastDoubleClick()) {
+            return;
+        }
+        cmd.executeCmd();
     }
-    cmd.executeCmd();
-  }
 
-  @Event
-  public void resumeAll(ResumeAllCmd cmd) {
-    if (CommonUtil.isFastDoubleClick()) {
-      return;
+    @Event
+    public void cancelAll(CancelAllCmd cmd) {
+        if (CommonUtil.isFastDoubleClick()) {
+            return;
+        }
+        cmd.executeCmd();
     }
-    cmd.executeCmd();
-  }
 
-  @Event
-  public void subStart(DGSubStartCmd cmd) {
-    if (CommonUtil.isFastDoubleClick()) {
-      return;
+    @Event
+    public void reStart(ReStartCmd cmd) {
+        if (CommonUtil.isFastDoubleClick()) {
+            return;
+        }
+        cmd.executeCmd();
     }
-    cmd.executeCmd();
-  }
 
-  @Event
-  public void subStop(DGSubStopCmd cmd) {
-    cmd.executeCmd();
-  }
+    @Event
+    public void highestPriority(HighestPriorityCmd cmd) {
+        if (CommonUtil.isFastDoubleClick()) {
+            return;
+        }
+        cmd.executeCmd();
+    }
+
+    @Event
+    public void resumeAll(ResumeAllCmd cmd) {
+        if (CommonUtil.isFastDoubleClick()) {
+            return;
+        }
+        cmd.executeCmd();
+    }
+
+    @Event
+    public void subStart(DGSubStartCmd cmd) {
+        if (CommonUtil.isFastDoubleClick()) {
+            return;
+        }
+        cmd.executeCmd();
+    }
+
+    @Event
+    public void subStop(DGSubStopCmd cmd) {
+        cmd.executeCmd();
+    }
 }

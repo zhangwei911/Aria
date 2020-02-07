@@ -19,28 +19,31 @@ import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+
 import com.arialyy.frame.util.DensityUtils;
 import com.arialyy.simple.R;
 import com.arialyy.simple.base.BaseDialog;
 import com.arialyy.simple.databinding.DialogLoadingBinding;
 
-@SuppressLint("ValidFragment") public class LoadingDialog extends BaseDialog<DialogLoadingBinding> {
-  public LoadingDialog(Object obj) {
-    super(obj);
-  }
-
-  @Override protected int setLayoutId() {
-    return R.layout.dialog_loading;
-  }
-
-  @Override
-  public void onStart() {
-    super.onStart();
-    Dialog dialog = getDialog();
-    if (dialog != null) {
-      dialog.getWindow().setLayout(DensityUtils.dp2px(120), DensityUtils.dp2px(120));
-      dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-      getDialog().setCanceledOnTouchOutside(false);
+@SuppressLint("ValidFragment")
+public class LoadingDialog extends BaseDialog<DialogLoadingBinding> {
+    public LoadingDialog(Object obj) {
+        super(obj);
     }
-  }
+
+    @Override
+    protected int setLayoutId() {
+        return R.layout.dialog_loading;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        Dialog dialog = getDialog();
+        if (dialog != null) {
+            dialog.getWindow().setLayout(DensityUtils.dp2px(120), DensityUtils.dp2px(120));
+            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            getDialog().setCanceledOnTouchOutside(false);
+        }
+    }
 }

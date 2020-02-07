@@ -19,35 +19,35 @@ package com.arialyy.aria.core.inf;
  * Created by lyy on 2017/2/6.
  */
 public interface IReceiver {
-  /**
-   * Receiver 销毁
-   */
-  void destroy();
+    /**
+     * Receiver 销毁
+     */
+    void destroy();
 
-  /**
-   * 注册
-   */
-  void register();
+    /**
+     * 注册
+     */
+    void register();
 
-  /**
-   * 移除观察者
-   */
-  void unRegister();
+    /**
+     * 移除观察者
+     */
+    void unRegister();
 
-  /**
-   * 观察者对象的类完整名称
-   */
-  String getTargetName();
+    /**
+     * 观察者对象的类完整名称
+     */
+    String getTargetName();
 
-  /**
-   * 获取当前Receiver的key
-   */
-  String getKey();
+    /**
+     * 获取当前Receiver的key
+     */
+    String getKey();
 
-  /**
-   * 设置类型
-   *
-   * @return {@link ReceiverType}
-   */
-  String getType();
+    /**
+     * 设置类型
+     *
+     * @return {@link ReceiverType}
+     */
+    String getType();
 }

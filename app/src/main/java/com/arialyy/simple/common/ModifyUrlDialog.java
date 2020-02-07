@@ -18,6 +18,7 @@ package com.arialyy.simple.common;
 import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.view.View;
+
 import com.arialyy.simple.R;
 import com.arialyy.simple.base.BaseDialog;
 import com.arialyy.simple.databinding.DialogModifyUrlBinding;
@@ -25,42 +26,48 @@ import com.arialyy.simple.databinding.DialogModifyUrlBinding;
 /**
  * Created by AriaL on 2019/5/27.
  */
-@SuppressLint("ValidFragment") public class ModifyUrlDialog
-    extends BaseDialog<DialogModifyUrlBinding> {
-  public static final int MODIFY_URL_DIALOG_RESULT = 0xA1;
+@SuppressLint("ValidFragment")
+public class ModifyUrlDialog
+        extends BaseDialog<DialogModifyUrlBinding> {
+    public static final int MODIFY_URL_DIALOG_RESULT = 0xA1;
 
-  private String mTitle, mText;
+    private String mTitle, mText;
 
-  public ModifyUrlDialog(Object obj, String title, String defaultText) {
-    super(obj);
-    mTitle = title;
-    mText = defaultText;
-  }
+    public ModifyUrlDialog(Object obj, String title, String defaultText) {
+        super(obj);
+        mTitle = title;
+        mText = defaultText;
+    }
 
-  @Override protected void init(Bundle savedInstanceState) {
-    super.init(savedInstanceState);
-    getBinding().setTitle(mTitle);
-    getBinding().setText(mText);
-    getBinding().cancel.setOnClickListener(new View.OnClickListener() {
-      @Override public void onClick(View v) {
-        dismiss();
-      }
-    });
-    getBinding().enter.setOnClickListener(new View.OnClickListener() {
-      @Override public void onClick(View v) {
-        mText = getBinding().getText();
-        getSimplerModule().onDialog(MODIFY_URL_DIALOG_RESULT, mText);
-        dismiss();
-      }
-    });
-    getBinding().edit.post(new Runnable() {
-      @Override public void run() {
-        getBinding().edit.setSelection(mText.length());
-      }
-    });
-  }
+    @Override
+    protected void init(Bundle savedInstanceState) {
+        super.init(savedInstanceState);
+        getBinding().setTitle(mTitle);
+        getBinding().setText(mText);
+        getBinding().cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dismiss();
+            }
+        });
+        getBinding().enter.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mText = getBinding().getText();
+                getSimplerModule().onDialog(MODIFY_URL_DIALOG_RESULT, mText);
+                dismiss();
+            }
+        });
+        getBinding().edit.post(new Runnable() {
+            @Override
+            public void run() {
+                getBinding().edit.setSelection(mText.length());
+            }
+        });
+    }
 
-  @Override protected int setLayoutId() {
-    return R.layout.dialog_modify_url;
-  }
+    @Override
+    protected int setLayoutId() {
+        return R.layout.dialog_modify_url;
+    }
 }

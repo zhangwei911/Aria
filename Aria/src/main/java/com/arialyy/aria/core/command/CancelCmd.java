@@ -24,25 +24,26 @@ import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
  * 取消命令
  */
 final public class CancelCmd<T extends AbsTaskWrapper> extends AbsNormalCmd<T> {
-  /**
-   * removeFile {@code true} 删除已经下载完成的任务，不仅删除下载记录，还会删除已经下载完成的文件，{@code false}
-   * 如果文件已经下载完成，只删除下载记录
-   */
-  public boolean removeFile = false;
+    /**
+     * removeFile {@code true} 删除已经下载完成的任务，不仅删除下载记录，还会删除已经下载完成的文件，{@code false}
+     * 如果文件已经下载完成，只删除下载记录
+     */
+    public boolean removeFile = false;
 
-  CancelCmd(T entity, int taskType) {
-    super(entity, taskType);
-  }
+    CancelCmd(T entity, int taskType) {
+        super(entity, taskType);
+    }
 
-  @Override public void executeCmd() {
-    if (!canExeCmd) return;
-    AbsTask task = getTask();
-    if (task == null) {
-      task = createTask();
+    @Override
+    public void executeCmd() {
+        if (!canExeCmd) return;
+        AbsTask task = getTask();
+        if (task == null) {
+            task = createTask();
+        }
+        if (task != null) {
+            mTaskWrapper.setRemoveFile(removeFile);
+            removeTask();
+        }
     }
-    if (task != null) {
-      mTaskWrapper.setRemoveFile(removeFile);
-      removeTask();
-    }
-  }
 }

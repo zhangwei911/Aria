@@ -16,6 +16,7 @@
 package com.arialyy.aria.core.task;
 
 import android.os.Bundle;
+
 import com.arialyy.aria.core.inf.IThreadStateManager;
 import com.arialyy.aria.exception.BaseException;
 
@@ -27,34 +28,34 @@ import com.arialyy.aria.exception.BaseException;
  */
 public interface IThreadTaskObserver {
 
-  /**
-   * 更新所有状态
-   *
-   * @param state state {@link IThreadStateManager#STATE_STOP}..
-   */
-  void updateState(int state, Bundle bundle);
+    /**
+     * 更新所有状态
+     *
+     * @param state state {@link IThreadStateManager#STATE_STOP}..
+     */
+    void updateState(int state, Bundle bundle);
 
-  /**
-   * 更新完成的状态
-   */
-  void updateCompleteState();
+    /**
+     * 更新完成的状态
+     */
+    void updateCompleteState();
 
-  /**
-   * 更新失败的状态
-   *
-   * @param needRetry 是否需要重试，一般是网络错误才需要重试
-   */
-  void updateFailState(BaseException e, boolean needRetry);
+    /**
+     * 更新失败的状态
+     *
+     * @param needRetry 是否需要重试，一般是网络错误才需要重试
+     */
+    void updateFailState(BaseException e, boolean needRetry);
 
-  /**
-   * 更新进度
-   *
-   * @param len 新增的长度
-   */
-  void updateProgress(long len);
+    /**
+     * 更新进度
+     *
+     * @param len 新增的长度
+     */
+    void updateProgress(long len);
 
-  /**
-   * 获取线程当前进度
-   */
-  long getThreadProgress();
+    /**
+     * 获取线程当前进度
+     */
+    long getThreadProgress();
 }

@@ -23,12 +23,12 @@ import com.arialyy.aria.core.inf.IEventHandler;
  */
 public interface ILiveTsUrlConverter extends IEventHandler {
 
-  /**
-   * 处理#EXTINF信息，对于某些服务器，返回的切片信息有可能是相对地址，因此，你需要自行转换为可下载http连接
-   *
-   * @param m3u8Url m3u8文件下载地址
-   * @param tsUrl ts文件下载地址
-   * @return 转换后的http地址
-   */
-  public String convert(String m3u8Url, String tsUrl);
+    /**
+     * 处理#EXTINF信息，对于某些服务器，返回的切片信息有可能是相对地址，因此，你需要自行转换为可下载http连接
+     *
+     * @param m3u8Url m3u8文件下载地址
+     * @param tsUrl   ts文件下载地址
+     * @return 转换后的http地址
+     */
+    public String convert(String m3u8Url, String tsUrl);
 }

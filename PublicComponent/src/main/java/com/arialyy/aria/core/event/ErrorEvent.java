@@ -16,11 +16,11 @@
 package com.arialyy.aria.core.event;
 
 public class ErrorEvent {
-  public long taskId;
-  public String errorMsg;
+    public long taskId;
+    public String errorMsg;
 
-  public ErrorEvent(long taskId, String errorMsg) {
-    this.taskId = taskId;
-    this.errorMsg = errorMsg;
-  }
+    public ErrorEvent(long taskId, String errorMsg) {
+        this.taskId = taskId;
+        this.errorMsg = errorMsg;
+    }
 }

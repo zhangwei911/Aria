@@ -16,8 +16,8 @@
 package com.arialyy.aria.core.config;
 
 public interface ConfigType {
-  int DOWNLOAD = 1;
-  int UPLOAD = 2;
-  int APP = 3;
-  int D_GROUP = 4;
+    int DOWNLOAD = 1;
+    int UPLOAD = 2;
+    int APP = 3;
+    int D_GROUP = 4;
 }

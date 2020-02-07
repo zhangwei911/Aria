@@ -27,96 +27,98 @@ import com.arialyy.aria.util.ComponentUtil;
  */
 public class DTaskWrapper extends AbsTaskWrapper<DownloadEntity> {
 
-  /**
-   * 所属的任务组组名，如果不属于任务组，则为null
-   */
-  private String groupHash;
+    /**
+     * 所属的任务组组名，如果不属于任务组，则为null
+     */
+    private String groupHash;
 
-  /**
-   * 该任务是否属于任务组
-   */
-  private boolean isGroupTask = false;
+    /**
+     * 该任务是否属于任务组
+     */
+    private boolean isGroupTask = false;
 
-  /**
-   * M3u8任务配置信息
-   */
-  private ITaskOption m3u8Option;
+    /**
+     * M3u8任务配置信息
+     */
+    private ITaskOption m3u8Option;
 
-  private TaskOptionParams m3u8Params = new TaskOptionParams();
+    private TaskOptionParams m3u8Params = new TaskOptionParams();
 
-  /**
-   * 文件下载url的临时保存变量
-   */
-  private String mTempUrl;
+    /**
+     * 文件下载url的临时保存变量
+     */
+    private String mTempUrl;
 
-  /**
-   * 文件保存路径的临时变量
-   */
-  private String mTempFilePath;
+    /**
+     * 文件保存路径的临时变量
+     */
+    private String mTempFilePath;
 
-  public DTaskWrapper(DownloadEntity entity) {
-    super(entity);
-  }
-
-  public ITaskOption getM3u8Option() {
-    return m3u8Option;
-  }
-
-  public void generateM3u8Option(Class<? extends ITaskOption> clazz) {
-    m3u8Option = ComponentUtil.getInstance().buildTaskOption(clazz, m3u8Params);
-  }
-
-  public TaskOptionParams getM3U8Params() {
-    if (m3u8Params == null) {
-      m3u8Params = new TaskOptionParams();
+    public DTaskWrapper(DownloadEntity entity) {
+        super(entity);
     }
-    return m3u8Params;
-  }
 
-  /**
-   * Task实体对应的key，下载url
-   */
-  @Override public String getKey() {
-    return getEntity().getKey();
-  }
-
-  @Override public DownloadConfig getConfig() {
-    if (isGroupTask) {
-      return Configuration.getInstance().dGroupCfg.getSubConfig();
-    } else {
-      return Configuration.getInstance().downloadCfg;
+    public ITaskOption getM3u8Option() {
+        return m3u8Option;
     }
-  }
 
-  public String getGroupHash() {
-    return groupHash;
-  }
+    public void generateM3u8Option(Class<? extends ITaskOption> clazz) {
+        m3u8Option = ComponentUtil.getInstance().buildTaskOption(clazz, m3u8Params);
+    }
 
-  public boolean isGroupTask() {
-    return isGroupTask;
-  }
+    public TaskOptionParams getM3U8Params() {
+        if (m3u8Params == null) {
+            m3u8Params = new TaskOptionParams();
+        }
+        return m3u8Params;
+    }
 
-  public void setGroupHash(String groupHash) {
-    this.groupHash = groupHash;
-  }
+    /**
+     * Task实体对应的key，下载url
+     */
+    @Override
+    public String getKey() {
+        return getEntity().getKey();
+    }
 
-  public void setGroupTask(boolean groupTask) {
-    isGroupTask = groupTask;
-  }
+    @Override
+    public DownloadConfig getConfig() {
+        if (isGroupTask) {
+            return Configuration.getInstance().dGroupCfg.getSubConfig();
+        } else {
+            return Configuration.getInstance().downloadCfg;
+        }
+    }
 
-  public String getTempUrl() {
-    return mTempUrl;
-  }
+    public String getGroupHash() {
+        return groupHash;
+    }
 
-  public void setTempUrl(String mTempUrl) {
-    this.mTempUrl = mTempUrl;
-  }
+    public boolean isGroupTask() {
+        return isGroupTask;
+    }
 
-  public String getTempFilePath() {
-    return mTempFilePath;
-  }
+    public void setGroupHash(String groupHash) {
+        this.groupHash = groupHash;
+    }
 
-  public void setTempFilePath(String mTempFilePath) {
-    this.mTempFilePath = mTempFilePath;
-  }
+    public void setGroupTask(boolean groupTask) {
+        isGroupTask = groupTask;
+    }
+
+    public String getTempUrl() {
+        return mTempUrl;
+    }
+
+    public void setTempUrl(String mTempUrl) {
+        this.mTempUrl = mTempUrl;
+    }
+
+    public String getTempFilePath() {
+        return mTempFilePath;
+    }
+
+    public void setTempFilePath(String mTempFilePath) {
+        this.mTempFilePath = mTempFilePath;
+    }
 }

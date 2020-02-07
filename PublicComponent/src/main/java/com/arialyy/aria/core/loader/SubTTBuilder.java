@@ -16,23 +16,27 @@
 package com.arialyy.aria.core.loader;
 
 import android.os.Handler;
+
 import com.arialyy.aria.core.TaskRecord;
 import com.arialyy.aria.core.task.IThreadTask;
+
 import java.util.List;
 
-public class SubTTBuilder implements IThreadTaskBuilder{
+public class SubTTBuilder implements IThreadTaskBuilder {
 
 
+    @Override
+    public List<IThreadTask> buildThreadTask(TaskRecord record, Handler stateHandler) {
+        return null;
+    }
 
-  @Override public List<IThreadTask> buildThreadTask(TaskRecord record, Handler stateHandler) {
-    return null;
-  }
+    @Override
+    public int getCreatedThreadNum() {
+        return 1;
+    }
 
-  @Override public int getCreatedThreadNum() {
-    return 1;
-  }
-
-  @Override public void accept(ILoaderVisitor visitor) {
-    visitor.addComponent(this);
-  }
+    @Override
+    public void accept(ILoaderVisitor visitor) {
+        visitor.addComponent(this);
+    }
 }

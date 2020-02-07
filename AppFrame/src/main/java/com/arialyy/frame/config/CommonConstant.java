@@ -5,5 +5,5 @@ package com.arialyy.frame.config;
  */
 
 public interface CommonConstant {
-  boolean DEBUG = true;
+    boolean DEBUG = true;
 }

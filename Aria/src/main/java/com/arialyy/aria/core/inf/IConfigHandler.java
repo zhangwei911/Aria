@@ -23,22 +23,22 @@ import com.arialyy.aria.core.common.AbsEntity;
  */
 public interface IConfigHandler {
 
-  /**
-   * 获取实体
-   */
-  AbsEntity getEntity();
+    /**
+     * 获取实体
+     */
+    AbsEntity getEntity();
 
-  /**
-   * 任务是否存在
-   *
-   * @return {@code true}任务存在，{@code false} 任务不存在
-   */
-  boolean taskExists();
+    /**
+     * 任务是否存在
+     *
+     * @return {@code true}任务存在，{@code false} 任务不存在
+     */
+    boolean taskExists();
 
-  /**
-   * 任务是否在执行
-   *
-   * @return {@code true} 任务正在执行，{@code false} 任务没有执行
-   */
-  boolean isRunning();
+    /**
+     * 任务是否在执行
+     *
+     * @return {@code true} 任务正在执行，{@code false} 任务没有执行
+     */
+    boolean isRunning();
 }

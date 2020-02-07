@@ -24,9 +24,9 @@ import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
  */
 public abstract class AbsCmdFactory<TASK_ENTITY extends AbsTaskWrapper, CMD extends AbsCmd> {
 
-  /**
-   * @param entity 下载实体
-   * {@link ITask#DOWNLOAD}、{@link ITask#DOWNLOAD_GROUP}、{@link ITask#UPLOAD}
-   */
-  public abstract CMD createCmd(TASK_ENTITY entity, int type, int taskType);
+    /**
+     * @param entity 下载实体
+     *               {@link ITask#DOWNLOAD}、{@link ITask#DOWNLOAD_GROUP}、{@link ITask#UPLOAD}
+     */
+    public abstract CMD createCmd(TASK_ENTITY entity, int type, int taskType);
 }

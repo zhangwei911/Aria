@@ -23,78 +23,83 @@ import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
 import com.arialyy.aria.core.wrapper.ITaskWrapper;
 import com.arialyy.aria.m3u8.M3U8TaskOption;
 import com.arialyy.aria.util.RecordUtil;
+
 import java.util.ArrayList;
 
 /**
  * 直播m3u8文件处理器
  */
 final class LiveRecordHandler extends RecordHandler {
-  private M3U8TaskOption mOption;
+    private M3U8TaskOption mOption;
 
-  LiveRecordHandler(AbsTaskWrapper wrapper) {
-    super(wrapper);
-  }
-
-  public void setOption(M3U8TaskOption option) {
-    mOption = option;
-  }
-
-  @Override public void onPre() {
-    super.onPre();
-    RecordUtil.delTaskRecord(getEntity().getFilePath(), IRecordHandler.TYPE_DOWNLOAD);
-  }
-
-  /**
-   * @deprecated 直播文件不需要处理任务记录
-   */
-  @Deprecated
-  @Override public void handlerTaskRecord(TaskRecord record) {
-    if (record.threadRecords == null) {
-      record.threadRecords = new ArrayList<>();
+    LiveRecordHandler(AbsTaskWrapper wrapper) {
+        super(wrapper);
     }
-  }
 
-  /**
-   * @deprecated 交由{@link #createThreadRecord(TaskRecord, String, int)} 处理
-   */
-  @Override
-  @Deprecated
-  public ThreadRecord createThreadRecord(TaskRecord record, int threadId, long startL, long endL) {
-    return null;
-  }
+    public void setOption(M3U8TaskOption option) {
+        mOption = option;
+    }
 
-  /**
-   * 创建线程记录
-   *
-   * @param taskRecord 任务记录
-   * @param tsUrl ts下载地址
-   * @param threadId 线程id
-   */
-  ThreadRecord createThreadRecord(TaskRecord taskRecord, String tsUrl, int threadId) {
-    ThreadRecord tr = new ThreadRecord();
-    tr.taskKey = taskRecord.filePath;
-    tr.isComplete = false;
-    tr.tsUrl = tsUrl;
-    tr.threadType = taskRecord.taskType;
-    tr.threadId = threadId;
-    tr.startLocation = 0;
-    taskRecord.threadRecords.add(tr);
-    return tr;
-  }
+    @Override
+    public void onPre() {
+        super.onPre();
+        RecordUtil.delTaskRecord(getEntity().getFilePath(), IRecordHandler.TYPE_DOWNLOAD);
+    }
 
-  @Override public TaskRecord createTaskRecord(int threadNum) {
-    TaskRecord record = new TaskRecord();
-    record.fileName = getEntity().getFileName();
-    record.filePath = getEntity().getFilePath();
-    record.threadRecords = new ArrayList<>();
-    record.threadNum = threadNum;
-    record.isBlock = true;
-    record.taskType = ITaskWrapper.M3U8_LIVE;
-    record.bandWidth = mOption.getBandWidth();
-    return record;
-  }
+    /**
+     * @deprecated 直播文件不需要处理任务记录
+     */
+    @Deprecated
+    @Override
+    public void handlerTaskRecord(TaskRecord record) {
+        if (record.threadRecords == null) {
+            record.threadRecords = new ArrayList<>();
+        }
+    }
 
-  @Override public int initTaskThreadNum() {
-    return 1;
-  }
+    /**
+     * @deprecated 交由{@link #createThreadRecord(TaskRecord, String, int)} 处理
+     */
+    @Override
+    @Deprecated
+    public ThreadRecord createThreadRecord(TaskRecord record, int threadId, long startL, long endL) {
+        return null;
+    }
+
+    /**
+     * 创建线程记录
+     *
+     * @param taskRecord 任务记录
+     * @param tsUrl      ts下载地址
+     * @param threadId   线程id
+     */
+    ThreadRecord createThreadRecord(TaskRecord taskRecord, String tsUrl, int threadId) {
+        ThreadRecord tr = new ThreadRecord();
+        tr.taskKey = taskRecord.filePath;
+        tr.isComplete = false;
+        tr.tsUrl = tsUrl;
+        tr.threadType = taskRecord.taskType;
+        tr.threadId = threadId;
+        tr.startLocation = 0;
+        taskRecord.threadRecords.add(tr);
+        return tr;
+    }
+
+    @Override
+    public TaskRecord createTaskRecord(int threadNum) {
+        TaskRecord record = new TaskRecord();
+        record.fileName = getEntity().getFileName();
+        record.filePath = getEntity().getFilePath();
+        record.threadRecords = new ArrayList<>();
+        record.threadNum = threadNum;
+        record.isBlock = true;
+        record.taskType = ITaskWrapper.M3U8_LIVE;
+        record.bandWidth = mOption.getBandWidth();
+        return record;
+    }
+
+    @Override
+    public int initTaskThreadNum() {
+        return 1;
+    }
 }

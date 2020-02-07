@@ -5,5 +5,5 @@ package com.arialyy.frame.config;
  */
 
 public interface NetConstant {
-  String BASE_URL = "http://wwww.baidu.com/";
+    String BASE_URL = "http://wwww.baidu.com/";
 }

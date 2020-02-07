@@ -20,49 +20,49 @@ package com.arialyy.aria.core.common.controller;
  */
 public interface INormalFeature {
 
-  /**
-   * 停止任务
-   */
-  void stop();
+    /**
+     * 停止任务
+     */
+    void stop();
 
-  /**
-   * 恢复任务
-   */
-  void resume();
+    /**
+     * 恢复任务
+     */
+    void resume();
 
-  /**
-   * 正常来说，当执行队列满时，调用恢复任务接口，只能将任务放到缓存队列中。
-   * 如果希望调用恢复接口，马上进入执行队列，需要使用该方法
-   *
-   * @param newStart true 立即将任务恢复到执行队列中
-   */
-  void resume(boolean newStart);
+    /**
+     * 正常来说，当执行队列满时，调用恢复任务接口，只能将任务放到缓存队列中。
+     * 如果希望调用恢复接口，马上进入执行队列，需要使用该方法
+     *
+     * @param newStart true 立即将任务恢复到执行队列中
+     */
+    void resume(boolean newStart);
 
-  /**
-   * 删除任务
-   */
-  void cancel();
+    /**
+     * 删除任务
+     */
+    void cancel();
 
-  /**
-   * 任务重试
-   */
-  void reTry();
+    /**
+     * 任务重试
+     */
+    void reTry();
 
-  /**
-   * 删除任务
-   *
-   * @param removeFile {@code true} 不仅删除任务数据库记录，还会删除已经删除完成的文件
-   * {@code false}如果任务已经完成，只删除任务数据库记录，
-   */
-  void cancel(boolean removeFile);
+    /**
+     * 删除任务
+     *
+     * @param removeFile {@code true} 不仅删除任务数据库记录，还会删除已经删除完成的文件
+     *                   {@code false}如果任务已经完成，只删除任务数据库记录，
+     */
+    void cancel(boolean removeFile);
 
-  /**
-   * 重新下载
-   */
-  long reStart();
+    /**
+     * 重新下载
+     */
+    long reStart();
 
-  /**
-   * 保存数据
-   */
-  void save();
+    /**
+     * 保存数据
+     */
+    void save();
 }

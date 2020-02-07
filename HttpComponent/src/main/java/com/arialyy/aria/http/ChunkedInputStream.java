@@ -19,6 +19,7 @@
 package com.arialyy.aria.http;
 
 import com.arialyy.aria.util.ALog;
+
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -27,75 +28,75 @@ import java.io.InputStream;
 // The final data chunk should be a 0-length chunk which will indicate end of input.
 @Deprecated
 public class ChunkedInputStream extends InputStream {
-  private static final String TAG = "ChunkedInputStream";
+    private static final String TAG = "ChunkedInputStream";
 
-  private DataInputStream din;
-  private int unreadBytes = 0;  // Bytes remaining in the current chunk of data
-  private byte[] singleByte = new byte[1];
-  private boolean endOfData = false;
-  private String id;
+    private DataInputStream din;
+    private int unreadBytes = 0;  // Bytes remaining in the current chunk of data
+    private byte[] singleByte = new byte[1];
+    private boolean endOfData = false;
+    private String id;
 
-  public ChunkedInputStream(InputStream in, String id) {
-    din = new DataInputStream(in);
-    this.id = id;
-    ALog.d(TAG, String.format("Creating chunked input for %s", id));
-  }
-
-  @Override
-  public void close() throws IOException {
-    ALog.d(TAG, String.format("%s: Closing chunked input.", id));
-    din.close();
-  }
-
-  @Override
-  public int read() throws IOException {
-    int bytesRead = read(singleByte, 0, 1);
-    return (bytesRead == -1) ? -1 : (int) singleByte[0];
-  }
-
-  @Override
-  public int read(byte[] b, int off, int len) throws IOException {
-    int bytesRead = 0;
-
-    if (len < 0) {
-      throw new IllegalArgumentException(id + ": Negative read length");
-    } else if (len == 0) {
-      return 0;
+    public ChunkedInputStream(InputStream in, String id) {
+        din = new DataInputStream(in);
+        this.id = id;
+        ALog.d(TAG, String.format("Creating chunked input for %s", id));
     }
 
-    // If there is a current unread chunk, read from that, or else get the next chunk.
-    if (unreadBytes == 0) {
-      try {
-        // Find the next chunk size
-        unreadBytes = din.readInt();
-        if (ALog.DEBUG) {
-          ALog.d(TAG, String.format("%s: Chunk size %s", id, unreadBytes));
+    @Override
+    public void close() throws IOException {
+        ALog.d(TAG, String.format("%s: Closing chunked input.", id));
+        din.close();
+    }
+
+    @Override
+    public int read() throws IOException {
+        int bytesRead = read(singleByte, 0, 1);
+        return (bytesRead == -1) ? -1 : (int) singleByte[0];
+    }
+
+    @Override
+    public int read(byte[] b, int off, int len) throws IOException {
+        int bytesRead = 0;
+
+        if (len < 0) {
+            throw new IllegalArgumentException(id + ": Negative read length");
+        } else if (len == 0) {
+            return 0;
         }
+
+        // If there is a current unread chunk, read from that, or else get the next chunk.
         if (unreadBytes == 0) {
-          ALog.d(TAG, String.format("%s: Hit end of data", id));
-          endOfData = true;
-          return -1;
+            try {
+                // Find the next chunk size
+                unreadBytes = din.readInt();
+                if (ALog.DEBUG) {
+                    ALog.d(TAG, String.format("%s: Chunk size %s", id, unreadBytes));
+                }
+                if (unreadBytes == 0) {
+                    ALog.d(TAG, String.format("%s: Hit end of data", id));
+                    endOfData = true;
+                    return -1;
+                }
+            } catch (IOException err) {
+                throw new IOException(id + ": Error while attempting to read chunk length", err);
+            }
         }
-      } catch (IOException err) {
-        throw new IOException(id + ": Error while attempting to read chunk length", err);
-      }
+
+        int bytesToRead = Math.min(len, unreadBytes);
+        try {
+            din.readFully(b, off, bytesToRead);
+        } catch (IOException err) {
+            throw new IOException(
+                    id + ": Error while attempting to read " + bytesToRead + " bytes from current chunk",
+                    err);
+        }
+        unreadBytes -= bytesToRead;
+        bytesRead += bytesToRead;
+
+        return bytesRead;
     }
 
-    int bytesToRead = Math.min(len, unreadBytes);
-    try {
-      din.readFully(b, off, bytesToRead);
-    } catch (IOException err) {
-      throw new IOException(
-          id + ": Error while attempting to read " + bytesToRead + " bytes from current chunk",
-          err);
+    public boolean isEndOfData() {
+        return endOfData;
     }
-    unreadBytes -= bytesToRead;
-    bytesRead += bytesToRead;
-
-    return bytesRead;
-  }
-
-  public boolean isEndOfData() {
-    return endOfData;
-  }
 }

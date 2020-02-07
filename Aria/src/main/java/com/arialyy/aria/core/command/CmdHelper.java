@@ -22,23 +22,23 @@ import com.arialyy.aria.core.task.ITask;
 import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
 
 public class CmdHelper {
-  /**
-   * 创建任务命令
-   *
-   * @param taskType {@link ITask#DOWNLOAD}、{@link ITask#DOWNLOAD_GROUP}、{@link ITask#UPLOAD}
-   */
-  public static <T extends AbsTaskWrapper> AbsNormalCmd createNormalCmd(T entity, int cmd,
-      int taskType) {
-    return NormalCmdFactory.getInstance().createCmd(entity, cmd, taskType);
-  }
+    /**
+     * 创建任务命令
+     *
+     * @param taskType {@link ITask#DOWNLOAD}、{@link ITask#DOWNLOAD_GROUP}、{@link ITask#UPLOAD}
+     */
+    public static <T extends AbsTaskWrapper> AbsNormalCmd createNormalCmd(T entity, int cmd,
+                                                                          int taskType) {
+        return NormalCmdFactory.getInstance().createCmd(entity, cmd, taskType);
+    }
 
-  /**
-   * 创建任务组命令
-   *
-   * @param childUrl 子任务url
-   */
-  public static <T extends AbsGroupTaskWrapper> AbsGroupCmd createGroupCmd(T entity, int cmd,
-      String childUrl) {
-    return GroupCmdFactory.getInstance().createCmd(entity, cmd, childUrl);
-  }
+    /**
+     * 创建任务组命令
+     *
+     * @param childUrl 子任务url
+     */
+    public static <T extends AbsGroupTaskWrapper> AbsGroupCmd createGroupCmd(T entity, int cmd,
+                                                                             String childUrl) {
+        return GroupCmdFactory.getInstance().createCmd(entity, cmd, childUrl);
+    }
 }

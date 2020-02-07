@@ -22,6 +22,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+
 import com.arialyy.simple.R;
 import com.arialyy.simple.base.BaseDialog;
 import com.arialyy.simple.databinding.DialogDownloadNumBinding;
@@ -30,42 +31,47 @@ import com.arialyy.simple.databinding.DialogDownloadNumBinding;
  * Created by “AriaLyy@outlook.com” on 2016/11/14.
  * 设置下载数量对话框
  */
-@SuppressLint("ValidFragment") public class DownloadNumDialog
-    extends BaseDialog<DialogDownloadNumBinding> implements RadioGroup.OnCheckedChangeListener {
-  public static final int RESULT_CODE = 1001;
-  Button mCancel;
-  RadioGroup mRg;
+@SuppressLint("ValidFragment")
+public class DownloadNumDialog
+        extends BaseDialog<DialogDownloadNumBinding> implements RadioGroup.OnCheckedChangeListener {
+    public static final int RESULT_CODE = 1001;
+    Button mCancel;
+    RadioGroup mRg;
 
-  public DownloadNumDialog(Object obj) {
-    super(obj);
-  }
-
-  @Override protected int setLayoutId() {
-    return R.layout.dialog_download_num;
-  }
-
-  @Override protected void init(Bundle savedInstanceState) {
-    super.init(savedInstanceState);
-    mCancel = findViewById(R.id.cancel);
-    mRg = findViewById(R.id.rg);
-
-    mCancel.setOnClickListener(new View.OnClickListener() {
-      @Override public void onClick(View v) {
-        dismiss();
-      }
-    });
-    for (int i = 0, count = mRg.getChildCount(); i < count; i++) {
-      RadioButton rb = (RadioButton) mRg.getChildAt(i);
-      rb.setId(i);
+    public DownloadNumDialog(Object obj) {
+        super(obj);
     }
-    mRg.setOnCheckedChangeListener(this);
-  }
 
-  @Override public void onCheckedChanged(RadioGroup group, int checkedId) {
-    RadioButton rb = (RadioButton) group.getChildAt(checkedId);
-    if (rb.isChecked()) {
-      getSimplerModule().onDialog(RESULT_CODE, rb.getTag());
-      dismiss();
+    @Override
+    protected int setLayoutId() {
+        return R.layout.dialog_download_num;
     }
-  }
+
+    @Override
+    protected void init(Bundle savedInstanceState) {
+        super.init(savedInstanceState);
+        mCancel = findViewById(R.id.cancel);
+        mRg = findViewById(R.id.rg);
+
+        mCancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dismiss();
+            }
+        });
+        for (int i = 0, count = mRg.getChildCount(); i < count; i++) {
+            RadioButton rb = (RadioButton) mRg.getChildAt(i);
+            rb.setId(i);
+        }
+        mRg.setOnCheckedChangeListener(this);
+    }
+
+    @Override
+    public void onCheckedChanged(RadioGroup group, int checkedId) {
+        RadioButton rb = (RadioButton) group.getChildAt(checkedId);
+        if (rb.isChecked()) {
+            getSimplerModule().onDialog(RESULT_CODE, rb.getTag());
+            dismiss();
+        }
+    }
 }

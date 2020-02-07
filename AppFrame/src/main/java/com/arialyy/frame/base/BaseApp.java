@@ -8,6 +8,6 @@ import android.content.Context;
  */
 
 public class BaseApp {
-  public static Context context;
-  public static Application app;
+    public static Context context;
+    public static Application app;
 }

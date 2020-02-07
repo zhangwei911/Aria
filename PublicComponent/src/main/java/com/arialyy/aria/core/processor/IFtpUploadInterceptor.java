@@ -17,6 +17,7 @@ package com.arialyy.aria.core.processor;
 
 import com.arialyy.aria.core.inf.IEventHandler;
 import com.arialyy.aria.core.upload.UploadEntity;
+
 import java.util.List;
 
 /**
@@ -24,11 +25,11 @@ import java.util.List;
  */
 public interface IFtpUploadInterceptor extends IEventHandler {
 
-  /**
-   * 处理拦截事件
-   *
-   * @param entity 上传信息实体
-   * @param fileList ftp服务器端remotePath下的文件列表
-   */
-  FtpInterceptHandler onIntercept(UploadEntity entity, List<String> fileList);
+    /**
+     * 处理拦截事件
+     *
+     * @param entity   上传信息实体
+     * @param fileList ftp服务器端remotePath下的文件列表
+     */
+    FtpInterceptHandler onIntercept(UploadEntity entity, List<String> fileList);
 }

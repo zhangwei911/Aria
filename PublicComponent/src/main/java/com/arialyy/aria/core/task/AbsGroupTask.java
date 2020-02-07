@@ -23,31 +23,32 @@ import com.arialyy.aria.core.group.AbsGroupLoaderUtil;
  * 任务组任务抽象类
  */
 public abstract class AbsGroupTask<TASK_ENTITY extends AbsGroupTaskWrapper>
-    extends AbsTask<TASK_ENTITY> {
+        extends AbsTask<TASK_ENTITY> {
 
-  @Override public String getKey() {
-    return mTaskWrapper.getEntity().getKey();
-  }
-
-  /**
-   * 启动任务组中的子任务
-   *
-   * @param url 子任务下载地址
-   */
-  public void startSubTask(String url) {
-    if (getUtil() != null) {
-      ((AbsGroupLoaderUtil) getUtil()).startSubTask(url);
+    @Override
+    public String getKey() {
+        return mTaskWrapper.getEntity().getKey();
     }
-  }
 
-  /**
-   * 停止任务组中的子任务
-   *
-   * @param url 子任务下载地址
-   */
-  public void stopSubTask(String url) {
-    if (getUtil() != null) {
-      ((AbsGroupLoaderUtil) getUtil()).stopSubTask(url);
+    /**
+     * 启动任务组中的子任务
+     *
+     * @param url 子任务下载地址
+     */
+    public void startSubTask(String url) {
+        if (getUtil() != null) {
+            ((AbsGroupLoaderUtil) getUtil()).startSubTask(url);
+        }
     }
-  }
+
+    /**
+     * 停止任务组中的子任务
+     *
+     * @param url 子任务下载地址
+     */
+    public void stopSubTask(String url) {
+        if (getUtil() != null) {
+            ((AbsGroupLoaderUtil) getUtil()).stopSubTask(url);
+        }
+    }
 }

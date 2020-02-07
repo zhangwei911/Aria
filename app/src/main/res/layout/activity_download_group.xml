@@ -1,61 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:bind="http://schemas.android.com/apk/res-auto"
-    >
-  <data>
-    <variable
-        name="fileSize"
-        type="String"
-        />
-    <variable
-        name="speed"
-        type="String"
-        />
-    <variable
-        name="progress"
-        type="int"
-        />
-    <variable
-        name="stateStr"
-        type="String"
-        />
-    <variable
-        name="timeLeft"
-        type="String"
-        />
+    xmlns:bind="http://schemas.android.com/apk/res-auto">
 
-  </data>
+    <data>
 
-  <RelativeLayout
-      android:layout_width="match_parent"
-      android:layout_height="match_parent"
-      android:orientation="vertical"
-      >
+        <variable
+            name="fileSize"
+            type="String" />
 
-    <include layout="@layout/layout_bar"/>
+        <variable
+            name="speed"
+            type="String" />
 
-    <include
-        layout="@layout/layout_content_single"
-        android:id="@+id/content"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/toolbar"
-        bind:fileSize="@{fileSize}"
-        bind:progress="@{progress}"
-        bind:speed="@{speed}"
-        bind:stateStr="@{stateStr}"
-        bind:timeLeft="@{timeLeft}"
-        />
+        <variable
+            name="progress"
+            type="int" />
 
-    <com.arialyy.simple.widget.SubStateLinearLayout
-        android:id="@+id/child_list"
+        <variable
+            name="stateStr"
+            type="String" />
+
+        <variable
+            name="timeLeft"
+            type="String" />
+
+    </data>
+
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/content"
-        android:paddingLeft="16dp"
-        android:paddingRight="16dp"
-        />
-  </RelativeLayout>
+        android:orientation="vertical">
+
+        <include layout="@layout/layout_bar" />
+
+        <include
+            layout="@layout/layout_content_single"
+            android:id="@+id/content"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/toolbar"
+            bind:fileSize="@{fileSize}"
+            bind:progress="@{progress}"
+            bind:speed="@{speed}"
+            bind:stateStr="@{stateStr}"
+            bind:timeLeft="@{timeLeft}" />
+
+        <com.arialyy.simple.widget.SubStateLinearLayout
+            android:id="@+id/child_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@+id/content"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp" />
+    </RelativeLayout>
 
 
 </layout>

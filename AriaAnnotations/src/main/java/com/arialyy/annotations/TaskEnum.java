@@ -20,29 +20,29 @@ package com.arialyy.annotations;
  * 任务类型枚举
  */
 public enum TaskEnum {
-  DOWNLOAD("com.arialyy.aria.core.task", "DownloadTask", "$$DownloadListenerProxy",
-      "NormalTaskListener"),
-  DOWNLOAD_GROUP("com.arialyy.aria.core.task", "DownloadGroupTask",
-      "$$DownloadGroupListenerProxy", "NormalTaskListener"),
-  DOWNLOAD_GROUP_SUB("com.arialyy.aria.core.task", "DownloadGroupTask",
-      "$$DGSubListenerProxy", "SubTaskListener"),
-  UPLOAD("com.arialyy.aria.core.task", "UploadTask", "$$UploadListenerProxy",
-      "NormalTaskListener"),
-  M3U8_PEER("com.arialyy.aria.core.task", "DownloadTask", "$$M3U8PeerListenerProxy",
-      "M3U8PeerTaskListener");
+    DOWNLOAD("com.arialyy.aria.core.task", "DownloadTask", "$$DownloadListenerProxy",
+            "NormalTaskListener"),
+    DOWNLOAD_GROUP("com.arialyy.aria.core.task", "DownloadGroupTask",
+            "$$DownloadGroupListenerProxy", "NormalTaskListener"),
+    DOWNLOAD_GROUP_SUB("com.arialyy.aria.core.task", "DownloadGroupTask",
+            "$$DGSubListenerProxy", "SubTaskListener"),
+    UPLOAD("com.arialyy.aria.core.task", "UploadTask", "$$UploadListenerProxy",
+            "NormalTaskListener"),
+    M3U8_PEER("com.arialyy.aria.core.task", "DownloadTask", "$$M3U8PeerListenerProxy",
+            "M3U8PeerTaskListener");
 
-  public String pkg, className, proxySuffix, proxySuperClass;
+    public String pkg, className, proxySuffix, proxySuperClass;
 
-  /**
-   * @param pkg 包名
-   * @param className 对应到任务类名
-   * @param proxySuffix 事件代理后缀
-   * @param proxySuperClass 代理类的父类
-   */
-  TaskEnum(String pkg, String className, String proxySuffix, String proxySuperClass) {
-    this.pkg = pkg;
-    this.className = className;
-    this.proxySuffix = proxySuffix;
-    this.proxySuperClass = proxySuperClass;
-  }
+    /**
+     * @param pkg             包名
+     * @param className       对应到任务类名
+     * @param proxySuffix     事件代理后缀
+     * @param proxySuperClass 代理类的父类
+     */
+    TaskEnum(String pkg, String className, String proxySuffix, String proxySuperClass) {
+        this.pkg = pkg;
+        this.className = className;
+        this.proxySuffix = proxySuffix;
+        this.proxySuperClass = proxySuperClass;
+    }
 }

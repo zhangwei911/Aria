@@ -29,47 +29,48 @@ import java.io.Reader;
  * @since 3.0
  */
 public final class CRLFLineReader extends BufferedReader {
-  private static final char LF = '\n';
-  private static final char CR = '\r';
+    private static final char LF = '\n';
+    private static final char CR = '\r';
 
-  /**
-   * Creates a CRLFLineReader that wraps an existing Reader
-   * input source.
-   *
-   * @param reader The Reader input source.
-   */
-  public CRLFLineReader(Reader reader) {
-    super(reader);
-  }
+    /**
+     * Creates a CRLFLineReader that wraps an existing Reader
+     * input source.
+     *
+     * @param reader The Reader input source.
+     */
+    public CRLFLineReader(Reader reader) {
+        super(reader);
+    }
 
-  /**
-   * Read a line of text.
-   * A line is considered to be terminated by carriage return followed immediately by a linefeed.
-   * This contrasts with BufferedReader which also allows other combinations.
-   *
-   * @since 3.0
-   */
-  @Override public String readLine() throws IOException {
-    StringBuilder sb = new StringBuilder();
-    int intch;
-    boolean prevWasCR = false;
-    synchronized (lock) { // make thread-safe (hopefully!)
-      while ((intch = read()) != -1) {
-        if (prevWasCR && intch == LF) {
-          return sb.substring(0, sb.length() - 1);
+    /**
+     * Read a line of text.
+     * A line is considered to be terminated by carriage return followed immediately by a linefeed.
+     * This contrasts with BufferedReader which also allows other combinations.
+     *
+     * @since 3.0
+     */
+    @Override
+    public String readLine() throws IOException {
+        StringBuilder sb = new StringBuilder();
+        int intch;
+        boolean prevWasCR = false;
+        synchronized (lock) { // make thread-safe (hopefully!)
+            while ((intch = read()) != -1) {
+                if (prevWasCR && intch == LF) {
+                    return sb.substring(0, sb.length() - 1);
+                }
+                if (intch == CR) {
+                    prevWasCR = true;
+                } else {
+                    prevWasCR = false;
+                }
+                sb.append((char) intch);
+            }
         }
-        if (intch == CR) {
-          prevWasCR = true;
-        } else {
-          prevWasCR = false;
+        String string = sb.toString();
+        if (string.length() == 0) { // immediate EOF
+            return null;
         }
-        sb.append((char) intch);
-      }
+        return string;
     }
-    String string = sb.toString();
-    if (string.length() == 0) { // immediate EOF
-      return null;
-    }
-    return string;
-  }
 }

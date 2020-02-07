@@ -16,6 +16,7 @@
 package com.arialyy.aria.core.listener;
 
 import android.os.Handler;
+
 import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.inf.IEntity;
@@ -29,37 +30,38 @@ import com.arialyy.aria.util.RecordUtil;
  * 下载监听类
  */
 public class BaseDListener extends BaseListener<DownloadEntity, DTaskWrapper, AbsTask<DTaskWrapper>>
-    implements IDLoadListener {
+        implements IDLoadListener {
 
-  public BaseDListener(AbsTask<DTaskWrapper> task, Handler outHandler) {
-    super(task, outHandler);
-  }
-
-  @Override
-  public void onPostPre(long fileSize) {
-    mEntity.setFileSize(fileSize);
-    mEntity.setConvertFileSize(CommonUtil.formatFileSize(fileSize));
-    saveData(IEntity.STATE_POST_PRE, -1);
-    sendInState2Target(ISchedulers.POST_PRE);
-  }
-
-  @Override
-  public void supportBreakpoint(boolean support) {
-    if (!support) {
-      sendInState2Target(ISchedulers.NO_SUPPORT_BREAK_POINT);
+    public BaseDListener(AbsTask<DTaskWrapper> task, Handler outHandler) {
+        super(task, outHandler);
     }
-  }
 
-  @Override protected void handleCancel() {
-    int sType = getTask().getSchedulerType();
-    if (sType == TaskSchedulerType.TYPE_CANCEL_AND_NOT_NOTIFY) {
-      mEntity.setComplete(false);
-      mEntity.setState(IEntity.STATE_WAIT);
-      RecordUtil.delTaskRecord(mEntity.getFilePath(), IRecordHandler.TYPE_DOWNLOAD,
-          mTaskWrapper.isRemoveFile(), false);
-    } else {
-      RecordUtil.delTaskRecord(mEntity.getFilePath(), IRecordHandler.TYPE_DOWNLOAD,
-          mTaskWrapper.isRemoveFile(), true);
+    @Override
+    public void onPostPre(long fileSize) {
+        mEntity.setFileSize(fileSize);
+        mEntity.setConvertFileSize(CommonUtil.formatFileSize(fileSize));
+        saveData(IEntity.STATE_POST_PRE, -1);
+        sendInState2Target(ISchedulers.POST_PRE);
     }
-  }
+
+    @Override
+    public void supportBreakpoint(boolean support) {
+        if (!support) {
+            sendInState2Target(ISchedulers.NO_SUPPORT_BREAK_POINT);
+        }
+    }
+
+    @Override
+    protected void handleCancel() {
+        int sType = getTask().getSchedulerType();
+        if (sType == TaskSchedulerType.TYPE_CANCEL_AND_NOT_NOTIFY) {
+            mEntity.setComplete(false);
+            mEntity.setState(IEntity.STATE_WAIT);
+            RecordUtil.delTaskRecord(mEntity.getFilePath(), IRecordHandler.TYPE_DOWNLOAD,
+                    mTaskWrapper.isRemoveFile(), false);
+        } else {
+            RecordUtil.delTaskRecord(mEntity.getFilePath(), IRecordHandler.TYPE_DOWNLOAD,
+                    mTaskWrapper.isRemoveFile(), true);
+        }
+    }
 }

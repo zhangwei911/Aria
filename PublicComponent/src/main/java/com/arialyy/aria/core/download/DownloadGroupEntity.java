@@ -17,9 +17,11 @@ package com.arialyy.aria.core.download;
 
 import android.os.Parcel;
 import android.text.TextUtils;
+
 import com.arialyy.aria.core.common.AbsGroupEntity;
 import com.arialyy.aria.core.wrapper.ITaskWrapper;
 import com.arialyy.aria.orm.annotation.Ignore;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,59 +30,65 @@ import java.util.List;
  */
 public class DownloadGroupEntity extends AbsGroupEntity {
 
-  @Ignore private List<DownloadEntity> subEntities;
+    @Ignore
+    private List<DownloadEntity> subEntities;
 
-  /**
-   * 子任务实体列表
-   */
-  public List<DownloadEntity> getSubEntities() {
-    if (subEntities == null) {
-      subEntities = new ArrayList<>();
-    }
-    return subEntities;
-  }
-
-  public void setSubEntities(List<DownloadEntity> subTasks) {
-    this.subEntities = subTasks;
-  }
-
-  public void setGroupHash(String key) {
-    this.groupHash = key;
-  }
-
-  @Override public int getTaskType() {
-    if (getSubEntities() == null || getSubEntities().isEmpty() || TextUtils.isEmpty(
-        getSubEntities().get(0).getUrl())) {
-      return ITaskWrapper.ERROR;
-    }
-    return (groupHash.startsWith("ftp") || groupHash.startsWith("sftp")) ? ITaskWrapper.D_FTP_DIR
-        : ITaskWrapper.DG_HTTP;
-  }
-
-  public DownloadGroupEntity() {
-  }
-
-  @Override public int describeContents() {
-    return 0;
-  }
-
-  @Override public void writeToParcel(Parcel dest, int flags) {
-    super.writeToParcel(dest, flags);
-    dest.writeTypedList(this.subEntities);
-  }
-
-  protected DownloadGroupEntity(Parcel in) {
-    super(in);
-    this.subEntities = in.createTypedArrayList(DownloadEntity.CREATOR);
-  }
-
-  public static final Creator<DownloadGroupEntity> CREATOR = new Creator<DownloadGroupEntity>() {
-    @Override public DownloadGroupEntity createFromParcel(Parcel source) {
-      return new DownloadGroupEntity(source);
+    /**
+     * 子任务实体列表
+     */
+    public List<DownloadEntity> getSubEntities() {
+        if (subEntities == null) {
+            subEntities = new ArrayList<>();
+        }
+        return subEntities;
     }
 
-    @Override public DownloadGroupEntity[] newArray(int size) {
-      return new DownloadGroupEntity[size];
+    public void setSubEntities(List<DownloadEntity> subTasks) {
+        this.subEntities = subTasks;
     }
-  };
+
+    public void setGroupHash(String key) {
+        this.groupHash = key;
+    }
+
+    @Override
+    public int getTaskType() {
+        if (getSubEntities() == null || getSubEntities().isEmpty() || TextUtils.isEmpty(
+                getSubEntities().get(0).getUrl())) {
+            return ITaskWrapper.ERROR;
+        }
+        return (groupHash.startsWith("ftp") || groupHash.startsWith("sftp")) ? ITaskWrapper.D_FTP_DIR
+                : ITaskWrapper.DG_HTTP;
+    }
+
+    public DownloadGroupEntity() {
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        super.writeToParcel(dest, flags);
+        dest.writeTypedList(this.subEntities);
+    }
+
+    protected DownloadGroupEntity(Parcel in) {
+        super(in);
+        this.subEntities = in.createTypedArrayList(DownloadEntity.CREATOR);
+    }
+
+    public static final Creator<DownloadGroupEntity> CREATOR = new Creator<DownloadGroupEntity>() {
+        @Override
+        public DownloadGroupEntity createFromParcel(Parcel source) {
+            return new DownloadGroupEntity(source);
+        }
+
+        @Override
+        public DownloadGroupEntity[] newArray(int size) {
+            return new DownloadGroupEntity[size];
+        }
+    };
 }

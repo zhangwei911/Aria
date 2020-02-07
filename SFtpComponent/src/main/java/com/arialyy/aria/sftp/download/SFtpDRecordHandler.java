@@ -24,6 +24,7 @@ import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.loader.IRecordHandler;
 import com.arialyy.aria.core.wrapper.ITaskWrapper;
 import com.arialyy.aria.util.RecordUtil;
+
 import java.util.ArrayList;
 
 /**
@@ -32,61 +33,64 @@ import java.util.ArrayList;
  */
 final class SFtpDRecordHandler extends RecordHandler {
 
-  SFtpDRecordHandler(DTaskWrapper wrapper) {
-    super(wrapper);
-  }
+    SFtpDRecordHandler(DTaskWrapper wrapper) {
+        super(wrapper);
+    }
 
-  @Override public void handlerTaskRecord(TaskRecord record) {
-    RecordHelper helper = new RecordHelper(getWrapper(), record);
-    if (record.threadNum == 1) {
-      helper.handleSingleThreadRecord();
-    } else {
-      if (getWrapper().isSupportBP()) {
-        if (record.isBlock) {
-          helper.handleBlockRecord();
+    @Override
+    public void handlerTaskRecord(TaskRecord record) {
+        RecordHelper helper = new RecordHelper(getWrapper(), record);
+        if (record.threadNum == 1) {
+            helper.handleSingleThreadRecord();
         } else {
-          helper.handleMultiRecord();
+            if (getWrapper().isSupportBP()) {
+                if (record.isBlock) {
+                    helper.handleBlockRecord();
+                } else {
+                    helper.handleMultiRecord();
+                }
+            }
         }
-      }
     }
-  }
 
-  @Override
-  public ThreadRecord createThreadRecord(TaskRecord record, int threadId, long startL, long endL) {
-    ThreadRecord tr;
-    tr = new ThreadRecord();
-    tr.taskKey = record.filePath;
-    tr.threadId = threadId;
-    tr.startLocation = startL;
-    tr.isComplete = false;
-    tr.threadType = record.taskType;
-    //最后一个线程的结束位置即为文件的总长度
-    if (threadId == (record.threadNum - 1)) {
-      endL = getFileSize();
+    @Override
+    public ThreadRecord createThreadRecord(TaskRecord record, int threadId, long startL, long endL) {
+        ThreadRecord tr;
+        tr = new ThreadRecord();
+        tr.taskKey = record.filePath;
+        tr.threadId = threadId;
+        tr.startLocation = startL;
+        tr.isComplete = false;
+        tr.threadType = record.taskType;
+        //最后一个线程的结束位置即为文件的总长度
+        if (threadId == (record.threadNum - 1)) {
+            endL = getFileSize();
+        }
+        tr.endLocation = endL;
+        tr.blockLen = RecordUtil.getBlockLen(getFileSize(), threadId, record.threadNum);
+        return tr;
     }
-    tr.endLocation = endL;
-    tr.blockLen = RecordUtil.getBlockLen(getFileSize(), threadId, record.threadNum);
-    return tr;
-  }
 
-  @Override public TaskRecord createTaskRecord(int threadNum) {
-    TaskRecord record = new TaskRecord();
-    record.fileName = getEntity().getFileName();
-    record.filePath = getEntity().getFilePath();
-    record.threadRecords = new ArrayList<>();
-    record.threadNum = threadNum;
-    record.isBlock = threadNum > 1;
-    record.taskType = ITaskWrapper.D_SFTP;
-    record.isGroupRecord = false;
+    @Override
+    public TaskRecord createTaskRecord(int threadNum) {
+        TaskRecord record = new TaskRecord();
+        record.fileName = getEntity().getFileName();
+        record.filePath = getEntity().getFilePath();
+        record.threadRecords = new ArrayList<>();
+        record.threadNum = threadNum;
+        record.isBlock = threadNum > 1;
+        record.taskType = ITaskWrapper.D_SFTP;
+        record.isGroupRecord = false;
 
-    return record;
-  }
+        return record;
+    }
 
-  @Override public int initTaskThreadNum() {
-    int threadNum = Configuration.getInstance().downloadCfg.getThreadNum();
-    return getFileSize() <= IRecordHandler.SUB_LEN
-        || threadNum == 1
-        ? 1
-        : threadNum;
-  }
+    @Override
+    public int initTaskThreadNum() {
+        int threadNum = Configuration.getInstance().downloadCfg.getThreadNum();
+        return getFileSize() <= IRecordHandler.SUB_LEN
+                || threadNum == 1
+                ? 1
+                : threadNum;
+    }
 }

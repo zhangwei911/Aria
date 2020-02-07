@@ -17,6 +17,7 @@ package com.arialyy.aria.core.task;
 
 import android.os.Handler;
 import android.os.Looper;
+
 import com.arialyy.aria.core.listener.ISchedulers;
 import com.arialyy.aria.core.upload.UTaskWrapper;
 import com.arialyy.aria.core.upload.UploadEntity;
@@ -27,47 +28,50 @@ import com.arialyy.aria.util.ComponentUtil;
  */
 public class UploadTask extends AbsTask<UTaskWrapper> {
 
-  private UploadTask(UTaskWrapper taskWrapper, Handler outHandler) {
-    mTaskWrapper = taskWrapper;
-    mOutHandler = outHandler;
-    mListener =
-        ComponentUtil.getInstance().buildListener(taskWrapper.getRequestType(), this, mOutHandler);
-  }
-
-  @Override public int getTaskType() {
-    return UPLOAD;
-  }
-
-  @Override public String getKey() {
-    return mTaskWrapper.getEntity().getFilePath();
-  }
-
-  public UploadEntity getEntity() {
-    return mTaskWrapper.getEntity();
-  }
-
-  @Override public String getTaskName() {
-    return mTaskWrapper.getEntity().getFileName();
-  }
-
-  public static class Builder {
-    private Handler mOutHandler;
-    private UTaskWrapper mTaskEntity;
-
-    public void setOutHandler(ISchedulers outHandler) {
-      mOutHandler = new Handler(Looper.getMainLooper(), outHandler);
+    private UploadTask(UTaskWrapper taskWrapper, Handler outHandler) {
+        mTaskWrapper = taskWrapper;
+        mOutHandler = outHandler;
+        mListener =
+                ComponentUtil.getInstance().buildListener(taskWrapper.getRequestType(), this, mOutHandler);
     }
 
-    public void setUploadTaskEntity(UTaskWrapper taskEntity) {
-      mTaskEntity = taskEntity;
+    @Override
+    public int getTaskType() {
+        return UPLOAD;
     }
 
-    public Builder() {
-
+    @Override
+    public String getKey() {
+        return mTaskWrapper.getEntity().getFilePath();
     }
 
-    public UploadTask build() {
-      return new UploadTask(mTaskEntity, mOutHandler);
+    public UploadEntity getEntity() {
+        return mTaskWrapper.getEntity();
     }
-  }
+
+    @Override
+    public String getTaskName() {
+        return mTaskWrapper.getEntity().getFileName();
+    }
+
+    public static class Builder {
+        private Handler mOutHandler;
+        private UTaskWrapper mTaskEntity;
+
+        public void setOutHandler(ISchedulers outHandler) {
+            mOutHandler = new Handler(Looper.getMainLooper(), outHandler);
+        }
+
+        public void setUploadTaskEntity(UTaskWrapper taskEntity) {
+            mTaskEntity = taskEntity;
+        }
+
+        public Builder() {
+
+        }
+
+        public UploadTask build() {
+            return new UploadTask(mTaskEntity, mOutHandler);
+        }
+    }
 }

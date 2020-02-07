@@ -21,6 +21,7 @@ import com.arialyy.aria.orm.AbsDbWrapper;
 import com.arialyy.aria.orm.annotation.Many;
 import com.arialyy.aria.orm.annotation.One;
 import com.arialyy.aria.orm.annotation.Wrapper;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,17 +32,18 @@ import java.util.List;
 @Wrapper
 public class RecordWrapper extends AbsDbWrapper {
 
-  @One
-  public TaskRecord taskRecord;
+    @One
+    public TaskRecord taskRecord;
 
-  @Many(parentColumn = "filePath", entityColumn = "taskKey")
-  public List<ThreadRecord> threadRecords;
+    @Many(parentColumn = "filePath", entityColumn = "taskKey")
+    public List<ThreadRecord> threadRecords;
 
-  @Override protected void handleConvert() {
-    if (threadRecords != null && !threadRecords.isEmpty()) {
-      taskRecord.threadRecords = threadRecords;
-    } else {
-      taskRecord.threadRecords = new ArrayList<>();
+    @Override
+    protected void handleConvert() {
+        if (threadRecords != null && !threadRecords.isEmpty()) {
+            taskRecord.threadRecords = threadRecords;
+        } else {
+            taskRecord.threadRecords = new ArrayList<>();
+        }
     }
-  }
 }

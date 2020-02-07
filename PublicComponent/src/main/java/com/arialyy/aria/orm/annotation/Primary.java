@@ -25,11 +25,13 @@ import java.lang.annotation.Target;
  * Created by lyy on 2015/11/2.
  * 表ID字段指定
  */
-@Target(ElementType.FIELD) @Retention(RetentionPolicy.RUNTIME) public @interface Primary {
-  int value() default -1;
+@Target(ElementType.FIELD)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface Primary {
+    int value() default -1;
 
-  /**
-   * 字段需要int类型才可以自增
-   */
-  boolean autoincrement() default false;
+    /**
+     * 字段需要int类型才可以自增
+     */
+    boolean autoincrement() default false;
 }

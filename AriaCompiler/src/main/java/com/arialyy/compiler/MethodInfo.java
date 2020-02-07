@@ -16,12 +16,13 @@
 package com.arialyy.compiler;
 
 import java.util.List;
+
 import javax.lang.model.element.VariableElement;
 
 /**
  * 方法信息
  */
 final class MethodInfo {
-  String methodName;
-  List<VariableElement> params;
+    String methodName;
+    List<VariableElement> params;
 }

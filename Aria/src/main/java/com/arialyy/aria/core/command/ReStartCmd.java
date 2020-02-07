@@ -24,18 +24,19 @@ import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
  */
 final class ReStartCmd<T extends AbsTaskWrapper> extends AbsNormalCmd<T> {
 
-  ReStartCmd(T entity, int taskType) {
-    super(entity, taskType);
-  }
+    ReStartCmd(T entity, int taskType) {
+        super(entity, taskType);
+    }
 
-  @Override public void executeCmd() {
-    AbsTask task = getTask();
-    if (task == null) {
-      task = createTask();
+    @Override
+    public void executeCmd() {
+        AbsTask task = getTask();
+        if (task == null) {
+            task = createTask();
+        }
+        if (task != null) {
+            mQueue.cancelTask(task, TaskSchedulerType.TYPE_CANCEL_AND_NOT_NOTIFY);
+            mQueue.startTask(task, TaskSchedulerType.TYPE_START_AND_RESET_STATE);
+        }
     }
-    if (task != null) {
-      mQueue.cancelTask(task, TaskSchedulerType.TYPE_CANCEL_AND_NOT_NOTIFY);
-      mQueue.startTask(task, TaskSchedulerType.TYPE_START_AND_RESET_STATE);
-    }
-  }
 }

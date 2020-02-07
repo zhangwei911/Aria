@@ -17,6 +17,7 @@ package com.arialyy.aria.core.processor;
 
 import com.arialyy.aria.core.download.M3U8Entity;
 import com.arialyy.aria.core.inf.IEventHandler;
+
 import java.util.List;
 
 /**
@@ -24,13 +25,13 @@ import java.util.List;
  */
 public interface ITsMergeHandler extends IEventHandler {
 
-  /**
-   * 合并ts文件
-   *
-   * @param m3U8Entity m3u8信息，可通过{@link M3U8Entity#keyPath}、{@link M3U8Entity#keyUrl}、
-   * {@link M3U8Entity#iv}、{@link M3U8Entity#method} 获取相应的加密信息
-   * @param tsPath ts文件列表
-   * @return {@code true} 合并成功
-   */
-  boolean merge(M3U8Entity m3U8Entity, List<String> tsPath);
+    /**
+     * 合并ts文件
+     *
+     * @param m3U8Entity m3u8信息，可通过{@link M3U8Entity#keyPath}、{@link M3U8Entity#keyUrl}、
+     *                   {@link M3U8Entity#iv}、{@link M3U8Entity#method} 获取相应的加密信息
+     * @param tsPath     ts文件列表
+     * @return {@code true} 合并成功
+     */
+    boolean merge(M3U8Entity m3U8Entity, List<String> tsPath);
 }

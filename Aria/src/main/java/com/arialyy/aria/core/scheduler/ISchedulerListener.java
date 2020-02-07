@@ -20,5 +20,5 @@ package com.arialyy.aria.core.scheduler;
  */
 public interface ISchedulerListener {
 
-  void setListener(Object obj);
+    void setListener(Object obj);
 }

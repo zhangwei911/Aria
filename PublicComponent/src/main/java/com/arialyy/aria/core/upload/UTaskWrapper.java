@@ -24,31 +24,33 @@ import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
  */
 public class UTaskWrapper extends AbsTaskWrapper<UploadEntity> {
 
-  /**
-   * 保存临时设置的上传路径
-   */
-  private String tempUrl;
+    /**
+     * 保存临时设置的上传路径
+     */
+    private String tempUrl;
 
-  public UTaskWrapper(UploadEntity entity) {
-    super(entity);
-  }
+    public UTaskWrapper(UploadEntity entity) {
+        super(entity);
+    }
 
-  public String getTempUrl() {
-    return tempUrl;
-  }
+    public String getTempUrl() {
+        return tempUrl;
+    }
 
-  public void setTempUrl(String tempUrl) {
-    this.tempUrl = tempUrl;
-  }
+    public void setTempUrl(String tempUrl) {
+        this.tempUrl = tempUrl;
+    }
 
-  /**
-   * 文件保存路径
-   */
-  @Override public String getKey() {
-    return getEntity().getKey();
-  }
+    /**
+     * 文件保存路径
+     */
+    @Override
+    public String getKey() {
+        return getEntity().getKey();
+    }
 
-  @Override public UploadConfig getConfig() {
-    return Configuration.getInstance().uploadCfg;
-  }
+    @Override
+    public UploadConfig getConfig() {
+        return Configuration.getInstance().uploadCfg;
+    }
 }

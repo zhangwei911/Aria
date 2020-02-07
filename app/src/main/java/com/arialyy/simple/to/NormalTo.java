@@ -22,36 +22,40 @@ import android.os.Parcelable;
  * 简单列表对象
  */
 public class NormalTo implements Parcelable {
-  public int icon;
-  public String title;
-  public String desc;
+    public int icon;
+    public String title;
+    public String desc;
 
-  public NormalTo() {
-  }
-
-  @Override public int describeContents() {
-    return 0;
-  }
-
-  @Override public void writeToParcel(Parcel dest, int flags) {
-    dest.writeInt(this.icon);
-    dest.writeString(this.title);
-    dest.writeString(this.desc);
-  }
-
-  protected NormalTo(Parcel in) {
-    this.icon = in.readInt();
-    this.title = in.readString();
-    this.desc = in.readString();
-  }
-
-  public static final Creator<NormalTo> CREATOR = new Creator<NormalTo>() {
-    @Override public NormalTo createFromParcel(Parcel source) {
-      return new NormalTo(source);
+    public NormalTo() {
     }
 
-    @Override public NormalTo[] newArray(int size) {
-      return new NormalTo[size];
+    @Override
+    public int describeContents() {
+        return 0;
     }
-  };
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(this.icon);
+        dest.writeString(this.title);
+        dest.writeString(this.desc);
+    }
+
+    protected NormalTo(Parcel in) {
+        this.icon = in.readInt();
+        this.title = in.readString();
+        this.desc = in.readString();
+    }
+
+    public static final Creator<NormalTo> CREATOR = new Creator<NormalTo>() {
+        @Override
+        public NormalTo createFromParcel(Parcel source) {
+            return new NormalTo(source);
+        }
+
+        @Override
+        public NormalTo[] newArray(int size) {
+            return new NormalTo[size];
+        }
+    };
 }

@@ -29,6 +29,7 @@ import com.arialyy.aria.core.upload.UTaskWrapper;
 import com.arialyy.aria.core.upload.UploadEntity;
 import com.arialyy.aria.orm.DbEntity;
 import com.arialyy.aria.util.ALog;
+
 import java.util.List;
 
 /**
@@ -36,81 +37,82 @@ import java.util.List;
  * 删除所有任务，并且删除所有回掉
  */
 final public class CancelAllCmd<T extends AbsTaskWrapper> extends AbsNormalCmd<T> {
-  /**
-   * removeFile {@code true} 删除已经下载完成的任务，不仅删除下载记录，还会删除已经下载完成的文件，{@code false}
-   * 如果文件已经下载完成，只删除下载记录
-   */
-  public boolean removeFile = false;
+    /**
+     * removeFile {@code true} 删除已经下载完成的任务，不仅删除下载记录，还会删除已经下载完成的文件，{@code false}
+     * 如果文件已经下载完成，只删除下载记录
+     */
+    public boolean removeFile = false;
 
-  CancelAllCmd(T entity, int taskType) {
-    super(entity, taskType);
-  }
+    CancelAllCmd(T entity, int taskType) {
+        super(entity, taskType);
+    }
 
-  @Override public void executeCmd() {
-    if (!canExeCmd) return;
-    if (isDownloadCmd) {
-      removeAllDTask();
-      removeAllDGTask();
-    } else {
-      removeUTask();
+    @Override
+    public void executeCmd() {
+        if (!canExeCmd) return;
+        if (isDownloadCmd) {
+            removeAllDTask();
+            removeAllDGTask();
+        } else {
+            removeUTask();
+        }
     }
-  }
 
-  /**
-   * 删除所有普通下载任务
-   */
-  private void removeAllDTask() {
-    List<DownloadEntity> entities =
-        DbEntity.findDatas(DownloadEntity.class, "isGroupChild=?", "false");
-    if (entities != null && !entities.isEmpty()) {
-      for (DownloadEntity entity : entities) {
-        remove(TaskWrapperManager.getInstance()
-            .getNormalTaskWrapper(DTaskWrapper.class, entity.getId()));
-      }
+    /**
+     * 删除所有普通下载任务
+     */
+    private void removeAllDTask() {
+        List<DownloadEntity> entities =
+                DbEntity.findDatas(DownloadEntity.class, "isGroupChild=?", "false");
+        if (entities != null && !entities.isEmpty()) {
+            for (DownloadEntity entity : entities) {
+                remove(TaskWrapperManager.getInstance()
+                        .getNormalTaskWrapper(DTaskWrapper.class, entity.getId()));
+            }
+        }
     }
-  }
 
-  /**
-   * 删除所有下载任务组任务
-   */
-  private void removeAllDGTask() {
-    List<DownloadGroupEntity> entities =
-        DbEntity.findDatas(DownloadGroupEntity.class, "state!=?", "-1");
-    if (entities != null && !entities.isEmpty()) {
-      for (DownloadGroupEntity entity : entities) {
-        remove(TaskWrapperManager.getInstance()
-            .getGroupWrapper(DGTaskWrapper.class, entity.getId()));
-      }
+    /**
+     * 删除所有下载任务组任务
+     */
+    private void removeAllDGTask() {
+        List<DownloadGroupEntity> entities =
+                DbEntity.findDatas(DownloadGroupEntity.class, "state!=?", "-1");
+        if (entities != null && !entities.isEmpty()) {
+            for (DownloadGroupEntity entity : entities) {
+                remove(TaskWrapperManager.getInstance()
+                        .getGroupWrapper(DGTaskWrapper.class, entity.getId()));
+            }
+        }
     }
-  }
 
-  /**
-   * 删除所有普通上传任务
-   */
-  private void removeUTask() {
-    List<UploadEntity> entities =
-        DbEntity.findDatas(UploadEntity.class, "isGroupChild=?", "false");
-    if (entities != null && !entities.isEmpty()) {
-      for (UploadEntity entity : entities) {
-        remove(TaskWrapperManager.getInstance()
-            .getNormalTaskWrapper(UTaskWrapper.class, entity.getId()));
-      }
+    /**
+     * 删除所有普通上传任务
+     */
+    private void removeUTask() {
+        List<UploadEntity> entities =
+                DbEntity.findDatas(UploadEntity.class, "isGroupChild=?", "false");
+        if (entities != null && !entities.isEmpty()) {
+            for (UploadEntity entity : entities) {
+                remove(TaskWrapperManager.getInstance()
+                        .getNormalTaskWrapper(UTaskWrapper.class, entity.getId()));
+            }
+        }
     }
-  }
 
-  private void remove(AbsTaskWrapper te) {
-    if (te == null) {
-      ALog.w(TAG, "取消任务失败，任务为空");
-      return;
+    private void remove(AbsTaskWrapper te) {
+        if (te == null) {
+            ALog.w(TAG, "取消任务失败，任务为空");
+            return;
+        }
+        if (te instanceof DTaskWrapper) {
+            mQueue = DTaskQueue.getInstance();
+        } else if (te instanceof UTaskWrapper) {
+            mQueue = UTaskQueue.getInstance();
+        } else if (te instanceof DGTaskWrapper) {
+            mQueue = DGroupTaskQueue.getInstance();
+        }
+        te.setRemoveFile(removeFile);
+        removeTask(te);
     }
-    if (te instanceof DTaskWrapper) {
-      mQueue = DTaskQueue.getInstance();
-    } else if (te instanceof UTaskWrapper) {
-      mQueue = UTaskQueue.getInstance();
-    } else if (te instanceof DGTaskWrapper) {
-      mQueue = DGroupTaskQueue.getInstance();
-    }
-    te.setRemoveFile(removeFile);
-    removeTask(te);
-  }
 }

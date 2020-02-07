@@ -30,51 +30,55 @@ import com.arialyy.aria.util.CommonUtil;
  * Created by AriaL on 2017/6/29. 任务组下载队列
  */
 public class DGroupTaskQueue
-    extends AbsTaskQueue<DownloadGroupTask, DGTaskWrapper> {
-  private static volatile DGroupTaskQueue INSTANCE = null;
+        extends AbsTaskQueue<DownloadGroupTask, DGTaskWrapper> {
+    private static volatile DGroupTaskQueue INSTANCE = null;
 
-  private final String TAG = CommonUtil.getClassName(this);
+    private final String TAG = CommonUtil.getClassName(this);
 
-  public static DGroupTaskQueue getInstance() {
-    if (INSTANCE == null) {
-      synchronized (DGroupTaskQueue.class) {
-        INSTANCE = new DGroupTaskQueue();
-        EventMsgUtil.getDefault().register(INSTANCE);
-      }
+    public static DGroupTaskQueue getInstance() {
+        if (INSTANCE == null) {
+            synchronized (DGroupTaskQueue.class) {
+                INSTANCE = new DGroupTaskQueue();
+                EventMsgUtil.getDefault().register(INSTANCE);
+            }
+        }
+        return INSTANCE;
     }
-    return INSTANCE;
-  }
 
-  private DGroupTaskQueue() {
-  }
-
-  @Override int getQueueType() {
-    return TYPE_DG_QUEUE;
-  }
-
-  @Event
-  public void maxTaskNum(DGMaxNumEvent event) {
-    setMaxTaskNum(event.maxNum);
-  }
-
-  @Override public int getMaxTaskNum() {
-    return AriaConfig.getInstance().getDGConfig().getMaxTaskNum();
-  }
-
-  @Override public DownloadGroupTask createTask(DGTaskWrapper wrapper) {
-    super.createTask(wrapper);
-    DownloadGroupTask task = null;
-    if (!mCachePool.taskExits(wrapper.getKey()) && !mExecutePool.taskExits(wrapper.getKey())) {
-      task = (DownloadGroupTask) TaskFactory.getInstance()
-          .createTask(wrapper, TaskSchedulers.getInstance());
-      addTask(task);
-    } else {
-      ALog.w(TAG, "任务已存在");
+    private DGroupTaskQueue() {
     }
-    return task;
-  }
 
-  @Override public int getOldMaxNum() {
-    return AriaConfig.getInstance().getDGConfig().oldMaxTaskNum;
-  }
+    @Override
+    int getQueueType() {
+        return TYPE_DG_QUEUE;
+    }
+
+    @Event
+    public void maxTaskNum(DGMaxNumEvent event) {
+        setMaxTaskNum(event.maxNum);
+    }
+
+    @Override
+    public int getMaxTaskNum() {
+        return AriaConfig.getInstance().getDGConfig().getMaxTaskNum();
+    }
+
+    @Override
+    public DownloadGroupTask createTask(DGTaskWrapper wrapper) {
+        super.createTask(wrapper);
+        DownloadGroupTask task = null;
+        if (!mCachePool.taskExits(wrapper.getKey()) && !mExecutePool.taskExits(wrapper.getKey())) {
+            task = (DownloadGroupTask) TaskFactory.getInstance()
+                    .createTask(wrapper, TaskSchedulers.getInstance());
+            addTask(task);
+        } else {
+            ALog.w(TAG, "任务已存在");
+        }
+        return task;
+    }
+
+    @Override
+    public int getOldMaxNum() {
+        return AriaConfig.getInstance().getDGConfig().oldMaxTaskNum;
+    }
 }

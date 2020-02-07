@@ -24,63 +24,67 @@ import com.arialyy.aria.util.CommonUtil;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 import com.jcraft.jsch.SftpException;
+
 import java.io.UnsupportedEncodingException;
 
 /**
  * 进行登录，获取session，获取文件信息
  */
 public abstract class AbsSFtpInfoTask<WP extends AbsTaskWrapper> implements IInfoTask {
-  protected String TAG = CommonUtil.getClassName(this);
-  protected Callback callback;
-  private WP wrapper;
-  private SFtpTaskOption option;
+    protected String TAG = CommonUtil.getClassName(this);
+    protected Callback callback;
+    private WP wrapper;
+    private SFtpTaskOption option;
 
-  public AbsSFtpInfoTask(WP wp) {
-    this.wrapper = wp;
-    this.option = (SFtpTaskOption) wrapper.getTaskOption();
-  }
-
-  protected abstract void getFileInfo(Session session)
-      throws JSchException, UnsupportedEncodingException, SftpException;
-
-  @Override public void run() {
-    try {
-      FtpUrlEntity entity = option.getUrlEntity();
-      String key = CommonUtil.getStrMd5(entity.hostName + entity.port + entity.user + 0);
-      Session session = SFtpSessionManager.getInstance().getSession(key);
-      if (session == null) {
-        session = SFtpUtil.getInstance().getSession(entity, 0);
-      }
-      getFileInfo(session);
-    } catch (JSchException e) {
-      e.printStackTrace();
-      fail(false, null);
-    } catch (UnsupportedEncodingException e) {
-      e.printStackTrace();
-      fail(false, null);
-    } catch (SftpException e) {
-      e.printStackTrace();
-      fail(false, null);
+    public AbsSFtpInfoTask(WP wp) {
+        this.wrapper = wp;
+        this.option = (SFtpTaskOption) wrapper.getTaskOption();
     }
-  }
 
-  protected SFtpTaskOption getOption() {
-    return option;
-  }
+    protected abstract void getFileInfo(Session session)
+            throws JSchException, UnsupportedEncodingException, SftpException;
 
-  protected WP getWrapper() {
-    return wrapper;
-  }
+    @Override
+    public void run() {
+        try {
+            FtpUrlEntity entity = option.getUrlEntity();
+            String key = CommonUtil.getStrMd5(entity.hostName + entity.port + entity.user + 0);
+            Session session = SFtpSessionManager.getInstance().getSession(key);
+            if (session == null) {
+                session = SFtpUtil.getInstance().getSession(entity, 0);
+            }
+            getFileInfo(session);
+        } catch (JSchException e) {
+            e.printStackTrace();
+            fail(false, null);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+            fail(false, null);
+        } catch (SftpException e) {
+            e.printStackTrace();
+            fail(false, null);
+        }
+    }
 
-  protected void fail(boolean needRetry, BaseException e) {
-    callback.onFail(getWrapper().getEntity(), e, needRetry);
-  }
+    protected SFtpTaskOption getOption() {
+        return option;
+    }
 
-  @Override public void setCallback(Callback callback) {
-    this.callback = callback;
-  }
+    protected WP getWrapper() {
+        return wrapper;
+    }
 
-  @Override public void accept(ILoaderVisitor visitor) {
-    visitor.addComponent(this);
-  }
+    protected void fail(boolean needRetry, BaseException e) {
+        callback.onFail(getWrapper().getEntity(), e, needRetry);
+    }
+
+    @Override
+    public void setCallback(Callback callback) {
+        this.callback = callback;
+    }
+
+    @Override
+    public void accept(ILoaderVisitor visitor) {
+        visitor.addComponent(this);
+    }
 }

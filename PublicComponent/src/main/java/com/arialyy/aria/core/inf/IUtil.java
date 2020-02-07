@@ -26,43 +26,43 @@ import com.arialyy.aria.core.upload.UploadEntity;
  */
 public interface IUtil {
 
-  /**
-   * 获取任务标志
-   *
-   * @return {@link DownloadEntity#getKey()}、{@link DownloadGroupEntity#getKey()}、{@link
-   * UploadEntity#getKey()}
-   */
-  String getKey();
+    /**
+     * 获取任务标志
+     *
+     * @return {@link DownloadEntity#getKey()}、{@link DownloadGroupEntity#getKey()}、{@link
+     * UploadEntity#getKey()}
+     */
+    String getKey();
 
-  /**
-   * 获取文件大小
-   */
-  long getFileSize();
+    /**
+     * 获取文件大小
+     */
+    long getFileSize();
 
-  /**
-   * 获取当前位置
-   */
-  long getCurrentLocation();
+    /**
+     * 获取当前位置
+     */
+    long getCurrentLocation();
 
-  /**
-   * 任务是否正在执行
-   *
-   * @return {@code true} 任务正在执行
-   */
-  boolean isRunning();
+    /**
+     * 任务是否正在执行
+     *
+     * @return {@code true} 任务正在执行
+     */
+    boolean isRunning();
 
-  /**
-   * 取消
-   */
-  void cancel();
+    /**
+     * 取消
+     */
+    void cancel();
 
-  /**
-   * 停止
-   */
-  void stop();
+    /**
+     * 停止
+     */
+    void stop();
 
-  /**
-   * 开始
-   */
-  void start();
+    /**
+     * 开始
+     */
+    void start();
 }

@@ -34,6 +34,7 @@ import com.arialyy.aria.http.HttpTaskOption;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.BufferedRandomAccessFile;
 import com.arialyy.aria.util.FileUtil;
+
 import java.io.File;
 import java.io.IOException;
 
@@ -42,24 +43,25 @@ import java.io.IOException;
  * @Date 2019-09-21
  */
 public final class HttpDLoaderUtil extends AbsNormalLoaderUtil {
-  public HttpDLoaderUtil(AbsTaskWrapper wrapper, IEventListener listener) {
-    super(wrapper, listener);
-    wrapper.generateTaskOption(HttpTaskOption.class);
-  }
+    public HttpDLoaderUtil(AbsTaskWrapper wrapper, IEventListener listener) {
+        super(wrapper, listener);
+        wrapper.generateTaskOption(HttpTaskOption.class);
+    }
 
-  @Override public AbsNormalLoader getLoader() {
-    return mLoader == null ? new NormalLoader(getTaskWrapper(), getListener()) : mLoader;
-  }
+    @Override
+    public AbsNormalLoader getLoader() {
+        return mLoader == null ? new NormalLoader(getTaskWrapper(), getListener()) : mLoader;
+    }
 
-  public LoaderStructure BuildLoaderStructure() {
-    LoaderStructure structure = new LoaderStructure();
-    structure.addComponent(new HttpRecordHandler(getTaskWrapper()))
-        .addComponent(new NormalThreadStateManager(getListener()))
-        .addComponent(new HttpDFileInfoTask((DTaskWrapper) getTaskWrapper()))
-        .addComponent(new NormalTTBuilder(getTaskWrapper(), new HttpDTTBuilderAdapter()));
-    structure.accept(getLoader());
-    return structure;
-  }
+    public LoaderStructure BuildLoaderStructure() {
+        LoaderStructure structure = new LoaderStructure();
+        structure.addComponent(new HttpRecordHandler(getTaskWrapper()))
+                .addComponent(new NormalThreadStateManager(getListener()))
+                .addComponent(new HttpDFileInfoTask((DTaskWrapper) getTaskWrapper()))
+                .addComponent(new NormalTTBuilder(getTaskWrapper(), new HttpDTTBuilderAdapter()));
+        structure.accept(getLoader());
+        return structure;
+    }
 
 
 }

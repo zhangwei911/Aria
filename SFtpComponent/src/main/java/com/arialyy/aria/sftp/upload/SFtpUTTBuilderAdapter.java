@@ -16,6 +16,7 @@
 package com.arialyy.aria.sftp.upload;
 
 import android.os.Handler;
+
 import com.arialyy.aria.core.FtpUrlEntity;
 import com.arialyy.aria.core.TaskRecord;
 import com.arialyy.aria.core.ThreadRecord;
@@ -29,45 +30,48 @@ import com.arialyy.aria.sftp.SFtpUtil;
 import com.arialyy.aria.util.CommonUtil;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
+
 import java.io.UnsupportedEncodingException;
 
 final class SFtpUTTBuilderAdapter extends AbsNormalTTBuilderAdapter {
-  private SFtpTaskOption option;
+    private SFtpTaskOption option;
 
-  SFtpUTTBuilderAdapter(UTaskWrapper wrapper) {
-    option = (SFtpTaskOption) wrapper.getTaskOption();
-  }
-
-  @Override public IThreadTaskAdapter getAdapter(SubThreadConfig config) {
-    return new SFtpUThreadTaskAdapter(config);
-  }
-
-  @Override
-  protected SubThreadConfig getSubThreadConfig(Handler stateHandler, ThreadRecord threadRecord,
-      boolean isBlock, int startNum) {
-    SubThreadConfig config =
-        super.getSubThreadConfig(stateHandler, threadRecord, isBlock, startNum);
-
-    FtpUrlEntity entity = option.getUrlEntity();
-    String key =
-        CommonUtil.getStrMd5(entity.hostName + entity.port + entity.user + threadRecord.threadId);
-    Session session = SFtpSessionManager.getInstance().getSession(key);
-    if (session == null) {
-      try {
-        session = SFtpUtil.getInstance().getSession(entity, threadRecord.threadId);
-      } catch (JSchException e) {
-        e.printStackTrace();
-      } catch (UnsupportedEncodingException e) {
-        e.printStackTrace();
-      }
+    SFtpUTTBuilderAdapter(UTaskWrapper wrapper) {
+        option = (SFtpTaskOption) wrapper.getTaskOption();
     }
-    config.obj = session;
 
-    return config;
-  }
+    @Override
+    public IThreadTaskAdapter getAdapter(SubThreadConfig config) {
+        return new SFtpUThreadTaskAdapter(config);
+    }
 
-  @Override public boolean handleNewTask(TaskRecord record, int totalThreadNum) {
+    @Override
+    protected SubThreadConfig getSubThreadConfig(Handler stateHandler, ThreadRecord threadRecord,
+                                                 boolean isBlock, int startNum) {
+        SubThreadConfig config =
+                super.getSubThreadConfig(stateHandler, threadRecord, isBlock, startNum);
 
-    return true;
-  }
+        FtpUrlEntity entity = option.getUrlEntity();
+        String key =
+                CommonUtil.getStrMd5(entity.hostName + entity.port + entity.user + threadRecord.threadId);
+        Session session = SFtpSessionManager.getInstance().getSession(key);
+        if (session == null) {
+            try {
+                session = SFtpUtil.getInstance().getSession(entity, threadRecord.threadId);
+            } catch (JSchException e) {
+                e.printStackTrace();
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+        }
+        config.obj = session;
+
+        return config;
+    }
+
+    @Override
+    public boolean handleNewTask(TaskRecord record, int totalThreadNum) {
+
+        return true;
+    }
 }

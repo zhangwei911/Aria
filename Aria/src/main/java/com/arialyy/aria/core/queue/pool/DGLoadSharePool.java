@@ -20,22 +20,22 @@ package com.arialyy.aria.core.queue.pool;
  * 下载任务池，该池子为简单任务和任务组共用
  */
 public class DGLoadSharePool {
-  private static volatile DGLoadSharePool INSTANCE;
+    private static volatile DGLoadSharePool INSTANCE;
 
-  public DGLoadExecutePool executePool;
-  public BaseCachePool cachePool;
+    public DGLoadExecutePool executePool;
+    public BaseCachePool cachePool;
 
-  private DGLoadSharePool() {
-    executePool = new DGLoadExecutePool<>();
-    cachePool = new BaseCachePool<>();
-  }
-
-  public static DGLoadSharePool getInstance() {
-    if (INSTANCE == null) {
-      synchronized (DGLoadSharePool.class) {
-        INSTANCE = new DGLoadSharePool();
-      }
+    private DGLoadSharePool() {
+        executePool = new DGLoadExecutePool<>();
+        cachePool = new BaseCachePool<>();
     }
-    return INSTANCE;
-  }
+
+    public static DGLoadSharePool getInstance() {
+        if (INSTANCE == null) {
+            synchronized (DGLoadSharePool.class) {
+                INSTANCE = new DGLoadSharePool();
+            }
+        }
+        return INSTANCE;
+    }
 }

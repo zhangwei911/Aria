@@ -19,6 +19,6 @@ package com.arialyy.aria.core.inf;
  * {@link AbsReceiver}类型
  */
 public interface ReceiverType {
-  String DOWNLOAD = "download";
-  String UPLOAD = "upload";
+    String DOWNLOAD = "download";
+    String UPLOAD = "upload";
 }

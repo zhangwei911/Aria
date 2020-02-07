@@ -17,13 +17,13 @@ package com.arialyy.aria.core.event;
 
 public class PeerIndexEvent {
 
-  public int peerIndex;
-  public long createTime;
-  public String key;
+    public int peerIndex;
+    public long createTime;
+    public String key;
 
-  public PeerIndexEvent(String key, int peerIndex) {
-    this.peerIndex = peerIndex;
-    this.key = key;
-    createTime = System.currentTimeMillis();
-  }
+    public PeerIndexEvent(String key, int peerIndex) {
+        this.peerIndex = peerIndex;
+        this.key = key;
+        createTime = System.currentTimeMillis();
+    }
 }

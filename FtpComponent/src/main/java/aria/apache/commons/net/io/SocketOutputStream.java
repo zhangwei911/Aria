@@ -35,46 +35,48 @@ import java.net.Socket;
  ***/
 
 public class SocketOutputStream extends FilterOutputStream {
-  private final Socket __socket;
+    private final Socket __socket;
 
-  /***
-   * Creates a SocketOutputStream instance wrapping an output stream and
-   * storing a reference to a socket that should be closed on closing
-   * the stream.
-   *
-   * @param socket  The socket to close on closing the stream.
-   * @param stream  The input stream to wrap.
-   ***/
-  public SocketOutputStream(Socket socket, OutputStream stream) {
-    super(stream);
-    __socket = socket;
-  }
+    /***
+     * Creates a SocketOutputStream instance wrapping an output stream and
+     * storing a reference to a socket that should be closed on closing
+     * the stream.
+     *
+     * @param socket  The socket to close on closing the stream.
+     * @param stream  The input stream to wrap.
+     ***/
+    public SocketOutputStream(Socket socket, OutputStream stream) {
+        super(stream);
+        __socket = socket;
+    }
 
-  /***
-   * Writes a number of bytes from a byte array to the stream starting from
-   * a given offset.  This method bypasses the equivalent method in
-   * FilterOutputStream because the FilterOutputStream implementation is
-   * very inefficient.
-   *
-   * @param buffer  The byte array to write.
-   * @param offset  The offset into the array at which to start copying data.
-   * @param length  The number of bytes to write.
-   * @throws IOException If an error occurs while writing to the underlying
-   *            stream.
-   ***/
-  @Override public void write(byte buffer[], int offset, int length) throws IOException {
-    out.write(buffer, offset, length);
-  }
+    /***
+     * Writes a number of bytes from a byte array to the stream starting from
+     * a given offset.  This method bypasses the equivalent method in
+     * FilterOutputStream because the FilterOutputStream implementation is
+     * very inefficient.
+     *
+     * @param buffer  The byte array to write.
+     * @param offset  The offset into the array at which to start copying data.
+     * @param length  The number of bytes to write.
+     * @throws IOException If an error occurs while writing to the underlying
+     *            stream.
+     ***/
+    @Override
+    public void write(byte buffer[], int offset, int length) throws IOException {
+        out.write(buffer, offset, length);
+    }
 
-  /***
-   * Closes the stream and immediately afterward closes the referenced
-   * socket.
-   *
-   * @throws IOException  If there is an error in closing the stream
-   *                         or socket.
-   ***/
-  @Override public void close() throws IOException {
-    super.close();
-    __socket.close();
-  }
+    /***
+     * Closes the stream and immediately afterward closes the referenced
+     * socket.
+     *
+     * @throws IOException  If there is an error in closing the stream
+     *                         or socket.
+     ***/
+    @Override
+    public void close() throws IOException {
+        super.close();
+        __socket.close();
+    }
 }

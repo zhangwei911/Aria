@@ -21,48 +21,48 @@ import com.arialyy.aria.core.download.AbsGroupTaskWrapper;
  * Created by AriaL on 2017/6/29. 任务组子任务控制命令
  */
 public class GroupCmdFactory {
-  /**
-   * 启动子任务
-   */
-  public static final int SUB_TASK_START = 0xa1;
-  /**
-   * 停止子任务
-   */
-  public static final int SUB_TASK_STOP = 0xa2;
+    /**
+     * 启动子任务
+     */
+    public static final int SUB_TASK_START = 0xa1;
+    /**
+     * 停止子任务
+     */
+    public static final int SUB_TASK_STOP = 0xa2;
 
-  private static volatile GroupCmdFactory INSTANCE = null;
+    private static volatile GroupCmdFactory INSTANCE = null;
 
-  private GroupCmdFactory() {
+    private GroupCmdFactory() {
 
-  }
-
-  public static GroupCmdFactory getInstance() {
-    if (INSTANCE == null) {
-      synchronized (GroupCmdFactory.class) {
-        INSTANCE = new GroupCmdFactory();
-      }
     }
-    return INSTANCE;
-  }
 
-  /**
-   * @param wrapper 参数信息
-   * @param type 命令类型{@link #SUB_TASK_START}、{@link #SUB_TASK_STOP}
-   * @param childUrl 需要控制的子任务url
-   */
-  public AbsGroupCmd createCmd(AbsGroupTaskWrapper wrapper, int type, String childUrl) {
-    AbsGroupCmd cmd = null;
-    switch (type) {
-      case SUB_TASK_START:
-        cmd = new DGSubStartCmd<>(wrapper);
-        break;
-      case SUB_TASK_STOP:
-        cmd = new DGSubStopCmd<>(wrapper);
-        break;
+    public static GroupCmdFactory getInstance() {
+        if (INSTANCE == null) {
+            synchronized (GroupCmdFactory.class) {
+                INSTANCE = new GroupCmdFactory();
+            }
+        }
+        return INSTANCE;
     }
-    if (cmd != null) {
-      cmd.childUrl = childUrl;
+
+    /**
+     * @param wrapper  参数信息
+     * @param type     命令类型{@link #SUB_TASK_START}、{@link #SUB_TASK_STOP}
+     * @param childUrl 需要控制的子任务url
+     */
+    public AbsGroupCmd createCmd(AbsGroupTaskWrapper wrapper, int type, String childUrl) {
+        AbsGroupCmd cmd = null;
+        switch (type) {
+            case SUB_TASK_START:
+                cmd = new DGSubStartCmd<>(wrapper);
+                break;
+            case SUB_TASK_STOP:
+                cmd = new DGSubStopCmd<>(wrapper);
+                break;
+        }
+        if (cmd != null) {
+            cmd.childUrl = childUrl;
+        }
+        return cmd;
     }
-    return cmd;
-  }
 }

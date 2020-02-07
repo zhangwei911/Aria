@@ -20,13 +20,13 @@ package com.arialyy.aria.exception;
  * Aria 文件异常
  */
 public class FileNotFoundException extends BaseException {
-  private static final String ARIA_FILE_EXCEPTION = "Aria File not found Exception:";
+    private static final String ARIA_FILE_EXCEPTION = "Aria File not found Exception:";
 
-  public FileNotFoundException(String tag, String detailMessage) {
-    super(tag, String.format("%s%s", ARIA_FILE_EXCEPTION, detailMessage));
-  }
+    public FileNotFoundException(String tag, String detailMessage) {
+        super(tag, String.format("%s%s", ARIA_FILE_EXCEPTION, detailMessage));
+    }
 
-  public FileNotFoundException(String tag, String message, Exception e) {
-    super(tag, message, e);
-  }
+    public FileNotFoundException(String tag, String message, Exception e) {
+        super(tag, message, e);
+    }
 }

@@ -17,27 +17,27 @@ package com.arialyy.aria.core.loader;
 
 public interface ILoader extends Runnable {
 
-  //void start();
+    //void start();
 
-  /**
-   * 任务是否在执行
-   *
-   * @return true 任务执行中
-   */
-  boolean isRunning();
+    /**
+     * 任务是否在执行
+     *
+     * @return true 任务执行中
+     */
+    boolean isRunning();
 
-  void cancel();
+    void cancel();
 
-  void stop();
+    void stop();
 
-  /**
-   * 任务是否被中断（停止，取消）
-   *
-   * @return true 任务中断，false 任务没有中断
-   */
-  boolean isBreak();
+    /**
+     * 任务是否被中断（停止，取消）
+     *
+     * @return true 任务中断，false 任务没有中断
+     */
+    boolean isBreak();
 
-  String getKey();
+    String getKey();
 
-  long getCurrentProgress();
+    long getCurrentProgress();
 }

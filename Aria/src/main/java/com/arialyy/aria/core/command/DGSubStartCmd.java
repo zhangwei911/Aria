@@ -22,13 +22,14 @@ import com.arialyy.aria.core.download.AbsGroupTaskWrapper;
  * 任务组开始命令，该命令负责处理任务组子任务的开始\恢复等工作
  */
 final class DGSubStartCmd<T extends AbsGroupTaskWrapper> extends AbsGroupCmd<T> {
-  DGSubStartCmd(T wrapper) {
-    super(wrapper);
-  }
-
-  @Override public void executeCmd() {
-    if (checkTask()) {
-      tempTask.startSubTask(childUrl);
+    DGSubStartCmd(T wrapper) {
+        super(wrapper);
     }
-  }
+
+    @Override
+    public void executeCmd() {
+        if (checkTask()) {
+            tempTask.startSubTask(childUrl);
+        }
+    }
 }

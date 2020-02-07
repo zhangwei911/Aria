@@ -4,28 +4,25 @@
     android:layout_width="match_parent"
     android:layout_height="@dimen/bar_height"
     android:background="@drawable/item_bg"
-    android:orientation="vertical"
-    >
+    android:orientation="vertical">
 
-  <androidx.appcompat.widget.AppCompatImageView
-      android:id="@+id/icon"
-      android:layout_width="@dimen/icon_size"
-      android:layout_height="@dimen/icon_size"
-      android:layout_centerVertical="true"
-      app:srcCompat="@drawable/ic_dir"
-      />
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/icon"
+        android:layout_width="@dimen/icon_size"
+        android:layout_height="@dimen/icon_size"
+        android:layout_centerVertical="true"
+        app:srcCompat="@drawable/ic_dir" />
 
-  <TextView
-      android:id="@+id/text"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:layout_centerVertical="true"
-      android:layout_marginLeft="8dp"
-      android:layout_toRightOf="@+id/icon"
-      android:ellipsize="marquee"
-      android:singleLine="true"
-      android:textColor="@color/text_black"
-      android:textSize="@dimen/text_size_normal"
-      />
+    <TextView
+        android:id="@+id/text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="8dp"
+        android:layout_toRightOf="@+id/icon"
+        android:ellipsize="marquee"
+        android:singleLine="true"
+        android:textColor="@color/text_black"
+        android:textSize="@dimen/text_size_normal" />
 
 </RelativeLayout>

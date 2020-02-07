@@ -26,69 +26,70 @@ import com.arialyy.aria.util.CommonUtil;
  * ftp文件夹下载
  */
 public class FtpDirBuilderTarget extends AbsBuilderTarget<FtpDirBuilderTarget> {
-  private FtpDirConfigHandler<FtpDirBuilderTarget> mConfigHandler;
-  private String url;
+    private FtpDirConfigHandler<FtpDirBuilderTarget> mConfigHandler;
+    private String url;
 
-  FtpDirBuilderTarget(String url) {
-    this.url = url;
-    mConfigHandler = new FtpDirConfigHandler<>(this, -1);
-    getEntity().setGroupHash(url);
-    getTaskWrapper().setNewTask(true);
-  }
-
-  /**
-   * 设置任务组的文件夹路径，在Aria中，任务组的所有子任务都会下载到以任务组组名的文件夹中。
-   * 如：groupDirPath = "/mnt/sdcard/download/group_test"
-   * <pre>
-   *   {@code
-   *      + mnt
-   *        + sdcard
-   *          + download
-   *            + group_test
-   *              - task1.apk
-   *              - task2.apk
-   *              - task3.apk
-   *              ....
-   *
-   *   }
-   * </pre>
-   *
-   * @param dirPath 任务组保存文件夹路径
-   */
-  public FtpDirBuilderTarget setDirPath(String dirPath) {
-    return mConfigHandler.setDirPath(dirPath);
-  }
-
-  /**
-   * 设置任务组别名
-   */
-  public FtpDirBuilderTarget setGroupAlias(String alias) {
-    mConfigHandler.setGroupAlias(alias);
-    return this;
-  }
-
-  /**
-   * 设置登陆、字符串编码、ftps等参数
-   */
-  public FtpDirBuilderTarget option(FtpOption option) {
-    if (option == null) {
-      throw new NullPointerException("ftp 任务配置为空");
+    FtpDirBuilderTarget(String url) {
+        this.url = url;
+        mConfigHandler = new FtpDirConfigHandler<>(this, -1);
+        getEntity().setGroupHash(url);
+        getTaskWrapper().setNewTask(true);
     }
-    option.setUrlEntity(CommonUtil.getFtpUrlInfo(url));
-    getTaskWrapper().getOptionParams().setParams(option);
-    return this;
-  }
 
-  @Override public DownloadGroupEntity getEntity() {
-    return (DownloadGroupEntity) super.getEntity();
-  }
+    /**
+     * 设置任务组的文件夹路径，在Aria中，任务组的所有子任务都会下载到以任务组组名的文件夹中。
+     * 如：groupDirPath = "/mnt/sdcard/download/group_test"
+     * <pre>
+     *   {@code
+     *      + mnt
+     *        + sdcard
+     *          + download
+     *            + group_test
+     *              - task1.apk
+     *              - task2.apk
+     *              - task3.apk
+     *              ....
+     *
+     *   }
+     * </pre>
+     *
+     * @param dirPath 任务组保存文件夹路径
+     */
+    public FtpDirBuilderTarget setDirPath(String dirPath) {
+        return mConfigHandler.setDirPath(dirPath);
+    }
 
-  /**
-   * 获取子任务管理器
-   *
-   * @return 子任务管理器
-   */
-  public SubTaskManager getSubTaskManager() {
-    return mConfigHandler.getSubTaskManager();
-  }
+    /**
+     * 设置任务组别名
+     */
+    public FtpDirBuilderTarget setGroupAlias(String alias) {
+        mConfigHandler.setGroupAlias(alias);
+        return this;
+    }
+
+    /**
+     * 设置登陆、字符串编码、ftps等参数
+     */
+    public FtpDirBuilderTarget option(FtpOption option) {
+        if (option == null) {
+            throw new NullPointerException("ftp 任务配置为空");
+        }
+        option.setUrlEntity(CommonUtil.getFtpUrlInfo(url));
+        getTaskWrapper().getOptionParams().setParams(option);
+        return this;
+    }
+
+    @Override
+    public DownloadGroupEntity getEntity() {
+        return (DownloadGroupEntity) super.getEntity();
+    }
+
+    /**
+     * 获取子任务管理器
+     *
+     * @return 子任务管理器
+     */
+    public SubTaskManager getSubTaskManager() {
+        return mConfigHandler.getSubTaskManager();
+    }
 }

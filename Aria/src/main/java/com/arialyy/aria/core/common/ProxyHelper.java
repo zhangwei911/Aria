@@ -16,6 +16,7 @@
 package com.arialyy.aria.core.common;
 
 import com.arialyy.annotations.TaskEnum;
+
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -26,93 +27,93 @@ import java.util.concurrent.ConcurrentHashMap;
  * 代理参数获取
  */
 public class ProxyHelper {
-  /**
-   * 普通下载任务类型
-   */
-  public static int PROXY_TYPE_DOWNLOAD = 0x01;
-  /**
-   * 组合下载任务类型
-   */
-  public static int PROXY_TYPE_DOWNLOAD_GROUP = 0x02;
-  /**
-   * 普通上传任务类型
-   */
-  public static int PROXY_TYPE_UPLOAD = 0x03;
-  /**
-   * m3u8 peer
-   */
-  public static int PROXY_TYPE_M3U8_PEER = 0x04;
-  /**
-   * 组合任务子任务类型
-   */
-  public static int PROXY_TYPE_DOWNLOAD_GROUP_SUB = 0x05;
-  public Map<String, Set<Integer>> mProxyCache = new ConcurrentHashMap<>();
+    /**
+     * 普通下载任务类型
+     */
+    public static int PROXY_TYPE_DOWNLOAD = 0x01;
+    /**
+     * 组合下载任务类型
+     */
+    public static int PROXY_TYPE_DOWNLOAD_GROUP = 0x02;
+    /**
+     * 普通上传任务类型
+     */
+    public static int PROXY_TYPE_UPLOAD = 0x03;
+    /**
+     * m3u8 peer
+     */
+    public static int PROXY_TYPE_M3U8_PEER = 0x04;
+    /**
+     * 组合任务子任务类型
+     */
+    public static int PROXY_TYPE_DOWNLOAD_GROUP_SUB = 0x05;
+    public Map<String, Set<Integer>> mProxyCache = new ConcurrentHashMap<>();
 
-  public static volatile ProxyHelper INSTANCE = null;
+    public static volatile ProxyHelper INSTANCE = null;
 
-  private ProxyHelper() {
-  }
-
-  public static ProxyHelper getInstance() {
-    if (INSTANCE == null) {
-      synchronized (ProxyHelper.class) {
-        INSTANCE = new ProxyHelper();
-      }
-    }
-    return INSTANCE;
-  }
-
-  /**
-   * 检查观察者对象的代理文件类型
-   *
-   * @param clazz 观察者对象
-   * @return {@link #PROXY_TYPE_DOWNLOAD}，如果没有实体对象则返回空的list
-   */
-  public Set<Integer> checkProxyType(Class clazz) {
-    final String className = clazz.getName();
-    Set<Integer> result = mProxyCache.get(clazz.getName());
-    if (result != null) {
-      return result;
-    }
-    result = new HashSet<>();
-    if (checkProxyExist(className, TaskEnum.DOWNLOAD_GROUP.proxySuffix)) {
-      result.add(PROXY_TYPE_DOWNLOAD_GROUP);
-    }
-    if (checkProxyExist(className, TaskEnum.DOWNLOAD.proxySuffix)) {
-      result.add(PROXY_TYPE_DOWNLOAD);
+    private ProxyHelper() {
     }
 
-    if (checkProxyExist(className, TaskEnum.UPLOAD.proxySuffix)) {
-      result.add(PROXY_TYPE_UPLOAD);
+    public static ProxyHelper getInstance() {
+        if (INSTANCE == null) {
+            synchronized (ProxyHelper.class) {
+                INSTANCE = new ProxyHelper();
+            }
+        }
+        return INSTANCE;
     }
 
-    if (checkProxyExist(className, TaskEnum.M3U8_PEER.proxySuffix)) {
-      result.add(PROXY_TYPE_M3U8_PEER);
+    /**
+     * 检查观察者对象的代理文件类型
+     *
+     * @param clazz 观察者对象
+     * @return {@link #PROXY_TYPE_DOWNLOAD}，如果没有实体对象则返回空的list
+     */
+    public Set<Integer> checkProxyType(Class clazz) {
+        final String className = clazz.getName();
+        Set<Integer> result = mProxyCache.get(clazz.getName());
+        if (result != null) {
+            return result;
+        }
+        result = new HashSet<>();
+        if (checkProxyExist(className, TaskEnum.DOWNLOAD_GROUP.proxySuffix)) {
+            result.add(PROXY_TYPE_DOWNLOAD_GROUP);
+        }
+        if (checkProxyExist(className, TaskEnum.DOWNLOAD.proxySuffix)) {
+            result.add(PROXY_TYPE_DOWNLOAD);
+        }
+
+        if (checkProxyExist(className, TaskEnum.UPLOAD.proxySuffix)) {
+            result.add(PROXY_TYPE_UPLOAD);
+        }
+
+        if (checkProxyExist(className, TaskEnum.M3U8_PEER.proxySuffix)) {
+            result.add(PROXY_TYPE_M3U8_PEER);
+        }
+
+        if (checkProxyExist(className, TaskEnum.DOWNLOAD_GROUP_SUB.proxySuffix)) {
+            result.add(PROXY_TYPE_DOWNLOAD_GROUP_SUB);
+        }
+
+        if (!result.isEmpty()) {
+            mProxyCache.put(clazz.getName(), result);
+        }
+        return result;
     }
 
-    if (checkProxyExist(className, TaskEnum.DOWNLOAD_GROUP_SUB.proxySuffix)) {
-      result.add(PROXY_TYPE_DOWNLOAD_GROUP_SUB);
-    }
+    private boolean checkProxyExist(String className, String proxySuffix) {
+        String clsName = className.concat(proxySuffix);
 
-    if (!result.isEmpty()) {
-      mProxyCache.put(clazz.getName(), result);
+        try {
+            if (getClass().getClassLoader().loadClass(clsName) != null) {
+                return true;
+            }
+            if (Class.forName(clsName) != null) {
+                return true;
+            }
+        } catch (ClassNotFoundException e) {
+            //e.printStackTrace();
+        }
+        return false;
     }
-    return result;
-  }
-
-  private boolean checkProxyExist(String className, String proxySuffix) {
-    String clsName = className.concat(proxySuffix);
-
-    try {
-      if (getClass().getClassLoader().loadClass(clsName) != null) {
-        return true;
-      }
-      if (Class.forName(clsName) != null) {
-        return true;
-      }
-    } catch (ClassNotFoundException e) {
-      //e.printStackTrace();
-    }
-    return false;
-  }
 }

@@ -17,6 +17,7 @@ package com.arialyy.aria.orm.annotation;
 
 import com.arialyy.aria.orm.ActionPolicy;
 import com.arialyy.aria.orm.DbEntity;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -26,25 +27,27 @@ import java.lang.annotation.Target;
  * Created by AriaL on 2017/7/4.
  * 外键约束
  */
-@Target(ElementType.FIELD) @Retention(RetentionPolicy.RUNTIME) public @interface Foreign {
+@Target(ElementType.FIELD)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface Foreign {
 
-  /**
-   * 关联的表
-   */
-  Class<? extends DbEntity> parent();
+    /**
+     * 关联的表
+     */
+    Class<? extends DbEntity> parent();
 
-  /**
-   * 父表对应的列名
-   */
-  String column();
+    /**
+     * 父表对应的列名
+     */
+    String column();
 
-  /**
-   * ON UPDATE 约束
-   */
-  ActionPolicy onUpdate() default ActionPolicy.NO_ACTION;
+    /**
+     * ON UPDATE 约束
+     */
+    ActionPolicy onUpdate() default ActionPolicy.NO_ACTION;
 
-  /**
-   * ON DELETE 约束
-   */
-  ActionPolicy onDelete() default ActionPolicy.NO_ACTION;
+    /**
+     * ON DELETE 约束
+     */
+    ActionPolicy onDelete() default ActionPolicy.NO_ACTION;
 }

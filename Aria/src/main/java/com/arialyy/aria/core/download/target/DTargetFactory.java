@@ -17,6 +17,7 @@ package com.arialyy.aria.core.download.target;
 
 import com.arialyy.aria.core.common.AbsBuilderTarget;
 import com.arialyy.aria.core.common.AbsNormalTarget;
+
 import java.util.List;
 
 /**
@@ -25,56 +26,56 @@ import java.util.List;
  */
 public class DTargetFactory {
 
-  public static volatile DTargetFactory INSTANCE;
+    public static volatile DTargetFactory INSTANCE;
 
-  private DTargetFactory() {
+    private DTargetFactory() {
 
-  }
+    }
 
-  public static DTargetFactory getInstance() {
+    public static DTargetFactory getInstance() {
 
-    if (INSTANCE == null) {
-      synchronized (DTargetFactory.class) {
         if (INSTANCE == null) {
-          INSTANCE = new DTargetFactory();
+            synchronized (DTargetFactory.class) {
+                if (INSTANCE == null) {
+                    INSTANCE = new DTargetFactory();
+                }
+            }
         }
-      }
+
+        return INSTANCE;
     }
 
-    return INSTANCE;
-  }
+    public <T extends AbsNormalTarget> T generateNormalTarget(Class<T> clazz, long taskId) {
+        T target = null;
+        if (clazz == HttpNormalTarget.class) {
+            target = (T) new HttpNormalTarget(taskId);
+        } else if (clazz == FtpNormalTarget.class) {
+            target = (T) new FtpNormalTarget(taskId);
+        } else if (clazz == GroupNormalTarget.class) {
+            target = (T) new GroupNormalTarget(taskId);
+        } else if (clazz == FtpDirNormalTarget.class) {
+            target = (T) new FtpDirNormalTarget(taskId);
+        }
 
-  public <T extends AbsNormalTarget> T generateNormalTarget(Class<T> clazz, long taskId) {
-    T target = null;
-    if (clazz == HttpNormalTarget.class) {
-      target = (T) new HttpNormalTarget(taskId);
-    } else if (clazz == FtpNormalTarget.class) {
-      target = (T) new FtpNormalTarget(taskId);
-    } else if (clazz == GroupNormalTarget.class) {
-      target = (T) new GroupNormalTarget(taskId);
-    } else if (clazz == FtpDirNormalTarget.class) {
-      target = (T) new FtpDirNormalTarget(taskId);
+        return target;
     }
 
-    return target;
-  }
+    public <T extends AbsBuilderTarget> T generateBuilderTarget(Class<T> clazz, String url) {
+        T target = null;
+        if (clazz == HttpBuilderTarget.class) {
+            target = (T) new HttpBuilderTarget(url);
+        } else if (clazz == FtpBuilderTarget.class) {
+            target = (T) new FtpBuilderTarget(url);
+        }
 
-  public <T extends AbsBuilderTarget> T generateBuilderTarget(Class<T> clazz, String url) {
-    T target = null;
-    if (clazz == HttpBuilderTarget.class) {
-      target = (T) new HttpBuilderTarget(url);
-    } else if (clazz == FtpBuilderTarget.class) {
-      target = (T) new FtpBuilderTarget(url);
+        return target;
     }
 
-    return target;
-  }
+    public FtpDirBuilderTarget generateDirBuilderTarget(String url) {
+        return new FtpDirBuilderTarget(url);
+    }
 
-  public FtpDirBuilderTarget generateDirBuilderTarget(String url) {
-    return new FtpDirBuilderTarget(url);
-  }
-
-  public GroupBuilderTarget generateGroupBuilderTarget(List<String> urls) {
-    return new GroupBuilderTarget(urls);
-  }
+    public GroupBuilderTarget generateGroupBuilderTarget(List<String> urls) {
+        return new GroupBuilderTarget(urls);
+    }
 }

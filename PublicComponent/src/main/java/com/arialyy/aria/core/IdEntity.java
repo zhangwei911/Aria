@@ -20,38 +20,38 @@ package com.arialyy.aria.core;
  */
 public class IdEntity {
 
-  /**
-   * 私钥证书路径
-   */
-  public String prvKey;
+    /**
+     * 私钥证书路径
+     */
+    public String prvKey;
 
-  /**
-   * 私钥证书密码
-   */
-  public String prvPass;
+    /**
+     * 私钥证书密码
+     */
+    public String prvPass;
 
-  /**
-   * 公钥证书路径
-   */
-  public String pubKey;
+    /**
+     * 公钥证书路径
+     */
+    public String pubKey;
 
-  /**
-   * knowhost文件路径
-   */
-  public String knowHost;
+    /**
+     * knowhost文件路径
+     */
+    public String knowHost;
 
-  /**
-   * ca 证书密码
-   */
-  public String storePass;
+    /**
+     * ca 证书密码
+     */
+    public String storePass;
 
-  /**
-   * ca证书路径
-   */
-  public String storePath;
+    /**
+     * ca证书路径
+     */
+    public String storePath;
 
-  /**
-   * ca证书别名
-   */
-  public String keyAlias;
+    /**
+     * ca证书别名
+     */
+    public String keyAlias;
 }

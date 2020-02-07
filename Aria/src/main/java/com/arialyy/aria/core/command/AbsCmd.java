@@ -23,13 +23,13 @@ import com.arialyy.aria.core.queue.AbsTaskQueue;
  * Created by AriaL on 2017/6/29.
  */
 public abstract class AbsCmd<T extends AbsTaskWrapper> implements ICmd {
-  protected AbsTaskQueue mQueue;
-  protected T mTaskWrapper;
-  protected String TAG;
+    protected AbsTaskQueue mQueue;
+    protected T mTaskWrapper;
+    protected String TAG;
 
-  /**
-   * 是否是下载任务的命令
-   * {@code true} 下载任务的命令，{@code false} 上传任务的命令
-   */
-  protected boolean isDownloadCmd = true;
+    /**
+     * 是否是下载任务的命令
+     * {@code true} 下载任务的命令，{@code false} 上传任务的命令
+     */
+    protected boolean isDownloadCmd = true;
 }

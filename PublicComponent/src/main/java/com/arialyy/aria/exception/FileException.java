@@ -20,13 +20,13 @@ package com.arialyy.aria.exception;
  * Aria 文件异常
  */
 public class FileException extends BaseException {
-  private static final String ARIA_FILE_EXCEPTION = "Aria File Exception:";
+    private static final String ARIA_FILE_EXCEPTION = "Aria File Exception:";
 
-  public FileException(String tag, String detailMessage) {
-    super(tag, String.format("%s%s", ARIA_FILE_EXCEPTION, detailMessage));
-  }
+    public FileException(String tag, String detailMessage) {
+        super(tag, String.format("%s%s", ARIA_FILE_EXCEPTION, detailMessage));
+    }
 
-  public FileException(String tag, String message, Exception e){
-    super(tag, message, e);
-  }
+    public FileException(String tag, String message, Exception e) {
+        super(tag, message, e);
+    }
 }

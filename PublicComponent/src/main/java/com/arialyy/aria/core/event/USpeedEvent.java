@@ -17,9 +17,9 @@ package com.arialyy.aria.core.event;
 
 public class USpeedEvent {
 
-  public int speed;
+    public int speed;
 
-  public USpeedEvent(int speed) {
-    this.speed = speed;
-  }
+    public USpeedEvent(int speed) {
+        this.speed = speed;
+    }
 }

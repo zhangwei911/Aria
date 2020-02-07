@@ -25,50 +25,51 @@ import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
  */
 public final class BuilderController extends FeatureController implements IStartFeature {
 
-  public BuilderController(AbsTaskWrapper wrapper) {
-    super(wrapper);
-  }
-
-  /**
-   * 添加任务，只添加任务不进行下载
-   *
-   * @return 正常添加，返回任务id，否则返回-1
-   */
-  public long add() {
-    setAction(ACTION_ADD);
-    if (checkConfig()) {
-      EventMsgUtil.getDefault()
-          .post(CmdHelper.createNormalCmd(getTaskWrapper(), NormalCmdFactory.TASK_CREATE,
-              checkTaskType()));
-      return getEntity().getId();
+    public BuilderController(AbsTaskWrapper wrapper) {
+        super(wrapper);
     }
-    return -1;
-  }
 
-  /**
-   * 开始任务
-   *
-   * @return 正常启动，返回任务id，否则返回-1
-   */
-  public long create() {
-    setAction(ACTION_CREATE);
-    if (checkConfig()) {
-      EventMsgUtil.getDefault()
-          .post(CmdHelper.createNormalCmd(getTaskWrapper(), NormalCmdFactory.TASK_START,
-              checkTaskType()));
-      return getEntity().getId();
+    /**
+     * 添加任务，只添加任务不进行下载
+     *
+     * @return 正常添加，返回任务id，否则返回-1
+     */
+    public long add() {
+        setAction(ACTION_ADD);
+        if (checkConfig()) {
+            EventMsgUtil.getDefault()
+                    .post(CmdHelper.createNormalCmd(getTaskWrapper(), NormalCmdFactory.TASK_CREATE,
+                            checkTaskType()));
+            return getEntity().getId();
+        }
+        return -1;
     }
-    return -1;
-  }
 
-  @Override public long setHighestPriority() {
-    setAction(ACTION_PRIORITY);
-    if (checkConfig()) {
-      EventMsgUtil.getDefault()
-          .post(CmdHelper.createNormalCmd(getTaskWrapper(), NormalCmdFactory.TASK_HIGHEST_PRIORITY,
-              checkTaskType()));
-      return getEntity().getId();
+    /**
+     * 开始任务
+     *
+     * @return 正常启动，返回任务id，否则返回-1
+     */
+    public long create() {
+        setAction(ACTION_CREATE);
+        if (checkConfig()) {
+            EventMsgUtil.getDefault()
+                    .post(CmdHelper.createNormalCmd(getTaskWrapper(), NormalCmdFactory.TASK_START,
+                            checkTaskType()));
+            return getEntity().getId();
+        }
+        return -1;
     }
-    return -1;
-  }
+
+    @Override
+    public long setHighestPriority() {
+        setAction(ACTION_PRIORITY);
+        if (checkConfig()) {
+            EventMsgUtil.getDefault()
+                    .post(CmdHelper.createNormalCmd(getTaskWrapper(), NormalCmdFactory.TASK_HIGHEST_PRIORITY,
+                            checkTaskType()));
+            return getEntity().getId();
+        }
+        return -1;
+    }
 }

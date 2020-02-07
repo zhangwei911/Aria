@@ -34,165 +34,165 @@ import com.arialyy.aria.util.CommonUtil;
  * Created by lyy on 2016/8/22. 下载命令
  */
 public abstract class AbsNormalCmd<T extends AbsTaskWrapper> extends AbsCmd<T> {
-  /**
-   * 能否执行命令
-   */
-  boolean canExeCmd = true;
+    /**
+     * 能否执行命令
+     */
+    boolean canExeCmd = true;
 
-  int taskType;
+    int taskType;
 
-  /**
-   * @param taskType 下载任务类型{@link ITask#DOWNLOAD}、{@link ITask#DOWNLOAD_GROUP}、{@link
-   * ITask#UPLOAD}
-   */
-  AbsNormalCmd(T entity, int taskType) {
-    this.taskType = taskType;
-    mTaskWrapper = entity;
-    TAG = CommonUtil.getClassName(this);
-    if (taskType == ITask.DOWNLOAD) {
-      if (!(entity instanceof DTaskWrapper)) {
-        ALog.e(TAG, "任务类型错误，任务类型应该为ICM.TASK_TYPE_DOWNLOAD");
-        return;
-      }
-      mQueue = DTaskQueue.getInstance();
-    } else if (taskType == ITask.DOWNLOAD_GROUP) {
-      if (!(entity instanceof DGTaskWrapper)) {
-        ALog.e(TAG, "任务类型错误，任务类型应该为ICM.TASK_TYPE_DOWNLOAD_GROUP");
-        return;
-      }
-      mQueue = DGroupTaskQueue.getInstance();
-    } else if (taskType == ITask.UPLOAD) {
-      if (!(entity instanceof UTaskWrapper)) {
-        ALog.e(TAG, "任务类型错误，任务类型应该为ICM.TASK_TYPE_UPLOAD");
-        return;
-      }
-      mQueue = UTaskQueue.getInstance();
-    } else {
-      ALog.e(TAG, "任务类型错误，任务类型应该为ICM.TASK_TYPE_DOWNLOAD、TASK_TYPE_DOWNLOAD_GROUP、TASK_TYPE_UPLOAD");
-      return;
+    /**
+     * @param taskType 下载任务类型{@link ITask#DOWNLOAD}、{@link ITask#DOWNLOAD_GROUP}、{@link
+     *                 ITask#UPLOAD}
+     */
+    AbsNormalCmd(T entity, int taskType) {
+        this.taskType = taskType;
+        mTaskWrapper = entity;
+        TAG = CommonUtil.getClassName(this);
+        if (taskType == ITask.DOWNLOAD) {
+            if (!(entity instanceof DTaskWrapper)) {
+                ALog.e(TAG, "任务类型错误，任务类型应该为ICM.TASK_TYPE_DOWNLOAD");
+                return;
+            }
+            mQueue = DTaskQueue.getInstance();
+        } else if (taskType == ITask.DOWNLOAD_GROUP) {
+            if (!(entity instanceof DGTaskWrapper)) {
+                ALog.e(TAG, "任务类型错误，任务类型应该为ICM.TASK_TYPE_DOWNLOAD_GROUP");
+                return;
+            }
+            mQueue = DGroupTaskQueue.getInstance();
+        } else if (taskType == ITask.UPLOAD) {
+            if (!(entity instanceof UTaskWrapper)) {
+                ALog.e(TAG, "任务类型错误，任务类型应该为ICM.TASK_TYPE_UPLOAD");
+                return;
+            }
+            mQueue = UTaskQueue.getInstance();
+        } else {
+            ALog.e(TAG, "任务类型错误，任务类型应该为ICM.TASK_TYPE_DOWNLOAD、TASK_TYPE_DOWNLOAD_GROUP、TASK_TYPE_UPLOAD");
+            return;
+        }
+        isDownloadCmd = taskType == ITask.DOWNLOAD || taskType == ITask.DOWNLOAD_GROUP;
     }
-    isDownloadCmd = taskType == ITask.DOWNLOAD || taskType == ITask.DOWNLOAD_GROUP;
-  }
 
-  /**
-   * 发送等待状态
-   */
-  void sendWaitState() {
-    AbsTask task = getTask();
-    if (task == null) {
-      task = createTask();
+    /**
+     * 发送等待状态
+     */
+    void sendWaitState() {
+        AbsTask task = getTask();
+        if (task == null) {
+            task = createTask();
+        }
+        sendWaitState(task);
     }
-    sendWaitState(task);
-  }
 
-  /**
-   * 发送等待状态
-   */
-  void sendWaitState(AbsTask task) {
-    if (task != null) {
-      task.getTaskWrapper().setState(IEntity.STATE_WAIT);
-      task.getOutHandler().obtainMessage(ISchedulers.WAIT, task).sendToTarget();
+    /**
+     * 发送等待状态
+     */
+    void sendWaitState(AbsTask task) {
+        if (task != null) {
+            task.getTaskWrapper().setState(IEntity.STATE_WAIT);
+            task.getOutHandler().obtainMessage(ISchedulers.WAIT, task).sendToTarget();
+        }
     }
-  }
 
-  /**
-   * 停止所有任务
-   */
-  void stopAll() {
-    mQueue.stopAllTask();
-  }
-
-  /**
-   * 停止任务
-   */
-  void stopTask() {
-    AbsTask task = getTask();
-    if (task == null) {
-      task = createTask();
+    /**
+     * 停止所有任务
+     */
+    void stopAll() {
+        mQueue.stopAllTask();
     }
-    mQueue.stopTask(task);
-  }
 
-  /**
-   * 删除任务
-   */
-  void removeTask() {
-    AbsTask task = getTask();
-    if (task == null) {
-      task = createTask();
+    /**
+     * 停止任务
+     */
+    void stopTask() {
+        AbsTask task = getTask();
+        if (task == null) {
+            task = createTask();
+        }
+        mQueue.stopTask(task);
     }
-    mQueue.cancelTask(task);
-  }
 
-  /**
-   * 删除任务
-   */
-  void removeTask(AbsTaskWrapper wrapper) {
-    AbsTask tempTask = getTask(wrapper.getKey());
-    if (tempTask == null) {
-      tempTask = createTask(wrapper);
+    /**
+     * 删除任务
+     */
+    void removeTask() {
+        AbsTask task = getTask();
+        if (task == null) {
+            task = createTask();
+        }
+        mQueue.cancelTask(task);
     }
-    mQueue.cancelTask(tempTask);
-  }
 
-  /**
-   * 启动任务
-   */
-  void startTask() {
-    AbsTask task = getTask();
-    if (task == null) {
-      task = createTask();
+    /**
+     * 删除任务
+     */
+    void removeTask(AbsTaskWrapper wrapper) {
+        AbsTask tempTask = getTask(wrapper.getKey());
+        if (tempTask == null) {
+            tempTask = createTask(wrapper);
+        }
+        mQueue.cancelTask(tempTask);
     }
-    mQueue.startTask(task);
-  }
 
-  /**
-   * 恢复任务
-   */
-  void resumeTask() {
-    AbsTask task = getTask();
-    if (task == null) {
-      task = createTask();
+    /**
+     * 启动任务
+     */
+    void startTask() {
+        AbsTask task = getTask();
+        if (task == null) {
+            task = createTask();
+        }
+        mQueue.startTask(task);
     }
-    mQueue.resumeTask(task);
-  }
+
+    /**
+     * 恢复任务
+     */
+    void resumeTask() {
+        AbsTask task = getTask();
+        if (task == null) {
+            task = createTask();
+        }
+        mQueue.resumeTask(task);
+    }
 
 
-  /**
-   * 从队列中获取任务
-   *
-   * @return 执行任务
-   */
-  AbsTask getTask() {
-    return mQueue.getTask(mTaskWrapper.getEntity().getKey());
-  }
+    /**
+     * 从队列中获取任务
+     *
+     * @return 执行任务
+     */
+    AbsTask getTask() {
+        return mQueue.getTask(mTaskWrapper.getEntity().getKey());
+    }
 
-  /**
-   * 从队列中获取任务
-   *
-   * @return 执行任务
-   */
-  AbsTask getTask(String key) {
-    return mQueue.getTask(key);
-  }
+    /**
+     * 从队列中获取任务
+     *
+     * @return 执行任务
+     */
+    AbsTask getTask(String key) {
+        return mQueue.getTask(key);
+    }
 
-  /**
-   * 创建任务
-   *
-   * @return 创建的任务
-   */
-  AbsTask createTask() {
-    return mQueue.createTask(mTaskWrapper);
-  }
+    /**
+     * 创建任务
+     *
+     * @return 创建的任务
+     */
+    AbsTask createTask() {
+        return mQueue.createTask(mTaskWrapper);
+    }
 
-  /**
-   * 创建指定实体的任务
-   *
-   * @param wrapper 特定的任务实体
-   * @return 创建的任务
-   */
-  AbsTask createTask(AbsTaskWrapper wrapper) {
+    /**
+     * 创建指定实体的任务
+     *
+     * @param wrapper 特定的任务实体
+     * @return 创建的任务
+     */
+    AbsTask createTask(AbsTaskWrapper wrapper) {
 
-    return mQueue.createTask(wrapper);
-  }
+        return mQueue.createTask(wrapper);
+    }
 }

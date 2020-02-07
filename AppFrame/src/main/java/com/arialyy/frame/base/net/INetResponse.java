@@ -8,13 +8,13 @@ package com.arialyy.frame.base.net;
  */
 public interface INetResponse<T> {
 
-  /**
-   * 网络请求成功
-   */
-  public void onResponse(T response);
+    /**
+     * 网络请求成功
+     */
+    public void onResponse(T response);
 
-  /**
-   * 请求失败
-   */
-  public void onFailure(Throwable e);
+    /**
+     * 请求失败
+     */
+    public void onFailure(Throwable e);
 }

@@ -16,6 +16,7 @@
 package com.arialyy.aria.http.download;
 
 import android.os.Handler;
+
 import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.group.AbsSubDLoadUtil;
 import com.arialyy.aria.core.group.SubRecordHandler;
@@ -28,31 +29,33 @@ import com.arialyy.aria.core.loader.SubLoader;
  * @Date 2019-09-28
  */
 final class HttpSubDLoaderUtil extends AbsSubDLoadUtil {
-  /**
-   * @param schedulers 调度器
-   * @param needGetInfo {@code true} 需要获取文件信息。{@code false} 不需要获取文件信息
-   */
-  HttpSubDLoaderUtil(DTaskWrapper taskWrapper, Handler schedulers, boolean needGetInfo,
-      String parentKey) {
-    super(taskWrapper, schedulers, needGetInfo, parentKey);
-  }
-
-  @Override protected SubLoader getLoader() {
-    if (mDLoader == null) {
-      mDLoader = new SubLoader(getWrapper(), getSchedulers());
-      mDLoader.setNeedGetInfo(isNeedGetInfo());
-      mDLoader.setParentKey(getParentKey());
+    /**
+     * @param schedulers  调度器
+     * @param needGetInfo {@code true} 需要获取文件信息。{@code false} 不需要获取文件信息
+     */
+    HttpSubDLoaderUtil(DTaskWrapper taskWrapper, Handler schedulers, boolean needGetInfo,
+                       String parentKey) {
+        super(taskWrapper, schedulers, needGetInfo, parentKey);
     }
-    return mDLoader;
-  }
 
-  @Override protected LoaderStructure buildLoaderStructure() {
-    LoaderStructure structure = new LoaderStructure();
-    structure.addComponent(new SubRecordHandler(getWrapper()))
-        .addComponent(new NormalTTBuilder(getWrapper(), new HttpDTTBuilderAdapter()))
-        .addComponent(new HttpDFileInfoTask(getWrapper()));
-    structure.accept(getLoader());
-    return structure;
-  }
+    @Override
+    protected SubLoader getLoader() {
+        if (mDLoader == null) {
+            mDLoader = new SubLoader(getWrapper(), getSchedulers());
+            mDLoader.setNeedGetInfo(isNeedGetInfo());
+            mDLoader.setParentKey(getParentKey());
+        }
+        return mDLoader;
+    }
+
+    @Override
+    protected LoaderStructure buildLoaderStructure() {
+        LoaderStructure structure = new LoaderStructure();
+        structure.addComponent(new SubRecordHandler(getWrapper()))
+                .addComponent(new NormalTTBuilder(getWrapper(), new HttpDTTBuilderAdapter()))
+                .addComponent(new HttpDFileInfoTask(getWrapper()));
+        structure.accept(getLoader());
+        return structure;
+    }
 }
 

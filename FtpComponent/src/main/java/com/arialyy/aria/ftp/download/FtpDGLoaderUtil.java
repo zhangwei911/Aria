@@ -29,19 +29,21 @@ import com.arialyy.aria.ftp.FtpTaskOption;
  */
 public final class FtpDGLoaderUtil extends AbsGroupLoaderUtil {
 
-  public FtpDGLoaderUtil(AbsTaskWrapper wrapper, IEventListener listener) {
-    super(wrapper, listener);
-    wrapper.generateTaskOption(FtpTaskOption.class);
-  }
+    public FtpDGLoaderUtil(AbsTaskWrapper wrapper, IEventListener listener) {
+        super(wrapper, listener);
+        wrapper.generateTaskOption(FtpTaskOption.class);
+    }
 
-  @Override protected AbsGroupLoader getLoader() {
-    return mLoader == null ? new FtpDGLoader(getTaskWrapper(), getListener()) : mLoader;
-  }
+    @Override
+    protected AbsGroupLoader getLoader() {
+        return mLoader == null ? new FtpDGLoader(getTaskWrapper(), getListener()) : mLoader;
+    }
 
-  @Override protected LoaderStructure buildLoaderStructure() {
-    LoaderStructure structure = new LoaderStructure();
-    structure.addComponent(new FtpDGInfoTask((DGTaskWrapper) getTaskWrapper()));
-    structure.accept(getLoader());
-    return structure;
-  }
+    @Override
+    protected LoaderStructure buildLoaderStructure() {
+        LoaderStructure structure = new LoaderStructure();
+        structure.addComponent(new FtpDGInfoTask((DGTaskWrapper) getTaskWrapper()));
+        structure.accept(getLoader());
+        return structure;
+    }
 }

@@ -7,15 +7,15 @@ import android.os.Environment;
  */
 
 public class PathConstaant {
-  private static final String WP_DIR = "windPath";
+    private static final String WP_DIR = "windPath";
 
-  /**
-   * 获取APK升级路径
-   */
-  public static String getWpPath() {
-    return Environment.getExternalStorageDirectory().getPath()
-        + "/"
-        + WP_DIR
-        + "/update/windPath.apk";
-  }
+    /**
+     * 获取APK升级路径
+     */
+    public static String getWpPath() {
+        return Environment.getExternalStorageDirectory().getPath()
+                + "/"
+                + WP_DIR
+                + "/update/windPath.apk";
+    }
 }

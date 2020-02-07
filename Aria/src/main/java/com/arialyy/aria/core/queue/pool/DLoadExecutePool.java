@@ -24,50 +24,53 @@ import com.arialyy.aria.util.ALog;
  * 单个下载任务的执行池
  */
 class DLoadExecutePool<TASK extends AbsTask> extends BaseExecutePool<TASK> {
-  private final String TAG = "DownloadExecutePool";
+    private final String TAG = "DownloadExecutePool";
 
-  @Override protected int getMaxSize() {
-    return AriaConfig.getInstance().getDConfig().getMaxTaskNum();
-  }
+    @Override
+    protected int getMaxSize() {
+        return AriaConfig.getInstance().getDConfig().getMaxTaskNum();
+    }
 
-  @Override public boolean putTask(TASK task) {
-    synchronized (DLoadExecutePool.class) {
-      if (task == null) {
-        ALog.e(TAG, "任务不能为空！！");
-        return false;
-      }
-      if (mExecuteQueue.contains(task)) {
-        if (!task.isRunning()) return true;
-        ALog.e(TAG, "任务【" + task.getTaskName() + "】进入执行队列失败，错误原因：已经在执行队列中");
-        return false;
-      } else {
-        if (mExecuteQueue.size() >= mSize) {
-          for (TASK temp : mExecuteQueue) {
-            if (temp.isHighestPriorityTask()) {
-              return false;
+    @Override
+    public boolean putTask(TASK task) {
+        synchronized (DLoadExecutePool.class) {
+            if (task == null) {
+                ALog.e(TAG, "任务不能为空！！");
+                return false;
             }
-          }
-          if (pollFirstTask()) {
-            return putNewTask(task);
-          }
-        } else {
-          return putNewTask(task);
+            if (mExecuteQueue.contains(task)) {
+                if (!task.isRunning()) return true;
+                ALog.e(TAG, "任务【" + task.getTaskName() + "】进入执行队列失败，错误原因：已经在执行队列中");
+                return false;
+            } else {
+                if (mExecuteQueue.size() >= mSize) {
+                    for (TASK temp : mExecuteQueue) {
+                        if (temp.isHighestPriorityTask()) {
+                            return false;
+                        }
+                    }
+                    if (pollFirstTask()) {
+                        return putNewTask(task);
+                    }
+                } else {
+                    return putNewTask(task);
+                }
+            }
         }
-      }
+        return false;
     }
-    return false;
-  }
 
-  @Override boolean pollFirstTask() {
-    TASK oldTask = mExecuteQueue.pollFirst();
-    if (oldTask == null) {
-      ALog.w(TAG, "移除任务失败，错误原因：任务为null");
-      return false;
+    @Override
+    boolean pollFirstTask() {
+        TASK oldTask = mExecuteQueue.pollFirst();
+        if (oldTask == null) {
+            ALog.w(TAG, "移除任务失败，错误原因：任务为null");
+            return false;
+        }
+        if (oldTask.isHighestPriorityTask()) {
+            return false;
+        }
+        oldTask.stop();
+        return true;
     }
-    if (oldTask.isHighestPriorityTask()) {
-      return false;
-    }
-    oldTask.stop();
-    return true;
-  }
 }

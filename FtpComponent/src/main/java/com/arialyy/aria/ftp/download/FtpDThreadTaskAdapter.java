@@ -17,6 +17,7 @@ package com.arialyy.aria.ftp.download;
 
 import aria.apache.commons.net.ftp.FTPClient;
 import aria.apache.commons.net.ftp.FTPReply;
+
 import com.arialyy.aria.core.common.SubThreadConfig;
 import com.arialyy.aria.exception.AriaIOException;
 import com.arialyy.aria.exception.TaskException;
@@ -24,6 +25,7 @@ import com.arialyy.aria.ftp.BaseFtpThreadTaskAdapter;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.BufferedRandomAccessFile;
 import com.arialyy.aria.util.CommonUtil;
+
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -38,180 +40,181 @@ import java.nio.channels.ReadableByteChannel;
  */
 final class FtpDThreadTaskAdapter extends BaseFtpThreadTaskAdapter {
 
-  FtpDThreadTaskAdapter(SubThreadConfig config) {
-    super(config);
-  }
-
-  @Override protected void handlerThreadTask() {
-    if (getThreadRecord().isComplete) {
-      handleComplete();
-      return;
+    FtpDThreadTaskAdapter(SubThreadConfig config) {
+        super(config);
     }
-    FTPClient client = null;
-    InputStream is = null;
 
-    try {
-      ALog.d(TAG,
-          String.format("任务【%s】线程__%s__开始下载【开始位置 : %s，结束位置：%s】", getTaskWrapper().getKey(),
-              getThreadRecord().threadId, getThreadRecord().startLocation,
-              getThreadRecord().endLocation));
-      client = createClient();
-      if (client == null) {
-        fail(new TaskException(TAG, "ftp client 创建失败"), false);
-        return;
-      }
-      if (getThreadRecord().startLocation > 0) {
-        client.setRestartOffset(getThreadRecord().startLocation);
-      }
-      //发送第二次指令时，还需要再做一次判断
-      int reply = client.getReplyCode();
-      if (!FTPReply.isPositivePreliminary(reply) && reply != FTPReply.COMMAND_OK) {
-        fail(new AriaIOException(TAG,
-            String.format("获取文件信息错误，错误码为：%s，msg：%s", reply, client.getReplyString())), false);
-        client.disconnect();
-        return;
-      }
-      String remotePath =
-          CommonUtil.convertFtpChar(charSet, mTaskOption.getUrlEntity().remotePath);
-      ALog.i(TAG, String.format("remotePath【%s】", remotePath));
-      is = client.retrieveFileStream(remotePath);
-      reply = client.getReplyCode();
-      if (!FTPReply.isPositivePreliminary(reply)) {
-        fail(new AriaIOException(TAG,
-            String.format("获取流失败，错误码为：%s，msg：%s", reply, client.getReplyString())), true);
-        client.disconnect();
-        return;
-      }
-
-      if (getThreadConfig().isBlock) {
-        readDynamicFile(is);
-      } else {
-        readNormal(is);
-        handleComplete();
-      }
-    } catch (IOException e) {
-      fail(new AriaIOException(TAG, String.format("下载失败【%s】", getThreadConfig().url), e), true);
-    } catch (Exception e) {
-      fail(new AriaIOException(TAG, String.format("下载失败【%s】", getThreadConfig().url), e), false);
-    } finally {
-      try {
-        if (is != null) {
-          is.close();
+    @Override
+    protected void handlerThreadTask() {
+        if (getThreadRecord().isComplete) {
+            handleComplete();
+            return;
         }
-      } catch (IOException e) {
-        e.printStackTrace();
-      }
-      closeClient(client);
-    }
-  }
+        FTPClient client = null;
+        InputStream is = null;
 
-  /**
-   * 处理线程完成的情况
-   */
-  private void handleComplete() {
-    if (getThreadTask().isBreak()) {
-      return;
-    }
-    if (!getThreadTask().checkBlock()) {
-      return;
-    }
-    complete();
-  }
+        try {
+            ALog.d(TAG,
+                    String.format("任务【%s】线程__%s__开始下载【开始位置 : %s，结束位置：%s】", getTaskWrapper().getKey(),
+                            getThreadRecord().threadId, getThreadRecord().startLocation,
+                            getThreadRecord().endLocation));
+            client = createClient();
+            if (client == null) {
+                fail(new TaskException(TAG, "ftp client 创建失败"), false);
+                return;
+            }
+            if (getThreadRecord().startLocation > 0) {
+                client.setRestartOffset(getThreadRecord().startLocation);
+            }
+            //发送第二次指令时，还需要再做一次判断
+            int reply = client.getReplyCode();
+            if (!FTPReply.isPositivePreliminary(reply) && reply != FTPReply.COMMAND_OK) {
+                fail(new AriaIOException(TAG,
+                        String.format("获取文件信息错误，错误码为：%s，msg：%s", reply, client.getReplyString())), false);
+                client.disconnect();
+                return;
+            }
+            String remotePath =
+                    CommonUtil.convertFtpChar(charSet, mTaskOption.getUrlEntity().remotePath);
+            ALog.i(TAG, String.format("remotePath【%s】", remotePath));
+            is = client.retrieveFileStream(remotePath);
+            reply = client.getReplyCode();
+            if (!FTPReply.isPositivePreliminary(reply)) {
+                fail(new AriaIOException(TAG,
+                        String.format("获取流失败，错误码为：%s，msg：%s", reply, client.getReplyString())), true);
+                client.disconnect();
+                return;
+            }
 
-  /**
-   * 动态长度文件读取方式
-   */
-  private void readDynamicFile(InputStream is) {
-    FileOutputStream fos = null;
-    FileChannel foc = null;
-    ReadableByteChannel fic = null;
-    try {
-      int len;
-      fos = new FileOutputStream(getThreadConfig().tempFile, true);
-      foc = fos.getChannel();
-      fic = Channels.newChannel(is);
-      ByteBuffer bf = ByteBuffer.allocate(getTaskConfig().getBuffSize());
-      while (getThreadTask().isLive() && (len = fic.read(bf)) != -1) {
+            if (getThreadConfig().isBlock) {
+                readDynamicFile(is);
+            } else {
+                readNormal(is);
+                handleComplete();
+            }
+        } catch (IOException e) {
+            fail(new AriaIOException(TAG, String.format("下载失败【%s】", getThreadConfig().url), e), true);
+        } catch (Exception e) {
+            fail(new AriaIOException(TAG, String.format("下载失败【%s】", getThreadConfig().url), e), false);
+        } finally {
+            try {
+                if (is != null) {
+                    is.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            closeClient(client);
+        }
+    }
+
+    /**
+     * 处理线程完成的情况
+     */
+    private void handleComplete() {
         if (getThreadTask().isBreak()) {
-          break;
+            return;
         }
-        if (mSpeedBandUtil != null) {
-          mSpeedBandUtil.limitNextBytes(len);
+        if (!getThreadTask().checkBlock()) {
+            return;
         }
-        if (getRangeProgress() + len >= getThreadRecord().endLocation) {
-          len = (int) (getThreadRecord().endLocation - getRangeProgress());
-          bf.flip();
-          fos.write(bf.array(), 0, len);
-          bf.compact();
-          progress(len);
-          break;
-        } else {
-          bf.flip();
-          foc.write(bf);
-          bf.compact();
-          progress(len);
-        }
-      }
-      handleComplete();
-    } catch (IOException e) {
-      fail(new AriaIOException(TAG, String.format("下载失败【%s】", getThreadConfig().url), e), true);
-    } finally {
-      try {
-        if (fos != null) {
-          fos.close();
-        }
-        if (foc != null) {
-          foc.close();
-        }
-        if (fic != null) {
-          fic.close();
-        }
-      } catch (IOException e) {
-        e.printStackTrace();
-      }
+        complete();
     }
-  }
 
-  /**
-   * 多线程写文件方式
-   */
-  private void readNormal(InputStream is) {
-    BufferedRandomAccessFile file = null;
-    try {
-      file =
-          new BufferedRandomAccessFile(getThreadConfig().tempFile, "rwd", getTaskConfig().getBuffSize());
-      if (getThreadRecord().startLocation > 0){
-        file.seek(getThreadRecord().startLocation);
-      }
-      byte[] buffer = new byte[getTaskConfig().getBuffSize()];
-      int len;
-      while (getThreadTask().isLive() && (len = is.read(buffer)) != -1) {
-        if (getThreadTask().isBreak()) {
-          break;
+    /**
+     * 动态长度文件读取方式
+     */
+    private void readDynamicFile(InputStream is) {
+        FileOutputStream fos = null;
+        FileChannel foc = null;
+        ReadableByteChannel fic = null;
+        try {
+            int len;
+            fos = new FileOutputStream(getThreadConfig().tempFile, true);
+            foc = fos.getChannel();
+            fic = Channels.newChannel(is);
+            ByteBuffer bf = ByteBuffer.allocate(getTaskConfig().getBuffSize());
+            while (getThreadTask().isLive() && (len = fic.read(bf)) != -1) {
+                if (getThreadTask().isBreak()) {
+                    break;
+                }
+                if (mSpeedBandUtil != null) {
+                    mSpeedBandUtil.limitNextBytes(len);
+                }
+                if (getRangeProgress() + len >= getThreadRecord().endLocation) {
+                    len = (int) (getThreadRecord().endLocation - getRangeProgress());
+                    bf.flip();
+                    fos.write(bf.array(), 0, len);
+                    bf.compact();
+                    progress(len);
+                    break;
+                } else {
+                    bf.flip();
+                    foc.write(bf);
+                    bf.compact();
+                    progress(len);
+                }
+            }
+            handleComplete();
+        } catch (IOException e) {
+            fail(new AriaIOException(TAG, String.format("下载失败【%s】", getThreadConfig().url), e), true);
+        } finally {
+            try {
+                if (fos != null) {
+                    fos.close();
+                }
+                if (foc != null) {
+                    foc.close();
+                }
+                if (fic != null) {
+                    fic.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
-        if (mSpeedBandUtil != null) {
-          mSpeedBandUtil.limitNextBytes(len);
-        }
-        if (getRangeProgress() + len >= getThreadRecord().endLocation) {
-          len = (int) (getThreadRecord().endLocation - getRangeProgress());
-          file.write(buffer, 0, len);
-          progress(len);
-          break;
-        } else {
-          file.write(buffer, 0, len);
-          progress(len);
-        }
-      }
-    } catch (IOException e) {
-      fail(new AriaIOException(TAG, String.format("下载失败【%s】", getThreadConfig().url), e), true);
-    } finally {
-      try {
-        if (file != null) {
-          file.close();
-        }
-      } catch (IOException e) {
-        e.printStackTrace();
-      }
     }
-  }
+
+    /**
+     * 多线程写文件方式
+     */
+    private void readNormal(InputStream is) {
+        BufferedRandomAccessFile file = null;
+        try {
+            file =
+                    new BufferedRandomAccessFile(getThreadConfig().tempFile, "rwd", getTaskConfig().getBuffSize());
+            if (getThreadRecord().startLocation > 0) {
+                file.seek(getThreadRecord().startLocation);
+            }
+            byte[] buffer = new byte[getTaskConfig().getBuffSize()];
+            int len;
+            while (getThreadTask().isLive() && (len = is.read(buffer)) != -1) {
+                if (getThreadTask().isBreak()) {
+                    break;
+                }
+                if (mSpeedBandUtil != null) {
+                    mSpeedBandUtil.limitNextBytes(len);
+                }
+                if (getRangeProgress() + len >= getThreadRecord().endLocation) {
+                    len = (int) (getThreadRecord().endLocation - getRangeProgress());
+                    file.write(buffer, 0, len);
+                    progress(len);
+                    break;
+                } else {
+                    file.write(buffer, 0, len);
+                    progress(len);
+                }
+            }
+        } catch (IOException e) {
+            fail(new AriaIOException(TAG, String.format("下载失败【%s】", getThreadConfig().url), e), true);
+        } finally {
+            try {
+                if (file != null) {
+                    file.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 }

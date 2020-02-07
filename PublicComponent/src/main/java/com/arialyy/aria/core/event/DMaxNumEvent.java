@@ -20,9 +20,9 @@ package com.arialyy.aria.core.event;
  */
 public class DMaxNumEvent {
 
-  public int maxNum;
+    public int maxNum;
 
-  public DMaxNumEvent(int maxNum) {
-    this.maxNum = maxNum;
-  }
+    public DMaxNumEvent(int maxNum) {
+        this.maxNum = maxNum;
+    }
 }

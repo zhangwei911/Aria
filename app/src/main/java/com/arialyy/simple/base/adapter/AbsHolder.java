@@ -17,6 +17,7 @@ package com.arialyy.simple.base.adapter;
 
 import android.util.SparseArray;
 import android.view.View;
+
 import androidx.annotation.IdRes;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -25,21 +26,21 @@ import androidx.recyclerview.widget.RecyclerView;
  * 通用Holder
  */
 public class AbsHolder extends RecyclerView.ViewHolder {
-  private View mView;
-  private SparseArray<View> mViews = new SparseArray<>();
+    private View mView;
+    private SparseArray<View> mViews = new SparseArray<>();
 
-  public AbsHolder(View itemView) {
-    super(itemView);
-    mView = itemView;
-  }
-
-  @SuppressWarnings("unchecked")
-  public <T extends View> T findViewById(@IdRes int id) {
-    View view = mViews.get(id);
-    if (view == null) {
-      view = mView.findViewById(id);
-      mViews.put(id, view);
+    public AbsHolder(View itemView) {
+        super(itemView);
+        mView = itemView;
     }
-    return (T) view;
-  }
+
+    @SuppressWarnings("unchecked")
+    public <T extends View> T findViewById(@IdRes int id) {
+        View view = mViews.get(id);
+        if (view == null) {
+            view = mView.findViewById(id);
+            mViews.put(id, view);
+        }
+        return (T) view;
+    }
 }

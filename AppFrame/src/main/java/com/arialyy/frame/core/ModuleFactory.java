@@ -15,52 +15,52 @@ import java.util.Map;
  */
 public class ModuleFactory {
 
-  private final String TAG = "ModuleFactory";
+    private final String TAG = "ModuleFactory";
 
-  private Map<Integer, AbsModule> mModules = new HashMap<>();
+    private Map<Integer, AbsModule> mModules = new HashMap<>();
 
-  private ModuleFactory() {
+    private ModuleFactory() {
 
-  }
-
-  /**
-   * 需要保证每个对象都有独立的享元工厂
-   */
-  public static ModuleFactory newInstance() {
-    return new ModuleFactory();
-  }
-
-  /**
-   * 获取Module
-   */
-  public <M extends AbsModule> M getModule(Context context, Class<M> clazz) {
-    M module = (M) mModules.get(clazz.hashCode());
-    if (module == null) {
-      return newInstanceModule(context, clazz);
     }
-    return module;
-  }
 
-  /**
-   * 构造一个新的Module
-   */
-  private <T extends AbsModule> T newInstanceModule(Context context, Class<T> clazz) {
-    Class[] paramTypes = { Context.class };
-    Object[] params = { context };
-    try {
-      Constructor<T> con = clazz.getConstructor(paramTypes);
-      T module = con.newInstance(params);
-      mModules.put(clazz.hashCode(), module);
-      return module;
-    } catch (NoSuchMethodException e) {
-      e.printStackTrace();
-    } catch (InvocationTargetException e) {
-      e.printStackTrace();
-    } catch (InstantiationException e) {
-      e.printStackTrace();
-    } catch (IllegalAccessException e) {
-      e.printStackTrace();
+    /**
+     * 需要保证每个对象都有独立的享元工厂
+     */
+    public static ModuleFactory newInstance() {
+        return new ModuleFactory();
     }
-    return null;
-  }
+
+    /**
+     * 获取Module
+     */
+    public <M extends AbsModule> M getModule(Context context, Class<M> clazz) {
+        M module = (M) mModules.get(clazz.hashCode());
+        if (module == null) {
+            return newInstanceModule(context, clazz);
+        }
+        return module;
+    }
+
+    /**
+     * 构造一个新的Module
+     */
+    private <T extends AbsModule> T newInstanceModule(Context context, Class<T> clazz) {
+        Class[] paramTypes = {Context.class};
+        Object[] params = {context};
+        try {
+            Constructor<T> con = clazz.getConstructor(paramTypes);
+            T module = con.newInstance(params);
+            mModules.put(clazz.hashCode(), module);
+            return module;
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 }

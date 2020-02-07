@@ -21,8 +21,8 @@ package com.arialyy.aria.core.command;
 
 public interface ICmd {
 
-  /**
-   * 执行命令
-   */
-  void executeCmd();
+    /**
+     * 执行命令
+     */
+    void executeCmd();
 }

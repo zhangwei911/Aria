@@ -25,59 +25,61 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
 import androidx.annotation.DrawableRes;
 import androidx.appcompat.widget.AppCompatImageView;
 import androidx.databinding.BindingAdapter;
+
 import com.arialyy.simple.R;
 
 public class SvgTextView extends RelativeLayout {
 
-  private TextView textView;
-  private AppCompatImageView icon;
+    private TextView textView;
+    private AppCompatImageView icon;
 
-  public SvgTextView(Context context) {
-    this(context, null);
-  }
-
-  public SvgTextView(Context context, AttributeSet attrs) {
-    super(context, attrs);
-    init(attrs);
-  }
-
-  private void init(AttributeSet attrs) {
-    LayoutInflater.from(getContext()).inflate(R.layout.layout_svg_text, this, true);
-    textView = findViewById(R.id.text);
-    icon = findViewById(R.id.image);
-
-    // init values from custom attributes
-    final TypedArray attributes =
-        getContext().obtainStyledAttributes(attrs, R.styleable.SvgTextView);
-    Drawable drawable = attributes.getDrawable(R.styleable.SvgTextView_svg_text_view_icon);
-    if (drawable != null) {
-      icon.setImageDrawable(drawable);
-    }
-    String str = attributes.getString(R.styleable.SvgTextView_text);
-    if (!TextUtils.isEmpty(str)) {
-      textView.setText(str);
+    public SvgTextView(Context context) {
+        this(context, null);
     }
 
-    attributes.recycle();
-  }
+    public SvgTextView(Context context, AttributeSet attrs) {
+        super(context, attrs);
+        init(attrs);
+    }
 
-  public void setIconClickListener(View.OnClickListener listener) {
-    icon.setOnClickListener(listener);
-  }
+    private void init(AttributeSet attrs) {
+        LayoutInflater.from(getContext()).inflate(R.layout.layout_svg_text, this, true);
+        textView = findViewById(R.id.text);
+        icon = findViewById(R.id.image);
 
-  @BindingAdapter(value = { "svg_text_view_icon" })
-  public static void bindAttr(SvgTextView svgTextView, @DrawableRes int drawable) {
-    svgTextView.icon.setImageResource(drawable);
-  }
+        // init values from custom attributes
+        final TypedArray attributes =
+                getContext().obtainStyledAttributes(attrs, R.styleable.SvgTextView);
+        Drawable drawable = attributes.getDrawable(R.styleable.SvgTextView_svg_text_view_icon);
+        if (drawable != null) {
+            icon.setImageDrawable(drawable);
+        }
+        String str = attributes.getString(R.styleable.SvgTextView_text);
+        if (!TextUtils.isEmpty(str)) {
+            textView.setText(str);
+        }
 
-  public void setIcon(@DrawableRes int drawable) {
-    icon.setImageResource(drawable);
-  }
+        attributes.recycle();
+    }
 
-  public void setText(String text) {
-    textView.setText(Html.fromHtml(text));
-  }
+    public void setIconClickListener(View.OnClickListener listener) {
+        icon.setOnClickListener(listener);
+    }
+
+    @BindingAdapter(value = {"svg_text_view_icon"})
+    public static void bindAttr(SvgTextView svgTextView, @DrawableRes int drawable) {
+        svgTextView.icon.setImageResource(drawable);
+    }
+
+    public void setIcon(@DrawableRes int drawable) {
+        icon.setImageResource(drawable);
+    }
+
+    public void setText(String text) {
+        textView.setText(Html.fromHtml(text));
+    }
 }

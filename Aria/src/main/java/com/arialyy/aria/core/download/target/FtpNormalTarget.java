@@ -27,69 +27,72 @@ import com.arialyy.aria.util.CommonUtil;
  * https://github.com/AriaLyy/Aria
  */
 public class FtpNormalTarget extends AbsNormalTarget<FtpNormalTarget> {
-  private DNormalConfigHandler<FtpNormalTarget> mConfigHandler;
+    private DNormalConfigHandler<FtpNormalTarget> mConfigHandler;
 
-  FtpNormalTarget(long taskId) {
-    mConfigHandler = new DNormalConfigHandler<>(this, taskId);
-    getTaskWrapper().setRequestType(ITaskWrapper.D_FTP);
-    getTaskWrapper().setNewTask(false);
-  }
-
-  /**
-   * 设置登陆、字符串编码、ftps等参数
-   */
-  public FtpNormalTarget option(FtpOption option) {
-    if (option == null) {
-      throw new NullPointerException("ftp 任务配置为空");
+    FtpNormalTarget(long taskId) {
+        mConfigHandler = new DNormalConfigHandler<>(this, taskId);
+        getTaskWrapper().setRequestType(ITaskWrapper.D_FTP);
+        getTaskWrapper().setNewTask(false);
     }
-    option.setUrlEntity(CommonUtil.getFtpUrlInfo(getEntity().getUrl()));
-    getTaskWrapper().getOptionParams().setParams(option);
-    return this;
-  }
 
-  /**
-   * 设置登陆、字符串编码、sftp等参数
-   */
-  public FtpNormalTarget sftpOption(SFtpOption option) {
-    if (option == null) {
-      throw new NullPointerException("ftp 任务配置为空");
+    /**
+     * 设置登陆、字符串编码、ftps等参数
+     */
+    public FtpNormalTarget option(FtpOption option) {
+        if (option == null) {
+            throw new NullPointerException("ftp 任务配置为空");
+        }
+        option.setUrlEntity(CommonUtil.getFtpUrlInfo(getEntity().getUrl()));
+        getTaskWrapper().getOptionParams().setParams(option);
+        return this;
     }
-    option.setUrlEntity(CommonUtil.getFtpUrlInfo(mConfigHandler.getUrl()));
-    getTaskWrapper().getOptionParams().setParams(option);
-    getEntity().setTaskType(ITaskWrapper.D_SFTP);
-    getTaskWrapper().setRequestType(ITaskWrapper.D_SFTP);
-    return this;
-  }
 
-  /**
-   * 设置文件保存文件夹路径
-   * 关于文件名：
-   * 1、如果保存路径是该文件的保存路径，如：/mnt/sdcard/file.zip，则使用路径中的文件名file.zip
-   * 2、如果保存路径是文件夹路径，如：/mnt/sdcard/，则使用FTP服务器该文件的文件名
-   */
-  public FtpNormalTarget modifyFilePath(String filePath) {
-    int lastIndex = mConfigHandler.getUrl().lastIndexOf("/");
-    getEntity().setFileName(mConfigHandler.getUrl().substring(lastIndex + 1));
-    mConfigHandler.setTempFilePath(filePath);
-    return this;
-  }
+    /**
+     * 设置登陆、字符串编码、sftp等参数
+     */
+    public FtpNormalTarget sftpOption(SFtpOption option) {
+        if (option == null) {
+            throw new NullPointerException("ftp 任务配置为空");
+        }
+        option.setUrlEntity(CommonUtil.getFtpUrlInfo(mConfigHandler.getUrl()));
+        getTaskWrapper().getOptionParams().setParams(option);
+        getEntity().setTaskType(ITaskWrapper.D_SFTP);
+        getTaskWrapper().setRequestType(ITaskWrapper.D_SFTP);
+        return this;
+    }
 
-  /**
-   * 更新下载地址
-   */
-  public FtpNormalTarget updateUrl(String newUrl) {
-    return mConfigHandler.updateUrl(newUrl);
-  }
+    /**
+     * 设置文件保存文件夹路径
+     * 关于文件名：
+     * 1、如果保存路径是该文件的保存路径，如：/mnt/sdcard/file.zip，则使用路径中的文件名file.zip
+     * 2、如果保存路径是文件夹路径，如：/mnt/sdcard/，则使用FTP服务器该文件的文件名
+     */
+    public FtpNormalTarget modifyFilePath(String filePath) {
+        int lastIndex = mConfigHandler.getUrl().lastIndexOf("/");
+        getEntity().setFileName(mConfigHandler.getUrl().substring(lastIndex + 1));
+        mConfigHandler.setTempFilePath(filePath);
+        return this;
+    }
 
-  @Override public boolean isRunning() {
-    return mConfigHandler.isRunning();
-  }
+    /**
+     * 更新下载地址
+     */
+    public FtpNormalTarget updateUrl(String newUrl) {
+        return mConfigHandler.updateUrl(newUrl);
+    }
 
-  @Override public boolean taskExists() {
-    return mConfigHandler.taskExists();
-  }
+    @Override
+    public boolean isRunning() {
+        return mConfigHandler.isRunning();
+    }
 
-  @Override public DownloadEntity getEntity() {
-    return (DownloadEntity) super.getEntity();
-  }
+    @Override
+    public boolean taskExists() {
+        return mConfigHandler.taskExists();
+    }
+
+    @Override
+    public DownloadEntity getEntity() {
+        return (DownloadEntity) super.getEntity();
+    }
 }

@@ -32,24 +32,26 @@ import com.arialyy.aria.sftp.SFtpTaskOption;
  */
 public class SFtpDLoaderUtil extends AbsNormalLoaderUtil {
 
-  public SFtpDLoaderUtil(AbsTaskWrapper wrapper, IEventListener listener) {
-    super(wrapper, listener);
-    wrapper.generateTaskOption(SFtpTaskOption.class);
-  }
+    public SFtpDLoaderUtil(AbsTaskWrapper wrapper, IEventListener listener) {
+        super(wrapper, listener);
+        wrapper.generateTaskOption(SFtpTaskOption.class);
+    }
 
-  @Override public AbsNormalLoader getLoader() {
-    return mLoader == null ? new SFtpDLoader((DTaskWrapper) getTaskWrapper(), getListener())
-        : mLoader;
-  }
+    @Override
+    public AbsNormalLoader getLoader() {
+        return mLoader == null ? new SFtpDLoader((DTaskWrapper) getTaskWrapper(), getListener())
+                : mLoader;
+    }
 
-  @Override public LoaderStructure BuildLoaderStructure() {
-    LoaderStructure structure = new LoaderStructure();
-    structure.addComponent(new SFtpDRecordHandler((DTaskWrapper) getTaskWrapper()))
-        .addComponent(new NormalThreadStateManager(getListener()))
-        .addComponent(new SFtpDInfoTask((DTaskWrapper) getTaskWrapper()))
-        .addComponent(new NormalTTBuilder(getTaskWrapper(), new SFtpDTTBuilderAdapter(
-            (DTaskWrapper) getTaskWrapper())));
-    structure.accept(getLoader());
-    return structure;
-  }
+    @Override
+    public LoaderStructure BuildLoaderStructure() {
+        LoaderStructure structure = new LoaderStructure();
+        structure.addComponent(new SFtpDRecordHandler((DTaskWrapper) getTaskWrapper()))
+                .addComponent(new NormalThreadStateManager(getListener()))
+                .addComponent(new SFtpDInfoTask((DTaskWrapper) getTaskWrapper()))
+                .addComponent(new NormalTTBuilder(getTaskWrapper(), new SFtpDTTBuilderAdapter(
+                        (DTaskWrapper) getTaskWrapper())));
+        structure.accept(getLoader());
+        return structure;
+    }
 }

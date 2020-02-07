@@ -24,6 +24,8 @@ import java.lang.annotation.Target;
  * Created by AriaL on 2017/7/4.
  * 一
  */
-@Target(ElementType.FIELD) @Retention(RetentionPolicy.RUNTIME) public @interface One {
+@Target(ElementType.FIELD)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface One {
 
 }

@@ -30,7 +30,7 @@ import java.lang.annotation.Target;
  *       }
  *   </code>
  * </pre>
- *
+ * <p>
  * 如果希望获取子任务的状态，可以使用onSub..类的注解
  * <pre>
  *   <code>
@@ -40,124 +40,160 @@ import java.lang.annotation.Target;
  *   </code>
  * </pre>
  */
-@Retention(RetentionPolicy.CLASS) @Target(ElementType.METHOD) public @interface DownloadGroup {
+@Retention(RetentionPolicy.CLASS)
+@Target(ElementType.METHOD)
+public @interface DownloadGroup {
 
-  /**
-   * " @Download.onPre"解，队列已经满了，继续创建新任务，将会回调该方法
-   */
-  @Retention(RetentionPolicy.CLASS) @Target(ElementType.METHOD) @interface onWait {
-    String[] value() default { AriaConstance.NO_URL };
-  }
+    /**
+     * " @Download.onPre"解，队列已经满了，继续创建新任务，将会回调该方法
+     */
+    @Retention(RetentionPolicy.CLASS)
+    @Target(ElementType.METHOD)
+    @interface onWait {
+        String[] value() default {AriaConstance.NO_URL};
+    }
 
-  /**
-   * " @DownloadGroup.onPre"解，在预处理完成时，Aria会调用该方法
-   */
-  @Retention(RetentionPolicy.CLASS) @Target(ElementType.METHOD) @interface onPre {
-    String[] value() default { AriaConstance.NO_URL };
-  }
+    /**
+     * " @DownloadGroup.onPre"解，在预处理完成时，Aria会调用该方法
+     */
+    @Retention(RetentionPolicy.CLASS)
+    @Target(ElementType.METHOD)
+    @interface onPre {
+        String[] value() default {AriaConstance.NO_URL};
+    }
 
-  /**
-   * " @DownloadGroup.onTaskPre"解，在任务预处理完成时，Aria会调用该方法
-   */
-  @Retention(RetentionPolicy.CLASS) @Target(ElementType.METHOD) @interface onTaskPre {
-    String[] value() default { AriaConstance.NO_URL };
-  }
+    /**
+     * " @DownloadGroup.onTaskPre"解，在任务预处理完成时，Aria会调用该方法
+     */
+    @Retention(RetentionPolicy.CLASS)
+    @Target(ElementType.METHOD)
+    @interface onTaskPre {
+        String[] value() default {AriaConstance.NO_URL};
+    }
 
-  /**
-   * " @DownloadGroup.onTaskResume"解，在任务恢复下载时，Aria会调用该方法
-   */
-  @Retention(RetentionPolicy.CLASS) @Target(ElementType.METHOD) @interface onTaskResume {
-    String[] value() default { AriaConstance.NO_URL };
-  }
+    /**
+     * " @DownloadGroup.onTaskResume"解，在任务恢复下载时，Aria会调用该方法
+     */
+    @Retention(RetentionPolicy.CLASS)
+    @Target(ElementType.METHOD)
+    @interface onTaskResume {
+        String[] value() default {AriaConstance.NO_URL};
+    }
 
-  /**
-   * " @DownloadGroup.onTaskStart"解，在任务开始下载时，Aria会调用该方法
-   */
-  @Retention(RetentionPolicy.CLASS) @Target(ElementType.METHOD) @interface onTaskStart {
-    String[] value() default { AriaConstance.NO_URL };
-  }
+    /**
+     * " @DownloadGroup.onTaskStart"解，在任务开始下载时，Aria会调用该方法
+     */
+    @Retention(RetentionPolicy.CLASS)
+    @Target(ElementType.METHOD)
+    @interface onTaskStart {
+        String[] value() default {AriaConstance.NO_URL};
+    }
 
-  /**
-   * " @DownloadGroup.onTaskStop"解，在任务停止时，Aria会调用该方法
-   */
-  @Retention(RetentionPolicy.CLASS) @Target(ElementType.METHOD) @interface onTaskStop {
-    String[] value() default { AriaConstance.NO_URL };
-  }
+    /**
+     * " @DownloadGroup.onTaskStop"解，在任务停止时，Aria会调用该方法
+     */
+    @Retention(RetentionPolicy.CLASS)
+    @Target(ElementType.METHOD)
+    @interface onTaskStop {
+        String[] value() default {AriaConstance.NO_URL};
+    }
 
-  /**
-   * " @DownloadGroup.onTaskCancel}l注解，在任务取消时，Aria会调用该方法
-   */
-  @Retention(RetentionPolicy.CLASS) @Target(ElementType.METHOD) @interface onTaskCancel {
-    String[] value() default { AriaConstance.NO_URL };
-  }
+    /**
+     * " @DownloadGroup.onTaskCancel}l注解，在任务取消时，Aria会调用该方法
+     */
+    @Retention(RetentionPolicy.CLASS)
+    @Target(ElementType.METHOD)
+    @interface onTaskCancel {
+        String[] value() default {AriaConstance.NO_URL};
+    }
 
-  /**
-   * " @DownloadGroup.onTaskFail)注解，在任务预失败时，Aria会调用该方法
-   */
-  @Retention(RetentionPolicy.CLASS) @Target(ElementType.METHOD) @interface onTaskFail {
-    String[] value() default { AriaConstance.NO_URL };
-  }
+    /**
+     * " @DownloadGroup.onTaskFail)注解，在任务预失败时，Aria会调用该方法
+     */
+    @Retention(RetentionPolicy.CLASS)
+    @Target(ElementType.METHOD)
+    @interface onTaskFail {
+        String[] value() default {AriaConstance.NO_URL};
+    }
 
-  /**
-   * " @DownloadGroup.onTaskComplete"解，在任务完成时，Aria会调用该方法
-   */
-  @Retention(RetentionPolicy.CLASS) @Target(ElementType.METHOD) @interface onTaskComplete {
-    String[] value() default { AriaConstance.NO_URL };
-  }
+    /**
+     * " @DownloadGroup.onTaskComplete"解，在任务完成时，Aria会调用该方法
+     */
+    @Retention(RetentionPolicy.CLASS)
+    @Target(ElementType.METHOD)
+    @interface onTaskComplete {
+        String[] value() default {AriaConstance.NO_URL};
+    }
 
-  /**
-   * " @DownloadGroup.onTaskRunning"解，在任务正在下载，Aria会调用该方法
-   */
-  @Retention(RetentionPolicy.CLASS) @Target(ElementType.METHOD) @interface onTaskRunning {
-    String[] value() default { AriaConstance.NO_URL };
-  }
+    /**
+     * " @DownloadGroup.onTaskRunning"解，在任务正在下载，Aria会调用该方法
+     */
+    @Retention(RetentionPolicy.CLASS)
+    @Target(ElementType.METHOD)
+    @interface onTaskRunning {
+        String[] value() default {AriaConstance.NO_URL};
+    }
 
-  /**
-   * 任务组子任务预处理的注解
-   */
-  @Retention(RetentionPolicy.CLASS) @Target(ElementType.METHOD) @interface onSubTaskPre {
-    String[] value() default { AriaConstance.NO_URL };
-  }
+    /**
+     * 任务组子任务预处理的注解
+     */
+    @Retention(RetentionPolicy.CLASS)
+    @Target(ElementType.METHOD)
+    @interface onSubTaskPre {
+        String[] value() default {AriaConstance.NO_URL};
+    }
 
-  /**
-   * 任务组子任务开始的注解
-   */
-  @Retention(RetentionPolicy.CLASS) @Target(ElementType.METHOD) @interface onSubTaskStart {
-    String[] value() default { AriaConstance.NO_URL };
-  }
+    /**
+     * 任务组子任务开始的注解
+     */
+    @Retention(RetentionPolicy.CLASS)
+    @Target(ElementType.METHOD)
+    @interface onSubTaskStart {
+        String[] value() default {AriaConstance.NO_URL};
+    }
 
-  /**
-   * 任务组子任务停止的注解
-   */
-  @Retention(RetentionPolicy.CLASS) @Target(ElementType.METHOD) @interface onSubTaskStop {
-    String[] value() default { AriaConstance.NO_URL };
-  }
+    /**
+     * 任务组子任务停止的注解
+     */
+    @Retention(RetentionPolicy.CLASS)
+    @Target(ElementType.METHOD)
+    @interface onSubTaskStop {
+        String[] value() default {AriaConstance.NO_URL};
+    }
 
-  /**
-   * 任务组子任务删除的注解
-   */
-  @Retention(RetentionPolicy.CLASS) @Target(ElementType.METHOD) @interface onSubTaskCancel {
-    String[] value() default { AriaConstance.NO_URL };
-  }
+    /**
+     * 任务组子任务删除的注解
+     */
+    @Retention(RetentionPolicy.CLASS)
+    @Target(ElementType.METHOD)
+    @interface onSubTaskCancel {
+        String[] value() default {AriaConstance.NO_URL};
+    }
 
-  /**
-   * 任务组子任务失败的注解
-   */
-  @Retention(RetentionPolicy.CLASS) @Target(ElementType.METHOD) @interface onSubTaskFail {
-    String[] value() default { AriaConstance.NO_URL };
-  }
+    /**
+     * 任务组子任务失败的注解
+     */
+    @Retention(RetentionPolicy.CLASS)
+    @Target(ElementType.METHOD)
+    @interface onSubTaskFail {
+        String[] value() default {AriaConstance.NO_URL};
+    }
 
-  /**
-   * 任务组子任务完成的注解
-   */
-  @Retention(RetentionPolicy.CLASS) @Target(ElementType.METHOD) @interface onSubTaskComplete {
-    String[] value() default { AriaConstance.NO_URL };
-  }
+    /**
+     * 任务组子任务完成的注解
+     */
+    @Retention(RetentionPolicy.CLASS)
+    @Target(ElementType.METHOD)
+    @interface onSubTaskComplete {
+        String[] value() default {AriaConstance.NO_URL};
+    }
 
-  /**
-   * 任务组子任务正在执行的注解
-   */
-  @Retention(RetentionPolicy.CLASS) @Target(ElementType.METHOD) @interface onSubTaskRunning {
-    String[] value() default { AriaConstance.NO_URL };
-  }
+    /**
+     * 任务组子任务正在执行的注解
+     */
+    @Retention(RetentionPolicy.CLASS)
+    @Target(ElementType.METHOD)
+    @interface onSubTaskRunning {
+        String[] value() default {AriaConstance.NO_URL};
+    }
 }

@@ -28,41 +28,41 @@ import com.arialyy.aria.util.CommonUtil;
  * 任务组命令
  */
 public abstract class AbsGroupCmd<T extends AbsGroupTaskWrapper> extends AbsCmd<T> {
-  /**
-   * 需要控制的子任务url
-   */
-  String childUrl;
+    /**
+     * 需要控制的子任务url
+     */
+    String childUrl;
 
-  AbsGroupTask tempTask;
+    AbsGroupTask tempTask;
 
-  AbsGroupCmd(T entity) {
-    mTaskWrapper = entity;
-    TAG = CommonUtil.getClassName(this);
-    if (entity instanceof DGTaskWrapper) {
-      mQueue = DGroupTaskQueue.getInstance();
-      isDownloadCmd = true;
+    AbsGroupCmd(T entity) {
+        mTaskWrapper = entity;
+        TAG = CommonUtil.getClassName(this);
+        if (entity instanceof DGTaskWrapper) {
+            mQueue = DGroupTaskQueue.getInstance();
+            isDownloadCmd = true;
+        }
     }
-  }
 
-  /**
-   * 创建任务
-   *
-   * @return 创建的任务
-   */
-  AbsTask createTask() {
-    tempTask = (AbsGroupTask) mQueue.createTask(mTaskWrapper);
-    return tempTask;
-  }
-
-  boolean checkTask() {
-    tempTask = (AbsGroupTask) mQueue.getTask(mTaskWrapper.getEntity().getKey());
-    if (tempTask == null) {
-      createTask();
-      if (tempTask.isComplete()) {
-        ALog.i(TAG, "任务已完成");
-        return false;
-      }
+    /**
+     * 创建任务
+     *
+     * @return 创建的任务
+     */
+    AbsTask createTask() {
+        tempTask = (AbsGroupTask) mQueue.createTask(mTaskWrapper);
+        return tempTask;
     }
-    return true;
-  }
+
+    boolean checkTask() {
+        tempTask = (AbsGroupTask) mQueue.getTask(mTaskWrapper.getEntity().getKey());
+        if (tempTask == null) {
+            createTask();
+            if (tempTask.isComplete()) {
+                ALog.i(TAG, "任务已完成");
+                return false;
+            }
+        }
+        return true;
+    }
 }

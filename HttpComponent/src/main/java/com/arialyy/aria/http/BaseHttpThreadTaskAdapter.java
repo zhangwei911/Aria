@@ -24,18 +24,18 @@ import com.arialyy.aria.core.task.AbsThreadTaskAdapter;
  * @Date 2019-09-22
  */
 public abstract class BaseHttpThreadTaskAdapter extends AbsThreadTaskAdapter {
-  protected HttpTaskOption mTaskOption;
+    protected HttpTaskOption mTaskOption;
 
-  protected BaseHttpThreadTaskAdapter(SubThreadConfig config) {
-    super(config);
-    mTaskOption = (HttpTaskOption) getTaskWrapper().getTaskOption();
-  }
+    protected BaseHttpThreadTaskAdapter(SubThreadConfig config) {
+        super(config);
+        mTaskOption = (HttpTaskOption) getTaskWrapper().getTaskOption();
+    }
 
-  protected String getFileName() {
-    return getEntity().getFileName();
-  }
+    protected String getFileName() {
+        return getEntity().getFileName();
+    }
 
-  protected AbsNormalEntity getEntity() {
-    return (AbsNormalEntity) getTaskWrapper().getEntity();
-  }
+    protected AbsNormalEntity getEntity() {
+        return (AbsNormalEntity) getTaskWrapper().getEntity();
+    }
 }

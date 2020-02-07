@@ -17,19 +17,20 @@ package com.arialyy.aria.core.download;
 
 import com.arialyy.aria.core.common.AbsEntity;
 import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
+
 import java.util.List;
 
 /**
  * 组合任务实体包裹器，用于加载和任务相关的参数，如：组合任务实体{@link DownloadGroupEntity}
  */
 public abstract class AbsGroupTaskWrapper<ENTITY extends AbsEntity, SUB extends AbsTaskWrapper>
-    extends AbsTaskWrapper<ENTITY> {
+        extends AbsTaskWrapper<ENTITY> {
 
-  public AbsGroupTaskWrapper(ENTITY entity) {
-    super(entity);
-  }
+    public AbsGroupTaskWrapper(ENTITY entity) {
+        super(entity);
+    }
 
-  public abstract List<SUB> getSubTaskWrapper();
+    public abstract List<SUB> getSubTaskWrapper();
 
-  public abstract void setSubTaskWrapper(List<SUB> subTaskWrapper);
+    public abstract void setSubTaskWrapper(List<SUB> subTaskWrapper);
 }

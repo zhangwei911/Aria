@@ -20,21 +20,21 @@ import com.arialyy.aria.core.inf.ITaskOption;
 
 public class SFtpTaskOption implements ITaskOption {
 
-  /**
-   * 账号和密码
-   */
-  private FtpUrlEntity urlEntity;
+    /**
+     * 账号和密码
+     */
+    private FtpUrlEntity urlEntity;
 
-  /**
-   * 字符编码，默认为"utf-8"
-   */
-  private String charSet = "utf-8";
+    /**
+     * 字符编码，默认为"utf-8"
+     */
+    private String charSet = "utf-8";
 
-  public FtpUrlEntity getUrlEntity() {
-    return urlEntity;
-  }
+    public FtpUrlEntity getUrlEntity() {
+        return urlEntity;
+    }
 
-  public String getCharSet() {
-    return charSet;
-  }
+    public String getCharSet() {
+        return charSet;
+    }
 }

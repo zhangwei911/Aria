@@ -31,16 +31,17 @@ import com.arialyy.aria.util.NetUtils;
  */
 final class ResumeAllCmd<T extends AbsTaskWrapper> extends AbsNormalCmd<T> {
 
-  ResumeAllCmd(T entity, int taskType) {
-    super(entity, taskType);
-  }
-
-  @Override public void executeCmd() {
-    if (!NetUtils.isConnected(AriaConfig.getInstance().getAPP())) {
-      ALog.w(TAG, "恢复任务失败，网络未连接");
-      return;
+    ResumeAllCmd(T entity, int taskType) {
+        super(entity, taskType);
     }
-    new Thread(new ResumeThread(isDownloadCmd,
-        String.format("state!=%s", IEntity.STATE_COMPLETE))).start();
-  }
+
+    @Override
+    public void executeCmd() {
+        if (!NetUtils.isConnected(AriaConfig.getInstance().getAPP())) {
+            ALog.w(TAG, "恢复任务失败，网络未连接");
+            return;
+        }
+        new Thread(new ResumeThread(isDownloadCmd,
+                String.format("state!=%s", IEntity.STATE_COMPLETE))).start();
+    }
 }

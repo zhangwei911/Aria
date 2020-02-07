@@ -16,6 +16,7 @@
 package com.arialyy.aria.core.download.target;
 
 import android.text.TextUtils;
+
 import com.arialyy.aria.core.common.AbsNormalTarget;
 import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.download.DownloadEntity;
@@ -32,83 +33,86 @@ import com.arialyy.aria.util.ALog;
  * 普通下载任务通用功能处理
  */
 class DNormalConfigHandler<TARGET extends AbsTarget> implements IConfigHandler {
-  private final String TAG = "DNormalDelegate";
-  private DownloadEntity mEntity;
+    private final String TAG = "DNormalDelegate";
+    private DownloadEntity mEntity;
 
-  private TARGET mTarget;
-  private DTaskWrapper mWrapper;
+    private TARGET mTarget;
+    private DTaskWrapper mWrapper;
 
-  /**
-   * @param taskId 第一次下载，taskId为-1
-   */
-  DNormalConfigHandler(TARGET target, long taskId) {
-    this.mTarget = target;
-    initTarget(taskId);
-  }
-
-  private void initTarget(long taskId) {
-    mWrapper = TaskWrapperManager.getInstance().getNormalTaskWrapper(DTaskWrapper.class, taskId);
-    // 判断已存在的任务
-    if (mTarget instanceof AbsNormalTarget) {
-      if (taskId < 0) {
-        mWrapper.setErrorEvent(new ErrorEvent(taskId, "任务id为空"));
-      } else if (mWrapper.getEntity().getId() < 0) {
-        mWrapper.setErrorEvent(new ErrorEvent(taskId, "任务信息不存在"));
-      }
+    /**
+     * @param taskId 第一次下载，taskId为-1
+     */
+    DNormalConfigHandler(TARGET target, long taskId) {
+        this.mTarget = target;
+        initTarget(taskId);
     }
 
-    mEntity = mWrapper.getEntity();
-    mTarget.setTaskWrapper(mWrapper);
-    if (mEntity != null) {
-      getWrapper().setTempFilePath(mEntity.getFilePath());
+    private void initTarget(long taskId) {
+        mWrapper = TaskWrapperManager.getInstance().getNormalTaskWrapper(DTaskWrapper.class, taskId);
+        // 判断已存在的任务
+        if (mTarget instanceof AbsNormalTarget) {
+            if (taskId < 0) {
+                mWrapper.setErrorEvent(new ErrorEvent(taskId, "任务id为空"));
+            } else if (mWrapper.getEntity().getId() < 0) {
+                mWrapper.setErrorEvent(new ErrorEvent(taskId, "任务信息不存在"));
+            }
+        }
+
+        mEntity = mWrapper.getEntity();
+        mTarget.setTaskWrapper(mWrapper);
+        if (mEntity != null) {
+            getWrapper().setTempFilePath(mEntity.getFilePath());
+        }
     }
-  }
 
-  TARGET updateUrl(String newUrl) {
-    if (TextUtils.isEmpty(newUrl)) {
-      ALog.e(TAG, "url更新失败，newUrl为null");
-      return mTarget;
+    TARGET updateUrl(String newUrl) {
+        if (TextUtils.isEmpty(newUrl)) {
+            ALog.e(TAG, "url更新失败，newUrl为null");
+            return mTarget;
+        }
+        if (mEntity.getUrl().equals(newUrl)) {
+            ALog.e(TAG, "url更新失败，新的下载url和旧的url一致");
+            return mTarget;
+        }
+        getWrapper().setRefreshInfo(true);
+        getWrapper().setTempUrl(newUrl);
+        ALog.d(TAG, "更新url成功");
+        return mTarget;
     }
-    if (mEntity.getUrl().equals(newUrl)) {
-      ALog.e(TAG, "url更新失败，新的下载url和旧的url一致");
-      return mTarget;
+
+    @Override
+    public DownloadEntity getEntity() {
+        return (DownloadEntity) mTarget.getEntity();
     }
-    getWrapper().setRefreshInfo(true);
-    getWrapper().setTempUrl(newUrl);
-    ALog.d(TAG, "更新url成功");
-    return mTarget;
-  }
 
-  @Override public DownloadEntity getEntity() {
-    return (DownloadEntity) mTarget.getEntity();
-  }
+    @Override
+    public boolean taskExists() {
+        return DbEntity.checkDataExist(DownloadEntity.class, "rowid=?",
+                String.valueOf(mEntity.getId()));
+    }
 
-  @Override public boolean taskExists() {
-    return DbEntity.checkDataExist(DownloadEntity.class, "rowid=?",
-        String.valueOf(mEntity.getId()));
-  }
+    @Override
+    public boolean isRunning() {
+        return DTaskQueue.getInstance().taskIsRunning(mEntity.getKey());
+    }
 
-  @Override public boolean isRunning() {
-    return DTaskQueue.getInstance().taskIsRunning(mEntity.getKey());
-  }
+    void setForceDownload(boolean forceDownload) {
+        getWrapper().setIgnoreFilePathOccupy(forceDownload);
+    }
 
-  void setForceDownload(boolean forceDownload) {
-    getWrapper().setIgnoreFilePathOccupy(forceDownload);
-  }
+    void setUrl(String url) {
+        mEntity.setUrl(url);
+    }
 
-  void setUrl(String url) {
-    mEntity.setUrl(url);
-  }
+    String getUrl() {
+        return mEntity.getUrl();
+    }
 
-  String getUrl() {
-    return mEntity.getUrl();
-  }
+    void setTempFilePath(String tempFilePath) {
+        getWrapper().setTempFilePath(tempFilePath);
+    }
 
-  void setTempFilePath(String tempFilePath) {
-    getWrapper().setTempFilePath(tempFilePath);
-  }
-
-  private DTaskWrapper getWrapper() {
-    return mWrapper;
-  }
+    private DTaskWrapper getWrapper() {
+        return mWrapper;
+    }
 }

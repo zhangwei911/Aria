@@ -20,33 +20,33 @@ package com.arialyy.aria.core.inf;
  * @Date 2019-09-10
  */
 public interface IOptionConstant {
-  // ftp 任务设置常量
-  String ftpUrlEntity = "urlEntity";
-  String charSet = "charSet";
-  String clientConfig = "clientConfig";
-  String uploadInterceptor = "uploadInterceptor";
+    // ftp 任务设置常量
+    String ftpUrlEntity = "urlEntity";
+    String charSet = "charSet";
+    String clientConfig = "clientConfig";
+    String uploadInterceptor = "uploadInterceptor";
 
-  // http
-  String useServerFileName = "useServerFileName";
-  String requestEnum = "requestEnum";
-  String fileLenAdapter = "fileLenAdapter";
-  String params = "params";
-  String formFields = "formFields";
-  String headers = "headers";
-  String proxy = "proxy";
+    // http
+    String useServerFileName = "useServerFileName";
+    String requestEnum = "requestEnum";
+    String fileLenAdapter = "fileLenAdapter";
+    String params = "params";
+    String formFields = "formFields";
+    String headers = "headers";
+    String proxy = "proxy";
 
-  // m3u8 vod
-  String bandWidth = "bandWidth";
-  String cacheDir = "cacheDir";
-  String generateIndexFileTemp = "generateIndexFileTemp";
-  String bandWidthUrlConverter = "bandWidthUrlConverter";
-  String mergeFile = "mergeFile";
-  String mergeHandler = "mergeHandler";
-  String vodUrlConverter = "vodUrlConverter";
-  String maxTsQueueNum = "maxTsQueueNum";
-  String jumpIndex = "jumpIndex";
+    // m3u8 vod
+    String bandWidth = "bandWidth";
+    String cacheDir = "cacheDir";
+    String generateIndexFileTemp = "generateIndexFileTemp";
+    String bandWidthUrlConverter = "bandWidthUrlConverter";
+    String mergeFile = "mergeFile";
+    String mergeHandler = "mergeHandler";
+    String vodUrlConverter = "vodUrlConverter";
+    String maxTsQueueNum = "maxTsQueueNum";
+    String jumpIndex = "jumpIndex";
 
-  // m3u8 live
-  String liveTsUrlConverter = "liveTsUrlConverter";
-  String liveUpdateInterval = "liveUpdateInterval";
+    // m3u8 live
+    String liveTsUrlConverter = "liveTsUrlConverter";
+    String liveUpdateInterval = "liveUpdateInterval";
 }

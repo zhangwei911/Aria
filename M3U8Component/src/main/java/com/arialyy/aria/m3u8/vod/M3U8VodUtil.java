@@ -36,27 +36,30 @@ import com.arialyy.aria.m3u8.M3U8TaskOption;
  */
 public final class M3U8VodUtil extends AbsNormalLoaderUtil {
 
-  public M3U8VodUtil(AbsTaskWrapper wrapper, IEventListener listener) {
-    super(wrapper, listener);
-  }
+    public M3U8VodUtil(AbsTaskWrapper wrapper, IEventListener listener) {
+        super(wrapper, listener);
+    }
 
-  @Override public DTaskWrapper getTaskWrapper() {
-    return (DTaskWrapper) super.getTaskWrapper();
-  }
+    @Override
+    public DTaskWrapper getTaskWrapper() {
+        return (DTaskWrapper) super.getTaskWrapper();
+    }
 
-  @Override public AbsNormalLoader getLoader() {
-    getTaskWrapper().generateM3u8Option(M3U8TaskOption.class);
-    getTaskWrapper().generateTaskOption(HttpTaskOption.class);
-    return mLoader == null ? new M3U8VodLoader(getTaskWrapper(), (M3U8Listener) getListener())
-        : mLoader;
-  }
+    @Override
+    public AbsNormalLoader getLoader() {
+        getTaskWrapper().generateM3u8Option(M3U8TaskOption.class);
+        getTaskWrapper().generateTaskOption(HttpTaskOption.class);
+        return mLoader == null ? new M3U8VodLoader(getTaskWrapper(), (M3U8Listener) getListener())
+                : mLoader;
+    }
 
-  @Override public LoaderStructure BuildLoaderStructure() {
-    LoaderStructure structure = new LoaderStructure();
-    structure.addComponent(new VodRecordHandler(getTaskWrapper()))
-        .addComponent(new M3U8InfoTask(getTaskWrapper()))
-        .addComponent(new VodStateManager(getTaskWrapper(), (M3U8Listener) getListener()));
-    structure.accept(getLoader());
-    return structure;
-  }
+    @Override
+    public LoaderStructure BuildLoaderStructure() {
+        LoaderStructure structure = new LoaderStructure();
+        structure.addComponent(new VodRecordHandler(getTaskWrapper()))
+                .addComponent(new M3U8InfoTask(getTaskWrapper()))
+                .addComponent(new VodStateManager(getTaskWrapper(), (M3U8Listener) getListener()));
+        structure.accept(getLoader());
+        return structure;
+    }
 }

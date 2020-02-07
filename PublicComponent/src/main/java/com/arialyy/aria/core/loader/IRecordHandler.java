@@ -24,64 +24,64 @@ import com.arialyy.aria.core.ThreadRecord;
  */
 public interface IRecordHandler extends ILoaderComponent {
 
-  int TYPE_DOWNLOAD = 1;
-  int TYPE_UPLOAD = 2;
-  int TYPE_M3U8_VOD = 3;
-  int TYPE_M3U8_LIVE = 4;
+    int TYPE_DOWNLOAD = 1;
+    int TYPE_UPLOAD = 2;
+    int TYPE_M3U8_VOD = 3;
+    int TYPE_M3U8_LIVE = 4;
 
-  String STATE = "_state_";
-  String RECORD = "_record_";
-  /**
-   * 小于1m的文件不启用多线程
-   */
-  long SUB_LEN = 1024 * 1024;
+    String STATE = "_state_";
+    String RECORD = "_record_";
+    /**
+     * 小于1m的文件不启用多线程
+     */
+    long SUB_LEN = 1024 * 1024;
 
-  /**
-   * 分块文件路径，文件路径.线程id.part
-   */
-  String SUB_PATH = "%s.%s.part";
+    /**
+     * 分块文件路径，文件路径.线程id.part
+     */
+    String SUB_PATH = "%s.%s.part";
 
-  /**
-   * 获取任务记录
-   */
-  TaskRecord getRecord(long fileSize);
+    /**
+     * 获取任务记录
+     */
+    TaskRecord getRecord(long fileSize);
 
-  /**
-   * 记录处理前的操作，可用来删除任务记录
-   */
-  void onPre();
+    /**
+     * 记录处理前的操作，可用来删除任务记录
+     */
+    void onPre();
 
-  /**
-   * 处理任务记录
-   */
-  void handlerTaskRecord(TaskRecord record);
+    /**
+     * 处理任务记录
+     */
+    void handlerTaskRecord(TaskRecord record);
 
-  /**
-   * 处理线程任务
-   *
-   * @param record 任务记录
-   * @param threadId 线程id
-   * @param startL 线程开始位置
-   * @param endL 线程结束位置
-   */
-  ThreadRecord createThreadRecord(TaskRecord record, int threadId, long startL, long endL);
+    /**
+     * 处理线程任务
+     *
+     * @param record   任务记录
+     * @param threadId 线程id
+     * @param startL   线程开始位置
+     * @param endL     线程结束位置
+     */
+    ThreadRecord createThreadRecord(TaskRecord record, int threadId, long startL, long endL);
 
-  /**
-   * 新任务创建任务记录
-   */
-  TaskRecord createTaskRecord(int threadNum);
+    /**
+     * 新任务创建任务记录
+     */
+    TaskRecord createTaskRecord(int threadNum);
 
-  /**
-   * 配置新任务的线程数
-   *
-   * @return 新任务的线程数
-   */
-  int initTaskThreadNum();
+    /**
+     * 配置新任务的线程数
+     *
+     * @return 新任务的线程数
+     */
+    int initTaskThreadNum();
 
-  /**
-   * 检查任务是否已完成
-   *
-   * @return true 任务已完成
-   */
-  boolean checkTaskCompleted();
+    /**
+     * 检查任务是否已完成
+     *
+     * @return true 任务已完成
+     */
+    boolean checkTaskCompleted();
 }

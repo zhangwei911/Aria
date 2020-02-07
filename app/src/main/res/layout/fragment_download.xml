@@ -1,60 +1,55 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:bind="http://schemas.android.com/apk/res-auto"
-    >
+    xmlns:bind="http://schemas.android.com/apk/res-auto">
 
-  <data>
-    <variable
-        name="fileSize"
-        type="String"
-        />
-    <variable
-        name="speed"
-        type="String"
-        />
-    <variable
-        name="progress"
-        type="int"
-        />
-    <variable
-        name="stateStr"
-        type="String"
-        />
-    <variable
-        name="file_name"
-        type="String"
-        />
-    <variable
-        name="url"
-        type="String"
-        />
-  </data>
+    <data>
 
-  <LinearLayout
-      android:layout_width="match_parent"
-      android:layout_height="match_parent"
-      android:orientation="vertical"
-      >
+        <variable
+            name="fileSize"
+            type="String" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@{@string/file_name(file_name)}"
-        />
+        <variable
+            name="speed"
+            type="String" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@{@string/url(url)}"
-        />
+        <variable
+            name="progress"
+            type="int" />
 
-    <include
-        layout="@layout/layout_content_single"
-        bind:fileSize="@{fileSize}"
-        bind:progress="@{progress}"
-        bind:speed="@{speed}"
-        bind:stateStr="@{stateStr}"
-        />
+        <variable
+            name="stateStr"
+            type="String" />
 
-  </LinearLayout>
+        <variable
+            name="file_name"
+            type="String" />
+
+        <variable
+            name="url"
+            type="String" />
+    </data>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@{@string/file_name(file_name)}" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@{@string/url(url)}" />
+
+        <include
+            layout="@layout/layout_content_single"
+            bind:fileSize="@{fileSize}"
+            bind:progress="@{progress}"
+            bind:speed="@{speed}"
+            bind:stateStr="@{stateStr}" />
+
+    </LinearLayout>
 </layout>

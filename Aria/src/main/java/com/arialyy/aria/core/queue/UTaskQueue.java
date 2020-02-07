@@ -30,49 +30,53 @@ import com.arialyy.aria.util.ALog;
  * Created by lyy on 2017/2/27. 上传任务队列
  */
 public class UTaskQueue extends AbsTaskQueue<UploadTask, UTaskWrapper> {
-  private static final String TAG = "UploadTaskQueue";
-  private static volatile UTaskQueue INSTANCE = null;
+    private static final String TAG = "UploadTaskQueue";
+    private static volatile UTaskQueue INSTANCE = null;
 
-  public static UTaskQueue getInstance() {
-    if (INSTANCE == null) {
-      synchronized (UTaskQueue.class) {
-        INSTANCE = new UTaskQueue();
-        EventMsgUtil.getDefault().register(INSTANCE);
-      }
+    public static UTaskQueue getInstance() {
+        if (INSTANCE == null) {
+            synchronized (UTaskQueue.class) {
+                INSTANCE = new UTaskQueue();
+                EventMsgUtil.getDefault().register(INSTANCE);
+            }
+        }
+        return INSTANCE;
     }
-    return INSTANCE;
-  }
 
-  private UTaskQueue() {
-  }
-
-  @Event
-  public void maxTaskNum(UMaxNumEvent event){
-    setMaxTaskNum(event.maxNum);
-  }
-
-  @Override int getQueueType() {
-    return TYPE_U_QUEUE;
-  }
-
-  @Override public int getOldMaxNum() {
-    return AriaConfig.getInstance().getUConfig().oldMaxTaskNum;
-  }
-
-  @Override public int getMaxTaskNum() {
-    return AriaConfig.getInstance().getUConfig().getMaxTaskNum();
-  }
-
-  @Override public UploadTask createTask(UTaskWrapper wrapper) {
-    super.createTask(wrapper);
-    UploadTask task = null;
-    if (!mCachePool.taskExits(wrapper.getKey()) && !mExecutePool.taskExits(wrapper.getKey())) {
-      task = (UploadTask) TaskFactory.getInstance()
-          .createTask(wrapper, TaskSchedulers.getInstance());
-      addTask(task);
-    } else {
-      ALog.w(TAG, "任务已存在");
+    private UTaskQueue() {
     }
-    return task;
-  }
+
+    @Event
+    public void maxTaskNum(UMaxNumEvent event) {
+        setMaxTaskNum(event.maxNum);
+    }
+
+    @Override
+    int getQueueType() {
+        return TYPE_U_QUEUE;
+    }
+
+    @Override
+    public int getOldMaxNum() {
+        return AriaConfig.getInstance().getUConfig().oldMaxTaskNum;
+    }
+
+    @Override
+    public int getMaxTaskNum() {
+        return AriaConfig.getInstance().getUConfig().getMaxTaskNum();
+    }
+
+    @Override
+    public UploadTask createTask(UTaskWrapper wrapper) {
+        super.createTask(wrapper);
+        UploadTask task = null;
+        if (!mCachePool.taskExits(wrapper.getKey()) && !mExecutePool.taskExits(wrapper.getKey())) {
+            task = (UploadTask) TaskFactory.getInstance()
+                    .createTask(wrapper, TaskSchedulers.getInstance());
+            addTask(task);
+        } else {
+            ALog.w(TAG, "任务已存在");
+        }
+        return task;
+    }
 }

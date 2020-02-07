@@ -32,75 +32,97 @@ import java.lang.annotation.Target;
  *   </code>
  * </pre>
  */
-@Retention(RetentionPolicy.CLASS) @Target(ElementType.METHOD) public @interface Upload {
+@Retention(RetentionPolicy.CLASS)
+@Target(ElementType.METHOD)
+public @interface Upload {
 
-  /**
-   * "@Upload.onWait" 注解，队列已经满了，继续创建新任务，将会回调该方法
-   */
-  @Retention(RetentionPolicy.CLASS) @Target(ElementType.METHOD) @interface onWait {
-    String[] value() default { AriaConstance.NO_URL };
-  }
+    /**
+     * "@Upload.onWait" 注解，队列已经满了，继续创建新任务，将会回调该方法
+     */
+    @Retention(RetentionPolicy.CLASS)
+    @Target(ElementType.METHOD)
+    @interface onWait {
+        String[] value() default {AriaConstance.NO_URL};
+    }
 
-  /**
-   * "@Upload.onPre"注解，在预处理完成时，Aria会调用该方法
-   */
-  @Retention(RetentionPolicy.CLASS) @Target(ElementType.METHOD) @interface onPre {
-    String[] value() default { AriaConstance.NO_URL };
-  }
+    /**
+     * "@Upload.onPre"注解，在预处理完成时，Aria会调用该方法
+     */
+    @Retention(RetentionPolicy.CLASS)
+    @Target(ElementType.METHOD)
+    @interface onPre {
+        String[] value() default {AriaConstance.NO_URL};
+    }
 
-  /**
-   * "@Upload.onTaskResume"注解，在任务恢复下载时，Aria会调用该方法
-   */
-  @Retention(RetentionPolicy.CLASS) @Target(ElementType.METHOD) @interface onTaskResume {
-    String[] value() default { AriaConstance.NO_URL };
-  }
+    /**
+     * "@Upload.onTaskResume"注解，在任务恢复下载时，Aria会调用该方法
+     */
+    @Retention(RetentionPolicy.CLASS)
+    @Target(ElementType.METHOD)
+    @interface onTaskResume {
+        String[] value() default {AriaConstance.NO_URL};
+    }
 
-  /**
-   * "@Upload.onTaskStart"注解，在任务开始下载时，Aria会调用该方法
-   */
-  @Retention(RetentionPolicy.CLASS) @Target(ElementType.METHOD) @interface onTaskStart {
-    String[] value() default { AriaConstance.NO_URL };
-  }
+    /**
+     * "@Upload.onTaskStart"注解，在任务开始下载时，Aria会调用该方法
+     */
+    @Retention(RetentionPolicy.CLASS)
+    @Target(ElementType.METHOD)
+    @interface onTaskStart {
+        String[] value() default {AriaConstance.NO_URL};
+    }
 
-  /**
-   * "@Upload.onTaskStop"注解，在任务停止时，Aria会调用该方法
-   */
-  @Retention(RetentionPolicy.CLASS) @Target(ElementType.METHOD) @interface onTaskStop {
-    String[] value() default { AriaConstance.NO_URL };
-  }
+    /**
+     * "@Upload.onTaskStop"注解，在任务停止时，Aria会调用该方法
+     */
+    @Retention(RetentionPolicy.CLASS)
+    @Target(ElementType.METHOD)
+    @interface onTaskStop {
+        String[] value() default {AriaConstance.NO_URL};
+    }
 
-  /**
-   * "@Upload.onTaskCancel"注解，在任务取消时，Aria会调用该方法
-   */
-  @Retention(RetentionPolicy.CLASS) @Target(ElementType.METHOD) @interface onTaskCancel {
-    String[] value() default { AriaConstance.NO_URL };
-  }
+    /**
+     * "@Upload.onTaskCancel"注解，在任务取消时，Aria会调用该方法
+     */
+    @Retention(RetentionPolicy.CLASS)
+    @Target(ElementType.METHOD)
+    @interface onTaskCancel {
+        String[] value() default {AriaConstance.NO_URL};
+    }
 
-  /**
-   * "@Upload.onTaskFail"注解，在任务预失败时，Aria会调用该方法
-   */
-  @Retention(RetentionPolicy.CLASS) @Target(ElementType.METHOD) @interface onTaskFail {
-    String[] value() default { AriaConstance.NO_URL };
-  }
+    /**
+     * "@Upload.onTaskFail"注解，在任务预失败时，Aria会调用该方法
+     */
+    @Retention(RetentionPolicy.CLASS)
+    @Target(ElementType.METHOD)
+    @interface onTaskFail {
+        String[] value() default {AriaConstance.NO_URL};
+    }
 
-  /**
-   * "@Upload.onTaskComplete"注解，在任务完成时，Aria会调用该方法
-   */
-  @Retention(RetentionPolicy.CLASS) @Target(ElementType.METHOD) @interface onTaskComplete {
-    String[] value() default { AriaConstance.NO_URL };
-  }
+    /**
+     * "@Upload.onTaskComplete"注解，在任务完成时，Aria会调用该方法
+     */
+    @Retention(RetentionPolicy.CLASS)
+    @Target(ElementType.METHOD)
+    @interface onTaskComplete {
+        String[] value() default {AriaConstance.NO_URL};
+    }
 
-  /**
-   * "@Upload.onTaskRunning"注解，在任务正在下载，Aria会调用该方法
-   */
-  @Retention(RetentionPolicy.CLASS) @Target(ElementType.METHOD) @interface onTaskRunning {
-    String[] value() default { AriaConstance.NO_URL };
-  }
+    /**
+     * "@Upload.onTaskRunning"注解，在任务正在下载，Aria会调用该方法
+     */
+    @Retention(RetentionPolicy.CLASS)
+    @Target(ElementType.METHOD)
+    @interface onTaskRunning {
+        String[] value() default {AriaConstance.NO_URL};
+    }
 
-  /**
-   * "@Upload.onNoSupportBreakPoint"注解，如果该任务不支持断点，Aria会调用该方法
-   */
-  @Retention(RetentionPolicy.CLASS) @Target(ElementType.METHOD) @interface onNoSupportBreakPoint {
-    String[] value() default { AriaConstance.NO_URL };
-  }
+    /**
+     * "@Upload.onNoSupportBreakPoint"注解，如果该任务不支持断点，Aria会调用该方法
+     */
+    @Retention(RetentionPolicy.CLASS)
+    @Target(ElementType.METHOD)
+    @interface onNoSupportBreakPoint {
+        String[] value() default {AriaConstance.NO_URL};
+    }
 }

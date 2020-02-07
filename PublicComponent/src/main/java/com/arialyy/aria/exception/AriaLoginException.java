@@ -15,14 +15,14 @@
  */
 package com.arialyy.aria.exception;
 
-public class AriaLoginException extends BaseException{
-  private static final String ARIA_NET_EXCEPTION = "Aria Login Exception:";
+public class AriaLoginException extends BaseException {
+    private static final String ARIA_NET_EXCEPTION = "Aria Login Exception:";
 
-  public AriaLoginException(String tag, String message) {
-    super(tag, String.format("%s%s", ARIA_NET_EXCEPTION, message));
-  }
+    public AriaLoginException(String tag, String message) {
+        super(tag, String.format("%s%s", ARIA_NET_EXCEPTION, message));
+    }
 
-  public AriaLoginException(String tag, String message, Exception e){
-    super(tag, message, e);
-  }
+    public AriaLoginException(String tag, String message, Exception e) {
+        super(tag, message, e);
+    }
 }

@@ -18,6 +18,7 @@
 package aria.apache.commons.net.ftp;
 
 import aria.apache.commons.net.util.TrustManagerUtils;
+
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 
@@ -31,24 +32,28 @@ import javax.net.ssl.X509TrustManager;
  * {@link TrustManagerUtils#getValidateServerCertificateTrustManager()
  * TrustManagerUtils#getValidateServerCertificateTrustManager()} instead
  */
-@Deprecated public class FTPSTrustManager implements X509TrustManager {
-  private static final X509Certificate[] EMPTY_X509CERTIFICATE_ARRAY = new X509Certificate[] {};
+@Deprecated
+public class FTPSTrustManager implements X509TrustManager {
+    private static final X509Certificate[] EMPTY_X509CERTIFICATE_ARRAY = new X509Certificate[]{};
 
-  /**
-   * No-op
-   */
-  @Override public void checkClientTrusted(X509Certificate[] certificates, String authType) {
-    return;
-  }
-
-  @Override public void checkServerTrusted(X509Certificate[] certificates, String authType)
-      throws CertificateException {
-    for (X509Certificate certificate : certificates) {
-      certificate.checkValidity();
+    /**
+     * No-op
+     */
+    @Override
+    public void checkClientTrusted(X509Certificate[] certificates, String authType) {
+        return;
     }
-  }
 
-  @Override public X509Certificate[] getAcceptedIssuers() {
-    return EMPTY_X509CERTIFICATE_ARRAY;
-  }
+    @Override
+    public void checkServerTrusted(X509Certificate[] certificates, String authType)
+            throws CertificateException {
+        for (X509Certificate certificate : certificates) {
+            certificate.checkValidity();
+        }
+    }
+
+    @Override
+    public X509Certificate[] getAcceptedIssuers() {
+        return EMPTY_X509CERTIFICATE_ARRAY;
+    }
 }

@@ -16,5 +16,5 @@
 package com.arialyy.simple.to;
 
 public class PeerIndex {
-  public int index;
+    public int index;
 }

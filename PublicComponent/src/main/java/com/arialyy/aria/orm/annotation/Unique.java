@@ -24,6 +24,7 @@ import java.lang.annotation.Target;
  * Created by laoyuyu on 2018/5/8.
  * 数据库 UNIQUE 约束
  */
-@Target(ElementType.FIELD) @Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.FIELD)
+@Retention(RetentionPolicy.RUNTIME)
 public @interface Unique {
 }

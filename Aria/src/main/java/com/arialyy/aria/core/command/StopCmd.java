@@ -27,21 +27,22 @@ import com.arialyy.aria.util.ALog;
  */
 final class StopCmd<T extends AbsTaskWrapper> extends AbsNormalCmd<T> {
 
-  StopCmd(T entity, int taskType) {
-    super(entity, taskType);
-  }
-
-  @Override public void executeCmd() {
-    if (!canExeCmd) return;
-    AbsTask task = getTask();
-    if (task == null) {
-      if (mTaskWrapper.getEntity().getState() == IEntity.STATE_RUNNING) {
-        stopTask();
-      } else {
-        ALog.w(TAG, "停止命令执行失败，【调度器中没有该任务】");
-      }
-    } else {
-      stopTask();
+    StopCmd(T entity, int taskType) {
+        super(entity, taskType);
     }
-  }
+
+    @Override
+    public void executeCmd() {
+        if (!canExeCmd) return;
+        AbsTask task = getTask();
+        if (task == null) {
+            if (mTaskWrapper.getEntity().getState() == IEntity.STATE_RUNNING) {
+                stopTask();
+            } else {
+                ALog.w(TAG, "停止命令执行失败，【调度器中没有该任务】");
+            }
+        } else {
+            stopTask();
+        }
+    }
 }

@@ -23,12 +23,12 @@ import com.arialyy.aria.core.inf.IEventHandler;
  */
 public interface IBandWidthUrlConverter extends IEventHandler {
 
-  /**
-   * 转换码率地址为可用的http地址，对于某些服务器，返回的切片信息有可能是相对地址，也可能是处理过的，
-   * 对于这种情况，你需要使用url转换器将地址转换为可正常访问的http地址
-   *
-   * @param bandWidthUrl 原始码率地址
-   * @return 可正常访问的http地址
-   */
-  String convert(String bandWidthUrl);
+    /**
+     * 转换码率地址为可用的http地址，对于某些服务器，返回的切片信息有可能是相对地址，也可能是处理过的，
+     * 对于这种情况，你需要使用url转换器将地址转换为可正常访问的http地址
+     *
+     * @param bandWidthUrl 原始码率地址
+     * @return 可正常访问的http地址
+     */
+    String convert(String bandWidthUrl);
 }

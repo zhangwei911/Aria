@@ -25,48 +25,48 @@ import com.arialyy.aria.core.wrapper.ITaskWrapper;
  * http 单文件上传
  */
 public class HttpBuilderTarget extends AbsBuilderTarget<HttpBuilderTarget> {
-  private UNormalConfigHandler<HttpBuilderTarget> mConfigHandler;
+    private UNormalConfigHandler<HttpBuilderTarget> mConfigHandler;
 
-  HttpBuilderTarget(String filePath) {
-    mConfigHandler = new UNormalConfigHandler<>(this, -1);
-    mConfigHandler.setFilePath(filePath);
-    //http暂时不支持断点上传
-    getTaskWrapper().setSupportBP(false);
-    getTaskWrapper().setRequestType(ITaskWrapper.U_HTTP);
-    ((UploadEntity) getEntity()).setTaskType(ITaskWrapper.U_HTTP);
-    getTaskWrapper().setNewTask(true);
-  }
-
-  /**
-   * 设置上传路径
-   *
-   * @param tempUrl 上传路径
-   */
-  public HttpBuilderTarget setUploadUrl(String tempUrl) {
-    mConfigHandler.setTempUrl(tempUrl);
-    return this;
-  }
-
-  /**
-   * 设置http请求参数，header等信息
-   */
-  public HttpBuilderTarget option(HttpOption option) {
-
-    if (option == null) {
-      throw new NullPointerException("任务配置为空");
+    HttpBuilderTarget(String filePath) {
+        mConfigHandler = new UNormalConfigHandler<>(this, -1);
+        mConfigHandler.setFilePath(filePath);
+        //http暂时不支持断点上传
+        getTaskWrapper().setSupportBP(false);
+        getTaskWrapper().setRequestType(ITaskWrapper.U_HTTP);
+        ((UploadEntity) getEntity()).setTaskType(ITaskWrapper.U_HTTP);
+        getTaskWrapper().setNewTask(true);
     }
-    getTaskWrapper().getOptionParams().setParams(option);
-    return this;
-  }
 
-  /**
-   * 如果文件路径被其它任务占用，删除其它任务
-   *
-   * @deprecated 使用 {@link #ignoreFilePathOccupy()}
-   */
-  @Deprecated
-  public HttpBuilderTarget forceUpload() {
-    getTaskWrapper().setIgnoreFilePathOccupy(true);
-    return this;
-  }
+    /**
+     * 设置上传路径
+     *
+     * @param tempUrl 上传路径
+     */
+    public HttpBuilderTarget setUploadUrl(String tempUrl) {
+        mConfigHandler.setTempUrl(tempUrl);
+        return this;
+    }
+
+    /**
+     * 设置http请求参数，header等信息
+     */
+    public HttpBuilderTarget option(HttpOption option) {
+
+        if (option == null) {
+            throw new NullPointerException("任务配置为空");
+        }
+        getTaskWrapper().getOptionParams().setParams(option);
+        return this;
+    }
+
+    /**
+     * 如果文件路径被其它任务占用，删除其它任务
+     *
+     * @deprecated 使用 {@link #ignoreFilePathOccupy()}
+     */
+    @Deprecated
+    public HttpBuilderTarget forceUpload() {
+        getTaskWrapper().setIgnoreFilePathOccupy(true);
+        return this;
+    }
 }

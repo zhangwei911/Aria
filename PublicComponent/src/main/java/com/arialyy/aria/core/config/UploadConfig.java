@@ -19,6 +19,7 @@ import com.arialyy.aria.core.event.EventMsgUtil;
 import com.arialyy.aria.core.event.UMaxNumEvent;
 import com.arialyy.aria.core.event.USpeedEvent;
 import com.arialyy.aria.util.ALog;
+
 import java.io.Serializable;
 
 /**
@@ -26,26 +27,28 @@ import java.io.Serializable;
  */
 public class UploadConfig extends BaseTaskConfig implements Serializable {
 
-  UploadConfig() {
-  }
-
-  @Override public UploadConfig setMaxSpeed(int maxSpeed) {
-    super.setMaxSpeed(maxSpeed);
-    EventMsgUtil.getDefault().post(new USpeedEvent(maxSpeed));
-    return this;
-  }
-
-  public UploadConfig setMaxTaskNum(int maxTaskNum) {
-    if (maxTaskNum <= 0){
-      ALog.e(TAG, "上传任务最大任务数不能小于0");
-      return this;
+    UploadConfig() {
     }
-    super.setMaxTaskNum(maxTaskNum);
-    EventMsgUtil.getDefault().post(new UMaxNumEvent(maxTaskNum));
-    return this;
-  }
 
-  @Override int getType() {
-    return TYPE_UPLOAD;
-  }
+    @Override
+    public UploadConfig setMaxSpeed(int maxSpeed) {
+        super.setMaxSpeed(maxSpeed);
+        EventMsgUtil.getDefault().post(new USpeedEvent(maxSpeed));
+        return this;
+    }
+
+    public UploadConfig setMaxTaskNum(int maxTaskNum) {
+        if (maxTaskNum <= 0) {
+            ALog.e(TAG, "上传任务最大任务数不能小于0");
+            return this;
+        }
+        super.setMaxTaskNum(maxTaskNum);
+        EventMsgUtil.getDefault().post(new UMaxNumEvent(maxTaskNum));
+        return this;
+    }
+
+    @Override
+    int getType() {
+        return TYPE_UPLOAD;
+    }
 }

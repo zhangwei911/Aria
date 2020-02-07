@@ -30,21 +30,23 @@ import com.arialyy.aria.http.HttpTaskOption;
  */
 public final class HttpDGLoaderUtil extends AbsGroupLoaderUtil {
 
-  public HttpDGLoaderUtil(AbsTaskWrapper taskWrapper, IEventListener listener) {
-    super(taskWrapper, listener);
-    taskWrapper.generateTaskOption(HttpTaskOption.class);
-  }
+    public HttpDGLoaderUtil(AbsTaskWrapper taskWrapper, IEventListener listener) {
+        super(taskWrapper, listener);
+        taskWrapper.generateTaskOption(HttpTaskOption.class);
+    }
 
-  @Override protected AbsGroupLoader getLoader() {
-    return mLoader == null ? new HttpDGLoader(getTaskWrapper(),
-        (DownloadGroupListener) getListener()) : mLoader;
-  }
+    @Override
+    protected AbsGroupLoader getLoader() {
+        return mLoader == null ? new HttpDGLoader(getTaskWrapper(),
+                (DownloadGroupListener) getListener()) : mLoader;
+    }
 
-  @Override protected LoaderStructure buildLoaderStructure() {
-    LoaderStructure structure = new LoaderStructure();
-    structure.addComponent(new HttpDGInfoTask((DGTaskWrapper) getTaskWrapper(),
-        (DownloadGroupListener) getListener()));
-    structure.accept(getLoader());
-    return structure;
-  }
+    @Override
+    protected LoaderStructure buildLoaderStructure() {
+        LoaderStructure structure = new LoaderStructure();
+        structure.addComponent(new HttpDGInfoTask((DGTaskWrapper) getTaskWrapper(),
+                (DownloadGroupListener) getListener()));
+        structure.accept(getLoader());
+        return structure;
+    }
 }

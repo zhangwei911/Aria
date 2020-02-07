@@ -4,78 +4,78 @@ apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 
 android {
-  compileSdkVersion rootProject.ext.compileSdkVersion
-  buildToolsVersion rootProject.ext.buildToolsVersion
+    compileSdkVersion rootProject.ext.compileSdkVersion
+    buildToolsVersion rootProject.ext.buildToolsVersion
 
-  defaultConfig {
-    applicationId "com.arialyy.simple"
-    minSdkVersion rootProject.ext.minSdkVersion
-    targetSdkVersion rootProject.ext.targetSdkVersion
-    versionCode 1
-    versionName "1.0"
-    multiDexEnabled true
-    vectorDrawables.useSupportLibrary = true
-  }
-
-  signingConfigs {
-    release {
-      storeFile file("lyy.keystore")
-      storePassword "123456"
-      keyAlias "key0"
-      keyPassword "123456"
-      v2SigningEnabled false
+    defaultConfig {
+        applicationId "com.arialyy.simple"
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        versionCode 1
+        versionName "1.0"
+        multiDexEnabled true
+        vectorDrawables.useSupportLibrary = true
     }
-  }
 
-  buildTypes {
-    release {
-      minifyEnabled false
-      proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-      signingConfig signingConfigs.release
+    signingConfigs {
+        release {
+            storeFile file("lyy.keystore")
+            storePassword "123456"
+            keyAlias "key0"
+            keyPassword "123456"
+            v2SigningEnabled false
+        }
     }
-  }
 
-  dataBinding {
-    enabled = true
-  }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
+        }
+    }
 
-  packagingOptions {
-    exclude 'META-INF/services/javax.annotation.processing.Processor'
-  }
+    dataBinding {
+        enabled = true
+    }
 
-  lintOptions {
-    abortOnError false
-  }
+    packagingOptions {
+        exclude 'META-INF/services/javax.annotation.processing.Processor'
+    }
 
-  //  sourceSets {
-  //    main.kotlin.srcDirs += 'src/main/kotlin'
-  //    main.java.srcDirs += 'src/main/java'
-  //  }
+    lintOptions {
+        abortOnError false
+    }
+
+    //  sourceSets {
+    //    main.kotlin.srcDirs += 'src/main/kotlin'
+    //    main.java.srcDirs += 'src/main/java'
+    //  }
 }
 
 dependencies {
-  implementation fileTree(include: ['*.jar'], dir: 'libs')
-  testImplementation 'junit:junit:4.12'
-  implementation 'androidx.cardview:cardview:1.0.0'
-  implementation 'com.google.android.material:material:1.0.0'
-  implementation "org.jetbrains.kotlin:kotlin-stdlib:${rootProject.ext.kotlin_version}"
-  api 'com.github.PhilJay:MPAndroidChart:v3.0.3'
-  debugImplementation 'com.squareup.leakcanary:leakcanary-android:1.5.4'
-  implementation 'com.github.bumptech.glide:glide:3.7.0'
-  implementation 'com.pddstudio:highlightjs-android:1.5.0'
-  implementation 'org.greenrobot:eventbus:3.1.1'
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    testImplementation 'junit:junit:4.12'
+    implementation 'androidx.cardview:cardview:1.0.0'
+    implementation 'com.google.android.material:material:1.0.0'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:${rootProject.ext.kotlin_version}"
+    api 'com.github.PhilJay:MPAndroidChart:v3.0.3'
+    debugImplementation 'com.squareup.leakcanary:leakcanary-android:1.5.4'
+    implementation 'com.github.bumptech.glide:glide:3.7.0'
+    implementation 'com.pddstudio:highlightjs-android:1.5.0'
+    implementation 'org.greenrobot:eventbus:3.1.1'
 
-  // aria
-  kapt project(':AriaCompiler')
-  implementation project(':Aria')
-  implementation project(':AppFrame')
-  implementation project(':M3U8Component')
-  implementation project(':FtpComponent')
-  implementation project(path: ':AriaAnnotations')
-  implementation project(path: ':SFtpComponent')
+    // aria
+    kapt project(':AriaCompiler')
+    implementation project(':Aria')
+    implementation project(':AppFrame')
+    implementation project(':M3U8Component')
+    implementation project(':FtpComponent')
+    implementation project(path: ':AriaAnnotations')
+    implementation project(path: ':SFtpComponent')
 
-  debugImplementation 'com.amitshekhar.android:debug-db:1.0.6'
+    debugImplementation 'com.amitshekhar.android:debug-db:1.0.6'
 }
 repositories {
-  mavenCentral()
+    mavenCentral()
 }

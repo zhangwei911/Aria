@@ -16,13 +16,13 @@
 package com.arialyy.aria.exception;
 
 public class AriaException extends BaseException {
-  private static final String ARIA_NET_EXCEPTION = "Aria Exception:";
+    private static final String ARIA_NET_EXCEPTION = "Aria Exception:";
 
-  public AriaException(String tag, String message) {
-    super(tag, String.format("%s%s", ARIA_NET_EXCEPTION, message));
-  }
+    public AriaException(String tag, String message) {
+        super(tag, String.format("%s%s", ARIA_NET_EXCEPTION, message));
+    }
 
-  public AriaException(String tag, String message, Exception e) {
-    super(tag, message, e);
-  }
+    public AriaException(String tag, String message, Exception e) {
+        super(tag, message, e);
+    }
 }

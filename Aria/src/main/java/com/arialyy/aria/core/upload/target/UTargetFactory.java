@@ -24,44 +24,44 @@ import com.arialyy.aria.core.common.AbsNormalTarget;
  */
 public class UTargetFactory {
 
-  public static volatile UTargetFactory INSTANCE;
+    public static volatile UTargetFactory INSTANCE;
 
-  private UTargetFactory() {
+    private UTargetFactory() {
 
-  }
+    }
 
-  public static UTargetFactory getInstance() {
+    public static UTargetFactory getInstance() {
 
-    if (INSTANCE == null) {
-      synchronized (UTargetFactory.class) {
         if (INSTANCE == null) {
-          INSTANCE = new UTargetFactory();
+            synchronized (UTargetFactory.class) {
+                if (INSTANCE == null) {
+                    INSTANCE = new UTargetFactory();
+                }
+            }
         }
-      }
+
+        return INSTANCE;
     }
 
-    return INSTANCE;
-  }
+    public <T extends AbsNormalTarget> T generateNormalTarget(Class<T> clazz, long taskId) {
+        T target = null;
+        if (clazz == HttpNormalTarget.class) {
+            target = (T) new HttpNormalTarget(taskId);
+        } else if (clazz == FtpNormalTarget.class) {
+            target = (T) new FtpNormalTarget(taskId);
+        }
 
-  public <T extends AbsNormalTarget> T generateNormalTarget(Class<T> clazz, long taskId) {
-    T target = null;
-    if (clazz == HttpNormalTarget.class) {
-      target = (T) new HttpNormalTarget(taskId);
-    } else if (clazz == FtpNormalTarget.class) {
-      target = (T) new FtpNormalTarget(taskId);
+        return target;
     }
 
-    return target;
-  }
+    public <T extends AbsBuilderTarget> T generateBuilderTarget(Class<T> clazz, String url) {
+        T target = null;
+        if (clazz == HttpBuilderTarget.class) {
+            target = (T) new HttpBuilderTarget(url);
+        } else if (clazz == FtpBuilderTarget.class) {
+            target = (T) new FtpBuilderTarget(url);
+        }
 
-  public <T extends AbsBuilderTarget> T generateBuilderTarget(Class<T> clazz, String url) {
-    T target = null;
-    if (clazz == HttpBuilderTarget.class) {
-      target = (T) new HttpBuilderTarget(url);
-    } else if (clazz == FtpBuilderTarget.class) {
-      target = (T) new FtpBuilderTarget(url);
+        return target;
     }
-
-    return target;
-  }
 }

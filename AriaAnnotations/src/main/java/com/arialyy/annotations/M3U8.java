@@ -32,26 +32,34 @@ import java.lang.annotation.Target;
  *   </code>
  * </pre>
  */
-@Retention(RetentionPolicy.CLASS) @Target(ElementType.METHOD) public @interface M3U8 {
+@Retention(RetentionPolicy.CLASS)
+@Target(ElementType.METHOD)
+public @interface M3U8 {
 
-  /**
-   * "@M3U8.onPeerStart"注解，切片开始下载
-   */
-  @Retention(RetentionPolicy.CLASS) @Target(ElementType.METHOD) @interface onPeerStart {
-    String[] value() default { AriaConstance.NO_URL };
-  }
+    /**
+     * "@M3U8.onPeerStart"注解，切片开始下载
+     */
+    @Retention(RetentionPolicy.CLASS)
+    @Target(ElementType.METHOD)
+    @interface onPeerStart {
+        String[] value() default {AriaConstance.NO_URL};
+    }
 
-  /**
-   * "@M3U8.onPeerFail注解，切片下载失败
-   */
-  @Retention(RetentionPolicy.CLASS) @Target(ElementType.METHOD) @interface onPeerFail {
-    String[] value() default { AriaConstance.NO_URL };
-  }
+    /**
+     * "@M3U8.onPeerFail注解，切片下载失败
+     */
+    @Retention(RetentionPolicy.CLASS)
+    @Target(ElementType.METHOD)
+    @interface onPeerFail {
+        String[] value() default {AriaConstance.NO_URL};
+    }
 
-  /**
-   * "@M3U8.onPeersComplete"注解，切片下载完成
-   */
-  @Retention(RetentionPolicy.CLASS) @Target(ElementType.METHOD) @interface onPeerComplete {
-    String[] value() default { AriaConstance.NO_URL };
-  }
+    /**
+     * "@M3U8.onPeersComplete"注解，切片下载完成
+     */
+    @Retention(RetentionPolicy.CLASS)
+    @Target(ElementType.METHOD)
+    @interface onPeerComplete {
+        String[] value() default {AriaConstance.NO_URL};
+    }
 }

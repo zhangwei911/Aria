@@ -25,6 +25,8 @@ import java.lang.annotation.Target;
  * Created by lyy on 2015/11/2.
  * 非空字段
  */
-@Target(ElementType.FIELD) @Retention(RetentionPolicy.RUNTIME) public @interface NoNull {
-  boolean value() default true;
+@Target(ElementType.FIELD)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface NoNull {
+    boolean value() default true;
 }

@@ -16,7 +16,9 @@
 package com.arialyy.aria.ftp.upload;
 
 import android.os.Handler;
+
 import aria.apache.commons.net.ftp.FTPFile;
+
 import com.arialyy.aria.core.common.AbsEntity;
 import com.arialyy.aria.core.common.CompleteInfo;
 import com.arialyy.aria.core.listener.IEventListener;
@@ -29,63 +31,67 @@ import com.arialyy.aria.core.upload.UTaskWrapper;
 import com.arialyy.aria.exception.BaseException;
 
 final class FtpULoader extends NormalLoader<UTaskWrapper> {
-  private FTPFile ftpFile;
+    private FTPFile ftpFile;
 
-  FtpULoader(UTaskWrapper wrapper, IEventListener listener) {
-    super(wrapper, listener);
-  }
-
-  @Override
-  protected void startThreadTask() {
-    // 检查记录
-    ((FtpURecordHandler) mRecordHandler).setFtpFile(ftpFile);
-    if (mRecordHandler.checkTaskCompleted()) {
-      mRecord.deleteData();
-      isComplete = true;
-      getListener().onComplete();
-      return;
-    }
-    mRecord = mRecordHandler.getRecord(getFileSize());
-
-    // 初始化线程状态管理器
-    mStateManager.setLooper(mRecord, getLooper());
-    getTaskList().addAll(mTTBuilder.buildThreadTask(mRecord,
-        new Handler(getLooper(), mStateManager.getHandlerCallback())));
-    mStateManager.updateCurrentProgress(getEntity().getCurrentProgress());
-
-    if (mStateManager.getCurrentProgress() > 0) {
-      getListener().onResume(mStateManager.getCurrentProgress());
-    } else {
-      getListener().onStart(mStateManager.getCurrentProgress());
+    FtpULoader(UTaskWrapper wrapper, IEventListener listener) {
+        super(wrapper, listener);
     }
 
-    startTimer();
-
-    // 启动线程任务
-    for (IThreadTask threadTask : getTaskList()) {
-      ThreadTaskManager.getInstance().startThread(mTaskWrapper.getKey(), threadTask);
-    }
-  }
-
-  @Override public void addComponent(IInfoTask infoTask) {
-    mInfoTask = infoTask;
-    infoTask.setCallback(new IInfoTask.Callback() {
-      @Override public void onSucceed(String key, CompleteInfo info) {
-        if (info.code == FtpUFileInfoTask.CODE_COMPLETE) {
-          getListener().onComplete();
-        } else {
-          ftpFile = (FTPFile) info.obj;
-          startThreadTask();
+    @Override
+    protected void startThreadTask() {
+        // 检查记录
+        ((FtpURecordHandler) mRecordHandler).setFtpFile(ftpFile);
+        if (mRecordHandler.checkTaskCompleted()) {
+            mRecord.deleteData();
+            isComplete = true;
+            getListener().onComplete();
+            return;
         }
-      }
+        mRecord = mRecordHandler.getRecord(getFileSize());
 
-      @Override public void onFail(AbsEntity entity, BaseException e, boolean needRetry) {
-        getListener().onFail(needRetry, e);
-      }
-    });
-  }
+        // 初始化线程状态管理器
+        mStateManager.setLooper(mRecord, getLooper());
+        getTaskList().addAll(mTTBuilder.buildThreadTask(mRecord,
+                new Handler(getLooper(), mStateManager.getHandlerCallback())));
+        mStateManager.updateCurrentProgress(getEntity().getCurrentProgress());
 
-  @Override public void addComponent(IRecordHandler recordHandler) {
-    mRecordHandler = recordHandler;
-  }
+        if (mStateManager.getCurrentProgress() > 0) {
+            getListener().onResume(mStateManager.getCurrentProgress());
+        } else {
+            getListener().onStart(mStateManager.getCurrentProgress());
+        }
+
+        startTimer();
+
+        // 启动线程任务
+        for (IThreadTask threadTask : getTaskList()) {
+            ThreadTaskManager.getInstance().startThread(mTaskWrapper.getKey(), threadTask);
+        }
+    }
+
+    @Override
+    public void addComponent(IInfoTask infoTask) {
+        mInfoTask = infoTask;
+        infoTask.setCallback(new IInfoTask.Callback() {
+            @Override
+            public void onSucceed(String key, CompleteInfo info) {
+                if (info.code == FtpUFileInfoTask.CODE_COMPLETE) {
+                    getListener().onComplete();
+                } else {
+                    ftpFile = (FTPFile) info.obj;
+                    startThreadTask();
+                }
+            }
+
+            @Override
+            public void onFail(AbsEntity entity, BaseException e, boolean needRetry) {
+                getListener().onFail(needRetry, e);
+            }
+        });
+    }
+
+    @Override
+    public void addComponent(IRecordHandler recordHandler) {
+        mRecordHandler = recordHandler;
+    }
 }

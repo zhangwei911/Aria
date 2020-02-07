@@ -16,6 +16,7 @@
 package com.arialyy.compiler;
 
 import com.arialyy.annotations.TaskEnum;
+
 import java.lang.annotation.Annotation;
 import java.util.HashMap;
 import java.util.Map;
@@ -26,28 +27,28 @@ import java.util.Set;
  * 代理类参数
  */
 class ProxyClassParam {
-  /**
-   * 代理文件名
-   */
-  String proxyClassName;
-  /**
-   * 被代理的类所在的包
-   */
-  String packageName;
-  /**
-   * 被代理的类
-   */
-  String className;
-  /**
-   * 主任务泛型参数
-   */
-  TaskEnum mainTaskEnum;
-  /**
-   * 子任务泛型参数
-   */
-  EntityInfo subTaskEnum = EntityInfo.NORMAL;
+    /**
+     * 代理文件名
+     */
+    String proxyClassName;
+    /**
+     * 被代理的类所在的包
+     */
+    String packageName;
+    /**
+     * 被代理的类
+     */
+    String className;
+    /**
+     * 主任务泛型参数
+     */
+    TaskEnum mainTaskEnum;
+    /**
+     * 子任务泛型参数
+     */
+    EntityInfo subTaskEnum = EntityInfo.NORMAL;
 
-  Set<TaskEnum> taskEnums;
-  Map<String, Set<String>> keyMappings = new HashMap<>();
-  Map<TaskEnum, Map<Class<? extends Annotation>, MethodInfo>> methods = new HashMap<>();
+    Set<TaskEnum> taskEnums;
+    Map<String, Set<String>> keyMappings = new HashMap<>();
+    Map<TaskEnum, Map<Class<? extends Annotation>, MethodInfo>> methods = new HashMap<>();
 }

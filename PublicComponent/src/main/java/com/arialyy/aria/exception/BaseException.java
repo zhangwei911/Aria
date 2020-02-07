@@ -17,19 +17,19 @@ package com.arialyy.aria.exception;
 
 public abstract class BaseException extends Exception {
 
-  private String tag;
+    private String tag;
 
-  public BaseException(String tag, String message) {
-    super(message);
-    this.tag = tag;
-  }
+    public BaseException(String tag, String message) {
+        super(message);
+        this.tag = tag;
+    }
 
-  public BaseException(String tag, String message, Exception e) {
-    super(String.format("%s\n%s", message == null ? "" : message, e == null ? "" : e.getMessage()));
-    this.tag = tag;
-  }
+    public BaseException(String tag, String message, Exception e) {
+        super(String.format("%s\n%s", message == null ? "" : message, e == null ? "" : e.getMessage()));
+        this.tag = tag;
+    }
 
-  public String getTag() {
-    return tag;
-  }
+    public String getTag() {
+        return tag;
+    }
 }

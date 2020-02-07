@@ -16,6 +16,7 @@
 package com.arialyy.aria.core.processor;
 
 import com.arialyy.aria.core.inf.IEventHandler;
+
 import java.util.List;
 
 /**
@@ -24,12 +25,12 @@ import java.util.List;
  */
 public interface IVodTsUrlConverter extends IEventHandler {
 
-  /**
-   * 处理#EXTINF信息，对于某些服务器，返回的切片信息有可能是相对地址，因此，你需要自行转换为可下载http连接
-   *
-   * @param m3u8Url m3u8文件下载地址
-   * @param tsUrls ts文件下载地址列表
-   * @return 根据切片信息转换后的http连接列表，如果你的切片信息是可以直接下载的http连接，直接返回extInf便可
-   */
-  List<String> convert(String m3u8Url, List<String> tsUrls);
+    /**
+     * 处理#EXTINF信息，对于某些服务器，返回的切片信息有可能是相对地址，因此，你需要自行转换为可下载http连接
+     *
+     * @param m3u8Url m3u8文件下载地址
+     * @param tsUrls  ts文件下载地址列表
+     * @return 根据切片信息转换后的http连接列表，如果你的切片信息是可以直接下载的http连接，直接返回extInf便可
+     */
+    List<String> convert(String m3u8Url, List<String> tsUrls);
 }

@@ -32,26 +32,27 @@ import com.arialyy.aria.util.NetUtils;
  * 4、用户手动暂停或任务完成后，第二次重新执行该任务，该命令将失效
  * 5、如果下载队列中已经满了，则会停止队尾的任务，当高优先级任务完成后，该队尾任务将自动执行
  * 6、把任务设置为最高优先级任务后，将自动执行任务，不需要重新调用start()启动任务
- *
+ * <p>
  * 目前只只支持单下载任务的最高优先级任务
  */
 final class HighestPriorityCmd<T extends AbsTaskWrapper> extends AbsNormalCmd<T> {
-  HighestPriorityCmd(T entity, int taskType) {
-    super(entity, taskType);
-  }
+    HighestPriorityCmd(T entity, int taskType) {
+        super(entity, taskType);
+    }
 
-  @Override public void executeCmd() {
-    if (!canExeCmd) return;
-    if (!NetUtils.isConnected(AriaConfig.getInstance().getAPP())){
-      ALog.e(TAG, "启动任务失败，网络未连接");
-      return;
+    @Override
+    public void executeCmd() {
+        if (!canExeCmd) return;
+        if (!NetUtils.isConnected(AriaConfig.getInstance().getAPP())) {
+            ALog.e(TAG, "启动任务失败，网络未连接");
+            return;
+        }
+        DownloadTask task = (DownloadTask) getTask();
+        if (task == null) {
+            task = (DownloadTask) createTask();
+        }
+        if (task != null) {
+            ((DTaskQueue) mQueue).setTaskHighestPriority(task);
+        }
     }
-    DownloadTask task = (DownloadTask) getTask();
-    if (task == null) {
-      task = (DownloadTask) createTask();
-    }
-    if (task != null) {
-      ((DTaskQueue) mQueue).setTaskHighestPriority(task);
-    }
-  }
 }

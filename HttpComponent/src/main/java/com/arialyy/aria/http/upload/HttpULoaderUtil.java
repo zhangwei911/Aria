@@ -35,30 +35,34 @@ import com.arialyy.aria.http.HttpTaskOption;
  * @Date 2019-09-19
  */
 public final class HttpULoaderUtil extends AbsNormalLoaderUtil {
-  public HttpULoaderUtil(AbsTaskWrapper wrapper, IEventListener listener) {
-    super(wrapper, listener);
-    wrapper.generateTaskOption(HttpTaskOption.class);
-  }
+    public HttpULoaderUtil(AbsTaskWrapper wrapper, IEventListener listener) {
+        super(wrapper, listener);
+        wrapper.generateTaskOption(HttpTaskOption.class);
+    }
 
-  @Override public AbsNormalLoader getLoader() {
-    return mLoader == null ? new HttpULoader((UTaskWrapper) getTaskWrapper(), getListener())
-        : mLoader;
-  }
+    @Override
+    public AbsNormalLoader getLoader() {
+        return mLoader == null ? new HttpULoader((UTaskWrapper) getTaskWrapper(), getListener())
+                : mLoader;
+    }
 
-  @Override public LoaderStructure BuildLoaderStructure() {
-    LoaderStructure structure = new LoaderStructure();
-    structure.addComponent(new HttpRecordHandler(getTaskWrapper()))
-        .addComponent(new NormalThreadStateManager(getListener()))
-        .addComponent(new NormalTTBuilder(getTaskWrapper(), new AbsNormalTTBuilderAdapter() {
-          @Override public IThreadTaskAdapter getAdapter(SubThreadConfig config) {
-            return new HttpUThreadTaskAdapter(config);
-          }
+    @Override
+    public LoaderStructure BuildLoaderStructure() {
+        LoaderStructure structure = new LoaderStructure();
+        structure.addComponent(new HttpRecordHandler(getTaskWrapper()))
+                .addComponent(new NormalThreadStateManager(getListener()))
+                .addComponent(new NormalTTBuilder(getTaskWrapper(), new AbsNormalTTBuilderAdapter() {
+                    @Override
+                    public IThreadTaskAdapter getAdapter(SubThreadConfig config) {
+                        return new HttpUThreadTaskAdapter(config);
+                    }
 
-          @Override public boolean handleNewTask(TaskRecord record, int totalThreadNum) {
-            return true;
-          }
-        }));
-    structure.accept(getLoader());
-    return structure;
-  }
+                    @Override
+                    public boolean handleNewTask(TaskRecord record, int totalThreadNum) {
+                        return true;
+                    }
+                }));
+        structure.accept(getLoader());
+        return structure;
+    }
 }

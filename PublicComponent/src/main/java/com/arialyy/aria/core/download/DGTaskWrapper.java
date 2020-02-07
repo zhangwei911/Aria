@@ -17,6 +17,7 @@ package com.arialyy.aria.core.download;
 
 import com.arialyy.aria.core.config.Configuration;
 import com.arialyy.aria.core.config.DGroupConfig;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,65 +26,68 @@ import java.util.List;
  */
 public class DGTaskWrapper extends AbsGroupTaskWrapper<DownloadGroupEntity, DTaskWrapper> {
 
-  private List<DTaskWrapper> subWrappers;
+    private List<DTaskWrapper> subWrappers;
 
-  private boolean unknownSize = false;
+    private boolean unknownSize = false;
 
-  /**
-   * 保存临时设置的文件夹路径
-   */
-  private String dirPathTemp;
+    /**
+     * 保存临时设置的文件夹路径
+     */
+    private String dirPathTemp;
 
-  /**
-   * 子任务文件名
-   */
-  private List<String> subNameTemp = new ArrayList<>();
+    /**
+     * 子任务文件名
+     */
+    private List<String> subNameTemp = new ArrayList<>();
 
-  public DGTaskWrapper(DownloadGroupEntity entity) {
-    super(entity);
-  }
-
-  public List<String> getSubNameTemp() {
-    return subNameTemp;
-  }
-
-  public void setSubNameTemp(List<String> subNameTemp) {
-    this.subNameTemp = subNameTemp;
-  }
-
-  public String getDirPathTemp() {
-    return dirPathTemp;
-  }
-
-  public void setDirPathTemp(String mDirPathTemp) {
-    this.dirPathTemp = mDirPathTemp;
-  }
-
-  @Override
-  public void setSubTaskWrapper(List<DTaskWrapper> subTaskEntities) {
-    this.subWrappers = subTaskEntities;
-  }
-
-  public boolean isUnknownSize() {
-    return unknownSize;
-  }
-
-  public void setUnknownSize(boolean unknownSize) {
-    this.unknownSize = unknownSize;
-  }
-
-  @Override public String getKey() {
-    return getEntity().getKey();
-  }
-
-  @Override public DGroupConfig getConfig() {
-    return Configuration.getInstance().dGroupCfg;
-  }
-
-  @Override public List<DTaskWrapper> getSubTaskWrapper() {
-    if (subWrappers == null) {
-      subWrappers = new ArrayList<>();
+    public DGTaskWrapper(DownloadGroupEntity entity) {
+        super(entity);
     }
-    return subWrappers;
-  }
+
+    public List<String> getSubNameTemp() {
+        return subNameTemp;
+    }
+
+    public void setSubNameTemp(List<String> subNameTemp) {
+        this.subNameTemp = subNameTemp;
+    }
+
+    public String getDirPathTemp() {
+        return dirPathTemp;
+    }
+
+    public void setDirPathTemp(String mDirPathTemp) {
+        this.dirPathTemp = mDirPathTemp;
+    }
+
+    @Override
+    public void setSubTaskWrapper(List<DTaskWrapper> subTaskEntities) {
+        this.subWrappers = subTaskEntities;
+    }
+
+    public boolean isUnknownSize() {
+        return unknownSize;
+    }
+
+    public void setUnknownSize(boolean unknownSize) {
+        this.unknownSize = unknownSize;
+    }
+
+    @Override
+    public String getKey() {
+        return getEntity().getKey();
+    }
+
+    @Override
+    public DGroupConfig getConfig() {
+        return Configuration.getInstance().dGroupCfg;
+    }
+
+    @Override
+    public List<DTaskWrapper> getSubTaskWrapper() {
+        if (subWrappers == null) {
+            subWrappers = new ArrayList<>();
+        }
+        return subWrappers;
+    }
 }

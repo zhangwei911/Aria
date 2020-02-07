@@ -35,31 +35,35 @@ import com.arialyy.aria.ftp.FtpTaskOption;
  */
 public final class FtpULoaderUtil extends AbsNormalLoaderUtil {
 
-  public FtpULoaderUtil(AbsTaskWrapper wrapper, IEventListener listener) {
-    super(wrapper, listener);
-    wrapper.generateTaskOption(FtpTaskOption.class);
-  }
+    public FtpULoaderUtil(AbsTaskWrapper wrapper, IEventListener listener) {
+        super(wrapper, listener);
+        wrapper.generateTaskOption(FtpTaskOption.class);
+    }
 
-  @Override public AbsNormalLoader getLoader() {
-    return mLoader == null ? new FtpULoader((UTaskWrapper) getTaskWrapper(), getListener())
-        : mLoader;
-  }
+    @Override
+    public AbsNormalLoader getLoader() {
+        return mLoader == null ? new FtpULoader((UTaskWrapper) getTaskWrapper(), getListener())
+                : mLoader;
+    }
 
-  @Override public LoaderStructure BuildLoaderStructure() {
-    LoaderStructure structure = new LoaderStructure();
-    structure.addComponent(new FtpURecordHandler((UTaskWrapper) getTaskWrapper()))
-        .addComponent(new NormalThreadStateManager(getListener()))
-        .addComponent(new FtpUFileInfoTask((UTaskWrapper) getTaskWrapper()))
-        .addComponent(new NormalTTBuilder(getTaskWrapper(), new AbsNormalTTBuilderAdapter() {
-          @Override public IThreadTaskAdapter getAdapter(SubThreadConfig config) {
-            return new FtpUThreadTaskAdapter(config);
-          }
+    @Override
+    public LoaderStructure BuildLoaderStructure() {
+        LoaderStructure structure = new LoaderStructure();
+        structure.addComponent(new FtpURecordHandler((UTaskWrapper) getTaskWrapper()))
+                .addComponent(new NormalThreadStateManager(getListener()))
+                .addComponent(new FtpUFileInfoTask((UTaskWrapper) getTaskWrapper()))
+                .addComponent(new NormalTTBuilder(getTaskWrapper(), new AbsNormalTTBuilderAdapter() {
+                    @Override
+                    public IThreadTaskAdapter getAdapter(SubThreadConfig config) {
+                        return new FtpUThreadTaskAdapter(config);
+                    }
 
-          @Override public boolean handleNewTask(TaskRecord record, int totalThreadNum) {
-            return true;
-          }
-        }));
-    structure.accept(getLoader());
-    return structure;
-  }
+                    @Override
+                    public boolean handleNewTask(TaskRecord record, int totalThreadNum) {
+                        return true;
+                    }
+                }));
+        structure.accept(getLoader());
+        return structure;
+    }
 }

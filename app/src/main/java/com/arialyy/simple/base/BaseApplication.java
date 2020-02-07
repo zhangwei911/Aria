@@ -18,6 +18,7 @@ package com.arialyy.simple.base;
 
 import android.app.Application;
 import android.os.StrictMode;
+
 import com.arialyy.aria.core.Aria;
 import com.arialyy.frame.core.AbsFrame;
 import com.arialyy.simple.BuildConfig;
@@ -28,37 +29,38 @@ import com.arialyy.simple.BuildConfig;
  */
 public class BaseApplication extends Application {
 
-  private static BaseApplication INSTANCE;
+    private static BaseApplication INSTANCE;
 
-  @Override public void onCreate() {
-    super.onCreate();
-    INSTANCE = this;
-    AbsFrame.init(this);
-    //Aria.init(this);
-    if (BuildConfig.DEBUG) {
-      //StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
-      //    .detectAll()
-      //    .penaltyLog()
-      //    .build());
-      //StrictMode.setThreadPolicy(
-      //    new StrictMode.ThreadPolicy.Builder().detectAll().penaltyLog().build());
-      //if (LeakCanary.isInAnalyzerProcess(this)) {//1
-      //  //This process is dedicated to LeakCanary for heap analysis.
-      //  //You should not init your app in this process.
-      //  return;
-      //}
-      //LeakCanary.install(this);
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        INSTANCE = this;
+        AbsFrame.init(this);
+        //Aria.init(this);
+        if (BuildConfig.DEBUG) {
+            //StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
+            //    .detectAll()
+            //    .penaltyLog()
+            //    .build());
+            //StrictMode.setThreadPolicy(
+            //    new StrictMode.ThreadPolicy.Builder().detectAll().penaltyLog().build());
+            //if (LeakCanary.isInAnalyzerProcess(this)) {//1
+            //  //This process is dedicated to LeakCanary for heap analysis.
+            //  //You should not init your app in this process.
+            //  return;
+            //}
+            //LeakCanary.install(this);
+        }
+
+        //registerReceiver(new ConnectionChangeReceiver(), new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
     }
 
-    //registerReceiver(new ConnectionChangeReceiver(), new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
-  }
+    public static BaseApplication getApp() {
+        return INSTANCE;
+    }
 
-  public static BaseApplication getApp() {
-    return INSTANCE;
-  }
-
-  @Override
-  public void onTerminate() {
-    super.onTerminate();
-  }
+    @Override
+    public void onTerminate() {
+        super.onTerminate();
+    }
 }

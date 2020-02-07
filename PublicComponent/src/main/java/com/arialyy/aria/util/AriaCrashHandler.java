@@ -25,50 +25,50 @@ import java.util.concurrent.Executors;
  * 程序异常日志捕获器
  */
 public class AriaCrashHandler implements Thread.UncaughtExceptionHandler {
-  private Thread.UncaughtExceptionHandler mDefaultHandler;
-  private ExecutorService mExecutorService;
+    private Thread.UncaughtExceptionHandler mDefaultHandler;
+    private ExecutorService mExecutorService;
 
-  public AriaCrashHandler() {
-    mDefaultHandler = Thread.getDefaultUncaughtExceptionHandler();
-    mExecutorService = Executors.newSingleThreadExecutor();
-  }
-
-  @Override
-  public void uncaughtException(Thread thread, Throwable ex) {
-    ex.printStackTrace();
-    //ALog.d(thread.getName(), ex.getLocalizedMessage());
-    handleException(thread.getName(), ex);
-    try {
-      Thread.sleep(1000);
-    } catch (InterruptedException e) {
-      e.printStackTrace();
-    } finally {
-      mDefaultHandler.uncaughtException(thread, ex);
-      exit();
-    }
-  }
-
-  /**
-   * 处理异常
-   */
-  private void handleException(final String name, final Throwable ex) {
-    if (ex == null) {
-      return;
+    public AriaCrashHandler() {
+        mDefaultHandler = Thread.getDefaultUncaughtExceptionHandler();
+        mExecutorService = Executors.newSingleThreadExecutor();
     }
 
-    mExecutorService.execute(new Runnable() {
-      @Override
-      public void run() {
-        ErrorHelp.saveError(name, "", ALog.getExceptionString(ex));
-      }
-    });
-  }
+    @Override
+    public void uncaughtException(Thread thread, Throwable ex) {
+        ex.printStackTrace();
+        //ALog.d(thread.getName(), ex.getLocalizedMessage());
+        handleException(thread.getName(), ex);
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } finally {
+            mDefaultHandler.uncaughtException(thread, ex);
+            exit();
+        }
+    }
 
-  /**
-   * 退出当前应用
-   */
-  private void exit() {
-    android.os.Process.killProcess(android.os.Process.myPid());
-    System.exit(1);
-  }
+    /**
+     * 处理异常
+     */
+    private void handleException(final String name, final Throwable ex) {
+        if (ex == null) {
+            return;
+        }
+
+        mExecutorService.execute(new Runnable() {
+            @Override
+            public void run() {
+                ErrorHelp.saveError(name, "", ALog.getExceptionString(ex));
+            }
+        });
+    }
+
+    /**
+     * 退出当前应用
+     */
+    private void exit() {
+        android.os.Process.killProcess(android.os.Process.myPid());
+        System.exit(1);
+    }
 }

@@ -26,22 +26,22 @@ import com.arialyy.aria.core.common.SubThreadConfig;
  */
 public interface ILoaderAdapter {
 
-  /**
-   * 处理新任务
-   *
-   * @param record 任务记录
-   * @param totalThreadNum 任务的线程总数
-   * @return {@code true}创建新任务成功
-   */
-  boolean handleNewTask(TaskRecord record, int totalThreadNum);
+    /**
+     * 处理新任务
+     *
+     * @param record         任务记录
+     * @param totalThreadNum 任务的线程总数
+     * @return {@code true}创建新任务成功
+     */
+    boolean handleNewTask(TaskRecord record, int totalThreadNum);
 
-  /**
-   * 创建线程任务
-   */
-  IThreadTask createThreadTask(SubThreadConfig config);
+    /**
+     * 创建线程任务
+     */
+    IThreadTask createThreadTask(SubThreadConfig config);
 
-  /**
-   * 处理任务记录
-   */
-  IRecordHandler recordHandler(AbsTaskWrapper wrapper);
+    /**
+     * 处理任务记录
+     */
+    IRecordHandler recordHandler(AbsTaskWrapper wrapper);
 }

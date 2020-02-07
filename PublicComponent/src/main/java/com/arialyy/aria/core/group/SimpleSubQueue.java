@@ -18,6 +18,7 @@ package com.arialyy.aria.core.group;
 import com.arialyy.aria.core.config.Configuration;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -30,165 +31,175 @@ import java.util.Set;
  * 组合任务队列，该队列生命周期和{@link AbsGroupLoaderUtil}生命周期一致
  */
 final class SimpleSubQueue implements ISubQueue<AbsSubDLoadUtil> {
-  private final String TAG = CommonUtil.getClassName(getClass());
-  /**
-   * 缓存下载器
-   */
-  private Map<String, AbsSubDLoadUtil> mCache = new LinkedHashMap<>();
-  /**
-   * 执行中的下载器
-   */
-  private Map<String, AbsSubDLoadUtil> mExec = new LinkedHashMap<>();
+    private final String TAG = CommonUtil.getClassName(getClass());
+    /**
+     * 缓存下载器
+     */
+    private Map<String, AbsSubDLoadUtil> mCache = new LinkedHashMap<>();
+    /**
+     * 执行中的下载器
+     */
+    private Map<String, AbsSubDLoadUtil> mExec = new LinkedHashMap<>();
 
-  /**
-   * 最大执行任务数
-   */
-  private int mExecSize;
+    /**
+     * 最大执行任务数
+     */
+    private int mExecSize;
 
-  /**
-   * 是否停止任务任务
-   */
-  private boolean isStopAll = false;
+    /**
+     * 是否停止任务任务
+     */
+    private boolean isStopAll = false;
 
-  private SimpleSubQueue() {
-    mExecSize = Configuration.getInstance().dGroupCfg.getSubMaxTaskNum();
-  }
-
-  static SimpleSubQueue newInstance() {
-    return new SimpleSubQueue();
-  }
-
-  synchronized AbsSubDLoadUtil getLoaderUtil(String key) {
-    AbsSubDLoadUtil sub = mExec.get(key);
-    if (sub != null) {
-      return sub;
+    private SimpleSubQueue() {
+        mExecSize = Configuration.getInstance().dGroupCfg.getSubMaxTaskNum();
     }
-    return mCache.get(key);
-  }
 
-  /**
-   * 获取缓存队列大小
-   */
-  int getCacheSize() {
-    return mCache.size();
-  }
-
-  boolean isStopAll() {
-    return isStopAll;
-  }
-
-  @Override public void addTask(AbsSubDLoadUtil fileer) {
-    mCache.put(fileer.getKey(), fileer);
-  }
-
-  @Override public void startTask(AbsSubDLoadUtil fileer) {
-    if (mExec.size() < mExecSize) {
-      mCache.remove(fileer.getKey());
-      mExec.put(fileer.getKey(), fileer);
-      ALog.d(TAG, String.format("开始执行子任务：%s", fileer.getEntity().getFileName()));
-      fileer.run();
-    } else {
-      ALog.d(TAG, String.format("执行队列已满，任务进入缓存器中，key: %s", fileer.getKey()));
-      addTask(fileer);
+    static SimpleSubQueue newInstance() {
+        return new SimpleSubQueue();
     }
-  }
 
-  @Override public void stopTask(AbsSubDLoadUtil fileer) {
-    fileer.stop();
-    mExec.remove(fileer.getKey());
-  }
-
-  @Override public void stopAllTask() {
-    isStopAll = true;
-    ALog.d(TAG, "停止组合任务");
-    Set<String> keys = mExec.keySet();
-    for (String key : keys) {
-      AbsSubDLoadUtil loader = mExec.get(key);
-      if (loader != null) {
-        ALog.d(TAG, String.format("停止子任务：%s", loader.getEntity().getFileName()));
-        loader.stop();
-      }
+    synchronized AbsSubDLoadUtil getLoaderUtil(String key) {
+        AbsSubDLoadUtil sub = mExec.get(key);
+        if (sub != null) {
+            return sub;
+        }
+        return mCache.get(key);
     }
-  }
 
-  @Override public void modifyMaxExecNum(int num) {
-    if (num < 1) {
-      ALog.e(TAG, String.format("修改组合任务子任务队列数失败，num: %s", num));
-      return;
+    /**
+     * 获取缓存队列大小
+     */
+    int getCacheSize() {
+        return mCache.size();
     }
-    if (num == mExecSize) {
-      ALog.i(TAG, String.format("忽略此次修改，oldSize: %s, num: %s", mExecSize, num));
-      return;
-    }
-    int oldSize = mExecSize;
-    mExecSize = num;
-    int diff = Math.abs(oldSize - num);
 
-    if (oldSize < num) { // 处理队列变小的情况，该情况下将停止队尾任务，并将这些任务添加到缓存队列中
-      if (mExec.size() > num) {
+    boolean isStopAll() {
+        return isStopAll;
+    }
+
+    @Override
+    public void addTask(AbsSubDLoadUtil fileer) {
+        mCache.put(fileer.getKey(), fileer);
+    }
+
+    @Override
+    public void startTask(AbsSubDLoadUtil fileer) {
+        if (mExec.size() < mExecSize) {
+            mCache.remove(fileer.getKey());
+            mExec.put(fileer.getKey(), fileer);
+            ALog.d(TAG, String.format("开始执行子任务：%s", fileer.getEntity().getFileName()));
+            fileer.run();
+        } else {
+            ALog.d(TAG, String.format("执行队列已满，任务进入缓存器中，key: %s", fileer.getKey()));
+            addTask(fileer);
+        }
+    }
+
+    @Override
+    public void stopTask(AbsSubDLoadUtil fileer) {
+        fileer.stop();
+        mExec.remove(fileer.getKey());
+    }
+
+    @Override
+    public void stopAllTask() {
+        isStopAll = true;
+        ALog.d(TAG, "停止组合任务");
         Set<String> keys = mExec.keySet();
-        List<AbsSubDLoadUtil> caches = new ArrayList<>();
-        int i = 0;
         for (String key : keys) {
-          if (i > num) {
-            caches.add(mExec.get(key));
-          }
-          i++;
+            AbsSubDLoadUtil loader = mExec.get(key);
+            if (loader != null) {
+                ALog.d(TAG, String.format("停止子任务：%s", loader.getEntity().getFileName()));
+                loader.stop();
+            }
         }
-        Collection<AbsSubDLoadUtil> temp = mCache.values();
+    }
+
+    @Override
+    public void modifyMaxExecNum(int num) {
+        if (num < 1) {
+            ALog.e(TAG, String.format("修改组合任务子任务队列数失败，num: %s", num));
+            return;
+        }
+        if (num == mExecSize) {
+            ALog.i(TAG, String.format("忽略此次修改，oldSize: %s, num: %s", mExecSize, num));
+            return;
+        }
+        int oldSize = mExecSize;
+        mExecSize = num;
+        int diff = Math.abs(oldSize - num);
+
+        if (oldSize < num) { // 处理队列变小的情况，该情况下将停止队尾任务，并将这些任务添加到缓存队列中
+            if (mExec.size() > num) {
+                Set<String> keys = mExec.keySet();
+                List<AbsSubDLoadUtil> caches = new ArrayList<>();
+                int i = 0;
+                for (String key : keys) {
+                    if (i > num) {
+                        caches.add(mExec.get(key));
+                    }
+                    i++;
+                }
+                Collection<AbsSubDLoadUtil> temp = mCache.values();
+                mCache.clear();
+                for (AbsSubDLoadUtil cache : caches) {
+                    addTask(cache);
+                }
+                for (AbsSubDLoadUtil t : temp) {
+                    addTask(t);
+                }
+            }
+        } else { // 处理队列变大的情况，该情况下将增加任务
+            if (mExec.size() < num) {
+                for (int i = 0; i < diff; i++) {
+                    AbsSubDLoadUtil next = getNextTask();
+                    if (next != null) {
+                        startTask(next);
+                    } else {
+                        ALog.d(TAG, "子任务中没有缓存任务");
+                    }
+                }
+            }
+        }
+    }
+
+    @Override
+    public void removeTaskFromExecQ(AbsSubDLoadUtil fileer) {
+        mExec.remove(fileer.getKey());
+    }
+
+    @Override
+    public void removeTask(AbsSubDLoadUtil fileer) {
+        removeTaskFromExecQ(fileer);
+        mCache.remove(fileer.getKey());
+    }
+
+    @Override
+    public void removeAllTask() {
+        ALog.d(TAG, "删除组合任务");
+        Set<String> keys = mExec.keySet();
+        for (String key : keys) {
+            AbsSubDLoadUtil loader = mExec.get(key);
+            if (loader != null) {
+                ALog.d(TAG, String.format("停止子任务：%s", loader.getEntity().getFileName()));
+                loader.cancel();
+            }
+        }
+    }
+
+    @Override
+    public AbsSubDLoadUtil getNextTask() {
+        Iterator<String> keys = mCache.keySet().iterator();
+        if (keys.hasNext()) {
+            return mCache.get(keys.next());
+        }
+        return null;
+    }
+
+    @Override
+    public void clear() {
         mCache.clear();
-        for (AbsSubDLoadUtil cache : caches) {
-          addTask(cache);
-        }
-        for (AbsSubDLoadUtil t : temp) {
-          addTask(t);
-        }
-      }
-    } else { // 处理队列变大的情况，该情况下将增加任务
-      if (mExec.size() < num) {
-        for (int i = 0; i < diff; i++) {
-          AbsSubDLoadUtil next = getNextTask();
-          if (next != null) {
-            startTask(next);
-          } else {
-            ALog.d(TAG, "子任务中没有缓存任务");
-          }
-        }
-      }
+        mExec.clear();
     }
-  }
-
-  @Override public void removeTaskFromExecQ(AbsSubDLoadUtil fileer) {
-    mExec.remove(fileer.getKey());
-  }
-
-  @Override public void removeTask(AbsSubDLoadUtil fileer) {
-    removeTaskFromExecQ(fileer);
-    mCache.remove(fileer.getKey());
-  }
-
-  @Override public void removeAllTask() {
-    ALog.d(TAG, "删除组合任务");
-    Set<String> keys = mExec.keySet();
-    for (String key : keys) {
-      AbsSubDLoadUtil loader = mExec.get(key);
-      if (loader != null) {
-        ALog.d(TAG, String.format("停止子任务：%s", loader.getEntity().getFileName()));
-        loader.cancel();
-      }
-    }
-  }
-
-  @Override public AbsSubDLoadUtil getNextTask() {
-    Iterator<String> keys = mCache.keySet().iterator();
-    if (keys.hasNext()) {
-      return mCache.get(keys.next());
-    }
-    return null;
-  }
-
-  @Override public void clear() {
-    mCache.clear();
-    mExec.clear();
-  }
 }

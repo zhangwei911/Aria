@@ -24,37 +24,37 @@ import com.arialyy.aria.util.CheckUtil;
  */
 public class M3U8LiveOption extends M3U8Option<M3U8LiveOption> {
 
-  private ILiveTsUrlConverter liveTsUrlConverter;
-  private long liveUpdateInterval;
+    private ILiveTsUrlConverter liveTsUrlConverter;
+    private long liveUpdateInterval;
 
-  public M3U8LiveOption() {
-    super();
-  }
-
-  /**
-   * M3U8 ts 文件url转换器，对于某些服务器，返回的ts地址可以是相对地址，也可能是处理过的
-   * 对于这种情况，你需要使用url转换器将地址转换为可正常访问的http地址
-   *
-   * @param liveTsUrlConverter {@link ILiveTsUrlConverter}
-   */
-  public M3U8LiveOption setLiveTsUrlConvert(ILiveTsUrlConverter liveTsUrlConverter) {
-    CheckUtil.checkMemberClass(liveTsUrlConverter.getClass());
-    this.liveTsUrlConverter = liveTsUrlConverter;
-    return this;
-  }
-
-  /**
-   * 设置直播的m3u8文件更新间隔，默认10000微秒。
-   *
-   * @param liveUpdateInterval 更新间隔，单位微秒
-   */
-  public M3U8LiveOption setM3U8FileUpdateInterval(long liveUpdateInterval) {
-    if (liveUpdateInterval <= 1) {
-      ALog.e(TAG, "间隔时间错误");
-      return this;
+    public M3U8LiveOption() {
+        super();
     }
 
-    this.liveUpdateInterval = liveUpdateInterval;
-    return this;
-  }
+    /**
+     * M3U8 ts 文件url转换器，对于某些服务器，返回的ts地址可以是相对地址，也可能是处理过的
+     * 对于这种情况，你需要使用url转换器将地址转换为可正常访问的http地址
+     *
+     * @param liveTsUrlConverter {@link ILiveTsUrlConverter}
+     */
+    public M3U8LiveOption setLiveTsUrlConvert(ILiveTsUrlConverter liveTsUrlConverter) {
+        CheckUtil.checkMemberClass(liveTsUrlConverter.getClass());
+        this.liveTsUrlConverter = liveTsUrlConverter;
+        return this;
+    }
+
+    /**
+     * 设置直播的m3u8文件更新间隔，默认10000微秒。
+     *
+     * @param liveUpdateInterval 更新间隔，单位微秒
+     */
+    public M3U8LiveOption setM3U8FileUpdateInterval(long liveUpdateInterval) {
+        if (liveUpdateInterval <= 1) {
+            ALog.e(TAG, "间隔时间错误");
+            return this;
+        }
+
+        this.liveUpdateInterval = liveUpdateInterval;
+        return this;
+    }
 }

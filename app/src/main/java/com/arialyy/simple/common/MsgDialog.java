@@ -18,6 +18,7 @@ package com.arialyy.simple.common;
 import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.view.View;
+
 import com.arialyy.simple.R;
 import com.arialyy.simple.base.BaseDialog;
 import com.arialyy.simple.databinding.DialogMsgBinding;
@@ -25,28 +26,32 @@ import com.arialyy.simple.databinding.DialogMsgBinding;
 /**
  * Created by AriaL on 2017/6/3.
  */
-@SuppressLint("ValidFragment") public class MsgDialog extends BaseDialog<DialogMsgBinding> {
+@SuppressLint("ValidFragment")
+public class MsgDialog extends BaseDialog<DialogMsgBinding> {
 
-  private String mTitle, mMsg;
+    private String mTitle, mMsg;
 
-  public MsgDialog(Object obj, String title, String msg) {
-    super(obj);
-    mTitle = title;
-    mMsg = msg;
-  }
+    public MsgDialog(Object obj, String title, String msg) {
+        super(obj);
+        mTitle = title;
+        mMsg = msg;
+    }
 
-  @Override protected void init(Bundle savedInstanceState) {
-    super.init(savedInstanceState);
-    getBinding().setTitle(mTitle);
-    getBinding().setMsg(mMsg);
-    getBinding().enter.setOnClickListener(new View.OnClickListener() {
-      @Override public void onClick(View v) {
-        dismiss();
-      }
-    });
-  }
+    @Override
+    protected void init(Bundle savedInstanceState) {
+        super.init(savedInstanceState);
+        getBinding().setTitle(mTitle);
+        getBinding().setMsg(mMsg);
+        getBinding().enter.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dismiss();
+            }
+        });
+    }
 
-  @Override protected int setLayoutId() {
-    return R.layout.dialog_msg;
-  }
+    @Override
+    protected int setLayoutId() {
+        return R.layout.dialog_msg;
+    }
 }

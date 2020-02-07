@@ -17,6 +17,7 @@
 package com.arialyy.simple.core.download.fragment;
 
 import android.os.Bundle;
+
 import com.arialyy.aria.core.Aria;
 import com.arialyy.simple.MainActivity;
 import com.arialyy.simple.R;
@@ -29,14 +30,16 @@ import com.arialyy.simple.to.NormalTo;
  */
 
 public class FragmentActivity extends BaseActivity<FragmentDownloadBinding> {
-  @Override protected int setLayoutId() {
-    return R.layout.activity_fragment;
-  }
+    @Override
+    protected int setLayoutId() {
+        return R.layout.activity_fragment;
+    }
 
-  @Override protected void init(Bundle savedInstanceState) {
-    super.init(savedInstanceState);
+    @Override
+    protected void init(Bundle savedInstanceState) {
+        super.init(savedInstanceState);
 
-    final NormalTo to = getIntent().getParcelableExtra(MainActivity.KEY_MAIN_DATA);
-    setTitle(to.title);
-  }
+        final NormalTo to = getIntent().getParcelableExtra(MainActivity.KEY_MAIN_DATA);
+        setTitle(to.title);
+    }
 }

@@ -29,96 +29,99 @@ import com.arialyy.aria.util.CommonUtil;
  */
 public abstract class AbsThreadTaskAdapter implements IThreadTaskAdapter {
 
-  protected String TAG = CommonUtil.getClassName(getClass());
-  /**
-   * 速度限制工具
-   */
-  protected BandwidthLimiter mSpeedBandUtil;
-  private ThreadRecord mThreadRecord;
-  private IThreadTaskObserver mObserver;
-  private AbsTaskWrapper mWrapper;
-  private SubThreadConfig mThreadConfig;
-  private IThreadTask mThreadTask;
+    protected String TAG = CommonUtil.getClassName(getClass());
+    /**
+     * 速度限制工具
+     */
+    protected BandwidthLimiter mSpeedBandUtil;
+    private ThreadRecord mThreadRecord;
+    private IThreadTaskObserver mObserver;
+    private AbsTaskWrapper mWrapper;
+    private SubThreadConfig mThreadConfig;
+    private IThreadTask mThreadTask;
 
-  protected AbsThreadTaskAdapter(SubThreadConfig config) {
-    mThreadRecord = config.record;
-    mWrapper = config.taskWrapper;
-    mThreadConfig = config;
-    if (getTaskConfig().getMaxSpeed() > 0) {
-      mSpeedBandUtil = new BandwidthLimiter(getTaskConfig().getMaxSpeed(), config.startThreadNum);
+    protected AbsThreadTaskAdapter(SubThreadConfig config) {
+        mThreadRecord = config.record;
+        mWrapper = config.taskWrapper;
+        mThreadConfig = config;
+        if (getTaskConfig().getMaxSpeed() > 0) {
+            mSpeedBandUtil = new BandwidthLimiter(getTaskConfig().getMaxSpeed(), config.startThreadNum);
+        }
     }
-  }
 
-  @Override public void call(IThreadTask threadTask) throws Exception {
-    mThreadTask = threadTask;
-    handlerThreadTask();
-  }
-
-  /**
-   * 开始处理线程任务
-   */
-  protected abstract void handlerThreadTask();
-
-  /**
-   * 当前线程的下去区间的进度
-   */
-  protected long getRangeProgress() {
-    return mObserver.getThreadProgress();
-  }
-
-  protected ThreadRecord getThreadRecord() {
-    return mThreadRecord;
-  }
-
-  protected AbsTaskWrapper getTaskWrapper() {
-    return mWrapper;
-  }
-
-  /**
-   * 获取任务配置信息
-   */
-  protected BaseTaskConfig getTaskConfig() {
-    return getTaskWrapper().getConfig();
-  }
-
-  protected IThreadTask getThreadTask() {
-    return mThreadTask;
-  }
-
-  /**
-   * 获取线程配置信息
-   */
-  protected SubThreadConfig getThreadConfig() {
-    return mThreadConfig;
-  }
-
-  @Override public void attach(IThreadTaskObserver observer) {
-    mObserver = observer;
-  }
-
-  @Override public void setMaxSpeed(int speed) {
-    if (mSpeedBandUtil == null) {
-      mSpeedBandUtil =
-          new BandwidthLimiter(getTaskConfig().getMaxSpeed(), getThreadConfig().startThreadNum);
+    @Override
+    public void call(IThreadTask threadTask) throws Exception {
+        mThreadTask = threadTask;
+        handlerThreadTask();
     }
-    mSpeedBandUtil.setMaxRate(speed);
-  }
 
-  protected void complete() {
-    if (mObserver != null) {
-      mObserver.updateCompleteState();
-    }
-  }
+    /**
+     * 开始处理线程任务
+     */
+    protected abstract void handlerThreadTask();
 
-  protected void fail(BaseException ex, boolean needRetry) {
-    if (mObserver != null) {
-      mObserver.updateFailState(ex, needRetry);
+    /**
+     * 当前线程的下去区间的进度
+     */
+    protected long getRangeProgress() {
+        return mObserver.getThreadProgress();
     }
-  }
 
-  protected void progress(long len) {
-    if (mObserver != null) {
-      mObserver.updateProgress(len);
+    protected ThreadRecord getThreadRecord() {
+        return mThreadRecord;
     }
-  }
+
+    protected AbsTaskWrapper getTaskWrapper() {
+        return mWrapper;
+    }
+
+    /**
+     * 获取任务配置信息
+     */
+    protected BaseTaskConfig getTaskConfig() {
+        return getTaskWrapper().getConfig();
+    }
+
+    protected IThreadTask getThreadTask() {
+        return mThreadTask;
+    }
+
+    /**
+     * 获取线程配置信息
+     */
+    protected SubThreadConfig getThreadConfig() {
+        return mThreadConfig;
+    }
+
+    @Override
+    public void attach(IThreadTaskObserver observer) {
+        mObserver = observer;
+    }
+
+    @Override
+    public void setMaxSpeed(int speed) {
+        if (mSpeedBandUtil == null) {
+            mSpeedBandUtil =
+                    new BandwidthLimiter(getTaskConfig().getMaxSpeed(), getThreadConfig().startThreadNum);
+        }
+        mSpeedBandUtil.setMaxRate(speed);
+    }
+
+    protected void complete() {
+        if (mObserver != null) {
+            mObserver.updateCompleteState();
+        }
+    }
+
+    protected void fail(BaseException ex, boolean needRetry) {
+        if (mObserver != null) {
+            mObserver.updateFailState(ex, needRetry);
+        }
+    }
+
+    protected void progress(long len) {
+        if (mObserver != null) {
+            mObserver.updateProgress(len);
+        }
+    }
 }

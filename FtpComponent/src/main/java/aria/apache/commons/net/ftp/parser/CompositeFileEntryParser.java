@@ -29,31 +29,32 @@ import aria.apache.commons.net.ftp.FTPFileEntryParserImpl;
  * a new matching parser will be searched.
  */
 public class CompositeFileEntryParser extends FTPFileEntryParserImpl {
-  private final FTPFileEntryParser[] ftpFileEntryParsers;
-  private FTPFileEntryParser cachedFtpFileEntryParser;
+    private final FTPFileEntryParser[] ftpFileEntryParsers;
+    private FTPFileEntryParser cachedFtpFileEntryParser;
 
-  public CompositeFileEntryParser(FTPFileEntryParser[] ftpFileEntryParsers) {
-    super();
+    public CompositeFileEntryParser(FTPFileEntryParser[] ftpFileEntryParsers) {
+        super();
 
-    this.cachedFtpFileEntryParser = null;
-    this.ftpFileEntryParsers = ftpFileEntryParsers;
-  }
-
-  @Override public FTPFile parseFTPEntry(String listEntry) {
-    if (cachedFtpFileEntryParser != null) {
-      FTPFile matched = cachedFtpFileEntryParser.parseFTPEntry(listEntry);
-      if (matched != null) {
-        return matched;
-      }
-    } else {
-      for (FTPFileEntryParser ftpFileEntryParser : ftpFileEntryParsers) {
-        FTPFile matched = ftpFileEntryParser.parseFTPEntry(listEntry);
-        if (matched != null) {
-          cachedFtpFileEntryParser = ftpFileEntryParser;
-          return matched;
-        }
-      }
+        this.cachedFtpFileEntryParser = null;
+        this.ftpFileEntryParsers = ftpFileEntryParsers;
     }
-    return null;
-  }
+
+    @Override
+    public FTPFile parseFTPEntry(String listEntry) {
+        if (cachedFtpFileEntryParser != null) {
+            FTPFile matched = cachedFtpFileEntryParser.parseFTPEntry(listEntry);
+            if (matched != null) {
+                return matched;
+            }
+        } else {
+            for (FTPFileEntryParser ftpFileEntryParser : ftpFileEntryParsers) {
+                FTPFile matched = ftpFileEntryParser.parseFTPEntry(listEntry);
+                if (matched != null) {
+                    cachedFtpFileEntryParser = ftpFileEntryParser;
+                    return matched;
+                }
+            }
+        }
+        return null;
+    }
 }

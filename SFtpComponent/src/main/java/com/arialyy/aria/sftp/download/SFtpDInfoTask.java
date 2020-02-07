@@ -27,6 +27,7 @@ import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 import com.jcraft.jsch.SftpATTRS;
 import com.jcraft.jsch.SftpException;
+
 import java.io.UnsupportedEncodingException;
 
 /**
@@ -34,37 +35,38 @@ import java.io.UnsupportedEncodingException;
  */
 final class SFtpDInfoTask extends AbsSFtpInfoTask<DTaskWrapper> {
 
-  SFtpDInfoTask(DTaskWrapper wrapper) {
-    super(wrapper);
-  }
-
-  @Override protected void getFileInfo(Session session) throws JSchException,
-      UnsupportedEncodingException, SftpException {
-    SFtpTaskOption option = (SFtpTaskOption) getWrapper().getTaskOption();
-    ChannelSftp channel = (ChannelSftp) session.openChannel("sftp");
-    channel.connect(1000);
-
-    //channel.setFilenameEncoding(option.getCharSet());
-    //channel.setFilenameEncoding("gbk");
-
-    String remotePath = option.getUrlEntity().remotePath;
-    String temp = CommonUtil.convertSFtpChar(option.getCharSet(), remotePath);
-    SftpATTRS attr = null;
-    try {
-      attr = channel.stat(temp);
-    } catch (Exception e) {
-      ALog.e(TAG, String.format("文件不存在，remotePath：%s", remotePath));
+    SFtpDInfoTask(DTaskWrapper wrapper) {
+        super(wrapper);
     }
 
-    if (attr != null) {
-      getWrapper().getEntity().setFileSize(attr.getSize());
-      CompleteInfo info = new CompleteInfo();
-      info.code = 200;
-      callback.onSucceed(getWrapper().getKey(), info);
-    } else {
-      callback.onFail(getWrapper().getEntity(),
-          new AriaException(TAG, String.format("文件不存在，remotePath：%s", remotePath)), false);
+    @Override
+    protected void getFileInfo(Session session) throws JSchException,
+            UnsupportedEncodingException, SftpException {
+        SFtpTaskOption option = (SFtpTaskOption) getWrapper().getTaskOption();
+        ChannelSftp channel = (ChannelSftp) session.openChannel("sftp");
+        channel.connect(1000);
+
+        //channel.setFilenameEncoding(option.getCharSet());
+        //channel.setFilenameEncoding("gbk");
+
+        String remotePath = option.getUrlEntity().remotePath;
+        String temp = CommonUtil.convertSFtpChar(option.getCharSet(), remotePath);
+        SftpATTRS attr = null;
+        try {
+            attr = channel.stat(temp);
+        } catch (Exception e) {
+            ALog.e(TAG, String.format("文件不存在，remotePath：%s", remotePath));
+        }
+
+        if (attr != null) {
+            getWrapper().getEntity().setFileSize(attr.getSize());
+            CompleteInfo info = new CompleteInfo();
+            info.code = 200;
+            callback.onSucceed(getWrapper().getKey(), info);
+        } else {
+            callback.onFail(getWrapper().getEntity(),
+                    new AriaException(TAG, String.format("文件不存在，remotePath：%s", remotePath)), false);
+        }
+        channel.disconnect();
     }
-    channel.disconnect();
-  }
 }

@@ -22,21 +22,21 @@ import com.arialyy.aria.core.wrapper.ITaskWrapper;
  * 获取文件信息完成后 回调给下载线程的信息
  */
 public class CompleteInfo {
-  /**
-   * 自定义的状态码
-   */
-  public int code;
+    /**
+     * 自定义的状态码
+     */
+    public int code;
 
-  public ITaskWrapper wrapper;
+    public ITaskWrapper wrapper;
 
-  public Object obj;
+    public Object obj;
 
-  public CompleteInfo() {
+    public CompleteInfo() {
 
-  }
+    }
 
-  public CompleteInfo(int code, ITaskWrapper wrapper) {
-    this.code = code;
-    this.wrapper = wrapper;
-  }
+    public CompleteInfo(int code, ITaskWrapper wrapper) {
+        this.code = code;
+        this.wrapper = wrapper;
+    }
 }

@@ -26,91 +26,92 @@ import com.arialyy.aria.core.task.UploadTask;
  */
 public class NormalTaskListener<TASK extends ITask> implements ISchedulerListener {
 
-  /**
-   * 队列已经满了，继续创建任务，将会回调该方法
-   */
-  public void onWait(TASK task) {
+    /**
+     * 队列已经满了，继续创建任务，将会回调该方法
+     */
+    public void onWait(TASK task) {
 
-  }
+    }
 
-  /**
-   * 预处理，有时有些地址链接比较慢，这时可以先在这个地方出来一些界面上的UI，如按钮的状态。
-   * 在这个回调中，任务是获取不到文件大小，下载速度等参数
-   */
-  public void onPre(TASK task) {
+    /**
+     * 预处理，有时有些地址链接比较慢，这时可以先在这个地方出来一些界面上的UI，如按钮的状态。
+     * 在这个回调中，任务是获取不到文件大小，下载速度等参数
+     */
+    public void onPre(TASK task) {
 
-  }
+    }
 
-  /**
-   * 任务预加载完成
-   */
-  public void onTaskPre(TASK task) {
+    /**
+     * 任务预加载完成
+     */
+    public void onTaskPre(TASK task) {
 
-  }
+    }
 
-  /**
-   * 任务恢复下载
-   */
-  public void onTaskResume(TASK task) {
+    /**
+     * 任务恢复下载
+     */
+    public void onTaskResume(TASK task) {
 
-  }
+    }
 
-  /**
-   * 任务开始
-   */
-  public void onTaskStart(TASK task) {
+    /**
+     * 任务开始
+     */
+    public void onTaskStart(TASK task) {
 
-  }
+    }
 
-  /**
-   * 任务停止
-   */
-  public void onTaskStop(TASK task) {
+    /**
+     * 任务停止
+     */
+    public void onTaskStop(TASK task) {
 
-  }
+    }
 
-  /**
-   * 任务取消
-   */
-  public void onTaskCancel(TASK task) {
+    /**
+     * 任务取消
+     */
+    public void onTaskCancel(TASK task) {
 
-  }
+    }
 
-  /**
-   * 任务失败
-   *
-   * @deprecated {@link #onTaskFail(ITask, Exception)}
-   */
-  public void onTaskFail(TASK task) {
+    /**
+     * 任务失败
+     *
+     * @deprecated {@link #onTaskFail(ITask, Exception)}
+     */
+    public void onTaskFail(TASK task) {
 
-  }
+    }
 
-  /**
-   * 任务失败
-   */
-  public void onTaskFail(TASK task, Exception e) {
+    /**
+     * 任务失败
+     */
+    public void onTaskFail(TASK task, Exception e) {
 
-  }
+    }
 
-  /**
-   * 任务完成
-   */
-  public void onTaskComplete(TASK task) {
+    /**
+     * 任务完成
+     */
+    public void onTaskComplete(TASK task) {
 
-  }
+    }
 
-  /**
-   * 任务执行中
-   */
-  public void onTaskRunning(TASK task) {
+    /**
+     * 任务执行中
+     */
+    public void onTaskRunning(TASK task) {
 
-  }
+    }
 
-  public void onNoSupportBreakPoint(TASK task) {
+    public void onNoSupportBreakPoint(TASK task) {
 
-  }
+    }
 
-  @Override public void setListener(Object obj) {
+    @Override
+    public void setListener(Object obj) {
 
-  }
+    }
 }

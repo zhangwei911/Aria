@@ -20,8 +20,8 @@ package com.arialyy.aria.orm;
  */
 public abstract class AbsDbWrapper {
 
-  /**
-   * 处理转换
-   */
-  protected abstract void handleConvert();
+    /**
+     * 处理转换
+     */
+    protected abstract void handleConvert();
 }

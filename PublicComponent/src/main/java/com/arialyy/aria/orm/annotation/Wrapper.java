@@ -24,6 +24,7 @@ import java.lang.annotation.Target;
  * Created by laoyuyu on 2018/3/21.
  * 关系包裹
  */
-@Target(ElementType.TYPE) @Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
 public @interface Wrapper {
 }

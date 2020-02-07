@@ -16,6 +16,7 @@
 package com.arialyy.aria.http.download;
 
 import android.os.Looper;
+
 import com.arialyy.aria.core.common.AbsEntity;
 import com.arialyy.aria.core.common.CompleteInfo;
 import com.arialyy.aria.core.download.DTaskWrapper;
@@ -31,43 +32,47 @@ import com.arialyy.aria.exception.BaseException;
  * http 组合任务加载器
  */
 final class HttpDGLoader extends AbsGroupLoader {
-  HttpDGLoader(AbsTaskWrapper groupWrapper, DownloadGroupListener listener) {
-    super(groupWrapper, listener);
-  }
-
-  @Override protected void handlerTask(Looper looper) {
-    if (isBreak()) {
-      return;
+    HttpDGLoader(AbsTaskWrapper groupWrapper, DownloadGroupListener listener) {
+        super(groupWrapper, listener);
     }
-    mInfoTask.run();
-  }
 
-  @Override
-  protected AbsSubDLoadUtil createSubLoader(DTaskWrapper wrapper, boolean needGetFileInfo) {
-    return new HttpSubDLoaderUtil(wrapper, getScheduler(), needGetFileInfo, getKey());
-  }
-
-  private void startSub() {
-    if (isBreak()) {
-      return;
+    @Override
+    protected void handlerTask(Looper looper) {
+        if (isBreak()) {
+            return;
+        }
+        mInfoTask.run();
     }
-    onPostStart();
-    for (DTaskWrapper wrapper : getWrapper().getSubTaskWrapper()) {
-      DownloadEntity dEntity = wrapper.getEntity();
-      startSubLoader(createSubLoader(wrapper, dEntity.getFileSize() < 0));
+
+    @Override
+    protected AbsSubDLoadUtil createSubLoader(DTaskWrapper wrapper, boolean needGetFileInfo) {
+        return new HttpSubDLoaderUtil(wrapper, getScheduler(), needGetFileInfo, getKey());
     }
-  }
 
-  @Override public void addComponent(IInfoTask infoTask) {
-    mInfoTask = infoTask;
-    mInfoTask.setCallback(new IInfoTask.Callback() {
-      @Override public void onSucceed(String key, CompleteInfo info) {
-        startSub();
-      }
+    private void startSub() {
+        if (isBreak()) {
+            return;
+        }
+        onPostStart();
+        for (DTaskWrapper wrapper : getWrapper().getSubTaskWrapper()) {
+            DownloadEntity dEntity = wrapper.getEntity();
+            startSubLoader(createSubLoader(wrapper, dEntity.getFileSize() < 0));
+        }
+    }
 
-      @Override public void onFail(AbsEntity entity, BaseException e, boolean needRetry) {
-        fail(e, needRetry);
-      }
-    });
-  }
+    @Override
+    public void addComponent(IInfoTask infoTask) {
+        mInfoTask = infoTask;
+        mInfoTask.setCallback(new IInfoTask.Callback() {
+            @Override
+            public void onSucceed(String key, CompleteInfo info) {
+                startSub();
+            }
+
+            @Override
+            public void onFail(AbsEntity entity, BaseException e, boolean needRetry) {
+                fail(e, needRetry);
+            }
+        });
+    }
 }

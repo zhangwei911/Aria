@@ -27,49 +27,52 @@ import com.arialyy.aria.util.CommonUtil;
  * ftp单任务上传
  */
 public class FtpNormalTarget extends AbsNormalTarget<FtpNormalTarget> {
-  private UNormalConfigHandler<FtpNormalTarget> mConfigHandler;
+    private UNormalConfigHandler<FtpNormalTarget> mConfigHandler;
 
-  FtpNormalTarget(long taskId) {
-    mConfigHandler = new UNormalConfigHandler<>(this, taskId);
-    getTaskWrapper().setRequestType(ITaskWrapper.U_FTP);
-    getTaskWrapper().setNewTask(false);
-  }
-
-  /**
-   * 设置登陆、字符串编码、ftps等参数
-   */
-  public FtpNormalTarget option(FtpOption option) {
-    if (option == null) {
-      throw new NullPointerException("ftp 任务配置为空");
+    FtpNormalTarget(long taskId) {
+        mConfigHandler = new UNormalConfigHandler<>(this, taskId);
+        getTaskWrapper().setRequestType(ITaskWrapper.U_FTP);
+        getTaskWrapper().setNewTask(false);
     }
-    option.setUrlEntity(CommonUtil.getFtpUrlInfo(getEntity().getUrl()));
-    getTaskWrapper().getOptionParams().setParams(option);
-    return this;
-  }
 
-  /**
-   * 设置登陆、字符串编码、sftp等参数
-   */
-  public FtpNormalTarget sftpOption(SFtpOption option) {
-    if (option == null) {
-      throw new NullPointerException("ftp 任务配置为空");
+    /**
+     * 设置登陆、字符串编码、ftps等参数
+     */
+    public FtpNormalTarget option(FtpOption option) {
+        if (option == null) {
+            throw new NullPointerException("ftp 任务配置为空");
+        }
+        option.setUrlEntity(CommonUtil.getFtpUrlInfo(getEntity().getUrl()));
+        getTaskWrapper().getOptionParams().setParams(option);
+        return this;
     }
-    option.setUrlEntity(CommonUtil.getFtpUrlInfo(getEntity().getUrl()));
-    getTaskWrapper().getOptionParams().setParams(option);
-    (getEntity()).setTaskType(ITaskWrapper.U_SFTP);
-    getTaskWrapper().setRequestType(ITaskWrapper.U_SFTP);
-    return this;
-  }
 
-  @Override public UploadEntity getEntity() {
-    return (UploadEntity) super.getEntity();
-  }
+    /**
+     * 设置登陆、字符串编码、sftp等参数
+     */
+    public FtpNormalTarget sftpOption(SFtpOption option) {
+        if (option == null) {
+            throw new NullPointerException("ftp 任务配置为空");
+        }
+        option.setUrlEntity(CommonUtil.getFtpUrlInfo(getEntity().getUrl()));
+        getTaskWrapper().getOptionParams().setParams(option);
+        (getEntity()).setTaskType(ITaskWrapper.U_SFTP);
+        getTaskWrapper().setRequestType(ITaskWrapper.U_SFTP);
+        return this;
+    }
 
-  @Override public boolean isRunning() {
-    return mConfigHandler.isRunning();
-  }
+    @Override
+    public UploadEntity getEntity() {
+        return (UploadEntity) super.getEntity();
+    }
 
-  @Override public boolean taskExists() {
-    return mConfigHandler.taskExists();
-  }
+    @Override
+    public boolean isRunning() {
+        return mConfigHandler.isRunning();
+    }
+
+    @Override
+    public boolean taskExists() {
+        return mConfigHandler.taskExists();
+    }
 }

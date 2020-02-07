@@ -21,53 +21,57 @@ import com.arialyy.aria.core.common.RecordHandler;
 import com.arialyy.aria.core.common.RecordHelper;
 import com.arialyy.aria.core.download.DownloadEntity;
 import com.arialyy.aria.core.wrapper.AbsTaskWrapper;
+
 import java.util.ArrayList;
 
 /**
  * 子任务记录处理
  */
 public class SubRecordHandler extends RecordHandler {
-  public SubRecordHandler(AbsTaskWrapper wrapper) {
-    super(wrapper);
-  }
-
-  @Override public void handlerTaskRecord(TaskRecord record) {
-    RecordHelper helper = new RecordHelper(getWrapper(), record);
-    helper.handleSingleThreadRecord();
-  }
-
-  @Override
-  public ThreadRecord createThreadRecord(TaskRecord record, int threadId, long startL, long endL) {
-    ThreadRecord tr;
-    tr = new ThreadRecord();
-    tr.taskKey = record.filePath;
-    tr.threadId = threadId;
-    tr.startLocation = startL;
-    tr.isComplete = false;
-    tr.threadType = getEntity().getTaskType();
-    tr.endLocation = getFileSize();
-    tr.blockLen = getFileSize();
-    return tr;
-  }
-
-  @Override public TaskRecord createTaskRecord(int threadNum) {
-    TaskRecord record = new TaskRecord();
-    record.fileName = getEntity().getFileName();
-    record.filePath = getEntity().getFilePath();
-    record.fileLength = getFileSize();
-    record.threadRecords = new ArrayList<>();
-    record.threadNum = threadNum;
-    record.isBlock = false;
-    record.taskType = getWrapper().getRequestType();
-    record.isGroupRecord = true;
-    if (getEntity() instanceof DownloadEntity) {
-      record.dGroupHash = ((DownloadEntity) getEntity()).getGroupHash();
+    public SubRecordHandler(AbsTaskWrapper wrapper) {
+        super(wrapper);
     }
 
-    return record;
-  }
+    @Override
+    public void handlerTaskRecord(TaskRecord record) {
+        RecordHelper helper = new RecordHelper(getWrapper(), record);
+        helper.handleSingleThreadRecord();
+    }
 
-  @Override public int initTaskThreadNum() {
-    return 1;
-  }
+    @Override
+    public ThreadRecord createThreadRecord(TaskRecord record, int threadId, long startL, long endL) {
+        ThreadRecord tr;
+        tr = new ThreadRecord();
+        tr.taskKey = record.filePath;
+        tr.threadId = threadId;
+        tr.startLocation = startL;
+        tr.isComplete = false;
+        tr.threadType = getEntity().getTaskType();
+        tr.endLocation = getFileSize();
+        tr.blockLen = getFileSize();
+        return tr;
+    }
+
+    @Override
+    public TaskRecord createTaskRecord(int threadNum) {
+        TaskRecord record = new TaskRecord();
+        record.fileName = getEntity().getFileName();
+        record.filePath = getEntity().getFilePath();
+        record.fileLength = getFileSize();
+        record.threadRecords = new ArrayList<>();
+        record.threadNum = threadNum;
+        record.isBlock = false;
+        record.taskType = getWrapper().getRequestType();
+        record.isGroupRecord = true;
+        if (getEntity() instanceof DownloadEntity) {
+            record.dGroupHash = ((DownloadEntity) getEntity()).getGroupHash();
+        }
+
+        return record;
+    }
+
+    @Override
+    public int initTaskThreadNum() {
+        return 1;
+    }
 }

@@ -26,37 +26,37 @@ import com.arialyy.aria.orm.annotation.Foreign;
  */
 public enum ActionPolicy {
 
-  /**
-   * 如果子表中有匹配的记录,则不允许对父表对应候选键进行update/delete操作
-   */
-  NO_ACTION("NO ACTION"),
+    /**
+     * 如果子表中有匹配的记录,则不允许对父表对应候选键进行update/delete操作
+     */
+    NO_ACTION("NO ACTION"),
 
-  /**
-   * 和NO ACTION 作用一致，和NO ACTION的区别是：
-   * 主表update/delete执行时，马上就触发约束；
-   * 而NO ACTION 是执行完成语句后才触发约束，
-   */
-  RESTRICT("RESTRICT"),
+    /**
+     * 和NO ACTION 作用一致，和NO ACTION的区别是：
+     * 主表update/delete执行时，马上就触发约束；
+     * 而NO ACTION 是执行完成语句后才触发约束，
+     */
+    RESTRICT("RESTRICT"),
 
-  /**
-   * 在父表上update/delete记录时，将子表上匹配记录的列设为null (要注意子表的外键列不能为not null)
-   */
-  SET_NULL("SET NULL"),
+    /**
+     * 在父表上update/delete记录时，将子表上匹配记录的列设为null (要注意子表的外键列不能为not null)
+     */
+    SET_NULL("SET NULL"),
 
-  /**
-   * 父表有变更时,子表将外键列设置成一个默认的值，default配置的值
-   */
-  SET_DEFAULT("SET ERROR"),
+    /**
+     * 父表有变更时,子表将外键列设置成一个默认的值，default配置的值
+     */
+    SET_DEFAULT("SET ERROR"),
 
-  /**
-   * 在父表上update/delete记录时，同步update/delete掉子表的匹配记录
-   */
-  CASCADE("CASCADE");
+    /**
+     * 在父表上update/delete记录时，同步update/delete掉子表的匹配记录
+     */
+    CASCADE("CASCADE");
 
-  String function;
+    String function;
 
-  ActionPolicy(String function) {
-    this.function = function;
-  }
+    ActionPolicy(String function) {
+        this.function = function;
+    }
 
 }

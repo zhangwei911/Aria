@@ -21,6 +21,7 @@ import com.arialyy.aria.orm.AbsDbWrapper;
 import com.arialyy.aria.orm.annotation.Many;
 import com.arialyy.aria.orm.annotation.One;
 import com.arialyy.aria.orm.annotation.Wrapper;
+
 import java.util.List;
 
 /**
@@ -30,15 +31,16 @@ import java.util.List;
 @Wrapper
 public class DGEntityWrapper extends AbsDbWrapper {
 
-  @One
-  public DownloadGroupEntity groupEntity;
+    @One
+    public DownloadGroupEntity groupEntity;
 
-  @Many(parentColumn = "groupHash", entityColumn = "groupHash")
-  public List<DownloadEntity> subEntity;
+    @Many(parentColumn = "groupHash", entityColumn = "groupHash")
+    public List<DownloadEntity> subEntity;
 
-  @Override protected void handleConvert() {
-    if (subEntity != null && !subEntity.isEmpty()) {
-      groupEntity.setSubEntities(subEntity);
+    @Override
+    protected void handleConvert() {
+        if (subEntity != null && !subEntity.isEmpty()) {
+            groupEntity.setSubEntities(subEntity);
+        }
     }
-  }
 }

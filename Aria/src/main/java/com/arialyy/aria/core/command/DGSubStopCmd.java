@@ -22,13 +22,14 @@ import com.arialyy.aria.core.download.AbsGroupTaskWrapper;
  * 停止任务组子任务的命令
  */
 final class DGSubStopCmd<T extends AbsGroupTaskWrapper> extends AbsGroupCmd<T> {
-  DGSubStopCmd(T entity) {
-    super(entity);
-  }
-
-  @Override public void executeCmd() {
-    if (checkTask()) {
-      tempTask.stopSubTask(childUrl);
+    DGSubStopCmd(T entity) {
+        super(entity);
     }
-  }
+
+    @Override
+    public void executeCmd() {
+        if (checkTask()) {
+            tempTask.stopSubTask(childUrl);
+        }
+    }
 }

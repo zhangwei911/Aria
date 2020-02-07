@@ -23,46 +23,47 @@ import com.arialyy.aria.core.task.ITask;
  * 子任务事件回调类
  */
 public class SubTaskListener<TASK extends ITask, SUB_ENTITY extends AbsNormalEntity>
-    implements ISchedulerListener {
+        implements ISchedulerListener {
 
-  public void onNoSupportBreakPoint(TASK task) {
+    public void onNoSupportBreakPoint(TASK task) {
 
-  }
+    }
 
-  public void onSubTaskPre(TASK task, SUB_ENTITY subTask) {
+    public void onSubTaskPre(TASK task, SUB_ENTITY subTask) {
 
-  }
+    }
 
-  public void onSubTaskStart(TASK task, SUB_ENTITY subTask) {
+    public void onSubTaskStart(TASK task, SUB_ENTITY subTask) {
 
-  }
+    }
 
-  public void onSubTaskStop(TASK task, SUB_ENTITY subTask) {
+    public void onSubTaskStop(TASK task, SUB_ENTITY subTask) {
 
-  }
+    }
 
-  public void onSubTaskCancel(TASK task, SUB_ENTITY subTask) {
+    public void onSubTaskCancel(TASK task, SUB_ENTITY subTask) {
 
-  }
+    }
 
-  public void onSubTaskComplete(TASK task, SUB_ENTITY subTask) {
+    public void onSubTaskComplete(TASK task, SUB_ENTITY subTask) {
 
-  }
+    }
 
-  @Deprecated
-  public void onSubTaskFail(TASK task, SUB_ENTITY subTask) {
+    @Deprecated
+    public void onSubTaskFail(TASK task, SUB_ENTITY subTask) {
 
-  }
+    }
 
-  public void onSubTaskFail(TASK task, SUB_ENTITY subTask, Exception e) {
+    public void onSubTaskFail(TASK task, SUB_ENTITY subTask, Exception e) {
 
-  }
+    }
 
-  public void onSubTaskRunning(TASK task, SUB_ENTITY subTask) {
+    public void onSubTaskRunning(TASK task, SUB_ENTITY subTask) {
 
-  }
+    }
 
-  @Override public void setListener(Object obj) {
+    @Override
+    public void setListener(Object obj) {
 
-  }
+    }
 }

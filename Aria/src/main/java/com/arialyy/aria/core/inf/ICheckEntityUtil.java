@@ -17,10 +17,10 @@ package com.arialyy.aria.core.inf;
 
 public interface ICheckEntityUtil {
 
-  /**
-   * 检查实体对象
-   *
-   * @return true 成功；false 失败
-   */
-  boolean checkEntity();
+    /**
+     * 检查实体对象
+     *
+     * @return true 成功；false 失败
+     */
+    boolean checkEntity();
 }

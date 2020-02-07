@@ -17,6 +17,7 @@ package com.arialyy.aria.http.upload;
 
 import android.os.Handler;
 import android.os.Looper;
+
 import com.arialyy.aria.core.inf.IThreadStateManager;
 import com.arialyy.aria.core.listener.IEventListener;
 import com.arialyy.aria.core.loader.AbsNormalLoader;
@@ -28,67 +29,76 @@ import com.arialyy.aria.core.task.IThreadTask;
 import com.arialyy.aria.core.upload.UTaskWrapper;
 import com.arialyy.aria.exception.AriaIOException;
 import com.arialyy.aria.util.ALog;
+
 import java.util.List;
 
 final class HttpULoader extends AbsNormalLoader<UTaskWrapper> {
-  HttpULoader(UTaskWrapper wrapper, IEventListener listener) {
-    super(wrapper, listener);
-  }
-
-  @Override public void addComponent(IRecordHandler recordHandler) {
-    mRecordHandler = recordHandler;
-  }
-
-  /**
-   * @deprecated http 上传任务不需要设置这个
-   */
-  @Deprecated
-  @Override public void addComponent(IInfoTask infoTask) {
-
-  }
-
-  @Override public void addComponent(IThreadStateManager threadState) {
-    mStateManager = threadState;
-  }
-
-  @Override public void addComponent(IThreadTaskBuilder builder) {
-    mTTBuilder = builder;
-  }
-
-  @Override protected void handleTask(Looper looper) {
-    mRecord = mRecordHandler.getRecord(getFileSize());
-    mStateManager.setLooper(mRecord, looper);
-    List<IThreadTask> tt = mTTBuilder.buildThreadTask(mRecord,
-        new Handler(looper, mStateManager.getHandlerCallback()));
-    if (tt == null || tt.isEmpty()) {
-      ALog.e(TAG, "创建线程任务失败");
-      getListener().onFail(false, new AriaIOException(TAG, "创建线程任务失败"));
-      return;
+    HttpULoader(UTaskWrapper wrapper, IEventListener listener) {
+        super(wrapper, listener);
     }
 
-    getListener().onStart(0);
-    ThreadTaskManager.getInstance().startThread(mTaskWrapper.getKey(), tt.get(0));
-
-    startTimer();
-  }
-
-  @Override public long getFileSize() {
-    return mTaskWrapper.getEntity().getFileSize();
-  }
-
-  @Override protected void checkComponent() {
-    if (mRecordHandler == null) {
-      throw new NullPointerException("任务记录组件为空");
+    @Override
+    public void addComponent(IRecordHandler recordHandler) {
+        mRecordHandler = recordHandler;
     }
-    if (mStateManager == null) {
-      throw new NullPointerException("任务状态管理组件为空");
-    }
-    if (mTTBuilder == null) {
-      throw new NullPointerException("线程任务组件为空");
-    }
-  }
 
-  @Override public long getCurrentProgress() {
-    return mStateManager.getCurrentProgress();
-  }
+    /**
+     * @deprecated http 上传任务不需要设置这个
+     */
+    @Deprecated
+    @Override
+    public void addComponent(IInfoTask infoTask) {
+
+    }
+
+    @Override
+    public void addComponent(IThreadStateManager threadState) {
+        mStateManager = threadState;
+    }
+
+    @Override
+    public void addComponent(IThreadTaskBuilder builder) {
+        mTTBuilder = builder;
+    }
+
+    @Override
+    protected void handleTask(Looper looper) {
+        mRecord = mRecordHandler.getRecord(getFileSize());
+        mStateManager.setLooper(mRecord, looper);
+        List<IThreadTask> tt = mTTBuilder.buildThreadTask(mRecord,
+                new Handler(looper, mStateManager.getHandlerCallback()));
+        if (tt == null || tt.isEmpty()) {
+            ALog.e(TAG, "创建线程任务失败");
+            getListener().onFail(false, new AriaIOException(TAG, "创建线程任务失败"));
+            return;
+        }
+
+        getListener().onStart(0);
+        ThreadTaskManager.getInstance().startThread(mTaskWrapper.getKey(), tt.get(0));
+
+        startTimer();
+    }
+
+    @Override
+    public long getFileSize() {
+        return mTaskWrapper.getEntity().getFileSize();
+    }
+
+    @Override
+    protected void checkComponent() {
+        if (mRecordHandler == null) {
+            throw new NullPointerException("任务记录组件为空");
+        }
+        if (mStateManager == null) {
+            throw new NullPointerException("任务状态管理组件为空");
+        }
+        if (mTTBuilder == null) {
+            throw new NullPointerException("线程任务组件为空");
+        }
+    }
+
+    @Override
+    public long getCurrentProgress() {
+        return mStateManager.getCurrentProgress();
+    }
 }

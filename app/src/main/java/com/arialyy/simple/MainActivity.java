@@ -22,6 +22,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
+
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatImageView;
 import androidx.lifecycle.Observer;
@@ -29,6 +30,7 @@ import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import com.arialyy.frame.permission.OnPermissionCallback;
 import com.arialyy.frame.permission.PermissionManager;
 import com.arialyy.frame.util.show.T;
@@ -49,6 +51,7 @@ import com.arialyy.simple.core.upload.SFtpUploadActivity;
 import com.arialyy.simple.databinding.ActivityMainBinding;
 import com.arialyy.simple.modlue.CommonModule;
 import com.arialyy.simple.to.NormalTo;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -57,130 +60,139 @@ import java.util.List;
  * 首页
  */
 public class MainActivity extends BaseActivity<ActivityMainBinding> {
-  public static final String KEY_MAIN_DATA = "KEY_MAIN_DATA";
+    public static final String KEY_MAIN_DATA = "KEY_MAIN_DATA";
 
-  @Override protected void init(Bundle savedInstanceState) {
-    super.init(savedInstanceState);
-    setSupportActionBar(mBar);
-    mBar.setTitle("Aria  Demo");
-    getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+    @Override
+    protected void init(Bundle savedInstanceState) {
+        super.init(savedInstanceState);
+        setSupportActionBar(mBar);
+        mBar.setTitle("Aria  Demo");
+        getSupportActionBar().setDisplayHomeAsUpEnabled(false);
 
-    getBinding().list.setLayoutManager(new LinearLayoutManager(this));
-    final List<NormalTo> data = new ArrayList<>();
-    final Adapter adapter = new Adapter(this, data);
-    getBinding().list.setAdapter(adapter);
-    getBinding().list.addItemDecoration(
-        new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
+        getBinding().list.setLayoutManager(new LinearLayoutManager(this));
+        final List<NormalTo> data = new ArrayList<>();
+        final Adapter adapter = new Adapter(this, data);
+        getBinding().list.setAdapter(adapter);
+        getBinding().list.addItemDecoration(
+                new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
 
-    final CommonModule module = ViewModelProviders.of(this).get(CommonModule.class);
-    module.getMainData(this).observe(this, new Observer<List<NormalTo>>() {
-      @Override public void onChanged(@Nullable List<NormalTo> normalTos) {
-        if (normalTos != null) {
-          data.addAll(normalTos);
-          adapter.notifyDataSetChanged();
-        }
-      }
-    });
-
-    RvItemClickSupport.addTo(getBinding().list).setOnItemClickListener(
-        new RvItemClickSupport.OnItemClickListener() {
-          @Override public void onItemClicked(RecyclerView recyclerView, int position, View v) {
-            switch (position) {
-              case 0:
-                module.startNextActivity(MainActivity.this, data.get(position),
-                    DownloadActivity.class);
-                break;
-              case 1:
-                module.startNextActivity(MainActivity.this, data.get(position),
-                    HttpUploadActivity.class);
-                break;
-              case 2:
-                module.startNextActivity(MainActivity.this, data.get(position),
-                    DownloadGroupActivity.class);
-                break;
-              case 3:
-                module.startNextActivity(MainActivity.this, data.get(position),
-                    FtpDownloadActivity.class);
-                break;
-              case 4:
-                module.startNextActivity(MainActivity.this, data.get(position),
-                    FTPDirDownloadActivity.class);
-                break;
-              case 5:
-                module.startNextActivity(MainActivity.this, data.get(position),
-                    FtpUploadActivity.class);
-                break;
-              case 6:
-                module.startNextActivity(MainActivity.this, data.get(position),
-                    M3U8VodDLoadActivity.class);
-                break;
-              case 7:
-                module.startNextActivity(MainActivity.this, data.get(position),
-                    M3U8LiveDLoadActivity.class);
-                break;
-              case 8: // d_sftp
-                module.startNextActivity(MainActivity.this, data.get(position),
-                    SFtpDownloadActivity.class);
-                break;
-              case 9: // u_sftp
-                module.startNextActivity(MainActivity.this, data.get(position),
-                    SFtpUploadActivity.class);
-                break;
+        final CommonModule module = ViewModelProviders.of(this).get(CommonModule.class);
+        module.getMainData(this).observe(this, new Observer<List<NormalTo>>() {
+            @Override
+            public void onChanged(@Nullable List<NormalTo> normalTos) {
+                if (normalTos != null) {
+                    data.addAll(normalTos);
+                    adapter.notifyDataSetChanged();
+                }
             }
-          }
         });
 
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-      boolean hasPermission = PermissionManager.getInstance()
-          .checkPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
-      if (!hasPermission) {
-        PermissionManager.getInstance().requestPermission(this, new OnPermissionCallback() {
-          @Override public void onSuccess(String... permissions) {
-          }
+        RvItemClickSupport.addTo(getBinding().list).setOnItemClickListener(
+                new RvItemClickSupport.OnItemClickListener() {
+                    @Override
+                    public void onItemClicked(RecyclerView recyclerView, int position, View v) {
+                        switch (position) {
+                            case 0:
+                                module.startNextActivity(MainActivity.this, data.get(position),
+                                        DownloadActivity.class);
+                                break;
+                            case 1:
+                                module.startNextActivity(MainActivity.this, data.get(position),
+                                        HttpUploadActivity.class);
+                                break;
+                            case 2:
+                                module.startNextActivity(MainActivity.this, data.get(position),
+                                        DownloadGroupActivity.class);
+                                break;
+                            case 3:
+                                module.startNextActivity(MainActivity.this, data.get(position),
+                                        FtpDownloadActivity.class);
+                                break;
+                            case 4:
+                                module.startNextActivity(MainActivity.this, data.get(position),
+                                        FTPDirDownloadActivity.class);
+                                break;
+                            case 5:
+                                module.startNextActivity(MainActivity.this, data.get(position),
+                                        FtpUploadActivity.class);
+                                break;
+                            case 6:
+                                module.startNextActivity(MainActivity.this, data.get(position),
+                                        M3U8VodDLoadActivity.class);
+                                break;
+                            case 7:
+                                module.startNextActivity(MainActivity.this, data.get(position),
+                                        M3U8LiveDLoadActivity.class);
+                                break;
+                            case 8: // d_sftp
+                                module.startNextActivity(MainActivity.this, data.get(position),
+                                        SFtpDownloadActivity.class);
+                                break;
+                            case 9: // u_sftp
+                                module.startNextActivity(MainActivity.this, data.get(position),
+                                        SFtpUploadActivity.class);
+                                break;
+                        }
+                    }
+                });
 
-          @Override public void onFail(String... permissions) {
-            T.showShort(MainActivity.this, "没有文件读写权限");
-            finish();
-          }
-        }, Manifest.permission.WRITE_EXTERNAL_STORAGE);
-      }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            boolean hasPermission = PermissionManager.getInstance()
+                    .checkPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+            if (!hasPermission) {
+                PermissionManager.getInstance().requestPermission(this, new OnPermissionCallback() {
+                    @Override
+                    public void onSuccess(String... permissions) {
+                    }
+
+                    @Override
+                    public void onFail(String... permissions) {
+                        T.showShort(MainActivity.this, "没有文件读写权限");
+                        finish();
+                    }
+                }, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+            }
+        }
     }
-  }
 
-  @Override protected int setLayoutId() {
-    return R.layout.activity_main;
-  }
-
-  private static class Adapter extends AbsRVAdapter<NormalTo, Adapter.Holder> {
-
-    Adapter(Context context, List<NormalTo> data) {
-      super(context, data);
+    @Override
+    protected int setLayoutId() {
+        return R.layout.activity_main;
     }
 
-    @Override protected Holder getViewHolder(View convertView, int viewType) {
-      return new Holder(convertView);
-    }
+    private static class Adapter extends AbsRVAdapter<NormalTo, Adapter.Holder> {
 
-    @Override protected int setLayoutId(int type) {
-      return R.layout.item_main;
-    }
+        Adapter(Context context, List<NormalTo> data) {
+            super(context, data);
+        }
 
-    @Override protected void bindData(Holder holder, int position, NormalTo item) {
-      holder.title.setText(item.title);
-      holder.desc.setText(item.desc);
-      holder.image.setImageResource(item.icon);
-    }
+        @Override
+        protected Holder getViewHolder(View convertView, int viewType) {
+            return new Holder(convertView);
+        }
 
-    private static class Holder extends AbsHolder {
-      TextView title, desc;
-      AppCompatImageView image;
+        @Override
+        protected int setLayoutId(int type) {
+            return R.layout.item_main;
+        }
 
-      Holder(View itemView) {
-        super(itemView);
-        title = findViewById(R.id.title);
-        desc = findViewById(R.id.desc);
-        image = findViewById(R.id.image);
-      }
+        @Override
+        protected void bindData(Holder holder, int position, NormalTo item) {
+            holder.title.setText(item.title);
+            holder.desc.setText(item.desc);
+            holder.image.setImageResource(item.icon);
+        }
+
+        private static class Holder extends AbsHolder {
+            TextView title, desc;
+            AppCompatImageView image;
+
+            Holder(View itemView) {
+                super(itemView);
+                title = findViewById(R.id.title);
+                desc = findViewById(R.id.desc);
+                image = findViewById(R.id.image);
+            }
+        }
     }
-  }
 }

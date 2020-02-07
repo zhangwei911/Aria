@@ -16,11 +16,11 @@
 package com.arialyy.aria.core;
 
 public interface ProtocolType {
-  String Default = "TLS";
-  String SSL = "SSL";
-  String SSLv3 = "SSLv3";
-  String TLS = "TLS";
-  String TLSv1 = "TLSv1";
-  String TLSv1_1 = "TLSv1.1";
-  String TLSv1_2 = "TLSv1.2";
+    String Default = "TLS";
+    String SSL = "SSL";
+    String SSLv3 = "SSLv3";
+    String TLS = "TLS";
+    String TLSv1 = "TLSv1";
+    String TLSv1_1 = "TLSv1.1";
+    String TLSv1_2 = "TLSv1.2";
 }

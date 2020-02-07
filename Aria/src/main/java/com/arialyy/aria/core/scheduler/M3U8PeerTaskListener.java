@@ -21,16 +21,17 @@ package com.arialyy.aria.core.scheduler;
  */
 public class M3U8PeerTaskListener implements ISchedulerListener {
 
-  public void onPeerStart(final String m3u8Url, final String peerPath, final int peerIndex) {
-  }
+    public void onPeerStart(final String m3u8Url, final String peerPath, final int peerIndex) {
+    }
 
-  public void onPeerComplete(final String m3u8Url, final String peerPath, final int peerIndex) {
-  }
+    public void onPeerComplete(final String m3u8Url, final String peerPath, final int peerIndex) {
+    }
 
-  public void onPeerFail(final String m3u8Url, final String peerPath, final int peerIndex) {
-  }
+    public void onPeerFail(final String m3u8Url, final String peerPath, final int peerIndex) {
+    }
 
-  @Override public void setListener(Object obj) {
+    @Override
+    public void setListener(Object obj) {
 
-  }
+    }
 }

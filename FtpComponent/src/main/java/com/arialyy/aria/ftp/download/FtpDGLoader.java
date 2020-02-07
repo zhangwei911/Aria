@@ -16,6 +16,7 @@
 package com.arialyy.aria.ftp.download;
 
 import android.os.Looper;
+
 import com.arialyy.aria.core.common.AbsEntity;
 import com.arialyy.aria.core.common.CompleteInfo;
 import com.arialyy.aria.core.download.DTaskWrapper;
@@ -32,57 +33,61 @@ import com.arialyy.aria.util.ALog;
  * ftp 组合任务加载器
  */
 final class FtpDGLoader extends AbsGroupLoader {
-  FtpDGLoader(AbsTaskWrapper groupWrapper, IEventListener listener) {
-    super(groupWrapper, listener);
-  }
-
-  @Override protected void handlerTask(Looper looper) {
-    if (isBreak()) {
-      return;
+    FtpDGLoader(AbsTaskWrapper groupWrapper, IEventListener listener) {
+        super(groupWrapper, listener);
     }
-    mInfoTask.run();
-  }
 
-  @Override
-  protected AbsSubDLoadUtil createSubLoader(DTaskWrapper wrapper, boolean needGetFileInfo) {
-    return new FtpSubDLoaderUtil(wrapper, getScheduler(), needGetFileInfo, getKey());
-  }
-
-  /**
-   * 启动子任务下载
-   */
-  private void startSub() {
-    if (isBreak()) {
-      return;
-    }
-    onPostStart();
-
-    // ftp需要获取完成只任务信息才更新只任务数量
-    getState().setSubSize(getWrapper().getSubTaskWrapper().size());
-
-    for (DTaskWrapper wrapper : getWrapper().getSubTaskWrapper()) {
-      if (wrapper.getState() != IEntity.STATE_COMPLETE) {
-        startSubLoader(createSubLoader(wrapper, false));
-      }
-    }
-  }
-
-  @Override public void addComponent(IInfoTask infoTask) {
-    mInfoTask = infoTask;
-    infoTask.setCallback(new IInfoTask.Callback() {
-      @Override public void onSucceed(String key, CompleteInfo info) {
-        if (info.code >= 200 && info.code < 300) {
-          startSub();
-        } else {
-          ALog.e(TAG, "获取任务信息失败，code：" + info.code);
-          getListener().onFail(false, null);
+    @Override
+    protected void handlerTask(Looper looper) {
+        if (isBreak()) {
+            return;
         }
-      }
+        mInfoTask.run();
+    }
 
-      @Override public void onFail(AbsEntity entity, BaseException e, boolean needRetry) {
-        //getListener().onFail(needRetry, e);
-        fail(e, needRetry);
-      }
-    });
-  }
+    @Override
+    protected AbsSubDLoadUtil createSubLoader(DTaskWrapper wrapper, boolean needGetFileInfo) {
+        return new FtpSubDLoaderUtil(wrapper, getScheduler(), needGetFileInfo, getKey());
+    }
+
+    /**
+     * 启动子任务下载
+     */
+    private void startSub() {
+        if (isBreak()) {
+            return;
+        }
+        onPostStart();
+
+        // ftp需要获取完成只任务信息才更新只任务数量
+        getState().setSubSize(getWrapper().getSubTaskWrapper().size());
+
+        for (DTaskWrapper wrapper : getWrapper().getSubTaskWrapper()) {
+            if (wrapper.getState() != IEntity.STATE_COMPLETE) {
+                startSubLoader(createSubLoader(wrapper, false));
+            }
+        }
+    }
+
+    @Override
+    public void addComponent(IInfoTask infoTask) {
+        mInfoTask = infoTask;
+        infoTask.setCallback(new IInfoTask.Callback() {
+            @Override
+            public void onSucceed(String key, CompleteInfo info) {
+                if (info.code >= 200 && info.code < 300) {
+                    startSub();
+                } else {
+                    ALog.e(TAG, "获取任务信息失败，code：" + info.code);
+                    getListener().onFail(false, null);
+                }
+            }
+
+            @Override
+            public void onFail(AbsEntity entity, BaseException e, boolean needRetry) {
+                //getListener().onFail(needRetry, e);
+                fail(e, needRetry);
+            }
+        });
+    }
 }

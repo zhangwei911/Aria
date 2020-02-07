@@ -29,84 +29,85 @@ import com.arialyy.aria.util.NetUtils;
  */
 final public class StartCmd<T extends AbsTaskWrapper> extends AbsNormalCmd<T> {
 
-  private boolean newStart = false;
+    private boolean newStart = false;
 
-  StartCmd(T entity, int taskType) {
-    super(entity, taskType);
-  }
-
-  /**
-   * 立即执行任务
-   *
-   * @param newStart true 立即执行任务，无论执行队列是否满了
-   */
-  public void setNewStart(boolean newStart) {
-    this.newStart = newStart;
-  }
-
-  @Override public void executeCmd() {
-    if (!canExeCmd) return;
-    if (!NetUtils.isConnected(AriaConfig.getInstance().getAPP())) {
-      ALog.e(TAG, "启动任务失败，网络未连接");
-      return;
-    }
-    String mod;
-    int maxTaskNum = mQueue.getMaxTaskNum();
-    AriaConfig config = AriaConfig.getInstance();
-    if (isDownloadCmd) {
-      mod = config.getDConfig().getQueueMod();
-    } else {
-      mod = config.getUConfig().getQueueMod();
+    StartCmd(T entity, int taskType) {
+        super(entity, taskType);
     }
 
-    AbsTask task = getTask();
-    if (task == null) {
-      task = createTask();
-      // 任务不存在时，根据配置不同，对任务执行操作
-      if (mod.equals(QueueMod.NOW.getTag())) {
-        startTask();
-      } else if (mod.equals(QueueMod.WAIT.getTag())) {
-        int state = task.getState();
-        if (mQueue.getCurrentExePoolNum() < maxTaskNum) {
-          if (state == IEntity.STATE_STOP
-              || state == IEntity.STATE_FAIL
-              || state == IEntity.STATE_OTHER
-              || state == IEntity.STATE_PRE
-              || state == IEntity.STATE_POST_PRE
-              || state == IEntity.STATE_COMPLETE) {
-            resumeTask();
-          } else if (state == IEntity.STATE_RUNNING) {
-            ALog.w(TAG, String.format("任务【%s】已经在运行", task.getTaskName()));
-          } else {
-            ALog.d(TAG, String.format("开始新任务, 任务状态：%s", state));
-            startTask();
-          }
-        } else {
-          if (newStart) {
-            startTask();
-          } else {
-            sendWaitState(task);
-          }
+    /**
+     * 立即执行任务
+     *
+     * @param newStart true 立即执行任务，无论执行队列是否满了
+     */
+    public void setNewStart(boolean newStart) {
+        this.newStart = newStart;
+    }
+
+    @Override
+    public void executeCmd() {
+        if (!canExeCmd) return;
+        if (!NetUtils.isConnected(AriaConfig.getInstance().getAPP())) {
+            ALog.e(TAG, "启动任务失败，网络未连接");
+            return;
         }
-      }
-    } else {
-      //任务没执行并且执行队列中没有该任务，才认为任务没有运行中
-      if (!mQueue.taskIsRunning(task.getKey())) {
-        resumeTask();
-      } else {
-        ALog.w(TAG, String.format("任务【%s】已经在运行", task.getTaskName()));
-      }
-    }
-    if (mQueue.getCurrentCachePoolNum() == 0) {
-      findAllWaitTask();
-    }
-  }
+        String mod;
+        int maxTaskNum = mQueue.getMaxTaskNum();
+        AriaConfig config = AriaConfig.getInstance();
+        if (isDownloadCmd) {
+            mod = config.getDConfig().getQueueMod();
+        } else {
+            mod = config.getUConfig().getQueueMod();
+        }
 
-  /**
-   * 当缓冲队列为null时，查找数据库中所有等待中的任务
-   */
-  private void findAllWaitTask() {
-    new Thread(
-        new ResumeThread(isDownloadCmd, String.format("state=%s", IEntity.STATE_WAIT))).start();
-  }
+        AbsTask task = getTask();
+        if (task == null) {
+            task = createTask();
+            // 任务不存在时，根据配置不同，对任务执行操作
+            if (mod.equals(QueueMod.NOW.getTag())) {
+                startTask();
+            } else if (mod.equals(QueueMod.WAIT.getTag())) {
+                int state = task.getState();
+                if (mQueue.getCurrentExePoolNum() < maxTaskNum) {
+                    if (state == IEntity.STATE_STOP
+                            || state == IEntity.STATE_FAIL
+                            || state == IEntity.STATE_OTHER
+                            || state == IEntity.STATE_PRE
+                            || state == IEntity.STATE_POST_PRE
+                            || state == IEntity.STATE_COMPLETE) {
+                        resumeTask();
+                    } else if (state == IEntity.STATE_RUNNING) {
+                        ALog.w(TAG, String.format("任务【%s】已经在运行", task.getTaskName()));
+                    } else {
+                        ALog.d(TAG, String.format("开始新任务, 任务状态：%s", state));
+                        startTask();
+                    }
+                } else {
+                    if (newStart) {
+                        startTask();
+                    } else {
+                        sendWaitState(task);
+                    }
+                }
+            }
+        } else {
+            //任务没执行并且执行队列中没有该任务，才认为任务没有运行中
+            if (!mQueue.taskIsRunning(task.getKey())) {
+                resumeTask();
+            } else {
+                ALog.w(TAG, String.format("任务【%s】已经在运行", task.getTaskName()));
+            }
+        }
+        if (mQueue.getCurrentCachePoolNum() == 0) {
+            findAllWaitTask();
+        }
+    }
+
+    /**
+     * 当缓冲队列为null时，查找数据库中所有等待中的任务
+     */
+    private void findAllWaitTask() {
+        new Thread(
+                new ResumeThread(isDownloadCmd, String.format("state=%s", IEntity.STATE_WAIT))).start();
+    }
 }

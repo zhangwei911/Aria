@@ -15,14 +15,14 @@
  */
 package com.arialyy.aria.exception;
 
-public class AriaIOException extends BaseException{
-  private static final String ARIA_NET_EXCEPTION = "Aria Net Exception:";
+public class AriaIOException extends BaseException {
+    private static final String ARIA_NET_EXCEPTION = "Aria Net Exception:";
 
-  public AriaIOException(String tag, String message) {
-    super(tag, String.format("%s%s", ARIA_NET_EXCEPTION, message));
-  }
+    public AriaIOException(String tag, String message) {
+        super(tag, String.format("%s%s", ARIA_NET_EXCEPTION, message));
+    }
 
-  public AriaIOException(String tag, String message, Exception e){
-    super(tag, message, e);
-  }
+    public AriaIOException(String tag, String message, Exception e) {
+        super(tag, message, e);
+    }
 }

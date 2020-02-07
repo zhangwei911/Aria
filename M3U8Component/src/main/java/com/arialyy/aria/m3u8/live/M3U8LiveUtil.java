@@ -36,28 +36,31 @@ import com.arialyy.aria.m3u8.M3U8TaskOption;
  */
 public class M3U8LiveUtil extends AbsNormalLoaderUtil {
 
-  public M3U8LiveUtil(AbsTaskWrapper wrapper, IEventListener listener) {
-    super(wrapper, listener);
-  }
+    public M3U8LiveUtil(AbsTaskWrapper wrapper, IEventListener listener) {
+        super(wrapper, listener);
+    }
 
-  @Override public DTaskWrapper getTaskWrapper() {
-    return (DTaskWrapper) super.getTaskWrapper();
-  }
+    @Override
+    public DTaskWrapper getTaskWrapper() {
+        return (DTaskWrapper) super.getTaskWrapper();
+    }
 
-  @Override public M3U8LiveLoader getLoader() {
-    getTaskWrapper().generateM3u8Option(M3U8TaskOption.class);
-    getTaskWrapper().generateTaskOption(HttpTaskOption.class);
-    return
-        mLoader == null ? new M3U8LiveLoader(getTaskWrapper(), (M3U8Listener) getListener())
-            : (M3U8LiveLoader) mLoader;
-  }
+    @Override
+    public M3U8LiveLoader getLoader() {
+        getTaskWrapper().generateM3u8Option(M3U8TaskOption.class);
+        getTaskWrapper().generateTaskOption(HttpTaskOption.class);
+        return
+                mLoader == null ? new M3U8LiveLoader(getTaskWrapper(), (M3U8Listener) getListener())
+                        : (M3U8LiveLoader) mLoader;
+    }
 
-  @Override public LoaderStructure BuildLoaderStructure() {
-    LoaderStructure structure = new LoaderStructure();
-    structure.addComponent(new LiveRecordHandler(getTaskWrapper()))
-        .addComponent(new M3U8InfoTask(getTaskWrapper()))
-        .addComponent(new LiveStateManager(getTaskWrapper(), getListener()));
-    structure.accept(getLoader());
-    return structure;
-  }
+    @Override
+    public LoaderStructure BuildLoaderStructure() {
+        LoaderStructure structure = new LoaderStructure();
+        structure.addComponent(new LiveRecordHandler(getTaskWrapper()))
+                .addComponent(new M3U8InfoTask(getTaskWrapper()))
+                .addComponent(new LiveStateManager(getTaskWrapper(), getListener()));
+        structure.accept(getLoader());
+        return structure;
+    }
 }

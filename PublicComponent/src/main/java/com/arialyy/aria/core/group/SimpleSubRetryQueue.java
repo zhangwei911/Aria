@@ -24,26 +24,26 @@ import java.util.concurrent.TimeUnit;
  * 子任务重试队列
  */
 final class SimpleSubRetryQueue {
-  private volatile static SimpleSubRetryQueue INSTANCE = null;
-  private ExecutorService pool = new ThreadPoolExecutor(5, 100,
-      60L, TimeUnit.SECONDS,
-      new SynchronousQueue<Runnable>());
+    private volatile static SimpleSubRetryQueue INSTANCE = null;
+    private ExecutorService pool = new ThreadPoolExecutor(5, 100,
+            60L, TimeUnit.SECONDS,
+            new SynchronousQueue<Runnable>());
 
-  public synchronized static SimpleSubRetryQueue getInstance() {
-    if (INSTANCE == null) {
-      synchronized (SimpleSubRetryQueue.class) {
-        INSTANCE = new SimpleSubRetryQueue();
-      }
+    public synchronized static SimpleSubRetryQueue getInstance() {
+        if (INSTANCE == null) {
+            synchronized (SimpleSubRetryQueue.class) {
+                INSTANCE = new SimpleSubRetryQueue();
+            }
+        }
+
+        return INSTANCE;
     }
 
-    return INSTANCE;
-  }
+    private SimpleSubRetryQueue() {
 
-  private SimpleSubRetryQueue() {
+    }
 
-  }
-
-  void offer(AbsSubDLoadUtil subDLoadUtil) {
-    pool.submit(subDLoadUtil.getLoader());
-  }
+    void offer(AbsSubDLoadUtil subDLoadUtil) {
+        pool.submit(subDLoadUtil.getLoader());
+    }
 }

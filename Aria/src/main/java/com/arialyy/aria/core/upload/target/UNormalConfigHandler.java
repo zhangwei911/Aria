@@ -27,6 +27,7 @@ import com.arialyy.aria.core.task.UploadTask;
 import com.arialyy.aria.core.upload.UTaskWrapper;
 import com.arialyy.aria.core.upload.UploadEntity;
 import com.arialyy.aria.orm.DbEntity;
+
 import java.io.File;
 
 /**
@@ -34,56 +35,59 @@ import java.io.File;
  * 普通上传任务通用功能处理
  */
 class UNormalConfigHandler<TARGET extends AbsTarget> implements IConfigHandler {
-  private UploadEntity mEntity;
-  private TARGET mTarget;
-  private UTaskWrapper mWrapper;
+    private UploadEntity mEntity;
+    private TARGET mTarget;
+    private UTaskWrapper mWrapper;
 
-  UNormalConfigHandler(TARGET target, long taskId) {
-    mTarget = target;
-    initTarget(taskId);
-  }
-
-  private void initTarget(long taskId) {
-    mWrapper = TaskWrapperManager.getInstance().getNormalTaskWrapper(UTaskWrapper.class, taskId);
-    // 判断已存在的任务
-    if (mTarget instanceof AbsNormalTarget) {
-      if (taskId < 0) {
-        mWrapper.setErrorEvent(new ErrorEvent(taskId, "任务id为空"));
-      } else if (mWrapper.getEntity().getId() < 0) {
-        mWrapper.setErrorEvent(new ErrorEvent(taskId, "任务信息不存在"));
-      }
+    UNormalConfigHandler(TARGET target, long taskId) {
+        mTarget = target;
+        initTarget(taskId);
     }
 
-    mEntity = mWrapper.getEntity();
-    mTarget.setTaskWrapper(mWrapper);
-    getTaskWrapper().setTempUrl(mEntity.getUrl());
-  }
+    private void initTarget(long taskId) {
+        mWrapper = TaskWrapperManager.getInstance().getNormalTaskWrapper(UTaskWrapper.class, taskId);
+        // 判断已存在的任务
+        if (mTarget instanceof AbsNormalTarget) {
+            if (taskId < 0) {
+                mWrapper.setErrorEvent(new ErrorEvent(taskId, "任务id为空"));
+            } else if (mWrapper.getEntity().getId() < 0) {
+                mWrapper.setErrorEvent(new ErrorEvent(taskId, "任务信息不存在"));
+            }
+        }
 
-  void setFilePath(String filePath) {
-    File file = new File(filePath);
-    mEntity.setFilePath(filePath);
-    mEntity.setFileName(file.getName());
-    mEntity.setFileSize(file.length());
-  }
+        mEntity = mWrapper.getEntity();
+        mTarget.setTaskWrapper(mWrapper);
+        getTaskWrapper().setTempUrl(mEntity.getUrl());
+    }
 
-  @Override public AbsEntity getEntity() {
-    return mEntity;
-  }
+    void setFilePath(String filePath) {
+        File file = new File(filePath);
+        mEntity.setFilePath(filePath);
+        mEntity.setFileName(file.getName());
+        mEntity.setFileSize(file.length());
+    }
 
-  @Override public boolean taskExists() {
-    return DbEntity.checkDataExist(UploadEntity.class, "key=?", mEntity.getFilePath());
-  }
+    @Override
+    public AbsEntity getEntity() {
+        return mEntity;
+    }
 
-  @Override public boolean isRunning() {
-    UploadTask task = UTaskQueue.getInstance().getTask(mEntity.getKey());
-    return task != null && task.isRunning();
-  }
+    @Override
+    public boolean taskExists() {
+        return DbEntity.checkDataExist(UploadEntity.class, "key=?", mEntity.getFilePath());
+    }
 
-  void setTempUrl(String tempUrl) {
-    getTaskWrapper().setTempUrl(tempUrl);
-  }
+    @Override
+    public boolean isRunning() {
+        UploadTask task = UTaskQueue.getInstance().getTask(mEntity.getKey());
+        return task != null && task.isRunning();
+    }
 
-  private UTaskWrapper getTaskWrapper() {
-    return mWrapper;
-  }
+    void setTempUrl(String tempUrl) {
+        getTaskWrapper().setTempUrl(tempUrl);
+    }
+
+    private UTaskWrapper getTaskWrapper() {
+        return mWrapper;
+    }
 }

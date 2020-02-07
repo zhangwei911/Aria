@@ -20,13 +20,13 @@ package com.arialyy.aria.core.event;
  */
 class EventMethodInfo {
 
-  /**
-   * 被{@link Event}注解的事件方法
-   */
-  String methodName;
+    /**
+     * 被{@link Event}注解的事件方法
+     */
+    String methodName;
 
-  /**
-   * 该方法对应的参数类型
-   */
-  Class<?> param;
+    /**
+     * 该方法对应的参数类型
+     */
+    Class<?> param;
 }

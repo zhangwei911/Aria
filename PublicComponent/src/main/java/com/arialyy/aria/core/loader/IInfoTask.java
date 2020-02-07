@@ -24,29 +24,29 @@ import com.arialyy.aria.exception.BaseException;
  */
 public interface IInfoTask extends ILoaderComponent {
 
-  /**
-   * 执行任务
-   */
-  void run();
-
-  /**
-   * 设置回调
-   */
-  void setCallback(Callback callback);
-
-  interface Callback {
     /**
-     * 处理完成
-     *
-     * @param info 一些回调的信息
+     * 执行任务
      */
-    void onSucceed(String key, CompleteInfo info);
+    void run();
 
     /**
-     * 请求失败
-     *
-     * @param e 错误信息
+     * 设置回调
      */
-    void onFail(AbsEntity entity, BaseException e, boolean needRetry);
-  }
+    void setCallback(Callback callback);
+
+    interface Callback {
+        /**
+         * 处理完成
+         *
+         * @param info 一些回调的信息
+         */
+        void onSucceed(String key, CompleteInfo info);
+
+        /**
+         * 请求失败
+         *
+         * @param e 错误信息
+         */
+        void onFail(AbsEntity entity, BaseException e, boolean needRetry);
+    }
 }

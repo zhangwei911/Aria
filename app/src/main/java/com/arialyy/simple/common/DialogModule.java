@@ -17,42 +17,45 @@
 package com.arialyy.simple.common;
 
 import android.text.TextUtils;
+
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
+
 import com.arialyy.aria.util.ALog;
 import com.arialyy.frame.base.BaseViewModule;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 public class DialogModule extends BaseViewModule {
 
-  private MutableLiveData<List<File>> mDirs = new MutableLiveData<>();
+    private MutableLiveData<List<File>> mDirs = new MutableLiveData<>();
 
-  /**
-   * 获取指定目录下的文件夹
-   *
-   * @param path 指定路径
-   */
-  LiveData<List<File>> getDirs(String path) {
-    if (TextUtils.isEmpty(path)) {
-      ALog.e(TAG, "路径为空");
-      return mDirs;
-    }
-    if (!path.startsWith("/")) {
-      ALog.e(TAG, "路径错误");
-      return mDirs;
-    }
-    File file = new File(path);
-    File[] files = file.listFiles();
-    List<File> data = new ArrayList<>();
-    for (File f : files) {
-      if (f.isDirectory()) {
-        data.add(f);
-      }
-    }
-    mDirs.postValue(data);
+    /**
+     * 获取指定目录下的文件夹
+     *
+     * @param path 指定路径
+     */
+    LiveData<List<File>> getDirs(String path) {
+        if (TextUtils.isEmpty(path)) {
+            ALog.e(TAG, "路径为空");
+            return mDirs;
+        }
+        if (!path.startsWith("/")) {
+            ALog.e(TAG, "路径错误");
+            return mDirs;
+        }
+        File file = new File(path);
+        File[] files = file.listFiles();
+        List<File> data = new ArrayList<>();
+        for (File f : files) {
+            if (f.isDirectory()) {
+                data.add(f);
+            }
+        }
+        mDirs.postValue(data);
 
-    return mDirs;
-  }
+        return mDirs;
+    }
 }

@@ -17,6 +17,7 @@ package com.arialyy.aria.core.common;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+
 import com.arialyy.aria.core.wrapper.ITaskWrapper;
 import com.arialyy.aria.orm.annotation.Default;
 
@@ -25,101 +26,103 @@ import com.arialyy.aria.orm.annotation.Default;
  */
 public abstract class AbsNormalEntity extends AbsEntity implements Parcelable {
 
-  /**
-   * 服务器地址
-   */
-  private String url;
+    /**
+     * 服务器地址
+     */
+    private String url;
 
-  /**
-   * 文件名
-   */
-  private String fileName;
+    /**
+     * 文件名
+     */
+    private String fileName;
 
-  /**
-   * 是否是任务组里面的下载实体
-   */
-  @Default("false")
-  private boolean isGroupChild = false;
+    /**
+     * 是否是任务组里面的下载实体
+     */
+    @Default("false")
+    private boolean isGroupChild = false;
 
-  @Default("false")
-  private boolean isRedirect = false; //是否重定向
-  private String redirectUrl; //重定向链接
+    @Default("false")
+    private boolean isRedirect = false; //是否重定向
+    private String redirectUrl; //重定向链接
 
-  /**
-   * 任务类型
-   * {@link ITaskWrapper}
-   */
-  private int taskType;
+    /**
+     * 任务类型
+     * {@link ITaskWrapper}
+     */
+    private int taskType;
 
 
-  public void setTaskType(int taskType) {
-    this.taskType = taskType;
-  }
+    public void setTaskType(int taskType) {
+        this.taskType = taskType;
+    }
 
-  public String getUrl() {
-    return url;
-  }
+    public String getUrl() {
+        return url;
+    }
 
-  public void setUrl(String url) {
-    this.url = url;
-  }
+    public void setUrl(String url) {
+        this.url = url;
+    }
 
-  public boolean isGroupChild() {
-    return isGroupChild;
-  }
+    public boolean isGroupChild() {
+        return isGroupChild;
+    }
 
-  public void setGroupChild(boolean groupChild) {
-    isGroupChild = groupChild;
-  }
+    public void setGroupChild(boolean groupChild) {
+        isGroupChild = groupChild;
+    }
 
-  public String getFileName() {
-    return fileName;
-  }
+    public String getFileName() {
+        return fileName;
+    }
 
-  public void setFileName(String fileName) {
-    this.fileName = fileName;
-  }
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
 
-  public boolean isRedirect() {
-    return isRedirect;
-  }
+    public boolean isRedirect() {
+        return isRedirect;
+    }
 
-  public void setRedirect(boolean redirect) {
-    isRedirect = redirect;
-  }
+    public void setRedirect(boolean redirect) {
+        isRedirect = redirect;
+    }
 
-  public String getRedirectUrl() {
-    return redirectUrl;
-  }
+    public String getRedirectUrl() {
+        return redirectUrl;
+    }
 
-  public void setRedirectUrl(String redirectUrl) {
-    this.redirectUrl = redirectUrl;
-  }
+    public void setRedirectUrl(String redirectUrl) {
+        this.redirectUrl = redirectUrl;
+    }
 
-  public abstract String getFilePath();
+    public abstract String getFilePath();
 
-  public AbsNormalEntity() {
-  }
+    public AbsNormalEntity() {
+    }
 
-  @Override public int describeContents() {
-    return 0;
-  }
+    @Override
+    public int describeContents() {
+        return 0;
+    }
 
-  @Override public void writeToParcel(Parcel dest, int flags) {
-    super.writeToParcel(dest, flags);
-    dest.writeString(this.url);
-    dest.writeString(this.fileName);
-    dest.writeByte(this.isGroupChild ? (byte) 1 : (byte) 0);
-    dest.writeByte(this.isRedirect ? (byte) 1 : (byte) 0);
-    dest.writeString(this.redirectUrl);
-  }
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        super.writeToParcel(dest, flags);
+        dest.writeString(this.url);
+        dest.writeString(this.fileName);
+        dest.writeByte(this.isGroupChild ? (byte) 1 : (byte) 0);
+        dest.writeByte(this.isRedirect ? (byte) 1 : (byte) 0);
+        dest.writeString(this.redirectUrl);
+    }
 
-  protected AbsNormalEntity(Parcel in) {
-    super(in);
-    this.url = in.readString();
-    this.fileName = in.readString();
-    this.isGroupChild = in.readByte() != 0;
-    this.isRedirect = in.readByte() != 0;
-    this.redirectUrl = in.readString();
-  }
+    protected AbsNormalEntity(Parcel in) {
+        super(in);
+        this.url = in.readString();
+        this.fileName = in.readString();
+        this.isGroupChild = in.readByte() != 0;
+        this.isRedirect = in.readByte() != 0;
+        this.redirectUrl = in.readString();
+    }
 }

@@ -25,6 +25,8 @@ import java.lang.annotation.Target;
  * Created by lyy on 2015/11/2.
  * 设置表名，如果不是使用该注解，默认为类名
  */
-@Target(ElementType.TYPE) @Retention(RetentionPolicy.RUNTIME) public @interface Table {
-  String tableName();
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface Table {
+    String tableName();
 }

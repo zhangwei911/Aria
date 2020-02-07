@@ -20,26 +20,26 @@ package com.arialyy.annotations;
  */
 
 public interface AriaConstance {
-  String NO_URL = "";
+    String NO_URL = "";
 
-  /**
-   * 注解方法为普通任务下载
-   */
-  int DOWNLOAD = 0xa1;
+    /**
+     * 注解方法为普通任务下载
+     */
+    int DOWNLOAD = 0xa1;
 
-  /**
-   * 注解方法为任务组下载
-   */
-  int DOWNLOAD_GROUP = 0xa2;
+    /**
+     * 注解方法为任务组下载
+     */
+    int DOWNLOAD_GROUP = 0xa2;
 
-  /**
-   * 注解方法为普通任务上传
-   */
-  int UPLOAD = 0xb1;
+    /**
+     * 注解方法为普通任务上传
+     */
+    int UPLOAD = 0xb1;
 
-  /**
-   * 注解方法为任务组上传
-   */
-  int UPLOAD_GROUP = 0xb2;
+    /**
+     * 注解方法为任务组上传
+     */
+    int UPLOAD_GROUP = 0xb2;
 }
 

@@ -24,46 +24,46 @@ import javax.tools.Diagnostic;
  */
 class PrintLog {
 
-  private volatile static PrintLog INSTANCE = null;
-  private Messager mMessager;
+    private volatile static PrintLog INSTANCE = null;
+    private Messager mMessager;
 
-  public static PrintLog init(Messager msg) {
-    if (INSTANCE == null) {
-      synchronized (PrintLog.class) {
-        INSTANCE = new PrintLog(msg);
-      }
+    public static PrintLog init(Messager msg) {
+        if (INSTANCE == null) {
+            synchronized (PrintLog.class) {
+                INSTANCE = new PrintLog(msg);
+            }
+        }
+        return INSTANCE;
     }
-    return INSTANCE;
-  }
 
-  public static PrintLog getInstance() {
-    return INSTANCE;
-  }
+    public static PrintLog getInstance() {
+        return INSTANCE;
+    }
 
-  private PrintLog() {
-  }
+    private PrintLog() {
+    }
 
-  private PrintLog(Messager msg) {
-    mMessager = msg;
-  }
+    private PrintLog(Messager msg) {
+        mMessager = msg;
+    }
 
-  public void error(Element e, String msg, Object... args) {
-    mMessager.printMessage(Diagnostic.Kind.ERROR, String.format(msg, args), e);
-  }
+    public void error(Element e, String msg, Object... args) {
+        mMessager.printMessage(Diagnostic.Kind.ERROR, String.format(msg, args), e);
+    }
 
-  public void error(String msg, Object... args) {
-    mMessager.printMessage(Diagnostic.Kind.ERROR, String.format(msg, args));
-  }
+    public void error(String msg, Object... args) {
+        mMessager.printMessage(Diagnostic.Kind.ERROR, String.format(msg, args));
+    }
 
-  public void warning(String msg) {
-    mMessager.printMessage(Diagnostic.Kind.WARNING, msg);
-  }
+    public void warning(String msg) {
+        mMessager.printMessage(Diagnostic.Kind.WARNING, msg);
+    }
 
-  public void error(String msg) {
-    mMessager.printMessage(Diagnostic.Kind.ERROR, msg);
-  }
+    public void error(String msg) {
+        mMessager.printMessage(Diagnostic.Kind.ERROR, msg);
+    }
 
-  public void info(String str) {
-    mMessager.printMessage(Diagnostic.Kind.NOTE, str);
-  }
+    public void info(String str) {
+        mMessager.printMessage(Diagnostic.Kind.NOTE, str);
+    }
 }

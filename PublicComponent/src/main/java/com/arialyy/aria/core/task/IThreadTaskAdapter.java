@@ -23,20 +23,20 @@ package com.arialyy.aria.core.task;
  */
 public interface IThreadTaskAdapter {
 
-  /**
-   * 执行任务
-   */
-  void call(IThreadTask threadTask) throws Exception;
+    /**
+     * 执行任务
+     */
+    void call(IThreadTask threadTask) throws Exception;
 
-  /**
-   * 设置当前线程最大下载速度
-   *
-   * @param speed 单位为：kb
-   */
-  void setMaxSpeed(int speed);
+    /**
+     * 设置当前线程最大下载速度
+     *
+     * @param speed 单位为：kb
+     */
+    void setMaxSpeed(int speed);
 
-  /**
-   * 注册观察者
-   */
-  void attach(IThreadTaskObserver observer);
+    /**
+     * 注册观察者
+     */
+    void attach(IThreadTaskObserver observer);
 }

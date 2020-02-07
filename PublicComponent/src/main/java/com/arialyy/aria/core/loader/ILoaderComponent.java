@@ -20,6 +20,6 @@ package com.arialyy.aria.core.loader;
  */
 public interface ILoaderComponent {
 
-  void accept(ILoaderVisitor visitor);
+    void accept(ILoaderVisitor visitor);
 
 }

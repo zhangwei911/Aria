@@ -24,21 +24,23 @@ import java.lang.annotation.Target;
  * Created by AriaL on 2017/7/4.
  * 一对多
  */
-@Target(ElementType.FIELD) @Retention(RetentionPolicy.RUNTIME) public @interface Many {
-  /**
-   * 父表对应的字段名
-   */
-  String parentColumn();
+@Target(ElementType.FIELD)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface Many {
+    /**
+     * 父表对应的字段名
+     */
+    String parentColumn();
 
-  /**
-   * 父表在子表对应的字段
-   */
-  String entityColumn();
+    /**
+     * 父表在子表对应的字段
+     */
+    String entityColumn();
 
-  ///**
-  // * 是否是一对一关系
-  // *
-  // * @return {@code true} 是，{@code false} 不是
-  // */
-  //boolean isOne2One() default false;
+    ///**
+    // * 是否是一对一关系
+    // *
+    // * @return {@code true} 是，{@code false} 不是
+    // */
+    //boolean isOne2One() default false;
 }

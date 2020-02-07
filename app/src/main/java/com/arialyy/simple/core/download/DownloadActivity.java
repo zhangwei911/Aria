@@ -18,11 +18,13 @@ package com.arialyy.simple.core.download;
 
 import android.os.Bundle;
 import android.view.View;
+
 import androidx.annotation.Nullable;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import com.arialyy.simple.MainActivity;
 import com.arialyy.simple.R;
 import com.arialyy.simple.base.BaseActivity;
@@ -32,6 +34,7 @@ import com.arialyy.simple.core.download.mutil.MultiTaskActivity;
 import com.arialyy.simple.databinding.ActivityDownloadMeanBinding;
 import com.arialyy.simple.modlue.CommonModule;
 import com.arialyy.simple.to.NormalTo;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,63 +42,67 @@ import java.util.List;
  * Created by Lyy on 2016/10/13.
  */
 public class DownloadActivity extends BaseActivity<ActivityDownloadMeanBinding> {
-  private NormalTo mTo;
+    private NormalTo mTo;
 
-  @Override protected int setLayoutId() {
-    return R.layout.activity_download_mean;
-  }
+    @Override
+    protected int setLayoutId() {
+        return R.layout.activity_download_mean;
+    }
 
-  @Override protected void init(Bundle savedInstanceState) {
-    super.init(savedInstanceState);
-    mTo = getIntent().getParcelableExtra(MainActivity.KEY_MAIN_DATA);
-    setTitle(mTo.title);
+    @Override
+    protected void init(Bundle savedInstanceState) {
+        super.init(savedInstanceState);
+        mTo = getIntent().getParcelableExtra(MainActivity.KEY_MAIN_DATA);
+        setTitle(mTo.title);
 
-    final List<NormalTo> data = new ArrayList<>();
-    getBinding().list.setLayoutManager(new GridLayoutManager(this, 2));
-    final NormalToAdapter adapter = new NormalToAdapter(this, data);
-    getBinding().list.setAdapter(adapter);
-    final CommonModule module = ViewModelProviders.of(this).get(CommonModule.class);
+        final List<NormalTo> data = new ArrayList<>();
+        getBinding().list.setLayoutManager(new GridLayoutManager(this, 2));
+        final NormalToAdapter adapter = new NormalToAdapter(this, data);
+        getBinding().list.setAdapter(adapter);
+        final CommonModule module = ViewModelProviders.of(this).get(CommonModule.class);
 
-    module.getDownloadData(this).observe(this,
-        new Observer<List<NormalTo>>() {
-          @Override public void onChanged(@Nullable List<NormalTo> normalTos) {
-            if (normalTos != null) {
-              data.addAll(normalTos);
-              adapter.notifyDataSetChanged();
-            }
-          }
-        });
+        module.getDownloadData(this).observe(this,
+                new Observer<List<NormalTo>>() {
+                    @Override
+                    public void onChanged(@Nullable List<NormalTo> normalTos) {
+                        if (normalTos != null) {
+                            data.addAll(normalTos);
+                            adapter.notifyDataSetChanged();
+                        }
+                    }
+                });
 
-    RvItemClickSupport.addTo(getBinding().list).setOnItemClickListener(
-        new RvItemClickSupport.OnItemClickListener() {
-          @Override public void onItemClicked(RecyclerView recyclerView, int position, View v) {
-            switch (position) {
-              case 0:
-                module.startNextActivity(DownloadActivity.this, data.get(position),
-                    SingleTaskActivity.class);
-                break;
-              case 1:
-                module.startNextActivity(DownloadActivity.this, data.get(position),
-                    MultiTaskActivity.class);
-                break;
-              case 2:
-                module.startNextActivity(DownloadActivity.this, data.get(position),
-                    HighestPriorityActivity.class);
-                break;
-              case 3:
-                module.startNextActivity(DownloadActivity.this, data.get(position),
-                    KotlinDownloadActivity.class);
-                break;
-              case 4:
-                // 服务中
-                break;
-              case 5:
-                // 组件中使用
-                module.startNextActivity(DownloadActivity.this, data.get(position),
-                    ComponentActivity.class);
-                break;
-            }
-          }
-        });
-  }
+        RvItemClickSupport.addTo(getBinding().list).setOnItemClickListener(
+                new RvItemClickSupport.OnItemClickListener() {
+                    @Override
+                    public void onItemClicked(RecyclerView recyclerView, int position, View v) {
+                        switch (position) {
+                            case 0:
+                                module.startNextActivity(DownloadActivity.this, data.get(position),
+                                        SingleTaskActivity.class);
+                                break;
+                            case 1:
+                                module.startNextActivity(DownloadActivity.this, data.get(position),
+                                        MultiTaskActivity.class);
+                                break;
+                            case 2:
+                                module.startNextActivity(DownloadActivity.this, data.get(position),
+                                        HighestPriorityActivity.class);
+                                break;
+                            case 3:
+                                module.startNextActivity(DownloadActivity.this, data.get(position),
+                                        KotlinDownloadActivity.class);
+                                break;
+                            case 4:
+                                // 服务中
+                                break;
+                            case 5:
+                                // 组件中使用
+                                module.startNextActivity(DownloadActivity.this, data.get(position),
+                                        ComponentActivity.class);
+                                break;
+                        }
+                    }
+                });
+    }
 }

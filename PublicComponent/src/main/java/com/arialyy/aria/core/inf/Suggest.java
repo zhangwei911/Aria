@@ -17,7 +17,7 @@ package com.arialyy.aria.core.inf;
 
 public interface Suggest {
 
-  String TASK_CONTROLLER = "after use #add()、#create()、#stop()、#cancel()、#resume()、#save()?";
+    String TASK_CONTROLLER = "after use #add()、#create()、#stop()、#cancel()、#resume()、#save()?";
 
-  String TO_CONTROLLER = "after use #controller()?";
+    String TO_CONTROLLER = "after use #controller()?";
 }

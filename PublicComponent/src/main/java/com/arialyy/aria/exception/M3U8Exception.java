@@ -15,14 +15,14 @@
  */
 package com.arialyy.aria.exception;
 
-public class M3U8Exception extends BaseException{
-  private static final String M3U8_EXCEPTION = "M3U8 Exception:";
+public class M3U8Exception extends BaseException {
+    private static final String M3U8_EXCEPTION = "M3U8 Exception:";
 
-  public M3U8Exception(String tag, String message) {
-    super(tag, String.format("%s%s", M3U8_EXCEPTION, message));
-  }
+    public M3U8Exception(String tag, String message) {
+        super(tag, String.format("%s%s", M3U8_EXCEPTION, message));
+    }
 
-  public M3U8Exception(String tag, String message, Exception e){
-    super(tag, message, e);
-  }
+    public M3U8Exception(String tag, String message, Exception e) {
+        super(tag, message, e);
+    }
 }

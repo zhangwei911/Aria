@@ -21,14 +21,14 @@ package com.arialyy.simple.core.download.mutil;
  */
 
 public class FileListEntity {
-  public String name, key, downloadPath;
+    public String name, key, downloadPath;
 
-  /**
-   * 0：普通任务
-   * 1：组合任务
-   * 2：m3u8任务
-   */
-  public int type = 0;
+    /**
+     * 0：普通任务
+     * 1：组合任务
+     * 2：m3u8任务
+     */
+    public int type = 0;
 
-  public String[] urls, names;
+    public String[] urls, names;
 }

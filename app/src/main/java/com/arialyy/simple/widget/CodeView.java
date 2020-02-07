@@ -22,11 +22,13 @@ import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.RelativeLayout;
+
 import com.arialyy.simple.R;
 import com.arialyy.simple.core.FullScreenCodeActivity;
 import com.pddstudio.highlightjs.HighlightJsView;
 import com.pddstudio.highlightjs.models.Language;
 import com.pddstudio.highlightjs.models.Theme;
+
 import java.io.File;
 
 /**
@@ -34,43 +36,44 @@ import java.io.File;
  */
 public class CodeView extends RelativeLayout {
 
-  private HighlightJsView mCodeView;
-  private File mSourceFile;
+    private HighlightJsView mCodeView;
+    private File mSourceFile;
 
-  public CodeView(Context context) {
-    super(context, null);
-  }
+    public CodeView(Context context) {
+        super(context, null);
+    }
 
-  public CodeView(Context context, AttributeSet attrs) {
-    super(context, attrs);
-    init(context);
-  }
+    public CodeView(Context context, AttributeSet attrs) {
+        super(context, attrs);
+        init(context);
+    }
 
-  private void init(Context context) {
-    LayoutInflater.from(context).inflate(R.layout.layout_code_demo, this, true);
-    mCodeView = findViewById(R.id.js_view);
-    mCodeView.setHighlightLanguage(Language.JAVA);
-    mCodeView.setTheme(Theme.ANDROID_STUDIO);
-    mCodeView.setZoomSupportEnabled(true);
-    findViewById(R.id.full_screen).setOnClickListener(new OnClickListener() {
-      @Override public void onClick(View v) {
-        // 横屏显示代码
-        Intent intent = new Intent(getContext(), FullScreenCodeActivity.class);
-        intent.putExtra(FullScreenCodeActivity.KEY_FILE_PATH, mSourceFile.getPath());
-        getContext().startActivity(intent);
-      }
-    });
-  }
+    private void init(Context context) {
+        LayoutInflater.from(context).inflate(R.layout.layout_code_demo, this, true);
+        mCodeView = findViewById(R.id.js_view);
+        mCodeView.setHighlightLanguage(Language.JAVA);
+        mCodeView.setTheme(Theme.ANDROID_STUDIO);
+        mCodeView.setZoomSupportEnabled(true);
+        findViewById(R.id.full_screen).setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // 横屏显示代码
+                Intent intent = new Intent(getContext(), FullScreenCodeActivity.class);
+                intent.putExtra(FullScreenCodeActivity.KEY_FILE_PATH, mSourceFile.getPath());
+                getContext().startActivity(intent);
+            }
+        });
+    }
 
-  public void setSource(File sourceFile) {
-    mSourceFile = sourceFile;
-    mCodeView.setSource(sourceFile);
-  }
+    public void setSource(File sourceFile) {
+        mSourceFile = sourceFile;
+        mCodeView.setSource(sourceFile);
+    }
 
 
-  public void setSource(File sourceFile, Language language) {
-    mSourceFile = sourceFile;
-    mCodeView.setHighlightLanguage(language);
-    mCodeView.setSource(sourceFile);
-  }
+    public void setSource(File sourceFile, Language language) {
+        mSourceFile = sourceFile;
+        mCodeView.setHighlightLanguage(language);
+        mCodeView.setSource(sourceFile);
+    }
 }

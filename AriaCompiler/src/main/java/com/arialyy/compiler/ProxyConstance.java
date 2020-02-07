@@ -20,21 +20,21 @@ package com.arialyy.compiler;
  * 扫描器常量
  */
 interface ProxyConstance {
-  boolean DEBUG = false;
-  /**
-   * 设置观察者的方法
-   */
-  String SET_LISTENER = "setListener";
+    boolean DEBUG = false;
+    /**
+     * 设置观察者的方法
+     */
+    String SET_LISTENER = "setListener";
 
-  int WAIT = 0X10;
-  int PRE = 0X11;
-  int TASK_PRE = 0X12;
-  int TASK_RESUME = 0X13;
-  int TASK_START = 0X14;
-  int TASK_STOP = 0X15;
-  int TASK_CANCEL = 0X16;
-  int TASK_FAIL = 0X17;
-  int TASK_COMPLETE = 0X18;
-  int TASK_RUNNING = 0X19;
-  int TASK_NO_SUPPORT_BREAKPOINT = 0X1A;
+    int WAIT = 0X10;
+    int PRE = 0X11;
+    int TASK_PRE = 0X12;
+    int TASK_RESUME = 0X13;
+    int TASK_START = 0X14;
+    int TASK_STOP = 0X15;
+    int TASK_CANCEL = 0X16;
+    int TASK_FAIL = 0X17;
+    int TASK_COMPLETE = 0X18;
+    int TASK_RUNNING = 0X19;
+    int TASK_NO_SUPPORT_BREAKPOINT = 0X1A;
 }

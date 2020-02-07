@@ -16,30 +16,31 @@
 package com.arialyy.aria.core.loader;
 
 import com.arialyy.aria.core.inf.IThreadStateManager;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class LoaderStructure {
-  private List<ILoaderComponent> parts = new ArrayList<>();
+    private List<ILoaderComponent> parts = new ArrayList<>();
 
-  public void accept(ILoaderVisitor visitor) {
+    public void accept(ILoaderVisitor visitor) {
 
-    for (ILoaderComponent part : parts) {
-      part.accept(visitor);
+        for (ILoaderComponent part : parts) {
+            part.accept(visitor);
+        }
     }
-  }
 
-  /**
-   * 将组件加入到集合，必须添加以下集合：
-   * 1 {@link IRecordHandler}
-   * 2 {@link IInfoTask}
-   * 3 {@link IThreadStateManager}
-   * 4 {@link IThreadTaskBuilder}
-   *
-   * @param component 待添加的组件
-   */
-  public LoaderStructure addComponent(ILoaderComponent component) {
-    parts.add(component);
-    return this;
-  }
+    /**
+     * 将组件加入到集合，必须添加以下集合：
+     * 1 {@link IRecordHandler}
+     * 2 {@link IInfoTask}
+     * 3 {@link IThreadStateManager}
+     * 4 {@link IThreadTaskBuilder}
+     *
+     * @param component 待添加的组件
+     */
+    public LoaderStructure addComponent(ILoaderComponent component) {
+        parts.add(component);
+        return this;
+    }
 }

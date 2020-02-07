@@ -16,6 +16,7 @@
 package com.arialyy.aria.core.listener;
 
 import android.os.Handler;
+
 import com.arialyy.aria.core.inf.IEntity;
 import com.arialyy.aria.core.loader.IRecordHandler;
 import com.arialyy.aria.core.inf.TaskSchedulerType;
@@ -28,22 +29,23 @@ import com.arialyy.aria.util.RecordUtil;
  * 下载监听类
  */
 public class BaseUListener extends BaseListener<UploadEntity, UTaskWrapper, AbsTask<UTaskWrapper>>
-    implements IUploadListener {
+        implements IUploadListener {
 
-  public BaseUListener(AbsTask<UTaskWrapper> task, Handler outHandler) {
-    super(task, outHandler);
-  }
-
-  @Override protected void handleCancel() {
-    int sType = getTask().getSchedulerType();
-    if (sType == TaskSchedulerType.TYPE_CANCEL_AND_NOT_NOTIFY) {
-      mEntity.setComplete(false);
-      mEntity.setState(IEntity.STATE_WAIT);
-      RecordUtil.delTaskRecord(mEntity.getFilePath(), IRecordHandler.TYPE_UPLOAD,
-          mTaskWrapper.isRemoveFile(), false);
-    } else {
-      RecordUtil.delTaskRecord(mEntity.getFilePath(), IRecordHandler.TYPE_UPLOAD,
-          mTaskWrapper.isRemoveFile(), true);
+    public BaseUListener(AbsTask<UTaskWrapper> task, Handler outHandler) {
+        super(task, outHandler);
     }
-  }
+
+    @Override
+    protected void handleCancel() {
+        int sType = getTask().getSchedulerType();
+        if (sType == TaskSchedulerType.TYPE_CANCEL_AND_NOT_NOTIFY) {
+            mEntity.setComplete(false);
+            mEntity.setState(IEntity.STATE_WAIT);
+            RecordUtil.delTaskRecord(mEntity.getFilePath(), IRecordHandler.TYPE_UPLOAD,
+                    mTaskWrapper.isRemoveFile(), false);
+        } else {
+            RecordUtil.delTaskRecord(mEntity.getFilePath(), IRecordHandler.TYPE_UPLOAD,
+                    mTaskWrapper.isRemoveFile(), true);
+        }
+    }
 }

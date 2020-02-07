@@ -25,45 +25,48 @@ import com.arialyy.aria.util.ALog;
  * http 单文件上传
  */
 public class HttpNormalTarget extends AbsNormalTarget<HttpNormalTarget> {
-  private UNormalConfigHandler<HttpNormalTarget> mConfigHandler;
+    private UNormalConfigHandler<HttpNormalTarget> mConfigHandler;
 
-  HttpNormalTarget(long taskId) {
-    mConfigHandler = new UNormalConfigHandler<>(this, taskId);
-    getTaskWrapper().setSupportBP(false);
-    getTaskWrapper().setRequestType(AbsTaskWrapper.U_HTTP);
-    getTaskWrapper().setNewTask(false);
-  }
-
-  /**
-   * 设置上传路径
-   *
-   * @param tempUrl 上传路径
-   */
-  public HttpNormalTarget setUploadUrl(String tempUrl) {
-    mConfigHandler.setTempUrl(tempUrl);
-    return this;
-  }
-
-  /**
-   * 设置http请求参数，header等信息
-   */
-  public HttpNormalTarget option(HttpOption option) {
-    if (option == null) {
-      throw new NullPointerException("任务配置为空");
+    HttpNormalTarget(long taskId) {
+        mConfigHandler = new UNormalConfigHandler<>(this, taskId);
+        getTaskWrapper().setSupportBP(false);
+        getTaskWrapper().setRequestType(AbsTaskWrapper.U_HTTP);
+        getTaskWrapper().setNewTask(false);
     }
-    getTaskWrapper().getOptionParams().setParams(option);
-    return this;
-  }
 
-  @Override public void resume() {
-    ALog.e(TAG, "http上传任务没有恢复功能");
-  }
+    /**
+     * 设置上传路径
+     *
+     * @param tempUrl 上传路径
+     */
+    public HttpNormalTarget setUploadUrl(String tempUrl) {
+        mConfigHandler.setTempUrl(tempUrl);
+        return this;
+    }
 
-  @Override public boolean isRunning() {
-    return mConfigHandler.isRunning();
-  }
+    /**
+     * 设置http请求参数，header等信息
+     */
+    public HttpNormalTarget option(HttpOption option) {
+        if (option == null) {
+            throw new NullPointerException("任务配置为空");
+        }
+        getTaskWrapper().getOptionParams().setParams(option);
+        return this;
+    }
 
-  @Override public boolean taskExists() {
-    return mConfigHandler.taskExists();
-  }
+    @Override
+    public void resume() {
+        ALog.e(TAG, "http上传任务没有恢复功能");
+    }
+
+    @Override
+    public boolean isRunning() {
+        return mConfigHandler.isRunning();
+    }
+
+    @Override
+    public boolean taskExists() {
+        return mConfigHandler.taskExists();
+    }
 }

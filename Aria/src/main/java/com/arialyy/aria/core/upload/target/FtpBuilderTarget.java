@@ -27,62 +27,62 @@ import com.arialyy.aria.util.CommonUtil;
  * ftp单任务上传
  */
 public class FtpBuilderTarget extends AbsBuilderTarget<FtpBuilderTarget> {
-  private UNormalConfigHandler<FtpBuilderTarget> mConfigHandler;
-  private String url;
+    private UNormalConfigHandler<FtpBuilderTarget> mConfigHandler;
+    private String url;
 
-  FtpBuilderTarget(String filePath) {
-    mConfigHandler = new UNormalConfigHandler<>(this, -1);
-    mConfigHandler.setFilePath(filePath);
-    getTaskWrapper().setRequestType(ITaskWrapper.U_FTP);
-    ((UploadEntity)getEntity()).setTaskType(ITaskWrapper.U_FTP);
-    getTaskWrapper().setNewTask(true);
-  }
-
-  /**
-   * 设置上传路径
-   *
-   * @param tempUrl 上传路径
-   */
-  public FtpBuilderTarget setUploadUrl(String tempUrl) {
-    url = tempUrl;
-    mConfigHandler.setTempUrl(tempUrl);
-    return this;
-  }
-
-  /**
-   * 如果文件路径被其它任务占用，删除其它任务
-   *
-   * @deprecated 使用 {@link #ignoreFilePathOccupy()}
-   */
-  @Deprecated
-  public FtpBuilderTarget forceUpload() {
-    getTaskWrapper().setIgnoreFilePathOccupy(true);
-    return this;
-  }
-
-  /**
-   * 设置登陆、字符串编码、ftps等参数
-   */
-  public FtpBuilderTarget option(FtpOption option) {
-    if (option == null) {
-      throw new NullPointerException("ftp 任务配置为空");
+    FtpBuilderTarget(String filePath) {
+        mConfigHandler = new UNormalConfigHandler<>(this, -1);
+        mConfigHandler.setFilePath(filePath);
+        getTaskWrapper().setRequestType(ITaskWrapper.U_FTP);
+        ((UploadEntity) getEntity()).setTaskType(ITaskWrapper.U_FTP);
+        getTaskWrapper().setNewTask(true);
     }
-    option.setUrlEntity(CommonUtil.getFtpUrlInfo(url));
-    getTaskWrapper().getOptionParams().setParams(option);
-    return this;
-  }
 
-  /**
-   * 设置登陆、字符串编码、sftp等参数
-   */
-  public FtpBuilderTarget sftpOption(SFtpOption option) {
-    if (option == null) {
-      throw new NullPointerException("ftp 任务配置为空");
+    /**
+     * 设置上传路径
+     *
+     * @param tempUrl 上传路径
+     */
+    public FtpBuilderTarget setUploadUrl(String tempUrl) {
+        url = tempUrl;
+        mConfigHandler.setTempUrl(tempUrl);
+        return this;
     }
-    option.setUrlEntity(CommonUtil.getFtpUrlInfo(url));
-    getTaskWrapper().getOptionParams().setParams(option);
-    ((UploadEntity)getEntity()).setTaskType(ITaskWrapper.U_SFTP);
-    getTaskWrapper().setRequestType(ITaskWrapper.U_SFTP);
-    return this;
-  }
+
+    /**
+     * 如果文件路径被其它任务占用，删除其它任务
+     *
+     * @deprecated 使用 {@link #ignoreFilePathOccupy()}
+     */
+    @Deprecated
+    public FtpBuilderTarget forceUpload() {
+        getTaskWrapper().setIgnoreFilePathOccupy(true);
+        return this;
+    }
+
+    /**
+     * 设置登陆、字符串编码、ftps等参数
+     */
+    public FtpBuilderTarget option(FtpOption option) {
+        if (option == null) {
+            throw new NullPointerException("ftp 任务配置为空");
+        }
+        option.setUrlEntity(CommonUtil.getFtpUrlInfo(url));
+        getTaskWrapper().getOptionParams().setParams(option);
+        return this;
+    }
+
+    /**
+     * 设置登陆、字符串编码、sftp等参数
+     */
+    public FtpBuilderTarget sftpOption(SFtpOption option) {
+        if (option == null) {
+            throw new NullPointerException("ftp 任务配置为空");
+        }
+        option.setUrlEntity(CommonUtil.getFtpUrlInfo(url));
+        getTaskWrapper().getOptionParams().setParams(option);
+        ((UploadEntity) getEntity()).setTaskType(ITaskWrapper.U_SFTP);
+        getTaskWrapper().setRequestType(ITaskWrapper.U_SFTP);
+        return this;
+    }
 }

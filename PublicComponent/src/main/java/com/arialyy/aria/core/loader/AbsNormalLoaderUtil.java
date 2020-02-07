@@ -28,122 +28,129 @@ import com.arialyy.aria.util.CommonUtil;
  * HTTP\FTP单任务下载工具
  */
 public abstract class AbsNormalLoaderUtil implements IUtil {
-  protected String TAG = CommonUtil.getClassName(getClass());
-  private IEventListener mListener;
-  protected AbsNormalLoader mLoader;
-  private AbsTaskWrapper mTaskWrapper;
-  private boolean isStop = false, isCancel = false;
+    protected String TAG = CommonUtil.getClassName(getClass());
+    private IEventListener mListener;
+    protected AbsNormalLoader mLoader;
+    private AbsTaskWrapper mTaskWrapper;
+    private boolean isStop = false, isCancel = false;
 
-  protected AbsNormalLoaderUtil(AbsTaskWrapper wrapper, IEventListener listener) {
-    mTaskWrapper = wrapper;
-    mListener = listener;
-    mLoader = getLoader();
-  }
-
-  /**
-   * 获取加载器
-   */
-  public abstract AbsNormalLoader getLoader();
-
-  /**
-   * 获取构造器
-   */
-  public abstract LoaderStructure BuildLoaderStructure();
-
-  @Override public String getKey() {
-    return mTaskWrapper.getKey();
-  }
-
-  @Override public long getFileSize() {
-    return mLoader.getFileSize();
-  }
-
-  /**
-   * 获取当前下载位置
-   */
-  @Override public long getCurrentLocation() {
-    return mLoader.getCurrentProgress();
-  }
-
-  @Override public boolean isRunning() {
-    return mLoader.isRunning();
-  }
-
-  /**
-   * 取消下载
-   */
-  @Override public void cancel() {
-    isCancel = true;
-    mLoader.cancel();
-    onCancel();
-  }
-
-  protected void onCancel() {
-
-  }
-
-  /**
-   * 停止下载
-   */
-  @Override public void stop() {
-    isStop = true;
-    mLoader.stop();
-    onStop();
-  }
-
-  protected void onStop() {
-
-  }
-
-  /**
-   * 多线程断点续传下载文件，开始下载
-   */
-  @Override public void start() {
-    if (isStop || isCancel) {
-      ALog.w(TAG, "启动任务失败，任务已停止或已取消");
-      return;
+    protected AbsNormalLoaderUtil(AbsTaskWrapper wrapper, IEventListener listener) {
+        mTaskWrapper = wrapper;
+        mListener = listener;
+        mLoader = getLoader();
     }
-    mListener.onPre();
-    // 如果网址没有变，而服务器端端文件改变，以下代码就没有用了
-    //if (mTaskWrapper.getEntity().getFileSize() <= 1
-    //    || mTaskWrapper.isRefreshInfo()
-    //    || mTaskWrapper.getRequestType() == AbsTaskWrapper.D_FTP
-    //    || mTaskWrapper.getState() == IEntity.STATE_FAIL) {
-    //  new Thread(createInfoThread()).create();
-    //} else {
-    //  mDownloader.create();
-    //}
 
-    BuildLoaderStructure();
-    new Thread(mLoader).start();
-    onStart();
-  }
+    /**
+     * 获取加载器
+     */
+    public abstract AbsNormalLoader getLoader();
 
-  protected void onStart() {
+    /**
+     * 获取构造器
+     */
+    public abstract LoaderStructure BuildLoaderStructure();
 
-  }
-
-  public boolean isStop() {
-    return isStop;
-  }
-
-  public boolean isCancel() {
-    return isCancel;
-  }
-
-  public IEventListener getListener() {
-    return mListener;
-  }
-
-  protected void fail(BaseException e, boolean needRetry) {
-    if (isStop || isCancel) {
-      return;
+    @Override
+    public String getKey() {
+        return mTaskWrapper.getKey();
     }
-    mListener.onFail(needRetry, e);
-    mLoader.onDestroy();
-  }
 
-  public AbsTaskWrapper getTaskWrapper() {
-    return mTaskWrapper;
-  }
+    @Override
+    public long getFileSize() {
+        return mLoader.getFileSize();
+    }
+
+    /**
+     * 获取当前下载位置
+     */
+    @Override
+    public long getCurrentLocation() {
+        return mLoader.getCurrentProgress();
+    }
+
+    @Override
+    public boolean isRunning() {
+        return mLoader.isRunning();
+    }
+
+    /**
+     * 取消下载
+     */
+    @Override
+    public void cancel() {
+        isCancel = true;
+        mLoader.cancel();
+        onCancel();
+    }
+
+    protected void onCancel() {
+
+    }
+
+    /**
+     * 停止下载
+     */
+    @Override
+    public void stop() {
+        isStop = true;
+        mLoader.stop();
+        onStop();
+    }
+
+    protected void onStop() {
+
+    }
+
+    /**
+     * 多线程断点续传下载文件，开始下载
+     */
+    @Override
+    public void start() {
+        if (isStop || isCancel) {
+            ALog.w(TAG, "启动任务失败，任务已停止或已取消");
+            return;
+        }
+        mListener.onPre();
+        // 如果网址没有变，而服务器端端文件改变，以下代码就没有用了
+        //if (mTaskWrapper.getEntity().getFileSize() <= 1
+        //    || mTaskWrapper.isRefreshInfo()
+        //    || mTaskWrapper.getRequestType() == AbsTaskWrapper.D_FTP
+        //    || mTaskWrapper.getState() == IEntity.STATE_FAIL) {
+        //  new Thread(createInfoThread()).create();
+        //} else {
+        //  mDownloader.create();
+        //}
+
+        BuildLoaderStructure();
+        new Thread(mLoader).start();
+        onStart();
+    }
+
+    protected void onStart() {
+
+    }
+
+    public boolean isStop() {
+        return isStop;
+    }
+
+    public boolean isCancel() {
+        return isCancel;
+    }
+
+    public IEventListener getListener() {
+        return mListener;
+    }
+
+    protected void fail(BaseException e, boolean needRetry) {
+        if (isStop || isCancel) {
+            return;
+        }
+        mListener.onFail(needRetry, e);
+        mLoader.onDestroy();
+    }
+
+    public AbsTaskWrapper getTaskWrapper() {
+        return mTaskWrapper;
+    }
 }

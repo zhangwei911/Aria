@@ -19,6 +19,7 @@ package aria.apache.commons.net.ftp.parser;
 
 import aria.apache.commons.net.ftp.Configurable;
 import aria.apache.commons.net.ftp.FTPClientConfig;
+
 import java.text.ParseException;
 import java.util.Calendar;
 
@@ -37,87 +38,88 @@ import java.util.Calendar;
  * @since 1.4
  */
 public abstract class ConfigurableFTPFileEntryParserImpl extends RegexFTPFileEntryParserImpl
-    implements Configurable {
+        implements Configurable {
 
-  private final FTPTimestampParser timestampParser;
+    private final FTPTimestampParser timestampParser;
 
-  /**
-   * constructor for this abstract class.
-   *
-   * @param regex Regular expression used main parsing of the
-   * file listing.
-   */
-  public ConfigurableFTPFileEntryParserImpl(String regex) {
-    super(regex);
-    this.timestampParser = new FTPTimestampParserImpl();
-  }
-
-  /**
-   * constructor for this abstract class.
-   *
-   * @param regex Regular expression used main parsing of the
-   * file listing.
-   * @param flags the flags to apply, see
-   * {@link java.util.regex.Pattern#compile(String, int) Pattern#compile(String, int)}. Use 0 for
-   * none.
-   * @since 3.4
-   */
-  public ConfigurableFTPFileEntryParserImpl(String regex, int flags) {
-    super(regex, flags);
-    this.timestampParser = new FTPTimestampParserImpl();
-  }
-
-  /**
-   * This method is called by the concrete parsers to delegate
-   * timestamp parsing to the timestamp parser.
-   *
-   * @param timestampStr the timestamp string pulled from the
-   * file listing by the regular expression parser, to be submitted
-   * to the <code>timestampParser</code> for extracting the timestamp.
-   * @return a <code>java.util.Calendar</code> containing results of the
-   * timestamp parse.
-   * @throws ParseException on parse error
-   */
-  public Calendar parseTimestamp(String timestampStr) throws ParseException {
-    return this.timestampParser.parseTimestamp(timestampStr);
-  }
-
-  /**
-   * Implementation of the {@link  Configurable  Configurable}
-   * interface. Configures this parser by delegating to the
-   * underlying Configurable FTPTimestampParser implementation, '
-   * passing it the supplied {@link  FTPClientConfig FTPClientConfig}
-   * if that is non-null or a default configuration defined by
-   * each concrete subclass.
-   *
-   * @param config the configuration to be used to configure this parser.
-   * If it is null, a default configuration defined by
-   * each concrete subclass is used instead.
-   */
-  @Override public void configure(FTPClientConfig config) {
-    if (this.timestampParser instanceof Configurable) {
-      FTPClientConfig defaultCfg = getDefaultConfiguration();
-      if (config != null) {
-        if (null == config.getDefaultDateFormatStr()) {
-          config.setDefaultDateFormatStr(defaultCfg.getDefaultDateFormatStr());
-        }
-        if (null == config.getRecentDateFormatStr()) {
-          config.setRecentDateFormatStr(defaultCfg.getRecentDateFormatStr());
-        }
-        ((Configurable) this.timestampParser).configure(config);
-      } else {
-        ((Configurable) this.timestampParser).configure(defaultCfg);
-      }
+    /**
+     * constructor for this abstract class.
+     *
+     * @param regex Regular expression used main parsing of the
+     *              file listing.
+     */
+    public ConfigurableFTPFileEntryParserImpl(String regex) {
+        super(regex);
+        this.timestampParser = new FTPTimestampParserImpl();
     }
-  }
 
-  /**
-   * Each concrete subclass must define this member to create
-   * a default configuration to be used when that subclass is
-   * instantiated without a {@link  FTPClientConfig  FTPClientConfig}
-   * parameter being specified.
-   *
-   * @return the default configuration for the subclass.
-   */
-  protected abstract FTPClientConfig getDefaultConfiguration();
+    /**
+     * constructor for this abstract class.
+     *
+     * @param regex Regular expression used main parsing of the
+     *              file listing.
+     * @param flags the flags to apply, see
+     *              {@link java.util.regex.Pattern#compile(String, int) Pattern#compile(String, int)}. Use 0 for
+     *              none.
+     * @since 3.4
+     */
+    public ConfigurableFTPFileEntryParserImpl(String regex, int flags) {
+        super(regex, flags);
+        this.timestampParser = new FTPTimestampParserImpl();
+    }
+
+    /**
+     * This method is called by the concrete parsers to delegate
+     * timestamp parsing to the timestamp parser.
+     *
+     * @param timestampStr the timestamp string pulled from the
+     *                     file listing by the regular expression parser, to be submitted
+     *                     to the <code>timestampParser</code> for extracting the timestamp.
+     * @return a <code>java.util.Calendar</code> containing results of the
+     * timestamp parse.
+     * @throws ParseException on parse error
+     */
+    public Calendar parseTimestamp(String timestampStr) throws ParseException {
+        return this.timestampParser.parseTimestamp(timestampStr);
+    }
+
+    /**
+     * Implementation of the {@link  Configurable  Configurable}
+     * interface. Configures this parser by delegating to the
+     * underlying Configurable FTPTimestampParser implementation, '
+     * passing it the supplied {@link  FTPClientConfig FTPClientConfig}
+     * if that is non-null or a default configuration defined by
+     * each concrete subclass.
+     *
+     * @param config the configuration to be used to configure this parser.
+     *               If it is null, a default configuration defined by
+     *               each concrete subclass is used instead.
+     */
+    @Override
+    public void configure(FTPClientConfig config) {
+        if (this.timestampParser instanceof Configurable) {
+            FTPClientConfig defaultCfg = getDefaultConfiguration();
+            if (config != null) {
+                if (null == config.getDefaultDateFormatStr()) {
+                    config.setDefaultDateFormatStr(defaultCfg.getDefaultDateFormatStr());
+                }
+                if (null == config.getRecentDateFormatStr()) {
+                    config.setRecentDateFormatStr(defaultCfg.getRecentDateFormatStr());
+                }
+                ((Configurable) this.timestampParser).configure(config);
+            } else {
+                ((Configurable) this.timestampParser).configure(defaultCfg);
+            }
+        }
+    }
+
+    /**
+     * Each concrete subclass must define this member to create
+     * a default configuration to be used when that subclass is
+     * instantiated without a {@link  FTPClientConfig  FTPClientConfig}
+     * parameter being specified.
+     *
+     * @return the default configuration for the subclass.
+     */
+    protected abstract FTPClientConfig getDefaultConfiguration();
 }

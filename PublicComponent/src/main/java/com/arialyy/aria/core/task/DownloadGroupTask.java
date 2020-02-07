@@ -18,6 +18,7 @@ package com.arialyy.aria.core.task;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.TextUtils;
+
 import com.arialyy.aria.core.AriaConfig;
 import com.arialyy.aria.core.download.DGTaskWrapper;
 import com.arialyy.aria.core.download.DownloadGroupEntity;
@@ -30,47 +31,49 @@ import com.arialyy.aria.util.ComponentUtil;
  */
 public class DownloadGroupTask extends AbsGroupTask<DGTaskWrapper> {
 
-  private DownloadGroupTask(DGTaskWrapper taskWrapper, Handler outHandler) {
-    mTaskWrapper = taskWrapper;
-    mOutHandler = outHandler;
-    mContext = AriaConfig.getInstance().getAPP();
-    mListener =
-        ComponentUtil.getInstance().buildListener(taskWrapper.getRequestType(), this, mOutHandler);
-  }
-
-  public DownloadGroupEntity getEntity() {
-    return mTaskWrapper.getEntity();
-  }
-
-  @Override public String getTaskName() {
-    return "任务组->" + (TextUtils.isEmpty(mTaskWrapper.getEntity().getAlias())
-        ? mTaskWrapper.getEntity().getGroupHash() : mTaskWrapper.getEntity().getAlias());
-  }
-
-  @Override public int getTaskType() {
-    return DOWNLOAD_GROUP;
-  }
-
-  public static class Builder {
-    DGTaskWrapper taskEntity;
-    Handler outHandler;
-
-    public Builder(DGTaskWrapper taskEntity) {
-      this.taskEntity = taskEntity;
+    private DownloadGroupTask(DGTaskWrapper taskWrapper, Handler outHandler) {
+        mTaskWrapper = taskWrapper;
+        mOutHandler = outHandler;
+        mContext = AriaConfig.getInstance().getAPP();
+        mListener =
+                ComponentUtil.getInstance().buildListener(taskWrapper.getRequestType(), this, mOutHandler);
     }
 
-    /**
-     * 设置自定义Handler处理下载状态时间
-     *
-     * @param schedulers {@link ISchedulers}
-     */
-    public DownloadGroupTask.Builder setOutHandler(ISchedulers schedulers) {
-      outHandler = new Handler(Looper.getMainLooper(), schedulers);
-      return this;
+    public DownloadGroupEntity getEntity() {
+        return mTaskWrapper.getEntity();
     }
 
-    public DownloadGroupTask build() {
-      return new DownloadGroupTask(taskEntity, outHandler);
+    @Override
+    public String getTaskName() {
+        return "任务组->" + (TextUtils.isEmpty(mTaskWrapper.getEntity().getAlias())
+                ? mTaskWrapper.getEntity().getGroupHash() : mTaskWrapper.getEntity().getAlias());
     }
-  }
+
+    @Override
+    public int getTaskType() {
+        return DOWNLOAD_GROUP;
+    }
+
+    public static class Builder {
+        DGTaskWrapper taskEntity;
+        Handler outHandler;
+
+        public Builder(DGTaskWrapper taskEntity) {
+            this.taskEntity = taskEntity;
+        }
+
+        /**
+         * 设置自定义Handler处理下载状态时间
+         *
+         * @param schedulers {@link ISchedulers}
+         */
+        public DownloadGroupTask.Builder setOutHandler(ISchedulers schedulers) {
+            outHandler = new Handler(Looper.getMainLooper(), schedulers);
+            return this;
+        }
+
+        public DownloadGroupTask build() {
+            return new DownloadGroupTask(taskEntity, outHandler);
+        }
+    }
 }

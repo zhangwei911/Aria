@@ -25,9 +25,10 @@ import com.arialyy.aria.util.CommonUtil;
  * 单个下载任务的执行池
  */
 class DGLoadExecutePool<TASK extends AbsTask> extends DLoadExecutePool<TASK> {
-  private final String TAG = CommonUtil.getClassName(this);
+    private final String TAG = CommonUtil.getClassName(this);
 
-  @Override protected int getMaxSize() {
-    return AriaConfig.getInstance().getDGConfig().getMaxTaskNum();
-  }
+    @Override
+    protected int getMaxSize() {
+        return AriaConfig.getInstance().getDGConfig().getMaxTaskNum();
+    }
 }

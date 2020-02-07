@@ -18,6 +18,7 @@ package com.arialyy.aria.core.task;
 
 import android.os.Handler;
 import android.os.Looper;
+
 import com.arialyy.aria.core.AriaConfig;
 import com.arialyy.aria.core.download.DTaskWrapper;
 import com.arialyy.aria.core.download.DownloadEntity;
@@ -30,70 +31,74 @@ import com.arialyy.aria.util.ComponentUtil;
  */
 public class DownloadTask extends AbsTask<DTaskWrapper> {
 
-  private DownloadTask(DTaskWrapper taskWrapper, Handler outHandler) {
-    mTaskWrapper = taskWrapper;
-    mOutHandler = outHandler;
-    mContext = AriaConfig.getInstance().getAPP();
-    mListener =
-        ComponentUtil.getInstance().buildListener(taskWrapper.getRequestType(), this, mOutHandler);
-  }
-
-  /**
-   * 获取文件保存路径
-   */
-  public String getFilePath() {
-    return mTaskWrapper.getEntity().getFilePath();
-  }
-
-  public DownloadEntity getEntity() {
-    return mTaskWrapper.getEntity();
-  }
-
-  /**
-   * 获取当前下载任务的下载地址
-   *
-   * @see DownloadTask#getKey()
-   */
-  @Deprecated public String getDownloadUrl() {
-    return mTaskWrapper.getEntity().getUrl();
-  }
-
-  @Override public int getTaskType() {
-    return ITask.DOWNLOAD;
-  }
-
-  @Override public String getKey() {
-    return mTaskWrapper.getEntity().getUrl();
-  }
-
-  public DownloadEntity getDownloadEntity() {
-    return mTaskWrapper.getEntity();
-  }
-
-  @Override public String getTaskName() {
-    return mTaskWrapper.getEntity().getFileName();
-  }
-
-  public static class Builder {
-    DTaskWrapper taskEntity;
-    Handler outHandler;
-
-    public Builder(DTaskWrapper taskEntity) {
-      this.taskEntity = taskEntity;
+    private DownloadTask(DTaskWrapper taskWrapper, Handler outHandler) {
+        mTaskWrapper = taskWrapper;
+        mOutHandler = outHandler;
+        mContext = AriaConfig.getInstance().getAPP();
+        mListener =
+                ComponentUtil.getInstance().buildListener(taskWrapper.getRequestType(), this, mOutHandler);
     }
 
     /**
-     * 设置自定义Handler处理下载状态时间
-     *
-     * @param schedulers {@link ISchedulers}
+     * 获取文件保存路径
      */
-    public Builder setOutHandler(ISchedulers schedulers) {
-      outHandler = new Handler(Looper.getMainLooper(), schedulers);
-      return this;
+    public String getFilePath() {
+        return mTaskWrapper.getEntity().getFilePath();
     }
 
-    public DownloadTask build() {
-      return new DownloadTask(taskEntity, outHandler);
+    public DownloadEntity getEntity() {
+        return mTaskWrapper.getEntity();
     }
-  }
+
+    /**
+     * 获取当前下载任务的下载地址
+     *
+     * @see DownloadTask#getKey()
+     */
+    @Deprecated
+    public String getDownloadUrl() {
+        return mTaskWrapper.getEntity().getUrl();
+    }
+
+    @Override
+    public int getTaskType() {
+        return ITask.DOWNLOAD;
+    }
+
+    @Override
+    public String getKey() {
+        return mTaskWrapper.getEntity().getUrl();
+    }
+
+    public DownloadEntity getDownloadEntity() {
+        return mTaskWrapper.getEntity();
+    }
+
+    @Override
+    public String getTaskName() {
+        return mTaskWrapper.getEntity().getFileName();
+    }
+
+    public static class Builder {
+        DTaskWrapper taskEntity;
+        Handler outHandler;
+
+        public Builder(DTaskWrapper taskEntity) {
+            this.taskEntity = taskEntity;
+        }
+
+        /**
+         * 设置自定义Handler处理下载状态时间
+         *
+         * @param schedulers {@link ISchedulers}
+         */
+        public Builder setOutHandler(ISchedulers schedulers) {
+            outHandler = new Handler(Looper.getMainLooper(), schedulers);
+            return this;
+        }
+
+        public DownloadTask build() {
+            return new DownloadTask(taskEntity, outHandler);
+        }
+    }
 }

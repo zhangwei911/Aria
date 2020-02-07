@@ -16,8 +16,10 @@
 package com.arialyy.aria.core.loader;
 
 import android.os.Handler;
+
 import com.arialyy.aria.core.TaskRecord;
 import com.arialyy.aria.core.task.IThreadTask;
+
 import java.util.List;
 
 /**
@@ -25,13 +27,13 @@ import java.util.List;
  */
 public interface IThreadTaskBuilder extends ILoaderComponent {
 
-  /**
-   * 构造线程任务
-   */
-  List<IThreadTask> buildThreadTask(TaskRecord record, Handler stateHandler);
+    /**
+     * 构造线程任务
+     */
+    List<IThreadTask> buildThreadTask(TaskRecord record, Handler stateHandler);
 
-  /**
-   * 获取创建的线程任务数，需要先调用{@link #buildThreadTask(TaskRecord, Handler)}方法才能获取创建的线程任务数
-   */
-  int getCreatedThreadNum();
+    /**
+     * 获取创建的线程任务数，需要先调用{@link #buildThreadTask(TaskRecord, Handler)}方法才能获取创建的线程任务数
+     */
+    int getCreatedThreadNum();
 }

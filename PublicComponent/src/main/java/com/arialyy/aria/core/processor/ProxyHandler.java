@@ -16,6 +16,7 @@
 package com.arialyy.aria.core.processor;
 
 import com.arialyy.aria.core.inf.IEventHandler;
+
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
@@ -27,24 +28,25 @@ import java.lang.reflect.Proxy;
  */
 public class ProxyHandler implements InvocationHandler {
 
-  private Object mTarget;
+    private Object mTarget;
 
-  /**
-   * 绑定代理对象并返回代理类
-   */
-  public Object bind(Class<? extends IEventHandler> clazz) {
-    //绑定该类实现的所有接口，取得代理类
-    try {
-      mTarget = clazz.newInstance();
-    } catch (IllegalAccessException e) {
-      e.printStackTrace();
-    } catch (InstantiationException e) {
-      e.printStackTrace();
+    /**
+     * 绑定代理对象并返回代理类
+     */
+    public Object bind(Class<? extends IEventHandler> clazz) {
+        //绑定该类实现的所有接口，取得代理类
+        try {
+            mTarget = clazz.newInstance();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        }
+        return Proxy.newProxyInstance(clazz.getClassLoader(), clazz.getInterfaces(), this);
     }
-    return Proxy.newProxyInstance(clazz.getClassLoader(), clazz.getInterfaces(), this);
-  }
 
-  @Override public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-    return method.invoke(mTarget, args);
-  }
+    @Override
+    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+        return method.invoke(mTarget, args);
+    }
 }

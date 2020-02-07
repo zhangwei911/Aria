@@ -27,43 +27,45 @@ import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 import com.jcraft.jsch.SftpATTRS;
 import com.jcraft.jsch.SftpException;
+
 import java.io.UnsupportedEncodingException;
 
 final class SFtpUInfoTask extends AbsSFtpInfoTask<UTaskWrapper> {
-  static final int ISCOMPLETE = 0xa1;
+    static final int ISCOMPLETE = 0xa1;
 
-  SFtpUInfoTask(UTaskWrapper uTaskWrapper) {
-    super(uTaskWrapper);
-  }
-
-  @Override protected void getFileInfo(Session session)
-      throws JSchException, UnsupportedEncodingException, SftpException {
-    SFtpTaskOption option = (SFtpTaskOption) getWrapper().getTaskOption();
-    ChannelSftp channel = (ChannelSftp) session.openChannel("sftp");
-    channel.connect(1000);
-
-    String remotePath = option.getUrlEntity().remotePath;
-    String temp = CommonUtil.convertSFtpChar(getOption().getCharSet(), remotePath)
-        + "/"
-        + getWrapper().getEntity().getFileName();
-
-    SftpATTRS attr = null;
-    try {
-      attr = channel.stat(temp);
-    } catch (Exception e) {
-      ALog.d(TAG, String.format("文件不存在，remotePath：%s", remotePath));
+    SFtpUInfoTask(UTaskWrapper uTaskWrapper) {
+        super(uTaskWrapper);
     }
 
-    boolean isComplete = false;
-    UploadEntity entity = getWrapper().getEntity();
-    if (attr != null && attr.getSize() == entity.getFileSize()) {
-      isComplete = true;
-    }
+    @Override
+    protected void getFileInfo(Session session)
+            throws JSchException, UnsupportedEncodingException, SftpException {
+        SFtpTaskOption option = (SFtpTaskOption) getWrapper().getTaskOption();
+        ChannelSftp channel = (ChannelSftp) session.openChannel("sftp");
+        channel.connect(1000);
 
-    CompleteInfo info = new CompleteInfo();
-    info.code = isComplete ? ISCOMPLETE : 200;
-    info.obj = attr;
-    channel.disconnect();
-    callback.onSucceed(getWrapper().getKey(), info);
-  }
+        String remotePath = option.getUrlEntity().remotePath;
+        String temp = CommonUtil.convertSFtpChar(getOption().getCharSet(), remotePath)
+                + "/"
+                + getWrapper().getEntity().getFileName();
+
+        SftpATTRS attr = null;
+        try {
+            attr = channel.stat(temp);
+        } catch (Exception e) {
+            ALog.d(TAG, String.format("文件不存在，remotePath：%s", remotePath));
+        }
+
+        boolean isComplete = false;
+        UploadEntity entity = getWrapper().getEntity();
+        if (attr != null && attr.getSize() == entity.getFileSize()) {
+            isComplete = true;
+        }
+
+        CompleteInfo info = new CompleteInfo();
+        info.code = isComplete ? ISCOMPLETE : 200;
+        info.obj = attr;
+        channel.disconnect();
+        callback.onSucceed(getWrapper().getKey(), info);
+    }
 }

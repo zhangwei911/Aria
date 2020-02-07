@@ -20,6 +20,7 @@ import com.arialyy.aria.orm.DbEntity;
 import com.arialyy.aria.orm.annotation.Ignore;
 import com.arialyy.aria.orm.annotation.NoNull;
 import com.arialyy.aria.orm.annotation.Unique;
+
 import java.util.List;
 
 /**
@@ -27,65 +28,65 @@ import java.util.List;
  * 任务上传或下载的任务记录
  */
 public class TaskRecord extends DbEntity {
-  //public static final int TYPE_HTTP_FTP = 0;
-  //public static final int TYPE_M3U8_VOD = 1;
-  //public static final int TYPE_M3U8_LIVE = 2;
+    //public static final int TYPE_HTTP_FTP = 0;
+    //public static final int TYPE_M3U8_VOD = 1;
+    //public static final int TYPE_M3U8_LIVE = 2;
 
-  @Ignore
-  public List<ThreadRecord> threadRecords;
+    @Ignore
+    public List<ThreadRecord> threadRecords;
 
-  /**
-   * 任务线程数
-   */
-  public int threadNum;
+    /**
+     * 任务线程数
+     */
+    public int threadNum;
 
-  /**
-   * 任务文件路径
-   */
-  public String filePath;
+    /**
+     * 任务文件路径
+     */
+    public String filePath;
 
-  /**
-   * 文件长度
-   */
-  public long fileLength;
+    /**
+     * 文件长度
+     */
+    public long fileLength;
 
-  /**
-   * 任务文件名
-   */
-  @NoNull
-  public String fileName;
+    /**
+     * 任务文件名
+     */
+    @NoNull
+    public String fileName;
 
-  /**
-   * 是否是任务组的子任务记录
-   * {@code true}是
-   */
-  public boolean isGroupRecord = false;
+    /**
+     * 是否是任务组的子任务记录
+     * {@code true}是
+     */
+    public boolean isGroupRecord = false;
 
-  /**
-   * 下载任务组名
-   */
-  public String dGroupHash;
+    /**
+     * 下载任务组名
+     */
+    public String dGroupHash;
 
-  /**
-   * 上传组任务名，暂时没有用
-   */
-  @Ignore
-  @Deprecated
-  public String uGroupHash;
+    /**
+     * 上传组任务名，暂时没有用
+     */
+    @Ignore
+    @Deprecated
+    public String uGroupHash;
 
-  /**
-   * 是否是分块{@code true}是，{@code false} 不是
-   */
-  public boolean isBlock = false;
+    /**
+     * 是否是分块{@code true}是，{@code false} 不是
+     */
+    public boolean isBlock = false;
 
-  /**
-   * 任务类型
-   * {@link ITaskWrapper}
-   */
-  public int taskType = 0;
+    /**
+     * 任务类型
+     * {@link ITaskWrapper}
+     */
+    public int taskType = 0;
 
-  /**
-   * m3u8文件码率
-   */
-  public long bandWidth = 0;
+    /**
+     * m3u8文件码率
+     */
+    public long bandWidth = 0;
 }

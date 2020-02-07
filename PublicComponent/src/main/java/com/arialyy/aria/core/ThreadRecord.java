@@ -24,45 +24,45 @@ import com.arialyy.aria.orm.DbEntity;
  */
 public class ThreadRecord extends DbEntity {
 
-  /**
-   * 任务的文件路径，不是当前线程记录的的分块文件路径
-   */
-  public String taskKey;
+    /**
+     * 任务的文件路径，不是当前线程记录的的分块文件路径
+     */
+    public String taskKey;
 
-  /**
-   * 开始位置
-   */
-  public long startLocation;
+    /**
+     * 开始位置
+     */
+    public long startLocation;
 
-  /**
-   * 结束位置
-   */
-  public long endLocation;
+    /**
+     * 结束位置
+     */
+    public long endLocation;
 
-  /**
-   * 线程是否完成
-   * {@code true}完成，{@code false}未完成
-   */
-  public boolean isComplete = false;
+    /**
+     * 线程是否完成
+     * {@code true}完成，{@code false}未完成
+     */
+    public boolean isComplete = false;
 
-  /**
-   * 线程id
-   */
-  public int threadId = 0;
+    /**
+     * 线程id
+     */
+    public int threadId = 0;
 
-  /**
-   * 分块长度
-   */
-  public long blockLen = 0;
+    /**
+     * 分块长度
+     */
+    public long blockLen = 0;
 
-  /**
-   * 线程类型
-   * {@link ITaskWrapper}
-   */
-  public int threadType = 0;
+    /**
+     * 线程类型
+     * {@link ITaskWrapper}
+     */
+    public int threadType = 0;
 
-  /**
-   * ts文件的下载地址
-   */
-  public String tsUrl;
+    /**
+     * ts文件的下载地址
+     */
+    public String tsUrl;
 }

@@ -19,6 +19,7 @@ package com.arialyy.aria.core.inf;
 import com.arialyy.aria.core.queue.DGroupTaskQueue;
 import com.arialyy.aria.core.queue.DTaskQueue;
 import com.arialyy.aria.core.queue.UTaskQueue;
+
 import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -28,64 +29,67 @@ import java.util.concurrent.ConcurrentHashMap;
  * 接收器
  */
 public abstract class AbsReceiver implements IReceiver {
-  /**
-   * 观察者对象map
-   * key 由 {@link #getKey(IReceiver)}指定
-   */
-  public static final Map<String, Object> OBJ_MAP = new ConcurrentHashMap<>();
-  /**
-   * 观察者对象类的完整名称
-   */
-  public String targetName;
-  /**
-   * 当dialog、dialogFragment、popupwindow已经被用户使用了Dismiss事件或Cancel事件，需要手动移除receiver
-   */
-  public boolean needRmListener = false;
+    /**
+     * 观察者对象map
+     * key 由 {@link #getKey(IReceiver)}指定
+     */
+    public static final Map<String, Object> OBJ_MAP = new ConcurrentHashMap<>();
+    /**
+     * 观察者对象类的完整名称
+     */
+    public String targetName;
+    /**
+     * 当dialog、dialogFragment、popupwindow已经被用户使用了Dismiss事件或Cancel事件，需要手动移除receiver
+     */
+    public boolean needRmListener = false;
 
-  /**
-   * 创建观察者对象map的key，生成规则：
-   * {@link #targetName}_{@code download}{@code upload}_{@link #hashCode()}
-   *
-   * @param receiver 当前接收器
-   * @return 返回key
-   */
-  public static String getKey(IReceiver receiver) {
-    return String.format("%s_%s_%s", receiver.getTargetName(), receiver.getType(),
-        receiver.hashCode());
-  }
-
-  @Override public String getTargetName() {
-    return targetName;
-  }
-
-  /**
-   * 获取当前Receiver的key
-   */
-  @Override public String getKey() {
-    return getKey(this);
-  }
-
-  /**
-   * 移除观察者对象
-   */
-  private void removeObj() {
-    for (Iterator<Map.Entry<String, Object>> iter = OBJ_MAP.entrySet().iterator();
-        iter.hasNext(); ) {
-      Map.Entry<String, Object> entry = iter.next();
-      String key = entry.getKey();
-      if (key.equals(getKey())) {
-        iter.remove();
-      }
+    /**
+     * 创建观察者对象map的key，生成规则：
+     * {@link #targetName}_{@code download}{@code upload}_{@link #hashCode()}
+     *
+     * @param receiver 当前接收器
+     * @return 返回key
+     */
+    public static String getKey(IReceiver receiver) {
+        return String.format("%s_%s_%s", receiver.getTargetName(), receiver.getType(),
+                receiver.hashCode());
     }
-  }
 
-  @Override public void destroy() {
-    unRegisterListener();
-    removeObj();
-  }
+    @Override
+    public String getTargetName() {
+        return targetName;
+    }
 
-  /**
-   * 移除{@link DTaskQueue}、{@link DGroupTaskQueue}、{@link UTaskQueue}中注册的观察者
-   */
-  protected abstract void unRegisterListener();
+    /**
+     * 获取当前Receiver的key
+     */
+    @Override
+    public String getKey() {
+        return getKey(this);
+    }
+
+    /**
+     * 移除观察者对象
+     */
+    private void removeObj() {
+        for (Iterator<Map.Entry<String, Object>> iter = OBJ_MAP.entrySet().iterator();
+             iter.hasNext(); ) {
+            Map.Entry<String, Object> entry = iter.next();
+            String key = entry.getKey();
+            if (key.equals(getKey())) {
+                iter.remove();
+            }
+        }
+    }
+
+    @Override
+    public void destroy() {
+        unRegisterListener();
+        removeObj();
+    }
+
+    /**
+     * 移除{@link DTaskQueue}、{@link DGroupTaskQueue}、{@link UTaskQueue}中注册的观察者
+     */
+    protected abstract void unRegisterListener();
 }

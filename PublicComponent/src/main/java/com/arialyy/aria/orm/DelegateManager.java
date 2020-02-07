@@ -16,6 +16,7 @@
 package com.arialyy.aria.orm;
 
 import android.util.SparseArray;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
@@ -24,46 +25,46 @@ import java.lang.reflect.InvocationTargetException;
  * Delegate管理器
  */
 class DelegateManager {
-  private final String TAG = "ModuleFactory";
+    private final String TAG = "ModuleFactory";
 
-  private SparseArray<AbsDelegate> mDelegates = new SparseArray<>();
-  private static volatile DelegateManager INSTANCE = null;
+    private SparseArray<AbsDelegate> mDelegates = new SparseArray<>();
+    private static volatile DelegateManager INSTANCE = null;
 
-  private DelegateManager() {
+    private DelegateManager() {
 
-  }
-
-  static DelegateManager getInstance() {
-    if (INSTANCE == null) {
-      synchronized (DelegateManager.class) {
-        INSTANCE = new DelegateManager();
-      }
     }
-    return INSTANCE;
-  }
 
-  /**
-   * 获取Module
-   */
-  <M extends AbsDelegate> M getDelegate(Class<M> clazz) {
-    M delegate = (M) mDelegates.get(clazz.hashCode());
-    try {
-      if (delegate == null) {
-        Constructor c = clazz.getDeclaredConstructor();
-        c.setAccessible(true);
-        delegate = (M) c.newInstance();
-        mDelegates.put(clazz.hashCode(), delegate);
+    static DelegateManager getInstance() {
+        if (INSTANCE == null) {
+            synchronized (DelegateManager.class) {
+                INSTANCE = new DelegateManager();
+            }
+        }
+        return INSTANCE;
+    }
+
+    /**
+     * 获取Module
+     */
+    <M extends AbsDelegate> M getDelegate(Class<M> clazz) {
+        M delegate = (M) mDelegates.get(clazz.hashCode());
+        try {
+            if (delegate == null) {
+                Constructor c = clazz.getDeclaredConstructor();
+                c.setAccessible(true);
+                delegate = (M) c.newInstance();
+                mDelegates.put(clazz.hashCode(), delegate);
+                return delegate;
+            }
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        }
         return delegate;
-      }
-    } catch (InstantiationException e) {
-      e.printStackTrace();
-    } catch (IllegalAccessException e) {
-      e.printStackTrace();
-    } catch (NoSuchMethodException e) {
-      e.printStackTrace();
-    } catch (InvocationTargetException e) {
-      e.printStackTrace();
     }
-    return delegate;
-  }
 }

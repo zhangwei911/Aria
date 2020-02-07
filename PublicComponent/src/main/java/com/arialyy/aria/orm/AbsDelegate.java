@@ -22,18 +22,18 @@ import android.database.sqlite.SQLiteDatabase;
  * Created by laoyuyu on 2018/3/22.
  */
 abstract class AbsDelegate {
-  static final String TAG = "AbsDelegate";
+    static final String TAG = "AbsDelegate";
 
-  void closeCursor(Cursor cursor) {
-    SqlUtil.closeCursor(cursor);
-  }
+    void closeCursor(Cursor cursor) {
+        SqlUtil.closeCursor(cursor);
+    }
 
-  /**
-   * 检查数据库是否关闭，已经关闭的话，打开数据库
-   *
-   * @return 返回数据库
-   */
-  SQLiteDatabase checkDb(SQLiteDatabase db) {
-    return SqlUtil.checkDb(db);
-  }
+    /**
+     * 检查数据库是否关闭，已经关闭的话，打开数据库
+     *
+     * @return 返回数据库
+     */
+    SQLiteDatabase checkDb(SQLiteDatabase db) {
+        return SqlUtil.checkDb(db);
+    }
 }
