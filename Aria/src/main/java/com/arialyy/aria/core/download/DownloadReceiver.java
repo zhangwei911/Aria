@@ -213,19 +213,19 @@ public class DownloadReceiver extends AbsReceiver {
         AriaManager.getInstance().removeReceiver(OBJ_MAP.get(getKey()));
     }
 
-    public void setNormalTaskListener(TaskEnum taskEnum, ISchedulerListener normalTaskListener) {
+    public void setNormalTaskListener(String url, TaskEnum taskEnum, ISchedulerListener normalTaskListener) {
         Object obj = OBJ_MAP.get(getKey());
-        TaskSchedulers.getInstance().setNormalTaskListener(taskEnum, obj, normalTaskListener);
+        TaskSchedulers.getInstance().setNormalTaskListener(url, taskEnum, obj, normalTaskListener);
     }
 
-    public void setM3U8PeerTaskListener(TaskEnum taskEnum, ISchedulerListener m3U8PeerTaskListener) {
+    public void setM3U8PeerTaskListener(String url, TaskEnum taskEnum, ISchedulerListener m3U8PeerTaskListener) {
         Object obj = OBJ_MAP.get(getKey());
-        TaskSchedulers.getInstance().setM3U8PeerTaskListener(taskEnum, obj, m3U8PeerTaskListener);
+        TaskSchedulers.getInstance().setM3U8PeerTaskListener(url, taskEnum, obj, m3U8PeerTaskListener);
     }
 
-    public void setSubTaskListener(TaskEnum taskEnum, ISchedulerListener subTaskListener) {
+    public void setSubTaskListener(String url, TaskEnum taskEnum, ISchedulerListener subTaskListener) {
         Object obj = OBJ_MAP.get(getKey());
-        TaskSchedulers.getInstance().setSubTaskListener(taskEnum, obj, subTaskListener);
+        TaskSchedulers.getInstance().setSubTaskListener(url, taskEnum, obj, subTaskListener);
     }
 
     @Override

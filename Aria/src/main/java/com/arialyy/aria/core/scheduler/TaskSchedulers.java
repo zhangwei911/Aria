@@ -97,52 +97,41 @@ public class TaskSchedulers<TASK extends ITask> implements ISchedulers {
         throw new NullPointerException("任务类型错误，type = " + taskType);
     }
 
-    public NormalTaskListener<TASK> getNormalTaskListener() {
-        return normalTaskListener;
-    }
-
-    public void setNormalTaskListener(TaskEnum taskEnum, Object obj, ISchedulerListener normalTaskListener) {
-        this.normalTaskListener = (NormalTaskListener<TASK>) normalTaskListener;
+    /**
+     * 设置监听器
+     * @param url 传null表示全局监听,传下载地址为单地址监听
+     * @param taskEnum 任务类型
+     * @param obj 下载对象
+     * @param taskListener 监听器
+     */
+    private void setListener(String url, TaskEnum taskEnum, Object obj, ISchedulerListener taskListener) {
         Map<TaskEnum, ISchedulerListener> listenersCallback = mObserversCallback.get(getKey(obj));
 
         if (listenersCallback == null) {
             listenersCallback = new ConcurrentHashMap<>();
-            mObserversCallback.put(getKey(obj), listenersCallback);
+            String urlMD5 = "";
+            if (url != null && url.trim().length() > 0) {
+                urlMD5 = "-" + CommonUtil.getStrMd5(url);
+            }
+            mObserversCallback.put(getKey(obj) + urlMD5, listenersCallback);
         }
-        normalTaskListener.setListener(obj);
-        listenersCallback.put(taskEnum, normalTaskListener);
+        taskListener.setListener(obj);
+        listenersCallback.put(taskEnum, taskListener);
     }
 
-    public M3U8PeerTaskListener getM3U8PeerTaskListener() {
-        return m3U8PeerTaskListener;
+    public void setNormalTaskListener(String url, TaskEnum taskEnum, Object obj, ISchedulerListener taskListener) {
+        this.normalTaskListener = (NormalTaskListener<TASK>) taskListener;
+        setListener(url, taskEnum, obj, taskListener);
     }
 
-    public void setM3U8PeerTaskListener(TaskEnum taskEnum, Object obj, ISchedulerListener m3U8PeerTaskListener) {
-        this.m3U8PeerTaskListener = (M3U8PeerTaskListener) m3U8PeerTaskListener;
-        Map<TaskEnum, ISchedulerListener> listenersCallback = mObserversCallback.get(getKey(obj));
-
-        if (listenersCallback == null) {
-            listenersCallback = new ConcurrentHashMap<>();
-            mObserversCallback.put(getKey(obj), listenersCallback);
-        }
-        m3U8PeerTaskListener.setListener(obj);
-        listenersCallback.put(taskEnum, m3U8PeerTaskListener);
+    public void setM3U8PeerTaskListener(String url, TaskEnum taskEnum, Object obj, ISchedulerListener taskListener) {
+        this.m3U8PeerTaskListener = (M3U8PeerTaskListener) taskListener;
+        setListener(url, taskEnum, obj, taskListener);
     }
 
-    public SubTaskListener<TASK, AbsNormalEntity> getSubTaskListener() {
-        return subTaskListener;
-    }
-
-    public void setSubTaskListener(TaskEnum taskEnum, Object obj, ISchedulerListener subTaskListener) {
-        this.subTaskListener = (SubTaskListener<TASK, AbsNormalEntity>) subTaskListener;
-        Map<TaskEnum, ISchedulerListener> listenersCallback = mObserversCallback.get(getKey(obj));
-
-        if (listenersCallback == null) {
-            listenersCallback = new ConcurrentHashMap<>();
-            mObserversCallback.put(getKey(obj), listenersCallback);
-        }
-        subTaskListener.setListener(obj);
-        listenersCallback.put(taskEnum, subTaskListener);
+    public void setSubTaskListener(String url, TaskEnum taskEnum, Object obj, ISchedulerListener taskListener) {
+        this.subTaskListener = (SubTaskListener<TASK, AbsNormalEntity>) taskListener;
+        setListener(url, taskEnum, obj, taskListener);
     }
 
     /**
