@@ -23,6 +23,7 @@ import com.arialyy.aria.core.command.CmdHelper;
 import com.arialyy.aria.core.command.NormalCmdFactory;
 import com.arialyy.aria.core.common.AbsBuilderTarget;
 import com.arialyy.aria.core.common.AbsEntity;
+import com.arialyy.aria.core.common.AbsNormalEntity;
 import com.arialyy.aria.core.common.ProxyHelper;
 import com.arialyy.aria.core.download.target.DTargetFactory;
 import com.arialyy.aria.core.download.target.FtpBuilderTarget;
@@ -38,7 +39,12 @@ import com.arialyy.aria.core.inf.AbsReceiver;
 import com.arialyy.aria.core.inf.ReceiverType;
 import com.arialyy.aria.core.queue.DGroupTaskQueue;
 import com.arialyy.aria.core.queue.DTaskQueue;
+import com.arialyy.aria.core.scheduler.ISchedulerListener;
+import com.arialyy.aria.core.scheduler.M3U8PeerTaskListener;
+import com.arialyy.aria.core.scheduler.NormalTaskListener;
+import com.arialyy.aria.core.scheduler.SubTaskListener;
 import com.arialyy.aria.core.scheduler.TaskSchedulers;
+import com.arialyy.aria.core.task.DownloadTask;
 import com.arialyy.aria.core.task.ITask;
 import com.arialyy.aria.orm.DbEntity;
 import com.arialyy.aria.util.ALog;
@@ -203,6 +209,21 @@ public class DownloadReceiver extends AbsReceiver {
       unRegisterListener();
     }
     AriaManager.getInstance().removeReceiver(OBJ_MAP.get(getKey()));
+  }
+
+  public void setNormalTaskListener(TaskEnum taskEnum, ISchedulerListener normalTaskListener){
+    Object obj = OBJ_MAP.get(getKey());
+    TaskSchedulers.getInstance().setNormalTaskListener(taskEnum,obj,normalTaskListener);
+  }
+
+  public void setM3U8PeerTaskListener(TaskEnum taskEnum, ISchedulerListener m3U8PeerTaskListener){
+    Object obj = OBJ_MAP.get(getKey());
+    TaskSchedulers.getInstance().setM3U8PeerTaskListener(taskEnum,obj,m3U8PeerTaskListener);
+  }
+
+  public void setSubTaskListener(TaskEnum taskEnum, ISchedulerListener subTaskListener){
+    Object obj = OBJ_MAP.get(getKey());
+    TaskSchedulers.getInstance().setSubTaskListener(taskEnum,obj,subTaskListener);
   }
 
   @Override public String getType() {

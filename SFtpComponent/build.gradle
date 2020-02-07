@@ -1,4 +1,5 @@
 apply plugin: 'com.android.library'
+apply from: 'maven.gradle'
 
 android {
   compileSdkVersion rootProject.ext.compileSdkVersion
@@ -27,7 +28,8 @@ dependencies {
 
   api "com.jcraft:jsch:0.1.55"
   api "com.jcraft:jzlib:1.1.3"
-  implementation project(path: ':PublicComponent')
+//  implementation project(path: ':PublicComponent')
+  implementation 'viz.commonlib:aria-public:1.0.0'
 }
 
 apply from: 'bintray-release.gradle'

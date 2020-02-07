@@ -1,4 +1,5 @@
 apply plugin: 'com.android.library'
+apply from: 'maven.gradle'
 
 android {
   compileSdkVersion rootProject.ext.compileSdkVersion
@@ -25,8 +26,10 @@ android {
 dependencies {
   implementation fileTree(dir: 'libs', include: ['*.jar'])
 
-  implementation project(path: ':HttpComponent')
-  implementation project(path: ':PublicComponent')
+//  implementation project(path: ':HttpComponent')
+//  implementation project(path: ':PublicComponent')
+  implementation 'viz.commonlib:aria-public:1.0.0'
+  implementation 'viz.commonlib:aria-http:1.0.0'
 }
 
 apply from: 'bintray-release.gradle'

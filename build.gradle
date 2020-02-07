@@ -27,6 +27,7 @@ allprojects {
     jcenter()
     mavenCentral()
     google()
+    maven{url getRepositoryDir()}
     maven { url 'https://jitpack.io' }
   }
 
@@ -65,4 +66,45 @@ ext {
 
   // 以下是androidX
   XAppcompatVersion = "1.1.0"
+}
+
+
+// get android sdk dir
+String getRepositoryDir() {
+  def rootDir = project.rootDir
+  def androidSdkDir = null
+  String envVar = System.getenv("ANDROID_HOME")
+  def localProperties = new File(rootDir, 'local.properties')
+  String systemProperty = System.getProperty("android.home")
+  if (envVar != null) {
+    androidSdkDir = envVar
+  } else if (localProperties.exists()) {
+    Properties properties = new Properties()
+    localProperties.withInputStream { instr ->
+      properties.load(instr)
+    }
+    def sdkDirProp = properties.getProperty('sdk.dir')
+    if (sdkDirProp != null) {
+      androidSdkDir = sdkDirProp
+    } else {
+      sdkDirProp = properties.getProperty('android.dir')
+      if (sdkDirProp != null) {
+        androidSdkDir = (new File(rootDir, sdkDirProp)).getAbsolutePath()
+      }
+    }
+  }
+  if (androidSdkDir == null && systemProperty != null) {
+    androidSdkDir = systemProperty
+  }
+  if (androidSdkDir == null) {
+    println("don't have env: android_home ,please set...")
+    if (androidSdkDir == null) {
+      throw new RuntimeException(
+              "Unable to determine Android SDK directory.")
+    }
+  }
+
+  def deployPath = file(androidSdkDir + "/extras/android/m2repository/")
+  String repository_url = "file://${deployPath.absolutePath}"
+  repository_url
 }

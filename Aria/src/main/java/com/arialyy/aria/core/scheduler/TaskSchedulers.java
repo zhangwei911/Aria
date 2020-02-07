@@ -18,6 +18,7 @@ package com.arialyy.aria.core.scheduler;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Message;
+
 import com.arialyy.annotations.TaskEnum;
 import com.arialyy.aria.core.AriaConfig;
 import com.arialyy.aria.core.common.AbsEntity;
@@ -39,6 +40,7 @@ import com.arialyy.aria.core.task.UploadTask;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
 import com.arialyy.aria.util.NetUtils;
+
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
@@ -54,7 +56,12 @@ public class TaskSchedulers<TASK extends ITask> implements ISchedulers {
   private static FailureTaskHandler mFailureTaskHandler;
 
   private Map<String, Map<TaskEnum, ISchedulerListener>> mObservers = new ConcurrentHashMap<>();
+  private Map<String, Map<TaskEnum, ISchedulerListener>> mObserversCallback = new ConcurrentHashMap<>();
   private AriaConfig mAriaConfig;
+
+  private NormalTaskListener<TASK> normalTaskListener = null;
+  private M3U8PeerTaskListener m3U8PeerTaskListener = null;
+  private SubTaskListener<TASK, AbsNormalEntity> subTaskListener = null;
 
   private TaskSchedulers() {
     mAriaConfig = AriaConfig.getInstance();
@@ -90,6 +97,54 @@ public class TaskSchedulers<TASK extends ITask> implements ISchedulers {
     throw new NullPointerException("任务类型错误，type = " + taskType);
   }
 
+  public NormalTaskListener<TASK> getNormalTaskListener() {
+    return normalTaskListener;
+  }
+
+  public void setNormalTaskListener(TaskEnum taskEnum, Object obj, ISchedulerListener normalTaskListener) {
+    this.normalTaskListener = (NormalTaskListener<TASK>) normalTaskListener;
+    Map<TaskEnum, ISchedulerListener> listenersCallback = mObserversCallback.get(getKey(obj));
+
+    if(listenersCallback == null){
+      listenersCallback = new ConcurrentHashMap<>();
+      mObserversCallback.put(getKey(obj), listenersCallback);
+    }
+    normalTaskListener.setListener(obj);
+    listenersCallback.put(taskEnum,normalTaskListener);
+  }
+
+  public M3U8PeerTaskListener getM3U8PeerTaskListener() {
+    return m3U8PeerTaskListener;
+  }
+
+  public void setM3U8PeerTaskListener(TaskEnum taskEnum, Object obj, ISchedulerListener m3U8PeerTaskListener) {
+    this.m3U8PeerTaskListener = (M3U8PeerTaskListener)m3U8PeerTaskListener;
+    Map<TaskEnum, ISchedulerListener> listenersCallback = mObserversCallback.get(getKey(obj));
+
+    if(listenersCallback == null){
+      listenersCallback = new ConcurrentHashMap<>();
+      mObserversCallback.put(getKey(obj), listenersCallback);
+    }
+    m3U8PeerTaskListener.setListener(obj);
+    listenersCallback.put(taskEnum,m3U8PeerTaskListener);
+  }
+
+  public SubTaskListener<TASK, AbsNormalEntity> getSubTaskListener() {
+    return subTaskListener;
+  }
+
+  public void setSubTaskListener(TaskEnum taskEnum, Object obj, ISchedulerListener subTaskListener) {
+    this.subTaskListener = (SubTaskListener<TASK, AbsNormalEntity> )subTaskListener;
+    Map<TaskEnum, ISchedulerListener> listenersCallback = mObserversCallback.get(getKey(obj));
+
+    if(listenersCallback == null){
+      listenersCallback = new ConcurrentHashMap<>();
+      mObserversCallback.put(getKey(obj), listenersCallback);
+    }
+    subTaskListener.setListener(obj);
+    listenersCallback.put(taskEnum,subTaskListener);
+  }
+
   /**
    * 将当前类注册到Aria
    *
@@ -99,10 +154,15 @@ public class TaskSchedulers<TASK extends ITask> implements ISchedulers {
   public void register(Object obj, TaskEnum taskEnum) {
     String targetName = obj.getClass().getName();
     Map<TaskEnum, ISchedulerListener> listeners = mObservers.get(getKey(obj));
+    Map<TaskEnum, ISchedulerListener> listenersCallback = mObserversCallback.get(getKey(obj));
 
     if (listeners == null) {
       listeners = new ConcurrentHashMap<>();
       mObservers.put(getKey(obj), listeners);
+    }
+    if(listenersCallback == null){
+      listenersCallback = new ConcurrentHashMap<>();
+      mObserversCallback.put(getKey(obj), listenersCallback);
     }
     String proxyClassName = targetName + taskEnum.proxySuffix;
 
@@ -113,6 +173,31 @@ public class TaskSchedulers<TASK extends ITask> implements ISchedulers {
         listeners.put(taskEnum, listener);
       } else {
         ALog.e(TAG, "注册错误，没有【" + proxyClassName + "】观察者");
+      }
+    }
+
+    if (!hasProxyListenerCallback(listenersCallback, taskEnum)) {
+      ISchedulerListener listenerCallback = null;
+      switch (taskEnum){
+        case DOWNLOAD:
+        case DOWNLOAD_GROUP:{
+            listenerCallback = normalTaskListener;
+          break;
+        }
+        case DOWNLOAD_GROUP_SUB:{
+            listenerCallback = subTaskListener;
+          break;
+        }
+        case M3U8_PEER:{
+            listenerCallback = m3U8PeerTaskListener;
+          break;
+        }
+      }
+      if (listenerCallback != null) {
+        listenerCallback.setListener(obj);
+        listenersCallback.put(taskEnum, listenerCallback);
+      } else {
+        ALog.e(TAG, "注册错误，没有【" + proxyClassName + "】回调观察者");
       }
     }
   }
@@ -127,17 +212,29 @@ public class TaskSchedulers<TASK extends ITask> implements ISchedulers {
     return !listeners.isEmpty() && listeners.get(taskEnum) != null;
   }
 
+  private boolean hasProxyListenerCallback(Map<TaskEnum, ISchedulerListener> listeners, TaskEnum TaskEnum) {
+    return !listeners.isEmpty() && listeners.get(TaskEnum) != null;
+  }
+
   /**
    * 移除注册
    *
    * @param obj 观察者类
    */
   public void unRegister(Object obj) {
-    if (!mObservers.containsKey(getKey(obj))) {
+    if (!mObservers.containsKey(getKey(obj)) || !mObserversCallback.containsKey(getKey(obj))) {
       return;
     }
     for (Iterator<Map.Entry<String, Map<TaskEnum, ISchedulerListener>>> iter =
         mObservers.entrySet().iterator(); iter.hasNext(); ) {
+      Map.Entry<String, Map<TaskEnum, ISchedulerListener>> entry = iter.next();
+
+      if (entry.getKey().equals(getKey(obj))) {
+        iter.remove();
+      }
+    }
+    for (Iterator<Map.Entry<String, Map<TaskEnum, ISchedulerListener>>> iter =
+         mObserversCallback.entrySet().iterator(); iter.hasNext(); ) {
       Map.Entry<String, Map<TaskEnum, ISchedulerListener>> entry = iter.next();
 
       if (entry.getKey().equals(getKey(obj))) {
@@ -206,7 +303,7 @@ public class TaskSchedulers<TASK extends ITask> implements ISchedulers {
           continue;
         }
         M3U8PeerTaskListener listener =
-            (M3U8PeerTaskListener) listeners.get(TaskEnum.M3U8_PEER);
+                (M3U8PeerTaskListener) listeners.get(TaskEnum.M3U8_PEER);
         if (listener == null) {
           continue;
         }
@@ -214,18 +311,50 @@ public class TaskSchedulers<TASK extends ITask> implements ISchedulers {
         switch (msg.what) {
           case M3U8_PEER_START:
             listener.onPeerStart(data.getString(DATA_M3U8_URL),
-                data.getString(DATA_M3U8_PEER_PATH),
-                data.getInt(DATA_M3U8_PEER_INDEX));
+                    data.getString(DATA_M3U8_PEER_PATH),
+                    data.getInt(DATA_M3U8_PEER_INDEX));
             break;
           case M3U8_PEER_COMPLETE:
             listener.onPeerComplete(data.getString(DATA_M3U8_URL),
-                data.getString(DATA_M3U8_PEER_PATH),
-                data.getInt(DATA_M3U8_PEER_INDEX));
+                    data.getString(DATA_M3U8_PEER_PATH),
+                    data.getInt(DATA_M3U8_PEER_INDEX));
             break;
           case M3U8_PEER_FAIL:
             listener.onPeerFail(data.getString(DATA_M3U8_URL),
-                data.getString(DATA_M3U8_PEER_PATH),
-                data.getInt(DATA_M3U8_PEER_INDEX));
+                    data.getString(DATA_M3U8_PEER_PATH),
+                    data.getInt(DATA_M3U8_PEER_INDEX));
+            break;
+        }
+      }
+    }
+    if (mObserversCallback.size() > 0) {
+      Set<String> keys = mObserversCallback.keySet();
+      for (String key : keys) {
+        Map<TaskEnum, ISchedulerListener> listeners = mObserversCallback.get(key);
+        if (listeners == null || listeners.isEmpty()) {
+          continue;
+        }
+        M3U8PeerTaskListener listener =
+                (M3U8PeerTaskListener) listeners.get(TaskEnum.M3U8_PEER);
+        if (listener == null) {
+          continue;
+        }
+
+        switch (msg.what) {
+          case M3U8_PEER_START:
+            listener.onPeerStart(data.getString(DATA_M3U8_URL),
+                    data.getString(DATA_M3U8_PEER_PATH),
+                    data.getInt(DATA_M3U8_PEER_INDEX));
+            break;
+          case M3U8_PEER_COMPLETE:
+            listener.onPeerComplete(data.getString(DATA_M3U8_URL),
+                    data.getString(DATA_M3U8_PEER_PATH),
+                    data.getInt(DATA_M3U8_PEER_INDEX));
+            break;
+          case M3U8_PEER_FAIL:
+            listener.onPeerFail(data.getString(DATA_M3U8_URL),
+                    data.getString(DATA_M3U8_PEER_PATH),
+                    data.getInt(DATA_M3U8_PEER_INDEX));
             break;
         }
       }
@@ -271,6 +400,45 @@ public class TaskSchedulers<TASK extends ITask> implements ISchedulers {
           case SUB_FAIL:
             listener.onSubTaskFail((TASK) params.groupTask, params.entity,
                 (Exception) (params.groupTask).getExpand(AbsTask.ERROR_INFO_KEY));
+            break;
+          case SUB_RUNNING:
+            listener.onSubTaskRunning((TASK) params.groupTask, params.entity);
+            break;
+          case SUB_CANCEL:
+            listener.onSubTaskCancel((TASK) params.groupTask, params.entity);
+            break;
+          case SUB_COMPLETE:
+            listener.onSubTaskComplete((TASK) params.groupTask, params.entity);
+            break;
+        }
+      }
+    }
+
+    if (mObserversCallback.size() > 0) {
+      Set<String> keys = mObserversCallback.keySet();
+      for (String key : keys) {
+        Map<TaskEnum, ISchedulerListener> listeners = mObserversCallback.get(key);
+        if (listeners == null || listeners.isEmpty()) {
+          continue;
+        }
+        SubTaskListener<TASK, AbsNormalEntity> listener =
+                (SubTaskListener<TASK, AbsNormalEntity>) listeners.get(TaskEnum.DOWNLOAD_GROUP_SUB);
+        if (listener == null) {
+          continue;
+        }
+        switch (msg.what) {
+          case SUB_PRE:
+            listener.onSubTaskPre((TASK) params.groupTask, params.entity);
+            break;
+          case SUB_START:
+            listener.onSubTaskStart((TASK) params.groupTask, params.entity);
+            break;
+          case SUB_STOP:
+            listener.onSubTaskStop((TASK) params.groupTask, params.entity);
+            break;
+          case SUB_FAIL:
+            listener.onSubTaskFail((TASK) params.groupTask, params.entity,
+                    (Exception) (params.groupTask).getExpand(AbsTask.ERROR_INFO_KEY));
             break;
           case SUB_RUNNING:
             listener.onSubTaskRunning((TASK) params.groupTask, params.entity);
@@ -386,6 +554,29 @@ public class TaskSchedulers<TASK extends ITask> implements ISchedulers {
         }
       }
     }
+
+    if (mObserversCallback.size() > 0) {
+      Set<String> keys = mObserversCallback.keySet();
+      for (String key : keys) {
+        Map<TaskEnum, ISchedulerListener> listeners = mObserversCallback.get(key);
+        if (listeners == null || listeners.isEmpty()) {
+          continue;
+        }
+        NormalTaskListener<TASK> listener = null;
+        if (mObserversCallback.get(key) != null) {
+          if (taskType == ITask.DOWNLOAD) {
+            listener = (NormalTaskListener<TASK>) listeners.get(TaskEnum.DOWNLOAD);
+          } else if (taskType == ITask.DOWNLOAD_GROUP) {
+            listener = (NormalTaskListener<TASK>) listeners.get(TaskEnum.DOWNLOAD_GROUP);
+          } else if (taskType == ITask.DOWNLOAD_GROUP) {
+            listener = (NormalTaskListener<TASK>) listeners.get(TaskEnum.UPLOAD);
+          }
+        }
+        if (listener != null) {
+          normalTaskCallback(ISchedulers.CHECK_FAIL, null, listener);
+        }
+      }
+    }
   }
 
   /**
@@ -404,6 +595,28 @@ public class TaskSchedulers<TASK extends ITask> implements ISchedulers {
         }
         NormalTaskListener<TASK> listener = null;
         if (mObservers.get(key) != null) {
+          if (task instanceof DownloadTask) {
+            listener = (NormalTaskListener<TASK>) listeners.get(TaskEnum.DOWNLOAD);
+          } else if (task instanceof DownloadGroupTask) {
+            listener = (NormalTaskListener<TASK>) listeners.get(TaskEnum.DOWNLOAD_GROUP);
+          } else if (task instanceof UploadTask) {
+            listener = (NormalTaskListener<TASK>) listeners.get(TaskEnum.UPLOAD);
+          }
+        }
+        if (listener != null) {
+          normalTaskCallback(state, task, listener);
+        }
+      }
+    }
+    if (mObserversCallback.size() > 0) {
+      Set<String> keys = mObserversCallback.keySet();
+      for (String key : keys) {
+        Map<TaskEnum, ISchedulerListener> listeners = mObserversCallback.get(key);
+        if (listeners == null || listeners.isEmpty()) {
+          continue;
+        }
+        NormalTaskListener<TASK> listener = null;
+        if (mObserversCallback.get(key) != null) {
           if (task instanceof DownloadTask) {
             listener = (NormalTaskListener<TASK>) listeners.get(TaskEnum.DOWNLOAD);
           } else if (task instanceof DownloadGroupTask) {

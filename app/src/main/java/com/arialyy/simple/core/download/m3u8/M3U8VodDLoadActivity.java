@@ -29,6 +29,7 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import com.arialyy.annotations.Download;
 import com.arialyy.annotations.M3U8;
+import com.arialyy.annotations.TaskEnum;
 import com.arialyy.aria.core.Aria;
 import com.arialyy.aria.core.common.AbsEntity;
 import com.arialyy.aria.core.download.DownloadEntity;
@@ -38,6 +39,8 @@ import com.arialyy.aria.core.processor.IBandWidthUrlConverter;
 import com.arialyy.aria.core.processor.IKeyUrlConverter;
 import com.arialyy.aria.core.processor.ITsMergeHandler;
 import com.arialyy.aria.core.processor.IVodTsUrlConverter;
+import com.arialyy.aria.core.scheduler.M3U8PeerTaskListener;
+import com.arialyy.aria.core.scheduler.NormalTaskListener;
 import com.arialyy.aria.core.task.DownloadTask;
 import com.arialyy.aria.util.ALog;
 import com.arialyy.aria.util.CommonUtil;
@@ -121,6 +124,101 @@ public class M3U8VodDLoadActivity extends BaseActivity<ActivityM3u8VodBinding> {
       @Override public void cancel(View v, AbsEntity entity) {
         Aria.download(this).load(mTaskId).cancel();
         mTaskId = -1;
+      }
+    });
+    Aria.download(this).setM3U8PeerTaskListener(TaskEnum.M3U8_PEER,new M3U8PeerTaskListener(){
+      @Override
+      public void onPeerStart(String m3u8Url, String peerPath, int peerIndex) {
+        super.onPeerStart(m3u8Url, peerPath, peerIndex);
+        Log.i("AriaCallback", String.format("onPeerStart m3u8Url:%s\npeerPath:%s\npeerIndex:%d", m3u8Url,peerPath,peerIndex));
+      }
+
+      @Override
+      public void onPeerComplete(String m3u8Url, String peerPath, int peerIndex) {
+        super.onPeerComplete(m3u8Url, peerPath, peerIndex);
+        Log.i("AriaCallback", String.format("onPeerComplete m3u8Url:%s\npeerPath:%s\npeerIndex:%d", m3u8Url,peerPath,peerIndex));
+      }
+
+      @Override
+      public void onPeerFail(String m3u8Url, String peerPath, int peerIndex) {
+        super.onPeerFail(m3u8Url, peerPath, peerIndex);
+        Log.i("AriaCallback", String.format("onPeerFail m3u8Url:%s\npeerPath:%s\npeerIndex:%d", m3u8Url,peerPath,peerIndex));
+      }
+    });
+
+    Aria.download(this).setNormalTaskListener(TaskEnum.DOWNLOAD,new NormalTaskListener<DownloadTask>(){
+      @Override
+      public void onWait(DownloadTask task) {
+        super.onWait(task);
+        Log.i("AriaCallback", String.format("onWait key:%s", task.getKey()));
+      }
+
+      @Override
+      public void onPre(DownloadTask task) {
+        super.onPre(task);
+        Log.i("AriaCallback", String.format("onPre key:%s", task.getKey()));
+      }
+
+      @Override
+      public void onTaskPre(DownloadTask task) {
+        super.onTaskPre(task);
+        Log.i("AriaCallback", String.format("onTaskPre key:%s", task.getKey()));
+      }
+
+      @Override
+      public void onTaskResume(DownloadTask task) {
+        super.onTaskResume(task);
+        Log.i("AriaCallback", String.format("onTaskResume key:%s", task.getKey()));
+      }
+
+      @Override
+      public void onTaskStart(DownloadTask task) {
+        super.onTaskStart(task);
+        Log.i("AriaCallback", String.format("onTaskStart key:%s", task.getKey()));
+      }
+
+      @Override
+      public void onTaskStop(DownloadTask task) {
+        super.onTaskStop(task);
+        Log.i("AriaCallback", String.format("onTaskStop key:%s", task.getKey()));
+      }
+
+      @Override
+      public void onTaskCancel(DownloadTask task) {
+        super.onTaskCancel(task);
+        Log.i("AriaCallback", String.format("onTaskCancel key:%s", task.getKey()));
+      }
+
+      @Override
+      public void onTaskFail(DownloadTask task) {
+        super.onTaskFail(task);
+        Log.i("AriaCallback", String.format("onTaskFail key:%s", task.getKey()));
+      }
+
+      @Override
+      public void onTaskFail(DownloadTask task, Exception e) {
+        super.onTaskFail(task, e);
+        e.printStackTrace();
+        Log.i("AriaCallback", String.format("onTaskFailWithEx key:%s", task.getKey()));
+      }
+
+      @Override
+      public void onTaskComplete(DownloadTask task) {
+        super.onTaskComplete(task);
+        Log.i("AriaCallback", String.format("onTaskComplete key:%s", task.getKey()));
+      }
+
+      @Override
+      public void onTaskRunning(DownloadTask task) {
+        super.onTaskRunning(task);
+        Log.i("AriaCallback", String.format("onTaskRunning key:%s", task.getKey()));
+        Log.i("AriaCallback", String.format("onTaskRunning filePath:%s speed:%s percent:%d", task.getFilePath(),task.getEntity().getConvertSpeed(),task.getEntity().getPercent()));
+      }
+
+      @Override
+      public void onNoSupportBreakPoint(DownloadTask task) {
+        super.onNoSupportBreakPoint(task);
+        Log.i("AriaCallback", String.format("onNoSupportBreakPoint key:%", task.getKey()));
       }
     });
   }
