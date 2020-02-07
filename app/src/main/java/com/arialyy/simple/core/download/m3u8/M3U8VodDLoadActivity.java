@@ -138,7 +138,7 @@ public class M3U8VodDLoadActivity extends BaseActivity<ActivityM3u8VodBinding> {
                 mTaskId = -1;
             }
         });
-        Aria.download(this).setM3U8PeerTaskListener(TaskEnum.M3U8_PEER, new M3U8PeerTaskListener() {
+        Aria.download(this).setM3U8PeerTaskListener(null, TaskEnum.M3U8_PEER, new M3U8PeerTaskListener() {
             @Override
             public void onPeerStart(String m3u8Url, String peerPath, int peerIndex) {
                 super.onPeerStart(m3u8Url, peerPath, peerIndex);
@@ -158,7 +158,7 @@ public class M3U8VodDLoadActivity extends BaseActivity<ActivityM3u8VodBinding> {
             }
         });
 
-        Aria.download(this).setNormalTaskListener(TaskEnum.DOWNLOAD, new NormalTaskListener<DownloadTask>() {
+        Aria.download(this).setNormalTaskListener(null, TaskEnum.DOWNLOAD, new NormalTaskListener<DownloadTask>() {
             @Override
             public void onWait(DownloadTask task) {
                 super.onWait(task);
